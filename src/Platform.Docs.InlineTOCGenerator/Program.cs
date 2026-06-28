@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using CodeBrix.YamlParse.Serialization;
+using CodeBrix.YamlParse.Serialization.NamingConventions;
+using System;
 using System.IO;
 using System.Text;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace CodeBrix.Platform.Docs.InlineTOCGenerator //Was previously: Uno.Docs.InlineTOCGenerator
 {

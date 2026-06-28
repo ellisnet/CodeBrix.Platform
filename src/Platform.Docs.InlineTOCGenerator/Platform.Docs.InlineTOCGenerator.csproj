@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="YamlDotNet" Version="18.0.0" />
+		<PackageReference Include="CodeBrix.YamlParse.MitLicenseForever" Version="1.0.179.189" />
 	</ItemGroup>
 
 </Project>

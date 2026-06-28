@@ -14,10 +14,11 @@
 // limitations under the License.
 //
 // ******************************************************************
-using System;
-using CommonServiceLocator;
+
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
+using System;
+
+using SvcLocator = CodeBrix.ServiceLocator;
 
 namespace CodeBrix.Platform.Extensions // was previously: Uno.Extensions
 {
@@ -57,11 +58,11 @@ namespace CodeBrix.Platform.Extensions // was previously: Uno.Extensions
 
 		private static ILoggerFactory GetFactory()
 		{
-			if (ServiceLocator.IsLocationProviderSet)
+			if (SvcLocator.ServiceLocator.IsLocationProviderSet)
 			{
 				try
 				{
-					var service = ServiceLocator.Current.GetService(typeof(ILoggerFactory));
+					var service = SvcLocator.ServiceLocator.Current.GetService(typeof(ILoggerFactory));
 
 					if (service is ILoggerFactory factory)
 					{

@@ -1,22 +1,6 @@
-﻿using CommonServiceLocator;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CodeBrix.TestMocks.Mocking;
-using CodeBrix.Platform.Extensions;
-using CodeBrix.Platform.UI.DataBinding;
-using Microsoft.UI.Xaml.Data;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using CodeBrix.Platform.Extensions.Disposables;
-using System.ComponentModel;
-using CodeBrix.Platform.UI;
-using Microsoft.UI.Xaml;
-using System.Threading;
+﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CodeBrix.Platform.UI.Tests.AttachedPropagation //Was previously: Uno.UI.Tests.AttachedPropagation
 {

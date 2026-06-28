@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<!--
 	  In-repo replacement for the former Uno.Core.Extensions.Logging / .Logging.Singleton packages.
-	  These logging extensions depend on Microsoft.Extensions.Logging + CommonServiceLocator, which is
+	  These logging extensions depend on Microsoft.Extensions.Logging + CodeBrix.ServiceLocator, which is
 	  why they cannot be compiled into Uno.Foundation (it references neither). LogExtensionPoint also
 	  holds static singleton state (the ambient ILoggerFactory), so it MUST live in a single shared
 	  assembly rather than being compiled into each consumer. Projects that used the
@@ -26,6 +26,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
-		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+		<PackageReference Include="CodeBrix.ServiceLocator.MsplLicenseForever" Version="1.0.179.175" />
 	</ItemGroup>
 </Project>

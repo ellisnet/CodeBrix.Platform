@@ -1,24 +1,9 @@
-﻿using CommonServiceLocator;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using CodeBrix.TestMocks.Mocking;
-using CodeBrix.Platform.Extensions;
-using CodeBrix.Platform.UI.DataBinding;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using CodeBrix.Platform.Extensions.Disposables;
-using System.ComponentModel;
-using CodeBrix.Platform.UI;
-using Microsoft.UI.Xaml;
-using CodeBrix.Platform.UI.Converters;
-using Microsoft.Extensions.Logging;
-using Microsoft.UI.Xaml.Controls;
-using CodeBrix.Platform.UI.Xaml;
 
 namespace CodeBrix.Platform.UI.Tests.BinderTests.ManualPropagation //Was previously: Uno.UI.Tests.BinderTests.ManualPropagation
 {
