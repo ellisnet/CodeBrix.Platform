@@ -9,15 +9,15 @@
 using Android.Runtime;
 using Android.Views;
 using Android.Views.Accessibility;
-using Uno.Diagnostics.Eventing;
-using Uno.Disposables;
-using Uno.Extensions;
-using Uno.Foundation.Logging;
-using Uno.UI;
-using Uno.UI.DataBinding;
-using Uno.UI.Extensions;
-using Uno.UI.Helpers;
-using Uno.UI.Media;
+using CodeBrix.Platform.Diagnostics.Eventing;
+using CodeBrix.Platform.Extensions.Disposables;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.Foundation.Logging;
+using CodeBrix.Platform.UI;
+using CodeBrix.Platform.UI.DataBinding;
+using CodeBrix.Platform.UI.Extensions;
+using CodeBrix.Platform.UI.Helpers;
+using CodeBrix.Platform.UI.Media;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -32,7 +32,7 @@ using Microsoft.UI.Xaml.Media.Animation;
 using global::Microsoft.UI.Xaml.Input;
 using Point = Windows.Foundation.Point;
 using Action = global::System.Action;
-using Uno.UI.Xaml;
+using CodeBrix.Platform.UI.Xaml;
 
 <#
 	foreach(var mixin in _mixins) {

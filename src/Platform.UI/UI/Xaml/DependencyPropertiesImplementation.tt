@@ -13,7 +13,7 @@ using CodeBrix.Platform.Extensions.Disposables;
 using System.Runtime.CompilerServices;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Foundation.Logging;
-using Uno.UI;
+using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.DataBinding;
 using Windows.Foundation;
 using Microsoft.UI.Xaml;

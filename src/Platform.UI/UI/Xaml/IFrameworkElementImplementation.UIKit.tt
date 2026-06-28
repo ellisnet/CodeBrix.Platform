@@ -6,26 +6,26 @@
 #pragma warning disable 414
 
 using System;
-using Uno.Disposables;
+using CodeBrix.Platform.Extensions.Disposables;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using Uno.UI.DataBinding;
-using Uno.Extensions;
-using Uno.UI;
-using Uno.UI.Helpers;
-using Uno.UI.Media;
+using CodeBrix.Platform.UI.DataBinding;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.UI;
+using CodeBrix.Platform.UI.Helpers;
+using CodeBrix.Platform.UI.Media;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using UIKit;
 using CoreGraphics;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Uno.Foundation.Logging;
+using CodeBrix.Platform.Foundation.Logging;
 using Windows.Foundation;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Automation;
-using Uno.UI.Xaml;
+using CodeBrix.Platform.UI.Xaml;
 using ObjCRuntime;
 
 <#
