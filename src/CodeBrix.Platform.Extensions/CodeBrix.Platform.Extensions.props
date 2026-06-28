@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  Shared SOURCE (not a NuGet package) for the CodeBrix.Platform.Extensions.* helpers that were
+  formerly the nventive/Platform Platform "Uno.Core.Extensions" packages. CodeBrix.Platform compiles
+  this source directly into the assemblies that need it instead of referencing a package.
+
+  Provenance: the source matches the lineage of the rest of CodeBrix.Platform — the
+  Uno.Core.Extensions as vendored/customized in the main Uno Platform repo (6.5 lineage), namespace-
+  and identifier-renamed Uno.* -> CodeBrix.Platform.Extensions.* (e.g. CodeBrixGetValueOrDefault ->
+  PlatformGetValueOrDefault). License: Apache 2.0 (Uno Platform Inc / nventive), except the Roslyn/
+  .NET-runtime-derived helpers in Internal\ which are MIT (.NET Foundation). See THIRD-PARTY-NOTICES.txt.
+
+  This main props compiles everything EXCEPT Logging\ + LoggingSingleton\, which depend on
+  Microsoft.Extensions.Logging (not referenced by Uno.Foundation). Projects that need the logging
+  extensions import CodeBrix.Platform.Extensions.Logging.props in addition to this one.
+-->
+<Project>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)**\*.cs"
+             Exclude="$(MSBuildThisFileDirectory)Logging\**\*.cs;$(MSBuildThisFileDirectory)LoggingSingleton\**\*.cs;$(MSBuildThisFileDirectory)obj\**\*.cs;$(MSBuildThisFileDirectory)bin\**\*.cs"
+             Link="CodeBrix.Platform.Extensions\%(RecursiveDir)%(FileName)%(Extension)" />
+  </ItemGroup>
+</Project>

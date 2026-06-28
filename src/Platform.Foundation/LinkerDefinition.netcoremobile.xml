@@ -1,0 +1,7 @@
+﻿<linker>
+  <assembly fullname="CodeBrix.Platform.Foundation">
+	<type fullname="Windows.Foundation.Collections.ObservableVectorListWrapper" />
+	<type fullname="Windows.Foundation.Collections.ObservableVectorListWrapper" />
+	<type fullname="Windows.Foundation.Collections.ObservableVectorWrapper" />
+  </assembly>
+</linker>

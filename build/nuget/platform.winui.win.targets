@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+
+	<Target Name="_RemoveRoslynSourceGeneration" BeforeTargets="CoreCompile;XamlPreCompile">
+		<!---
+		If the users explicitly disables Roslyn source generation, remove the analyzer item which is automatically added by Nuget.
+		-->
+		<ItemGroup>
+			<_AnalyzerToRemove Include="@(Analyzer)" Condition="'%(FileName)'=='CodeBrix.Platform.UI.SourceGenerators'" />
+			<Analyzer Remove="@(_AnalyzerToRemove)"/>
+		</ItemGroup>
+	</Target>
+
+	<!--
+	List of packages that provide an codebrix-platform-runtime folder. Needed for WPF target.
+	-->
+	<ItemGroup Condition="'$(UseWPF)'=='True'">
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.UI" PackageBasePath="$(MSBuildThisFileDirectory).." Condition="'$(MSBuildThisFile)'=='codebrix.platform.ui.targets'" />
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.WinUI" PackageBasePath="$(MSBuildThisFileDirectory).." Condition="'$(MSBuildThisFile)'=='platform.winui.targets'" />
+	</ItemGroup>
+
+	<Import Project="platform.winui.runtime-replace.targets" />
+
+</Project>

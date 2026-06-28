@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Platform.ResourceTrimmingValidator": {
+      "commandName": "Project"
+    }
+  }
+}

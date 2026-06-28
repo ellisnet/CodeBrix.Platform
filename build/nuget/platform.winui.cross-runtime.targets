@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--
+  Cross-runtime libraries creation targets
+  -->
+	<Target Name="PrepareCodeBrixRuntimeProjectReferences" BeforeTargets="BeforeBuild">
+
+		<!--
+	Build the ProjectReference item group for CodeBrixRuntimeProjectReference items.
+	The references are added as non-referencing ProjectReferences to enable the inclusion
+	of their output in the final nuget package.
+	-->
+		<ItemGroup>
+			<ProjectReference Include="%(CodeBrixRuntimeProjectReference.Identity)">
+				<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+				<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+				<UndefineProperties>TargetFramework</UndefineProperties>
+			</ProjectReference>
+		</ItemGroup>
+
+	</Target>
+
+	<Target Name="ResolvePrepareCodeBrixRuntimeProjectReferences" AfterTargets="ResolveProjectReferences">
+
+		<!-- Execute CodeBrixRuntimeGetTargetPath for all CodeBrixRuntimeProjectReference to get their actual output -->
+		<MSBuild
+		  Projects="@(CodeBrixRuntimeProjectReference)"
+		  Targets="CodeBrixRuntimeGetTargetPath"
+		  BuildInParallel="$(BuildInParallel)"
+		  Properties="Configuration=$(Configuration);Platform=$(Platform);TargetFramework=$(TargetFramework)"
+		  ContinueOnError="!$(BuildingProject)">
+
+			<Output TaskParameter="TargetOutputs" ItemName="CodeBrixRuntimeProjectReferenceOutput" />
+		</MSBuild>
+
+		<ItemGroup>
+			<!-- Add the appropriate metadata to include those files -->
+			<CodeBrixRuntimeProjectReferenceOutput Update="@(CodeBrixRuntimeProjectReferenceOutput)">
+				<Pack>true</Pack>
+				<PackagePath>codebrix-platform-runtime/%(CodeBrixRuntimeIdentifier)</PackagePath>
+			</CodeBrixRuntimeProjectReferenceOutput>
+
+			<!-- Include symbols as well, if available -->
+			<CodeBrixRuntimeProjectReferenceOutput
+				Include="@(CodeBrixRuntimeProjectReferenceOutput->'%(rootdir)%(directory)%(filename).pdb')"
+				Condition="exists('%(rootdir)%(directory)%(filename).pdb')">
+				<Pack>true</Pack>
+				<PackagePath>codebrix-platform-runtime/%(CodeBrixRuntimeIdentifier)</PackagePath>
+			</CodeBrixRuntimeProjectReferenceOutput>
+
+		</ItemGroup>
+
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="@(CodeBrixRuntimeProjectReferenceOutput)" />
+		</ItemGroup>
+
+		<RemoveDuplicates Inputs="@(TfmSpecificPackageFile)">
+			<Output TaskParameter="Filtered" ItemName="FilteredCodeBrixRuntimeProjectReferenceOutput" />
+		</RemoveDuplicates>
+
+		<ItemGroup>
+			<TfmSpecificPackageFile Remove="@(TfmSpecificPackageFile)" />
+			<TfmSpecificPackageFile Include="@(FilteredCodeBrixRuntimeProjectReferenceOutput)" />
+		</ItemGroup>
+	</Target>
+
+	<!-- Target used to determine the outputs of a project alongs with its associated CodeBrixRuntimeIdentifier -->
+	<Target
+		Name="CodeBrixRuntimeGetTargetPath"
+		DependsOnTargets="GetTargetPath"
+		Returns="@(CodeBrixRuntimeTargetPathWithTargetPlatformMoniker)">
+
+		<ItemGroup>
+			<CodeBrixRuntimeTargetPathWithTargetPlatformMoniker
+				Include="@(TargetPathWithTargetPlatformMoniker)"
+				CodeBrixRuntimeIdentifier="$(CodeBrixRuntimeIdentifier.ToLower())" />
+		</ItemGroup>
+
+	</Target>
+
+</Project>

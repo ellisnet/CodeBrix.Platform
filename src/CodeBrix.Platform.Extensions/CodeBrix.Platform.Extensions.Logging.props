@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+  The CodeBrix.Platform.Extensions.Logging extensions (formerly Uno.Core.Extensions.Logging /
+  .Logging.Singleton). Split out from the main props because these depend on
+  Microsoft.Extensions.Logging, which Uno.Foundation does not reference. Projects that used the
+  Uno.Core.Extensions.Logging* packages import THIS props (in addition to getting the rest of the
+  helpers transitively from Uno.Foundation, or from the main props for standalone tools). The
+  importing project must have Microsoft.Extensions.Logging available (directly or transitively).
+-->
+<Project>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Logging\**\*.cs" Link="CodeBrix.Platform.Extensions\Logging\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)LoggingSingleton\**\*.cs" Link="CodeBrix.Platform.Extensions\LoggingSingleton\%(RecursiveDir)%(FileName)%(Extension)" />
+  </ItemGroup>
+</Project>

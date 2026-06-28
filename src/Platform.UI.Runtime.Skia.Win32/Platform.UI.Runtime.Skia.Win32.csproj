@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.Win32</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.Win32</RootNamespace>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj with the shared date-stamped version. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Title>CodeBrix.Platform.Runtime.Skia.Win32</Title>
+		<Description>Win32 Skia runtime host for CodeBrix.Platform applications.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever</PackageId>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+
+		<!-- Ignore NU5104 for net7.0 System.Drawing.Common -->
+		<NoWarn>$(NoWarn);NU5104</NoWarn>
+
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Web.WebView2" Aliases="mswebview2" PrivateAssets="all" />
+
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.296">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="HarfBuzzSharp" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Foundation is folded into the aggregate; compile against it but don't emit a
+		     (non-existent) standalone CodeBrix.Platform.Foundation package dependency. -->
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.Win32.Support\Platform.UI.Runtime.Skia.Win32.Support.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Pack the buildTransitive props/targets renamed to <PackageId>.props/.targets so
+		     NuGet auto-imports them for consumers (and to satisfy NU5129). -->
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Win32.props">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever.props</PackagePath>
+		</Content>
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Win32.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever.targets</PackagePath>
+		</Content>
+	</ItemGroup>
+
+	<!--
+	Workaround for Microsoft.Web.WebView2 1.0.3967+: the package's build/Common.targets
+	injects unaliased <Reference> items for lib_manual\*\Microsoft.Web.WebView2.*.dll,
+	which collide with Uno.UI's own CoreWebView2 facade types. The Aliases= attribute
+	on the PackageReference above only applies to NuGet's auto-resolved lib/*.dll refs,
+	not to the ones injected by the package's targets. We re-stamp the alias on every
+	Microsoft.Web.WebView2.* Reference so they all flow through the mswebview2 alias.
+	-->
+	<Target Name="_CodeBrixAliasWebView2References" BeforeTargets="ResolveAssemblyReferences">
+		<ItemGroup>
+			<Reference Update="@(Reference)" Aliases="mswebview2" Condition="$([System.String]::Copy('%(Filename)').StartsWith('Microsoft.Web.WebView2'))" />
+		</ItemGroup>
+	</Target>
+
+	<Target Name="_CodeBrixUpdateAdditionalAssemblies" AfterTargets="DispatchToInnerBuilds">
+		<ItemGroup>
+			<Content Include="../Platform.UI.Runtime.Skia.Win32.Support/bin/$(Configuration)/$(NetCurrent)/*.dll">
+				<Pack>true</Pack>
+				<PackagePath>lib/$(NetCurrent)</PackagePath>
+			</Content>
+			<Content Include="../Platform.UI.Runtime.Skia.Win32.Support/bin/$(Configuration)/$(NetCurrent)/*.pdb">
+				<Pack>true</Pack>
+				<PackagePath>lib/$(NetCurrent)</PackagePath>
+			</Content>
+		</ItemGroup>
+	</Target>
+
+</Project>

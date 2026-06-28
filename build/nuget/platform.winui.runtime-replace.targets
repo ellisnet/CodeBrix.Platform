@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Target used to override the codebrix-platform-runtime targets -->
+	<Target Name="ReplaceCodeBrixRuntime"
+				Condition="
+					'$(CodeBrixRuntimeIdentifier)' != '' 
+					OR ( 
+						'$(CodeBrixWinRTRuntimeIdentifier)' != '' 
+						AND '$(CodeBrixUIRuntimeIdentifier)' != ''
+					)"
+				BeforeTargets="_ComputeResolvedCopyLocalPublishAssets;ResolveLockFileCopyLocalFiles;ComputeFilesToPublish;GeneratePublishDependencyFile;ResolveLockFileReferences">
+
+		<PropertyGroup>
+			<!-- Compatibility with the single-layer runtime replace -->
+			<_LibraryCodeBrixRuntimeIdentifier>$(CodeBrixRuntimeIdentifier)</_LibraryCodeBrixRuntimeIdentifier>
+			<_LibraryCodeBrixRuntimeIdentifier Condition=" '$(_LibraryCodeBrixRuntimeIdentifier)' == '' ">$(CodeBrixUIRuntimeIdentifier)</_LibraryCodeBrixRuntimeIdentifier>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<_CodeBrixRuntimeEnabledPackage_EmptyPackageBasePath
+				Include="@(CodeBrixRuntimeEnabledPackage)"
+				Condition="'%(CodeBrixRuntimeEnabledPackage.PackageBasePath)'==''" />
+
+			<!-- 
+			Legacy convention: netstandard2.0 (codebrix-platform-runtime/**)
+			-->
+			<!-- Add the files for the current selected runtime identifier -->
+			<RuntimeCopyLocalItemsMerged
+							Include="%(CodeBrixRuntimeEnabledPackage.PackageBasePath)/codebrix-platform-runtime/$(_LibraryCodeBrixRuntimeIdentifier.ToLowerInvariant())/*.dll"
+							NuGetPackageId="%(CodeBrixRuntimeEnabledPackage.Identity)" />
+			<RuntimeCopyLocalItemsMerged
+				Include="%(CodeBrixRuntimeEnabledPackage.PackageBasePath)/../codebrix-platform-runtime/$(_LibraryCodeBrixRuntimeIdentifier.ToLowerInvariant())/*.dll"
+				NuGetPackageId="%(CodeBrixRuntimeEnabledPackage.Identity)" />
+
+			<!-- Add metadata so the .deps.json file is generated properly (.NET 5+) -->
+			<RuntimeCopyLocalItemsToUpdate
+				Include="@(RuntimeCopyLocalItemsMerged)"
+				AssetType="runtime"
+				CopyLocal="true"
+				DestinationSubPath="%(FileName)%(Extension)"
+				CopyToPublishDirectory="true"
+				PathInPackage="codebrix-platform-runtime/$(_LibraryCodeBrixRuntimeIdentifier.ToLowerInvariant())/%(FileName)%(Extension)" />
+
+			<!-- Publish pdb files -->
+			<ReferenceCopyLocalPaths Condition=" '$(Optimize)' != 'true' " Include="%(CodeBrixRuntimeEnabledPackage.PackageBasePath)/../codebrix-platform-runtime/$(_LibraryCodeBrixRuntimeIdentifier.ToLowerInvariant())/*.pdb" />
+			<ReferenceCopyLocalPaths Condition=" '$(Optimize)' != 'true' " Include="%(CodeBrixRuntimeEnabledPackage.PackageBasePath)/codebrix-platform-runtime/$(_LibraryCodeBrixRuntimeIdentifier.ToLowerInvariant())/*.pdb" />
+		</ItemGroup>
+
+		<!-- 
+		Cross-runtime convention: net7.0 or later (codebrix-platform-runtime/[TargetFramework]/**)
+		-->
+		<RuntimeAssetsSelectorTask_v0
+			CodeBrixRuntimeEnabledPackage="@(CodeBrixRuntimeEnabledPackage)"
+			CodeBrixRuntimeIdentifier="$(CodeBrixRuntimeIdentifier.ToLowerInvariant())"
+			CodeBrixWinRTRuntimeIdentifier="$(CodeBrixWinRTRuntimeIdentifier.ToLowerInvariant())"
+			CodeBrixUIRuntimeIdentifier="$(CodeBrixUIRuntimeIdentifier.ToLowerInvariant())"
+			ResolvedCompileFileDefinitionsInput="@(ResolvedCompileFileDefinitions)"
+			RuntimeCopyLocalItemsInput="@(RuntimeCopyLocalItems)"
+			NuGetPackageRoot="$(NuGetPackageRoot)"
+			TargetFrameworkVersion="$(TargetFrameworkVersion)">
+			<Output TaskParameter="RuntimeCopyLocalItemsToAdd" ItemName="RuntimeCopyLocalItemsMerged2" />
+			<Output TaskParameter="RuntimeCopyLocalItemsToRemove" ItemName="_RuntimeCopyLocalItemsToRemove" />
+			<Output TaskParameter="ResolvedCompileFileDefinitionsToAdd" ItemName="_ResolvedCompileFileDefinitionsToAdd" />
+			<Output TaskParameter="ResolvedCompileFileDefinitionsToRemove" ItemName="_ResolvedCompileFileDefinitionsToRemove" />
+			<!-- Publish PDB files-->
+			<Output TaskParameter="DebugSymbols" ItemName="ReferenceCopyLocalPaths" />
+		</RuntimeAssetsSelectorTask_v0>
+
+		<ItemGroup>
+			<!-- Add metadata so the .deps.json file is generated properly (.NET 5+) -->
+			<RuntimeCopyLocalItemsToUpdate
+				Include="@(RuntimeCopyLocalItemsMerged2)"
+				AssetType="runtime"
+				CopyLocal="true"
+				DestinationSubPath="%(FileName)%(Extension)"
+				CopyToPublishDirectory="true"
+				PathInPackage="%(PathInPackage)" />
+
+			<ResolvedCompileFileDefinitions Remove="@(_ResolvedCompileFileDefinitionsToRemove)" />
+			<ResolvedCompileFileDefinitions Include="@(_ResolvedCompileFileDefinitionsToAdd)" />
+			<RuntimeCopyLocalItems Remove="@(_RuntimeCopyLocalItemsToRemove)" />
+			<RuntimeCopyLocalItems Include="@(RuntimeCopyLocalItemsToUpdate)"/>
+		</ItemGroup>
+
+		<Error
+			Text="The package(s) [@(_CodeBrixRuntimeEnabledPackage_EmptyPackageBasePath)] do not define the CodeBrixRuntimeEnabledPackage.PackageBasePath metadata. Make sure to add one to specify the current location of the targets file."
+			Condition="'@(_CodeBrixRuntimeEnabledPackage_EmptyPackageBasePath)'!=''" />
+	</Target>
+
+	<Target Name="_CodeBrixValidateReferencesCodeBrixRuntimeIdentifier" BeforeTargets="CoreCompile">
+		<RuntimeAssetsValidatorTask_v0
+			CodeBrixUIRuntimeIdentifier="$(CodeBrixUIRuntimeIdentifier.ToLowerInvariant())"
+			CodeBrixRuntimeIdentifier="$(CodeBrixRuntimeIdentifier.ToLowerInvariant())"
+			RuntimeCopyLocalItemsInput="@(RuntimeCopyLocalItems)">
+		</RuntimeAssetsValidatorTask_v0>
+	</Target>
+
+	<!-- Force a rebuild on runtime files changes -->
+	<ItemGroup Condition="'$(CodeBrixRuntimeIdentifier)'!='' OR '$(CodeBrixUIRuntimeIdentifier)'!='' OR '$(CodeBrixWinRTRuntimeIdentifier)'!=''">
+		<UpToDateCheckInput Include="$(MSBuildThisFileDirectory)/../codebrix-platform-runtime/*" />
+	</ItemGroup>
+
+
+</Project>

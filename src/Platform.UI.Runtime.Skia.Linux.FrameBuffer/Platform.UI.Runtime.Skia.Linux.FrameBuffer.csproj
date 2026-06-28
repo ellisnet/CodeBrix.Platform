@@ -1,0 +1,62 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer</AssemblyName>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj with the shared date-stamped version. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Title>CodeBrix.Platform.Runtime.Skia.FrameBuffer</Title>
+		<Description>Linux framebuffer Skia runtime host for CodeBrix.Platform applications.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer</RootNamespace>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="HarfBuzzSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Pack the buildTransitive props/targets renamed to <PackageId>.props/.targets so
+		     NuGet auto-imports them for consumers (and to satisfy NU5129). -->
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.props">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever.props</PackagePath>
+		</Content>
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever.targets</PackagePath>
+		</Content>
+	</ItemGroup>
+
+</Project>

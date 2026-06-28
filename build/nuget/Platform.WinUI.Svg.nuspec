@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.Svg.ApacheLicenseForever</id>
+		<version>$codebrixversion$</version>
+		<title>CodeBrix.Platform.Svg</title>
+		<authors>Jeremy Ellis and contributors</authors>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<projectUrl>https://github.com/ellisnet/CodeBrix.Platform</projectUrl>
+		<license type="expression">Apache-2.0</license>
+		<icon>icon-codebrix-128.png</icon>
+		<readme>README.md</readme>
+		<description>
+			SVG rendering support (SvgImageSource on Skia targets) for CodeBrix.Platform applications.
+		</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+		<tags>svg;vector-graphics;skia;rendering;CodeBrix</tags>
+		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
+
+		<dependencies>
+			<group targetFramework="net10.0">
+				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
+				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="3.119.4" />
+				<dependency id="CodeBrix.SkiaSvg.MitLicenseForever" version="1.0.117" />
+				<dependency id="System.Json" version="4.7.1" />
+			</group>
+
+		</dependencies>
+
+		<references>
+			<group targetFramework="net10.0">
+				<reference file="CodeBrix.Platform.UI.Svg.dll" />
+			</group>
+		</references>
+	</metadata>
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+		<file src="..\..\src\AddIns\Platform.UI.Svg\bin\Platform.UI.Svg.Reference\Release\net10.0\CodeBrix.Platform.UI.Svg.dll" target="lib\net10.0" />
+
+		<!-- Build targets (renamed to <PackageId>.targets so NuGet auto-imports it). -->
+		<file src="..\..\src\AddIns\Platform.UI.Svg\buildTransitive\Platform.WinUI.Svg.targets" target="buildTransitive\CodeBrix.Platform.Svg.ApacheLicenseForever.targets" />
+
+		<!-- net10.0 Skia -->
+		<file src="..\..\src\AddIns\Platform.UI.Svg\Bin\Platform.UI.Svg.Skia\Release\net10.0\CodeBrix.Platform.UI.Svg.*" target="codebrix-platform-runtime\net10.0\skia" />
+
+	</files>
+</package>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+	
+		<!-- Wrap WinAppSDK detection until a stable property can be used -->
+		<_CodeBrixIsWinAppSDKDefined>false</_CodeBrixIsWinAppSDKDefined>
+		<_CodeBrixIsWinAppSDKDefined Condition="'$(WindowsAppSDKWinUI)'=='true' or '$(UseWinUITools)'=='true'">true</_CodeBrixIsWinAppSDKDefined>
+
+		<!-- This fork ships a single WinUI aggregate package; this entry is always it.
+		     (Was a filename check; the file is renamed to the package id at pack time.) -->
+		<_IsCodeBrixWinUIPackage>true</_IsCodeBrixWinUIPackage>
+	</PropertyGroup>
+
+	<!-- Sibling targets live next to this entry in buildTransitive/; reference them
+	     location-independently so this works as the root <id>.targets entry file. -->
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.common.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.cross-runtime.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
+
+	<!--
+		If SingleProject is set, we're in a 5.1 or earlier template.
+		Starting 5.2, `SingleProject` is named `CodeBrixSingleProject`
+	-->
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.single-project.targets" Condition=" $(SingleProject) == 'true' AND '$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.runtime-replace.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
+
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.winappsdk.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'=='true'" />
+
+</Project>

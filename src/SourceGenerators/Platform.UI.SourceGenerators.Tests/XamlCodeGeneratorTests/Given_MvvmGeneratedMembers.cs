@@ -1,0 +1,283 @@
+﻿using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
+using CommunityToolkit.Mvvm.SourceGenerators;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Testing;
+using CodeBrix.Platform.UI.SourceGenerators.Tests.Verifiers;
+
+namespace CodeBrix.Platform.UI.SourceGenerators.Tests; //Was previously: Uno.UI.SourceGenerators.Tests
+
+
+[TestClass]
+public class Given_MvvmGeneratedMembers
+{
+	private class MvvmTest : XamlSourceGeneratorVerifier.TestBase
+	{
+		private static readonly ImmutableArray<PackageIdentity> s_mvvmPackages = ImmutableArray.Create(new PackageIdentity("CommunityToolkit.Mvvm", "8.2.0"));
+
+		public MvvmTest(XamlFile xamlFile, string testMethodName, [CallerFilePath] string testFilePath = "") : base(xamlFile, testFilePath, testMethodName)
+		{
+			ReferenceAssemblies = ReferenceAssemblies.AddPackages(s_mvvmPackages);
+		}
+
+		public MvvmTest(XamlFile[] xamlFiles, string testMethodName, [CallerFilePath] string testFilePath = "") : base(xamlFiles, testFilePath, testMethodName)
+		{
+			ReferenceAssemblies = ReferenceAssemblies.AddPackages(s_mvvmPackages);
+		}
+
+		protected override IEnumerable<Type> GetSourceGenerators()
+		{
+			foreach (var generatorType in base.GetSourceGenerators())
+			{
+				yield return generatorType;
+			}
+
+			yield return typeof(ObservablePropertyGenerator);
+			yield return typeof(RelayCommandGenerator);
+		}
+	}
+
+	[TestMethod]
+	[DataRow("name")]
+	[DataRow("_name")]
+	[DataRow("m_name")]
+	public async Task When_ObservableProperty_AttributeExists(string fieldName)
+	{
+		var xamlFile = new XamlFile(
+			"MainPage.xaml",
+			"""
+			<Page x:Class="TestRepro.MainPage"
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+				<StackPanel>
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper()}" />
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper(), Mode=OneWay}" />
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper(), Mode=TwoWay, BindBack=ViewModel.MyBindBack}" />
+				</StackPanel>
+			</Page>
+			""");
+
+		var test = new MvvmTest(xamlFile, $"WOPAE_{fieldName}")
+		{
+			TestState =
+			{
+				Sources =
+				{
+					$$"""
+					using Microsoft.UI.Xaml.Controls;
+					using CommunityToolkit.Mvvm.ComponentModel;
+
+					namespace TestRepro
+					{
+						public sealed partial class MainPage : Page
+						{
+							public MyViewModel ViewModel = new MyViewModel();
+
+							public MainPage()
+							{
+								this.InitializeComponent();
+							}
+						}
+
+						public partial class MyViewModel : ObservableObject
+						{
+							[ObservableProperty]
+							private string {{fieldName}};
+
+							public void MyBindBack(string s) { }
+						}
+					}
+					"""
+				}
+			}
+		}.AddGeneratedSources();
+
+		await test.RunAsync();
+	}
+
+	[TestMethod]
+	public async Task When_Boolean_Observable_Property()
+	{
+		var xamlFile = new XamlFile(
+			"MainPage.xaml",
+			"""
+			<Page x:Class="TestRepro.MainPage"
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+				<StackPanel>
+					<ToggleSwitch IsOn="{x:Bind ViewModel.IsEnabled, Mode=TwoWay}" OnContent="Enabled" OffContent="Disabled"/>
+				</StackPanel>
+			</Page>
+			""");
+
+		var test = new MvvmTest(xamlFile, $"WBOP")
+		{
+			TestState =
+			{
+				Sources =
+				{
+					$$"""
+					using Microsoft.UI.Xaml.Controls;
+					using CommunityToolkit.Mvvm.ComponentModel;
+
+					namespace TestRepro
+					{
+						public sealed partial class MainPage : Page
+						{
+							public MyViewModel ViewModel = new MyViewModel();
+
+							public MainPage()
+							{
+								this.InitializeComponent();
+							}
+						}
+
+						public partial class MyViewModel : ObservableObject
+						{
+							[ObservableProperty]
+							private bool _isEnabled;
+						}
+					}
+					"""
+				}
+			}
+		}.AddGeneratedSources();
+
+		await test.RunAsync();
+	}
+
+	[TestMethod]
+	public async Task When_Nested_Boolean_Observable_Property()
+	{
+		var xamlFile = new XamlFile(
+			"MainPage.xaml",
+			"""
+			<Page x:Class="TestRepro.MainPage"
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+				<StackPanel>
+					<ToggleSwitch IsOn="{x:Bind ViewModel.SubModel.IsEnabled, Mode=TwoWay}" OnContent="Enabled" OffContent="Disabled"/>
+				</StackPanel>
+			</Page>
+			""");
+
+		var test = new MvvmTest(xamlFile, $"WNBOP")
+		{
+			TestState =
+			{
+				Sources =
+				{
+					$$"""
+					using Microsoft.UI.Xaml.Controls;
+					using CommunityToolkit.Mvvm.ComponentModel;
+
+					namespace TestRepro
+					{
+						public sealed partial class MainPage : Page
+						{
+							public MyViewModel ViewModel = new MyViewModel();
+
+							public MainPage()
+							{
+								this.InitializeComponent();
+							}
+						}
+
+						public partial class MyViewModel : ObservableObject
+						{
+							[ObservableProperty]
+							private MySubViewModel _subModel;
+						}
+
+						public partial class MySubViewModel : ObservableObject
+						{
+							[ObservableProperty]
+							private bool _isEnabled;
+						}
+					}
+					"""
+				}
+			}
+		}.AddGeneratedSources();
+
+		await test.RunAsync();
+	}
+
+	[TestMethod]
+	public async Task When_ObservableProperty_AttributeDoesNotExists()
+	{
+		// This test is an error scenario case.
+		// Despite the "name" field doesn't have ObservableProperty attribute, we still take its type into account
+		// and try to bind against "Name" property which won't exist.
+		var xamlFile = new XamlFile(
+			"MainPage.xaml",
+			"""
+			<Page x:Class="TestRepro.MainPage"
+					xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+				<StackPanel>
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper()}" />
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper(), Mode=OneWay}" />
+					<TextBlock Text="{x:Bind ViewModel.Name.ToUpper(), Mode=TwoWay, BindBack=ViewModel.MyBindBack}" />
+				</StackPanel>
+			</Page>
+			""");
+
+		var test = new MvvmTest(xamlFile, "WOPADNE")
+		{
+			TestState =
+			{
+				Sources =
+				{
+					$$"""
+					using Microsoft.UI.Xaml.Controls;
+					using CommunityToolkit.Mvvm.ComponentModel;
+
+					namespace TestRepro
+					{
+						public sealed partial class MainPage : Page
+						{
+							public MyViewModel ViewModel = new MyViewModel();
+
+							public MainPage()
+							{
+								this.InitializeComponent();
+							}
+						}
+
+						public partial class MyViewModel : ObservableObject
+						{
+							private string name;
+
+							public void MyBindBack(string s) { }
+						}
+					}
+					"""
+				}
+			}
+		}.AddGeneratedSources();
+		// The generated file path uses the build host's separator ('\' on Windows, '/' elsewhere) and a
+		// hash derived from the (cross-platform-stable) XAML file path; build it with Path.Combine so the
+		// expectation matches on every OS.
+		var generatedMainPage = System.IO.Path.Combine(
+			"CodeBrix.Platform.UI.SourceGenerators",
+			"CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator",
+			"MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs");
+		test.ExpectedDiagnostics.AddRange(new[]
+		{
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 74, 266, 74, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 96, 266, 96, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 118, 266, 118, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+		});
+
+		await test.RunAsync();
+	}
+}

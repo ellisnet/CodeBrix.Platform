@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemGroup>
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.Lottie.ApacheLicenseForever" PackageBasePath="$(MSBuildThisFileDirectory)" />
+	</ItemGroup>
+
+	<Target Name="_ValidateLottieDependencySkia"
+			BeforeTargets="Compile"
+			Condition="'$(IsCodeBrixHead)'=='true' and '$(CodeBrixRuntimeIdentifier)'=='Skia' and '$(CodeBrixDisableLottieSkiaVersionCheck)'==''">
+
+		<!--
+		Nuget does not support dynamic references in packages, and we need Skottie only for the Skia CodeBrixRuntime
+		We do the validation at runtime to determine if the SkiaSharp.Skottie package is referenced.
+		The SkiaSharp views requirement is satisfied by the CodeBrix.Platform.SkiaSharp.Views
+		package, which is a declared dependency of this package and needs no validation here.
+		-->
+
+		<ItemGroup>
+			<_SkottieRefs Include="@(ReferencePath)" Condition="'%(ReferencePath.NuGetPackageId)' == 'SkiaSharp.Skottie'" />
+		</ItemGroup>
+
+		<Error Condition="'@(_SkottieRefs)'==''" Text="The 'SkiaSharp.Skottie' NuGet Package (3.119.0 or later) must be referenced in the project. You can add &lt;PackageReference Include=&quot;SkiaSharp.Skottie&quot; Version=&quot;3.119.0&quot; /> to your project." />
+	</Target>
+</Project>

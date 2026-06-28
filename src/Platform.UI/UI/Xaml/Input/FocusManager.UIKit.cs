@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UIKit;
+using CodeBrix.Platform.UI.Extensions;
+using Microsoft.UI.Xaml.Controls;
+using Windows.UI.ViewManagement;
+using CodeBrix.Platform.UI.Xaml.Core;
+
+namespace Microsoft.UI.Xaml.Input
+{
+	public partial class FocusManager
+	{
+		private static void FocusNative(UIElement control)
+		{
+			var focusManager = VisualTree.GetFocusManagerForElement(control);
+			if (control?.CanBecomeFirstResponder == true &&
+				focusManager?.InitialFocus == false)  // Do not focus natively on initial focus so the soft keyboard is not opened
+			{
+				control.BecomeFirstResponder();
+			}
+		}
+	}
+}

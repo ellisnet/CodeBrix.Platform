@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<!-- There is no need to multi-target this test project -->
+		<!-- We keep it on the oldest supported TFM -->
+		<!-- Though we could use CodeBrixTargetFrameworkOverride to choose between NetPrevious and NetCurrent -->
+		<!-- As of writing this comment, we don't see a need to do that, so we keep it simple -->
+		<TargetFramework>$(NetCurrent)</TargetFramework>
+		<!-- {0} does not explicitly define the {1} base type in code behind. -->
+		<NoWarn>$(NoWarn);UXAML0002;CS1030</NoWarn>
+
+		<!-- We have a test that explicitly verifies backward compatibility when a namespace is not found and fuzzy matching should be used. -->
+		<CodeBrixEnableXamlFuzzyMatching>true</CodeBrixEnableXamlFuzzyMatching>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Product>$(AssemblyName) ($(TargetFramework))</Product>
+		<DefaultLanguage>en-US</DefaultLanguage>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);CODEBRIX_REFERENCE_API</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PRIResource Include="Resources.resw" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="StoryboardTargetTest.xaml" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.UI.Toolkit\Platform.UI.Toolkit.Reference.csproj" />
+		<ProjectReference Include="..\XamlGenerationTests.Core\XamlGenerationTests.Core.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+</Project>

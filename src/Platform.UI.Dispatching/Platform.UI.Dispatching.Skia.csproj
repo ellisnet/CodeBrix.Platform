@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Dispatching</AssemblyName>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX_UI_DISPATCHING_PROJECT</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RootNamespace>CodeBrix.Platform.UI.Dispatching</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX</DefineConstants>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Generated\3.0.0.0\" />
+	</ItemGroup>
+
+</Project>

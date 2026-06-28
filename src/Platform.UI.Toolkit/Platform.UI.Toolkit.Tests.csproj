@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Toolkit</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Toolkit</RootNamespace>
+		<Product>$(AssemblyName) ($(TargetFramework))</Product>
+		<DefaultLanguage>en-US</DefaultLanguage>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Tests.csproj">
+			<Name>CodeBrix.Platform.UI.Tests</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Platform.UWP\Platform.Tests.csproj">
+			<Name>CodeBrix.Platform.Tests</Name>
+		</ProjectReference>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Tests.csproj">
+			<Name>CodeBrix.Platform.Foundation.Tests</Name>
+		</ProjectReference>
+	</ItemGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<Target Name="_CodeBrixToolkitOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.ui\$(CodeBrixNugetOverrideVersion)\lib\$(_OverrideTargetFramework)</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+</Project>

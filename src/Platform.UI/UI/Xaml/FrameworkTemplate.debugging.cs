@@ -1,0 +1,34 @@
+﻿#if DEBUG
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.UI;
+using CodeBrix.Platform.UI.DataBinding;
+
+#if false
+using View = Android.Views.View;
+#elif false
+using View = UIKit.UIView;
+#else
+using View = Microsoft.UI.Xaml.UIElement;
+#endif
+
+namespace Microsoft.UI.Xaml
+{
+
+	public partial class FrameworkTemplate
+	{
+		/// <summary>
+		/// Debugging aid which returns the resource key associated with this resource, if it came from a <see cref="ResourceDictionary"/>.
+		/// </summary>
+		/// <remarks>Note: The DEBUG_SET_RESOURCE_SOURCE symbol must be set in <see cref="ResourceDictionary"/> for this to return a value.</remarks>
+		public string ResourceNameDebug => this.GetResourceNameDebug();
+
+		public ResourceDictionary? ContainingResourceDictionaryDebug => this.GetContainingResourceDictionaryDebug();
+	}
+}
+
+
+#endif

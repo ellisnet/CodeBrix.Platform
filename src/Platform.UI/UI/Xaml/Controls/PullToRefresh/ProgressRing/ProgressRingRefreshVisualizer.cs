@@ -1,0 +1,15 @@
+﻿using Microsoft.UI.Xaml.Controls;
+
+using WUXProgressRing = Microsoft.UI.Xaml.Controls.ProgressRing;
+
+namespace CodeBrix.Platform.UI.Xaml.Controls; //Was previously: Uno.UI.Xaml.Controls
+
+internal partial class ProgressRingRefreshVisualizer : RefreshVisualizer
+{
+	public ProgressRingRefreshVisualizer()
+	{
+		Content = ProgressRing;
+	}
+
+	internal WUXProgressRing ProgressRing { get; } = new WUXProgressRing();
+}

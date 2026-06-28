@@ -1,0 +1,124 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUWPOrWinUI)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Toolkit</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Toolkit</RootNamespace>
+		<DefaultLanguage>en-US</DefaultLanguage>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+
+		<!--
+		Required by Microsoft.WindowsAppSDK 1.6+ on .NET 10 SDK.
+		(Bumped from 1.0.0 because that version's CompileXaml task fails to load under .NET 10 SDK / VS 2026 MSBuild host.)
+		-->
+		<WindowsSdkPackageVersion>10.0.19041.38</WindowsSdkPackageVersion>
+
+		<!--
+		WindowsAppSDK MrtCore/AppxPackage MSBuild tasks live under
+		$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v18.0\AppxPackage\.
+		When run inside Visual Studio, $(MSBuildExtensionsPath) already resolves to the VS
+		MSBuild folder and the tasks load fine. When run via the standalone `dotnet build`
+		CLI, $(MSBuildExtensionsPath) resolves to the .NET SDK folder, where the AppxPackage
+		task DLLs are not present. Redirect $(MSBuildExtensionsPath) to the VS MSBuild folder
+		only for non-VS builds, when that VS folder actually exists on disk.
+		-->
+		<MSBuildExtensionsPath Condition=" '$(BuildingInsideVisualStudio)' != 'true'&#xD;&#xA;							AND Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\Microsoft.Build.AppxPackage.dll') ">$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\</MSBuildExtensionsPath>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">
+		<DefineConstants>$(DefineConstants);WINUI</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="Platform.UI\Behaviors\VisibleBoundsPadding.cs" />
+		<Compile Include="..\Platform.UI\Extensions\DependencyObjectExtensions.cs" Link="Platform.UI\Extensions\DependencyObjectExtensions.cs" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">
+		<ProjectReference Include="..\CodeBrix.Platform.Extensions\CodeBrix.Platform.Extensions.csproj" />
+
+		<Compile Include="..\Platform.UI\Extensions\PrettyPrint.cs" Link="Platform.UI\Extensions\PrettyPrint.cs" />
+		<Compile Include="..\Platform.UI\Extensions\ViewExtensions.visual-tree.cs" Link="Platform.UI\Extensions\ViewExtensions.visual-tree.cs" />
+		<Compile Include="..\Platform.UI\Extensions\UIElementExtensions.Debug.cs" Link="Platform.UI\Extensions\UIElementExtensions.Debug.cs" />
+
+		<Compile Include="..\Platform.UI\Helpers\XamlHelper.cs" Link="Platform.UI\Helpers\XamlHelper.cs" />
+		<Compile Include="..\Platform.UI\Helpers\ElementMetadataUpdateHandlerAttribute.cs" Link="Platform.UI\Helpers\ElementMetadataUpdateHandlerAttribute.cs" />
+		<Compile Include="..\Platform.UI\Helpers\TypeMappings.cs" Link="Platform.UI\Helpers\TypeMappings.cs" />
+
+		<!-- CodeBrix.Platform fork: Hot Reload `.cs` includes removed (Uno.UI.RemoteControl folder dropped). -->
+
+		<!--<Compile Include="..\Platform.UI\UI\Xaml\Media\VisualTreeHelper.crossruntime.cs" Link="Platform.UI\UI\Xaml\Media\VisualTreeHelper.crossruntime.cs" />-->
+		
+		<!-- Diagnostics overlay -->
+		<Compile Include="..\Platform.Foundation\Diagnostics\DiagnosticViewNotification.cs" Link="Platform.Foundation\Diagnostics\DiagnosticViewNotification.cs" />
+		<Compile Include="..\Platform.Foundation\Diagnostics\DiagnosticViewRegistry.cs" Link="Platform.Foundation\Diagnostics\DiagnosticViewRegistry.cs" />
+		<Compile Include="..\Platform.Foundation\Diagnostics\IDiagnosticView.cs" Link="Platform.Foundation\Diagnostics\IDiagnosticView.cs" />
+		<Compile Include="..\Platform.Foundation\Diagnostics\IDiagnosticViewContext.cs" Link="Platform.Foundation\Diagnostics\IDiagnosticViewContext.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticView.cs" Link="Platform.UI\Diagnostics\DiagnosticView.cs" /> 
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticView.Factories.cs" Link="Platform.UI\Diagnostics\DiagnosticView.Factories.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticView.TView.cs" Link="Platform.UI\Diagnostics\DiagnosticView.TView.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticView.TView.TState.cs" Link="Platform.UI\Diagnostics\DiagnosticView.TView.TState.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticViewHelper.cs" Link="Platform.UI\Diagnostics\DiagnosticViewHelper.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticViewManager.TView.cs" Link="Platform.UI\Diagnostics\DiagnosticViewManager.TView.cs" />
+		<Compile Include="..\Platform.UI\Diagnostics\DiagnosticViewManager.TView.TState.cs" Link="Platform.UI\Diagnostics\DiagnosticViewManager.TView.TState.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+
+		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4 " Condition="'$(CODEBRIX_UWP_BUILD)'=='true'" />
+
+		<PackageReference Include="PolySharp" Version="1.16.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+
+		<FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.19041.21" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+		<FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" TargetingPackVersion="10.0.19041.21" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+	</ItemGroup>
+
+	<!-- Override existing target, this project cannot be published -->
+	<Target Name="Publish" />
+
+	<Target Name="_CodeBrixToolkitOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_OverrideTargetFramework Condition="'$(_OverrideTargetFramework)' == 'uap10.0.19041'">UAP</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.winui\$(CodeBrixNugetOverrideVersion)\lib\$(_OverrideTargetFramework)</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+	<!-- https://github.com/microsoft/microsoft-ui-xaml/issues/4503 -->
+	<Target Name="_CalculateXbfSupport" Condition="'$(TargetFramework)'=='uap10.0.19041'" />
+
+	<!-- CodeBrix.Platform fork: this project references no Microsoft.Testing.Platform
+	     package, so it has no real `_MTPBuild` target. `dotnet test <slnx>` invokes that
+	     target solution-wide and fails this project with MSB4057. This no-op satisfies the
+	     CLI; the project legitimately has no MTP tests to run. -->
+	<Target Name="_MTPBuild" />
+
+</Project>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemGroup>
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.Svg.ApacheLicenseForever" PackageBasePath="$(MSBuildThisFileDirectory)" />
+	</ItemGroup>
+
+	<!--
+	CodeBrix.Platform fork: the upstream consumer-side validation target was removed.
+	The SkiaSharp views and SVG-rendering requirements are satisfied by the
+	CodeBrix.Platform.SkiaSharp.Views and CodeBrix.SkiaSvg.MitLicenseForever packages,
+	which are declared dependencies of this package and need no validation here.
+	(Upstream demanded a consumer reference to Svg.Skia, which this fork's
+	implementation no longer uses.)
+	-->
+</Project>

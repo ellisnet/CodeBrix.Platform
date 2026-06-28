@@ -1,0 +1,5 @@
+<Project>
+	<ItemGroup>
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.WinRT" PackageBasePath="$(MSBuildThisFileDirectory).." />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<ItemGroup>
+		<CodeBrixRuntimeEnabledPackage Include="codebrix.platform.ui.xamlhost" PackageBasePath="$(MSBuildThisFileDirectory)" Condition="'$(MSBuildThisFile)'=='codebrix.platform.ui.xamlhost.props'" />
+		<CodeBrixRuntimeEnabledPackage Include="codebrix.platform.winui.xamlhost" PackageBasePath="$(MSBuildThisFileDirectory)" Condition="'$(MSBuildThisFile)'=='codebrix.platform.winui.xamlhost.props'" />
+	</ItemGroup>
+
+</Project>

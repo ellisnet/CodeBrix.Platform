@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.Foundation</AssemblyName>
+		<RootNamespace>Windows.Foundation</RootNamespace>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.Foundation</CommonOverridePackageId>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<ItemGroup>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\CodeBrix.Platform.Extensions\CodeBrix.Platform.Extensions.props" />
+
+</Project>

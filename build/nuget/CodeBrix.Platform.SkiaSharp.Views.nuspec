@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever</id>
+		<!--
+		The version of this package is deliberately tied to the SkiaSharp version it
+		vendors, NOT the CodeBrix.Platform family version. It is hard-coded here (not
+		set by CI) and bumped only together with $(SkiaSharpVersion). The fourth
+		version segment is reserved for glue-only fixes between SkiaSharp bumps.
+		See src/AddIns/CodeBrix.Platform.SkiaSharp.Views/PORTING-NOTES.md.
+		-->
+		<version>3.119.4</version>
+		<title>CodeBrix.Platform.SkiaSharp.Views</title>
+		<authors>Jeremy Ellis and contributors</authors>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<projectUrl>https://github.com/ellisnet/CodeBrix.Platform</projectUrl>
+		<license type="expression">MIT</license>
+		<icon>icon-codebrix-128.png</icon>
+		<readme>README.md</readme>
+		<description>
+			SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications.
+			Vendored from SkiaSharp v3.119.4 (MIT) and compiled against CodeBrix.Platform.
+		</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</copyright>
+		<tags>skiasharp;skia;views;canvas;skxamlcanvas;CodeBrix</tags>
+		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
+
+		<dependencies>
+			<group targetFramework="net10.0">
+				<dependency id="SkiaSharp" version="3.119.4" exclude="Build,Analyzers" />
+				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
+			</group>
+		</dependencies>
+	</metadata>
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+
+		<!-- The real (Skia) implementation ships directly in lib; no reference/codebrix-platform-runtime split. -->
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.pdb" target="lib\net10.0" />
+	</files>
+</package>

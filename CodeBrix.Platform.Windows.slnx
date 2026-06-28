@@ -1,0 +1,128 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path=".globalconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="NuGet.Config" />
+    <File Path="THIRD-PARTY-NOTICES.txt" />
+    <File Path="version.json" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="src/Platform.Foundation/Platform.Foundation.csproj" />
+    <Project Path="src/Platform.Foundation/Platform.Foundation.Reference.csproj" />
+    <Project Path="src/Platform.Foundation/Platform.Foundation.Skia.csproj" />
+    <Project Path="src/Platform.Foundation.Logging/Platform.Foundation.Logging.csproj" />
+    <Project Path="src/CodeBrix.Platform.Extensions/CodeBrix.Platform.Extensions.csproj" />
+    <Project Path="src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+    <Project Path="src/Platform.UI.Composition/Platform.UI.Composition.Reference.csproj" />
+    <Project Path="src/Platform.UI.Composition/Platform.UI.Composition.Skia.csproj" />
+    <Project Path="src/Platform.UI.Dispatching/Platform.UI.Dispatching.Reference.csproj" />
+    <Project Path="src/Platform.UI.Dispatching/Platform.UI.Dispatching.Skia.csproj" />
+    <Project Path="src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+  </Folder>
+  <Folder Name="/UWP/">
+    <Project Path="src/Platform.UWP/Platform.Reference.csproj" />
+    <Project Path="src/Platform.UWP/Platform.Skia.csproj" />
+  </Folder>
+  <Folder Name="/UI/">
+    <Project Path="src/Platform.UI/Platform.UI.Reference.csproj" />
+    <Project Path="src/Platform.UI/Platform.UI.Skia.csproj" />
+    <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj" />
+    <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
+    <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Windows.csproj" />
+    <Project Path="src/Platform.UI.XamlHost/Platform.UI.XamlHost.Reference.csproj" />
+    <Project Path="src/Platform.UI.XamlHost/Platform.UI.XamlHost.Skia.csproj" />
+    <Project Path="src/Platform.UI.XamlHost.Skia.Wpf/Platform.UI.XamlHost.Skia.Wpf.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Reference.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Skia.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Reference.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Skia.csproj" />
+  </Folder>
+  <Folder Name="/Runtime/">
+    <Project Path="src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.X11/Platform.UI.Runtime.Skia.X11.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/src/">
+    <File Path="src/Directory.Build.props" />
+    <File Path="src/Directory.Build.targets" />
+  </Folder>
+  <Folder Name="/Source Generators/">
+    <Project Path="src/SourceGenerators/System.Xaml/Platform.Xaml.csproj" />
+    <Project Path="src/SourceGenerators/Platform.UI.SourceGenerators/Platform.UI.SourceGenerators.csproj" />
+    <Project Path="src/SourceGenerators/Platform.UI.SourceGenerators.Internal/Platform.UI.SourceGenerators.Internal.csproj" />
+    <Project Path="src/SourceGenerators/Platform.UI.Tasks/Platform.UI.Tasks.csproj" />
+    <Project Path="src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj" />
+  </Folder>
+  <Folder Name="/AddIns/">
+    <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Reference.csproj" />
+    <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj" />
+    <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.Win32/Platform.UI.MediaPlayer.Skia.Win32.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.X11/Platform.UI.MediaPlayer.Skia.X11.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Reference.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Windows.csproj" />
+    <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Reference.csproj" />
+    <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebView.Skia.X11/Platform.UI.WebView.Skia.X11.csproj" />
+    <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+    <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Windows.csproj" />
+    <Project Path="src/AddIns/Platform.WinUI.Graphics3DGL/Platform.WinUI.Graphics3DGL.csproj" />
+  </Folder>
+  <Folder Name="/Tools/">
+    <Project Path="src/Platform.Analyzers/Platform.Analyzers.csproj" />
+    <Project Path="src/Platform.Docs.InlineTOCGenerator/Platform.Docs.InlineTOCGenerator.csproj" />
+    <Project Path="src/Platform.NUnitTransformTool/Platform.NUnitTransformTool.csproj" />
+    <Project Path="src/Platform.ReferenceImplComparer/Platform.ReferenceImplComparer.csproj" />
+    <Project Path="src/Platform.UWPSyncGenerator/Platform.UWPSyncGenerator.csproj" />
+    <!--I don't think I need this: <Project Path="src/Platform.UWPSyncGenerator.Reference/Platform.UWPSyncGenerator.Reference.csproj" />-->
+    <Project Path="src/Platform.ResourceTrimmingValidator/Platform.ResourceTrimmingValidator.csproj" />
+    <Project Path="src/Platform.XamlTrimmingValidator/Platform.XamlTrimmingValidator.csproj" />
+    <Project Path="tools/ResourcesExtractor/ResourcesExtractor/ResourcesExtractor.csproj">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="src/Platform.UI.Tests/Platform.UI.Unit.Tests.csproj" />
+    <Project Path="src/Platform.UI.Tests.ViewLibrary/Platform.UI.Tests.ViewLibrary.csproj" />
+    <Project Path="src/Platform.UI.Tests.ViewLibraryProps/Platform.UI.Tests.ViewLibraryProps.csproj" />
+    <Project Path="src/Platform.UI/Platform.UI.Tests.csproj" />
+    <Project Path="src/Platform.UWP/Platform.Tests.csproj" />
+    <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj" />
+    <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Windows.csproj" />
+    <Project Path="src/Platform.Foundation/Platform.Foundation.Tests.csproj" />
+    <Project Path="src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj" />
+    <Project Path="src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Tests.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Tests.csproj" />
+    <Project Path="src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Tests.csproj" />
+    <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
+    <!-- CodeBrix.Platform fork: the upstream System.Xaml.Tests.MS (net461) and Uno.Xaml.Tests
+         (net462) conformance-test projects were removed entirely — CodeBrix.Platform does not
+         support .NET Framework 4.x. They compared Uno.Xaml against Microsoft's reference
+         System.Xaml.dll; recover them from upstream uno (or git history) if that conformance
+         work is ever needed. -->
+    <Project Path="src/SourceGenerators/Platform.UI.SourceGenerators.Tests/Platform.UI.SourceGenerators.Tests.csproj" />
+    <!-- CodeBrix.Platform fork: XamlGenerationTests + Core excluded from the solution.
+         The test XAML fixtures have upstream-inherited authoring issues (Style.PartialOverride,
+         legacy Setter syntax inside VisualState.Setters) that the modern XAML generator
+         validates strictly. Upstream's CI doesn't build these projects directly either —
+         the XAML files are exercised through Uno.UI.SourceGenerators.Tests' snapshot harness.
+         Build them standalone via `dotnet build src/SourceGenerators/XamlGenerationTests/...`
+         if you're iterating on the XAML generator. -->
+    <Project Path="src/Platform.Analyzers.Tests/Platform.Analyzers.Tests.csproj" />
+  </Folder>
+</Solution>

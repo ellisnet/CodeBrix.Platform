@@ -1,0 +1,17 @@
+<Project>
+
+	<!--
+	CodeBrix.Platform fork: .NET 10 only.
+	Platform-agnostic projects that import this file will resolve TargetFrameworks
+	to plain net10.0 regardless of what CodeBrixTargetFrameworkOverride was set to.
+	The upstream net9.0 branch was removed.
+	-->
+	<Choose>
+		<When Condition="$(CodeBrixTargetFrameworkOverride.StartsWith('net10.0'))">
+			<PropertyGroup>
+				<TargetFrameworks>net10.0</TargetFrameworks>
+			</PropertyGroup>
+		</When>
+	</Choose>
+
+</Project>

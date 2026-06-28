@@ -1,0 +1,91 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.MacOS</AssemblyName>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<DefineConstants>CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA</DefineConstants>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj with the shared date-stamped version. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Title>CodeBrix.Platform.Runtime.Skia.MacOS</Title>
+		<Description>macOS Skia runtime host for CodeBrix.Platform applications.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.MacOS</RootNamespace>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
+		<PackageReference Include="HarfBuzzSharp" />
+		<PackageReference Include="SkiaSharp" />
+    <PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.178.348" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<_XcodeBuildArgs Condition="'$(Configuration)'=='Debug'">build-for-testing -scheme CodeBrixNativeMac</_XcodeBuildArgs>
+
+		<!-- The native macOS dylib is built by Xcode. In this project's setup full Xcode
+		     only exists on Apple Silicon, so default to building the native lib only there.
+		     On an Intel Mac (Command Line Tools, no xcodebuild) the native step is skipped
+		     so `dotnet build` / `dotnet test` still smoke-test the managed code.
+		     NuGet packaging is always done on Apple Silicon, where this runs as before.
+		     Override either way with -p:BuildNativeMac=true|false. -->
+		<BuildNativeMac Condition="'$(BuildNativeMac)' == '' and $([MSBuild]::IsOsPlatform('OSX')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</BuildNativeMac>
+		<BuildNativeMac Condition="'$(BuildNativeMac)' == ''">false</BuildNativeMac>
+	</PropertyGroup>
+
+	<Target Name="BuildCodeBrixNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' == 'true'">
+		<Exec Command="$(MSBuildThisFileDirectory)PlatformNativeMac/build.sh $(_XcodeBuildArgs)" WorkingDirectory="$(MSBuildThisFileDirectory)PlatformNativeMac/" />
+	</Target>
+
+	<Target Name="_ReportSkippedNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' != 'true' and $([MSBuild]::IsOsPlatform('OSX'))">
+		<Message Importance="high" Text="Skipping native macOS build (BuildNativeMac=false — e.g. Intel Mac without Xcode). Managed build only; libCodeBrixNativeMac.dylib will be absent, so native-dependent tests won't run here." />
+	</Target>
+
+	<ItemGroup>
+		<None Include="$(MSBuildThisFileDirectory)PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.*" PackagePath="runtimes/osx/native" Pack="true" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Pack the buildTransitive props/targets renamed to <PackageId>.props/.targets so
+		     NuGet auto-imports them for consumers (and to satisfy NU5129). -->
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.MacOS.props">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.props</PackagePath>
+		</Content>
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.MacOS.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.targets</PackagePath>
+		</Content>
+	</ItemGroup>
+
+</Project>

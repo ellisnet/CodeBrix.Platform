@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Composition</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Composition</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX</DefineConstants>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UWP\Platform.Tests.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Tests.csproj" />
+	</ItemGroup>
+</Project>

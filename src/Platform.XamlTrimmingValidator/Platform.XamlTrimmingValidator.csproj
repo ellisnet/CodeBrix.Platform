@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.XamlTrimmingValidator</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.XamlTrimmingValidator</RootNamespace>
+	</PropertyGroup>
+
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>$(NetCurrent)</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.165.386" />
+    <PackageReference Include="CodeBrix.ArgumentParser.MitLicenseForever" Version="1.0.165.286" />
+  </ItemGroup>
+
+</Project>

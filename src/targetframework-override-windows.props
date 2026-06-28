@@ -1,0 +1,17 @@
+<Project>
+
+	<!--
+	CodeBrix.Platform fork: .NET 10 only.
+	Wpf-specific projects that import this file get net10.0-windows when building
+	with CodeBrixTargetFrameworkOverride starting with net10.0 (the only Net*Current we ship).
+	The upstream net9.0 branch was removed.
+	-->
+	<Choose>
+		<When Condition="$(CodeBrixTargetFrameworkOverride.StartsWith('net10.0'))">
+			<PropertyGroup>
+				<TargetFrameworks>net10.0-windows</TargetFrameworks>
+			</PropertyGroup>
+		</When>
+	</Choose>
+
+</Project>

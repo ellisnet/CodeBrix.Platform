@@ -1,0 +1,78 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.SourceGenerators.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.SourceGenerators.Tests</RootNamespace>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<!-- There is no need to multi-target this test project -->
+		<!-- We keep it on the oldest supported TFM -->
+		<!-- Though we could use CodeBrixTargetFrameworkOverride to choose between NetPrevious and NetCurrent -->
+		<!-- As of writing this comment, we don't see a need to do that, so we keep it simple -->
+		<TargetFramework>$(NetCurrent)</TargetFramework>
+		<IsPackable>false</IsPackable>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<EnableAutomaticXamlPageInclusion>false</EnableAutomaticXamlPageInclusion>
+		<OutputType>Exe</OutputType>
+
+		<!-- We need all the intermediate assemblies -->
+		<DisablePrivateProjectReference>true</DisablePrivateProjectReference>
+
+	</PropertyGroup>
+
+	<ItemGroup Label="GlobalUsings">
+		<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+		<Using Include="SilverAssertions" />
+		<Using Include="SilverAssertions.Execution" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="Results\**\*.*" />
+		<None Include="Results\**\*.*" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="**\*.xaml.cs" />
+		<None Include="**\*.xaml.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MSTest" />
+		<PackageReference Include="coverlet.collector" Version="10.0.1">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.CodeAnalysis" Version="5.3.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.Features" Version="5.3.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.3.0" />
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.4" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
+		<PackageReference Include="NuGet.Packaging" />
+		<Reference Include="$(NuGetPackageRoot)\communitytoolkit.mvvm\$(CommunityToolkitMvvmVersion)\analyzers\dotnet\roslyn4.3\cs\CommunityToolkit.Mvvm.SourceGenerators.dll" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj" />
+		<ProjectReference Include="..\Platform.UI.SourceGenerators.Internal\Platform.UI.SourceGenerators.Internal.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="XamlCodeGeneratorTests\Out\**\*.cs" />
+		<EmbeddedResource Include="XamlCodeGeneratorTests\Out\**\*.cs" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
+	</ItemGroup>
+
+	<!-- Disabled as tests explicitly use WinUI types -->
+	<ItemGroup Condition="'$(CODEBRIX_UWP_BUILD)'=='true'">
+		<Compile Remove="_Dotnet.cs" />
+		<Compile Remove="DependencyObjectGeneratorTests\Given_DependencyObjectGenerator.cs" />
+		<Compile Remove="DependencyPropertyGeneratorTests\Given_DependencyPropertyGenerator.cs" />
+		<Compile Remove="ImplementedRoutedEventsGeneratorTests\Given_ImplementedRoutedEventsGenerator.cs" />
+		<Compile Remove="Verifiers\CSGenerator.cs" />
+		<Compile Remove="Verifiers\CSHelper.cs" />
+		<Compile Remove="XamlCodeGeneratorTests\**\*.cs" />
+	</ItemGroup>
+</Project>

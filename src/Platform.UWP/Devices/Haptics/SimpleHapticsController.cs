@@ -1,0 +1,22 @@
+﻿namespace Windows.Devices.Haptics
+{
+	public partial class SimpleHapticsController
+	{
+		internal SimpleHapticsController()
+		{
+			InitPlatform();
+		}
+
+		partial void InitPlatform();
+
+#if __SKIA__
+		public bool IsIntensitySupported => false;
+
+		public bool IsPlayCountSupported => false;
+
+		public bool IsPlayDurationSupported => false;
+
+		public bool IsReplayPauseIntervalSupported => false;
+#endif
+	}
+}

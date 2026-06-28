@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+		<CodeBrixDisableTargetFrameworkPlatformOverride>true</CodeBrixDisableTargetFrameworkPlatformOverride>
+	</PropertyGroup>
+	<Import Project="../../targetframework-override.props" />
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.WinUI.Graphics2DSK</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.WinUI.Graphics2DSK</RootNamespace>
+
+		<Nullable>enable</Nullable>
+		
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);CROSSRUNTIME</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" PrivateAssets="all" />
+	</ItemGroup>
+	
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+</Project>

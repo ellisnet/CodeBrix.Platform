@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Tasks</AssemblyName>
+	</PropertyGroup>
+
+	<Import Project="AssemblyName.props" />
+	<PropertyGroup>
+		<!--
+		CodeBrix.Platform fork: retargeted netstandard2.0 → $(NetCurrent). The old
+		"MSBuild tasks should be netstandard2.0" convention existed to let one task
+		assembly load into both .NET Framework MSBuild (the Visual Studio classic
+		engine) and dotnet MSBuild. This fork supports dotnet builds only, and the
+		Microsoft.Build 18.x packages no longer ship netstandard2.0 assets (the old
+		setup silently fell back to their net472 assets — the source of NU1701).
+		-->
+		<TargetFramework>$(NetCurrent)</TargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<RootNamespace>CodeBrix.Platform.UI.Tasks</RootNamespace>
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>portable</DebugType>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Build" Version="18.7.1" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build.Framework" Version="18.7.1" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.7.1" ExcludeAssets="runtime" />
+		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.7.1" ExcludeAssets="runtime" />
+		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.165.386" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\Platform.UWP\ApplicationModel\Resources\Core\ResourceCandidate.cs">
+			<Link>Resources\ResourceCandidate.cs</Link>
+		</Compile>
+		<Compile Include="..\..\Platform.UWP\ApplicationModel\Resources\Core\ResourceQualifier.cs">
+			<Link>Resources\ResourceQualifier.cs</Link>
+		</Compile>
+		<Compile Include="..\..\Platform.UWP\Helpers\AndroidResourceNameEncoder.cs">
+			<Link>Resources\AndroidResourceNameEncoder.cs</Link>
+		</Compile>
+		<Compile Include="..\Platform.UI.SourceGenerators\BindableTypeProviders\LinkerHintsHelpers.cs" Link="Helpers\LinkerHintsHelpers.cs" />
+		<!-- CodeBrix.Platform fork: HotReloadInfoHelper.cs Compile removed (Uno.UI.RemoteControl folder dropped). -->
+	</ItemGroup>
+
+	<Target Name="_copyCodeBrixTasksBuildTime" AfterTargets="Build">
+		<ItemGroup>
+			<_codebrixTasksFiles Include="$(OutputPath)\*.*" />
+		</ItemGroup>
+		<!--
+		Copy the files to an alternal location, using deterministic build.
+		Don't fail the build if the file is locked
+		-->
+		<Copy SkipUnchangedFiles="true" SourceFiles="@(_codebrixTasksFiles)" DestinationFolder="$(OutputPath)\..\$(Configuration)_Shadow" Retries="1" RetryDelayMilliseconds="500" ContinueOnError="true" />
+	</Target>
+
+	<Target Name="_CodeBrixToolkitOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_PackageId>codebrix.platform.ui</_PackageId>
+			<_PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">codebrix.platform.winui</_PackageId>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\$(_PackageId)\$(CodeBrixNugetOverrideVersion)\buildTransitive\Platform.UI.Tasks</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+</Project>

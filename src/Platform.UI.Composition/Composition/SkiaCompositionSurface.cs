@@ -1,0 +1,20 @@
+﻿#nullable enable
+
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.Foundation.Logging;
+using Windows.Graphics;
+
+namespace Microsoft.UI.Composition
+{
+	internal partial class SkiaCompositionSurface : ICompositionSurface
+	{
+		internal SkiaCompositionSurface()
+		{
+		}
+	}
+}

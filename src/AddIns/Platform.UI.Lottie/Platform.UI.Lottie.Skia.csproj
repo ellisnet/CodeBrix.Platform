@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<Deterministic>true</Deterministic>
+
+		<AssemblyName>CodeBrix.Platform.UI.Lottie</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Lottie</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+		<Nullable>enable</Nullable>
+
+		<DefineConstants>$(DefineConstants);HAS_SKOTTIE</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+
+		<PackageReference Include="SkiaSharp.Skottie" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+		<ProjectReference Include="..\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<Target Name="_CodeBrixUILottieOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_overridePackageId>codebrix.platform.ui.lottie</_overridePackageId>
+			<_overridePackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">codebrix.platform.winui.lottie</_overridePackageId>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\$(_overridePackageId)\$(CodeBrixNugetOverrideVersion)\codebrix-platform-runtime\$(TargetFramework)\$(CodeBrixRuntimeIdentifier.ToLowerInvariant())</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+</Project>

@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	  In-repo base ASSEMBLY for the CodeBrix.Platform.Extensions.* helpers (formerly the
+	  Uno.Core.Extensions base packages). Most of the solution gets these types by COMPILING the source
+	  in (Uno.Foundation + the source generators import CodeBrix.Platform.Extensions.props directly,
+	  which is required for the analyzers and preserves Uno.Foundation's InternalsVisibleTo graph).
+
+	  This project exists ONLY for consumers that historically referenced the Uno.Core.Extensions NuGet
+	  packages and do NOT reference Uno.Foundation — i.e. the WinAppSDK ("*.Windows") flavors and the
+	  standalone Uno.UWPSyncGenerator tool. They reference THIS assembly instead of the old packages.
+	  No project references both this assembly and Uno.Foundation, so there is no duplicate-type clash.
+
+	  ImplicitUsings is enabled to match how Uno.Foundation compiles the same source.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetCurrent)</TargetFrameworks>
+		<AssemblyName>CodeBrix.Platform.Extensions</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.Extensions</RootNamespace>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<Import Project="CodeBrix.Platform.Extensions.props" />
+
+	<!-- These consumers historically used internal helpers (IndentedStringBuilder, Disposable, ...) from
+	     the Uno.Core.Extensions packages; grant them access, mirroring Uno.Foundation's internal+IVT model. -->
+	<ItemGroup>
+		<InternalsVisibleTo Include="CodeBrix.Platform.UWPSyncGenerator" />
+		<InternalsVisibleTo Include="CodeBrix.Platform.UI.RuntimeTests" />
+		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Toolkit" />
+	</ItemGroup>
+</Project>

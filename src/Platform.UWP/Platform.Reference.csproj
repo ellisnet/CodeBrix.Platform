@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform</AssemblyName>
+		<RootNamespace>Windows</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX;HAS_UMBRELLA_UI;HAS_UMBRELLA_BINDING;HAS_CRIPPLEDREFLECTION</DefineConstants>
+		<CodeBrixDisableAnalyzersForSamples>true</CodeBrixDisableAnalyzersForSamples>
+
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Reference</CodeBrixRuntimeIdentifier>
+		
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\Platform.UI.Dispatching\Platform.UI.Dispatching.Reference.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\UI\Input\WinRT\*.cs" />
+		<Compile Include="..\Platform.UI\UI\Colors.cs" />
+		<Compile Include="..\Platform.UI\UI\ColorHelper.cs" />
+		<Compile Include="..\Platform.UI\UI\Text\FontWeights.cs" />
+	</ItemGroup>
+</Project>

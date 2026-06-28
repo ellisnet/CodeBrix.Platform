@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Platform.UWPSyncGenerator": {
+      "commandName": "Project",
+      "commandLineArgs": "sync"
+    }
+  }
+}

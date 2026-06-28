@@ -1,0 +1,11 @@
+﻿using Foundation;
+
+namespace CodeBrix.Platform.UI; //Was previously: Uno.UI
+
+/// <summary>
+/// An index to an entry in a grouped items source.
+/// </summary>
+internal partial struct IndexPath
+{
+	internal static IndexPath FromNSIndexPath(NSIndexPath indexPath) => new IndexPath(indexPath.Row, indexPath.Section);
+}

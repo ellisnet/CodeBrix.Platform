@@ -1,0 +1,214 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<PropertyGroup>
+		<SourceGeneratorBasePath Condition="'$(SourceGeneratorBasePath)'==''">.\</SourceGeneratorBasePath>
+		<CodeBrixUIMSBuildTasksTargetPath Condition="'$(CodeBrixUIMSBuildTasksTargetPath)'==''"></CodeBrixUIMSBuildTasksTargetPath>
+
+		<_IsCodeBrixPlatform>true</_IsCodeBrixPlatform>
+	</PropertyGroup>
+
+	<!-- Feature configuration -->
+	<PropertyGroup>
+		<CodeBrixDragDropExternalSupport Condition="'$(CodeBrixDragDropExternalSupport)'==''">true</CodeBrixDragDropExternalSupport>
+		<CodeBrixEnableDynamicDataTemplateUpdate Condition="'$(CodeBrixEnableDynamicDataTemplateUpdate)'=='' AND '$(Optimize)' == 'true'">false</CodeBrixEnableDynamicDataTemplateUpdate>
+		<CodeBrixEnableDynamicDataTemplateUpdate Condition="'$(CodeBrixEnableDynamicDataTemplateUpdate)'=='' AND '$(Optimize)' != 'true'">true</CodeBrixEnableDynamicDataTemplateUpdate>
+	</PropertyGroup>
+	<ItemGroup>
+		
+		<RuntimeHostConfigurationOption Include="Windows.ApplicationModel.DataTransfer.DragDrop.ExternalSupport"
+										Value="$(CodeBrixDragDropExternalSupport)"
+										Trim="true" />
+
+		<RuntimeHostConfigurationOption Include="CodeBrix.Platform.UI.EnableDynamicDataTemplateUpdate"
+										Value="$(CodeBrixEnableDynamicDataTemplateUpdate)"
+										Trim="true" />
+	</ItemGroup>
+
+	<Target Name="ValidateCodeBrixUIAndCodeBrixWinUIExclusion" BeforeTargets="BeforeBuild">
+		<Error Code="UNOB0001"
+			   HelpLink="https://aka.platform.uno/UNOB0001"
+			   Text="Cannot build with both the CodeBrix.Platform and Uno.WinUI nuget packages referenced. https://aka.platform.uno/UNOB0001"
+			   Condition="'$(PkgCodeBrix_Platform_ApacheLicenseForever)'!='' and '$(PkgUno_WinUI)'!=''" />
+	</Target>
+
+	<!--
+	Include a marker for _FindInvalidWinAppSDKCodeBrixPlatformReference to determine if a net7.0-only project is referenced
+	from a WinAppSDK project.
+	-->
+	<Target Name="_CodeBrixUpdateAdditionalProperties" BeforeTargets="GetTargetFrameworksWithPlatformForSingleTargetFramework">
+		<ItemGroup>
+			<AdditionalTargetFrameworkInfoProperty Include="_IsCodeBrixPlatform" />
+		</ItemGroup>
+	</Target>
+	
+	<Import Project="$(SourceGeneratorBasePath)Platform.UI.SourceGenerators.props" />
+	<Import Project="$(CodeBrixUIMSBuildTasksTargetPath)Platform.UI.Tasks.targets" />
+
+	<Target Name="_CodeBrixWinUICommonFeatureDefines" AfterTargets="PrepareForBuild">
+
+		<!-- 
+			Defines CodeBrix.Platform features.
+
+			Note to contributors: Adding a feature here allows for smoother upgrade
+			to a more recent version of CodeBrix.Platform. These constants are defined in the code
+			that uses CodeBrix.Platform, so conditional compilation can be used to detect the presence
+			of breaking changes.
+		-->
+		<PropertyGroup>
+			<DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__</DefineConstants>
+			<DefineConstants Condition="$(_IsCodeBrixWinUIPackage)">$(DefineConstants);HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING</DefineConstants>
+			<DefineConstants>$(DefineConstants);CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE</DefineConstants>
+			<DefineConstants>$(DefineConstants);CODEBRIX_HAS_NO_IDEPENDENCYOBJECT</DefineConstants>
+		</PropertyGroup>
+
+		<!-- Note: This might need to be adjusted when we have netX.0-browser -->
+		<PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == ''">
+			<DefineConstants>$(DefineConstants);CODEBRIX_REFERENCE_API</DefineConstants>
+		</PropertyGroup>
+
+	</Target>
+
+	<Target Name="ReplaceRefAssemblies" AfterTargets="_ResolveAssemblies" Condition="'$(AndroidApplication)'=='true'">
+		<!-- This is a workaround for https://github.com/xamarin/xamarin-android/issues/1162#issuecomment-359475008 -->
+		<ItemGroup>
+			<ResolvedAssembliesFixedWindows Include="@(ResolvedAssemblies->Replace('\ref\','\lib\'))" />
+			<ResolvedAssembliesFixedUnix Include="@(ResolvedAssemblies->Replace('/ref/','/lib/'))" />
+			<ResolvedAssembliesFixed Include="@(ResolvedAssembliesFixedWindows)" Condition="@(ResolvedAssembliesFixedWindows) != @(ResolvedAssemblies)" />
+			<ResolvedAssembliesFixed Include="@(ResolvedAssembliesFixedUnix)" Condition="@(ResolvedAssembliesFixedUnix) != @(ResolvedAssemblies)" />
+			<ResolvedAssemblies Condition="'@(ResolvedAssembliesFixed->Count())' &gt; 0" Remove="@(ResolvedAssemblies)" />
+			<ResolvedAssemblies Include="@(ResolvedAssembliesFixed)" />
+		</ItemGroup>
+	</Target>
+
+	<!-- List of packages that provide an codebrix-platform-runtime folder.
+	     This fork ships a single aggregate package id. -->
+	<ItemGroup>
+		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.ApacheLicenseForever" PackageBasePath="$(MSBuildThisFileDirectory).." />
+	</ItemGroup>
+
+	<!--
+  Cross-runtime libraries creation targets
+  -->
+	<Target Name="PrepareCodeBrixRuntimeProjectReferences" BeforeTargets="BeforeBuild">
+
+		<!--
+	Build the ProjectReference item group for CodeBrixRuntimeProjectReference items.
+	The references are added as non-referencing ProjectReferences to enable the inclusion
+	of their output in the final nuget package.
+	-->
+		<ItemGroup>
+			<ProjectReference Include="%(CodeBrixRuntimeProjectReference.Identity)">
+				<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+				<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+				<UndefineProperties>TargetFramework</UndefineProperties>
+			</ProjectReference>
+		</ItemGroup>
+
+	</Target>
+
+	<Target Name="ResolvePrepareCodeBrixRuntimeProjectReferences" AfterTargets="ResolveProjectReferences">
+
+		<!-- Execute CodeBrixRuntimeGetTargetPath for all CodeBrixRuntimeProjectReference to get their actual output -->
+		<MSBuild
+			Projects="@(CodeBrixRuntimeProjectReference)"
+			Targets="CodeBrixRuntimeGetTargetPath"
+			BuildInParallel="$(BuildInParallel)"
+			Properties="Configuration=$(Configuration);Platform=$(Platform);TargetFramework=$(TargetFramework)"
+			ContinueOnError="!$(BuildingProject)">
+
+			<Output TaskParameter="TargetOutputs" ItemName="CodeBrixRuntimeProjectReferenceOutput" />
+		</MSBuild>
+
+		<ItemGroup>
+			<!-- Add the appropriate metadata to include those files -->
+			<CodeBrixRuntimeProjectReferenceOutput Update="@(CodeBrixRuntimeProjectReferenceOutput)">
+				<Pack>true</Pack>
+				<PackagePath>codebrix-platform-runtime/%(CodeBrixRuntimeIdentifier)</PackagePath>
+			</CodeBrixRuntimeProjectReferenceOutput>
+
+			<!-- Include symbols as well, if available -->
+			<CodeBrixRuntimeProjectReferenceOutput
+				Include="@(CodeBrixRuntimeProjectReferenceOutput->'%(rootdir)%(directory)%(filename).pdb')"
+				Condition="exists('%(rootdir)%(directory)%(filename).pdb')">
+				<Pack>true</Pack>
+				<PackagePath>codebrix-platform-runtime/%(CodeBrixRuntimeIdentifier)</PackagePath>
+			</CodeBrixRuntimeProjectReferenceOutput>
+
+		</ItemGroup>
+
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="@(CodeBrixRuntimeProjectReferenceOutput)" />
+		</ItemGroup>
+
+		<RemoveDuplicates Inputs="@(TfmSpecificPackageFile)">
+			<Output TaskParameter="Filtered" ItemName="FilteredCodeBrixRuntimeProjectReferenceOutput" />
+		</RemoveDuplicates>
+
+		<ItemGroup>
+			<TfmSpecificPackageFile Remove="@(TfmSpecificPackageFile)" />
+			<TfmSpecificPackageFile Include="@(FilteredCodeBrixRuntimeProjectReferenceOutput)" />
+		</ItemGroup>
+	</Target>
+
+	<!-- Target used to determine the outputs of a project alongs with its associated CodeBrixRuntimeIdentifier -->
+	<Target
+	  Name="CodeBrixRuntimeGetTargetPath"
+	  DependsOnTargets="GetTargetPath"
+	  Returns="@(CodeBrixRuntimeTargetPathWithTargetPlatformMoniker)">
+
+		<ItemGroup>
+			<CodeBrixRuntimeTargetPathWithTargetPlatformMoniker
+				Include="@(TargetPathWithTargetPlatformMoniker)"
+				CodeBrixRuntimeIdentifier="$(CodeBrixRuntimeIdentifier.ToLower())" />
+		</ItemGroup>
+
+	</Target>
+
+
+	<!--
+	  Target used to warn the developer that overriden package binaries have been placed in the nuget cache.
+	  -->
+	<Target Name="_CodeBrixNotifyNugetOverride" BeforeTargets="PrepareProjectReferences">
+		<ItemGroup>
+			<!--
+      If System.Collections* files are present, the package may have been overriden by a CodeBrix.Platform solution
+      version before the introduction of this check.
+      -->
+			<_OverrideFiles Include="$(MSBuildThisFileDirectory)../tools/System.Collections*.dll"/>
+		</ItemGroup>
+		<PropertyGroup>
+			<_warnForCodeBrixOverride>false</_warnForCodeBrixOverride>
+			<_warnForCodeBrixOverride Condition="'@(_OverrideFiles)'!='' or exists('$(MSBuildThisFileDirectory)../.packageoverride')">true</_warnForCodeBrixOverride>
+		</PropertyGroup>
+		<Warning Condition="$(_warnForCodeBrixOverride)"
+             Text="======================================"
+             ContinueOnError="true" />
+		<Warning Condition="$(_warnForCodeBrixOverride)"
+             Text="The CodeBrix.Platform.UI nuget package has been overriden and may use modified files.&#x0d;&#x0a;Clear this package version folder in the nuget cache to return to a stable state."
+             ContinueOnError="true" />
+		<Warning Condition="$(_warnForCodeBrixOverride)"
+             Text="======================================"
+             ContinueOnError="true" />
+	</Target>
+
+	<!-- Workaround for OmniSharp single-TargetFramework use -->
+	<PropertyGroup Condition="'$(CodeBrixForceSingleTFM)' == 'true'">
+		<TargetFrameworks></TargetFrameworks>
+	</PropertyGroup>
+  
+	<Target Name="CleanupMarkupPass1" BeforeTargets="MarkupCompilePass1" Condition="'$(UseWPF)'=='true'">
+		<!--
+		Remove CodeBrix.Platform files when building for WPF, and move those files to the
+		CodeBrixPage and CodeBrixApplicationDefinition to avoid conflicts with the WPF ones.
+		-->
+		<ItemGroup>
+			<CodeBrixPage Include="@(Page)" Condition="%(Page.XamlRuntime)=='WinUI'" />
+			<CodeBrixApplicationDefinition Include="@(ApplicationDefinition)" Condition="%(ApplicationDefinition.XamlRuntime)=='WinUI'" />
+
+			<Page Remove="@(Page)" Condition="%(Page.XamlRuntime)=='WinUI'" />
+			<ApplicationDefinition Remove="@(ApplicationDefinition)" Condition="%(ApplicationDefinition.XamlRuntime)=='WinUI'" />
+		</ItemGroup>
+	</Target>
+	
+</Project>

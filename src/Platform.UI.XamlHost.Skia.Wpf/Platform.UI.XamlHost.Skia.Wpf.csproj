@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.XamlHost.Skia.Wpf</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.XamlHost.Skia.Wpf</RootNamespace>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetWpfPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-windows.props" />
+
+	<PropertyGroup>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>false</IsPackable>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.WinUI.XamlHost.Skia.Wpf</PackageId>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.Wpf\Platform.UI.Runtime.Skia.Wpf.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.XamlHost\Platform.UI.XamlHost.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Themes\Generic.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+	</ItemGroup>
+</Project>

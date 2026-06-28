@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.Foundation</AssemblyName>
+		<RootNamespace>Windows.Foundation</RootNamespace>
+		<NoWarn>$(NoWarn);1572;1712;1711;1574</NoWarn>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="LinkerDefinition.netcoremobile.xml">
+			<LogicalName>$(AssemblyName).xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<Import Project="..\CodeBrix.Platform.Extensions\CodeBrix.Platform.Extensions.props" />
+</Project>

@@ -1,0 +1,72 @@
+﻿<Project>
+
+	<PropertyGroup>
+		<RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<RepositoryBranch>$(NBGV_BuildingRef)</RepositoryBranch>
+		<RepositoryCommit>$(NBGV_GitCommitId)</RepositoryCommit>
+		<PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform</PackageProjectUrl>
+		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors</Copyright>
+		<Authors>Jeremy Ellis and contributors</Authors>
+		<Product>CodeBrix.Platform</Product>
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageTags>skia;runtime;desktop;host;dotnet;CodeBrix</PackageTags>
+		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+		<!-- Disable source link when not building on GitHub -->
+		<SourceLinkEnabled Condition="'$(BUILD_REPOSITORY_PROVIDER)'!='GitHub'">false</SourceLinkEnabled>
+		<EmbedUntrackedSources Condition="'$(BUILD_REPOSITORY_PROVIDER)'=='GitHub'">true</EmbedUntrackedSources>
+		<Deterministic>true</Deterministic>
+
+		<CODEBRIX_UWP_BUILD>false</CODEBRIX_UWP_BUILD>
+
+		<!--
+		CodeBrix.Platform fork: .NET 10 only.
+		Upstream uno carried both NetPrevious (net9.0) and NetCurrent (net10.0); here every
+		`Net*PreviousAndCurrent` alias collapses to NetCurrent. NetPrevious is intentionally
+		left empty so any leftover `'$(TargetFramework)'=='$(NetPrevious)'` condition
+		becomes a dead branch instead of duplicating the NetCurrent branch.
+		Mobile / WebAssembly / Android aliases were removed because their platforms are out of scope.
+		-->
+
+		<NetCurrent>net10.0</NetCurrent>
+		<NetPrevious></NetPrevious>
+
+		<NetCurrentWpf>$(NetCurrent)-windows</NetCurrentWpf>
+		<NetCurrentWinAppSDK>$(NetCurrent)-windows10.0.19041.0</NetCurrentWinAppSDK>
+
+		<NetWpfPreviousAndCurrent>$(NetCurrentWpf)</NetWpfPreviousAndCurrent>
+		<NetSkiaPreviousAndCurrent>$(NetCurrent)</NetSkiaPreviousAndCurrent>
+		<NetReferencePreviousAndCurrent>$(NetCurrent)</NetReferencePreviousAndCurrent>
+		<NetWinAppSDKPreviousAndCurrent>$(NetCurrentWinAppSDK)</NetWinAppSDKPreviousAndCurrent>
+		<NetUnitTests>$(NetCurrent)</NetUnitTests>
+
+		<NetUWPOrWinUI>$(NetCurrentWinAppSDK)</NetUWPOrWinUI>
+
+		<!-- MSTEST0001: Explicitly enable or disable tests parallelization -->
+		<NoWarn>$(NoWarn);MSTEST0001;MSTEST0037</NoWarn>
+	</PropertyGroup>
+
+	<!--
+	CodeBrix.Platform fork: suppress code-analysis (CA*) rules that the upstream Uno
+	build escalates to errors. These are style/perf suggestions, not real bugs, and
+	silencing them lets the actual compilation issues surface.
+	-->
+	<PropertyGroup>
+		<CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+		<NoWarn>$(NoWarn);CA1303;CA1307;CA1308;CA1309;CA1819;CA1820;CA1822;CA1838;CA1852;CA1859;CA2101</NoWarn>
+	</PropertyGroup>
+
+	<!--
+	CodeBrix.Platform fork: enable Windows-targeting on non-Windows hosts.
+	Several in-scope csprojs target `-windows` (WPF) or `-windows10.0.19041.0`
+	(WinAppSDK); on Linux/macOS those fail NETSDK1100 without this flag.
+	Scoped via `Condition` so Windows hosts are unaffected.
+	-->
+	<PropertyGroup Condition="'$(OS)' != 'Windows_NT'">
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+	</PropertyGroup>
+
+</Project>

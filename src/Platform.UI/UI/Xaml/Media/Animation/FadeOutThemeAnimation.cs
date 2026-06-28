@@ -1,0 +1,28 @@
+﻿using System;
+using System.Threading;
+using Microsoft.UI.Xaml.Markup;
+using CodeBrix.Platform.UI;
+
+namespace Microsoft.UI.Xaml.Media.Animation
+{
+	public partial class FadeOutThemeAnimation : DoubleAnimation
+	{
+		public static DependencyProperty TargetNameProperty { get; } = DependencyProperty.Register(
+			"TargetName", typeof(string), typeof(FadeOutThemeAnimation), new FrameworkPropertyMetadata(string.Empty));
+
+		public string TargetName
+		{
+			get => (string)GetValue(TargetNameProperty);
+			set => SetValue(TargetNameProperty, value);
+		}
+
+		private protected override void InitTarget()
+		{
+			var target = NameScope.GetNameScope(this)?.FindName(TargetName);
+			if (target is DependencyObject depObj)
+			{
+				Storyboard.SetTarget(this, depObj);
+			}
+		}
+	}
+}

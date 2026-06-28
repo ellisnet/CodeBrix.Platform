@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.XamlHost</AssemblyName>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX_UI_XamlHost_PROJECT</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RootNamespace>CodeBrix.Platform.UI.XamlHost</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX</DefineConstants>
+
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

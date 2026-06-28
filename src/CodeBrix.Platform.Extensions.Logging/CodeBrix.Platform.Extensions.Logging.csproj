@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	  In-repo replacement for the former Uno.Core.Extensions.Logging / .Logging.Singleton packages.
+	  These logging extensions depend on Microsoft.Extensions.Logging + CommonServiceLocator, which is
+	  why they cannot be compiled into Uno.Foundation (it references neither). LogExtensionPoint also
+	  holds static singleton state (the ambient ILoggerFactory), so it MUST live in a single shared
+	  assembly rather than being compiled into each consumer. Projects that used the
+	  Uno.Core.Extensions.Logging* packages now reference THIS project instead.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetCurrent)</TargetFrameworks>
+		<AssemblyName>CodeBrix.Platform.Extensions.Logging</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.Extensions.Logging</RootNamespace>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<Import Project="..\CodeBrix.Platform.Extensions\CodeBrix.Platform.Extensions.Logging.props" />
+
+	<ItemGroup>
+		<!-- LogExtensionPoint uses the internal Transactional helper for thread-safe factory init -->
+		<Compile Include="..\CodeBrix.Platform.Extensions\Threading\Transactional.cs" Link="Threading\Transactional.cs" />
+		<Compile Include="..\CodeBrix.Platform.Extensions\Threading\Transactional.Immutables.cs" Link="Threading\Transactional.Immutables.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
+		<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+	</ItemGroup>
+</Project>

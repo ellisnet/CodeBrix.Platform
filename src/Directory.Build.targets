@@ -1,0 +1,164 @@
+<Project>
+	<Import Project="Platform.CrossTargetting.targets" />
+
+	<PropertyGroup>
+		<Product>$(AssemblyName) $(TargetFramework)</Product>
+		<Product Condition="'$(CodeBrixRuntimeIdentifier)' != ''">$(AssemblyName) ($(TargetFramework) $(CodeBrixRuntimeIdentifier))</Product>
+		<CommunityToolkitMvvmVersion>8.4.2</CommunityToolkitMvvmVersion>
+	</PropertyGroup>
+
+	<!-- 
+	Disable analyzers for eligible projects in samples to improve build performance.
+	To disable analyzers for a project, BOTH the global environment variable CODEBRIX_DISABLE_ANALYZERS_IN_SAMPLES=true AND the project property CodeBrixDisableAnalyzersForSamples=true must be set.
+	 -->
+	<PropertyGroup Condition="'$(CODEBRIX_DISABLE_ANALYZERS_IN_SAMPLES)' == 'true' and '$(CodeBrixDisableAnalyzersForSamples)'=='true'">
+		<CodeBrixDisableNetAnalyzers>true</CodeBrixDisableNetAnalyzers>
+		<RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+		<RunAnalyzersDuringAnalysis>false</RunAnalyzersDuringAnalysis>
+		<EnableNETAnalyzers>false</EnableNETAnalyzers>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- 
+ 		Ensures that AssignLinkMetadata runs before AssignTargetPaths. 
+ 		Otherwise, AssignTargetPath will generate a rooted path and will break embedded sources 
+ 		LogicalName metadata's behavior. 
+ 		-->
+		<!-- NOTE: This code already exists in Platform.UI.Tasks.targets, but inside of uno this targets file is imported very early -->
+		<!-- and then AssignTargetPathsDependsOn gets cleared by msbuild -->
+		<!-- This shouldn't be happening outside of Uno where Platform.UI.Tasks.targets is imported from NuGet package at the correct time -->
+		<AssignTargetPathsDependsOn>$(AssignTargetPathsDependsOn);AssignLinkMetadata</AssignTargetPathsDependsOn>
+	</PropertyGroup>
+
+	<ItemGroup Condition="$(EnableAutomaticXamlPageInclusion)">
+		<Page Include="**/*.xaml" Exclude="$(DefaultItemExcludes);$(DefaultExcludesInProjectFolder);$(PageExclusions)" />
+		<None Remove="**/*.xaml" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(XamlMergeOutputFile)'!=''">
+		<XamlMergeInput Include="@(Page)" Exclude="@(_NonMergedXamlResources)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="@(Page)" />
+	</ItemGroup>
+
+	<!--
+	Comment out this section if you need to update Resource.designer.cs files.
+	See DEVELOPMENT.md#Android for details.
+	-->
+	<Choose>
+		<When Condition="'$(TargetPlatformIdentifier)' == 'Android' and '$(AndroidApplication)' != 'true'">
+			<PropertyGroup >
+				<AndroidGenerateResourceDesigner>false</AndroidGenerateResourceDesigner>
+				<AndroidUseIntermediateDesignerFile>false</AndroidUseIntermediateDesignerFile>
+			</PropertyGroup>
+		</When>
+		<Otherwise>
+			<PropertyGroup>
+				<!--
+				This works around the fact that AndroidResgenFile is
+				automatically included as compiled file, even if AndroidUseIntermediateDesignerFile
+				is set to true.
+				-->
+				<AndroidUseIntermediateDesignerFile>True</AndroidUseIntermediateDesignerFile>
+				<AndroidResgenFile>obj\$(TargetFramework)\Resources\Resource.Designer.cs</AndroidResgenFile>
+			</PropertyGroup>
+		</Otherwise>
+	</Choose>
+
+	<Target Name="AndroidResourceGenWorkaround_16_2" AfterTargets="_UpdateAndroidResgen" Condition="'$(AndroidUseIntermediateDesignerFile)'=='True' and !Exists($(_AndroidResourceDesignerFile))">
+		<WriteLinesToFile File="$(_AndroidResourceDesignerFile)" Lines="// Empty Content from CodeBrix.Platform Directory.Build.targets." />
+	</Target>
+
+	<PropertyGroup>
+		<MSTestVersion>4.2.3</MSTestVersion>
+		<MicrosoftTestingPlatformVersion>2.2.3</MicrosoftTestingPlatformVersion>
+		<SkiaSharpVersion>3.119.4</SkiaSharpVersion>
+		<HarfbuzzSharpVersion>8.3.1.5</HarfbuzzSharpVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Update="CodeBrix.Platform.Extensions.ApacheLicenseForever" Version="1.0.165.1317" />
+		<PackageReference Update="MSTest" Version="$(MSTestVersion)" />
+		<PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
+		<PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
+		<PackageReference Update="MSTest.Analyzers" Version="$(MSTestVersion)" />
+		<PackageReference Update="Combinatorial.MSTest" Version="2.0.0" />
+
+		<PackageReference Update="NUnit" Version="4.6.0" />
+		<PackageReference Update="NUnit3TestAdapter" Version="6.2.0" />
+		<PackageReference Update="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingPlatformVersion)" />
+		<PackageReference Update="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.165.369" />
+    <!--The version of this NuGet.Packaging package MUST be compatible with the Microsoft.CodeAnalysis.Testing package version that is being used-->
+		<PackageReference Update="NuGet.Packaging" Version="7.6.0" />
+
+		<PackageReference Update="SkiaSharp" Version="$(SkiaSharpVersion)"  />
+		<PackageReference Update="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
+		<PackageReference Update="SkiaSharp.Skottie" Version="$(SkiaSharpVersion)" />
+		<PackageReference Update="SkiaSharp.NativeAssets.macos" Version="$(SkiaSharpVersion)" />
+
+		<PackageReference Update="HarfBuzzSharp" Version="$(HarfbuzzSharpVersion)" />
+		<PackageReference Update="HarfBuzzSharp.NativeAssets.macOS" Version="$(HarfbuzzSharpVersion)" />
+		<PackageReference Update="HarfBuzzSharp.NativeAssets.Linux" Version="$(HarfbuzzSharpVersion)" />
+
+		<PackageReference Condition=" '$(TargetFramework)' == '$(NetPrevious)' " Update="Microsoft.Win32.SystemEvents" Version="9.0.0" />
+		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.0-rc.2.25502.107" />
+
+		<PackageReference Update="GtkSharp" Version="3.24.24.95" />
+		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.9" />
+		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
+		<PackageReference Update="Newtonsoft.Json" Version="13.0.4" />
+		<PackageReference Update="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvmVersion)" />
+		<PackageReference Update="Microsoft.Web.WebView2" Version="1.0.4022.49" />
+	</ItemGroup>
+
+	<Target Name="ValidateSolutionPath" BeforeTargets="Build">
+		<Error Condition="$(MSBuildThisFileDirectory.Contains(' '))"
+			 Text="The CodeBrix.Platform.UI Solution cannot build with a space in the path. Consider changing to a path without spaces."/>
+	</Target>
+
+	<Target Name="WorkaroundMissingWinAppSDKDLL"
+					BeforeTargets="BinPlaceBootstrapDll">
+
+		<!-- Workaround for
+	  C:\a\.nuget\microsoft.windowsappsdk.foundation\1.0.0-experimental1\build\Microsoft.WindowsAppSDK.Bootstrap.targets(11,5):
+	  error MSB3030: Could not copy the file "C:\a\.nuget\microsoft.windowsappsdk.foundation\1.0.0-experimental1\build\..\runtimes\lib\native\AnyCPU\Microsoft.WindowsAppSDK.Bootstrap.dll" because it was not found.
+	  -->
+		<CreateProperty Value="x86">
+			<Output
+				TaskParameter="Value"
+				PropertyName="_WindowsAppSDKFoundationPlatform" />
+		</CreateProperty>
+	</Target>
+
+	<Target Name="WorkaroundMissingWinAppSDKDLL_2"
+				  BeforeTargets="BeforeBuild">
+
+		<!-- Workaround for
+         C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\MSBuild\Current\Bin\Microsoft.Common.CurrentVersion.targets(4559,5):
+				 error MSB3030: Could not copy the file "C:\a\.nuget\microsoft.windowsappsdk\1.0.0-preview3\build\..\runtimes\lib\native\AnyCPU\Microsoft.WindowsAppRuntime.Bootstrap.dll" because it was not found.
+	  -->
+		<ItemGroup>
+			<_itemToRemove Include="@(ReferenceCopyLocalPaths)" Condition="'%(FileName)%(Extension)'=='Microsoft.WindowsAppRuntime.Bootstrap.dll'" />
+			<ReferenceCopyLocalPaths Remove="@(_itemToRemove)"/>
+		</ItemGroup>
+	</Target>
+
+	<!-- Workaround for https://github.com/xamarin/xamarin-macios/issues/17005 -->
+	<Target Name="_DisableRemoteBuildForLibraries" BeforeTargets="_SayHello" Condition="'$(OutputType)'=='Library'">
+		<PropertyGroup>
+			<IsRemoteBuild>false</IsRemoteBuild>
+			<ServerAddress></ServerAddress>
+		</PropertyGroup>
+	</Target>
+
+
+	<ItemDefinitionGroup>
+		<ProjectReference>
+			<!-- Avoid copying all outputs to every dependent projects, for build performance -->
+			<Private Condition="'$(OutputType)' == 'library' AND '$(DisablePrivateProjectReference)'!='true'">false</Private>
+		</ProjectReference>
+	</ItemDefinitionGroup>
+
+</Project>

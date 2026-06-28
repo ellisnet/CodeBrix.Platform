@@ -1,0 +1,81 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<!--
+		CS0109: upstream sources declare `public new void Invalidate()` because the Uno
+		version they compile against has an Invalidate() member to hide; this fork does
+		not. Suppressed (rather than editing) to keep the vendored files byte-identical
+		with upstream for easy re-diffing on SkiaSharp version bumps.
+		-->
+		<NoWarn>$(NoWarn);CS0109</NoWarn>
+		<Deterministic>true</Deterministic>
+
+		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views</AssemblyName>
+		<RootNamespace>SkiaSharp.Views.Windows</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!--
+		Upstream (SkiaSharp.Views.Platform.WinUI.Skia.csproj) defines HAS_CODEBRIX_SKIA;WINUI and
+		gets HAS_CODEBRIX/HAS_CODEBRIX_WINUI/CODEBRIX_REFERENCE_API from the CodeBrix.Platform package props.
+		CODEBRIX_REFERENCE_API is intentionally NOT defined here: this flavor compiles against
+		the real CodeBrix.Platform UI Skia binaries, not reference shells. See PORTING-NOTES.md.
+		-->
+		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;HAS_CODEBRIX_SKIA;WINUI</DefineConstants>
+
+		<!--
+		The version of this library is deliberately tied to the SkiaSharp version it
+		vendors (see PORTING-NOTES.md), NOT the CodeBrix.Platform family version.
+		Family-wide version-bump tooling must skip this project. Bump only together
+		with $(SkiaSharpVersion) in src/Directory.Build.targets, after re-diffing the
+		vendored sources against the matching SkiaSharp tag. The fourth version
+		segment is reserved for glue-only fixes between SkiaSharp bumps.
+		-->
+		<Version>3.119.4</Version>
+		<PackageVersion>3.119.4</PackageVersion>
+
+		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
+		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Reference-flavor API shells; compiled only by the .Reference flavor of this project -->
+		<Compile Remove="SkiaSharp.Views.Platform.WinUI\**\*.cs" />
+		<None Include="SkiaSharp.Views.Platform.WinUI\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<Target Name="_CodeBrixSkiaSharpViewsOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.skiasharp.views\$(CodeBrixNugetOverrideVersion)\lib\$(_OverrideTargetFramework)</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+	</Target>
+
+</Project>

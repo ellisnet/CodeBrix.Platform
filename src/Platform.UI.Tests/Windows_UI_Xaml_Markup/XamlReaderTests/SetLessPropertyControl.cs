@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
+
+namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml_Markup.XamlReaderTests //Was previously: Uno.UI.Tests.Windows_UI_Xaml_Markup.XamlReaderTests
+{
+	public class SetLessPropertyControl : FrameworkElement
+	{
+		public int MyProperty { set { } }
+	}
+}

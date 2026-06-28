@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.XamlHost</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.XamlHost</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX;IS_CODEBRIX_UI_XamlHost_PROJECT</DefineConstants>
+
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Reference</CodeBrixRuntimeIdentifier>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Reference.csproj" />
+	</ItemGroup>
+</Project>

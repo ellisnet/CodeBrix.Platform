@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.RuntimeTests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.RuntimeTests</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+		<DefineConstants>$(DefineConstants);IS_RUNTIME_UI_TESTS</DefineConstants>
+		<NoWarn>$(NoWarn);CS1998</NoWarn>
+	</PropertyGroup>
+	
+	<ItemGroup Label="GlobalUsings">
+		<Using Include="SilverAssertions" />
+	</ItemGroup>
+
+	<!--
+	Uncomment this block to enable generated source debugging
+	<PropertyGroup>
+		<CodeBrixUISourceGeneratorDebuggerBreak>True</CodeBrixUISourceGeneratorDebuggerBreak>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	</PropertyGroup>
+	-->
+
+	<ItemGroup>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="MSTest.TestFramework" />
+		<PackageReference Include="MSTest.Analyzers" />
+		<PackageReference Include="Combinatorial.MSTest" />
+	</ItemGroup>
+
+	<!-- CodeBrix.Platform fork: SamplesApp.UITests Compile includes removed (SamplesApp folder dropped). -->
+	<ItemGroup>
+		<Compile Include="..\Platform.Foundation\_Compat\IsExternalInit.cs" Link="_Compat\IsExternalInit.cs" />
+	</ItemGroup>
+
+	<Import Project="UnitTestsImport.props" />
+	<Import Project="UITestsImport.props" />
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\Border_Snapshot.bgra8" />
+		<EmbeddedResource Include="LinkerDefinition.Skia.xml">
+			<LogicalName>$(AssemblyName).xml</LogicalName>
+		</EmbeddedResource>
+		<EmbeddedResource Include="Assets\PlatformA4.pdf" />
+		<EmbeddedResource Include="Assets\PlatformA4.png" />
+		<EmbeddedResource Include="Assets\PlatformA4_Crop.png" />
+		<EmbeddedResource Include="Assets\PlatformA4_Protected.pdf" />
+		<EmbeddedResource Include="Assets\PlatformA4_Protected.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj" />
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(DocsGeneration)'==''">
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+			<UndefineProperties>TargetFramework</UndefineProperties>
+		</ProjectReference>
+	</ItemGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+		<PRIResource Include="Resources\**\*.resw" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\**" />
+	</ItemGroup>
+
+	<Target Name="ValidateLocalAssets" AfterTargets="Build" Condition="'$(TargetFramework)'!=''">
+		<Message Text="Validating local assets" Importance="high" />
+		<Error Condition="!Exists('$(OutputPath)CodeBrix.Platform.UI.RuntimeTests\Assets\TransientAsset01.txt')" Text="$(OutputPath)CodeBrix.Platform.UI.RuntimeTests\Assets\TransientAsset01.txt" />
+	</Target>
+
+	<ItemGroup>
+		<Page Update="Tests\Windows_UI_Xaml_Controls\FlyoutPages\When_PlacementTarget_Binding.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<!-- Multiwindowing is only supported on Uno.WinUI -->
+	<ItemGroup Condition="'$(CODEBRIX_UWP_BUILD)'=='true'">
+		<Compile Remove="$(MSBuildThisFileDirectory)Tests\Windows_UI_Xaml\Controls\Multiwindow\**\*.xaml.cs" />
+	</ItemGroup>
+	<PropertyGroup Condition="'$(CODEBRIX_UWP_BUILD)'=='true'">
+		<PageExclusions>$(MSBuildThisFileDirectory)Tests\Windows_UI_Xaml\Controls\Multiwindow\**\*.xaml</PageExclusions>
+	</PropertyGroup>
+</Project>

@@ -1,0 +1,10 @@
+﻿<linker>
+  <assembly fullname="CodeBrix.Platform.UI.Toolkit">
+	<type fullname="CodeBrix.Platform.UI.Toolkit.CommandBarExtensions"/>
+	<type fullname="CodeBrix.Platform.UI.Toolkit.MenuFlyoutItemExtensions"/>
+	<type fullname="CodeBrix.Platform.UI.Toolkit.UIElementExtensions"/>
+	<type fullname="CodeBrix.Platform.UI.Toolkit.MenuFlyoutExtensions"/>
+	<type fullname="CodeBrix.Platform.UI.Toolkit.SplitViewExtensions"/>
+	<type fullname="CodeBrix.Platform.UI.Markup.FromJsonExtension"/>
+  </assembly>
+</linker>

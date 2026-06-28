@@ -1,0 +1,19 @@
+﻿#nullable enable
+
+using Microsoft.UI.Xaml;
+
+namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
+{
+	internal struct TabStopCandidateSearchResult
+	{
+		public TabStopCandidateSearchResult(bool didCycleFocusAtRootVisualScope, DependencyObject? candidate)
+		{
+			DidCycleFocusAtRootVisualScope = didCycleFocusAtRootVisualScope;
+			Candidate = candidate;
+		}
+
+		public DependencyObject? Candidate { get; set; }
+
+		public bool DidCycleFocusAtRootVisualScope { get; set; }
+	}
+}

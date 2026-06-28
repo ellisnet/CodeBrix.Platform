@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.NUnitTransformTool</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.NUnitTransformTool</RootNamespace>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<!-- There is no need to multi-target this project -->
+		<!-- We keep it on the oldest supported TFM -->
+		<!-- Though we could use CodeBrixTargetFrameworkOverride to choose between NetPrevious and NetCurrent -->
+		<!-- As of writing this comment, we don't see a need to do that, so we keep it simple -->
+		<TargetFramework>$(NetCurrent)</TargetFramework>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<RollForward>major</RollForward>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.165.386" />
+	</ItemGroup>
+
+</Project>

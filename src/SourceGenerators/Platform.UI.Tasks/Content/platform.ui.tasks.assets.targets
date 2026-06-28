@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<UsingTask
+		Condition="'$(_IsCodeBrixUISolution)'==''"
+		AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll"
+		TaskName="CodeBrix.Platform.UI.Tasks.Assets.ExpandPackageAssets_v0"
+		Runtime="NET"
+		TaskFactory="TaskHostFactory" />
+
+	<UsingTask
+		Condition="'$(_IsCodeBrixUISolution)'!=''"
+		AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll"
+		TaskName="CodeBrix.Platform.UI.Tasks.Assets.ExpandPackageAssets_v0"
+		Runtime="NET"
+		TaskFactory="TaskHostFactory" />
+
+	<PropertyGroup>
+		<_CodeBrixDirectorySeparator Condition="'$(OS)' == 'Unix'">/</_CodeBrixDirectorySeparator>
+		<_CodeBrixDirectorySeparator Condition="'$(OS)' == 'Windows_NT'">\</_CodeBrixDirectorySeparator>
+	</PropertyGroup>
+
+	<Target Name="_DefineCodeBrixPriProperties">
+		<!-- Generate Library Layout when generating NuGet packages -->
+		<PropertyGroup Condition="'$(CodeBrixSkipLibraryLayout)' != 'true'">
+			<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_CodeBrixIncludeLibraryAssets</TargetsForTfmSpecificContentInPackage>
+
+			<CodeBrixPriInitialPath>$(AssemblyName)</CodeBrixPriInitialPath>
+			<ProjectCodeBrixPriFileName Condition="'$(ProjectCodeBrixPriFileName)' == '' and '$(CodeBrixPriInitialPath)' != ''">$(CodeBrixPriInitialPath).uprimarker</ProjectCodeBrixPriFileName>
+			<ProjectCodeBrixPriFullPath Condition="'$(ProjectCodeBrixPriFullPath)' == ''">$(TargetDir)$(ProjectCodeBrixPriFileName)</ProjectCodeBrixPriFullPath>
+		</PropertyGroup>
+	</Target>
+
+	<!--
+	Local marker declaration, used when project outputs are determined transitively
+	-->
+	<Target Name="_CodeBrixDeclarePriMarker"
+			AfterTargets="_CodeBrixGeneratePriMarker"
+			DependsOnTargets="_DefineCodeBrixPriProperties"
+			BeforeTargets="GetCopyToOutputDirectoryItems">
+
+		<ItemGroup Condition="exists('$(ProjectCodeBrixPriFullPath)')">
+			<_AllChildProjectItemsWithTargetPath Include="$(ProjectCodeBrixPriFullPath)">
+				<TargetPath>$(ProjectCodeBrixPriFileName)</TargetPath>
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				<PublishFolderType>None</PublishFolderType>
+			</_AllChildProjectItemsWithTargetPath>
+		</ItemGroup>
+
+	</Target>
+
+	<!--
+	Marker generation to ensure that assets are only copied for codebrix-enabled targets
+
+	The target needs also to run in the context of generating a nuget package after a build 
+	has already occurred. See https://github.com/unoplatform/uno/issues/13167#issuecomment-1677286706
+	-->
+	<Target Name="_CodeBrixGeneratePriMarker"
+			Condition="'$(GenerateLibraryLayout)' == 'true' AND '$(SDKIdentifier)' != 'Windows'"
+			BeforeTargets="PrepareForRun;GenerateNuSpec"
+			DependsOnTargets="_DefineCodeBrixPriProperties">
+
+		<WriteLinesToFile File="$(ProjectCodeBrixPriFullPath)"
+						  Lines="@(ContentWithTargetPath)"
+						  Condition="'@(ContentWithTargetPath)'!=''"
+						  Overwrite="true" />
+
+	</Target>
+
+	<!--
+	Assign NuGet metadata for generated nuget packages to contain
+	assets next to each target framework assemblies
+	-->
+	<Target Name="_CodeBrixIncludeLibraryAssets"
+			Condition="'$(GenerateLibraryLayout)' == 'true' AND '$(SDKIdentifier)' != 'Windows'"
+			DependsOnTargets="_DefineCodeBrixPriProperties">
+		<PropertyGroup>
+			<_CodeBrixTargetPlatformVersion
+				Condition="
+					'$(TargetPlatformIdentifier)'=='android'
+					or '$(TargetPlatformIdentifier)'=='ios'
+					or '$(TargetPlatformIdentifier)'=='macos'
+					or '$(TargetPlatformIdentifier)'=='maccatalyst'
+					or '$(TargetPlatformIdentifier)'=='tvos'
+					or '$(TargetPlatformIdentifier)'=='desktop'
+					or '$(TargetPlatformIdentifier)'=='browserwasm'
+					">$(TargetPlatformVersion)</_CodeBrixTargetPlatformVersion>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<_filteredContentWithTargetPath
+				Include="@(ContentWithTargetPath)" />
+
+			<TfmSpecificPackageFile Include="@(_filteredContentWithTargetPath)"
+									PackagePath="lib\$(TargetFramework)$(_CodeBrixTargetPlatformVersion)\$(CodeBrixPriInitialPath)\%(_filteredContentWithTargetPath.TargetPath)" />
+			<TfmSpecificPackageFile Condition="'@(ContentWithTargetPath)'!=''"
+									Include="$(ProjectCodeBrixPriFullPath)"
+									PackagePath="lib\$(TargetFramework)$(_CodeBrixTargetPlatformVersion)\$(ProjectCodeBrixPriFileName)" />
+		</ItemGroup>
+	</Target>
+
+	<!-- 
+	Avoid the generation of the AAR file on android as we're already
+	packing the files ourselves.
+	-->
+	<Target Name="_CodeBrixCleanupAar"
+			Condition="'$(GenerateLibraryLayout)' == 'true' AND '$(TargetPlatformIdentifier)'=='android'"
+			BeforeTargets="_CreateAarCache">
+		<ItemGroup>
+			<AndroidAsset Remove="@(Content)" />
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup>
+		<_CodeBrixAddLibraryAssetsBeforeTargets>
+			$(_CodeBrixAddLibraryAssetsBeforeTargets);
+			GetCopyToOutputDirectoryItems;
+			GenerateCodeBrixWasmAssets;
+		</_CodeBrixAddLibraryAssetsBeforeTargets>
+	</PropertyGroup>
+
+	<!--
+	Populate output groups when building heads
+	-->
+	<Target Name="_CodeBrixAddLibraryAssets"
+			Condition="'$(IsCodeBrixHead)'=='true' or '$(AndroidApplication)'=='true' or '$(ProjectTypeGuids)'!=''"
+			DependsOnTargets="_CodeBrixFindPackageAssetMarkers"
+			BeforeTargets="$(_CodeBrixAddLibraryAssetsBeforeTargets)">
+
+		<ExpandPackageAssets_v0 MarkerFiles="@(_CodeBrixPriFiles)">
+			<Output TaskParameter="Assets" ItemName="_CodeBrixAssetsFilesExpanded" />
+		</ExpandPackageAssets_v0>
+
+		<ItemGroup>
+			<_AllChildProjectItemsWithTargetPath Include="@(_CodeBrixAssetsFilesExpanded)" KeepMetadata="TargetPath">
+				<TargetPath Condition="'$(PriInitialPath)' != ''">$(PriInitialPath)\%(_CodeBrixAssetsFilesExpanded.TargetPath)</TargetPath>
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			</_AllChildProjectItemsWithTargetPath>
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup>
+		<_CodeBrixFindPackageAssetMarkersDependsOn Condition="'$(ProjectTypeGuids)'!=''">
+			$(_CodeBrixFindPackageAssetMarkersDependsOn);
+			ResolveNuGetPackageAssets
+		</_CodeBrixFindPackageAssetMarkersDependsOn>
+	</PropertyGroup>
+
+	<!--
+	Determines the marker location for project references
+	-->
+	<Target Name="_CodeBrixFindPackageAssetMarkers"
+			Condition="'$(IsCodeBrixHead)'=='true' or '$(AndroidApplication)'=='true' or '$(ProjectTypeGuids)'!=''"
+			DependsOnTargets="$(_CodeBrixFindPackageAssetMarkersDependsOn)">
+
+		<ItemGroup Condition="'$(ProjectTypeGuids)'!=''">
+			<!-- Xamarin-based targets which don't set RuntimeCopyLocalItems must use  -->
+			<_CodeBrixPriFiles Include="@(Reference->'%(RootDir)%(Directory)%(Filename).uprimarker')"
+						  Condition="$([System.IO.File]::Exists('%(RootDir)%(Directory)%(Filename).uprimarker'))"
+						  PublishFolderType="None" />
+		</ItemGroup>
+
+		<ItemGroup Condition="'$(ProjectTypeGuids)'==''">
+			<_CodeBrixPriFiles Include="@(RuntimeCopyLocalItems->'%(RootDir)%(Directory)%(Filename).uprimarker')"
+						  Condition="$([System.IO.File]::Exists('%(RootDir)%(Directory)%(Filename).uprimarker'))"
+						  PublishFolderType="None" />
+		</ItemGroup>
+
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Include="@(_CodeBrixPriFiles)"/>
+		</ItemGroup>
+	</Target>
+
+	<!--
+	Project references assets copy local support
+	-->
+	<PropertyGroup>
+		<_CodeBrixAddAssetsFilesToCopyLocalDependsOn>
+			ContentFilesProjectOutputGroup;
+			AssignTargetPaths;
+			_DefineCodeBrixPriProperties;
+			$(_CodeBrixAddAssetsFilesToCopyLocalDependsOn)
+		</_CodeBrixAddAssetsFilesToCopyLocalDependsOn>
+	</PropertyGroup>
+
+	<!--
+	Target executed by every project onto its references to determine copy local assets.
+	Since this target renames assets to include the project name, it must not be executed
+	on the project head. On iOS, it can cause the creation of an invalid app-named
+	folder, breaking the build.
+	-->
+	<Target Name="_CodeBrixAddAssetsFilesToCopyLocal"
+			DependsOnTargets="$(_CodeBrixAddAssetsFilesToCopyLocalDependsOn)"
+			Condition="'$(IsCodeBrixHead)'!='true' and '$(AndroidApplication)'!='true' and '$(ProjectTypeGuids)'==''"
+			BeforeTargets="GetCopyToOutputDirectoryItems">
+
+		<ItemGroup>
+			<_AllChildProjectItemsWithTargetPath Include="@(ContentFilesProjectOutputGroupOutput)">
+				<!-- Update link metadata only if available, prefer TargetPath otherwise -->
+				<Link Condition="'%(ContentFilesProjectOutputGroupOutput.Link)' != ''">$(CodeBrixPriInitialPath)$(_CodeBrixDirectorySeparator)%(ContentFilesProjectOutputGroupOutput.Link)</Link>
+				<TargetPath Condition="'$(CodeBrixPriInitialPath)' != ''">$(CodeBrixPriInitialPath)$(_CodeBrixDirectorySeparator)%(ContentFilesProjectOutputGroupOutput.TargetPath)</TargetPath>
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			</_AllChildProjectItemsWithTargetPath>
+
+			<ContentFilesProjectOutputGroupOutput Remove="@(_AllChildProjectItemsWithTargetPath)" />
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup>
+		<_CodeBrixAddAssetsFilesToPublishDirectoryDependsOn>
+			ContentFilesProjectOutputGroup;
+			AssignTargetPaths;
+			_DefineCodeBrixPriProperties;
+			$(_CodeBrixAddAssetsFilesToPublishDirectoryDependsOn)
+		</_CodeBrixAddAssetsFilesToPublishDirectoryDependsOn>
+	</PropertyGroup>
+
+	<!--
+	Target executed by every project onto its references to determine publish assets.
+	Since this target renames assets to include the project name, it must not be executed
+	on the project head.
+	-->
+	<Target Name="_CodeBrixAddAssetsFilesToPublishDirectory"
+			DependsOnTargets="$(_CodeBrixAddAssetsFilesToPublishDirectoryDependsOn)"
+			Condition="'$(IsCodeBrixHead)'!='true' and '$(AndroidApplication)'!='true' and '$(ProjectTypeGuids)'==''"
+			BeforeTargets="GetCopyToPublishDirectoryItems">
+
+		<ItemGroup>
+			<_AllChildProjectPublishItemsWithTargetPath Include="@(ContentWithTargetPath)">
+				<!-- Update link metadata only if available, prefer TargetPath otherwise -->
+				<Link Condition="'%(ContentWithTargetPath.Link)' != ''">$(CodeBrixPriInitialPath)$(_CodeBrixDirectorySeparator)%(ContentWithTargetPath.Link)</Link>
+				<TargetPath Condition="'$(CodeBrixPriInitialPath)' != ''">$(CodeBrixPriInitialPath)$(_CodeBrixDirectorySeparator)%(ContentWithTargetPath.TargetPath)</TargetPath>
+				<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			</_AllChildProjectPublishItemsWithTargetPath>
+
+			<ContentWithTargetPath Remove="@(_AllChildProjectPublishItemsWithTargetPath)" />
+		</ItemGroup>
+	</Target>
+
+	<!--
+	Adjust support for build output for the WebAssembly bootstrapper, because earlier
+	versions (3.x) don't support TargetPath metadata.
+	-->
+	<Target Name="_CodeBrixWasmContentAdjust"
+			Condition="'$(WasmShellSupportsBuildOutputGroups)'!='true'"
+			DependsOnTargets="GetCopyToOutputDirectoryItems"
+			BeforeTargets="BuildDist">
+		<ItemGroup>
+			<Content Include="@(_SourceItemsToCopyToOutputDirectory)"
+					 Condition="'%(_SourceItemsToCopyToOutputDirectory.TargetPath)'!=''"
+					 Link="%(_SourceItemsToCopyToOutputDirectory.TargetPath)" />
+		</ItemGroup>
+	</Target>
+
+	<!--
+	Ensure that project transitive references are copied to the publish directory, as well
+	as nuget packages content.
+	-->
+	<Target Name="_CodeBrixAssetsGetCopyToPublishDirectory"
+			BeforeTargets="GetCopyToPublishDirectoryItems"
+			Condition=" '$(UsingMicrosoftNETSdkWebAssembly)' != 'true' ">
+		<ItemGroup>
+			<ContentWithTargetPath Include="@(_TransitiveItemsToCopyToOutputDirectory)">
+				<TargetPath>%(TargetPath)</TargetPath>
+				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			</ContentWithTargetPath>
+		</ItemGroup>
+	</Target>
+
+	<PropertyGroup>
+		<CodeBrixGenerateAssetsManifestDependsOn>
+			$(CodeBrixGenerateAssetsManifestDependsOn);
+			_CodeBrixAssetsGetCopyToPublishDirectoryItems
+		</CodeBrixGenerateAssetsManifestDependsOn>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<CodeBrixGenerateAssetsManifestDependsOn>
+			$(CodeBrixGenerateAssetsManifestDependsOn);
+			_CodeBrixAssetsGetCopyToPublishDirectoryItems
+		</CodeBrixGenerateAssetsManifestDependsOn>
+
+		<_CodeBrixAssetsGetCopyToPublishDirectoryItemsDependsOn>
+			$(_CodeBrixAssetsGetCopyToPublishDirectoryItemsDependsOn);
+			_CodeBrixGetCopyToOutputItems;
+			GenerateCodeBrixWasmAssets; <!-- Required for 9.0.102 and later to get WasmShellOutputPackagePath -->
+		</_CodeBrixAssetsGetCopyToPublishDirectoryItemsDependsOn>
+	</PropertyGroup>
+
+	<!--
+	Ensure that project transitive references are copied to the publish directory, as well
+	as nuget packages content.
+	-->
+	<Target Name="_CodeBrixAssetsGetCopyToPublishDirectoryItems"
+			DependsOnTargets="$(_CodeBrixAssetsGetCopyToPublishDirectoryItemsDependsOn)"
+			Condition=" '$(UsingMicrosoftNETSdkWebAssembly)' == 'true' ">
+
+		<ItemGroup Condition=" @(CodeBrixAllCopyToOutputItems->Count()) > 0">
+			<_CodeBrixTransitiveItems Include="@(CodeBrixAllCopyToOutputItems)">
+				<!-- set the ContentRoot using GetDirectoryName -->
+				<ContentRoot>$([System.IO.Path]::GetDirectoryName('%(FullPath)'))</ContentRoot>
+				<Link>wwwroot/$(WasmShellOutputPackagePath)/%(TargetPath)</Link>
+				<TargetPath></TargetPath>
+			</_CodeBrixTransitiveItems>
+
+			<_CodeBrixTransitiveItems Remove="@(StaticWebAsset)" Condition="'%(StaticWebAsset.Link)' == '%(_CodeBrixTransitiveItems.Link)'" />
+		</ItemGroup>
+
+		<DefineStaticWebAssets
+			CandidateAssets="@(_CodeBrixTransitiveItems)"
+			FingerprintCandidates="$(StaticWebAssetsFingerprintContent)"
+			FingerprintPatterns="@(StaticWebAssetFingerprintPattern)"
+			RelativePathPattern="wwwroot/**"
+			SourceType="Discovered"
+			SourceId="$(PackageId)"
+			ContentRoot="$(MSBuildProjectDirectory)\wwwroot\"
+			BasePath="$(StaticWebAssetBasePath)"
+			AssetMergeSource="$(StaticWebAssetMergeTarget)">
+			<Output TaskParameter="Assets" ItemName="_CodeBrixTransitiveItems_StaticWebAsset" />
+		</DefineStaticWebAssets>
+
+		<RemoveDuplicates Inputs="@(StaticWebAsset);@(_CodeBrixTransitiveItems_StaticWebAsset)">
+			<Output TaskParameter="Filtered" ItemName="_CodeBrixTransitiveItems_Unique_StaticWebAsset"/>
+		</RemoveDuplicates>
+
+		<ItemGroup>
+			<StaticWebAsset Remove="@(StaticWebAsset)" />
+			<StaticWebAsset Include="@(_CodeBrixTransitiveItems_Unique_StaticWebAsset)" />
+
+			<_CodeBrixTransitiveItems_Unique_StaticWebAsset Remove="@(_CodeBrixTransitiveItems_Unique_StaticWebAsset)" />
+			<_CodeBrixTransitiveItems_Unique_StaticWebAsset Remove="@(_CodeBrixTransitiveItems_StaticWebAsset)" />
+		</ItemGroup>
+
+		<DefineStaticWebAssetEndpoints
+			  CandidateAssets="@(StaticWebAsset)"
+			  ExistingEndpoints="@(StaticWebAssetEndpoint)"
+			  ContentTypeMappings="@(StaticWebAssetContentTypeMapping)"
+			>
+			<Output TaskParameter="Endpoints" ItemName="StaticWebAssetEndpoint" />
+		</DefineStaticWebAssetEndpoints>
+
+	</Target>
+
+	<!-- 
+	Recursively get all copy to publish items.
+	
+	This is a clone of GetCopyToPublishDirectoryItems, but without the original 
+	dependencies that may cause invalid chains of targets evaluations.
+	-->
+	<Target Name="_CodeBrixGetCopyToOutputItems"
+				Returns="@(CodeBrixAllCopyToOutputItems)"
+				KeepDuplicateOutputs="false"
+				DependsOnTargets="AssignTargetPaths;AssignTargetPaths;_GetProjectReferenceTargetFrameworkProperties">
+
+		<PropertyGroup>
+			<_CodeBrixGCKeepMetadata>CopyToPublishDirectory;ExcludeFromSingleFile;TargetPath</_CodeBrixGCKeepMetadata>
+		</PropertyGroup>
+
+		<MSBuild Projects="@(_MSBuildProjectReferenceExistent)"
+			Targets="GetCopyToPublishDirectoryItems"
+			BuildInParallel="$(BuildInParallel)"
+			Properties="%(_MSBuildProjectReferenceExistent.SetConfiguration); %(_MSBuildProjectReferenceExistent.SetPlatform); %(_MSBuildProjectReferenceExistent.SetTargetFramework)"
+			Condition="'@(_MSBuildProjectReferenceExistent)' != '' and '$(_GetChildProjectCopyToPublishDirectoryItems)' == 'true' and '%(_MSBuildProjectReferenceExistent.Private)' != 'false'"
+			ContinueOnError="$(ContinueOnError)"
+			RemoveProperties="%(_MSBuildProjectReferenceExistent.GlobalPropertiesToRemove)$(_GlobalPropertiesToRemoveFromProjectReferences)">
+
+			<Output TaskParameter="TargetOutputs" ItemName="_CodeBrixAllChildProjectItemsWithTargetPath"/>
+		</MSBuild>
+
+		<ItemGroup>
+			<_CodeBrixSourceItemsToCopy
+				KeepDuplicates="false"
+				KeepMetadata="$(_CodeBrixGCKeepMetadata)"
+				Include="@(_CodeBrixAllChildProjectItemsWithTargetPath->'%(FullPath)')"
+				Condition="'%(_CodeBrixAllChildProjectItemsWithTargetPath.CopyToPublishDirectory)'!='Never'"/>
+
+			<CodeBrixAllCopyToOutputItems Include="@(_CodeBrixSourceItemsToCopy->'%(FullPath)')"/>
+		</ItemGroup>
+	</Target>
+</Project>

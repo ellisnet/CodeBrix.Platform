@@ -1,0 +1,36 @@
+#nullable enable
+
+using System;
+using System.Threading.Tasks;
+
+namespace CodeBrix.Platform.UI.Hosting; //Was previously: Uno.UI.Hosting
+
+public abstract class CodeBrixPlatformHost
+{
+	internal Action? AfterInitAction { get; set; }
+
+	private async Task RunCore()
+	{
+		Initialize();
+		await InitializeAsync();
+		AfterInitAction?.Invoke();
+		await RunLoop();
+	}
+
+	public void Run()
+	{
+		var task = RunCore();
+		if (task != Task.CompletedTask)
+		{
+			throw new InvalidOperationException($"Running host {this} requires calling 'await host.RunAsync()' instead of 'host.Run()'.");
+		}
+	}
+
+	public async Task RunAsync() => await RunCore();
+
+	protected abstract void Initialize();
+
+	protected virtual Task InitializeAsync() => Task.CompletedTask;
+
+	protected abstract Task RunLoop();
+}

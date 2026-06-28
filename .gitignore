@@ -427,3 +427,8 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+# Bundled legacy NuGet tools — unused by the build (SDK packer is used instead)
+build/external/nuget/*.exe
+# Local nuget pack output (belt-and-suspenders; already caught by [Rr]elease/ + *.nupkg)
+nugets/

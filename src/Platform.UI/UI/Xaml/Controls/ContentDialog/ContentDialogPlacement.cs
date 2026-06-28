@@ -1,0 +1,14 @@
+﻿#pragma warning disable 108 // new keyword hiding
+#pragma warning disable 114 // new keyword hiding
+using CodeBrix.Platform;
+using CodeBrix.Platform.Extensions;
+
+namespace Microsoft.UI.Xaml.Controls
+{
+	public enum ContentDialogPlacement
+	{
+		Popup,
+		[NotImplemented]
+		InPlace,
+	}
+}

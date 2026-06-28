@@ -1,0 +1,22 @@
+﻿using SkiaSharp;
+using CodeBrix.Platform.UI.UI.Xaml.Media;
+
+namespace Microsoft.UI.Xaml.Media
+{
+	partial class GeometryGroup
+	{
+		internal override SKPath GetSKPath()
+		{
+			var path = new SKPath();
+
+			foreach (var geometry in Children)
+			{
+				var geometryPath = geometry.GetSKPath();
+				path.AddPath(geometryPath);
+			}
+
+			path.FillType = FillRule.ToSkiaFillType();
+			return path;
+		}
+	}
+}

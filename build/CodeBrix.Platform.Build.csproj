@@ -1,0 +1,135 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+	========================================================================
+	CodeBrix.Platform NuGet packaging driver
+	========================================================================
+	Ported from upstream Uno's build/Uno.UI.Build.csproj, retrofitted with the
+	canonical CodeBrix date-stamped versioning scheme.
+
+	This project intentionally compiles nothing of value: its job is to gather
+	the ALREADY-BUILT Release outputs of the platform projects and pack them
+	into NuGet packages (pack-only model). Build the solution in Release first,
+	then build (or run) this project to produce the packages.
+
+	One run computes $(BuildVersion) ONCE and stamps it on every package it
+	produces, so a full package build yields a set that all share the same
+	version (the single exception is CodeBrix.Platform.SkiaSharp.Views, which
+	is pinned to the SkiaSharp version it vendors — its nuspec carries a literal
+	<version> rather than the $codebrixversion$ token).
+
+	Packing goes through the .NET SDK packer (via the CodeBrix.Pack.Shim
+	project), NOT build\external\nuget\NuGet.exe — that bundled packer is 5.4.0
+	(2019) and mis-emits net10.0 dependency groups as ".NETFramework10.0".
+
+	Packages land in:  {repo}\nugets\$(Configuration)\$(BuildVersion)\
+	========================================================================
+	-->
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<!-- This driver is never itself a package. -->
+		<IsPackable>false</IsPackable>
+		<IsPublishable>false</IsPublishable>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Nullable>disable</Nullable>
+		<!-- This project has no source files; silence the empty-compile warning. -->
+		<NoWarn>$(NoWarn);CS2008</NoWarn>
+	</PropertyGroup>
+
+	<!--
+	Canonical CodeBrix date-stamped version (computed once per build run).
+	Format: 1.<years-since-2026>.<dayOfYear>.<minuteOfDay>, all from UTC now.
+	This mirrors the canonical version block used in every packable CodeBrix
+	.csproj; here it is the single source of truth for the whole pack run.
+
+	OVERRIDE: pass -p:BuildVersion=1.x.y.z to reuse an EXISTING version instead
+	of stamping a fresh one. Required when a package must be rebuilt on a second
+	machine and stay in the same version-locked set — e.g. the .MacOS package,
+	whose native dylib can only be built on Apple Silicon. Building it there with
+	-p:BuildVersion=<the Windows run's version> keeps its sibling dependencies
+	(aggregate / base runtime / FrameBuffer) pinned to that already-published
+	version, so publishing ONLY the rebuilt .MacOS package still restores cleanly.
+	(The Condition below makes the date-stamp a fallback; an explicitly supplied
+	BuildVersion wins.)
+	-->
+	<PropertyGroup>
+		<_VersionBaseYear>2026</_VersionBaseYear>
+		<_VersionYears>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), $(_VersionBaseYear)))</_VersionYears>
+		<_VersionDayOfYear>$([System.DateTime]::UtcNow.DayOfYear)</_VersionDayOfYear>
+		<_VersionMinuteOfDay>$([System.Convert]::ToInt32($([System.Math]::Floor($([System.DateTime]::UtcNow.TimeOfDay.TotalMinutes)))))</_VersionMinuteOfDay>
+		<BuildVersion Condition="'$(BuildVersion)'==''">1.$(_VersionYears).$(_VersionDayOfYear).$(_VersionMinuteOfDay)</BuildVersion>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<_RepoRoot>$(MSBuildThisFileDirectory)..\</_RepoRoot>
+		<_NuspecDir>$(MSBuildThisFileDirectory)nuget</_NuspecDir>
+		<_PackShim>$(MSBuildThisFileDirectory)nuget-pack-shim\CodeBrix.Pack.Shim.csproj</_PackShim>
+		<_PackOutputDir>$(_RepoRoot)nugets\$(Configuration)\$(BuildVersion)</_PackOutputDir>
+	</PropertyGroup>
+
+	<!--
+	The set of nuspec-driven packages produced by this driver. Extend this list
+	as packages are migrated. Date-stamped packages use the $codebrixversion$
+	token in their <version>; SkiaSharp.Views uses a literal pinned version.
+	-->
+	<ItemGroup>
+		<_Nuspec Include="$(_NuspecDir)\Platform.WinUI.nuspec" />
+		<_Nuspec Include="$(_NuspecDir)\Platform.WinUI.Graphics2DSK.nuspec" />
+		<_Nuspec Include="$(_NuspecDir)\Platform.WinUI.Lottie.nuspec" />
+		<_Nuspec Include="$(_NuspecDir)\Platform.WinUI.Svg.nuspec" />
+		<_Nuspec Include="$(_NuspecDir)\CodeBrix.Platform.SkiaSharp.Views.nuspec" />
+	</ItemGroup>
+
+	<!--
+	csproj-packed packages (the head / runtime-host packages). Packed with -p:Version so
+	they AND their ProjectReference dependencies (the aggregate, the base Runtime.Skia)
+	carry the one shared date-stamped version. Their own GeneratePackageOnBuild is OFF;
+	this driver is the sole packer.
+	-->
+	<ItemGroup>
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Win32\Platform.UI.Runtime.Skia.Win32.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wpf\Platform.UI.Runtime.Skia.Wpf.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.MacOS\Platform.UI.Runtime.Skia.MacOS.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+	</ItemGroup>
+
+	<Target Name="PackCodeBrix"
+			AfterTargets="Build"
+			Condition="'$(Configuration)'=='Release'">
+
+		<!-- Capture git branch/commit for the nuspec <repository> tokens. -->
+		<Exec Command="git rev-parse --abbrev-ref HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true" WorkingDirectory="$(_RepoRoot)">
+			<Output TaskParameter="ConsoleOutput" PropertyName="_GitBranch" />
+		</Exec>
+		<Exec Command="git rev-parse HEAD" ConsoleToMSBuild="true" IgnoreExitCode="true" WorkingDirectory="$(_RepoRoot)">
+			<Output TaskParameter="ConsoleOutput" PropertyName="_GitCommit" />
+		</Exec>
+		<PropertyGroup>
+			<_GitBranch Condition="'$(_GitBranch)'==''">unknown</_GitBranch>
+			<_GitCommit Condition="'$(_GitCommit)'==''">unknown</_GitCommit>
+		</PropertyGroup>
+
+		<MakeDir Directories="$(_PackOutputDir)" />
+
+		<Message Importance="high" Text="CodeBrix pack: version $(BuildVersion) -> $(_PackOutputDir)" />
+
+		<!-- Pack each nuspec through the SDK packer (net10.0-aware). One Exec per
+		     nuspec; the shim turns the -p: values into NuspecFile/NuspecProperties. -->
+		<Exec Command="dotnet pack &quot;$(_PackShim)&quot; -p:CbxNuspec=&quot;%(_Nuspec.Identity)&quot; -p:CbxNuspecBasePath=&quot;$(_NuspecDir)&quot; -p:CbxVersion=$(BuildVersion) -p:CbxBranch=$(_GitBranch) -p:CbxCommit=$(_GitCommit) --output &quot;$(_PackOutputDir)&quot; --nologo --verbosity minimal" />
+
+		<!-- Pack the csproj-based head/runtime packages with the shared date-stamped PACKAGE
+		     version only. We must NOT pass -p:Version here: that would override the platform's
+		     stable <Version>255.255.255.255</Version> (Directory.Build.props) and bump the
+		     AssemblyVersion of every project in the head's build graph, while folded-but-
+		     unreferenced assemblies (e.g. the logging Adapter) stay at 255.255.255.255 — a skew
+		     that breaks runtime assembly binding. -p:PackageVersion sets only the NuGet package
+		     version and still flows to the ProjectReference dependency versions. -->
+		<Exec Command="dotnet pack &quot;%(_CsprojPackage.Identity)&quot; -c Release -p:PackageVersion=$(BuildVersion) --output &quot;$(_PackOutputDir)&quot; --nologo --verbosity minimal" />
+
+	</Target>
+
+</Project>

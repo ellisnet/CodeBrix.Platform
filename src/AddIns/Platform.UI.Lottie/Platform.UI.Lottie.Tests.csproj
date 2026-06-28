@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);Uno0001</NoWarn>
+		<Deterministic>true</Deterministic>
+		<Nullable>enable</Nullable>
+		<AssemblyName>CodeBrix.Platform.UI.Lottie</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Lottie</RootNamespace>
+
+		<!--
+		Unlike the Skia/Reference flavors, this flavor does NOT define HAS_SKOTTIE: the
+		unit tests only exercise the parsing/theming surface, and LottieVisualSourceBase
+		provides a test-friendly InnerUpdate stub for !HAS_SKOTTIE + IS_UNIT_TESTS.
+		This avoids needing the SkiaSharp views types here, which would otherwise have to
+		bind against the Tests flavor of Uno.UI (see CodeBrix.Platform.SkiaSharp.Views).
+		-->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="buildTransitive\*.Lottie.targets" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="buildTransitive\*.Lottie.targets">
+			<PackagePath>build</PackagePath>
+			<Pack>true</Pack>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Tests.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Newtonsoft.Json" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+</Project>

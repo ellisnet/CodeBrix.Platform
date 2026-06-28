@@ -1,0 +1,50 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Composition</AssemblyName>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX_COMPOSITION</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RootNamespace>CodeBrix.Platform.UI.Composition</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX</DefineConstants>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="AssemblyInfo.skia.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj" Condition="'$(SyncGeneratorRunning)'!='true'" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" Condition="'$(SyncGeneratorRunning)'=='true'" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" Condition="'$(SyncGeneratorRunning)'!='true'" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" Condition="'$(SyncGeneratorRunning)'=='true'" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\UI\Xaml\CornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\FullCornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.skia.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\Thickness.cs" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever</id>
+		<version>$codebrixversion$</version>
+		<title>CodeBrix.Platform.Graphics2DSK</title>
+		<authors>Jeremy Ellis and contributors</authors>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<icon>icon-codebrix-128.png</icon>
+		<readme>README.md</readme>
+		<projectUrl>https://github.com/ellisnet/CodeBrix.Platform</projectUrl>
+		<license type="expression">Apache-2.0</license>
+		<description>2D graphics extensions (SkiaSharp) for CodeBrix.Platform applications.</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+		<tags>graphics;2d;skia;skiasharp;drawing;CodeBrix</tags>
+		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
+		<dependencies>
+
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+
+        <file src="..\..\src\AddIns\Platform.WinUI.Graphics2DSK\bin\Platform.WinUI.Graphics2DSK.Crossruntime\Release\net10.0\CodeBrix.Platform.WinUI.Graphics2DSK.*" target="lib\net10.0" />
+
+	</files>
+
+</package>

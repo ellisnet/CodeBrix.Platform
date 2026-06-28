@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="5.0">
+	<id>CodeBrix.Platform.WinUI.Skia.Linux.FrameBuffer</id>
+	<version>1.0.0.0</version>
+	<title>Uno.UI</title>
+	<authors>Uno Platform</authors>
+	<owners>unoplatform</owners>
+	<requireLicenseAcceptance>false</requireLicenseAcceptance>
+	<projectUrl>https://platform.uno/</projectUrl>
+	<license type="expression">Apache-2.0</license>
+	<icon>icon-codebrix-128.png</icon>
+	<description>Build Mobile, Desktop and WebAssembly apps with C# and XAML. Today. Open source and professionally supported.</description>
+	<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+	<repository type="git" url="https://github.com/unoplatform/uno.git" branch="$branch$" commit="$commitid$" />
+
+	<dependencies>
+	  <dependency id="CodeBrix.Platform.WinUI" version="1.0.0" />
+	  <dependency id="CodeBrix.Platform.WinUI.Runtime.Skia.Linux.FrameBuffer" version="1.0.0" />
+	</dependencies>
+  </metadata>
+
+  <files>
+	<file src="..\..\icon-codebrix-128.png" target="/" />
+	<file src="_._" target="lib\netstandard1.0" />
+  </files>
+</package>

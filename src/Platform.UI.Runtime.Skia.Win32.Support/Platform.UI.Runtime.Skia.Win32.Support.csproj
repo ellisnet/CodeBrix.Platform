@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.Win32.Support</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.Win32.Support</RootNamespace>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetCurrent)</TargetFrameworks>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<Description>Support assembly for CodeBrix.Platform Skia Win32 Runtime</Description>
+
+		<CommonOverridePackageId>codebrix.platform.winui.runtime.skia.win32</CommonOverridePackageId>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+
+		<!-- Ignore NU5104 for net7.0 System.Drawing.Common -->
+		<NoWarn>$(NoWarn);NU5104</NoWarn>
+
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.296">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+</Project>

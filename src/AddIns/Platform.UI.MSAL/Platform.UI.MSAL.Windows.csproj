@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUWPOrWinUI)</TargetFrameworks>
+		<NoWarn>$(NoWarn);NU5100;NU5118;NU5128</NoWarn>
+		<Deterministic>true</Deterministic>
+
+		<AssemblyName>CodeBrix.Platform.UI.MSAL</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.MSAL</RootNamespace>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<Description>This package provides the extensions to MSAL (Microsoft.Identity.Client) for a CodeBrix.Platform application.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.WinUI.MSAL</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="buildTransitive\*.MSAL.targets" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="buildTransitive/*">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.84.2" />
+	</ItemGroup>
+
+	<Import Project="..\..\..\build\nuget\platform.winui.cross-runtime.targets" />
+
+	<Target Name="_CodeBrixToolkitOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.ui.msal\$(CodeBrixNugetOverrideVersion)\lib\$(_OverrideTargetFramework)</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+
+	<Target Name="IncludeRuntimeAssets" BeforeTargets="BeforeCompile">
+		<RemoveDuplicates Inputs="@(TfmSpecificPackageFile)">
+				<Output TaskParameter="Filtered" ItemName="FilteredTfmSpecificPackageFile" />
+		</RemoveDuplicates>
+
+		<ItemGroup>
+			<TfmSpecificPackageFile Remove="@(TfmSpecificPackageFile)" />
+			<TfmSpecificPackageFile Include="@(FilteredTfmSpecificPackageFile)" />
+		</ItemGroup>
+
+	</Target>
+
+	<!-- Workaround for missing target running on .NET 5 -->
+	<Target Name="GetTargetPath" />
+
+</Project>

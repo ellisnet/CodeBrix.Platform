@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<!-- CS0109: see the .Skia flavor csproj — keeps vendored files byte-identical with upstream. -->
+		<NoWarn>$(NoWarn);Uno0001;CS0109</NoWarn>
+		<Deterministic>true</Deterministic>
+
+		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views</AssemblyName>
+		<RootNamespace>SkiaSharp.Views.Windows</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Reference</CodeBrixRuntimeIdentifier>
+
+		<!--
+		Upstream (SkiaSharp.Views.Platform.WinUI.csproj, plain-TFM build) defines HAS_CODEBRIX;WINUI
+		and gets HAS_CODEBRIX_WINUI/CODEBRIX_REFERENCE_API from the CodeBrix.Platform package props.
+		CODEBRIX_REFERENCE_API selects the *.Reference.cs API shells. See PORTING-NOTES.md.
+		-->
+		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;WINUI;CODEBRIX_REFERENCE_API</DefineConstants>
+
+		<!-- See the .Skia flavor csproj: version is tied to the vendored SkiaSharp version. -->
+		<Version>3.119.4</Version>
+		<PackageVersion>3.119.4</PackageVersion>
+
+		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
+		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Skia-flavor implementation; compiled only by the .Skia flavor of this project -->
+		<Compile Remove="SkiaSharp.Views.Platform.WinUI.Skia\**\*.cs" />
+		<None Include="SkiaSharp.Views.Platform.WinUI.Skia\**\*.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+</Project>

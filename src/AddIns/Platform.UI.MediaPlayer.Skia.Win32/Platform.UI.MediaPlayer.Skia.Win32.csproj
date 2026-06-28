@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.MediaPlayer.Skia.Win32</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.MediaPlayer.Skia.Win32</RootNamespace>
+
+		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+		<!-- Not yet migrated to the shared CodeBrix.Platform ship-metadata; keep the legacy icon
+		     and opt out of the central README/notices packing so this auto-pack stays green. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageReadmeFile></PackageReadmeFile>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32</PackageId>
+		<Description>This package provides support for MediaPlayerElement for CodeBrix.Platform Skia+Win32 apps</Description>
+
+		<DefineConstants>$(DefineConstants);IS_MPE_WIN32</DefineConstants>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.165.1288" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.296">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<ProjectReference Include="..\..\Platform.UI.Runtime.Skia.Win32\Platform.UI.Runtime.Skia.Win32.csproj" />
+		<ProjectReference Include="..\..\Platform.UI.Runtime.Skia.Win32.Support\Platform.UI.Runtime.Skia.Win32.Support.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI.MediaPlayer.Skia.X11\SharedMediaPlayerExtension.cs" />
+	</ItemGroup>
+
+	<Target Name="_CodeBrixUICodeBrixUIMediaPlayerSkiaWin32OverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.ui.mediaplayer.skia.win32\$(CodeBrixNugetOverrideVersion)\codebrix-platform-runtime\$(CodeBrixRuntimeIdentifier.ToLowerInvariant())</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\libvlc_init_sample.mp4" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+</Project>

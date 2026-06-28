@@ -1,0 +1,22 @@
+<Project>
+	<!--
+	CodeBrix.Platform fork: .NET 10 only. Mobile/Apple-platform TFM remappings
+	(net*-ios → net*-ios18.0 etc.) were removed because all mobile/Apple-UIKit
+	platforms are out of scope. The .Wasm.csproj branch of the no-platform-override
+	gate was also removed.
+	-->
+	<PropertyGroup>
+		<_ShouldUseNoPlatformOverride>false</_ShouldUseNoPlatformOverride>
+		<_ShouldUseNoPlatformOverride Condition="
+			$(MSBuildProjectFile.EndsWith('.Skia.csproj'))
+			OR $(MSBuildProjectFile.EndsWith('.Reference.csproj'))
+			OR '$(CodeBrixDisableTargetFrameworkPlatformOverride)' == 'true'
+		">true</_ShouldUseNoPlatformOverride>
+	</PropertyGroup>
+
+	<Import Condition="'$(_ShouldUseNoPlatformOverride)'=='true'" Project="targetframework-override-noplatform.props" />
+	<PropertyGroup Condition="'$(CodeBrixTargetFrameworkOverride)'!='' AND '$(_ShouldUseNoPlatformOverride)' == 'false'">
+		<TargetFrameworks>$(CodeBrixTargetFrameworkOverride)</TargetFrameworks>
+	</PropertyGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+	<PageExclusions>$(MSBuildThisFileDirectory)Resources\**\*.xaml</PageExclusions>
+  </PropertyGroup>
+
+  <UsingTask TaskName="BatchMergeXaml" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" Runtime="NET" TaskFactory="TaskHostFactory" />
+
+
+  <PropertyGroup Condition="'$(CodeBrixRuntimeIdentifier)'=='Reference'">
+	<EnableAutomaticXamlPageInclusion>false</EnableAutomaticXamlPageInclusion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+  </PropertyGroup>
+
+  <Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+</Project>

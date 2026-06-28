@@ -1,0 +1,19 @@
+﻿#if HAS_CODEBRIX
+using DirectUI.Components;
+using Microsoft.UI.Xaml.Data;
+
+using Microsoft.UI.Xaml.Tests.Enterprise;
+
+namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Data; //Was previously: Uno.UI.RuntimeTests.MUX.Windows_UI_Xaml_Data
+
+[TestClass]
+[RunsOnUIThread]
+public partial class ItemIndexRangeHelperUnitTests : BaseDxamlTestClass
+{
+	private void VerifyRange(ItemIndexRangeHelper.Range range, int firstIndex, uint length)
+	{
+		VERIFY_ARE_EQUAL(range.FirstIndex, firstIndex);
+		VERIFY_ARE_EQUAL(range.Length, length);
+	}
+}
+#endif

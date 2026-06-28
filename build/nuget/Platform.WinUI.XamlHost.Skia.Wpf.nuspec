@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.WinUI.XamlHost.Skia.Wpf</id>
+		<version>0.0.1</version>
+		<authors>Uno Platform</authors>
+		<icon>icon-codebrix-128.png</icon>
+		<projectUrl>https://github.com/unoplatform/uno</projectUrl>
+		<license type="expression">Apache-2.0</license>
+		<description>This package provides the XAML hosting capabilities for an Uno Platform Skia+WPF applications.</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+		<repository type="git" url="https://github.com/unoplatform/uno.git" branch="$branch$" commit="$commitid$" />
+		<dependencies>
+			<group targetFramework="net10.0">
+				<dependency id="CodeBrix.Platform.WinUI.XamlHost" version="to-be-set-by-ci" />
+				<dependency id="CodeBrix.Platform.WinUI.Runtime.Skia.Wpf" version="to-be-set-by-ci" />
+			</group>
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\src\Platform.UI.XamlHost.Skia.Wpf\Bin\Release\net10.0-windows\Uno.UI.XamlHost.Skia.Wpf.*" target="lib\net10.0-windows" />
+	</files>
+
+</package>

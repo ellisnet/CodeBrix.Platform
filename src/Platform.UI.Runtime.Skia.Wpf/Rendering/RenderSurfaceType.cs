@@ -1,0 +1,7 @@
+﻿namespace CodeBrix.Platform.UI.Runtime.Skia.Wpf;
+
+public enum RenderSurfaceType
+{
+	Software,
+	OpenGL,
+}

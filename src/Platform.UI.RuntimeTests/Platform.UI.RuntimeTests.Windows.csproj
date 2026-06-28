@@ -1,0 +1,94 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUWPOrWinUI)</TargetFrameworks>
+		<AssemblyName>CodeBrix.Platform.UI.RuntimeTests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.RuntimeTests</RootNamespace>
+
+		<DefineConstants>$(DefineConstants);IS_RUNTIME_UI_TESTS</DefineConstants>
+		<NoWarn>$(NoWarn);CS1998</NoWarn>
+		<UseWinUI>true</UseWinUI>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+
+		<!-- Disabled because of https://github.com/dotnet/sdk/issues/43680#issuecomment-2401193028 -->
+		<CsWinRTAotOptimizerEnabled>false</CsWinRTAotOptimizerEnabled>
+
+		<!--
+		CodeBrix.Platform fork: mirrors the workaround in Platform.UI.Toolkit.Windows.csproj.
+		WindowsAppSDK MrtCore/AppxPackage MSBuild tasks live under
+		$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v18.0\AppxPackage\.
+		When run inside Visual Studio, $(MSBuildExtensionsPath) already resolves to the VS
+		MSBuild folder and the tasks load fine. When run via the standalone `dotnet build`
+		CLI, $(MSBuildExtensionsPath) resolves to the .NET SDK folder, where the AppxPackage
+		task DLLs are not present. Redirect $(MSBuildExtensionsPath) to the VS MSBuild folder
+		only for non-VS builds, when that VS folder actually exists on disk.
+		-->
+		<MSBuildExtensionsPath Condition=" '$(BuildingInsideVisualStudio)' != 'true'&#xD;&#xA;							AND Exists('$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\Microsoft\VisualStudio\v18.0\AppxPackage\Microsoft.Build.AppxPackage.dll') ">$(ProgramFiles)\Microsoft Visual Studio\18\Professional\MSBuild\</MSBuildExtensionsPath>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<ItemGroup Label="GlobalUsings">
+		<Using Include="SilverAssertions" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="MSTest.TestFramework" />
+		<PackageReference Include="MSTest.Analyzers" />
+		<PackageReference Include="Combinatorial.MSTest" />
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Windows.csproj" />
+	</ItemGroup>
+
+	<!-- CodeBrix.Platform fork: SamplesApp.UITests Compile includes removed (SamplesApp folder dropped). -->
+	<ItemGroup>
+		<Compile Include="..\Platform.Foundation\_Compat\IsExternalInit.cs" Link="_Compat\IsExternalInit.cs" />
+	</ItemGroup>
+
+	<Import Project="UnitTestsImport.props" />
+
+	<ItemGroup>
+		<EmbeddedResource Include="Assets\Border_Snapshot.bgra8" />
+		<EmbeddedResource Include="Assets\PlatformA4.pdf" />
+		<EmbeddedResource Include="Assets\PlatformA4.png" />
+		<EmbeddedResource Include="Assets\PlatformA4_Crop.png" />
+		<EmbeddedResource Include="Assets\PlatformA4_Protected.pdf" />
+		<EmbeddedResource Include="Assets\PlatformA4_Protected.png" />
+		<EmbeddedResource Include="Assets\PlatformA4_100x141.png" />
+		<Content Include="Assets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+
+		<!-- We remove Unit tests imported from MUX on UAP as they are usualy heavily relying on internal classes.-->
+		<Compile Remove="$(MSBuildThisFileDirectory)MUX\Microsoft_UI_XAML_Controls\**\*.cs" />
+	</ItemGroup>
+	
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);WINAPPSDK</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<PageExclusions>$(MSBuildThisFileDirectory)MUX\Microsoft_UI_XAML_Controls\**\*.xaml</PageExclusions>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PRIResource Include="Resources\**\*.resw" />
+	</ItemGroup>
+
+	<!-- CodeBrix.Platform fork: Given_HtmlElementAttribute.Wasm.cs Compile removed (WASM-only test file deleted). -->
+	<ItemGroup>
+		<ProjectReference Include="../CodeBrix.Platform.Extensions/CodeBrix.Platform.Extensions.csproj" />
+		<ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<!-- CodeBrix.Platform fork: this project references only MSTest.TestFramework (the
+	     assertion/attribute framework), not the MSTest meta-package or the MTP runner, so
+	     it has no real `_MTPBuild` target. It is a WinUI runtime-test harness hosted in an
+	     app, not an MTP test exe. `dotnet test <slnx>` invokes `_MTPBuild` solution-wide and
+	     fails this project with MSB4057. This no-op satisfies the CLI; its tests run in the
+	     app host / Visual Studio, never via MTP `dotnet test`. -->
+	<Target Name="_MTPBuild" />
+</Project>

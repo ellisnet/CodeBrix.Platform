@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>69ea1cb5-bb31-414a-9e0b-74c72ff7775f</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>SourceGeneratorHelpers</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\Platform.Foundation\_Compat\*.cs" Link="_Compat\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\AnalyzerSuppressions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\DesignTimeHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\GeneratorExecutionContextExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\HashBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\PathHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\PlatformHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\SymbolExtensions.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\PlatformNamedTypeSymbolDisplayVisitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Internal\ObjectPool.cs" Link="_Extensions\ObjectPool.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Internal\PooledStringBuilder.cs" Link="_Extensions\PooledStringBuilder.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Core\**\*.cs" Link="_Extensions\Core\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Collections\**\*.cs" Link="_Extensions\Collections\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Disposables\**\*.cs" Link="_Extensions\Disposables\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Equality\**\*.cs" Link="_Extensions\Equality\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="$(MSBuildThisFileDirectory)..\..\CodeBrix.Platform.Extensions\Compatibility\**\*.cs" Link="_Extensions\Compatibility\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

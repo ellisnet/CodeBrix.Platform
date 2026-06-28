@@ -1,0 +1,47 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.WebView.Skia.X11</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.WebView.Skia.X11</RootNamespace>
+
+		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+		<!-- Not yet migrated to the shared CodeBrix.Platform ship-metadata; keep the legacy icon
+		     and opt out of the central README/notices packing so this auto-pack stays green. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageReadmeFile></PackageReadmeFile>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.WebView.Skia.X11</PackageId>
+		<Description>This package provides support for WebView for CodeBrix.Platform Skia+X11 apps</Description>
+
+		<!--
+		  "A stable release of a package should not have a prerelease dependency."
+		  because of WebkitGtkSharp 3.24.24.117-develop
+		  -->
+		<NoWarn>$(NoWarn);NU5104</NoWarn>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="WebkitGtkSharp" Version="3.24.24.117-develop" />
+
+		<ProjectReference Include="..\..\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+</Project>

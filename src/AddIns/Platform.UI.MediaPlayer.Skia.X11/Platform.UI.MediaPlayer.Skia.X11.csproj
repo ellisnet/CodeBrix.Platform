@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+    <PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.MediaPlayer.Skia.X11</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.MediaPlayer.Skia.X11</RootNamespace>
+
+		<DefineConstants>$(DefineConstants);IS_MPE_X11</DefineConstants>
+
+		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
+		<!-- Not yet migrated to the shared CodeBrix.Platform ship-metadata; keep the legacy icon
+		     and opt out of the central README/notices packing so this auto-pack stays green. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageReadmeFile></PackageReadmeFile>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11</PackageId>
+		<Description>This package provides support for MediaPlayerElement for CodeBrix.Platform Skia+X11 apps</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+    </PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.165.1288" />
+		
+		<ProjectReference Include="..\..\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<Target Name="_CodeBrixUICodeBrixUIMediaPlayerSkiaX11OverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.ui.mediaplayer.skia.x11\$(CodeBrixNugetOverrideVersion)\codebrix-platform-runtime\$(CodeBrixRuntimeIdentifier.ToLowerInvariant())</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\libvlc_init_sample.mp4" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+</Project>

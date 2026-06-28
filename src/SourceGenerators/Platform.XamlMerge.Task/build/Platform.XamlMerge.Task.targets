@@ -1,0 +1,70 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+
+	<!--
+	CodeBrix.Platform fork: vendored from the upstream package's build/Platform.XamlMerge.Task.targets
+	(see ../PORTING-NOTES.md). Only the UsingTask lines changed: the task assembly is loaded
+	from this in-repo project's shadow-copy output (produced by its _copyTasksBuildTime target)
+	instead of the NuGet package's tools folder. The assembly is loaded lazily at first task
+	use, so no exists() condition is needed; src/Platform.UI/XamlMerge.targets builds this project
+	before the merge target runs.
+	-->
+	<UsingTask TaskName="BatchMergeXaml_v0" AssemblyFile="$(MSBuildThisFileDirectory)..\bin\$(Configuration)_Shadow\CodeBrix.Platform.XamlMerge.Task.v0.dll" Runtime="NET" TaskFactory="TaskHostFactory" />
+
+	<PropertyGroup>
+		<XamlMergeOutputFile Condition="'$(XamlMergeOutputFile)'==''">$(MSBuildProjectDirectory)\Generated\mergedpages.xaml</XamlMergeOutputFile>
+	</PropertyGroup>
+
+	<Target Name="GenerateMergedXaml"
+					BeforeTargets="_ComputeTargetFrameworkItems;BeforeBuild" Condition="('$(TargetFramework)' == '' or '$(TargetFrameworks)'=='') and ('$(BuildingProject)' == 'true' or '$(DesignTimeBuild)' != 'true')">
+		<ItemGroup>
+			<_FilteredXamlMergeInput
+				Include="@(XamlMergeInput)"
+				Condition="'%(XamlMergeInput.FullPath)'!='$(XamlMergeOutputFile)'" />
+		</ItemGroup>
+
+		<BatchMergeXaml_v0
+			ProjectFullPath="$(MSBuildProjectFullPath)"
+			Pages="@(_FilteredXamlMergeInput)"
+			MergedXamlFile="$(XamlMergeOutputFile)"
+			TlogReadFilesOutputPath="$(IntermediateOutputPath)\XamlMerge.read.1u.tlog"
+			TlogWriteFilesOutputPath="$(IntermediateOutputPath)\XamlMerge.write.1u.tlog" />
+		<Message Text="Merged resources XAML file was generated in $(XamlMergeOutputFile)" />
+
+		<CallTarget Targets="_AdjustedMergedXamlItems" />
+	</Target>
+
+	<Target Name="_AdjustedMergedXamlItems"
+					BeforeTargets="GetCopyToOutputDirectoryItems;BeforeBuild;BeforeCompile">
+
+		<ItemGroup>
+			<Page Remove="@(XamlMergeInput)" />
+
+			<!--
+			Include the generated file in Pages if not already present.
+			This can happen when building for the first time.
+			-->
+			<_additionalPages Include="@(Page)"
+												Condition="'%(Page.FullPath)'!=$([System.IO.Path]::GetFullPath('$(XamlMergeOutputFile)'))"
+												KeepDuplicates="False" />
+
+			<_mergeOutputInluded Include="@(Page)"
+														Condition="'%(Page.FullPath)'==$([System.IO.Path]::GetFullPath('$(XamlMergeOutputFile)'))" />
+
+			<Page Include="$([MSBuild]::MakeRelative('$(MSBuildProjectDirectory)', '$(XamlMergeOutputFile)'))"
+						KeepDuplicates="False"
+						Condition="'@(_mergeOutputInluded)'==''"/>
+			<Page Include="@(_additionalPages)"
+						KeepDuplicates="False" />
+		</ItemGroup>
+
+	</Target>
+
+	<!-- Support for multi-targeting -->
+	<Target Name="_GenerateMergedXaml"
+				DependsOnTargets="GenerateMergedXaml"
+				BeforeTargets="DispatchToInnerBuilds"
+				Condition="'$(TargetFramework)' == ''">
+	</Target>
+
+</Project>

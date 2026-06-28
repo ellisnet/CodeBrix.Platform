@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Toolkit</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Toolkit</RootNamespace>
+		<DefaultLanguage>en-US</DefaultLanguage>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="LinkerDefinition.net6.0.xml">
+			<LogicalName>$(AssemblyName).xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj">
+		</ProjectReference>
+		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj">
+		</ProjectReference>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj">
+		</ProjectReference>
+	</ItemGroup>
+
+	<!-- Override existing target, this project cannot be published -->
+	<Target Name="Publish" />
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+</Project>

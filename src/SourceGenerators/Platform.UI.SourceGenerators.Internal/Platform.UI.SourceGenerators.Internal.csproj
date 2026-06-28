@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<PropertyGroup>
+		<RootNamespace>CodeBrix.Platform.UI.SourceGenerators.Internal</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- Generators must be on netstandard2.0 so that they run in VS (.NET Framework) and dotnet build (.NET Core) -->
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<AssemblyName>CodeBrix.Platform.UI.SourceGenerators.Internal</AssemblyName>
+		<AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" ExcludeAssets="runtime" />
+	</ItemGroup>
+
+	<Import Project="..\SourceGeneratorHelpers\SourceGeneratorHelpers.projitems" Label="Shared" />
+
+	<ItemGroup>
+		<!-- CodeBrix.Platform fork: TSInteropMessageAttribute.wasm.cs Compile removed (Uno.Foundation.Runtime.WebAssembly dropped). -->
+		<!-- TSBindingsGenerator depends on Uno.Foundation.Interop.TSInteropMessageAttribute (WASM-only, dropped in this fork). -->
+		<Compile Remove="TSBindings\TSBindingsGenerator.cs" />
+		<Compile Include="..\Platform.UI.SourceGenerators\XamlGenerator\XamlConstants.cs" Link="XamlGenerator\XamlConstants.cs" />
+	</ItemGroup>
+
+	<Target Name="GetTargetPath" />
+	<Target Name="GetCopyToPublishDirectoryItems" />
+</Project>

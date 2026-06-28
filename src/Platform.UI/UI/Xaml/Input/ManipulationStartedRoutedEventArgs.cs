@@ -1,0 +1,54 @@
+﻿using CodeBrix.Platform.UI.Xaml.Input;
+using Windows.Devices.Input;
+using Windows.Foundation;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.UI;
+
+#if HAS_CODEBRIX_WINUI
+using Microsoft.UI.Input;
+using PointerDeviceType = Microsoft.UI.Input.PointerDeviceType;
+#else
+using Windows.UI.Input;
+#endif
+
+namespace Microsoft.UI.Xaml.Input
+{
+	public partial class ManipulationStartedRoutedEventArgs : RoutedEventArgs, IHandleableRoutedEventArgs
+	{
+		private readonly GestureRecognizer _recognizer;
+
+		public ManipulationStartedRoutedEventArgs() { }
+
+		internal ManipulationStartedRoutedEventArgs(UIElement source, UIElement container, GestureRecognizer recognizer, ManipulationStartedEventArgs args)
+			: base(source)
+		{
+			Container = container;
+
+			_recognizer = recognizer;
+
+			Pointers = args.Pointers;
+			PointerDeviceType = args.PointerDeviceType;
+			Position = FeatureConfiguration.ManipulationRoutedEventArgs.IsAbsolutePositionEnabled
+				? args.Position
+				: UIElement.GetTransform(container, null).Inverse().Transform(args.Position);
+			Cumulative = args.Cumulative;
+		}
+
+		/// <summary>
+		/// Gets identifiers of all pointer that has been involved in that manipulation.
+		/// </summary>
+		/// <remarks>All pointers are expected to have the same <see cref="PointerIdentifier.Type"/>.</remarks>
+		internal PointerIdentifier[] Pointers { get; }
+
+		public bool Handled { get; set; }
+
+		public UIElement Container { get; }
+
+		public PointerDeviceType PointerDeviceType { get; }
+		public Point Position { get; }
+		public ManipulationDelta Cumulative { get; }
+
+		public void Complete()
+			=> _recognizer?.CompleteGesture();
+	}
+}

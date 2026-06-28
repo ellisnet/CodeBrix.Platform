@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.Lottie.ApacheLicenseForever</id>
+		<version>$codebrixversion$</version>
+		<title>CodeBrix.Platform.Lottie</title>
+		<authors>Jeremy Ellis and contributors</authors>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<projectUrl>https://github.com/ellisnet/CodeBrix.Platform</projectUrl>
+		<license type="expression">Apache-2.0</license>
+		<icon>icon-codebrix-128.png</icon>
+		<readme>README.md</readme>
+		<description>
+			Lottie animation support for CodeBrix.Platform applications (a port of Microsoft.Toolkit.Uwp.UI.Lottie).
+
+			Original documentation: https://docs.microsoft.com/windows/communitytoolkit/animations/lottie
+		</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+		<tags>lottie;animation;json;skia;CodeBrix</tags>
+		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
+
+		<dependencies>
+
+			<group targetFramework="net10.0">
+				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
+				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="3.119.4" />
+				<dependency id="System.Json" version="4.7.1" />
+			</group>
+
+		</dependencies>
+
+		<references>
+			<group targetFramework="net10.0">
+				<reference file="CodeBrix.Platform.UI.Lottie.dll" />
+			</group>
+			<!-- For UAP (UWP), the reference to Microsoft.Toolkit.Uwp.UI.Lottie will be added manually -->
+		</references>
+	</metadata>
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Reference\Release\net10.0\CodeBrix.Platform.UI.Lottie.dll" target="lib\net10.0" />
+
+		<!-- Build targets (renamed to <PackageId>.targets so NuGet auto-imports it). -->
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\buildTransitive\Platform.WinUI.Lottie.targets" target="buildTransitive\CodeBrix.Platform.Lottie.ApacheLicenseForever.targets" />
+
+		<!-- net10.0 Skia -->
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\Bin\Platform.UI.Lottie.Skia\Release\net10.0\CodeBrix.Platform.UI.Lottie.*" target="codebrix-platform-runtime\net10.0\skia" />
+	</files>
+</package>

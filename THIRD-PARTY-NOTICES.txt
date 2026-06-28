@@ -1,0 +1,430 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+CodeBrix.Platform incorporates material from the project(s) listed below
+(collectively, "Third Party Code"). Jeremy Ellis and contributors are not the
+original author(s) of the Third Party Code. The original copyright notices and
+the licenses, under which Jeremy Ellis and contributors received such Third
+Party Code, are set forth below. Such licenses and notices are provided for
+informational purposes only. Jeremy Ellis and contributors license the
+CodeBrix.Platform project to you under the terms set forth in the LICENSE file
+(the Apache License, Version 2.0), which is located at the root of this
+repository.
+
+CodeBrix.Platform is, as a whole, a fork of the Uno Platform (see item 1 in
+Part A). It therefore contains a large body of Uno Platform source, plus the
+third-party material that the Uno Platform itself incorporates, plus additional
+code and asset files vendored directly into this repository. All three are
+documented below. This file is intended to be a comprehensive "one-stop"
+record of the provenance and licensing of every body of source code and asset
+file that was pulled into this repository from an outside project.
+
+This file documents only source code and asset files that are present in this
+repository. Functionality obtained by referencing a published NuGet package
+(whose source is not part of this repository) is NOT documented here; such
+packages carry their own license and notice files.
+
+If you have any questions about any Third Party Code noticed here, or if you
+believe that any Third Party Code noticed here has been included in
+CodeBrix.Platform in error, please open a new issue at:
+https://github.com/ellisnet/CodeBrix.Platform/issues
+
+The full text of each distinct license referenced below is reproduced in
+Part D. The Apache License, Version 2.0 (used by this repository itself and by
+several of the components below) is reproduced in the LICENSE file at the root
+of this repository and is not duplicated here.
+
+================================================================================
+ PART A — PRIMARY UPSTREAM
+================================================================================
+
+1.  Uno Platform (version 6.5)
+    -------------------------------------------------------------------------
+    Project URL:  https://github.com/unoplatform/uno
+    Copyright:    Copyright (c) nventive inc., Uno Platform Inc., and the Uno
+                  Platform contributors. All rights reserved.
+    License:      Apache License, Version 2.0
+
+    The entire CodeBrix.Platform repository is derived from the Uno Platform
+    (the release/stable/6.5 line). The great majority of the source under
+    src/ is Uno Platform source, modified for this fork:
+
+      - retargeted to .NET 10 only (the mobile, WebAssembly, and UWP heads are
+        not built; much of that source is stripped or left dormant);
+      - the public assembly names and namespaces were renamed from Uno.* to
+        CodeBrix.Platform.* (e.g. Uno.UI -> CodeBrix.Platform.UI,
+        Uno.Foundation -> CodeBrix.Platform.Foundation,
+        Uno.UI.Toolkit -> CodeBrix.Platform.UI.Toolkit); and
+      - the result is packaged as the CodeBrix.Platform.* NuGet packages.
+
+    The Uno Platform is licensed under the Apache License, Version 2.0; the full
+    license text is in the LICENSE file at the root of this repository. The Uno
+    Platform itself incorporates third-party material (Parts B and C below carry
+    forward the relevant notices).
+
+================================================================================
+ PART B — THIRD-PARTY SOURCE CODE VENDORED OR DERIVED INTO src/
+================================================================================
+
+The components in this part are present as source code in this repository
+(copied verbatim or modified). They are grouped by license.
+
+--------------------------------------------------------------------------------
+ Apache License, Version 2.0  (same license as this repository; full text in the
+ root LICENSE file)
+--------------------------------------------------------------------------------
+
+2.  Uno.Core.Extensions  (vendored as CodeBrix.Platform.Extensions and
+    CodeBrix.Platform.Extensions.Logging)
+    Project URLs: https://github.com/unoplatform/Uno.Core   (standalone
+                    Uno.Core.Extensions, version 4.1.1, commit
+                    6da975c67063a670626fe7ae19250ff585ba2224)
+                  https://github.com/unoplatform/uno   (the equivalent helpers
+                    as carried in the Uno Platform 6.5 source)
+    Copyright:    Copyright (c) 2015-2018 nventive inc. / Uno Platform Inc.
+                  All rights reserved.
+    License:      Apache License, Version 2.0
+
+    Source files under src/CodeBrix.Platform.Extensions/ and
+    src/CodeBrix.Platform.Extensions.Logging/, and the equivalent helpers
+    compiled into CodeBrix.Platform.Foundation and the source generators, are
+    derived from the nventive / Uno Platform "Uno.Core.Extensions" helper
+    libraries (the base, Collections, Disposables, Equality, Logging,
+    Logging.Singleton, and Threading helper sets). The namespaces were renamed
+    from Uno.* to CodeBrix.Platform.Extensions.*; each renamed namespace line
+    carries a "// was previously: <original-namespace>" provenance comment. No
+    managed behavior was changed. The Uno.Core.Extensions.Compatibility helper
+    set was deliberately NOT vendored.
+
+    Note: a small number of files under
+    src/CodeBrix.Platform.Extensions/Internal/ are NOT part of
+    Uno.Core.Extensions; see item 8 (.NET Foundation, MIT).
+
+3.  Uno.Diagnostics.Eventing
+    Project URL:  https://github.com/unoplatform/Uno.Diagnostics.Eventing
+    Source:       tag 2.1.0 (commit fb046f1); formerly the 2.0.1 NuGet package.
+    Copyright:    Copyright (c) nventive inc. All rights reserved.
+    License:      Apache License, Version 2.0
+
+    Eight verbatim .cs files under src/Platform.Foundation/Diagnostics/Eventing/
+    (Tracing.cs, IEventProvider.cs, IEventProviderFactory.cs,
+    NullEventProvider.cs, EventProviderExtensions.cs, EventActivity.cs,
+    EventDescriptor.cs, EventOpcode.cs). The .Providers sibling was not vendored.
+    (The upstream License.md header carries a copy/paste artifact naming
+    "Uno.MonoAnalyzers"; the Apache-2.0 grant itself is unambiguous.)
+
+4.  Uno.XamlMerge.Task   (build-time only; NOT shipped in any package)
+    Project URL:  https://github.com/unoplatform/uno.xamlmerge.task
+    Source:       commit f76645703193d279913d46c9181e0642bc79c095; formerly the
+                  1.27.0-dev.44 NuGet package.
+    Copyright:    Copyright (c) Uno Platform Inc. / nventive inc.
+    License:      Apache License, Version 2.0
+
+    Verbatim .cs files (BatchMergeXaml.cs, CustomTask.cs, MergedDictionary.cs,
+    Utils.cs) under src/SourceGenerators/Platform.XamlMerge.Task/, plus an
+    adapted build/*.targets. Used only to merge control-style XAML during this
+    repository's own build; nothing from this project ships to consumers.
+    (See PORTING-NOTES.md in that folder.)
+
+5.  RealtimeBlurView
+    Project URL:  https://github.com/mmin18/RealtimeBlurView
+    Copyright:    Copyright 2016 Tu Yimin (http://github.com/mmin18)
+    License:      Apache License, Version 2.0
+
+    One of the two projects the Uno Platform's Android AcrylicBrush
+    implementation is based on. This fork targets .NET 10 desktop / Skia and
+    does not build the Android head; the upstream-derived source may remain in
+    the tree and is attributed here for completeness.
+
+--------------------------------------------------------------------------------
+ MIT License  (full text in Part D)
+--------------------------------------------------------------------------------
+
+6.  SkiaSharp — view glue (SkiaSharp.Views.Uno.WinUI)
+    Project URL:  https://github.com/mono/SkiaSharp
+    Source:       tag v3.119.4 (commit f568ac94dd768ef9a2f593537cfde2dd0d348ef5)
+    Copyright:    Copyright (c) 2015-2016 Xamarin, Inc.
+                  Copyright (c) 2017-2018 Microsoft Corporation.
+    License:      MIT License
+
+    Ten verbatim .cs files under src/AddIns/CodeBrix.Platform.SkiaSharp.Views/
+    (SKXamlCanvas, SKSwapChainPanel, SKPaintSurfaceEventArgs,
+    SKPaintGLSurfaceEventArgs, Extensions, UWPExtensions, and their
+    .Skia/.Reference flavors), copied byte-for-byte from the SkiaSharp views
+    source. Only this thin view-glue layer is present in this repository.
+    (See PORTING-NOTES.md in that folder.)
+
+7.  Mono / Novell — System.Xaml
+    Project URL:  https://github.com/mono/mono
+    Copyright:    Copyright (C) 2010 Novell Inc. (http://www.novell.com)
+                  Portions Copyright (c) Xamarin, Inc.
+    License:      MIT License
+
+    Approximately 110 source files under src/SourceGenerators/System.Xaml/
+    (XamlReader/Writer, the XAML schema/type system, and markup-extension
+    support), derived from the Mono implementation of System.Xaml.
+
+8.  .NET Foundation — .NET runtime, Roslyn, and corefx
+    Project URLs: https://github.com/dotnet/runtime
+                  https://github.com/dotnet/roslyn
+                  (historically https://github.com/dotnet/corefx)
+    Copyright:    Copyright (c) .NET Foundation and Contributors. All rights
+                  reserved.
+    License:      MIT License
+
+    Source files derived from .NET Foundation projects, including:
+      - src/CodeBrix.Platform.Extensions/Internal/ObjectPool.cs and
+        PooledStringBuilder.cs  <- dotnet/roslyn (Microsoft.CodeAnalysis
+        pooled-object helpers)
+      - src/CodeBrix.Platform.Extensions/Internal/StringBuilderCache.cs  <-
+        dotnet/runtime (System.Text.StringBuilderCache)
+      - src/AddIns/Platform.UI.Lottie/System.Json/ (7 files)  <- dotnet/corefx
+        System.Json
+      - assorted compatibility / COM-interop helpers (e.g. _Compat/Nullable.cs,
+        Win32/XamlHost COM interop)
+
+9.  Microsoft — WinUI (microsoft-ui-xaml)
+    Project URL:  https://github.com/microsoft/microsoft-ui-xaml
+    Copyright:    Copyright (c) Microsoft Corporation. All rights reserved.
+    License:      MIT License
+
+    The control implementations under src/Platform.UI/UI/Xaml/ and
+    src/Platform.UI/Helpers/WinUI/ are ports of the WinUI (microsoft-ui-xaml)
+    controls — the public WinUI API surface that the Uno Platform implements.
+    (A small number of these files carry an Apache-2.0 header from the Uno
+    Platform where the implementation is Uno-authored; those are covered by
+    item 1.)
+
+10. The Avalonia Project (AvaloniaUI OU)
+    Project URL:  https://github.com/AvaloniaUI/Avalonia
+    Copyright:    Copyright (c) The Avalonia Project / AvaloniaUI OU
+    License:      MIT License
+
+    src/Platform.UI/Media/PathMarkupParser.cs (Avalonia original with 2018 Uno
+    modifications) and the DRM bindings under the Linux FrameBuffer head
+    (DrmBindings.cs).
+
+11. X11 / X.Org / xkbcommon / freedesktop.org bindings
+    Project URLs: https://gitlab.freedesktop.org/xorg
+                  https://github.com/xkbcommon/libxkbcommon
+    License:      MIT License / X11 License / HPND-style permissive grants
+                  (full X11 text in Part D)
+
+    The Linux Skia heads (src/Platform.UI.Runtime.Skia.X11/ and
+    src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/) contain bindings and
+    helpers derived from the X.Org, xkbcommon, and freedesktop.org projects
+    (Xlib, XInput, xkbcommon, DRM/KMS, evdev). Copyright is held by numerous
+    upstream authors, including: The Open Group (1985-1998), Silicon Graphics
+    Inc. (1993), Frederic Lepied (1996-1997, an "X Consortium / permission to
+    use without fee" HPND-style grant), Red Hat, Inc. (2009), Peter Hutterer
+    (2007), Daniel Stone (2009-2012), Dan Nicholson (2008), Intel Corporation
+    (2006, 2012), Ran Benita (2012), and Andrew Newlands (2018). Each retains
+    its original permissive header. (These heads are built only on Linux.)
+
+12. Xamarin — LibDl / dlopen helper
+    Project URL:  https://github.com/mono/mono
+    Copyright:    Copyright (c) Xamarin, Inc.
+    License:      MIT License
+
+    src/Platform.UI.Runtime.Skia.X11/LibDl.cs (native-library loading helper).
+
+13. Sharpnado.MaterialFrame
+    Project URL:  https://github.com/roubachof/Sharpnado.MaterialFrame
+    Copyright:    Copyright (c) 2020 Jean-Marie Alfonsi
+    License:      MIT License
+
+    The second of the two projects the Uno Platform's Android AcrylicBrush
+    implementation is based on. As with item 5, this fork does not build the
+    Android head; attributed here for completeness.
+
+--------------------------------------------------------------------------------
+ BSD 3-Clause License  (full text in Part D)
+--------------------------------------------------------------------------------
+
+14. Flutter
+    Project URL:  https://github.com/flutter/flutter
+    Copyright:    Copyright 2014 The Flutter Authors. All rights reserved.
+    License:      BSD 3-Clause License
+
+    A portion of the Uno Platform (carried into this fork) implements an
+    algorithm derived from Flutter.
+
+--------------------------------------------------------------------------------
+ Microsoft Public License (MS-PL)  (full text in Part D)
+--------------------------------------------------------------------------------
+
+15. Combinatorial.MSTest
+    License:      Microsoft Public License (MS-PL)
+
+    Test-infrastructure helper used by the Uno-derived test projects.
+
+================================================================================
+ PART C — BUNDLED ASSET FILES
+================================================================================
+
+Asset files (non-source) carried in this repository, by origin:
+
+  Ships with the libraries (Uno Platform / nventive authored, Apache-2.0;
+  covered by item 1):
+    - src/Platform.UI/UI/Xaml/Controls/ProgressRing/*.json — the determinate /
+      indeterminate ProgressRing Lottie animations.
+    - src/Platform.UI/Resources/NoiseAsset256x256.png — the AcrylicBrush noise
+      texture.
+
+  Test-only assets (NOT shipped in any package):
+    - src/Platform.UI.RuntimeTests/Assets/Fonts/Roboto-Regular.ttf — the Google
+      "Roboto" font, licensed under the Apache License, Version 2.0
+      (https://github.com/googlefonts/roboto).
+    - src/Platform.UI.RuntimeTests/Assets/Fonts/platform-fluentui-assets-runtimetest01.ttf
+      — a Fluent symbol test font (renamed from uno-fluentui-assets; Apache-2.0).
+    - Image / SVG test fixtures under src/Platform.UI.RuntimeTests/Assets/ and
+      src/Platform.UI.Tests/ (PNG, SVG, Lottie JSON used by unit/runtime tests).
+
+  Note: the Fluent symbol icon font that ships with applications is NOT carried
+  as a file in this repository's source tree; it is provided to applications by
+  a separate package and is therefore not part of this repository.
+
+================================================================================
+ PART D — FULL LICENSE TEXTS
+================================================================================
+
+The Apache License, Version 2.0 (used by this repository itself and by items
+1, 2, 3, 4, and 5, and by the Roboto and Fluent font assets) is reproduced in
+the LICENSE file at the root of this repository and is not duplicated here.
+
+--------------------------------------------------------------------------------
+ The MIT License (MIT)
+--------------------------------------------------------------------------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------------
+ The X11 License  (covers the X.Org / xkbcommon / freedesktop bindings in
+ item 11; the various upstream headers are MIT/X11/HPND-equivalent permissive
+ grants — this representative X11 text is provided for reference)
+--------------------------------------------------------------------------------
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Some upstream X.Org headers (e.g. the Frederic Lepied input header) use the
+older HPND/X-Consortium phrasing: "Permission to use, copy, modify, distribute,
+and sell this software and its documentation for any purpose is hereby granted
+without fee, provided that [the] copyright notice appear in all copies ...".
+The original header text is preserved verbatim in each such source file.
+
+--------------------------------------------------------------------------------
+ BSD 3-Clause License  (Flutter, item 14)
+--------------------------------------------------------------------------------
+
+Copyright 2014 The Flutter Authors. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+      copyright notice, this list of conditions and the following
+      disclaimer in the documentation and/or other materials provided
+      with the distribution.
+    * Neither the name of Google Inc. nor the names of its
+      contributors may be used to endorse or promote products derived
+      from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+--------------------------------------------------------------------------------
+ Microsoft Public License (MS-PL)  (Combinatorial.MSTest, item 15)
+--------------------------------------------------------------------------------
+
+This license governs use of the accompanying software. If you use the software,
+you accept this license. If you do not accept the license, do not use the
+software.
+
+1. Definitions
+ The terms "reproduce," "reproduction," "derivative works," and "distribution"
+ have the same meaning here as under U.S. copyright law.
+ A "contribution" is the original software, or any additions or changes to the
+ software.
+ A "contributor" is any person that distributes its contribution under this
+ license.
+ "Licensed patents" are a contributor's patent claims that read directly on its
+ contribution.
+
+2. Grant of Rights
+ (A) Copyright Grant- Subject to the terms of this license, including the
+ license conditions and limitations in section 3, each contributor grants you a
+ non-exclusive, worldwide, royalty-free copyright license to reproduce its
+ contribution, prepare derivative works of its contribution, and distribute its
+ contribution or any derivative works that you create.
+ (B) Patent Grant- Subject to the terms of this license, including the license
+ conditions and limitations in section 3, each contributor grants you a
+ non-exclusive, worldwide, royalty-free license under its licensed patents to
+ make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
+ its contribution in the software or derivative works of the contribution in the
+ software.
+
+3. Conditions and Limitations
+ (A) No Trademark License- This license does not grant you rights to use any
+ contributors' name, logo, or trademarks.
+ (B) If you bring a patent claim against any contributor over patents that you
+ claim are infringed by the software, your patent license from such contributor
+ to the software ends automatically.
+ (C) If you distribute any portion of the software, you must retain all
+ copyright, patent, trademark, and attribution notices that are present in the
+ software.
+ (D) If you distribute any portion of the software in source code form, you may
+ do so only under this license by including a complete copy of this license with
+ your distribution. If you distribute any portion of the software in compiled or
+ object code form, you may only do so under a license that complies with this
+ license.
+ (E) The software is licensed "as-is." You bear the risk of using it. The
+ contributors give no express warranties, guarantees or conditions. You may have
+ additional consumer rights under your local laws which this license cannot
+ change. To the extent permitted under your local laws, the contributors exclude
+ the implied warranties of merchantability, fitness for a particular purpose and
+ non-infringement.
+
+================================================================================
+
+END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

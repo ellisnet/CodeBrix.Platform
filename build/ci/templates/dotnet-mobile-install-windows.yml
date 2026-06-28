@@ -1,0 +1,7 @@
+steps:
+
+  - template: dotnet-install.yml
+
+  - template: jdk-setup.yml
+
+  - template: dotnet-setup-cache.yml

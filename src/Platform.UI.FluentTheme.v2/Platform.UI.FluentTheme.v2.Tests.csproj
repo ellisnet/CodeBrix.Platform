@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.FluentTheme.v2</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.FluentTheme.v2</RootNamespace>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Tests.csproj" />
+	</ItemGroup>
+
+	<Import Project="FluentMerge.targets" />
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+</Project>

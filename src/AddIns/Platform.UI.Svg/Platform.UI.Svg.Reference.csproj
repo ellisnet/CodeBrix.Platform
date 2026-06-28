@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<Deterministic>true</Deterministic>
+		<Nullable>enable</Nullable>
+
+		<AssemblyName>CodeBrix.Platform.UI.Svg</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Svg</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Reference</CodeBrixRuntimeIdentifier>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The reference build does not need svg.skia sources -->
+		<Compile Remove="External/**/*.cs" />
+	</ItemGroup>
+
+	<Target Name="_CodeBrixSvgOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\codebrix.platform.ui.svg\$(CodeBrixNugetOverrideVersion)\lib\$(_OverrideTargetFramework)</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+</Project>

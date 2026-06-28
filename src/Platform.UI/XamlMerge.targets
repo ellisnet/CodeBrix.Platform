@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <!--
+  CodeBrix.Platform fork: the XAML-merge task is built in-repo
+  (src/SourceGenerators/Platform.XamlMerge.Task, vendored from
+  github.com/unoplatform/uno.xamlmerge.task — see its PORTING-NOTES.md) instead of
+  consuming the Uno.XamlMerge.Task NuGet package. The import below replaces both the
+  package's automatic build-folder import (inner builds) and the previous explicit
+  package-cache import (outer build); the targets' own conditions scope what runs where.
+  -->
+  <PropertyGroup>
+	<_CodeBrixXamlMergeTaskProject>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.XamlMerge.Task\Platform.XamlMerge.Task.csproj</_CodeBrixXamlMergeTaskProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+	<XamlMergeOutputFile>$(MSBuildProjectDirectory)\UI\Xaml\Style\mergedstyles.xaml</XamlMergeOutputFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+	  <!--
+		Exclude SystemResources.xaml from the merged dictionary to avoid
+		direct non-overridable resources in other files. See When_Theme_Changed_Animated_Value
+		test for more details.
+	  -->
+	  <_NonMergedXamlResources Include="$(MSBuildProjectDirectory)\UI\Xaml\Style\Generic\SystemResources.xaml" />
+	  <_NonMergedXamlResources Include="$(MSBuildProjectDirectory)\UI\Xaml\Style\Generic\Generic.Native.xaml" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.XamlMerge.Task\build\Platform.XamlMerge.Task.targets" />
+
+  <!-- Make sure the in-repo task assembly exists (and is current) before the merge runs. -->
+  <Target Name="_BuildCodeBrixXamlMergeTask"
+				  BeforeTargets="GenerateMergedXaml"
+				  Condition="'$(TargetFramework)' == ''">
+	  <!--
+	  Pin TargetFramework explicitly when invoking the task project's build.
+	  This target only runs in the OUTER (cross-targeting) build, where
+	  $(TargetFramework) is empty. Visual Studio passes that empty TargetFramework
+	  as a global property, and the MSBuild task below inherits the caller's global
+	  properties - so the empty value leaks into the single-target task project and
+	  overrides its own <TargetFramework>$(NetCurrent)</TargetFramework>, failing with
+	  NETSDK1013. Command-line MSBuild never sets an empty TargetFramework global, so it
+	  only reproduces inside VS. Passing TargetFramework=$(NetCurrent) overrides the
+	  leaked empty value and forces a clean single-target build either way.
+	  -->
+	  <MSBuild Projects="$(_CodeBrixXamlMergeTaskProject)"
+			   Targets="Build"
+			   Properties="Configuration=$(Configuration);TargetFramework=$(NetCurrent)" />
+  </Target>
+
+</Project>

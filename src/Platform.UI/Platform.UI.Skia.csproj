@@ -1,0 +1,107 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);ENABLE_LEGACY_TEMPLATED_PARENT_SUPPORT</DefineConstants>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX;IS_CODEBRIX_UI_PROJECT</DefineConstants>
+		<CodeBrixDisableAnalyzersForSamples>true</CodeBrixDisableAnalyzersForSamples>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+		<RootNamespace>CodeBrix.Platform.UI</RootNamespace>
+		<AssemblyName>CodeBrix.Platform.UI</AssemblyName>
+		<IsAotCompatible>true</IsAotCompatible>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+		<CodeBrixXamlResourcesUpriTrimming>true</CodeBrixXamlResourcesUpriTrimming>
+
+		<!-- This project is not packed on its own (the aggregate is built from the
+		     Platform.WinUI.nuspec). This PackageId only governs how head/runtime
+		     packages that ProjectReference this project resolve their dependency:
+		     it must equal the aggregate package id so they depend on the aggregate. -->
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.ApacheLicenseForever</PackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml;" Visible="False" />
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HarfBuzzSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj" Condition="'$(SyncGeneratorRunning)'!='true'" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" Condition="'$(SyncGeneratorRunning)'=='true'" />
+		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="..\SourceGenerators\System.Xaml\Platform.Xaml.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="$(PlatformItemsBasePath)UI\Xaml\Controls\ProgressRing\*.json" />
+		<PRIResource Include="$(PlatformItemsBasePath)**\*.resw" />
+	</ItemGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+	  <EmbeddedResource Include="Resources\NoiseAsset256x256.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PageExclusions>$(PlatformItemsBasePath)Themes\WinUI\Resources\**\*.xaml</PageExclusions>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+	<Import Project="MixinGeneration.targets" />
+	<Import Project="XamlMerge.targets" />
+
+	<Target Name="_CodeBrixToolkitOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
+
+		<PropertyGroup>
+			<_OverrideTargetFramework>$(TargetFramework)</_OverrideTargetFramework>
+			<_TargetNugetFolder>$(NuGetPackageRoot)\$(PackageId.ToLowerInvariant())\$(CodeBrixNugetOverrideVersion)\codebrix-platform-runtime\$(TargetFramework)\$(CodeBrixRuntimeIdentifier.ToLowerInvariant())</_TargetNugetFolder>
+		</PropertyGroup>
+		<ItemGroup>
+			<_OutputFiles Include="$(TargetDir)**" />
+		</ItemGroup>
+		<MakeDir Directories="$(_TargetNugetFolder)" />
+
+		<Message Importance="high" Text="OVERRIDING NUGET PACKAGE CACHE: $(_TargetNugetFolder)" />
+
+		<Copy SourceFiles="@(_OutputFiles)" DestinationFiles="@(_OutputFiles->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename)%(Extension)')" />
+		<Copy SourceFiles="@(_OutputFilesPDB)" DestinationFiles="@(_OutputFilesPDB->'$(_TargetNugetFolder)\%(RecursiveDir)%(Filename).pdb')" />
+	</Target>
+
+	<ItemGroup Condition="'$(DocsGeneration)'==''">
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+			<UndefineProperties>TargetFramework</UndefineProperties>
+		</ProjectReference>
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.SourceGenerators.Internal\Platform.UI.SourceGenerators.Internal.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<OutputItemType>Analyzer</OutputItemType>
+		</ProjectReference>
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.Tasks\Platform.UI.Tasks.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+			<UndefineProperties>TargetFramework</UndefineProperties>
+		</ProjectReference>
+	</ItemGroup>
+
+</Project>
