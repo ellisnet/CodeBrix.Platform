@@ -32,9 +32,9 @@ public class CodeBrixInitializeComponentAnalyzerTests
 		}
 		""";
 
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.178.1001")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.179.226")];
 
-	private static readonly ReferenceAssemblies _net80WithCodeBrix = ReferenceAssemblies.Net.Net80.AddPackages(_codebrixPackage);
+	private static readonly ReferenceAssemblies _net100WithCodeBrix = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackage);
 
 
 	private static async Task VerifyAsync((string filename, string content) file1, (string filename, string content) file2)
@@ -57,7 +57,7 @@ public class CodeBrixInitializeComponentAnalyzerTests
 					file2,
 				}
 			},
-			ReferenceAssemblies = _net80WithCodeBrix,
+			ReferenceAssemblies = _net100WithCodeBrix,
 		}.RunAsync();
 	}
 

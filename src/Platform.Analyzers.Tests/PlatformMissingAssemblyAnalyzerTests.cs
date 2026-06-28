@@ -14,11 +14,11 @@ public class CodeBrixMissingAssemblyAnalyzerTests
 {
 	// CodeBrix.Platform ships a single aggregate package (no UI/WinUI split). Requires the
 	// package on a restorable feed (nuget.org once published, or src/PackageCache).
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.178.1001")];
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackageWithLottie = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.178.1001"), new PackageIdentity("CodeBrix.Platform.Lottie.ApacheLicenseForever", "1.0.178.1001")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.179.226")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackageWithLottie = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.179.226"), new PackageIdentity("CodeBrix.Platform.Lottie.ApacheLicenseForever", "1.0.179.226")];
 
-	private static readonly ReferenceAssemblies _net80WithCodeBrix = ReferenceAssemblies.Net.Net80.AddPackages(_codebrixPackage);
-	private static readonly ReferenceAssemblies _net80WithCodeBrixAndLottie = ReferenceAssemblies.Net.Net80.AddPackages(_codebrixPackageWithLottie);
+	private static readonly ReferenceAssemblies _net100WithCodeBrix = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackage);
+	private static readonly ReferenceAssemblies _net100WithCodeBrixAndLottie = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackageWithLottie);
 
 
 
@@ -42,7 +42,7 @@ public class CodeBrixMissingAssemblyAnalyzerTests
 		{
 			TestCode = code,
 			FixedCode = code,
-			ReferenceAssemblies = _net80WithCodeBrixAndLottie,
+			ReferenceAssemblies = _net100WithCodeBrixAndLottie,
 		};
 
 		test.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", CodeBrixHeadGlobalConfig));
@@ -66,7 +66,7 @@ public class CodeBrixMissingAssemblyAnalyzerTests
 		{
 			TestCode = code,
 			FixedCode = code,
-			ReferenceAssemblies = _net80WithCodeBrix,
+			ReferenceAssemblies = _net100WithCodeBrix,
 		};
 
 		test.TestState.AnalyzerConfigFiles.Add(("/.globalconfig", CodeBrixHeadGlobalConfig));

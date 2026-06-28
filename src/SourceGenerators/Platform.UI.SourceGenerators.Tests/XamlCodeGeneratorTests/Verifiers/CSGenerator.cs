@@ -8,6 +8,8 @@
 #error "WRITE_EXPECTED should not be defined!"
 #endif
 
+using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
@@ -96,6 +98,11 @@ namespace CodeBrix.Platform.UI.SourceGenerators.Tests.Verifiers //Was previously
 			private readonly XamlFile[] _xamlFiles;
 			private readonly ResourceFile[] _resourceFiles;
 
+			// CodeBrix.Platform fork: the expected generated sources (baseline content), keyed later by
+			// "<GeneratorTypeName>_<hintName>" and compared against the actual generator output by NAME in
+			// GetProjectCompilationAsync. See the constructor for why we bypass the harness's built-in matcher.
+			private readonly List<(Type type, string name, string text)> _expectedGenerated = new();
+
 			public bool EnableFuzzyMatching { get; set; } = true;
 			public Dictionary<string, string>? GlobalConfigOverride { get; set; }
 
@@ -118,9 +125,16 @@ namespace CodeBrix.Platform.UI.SourceGenerators.Tests.Verifiers //Was previously
 
 				ReferenceAssemblies = _Dotnet.Current.ReferenceAssemblies;
 
-#if WRITE_EXPECTED
+				// CodeBrix.Platform fork: skip the roslyn-sdk built-in generated-source verification. Its
+				// WeightedMatch pairs expected/actual generated documents positionally when their orders differ;
+				// the Uno->CodeBrix rename changed the generator emission order relative to the embedded-baseline
+				// (manifest) order, so it mis-pairs files (e.g. MyViewModel.g.cs vs LocalizationResources.cs) and
+				// reports bogus "file list"/content diffs even though every file's content is byte-identical to its
+				// baseline. We replace it with a deterministic NAME-based comparison (VerifyGeneratedSourcesByName,
+				// invoked from GetProjectCompilationAsync) that pairs each generated file with its baseline by hint
+				// name, so content is still fully verified and missing/extra files still fail. (Under WRITE_EXPECTED
+				// the check is skipped anyway while baselines are being regenerated.)
 				TestBehaviors |= TestBehaviors.SkipGeneratedSourcesCheck;
-#endif
 			}
 
 			protected override async Task RunImplAsync(CancellationToken cancellationToken)
@@ -292,6 +306,12 @@ build_metadata.AdditionalFiles.SourceItemGroup = PRIResource
 					}
 				}
 
+#if !WRITE_EXPECTED
+				// CodeBrix.Platform fork: name-based generated-source verification (replaces the harness's
+				// order-sensitive matcher, disabled in the constructor). Skipped while regenerating baselines.
+				VerifyGeneratedSourcesByName(compilation, project);
+#endif
+
 				return (compilation, generatorDiagnostics);
 			}
 
@@ -323,10 +343,50 @@ build_metadata.AdditionalFiles.SourceItemGroup = PRIResource
 						"ObservablePropertyGenerator" => typeof(ObservablePropertyGenerator),
 						_ => throw new Exception("Unexpected generator name"),
 					};
-					TestState.GeneratedSources.Add((type, name, reader.ReadToEnd()));
+					_expectedGenerated.Add((type, name, reader.ReadToEnd()));
 				}
 
 				return this;
+			}
+
+			// CodeBrix.Platform fork: name-based replacement for the harness's generated-source verification
+			// (disabled via TestBehaviors.SkipGeneratedSourcesCheck in the constructor). Pairs each generated
+			// file with its baseline by "<GeneratorTypeName>_<hintName>" key, then asserts the file set and each
+			// file's content match — immune to the generator emission ORDER that defeats WeightedMatch.
+			private void VerifyGeneratedSourcesByName(Compilation compilation, Project project)
+			{
+				var actual = new Dictionary<string, string>(StringComparer.Ordinal);
+				foreach (var tree in compilation.SyntaxTrees.Skip(project.DocumentIds.Count))
+				{
+					actual[GetFileNameFromTree(tree)] = tree.GetText().ToString();
+				}
+
+				var expected = new Dictionary<string, string>(StringComparer.Ordinal);
+				foreach (var item in _expectedGenerated)
+				{
+					expected[$"{item.type.Name}_{item.name}"] = item.text;
+				}
+
+				var missing = expected.Keys.Where(k => !actual.ContainsKey(k)).OrderBy(k => k, StringComparer.Ordinal).ToList();
+				var unexpected = actual.Keys.Where(k => !expected.ContainsKey(k)).OrderBy(k => k, StringComparer.Ordinal).ToList();
+				if (missing.Count > 0 || unexpected.Count > 0)
+				{
+					throw new InvalidOperationException(
+						"Generated source file set did not match the baselines." +
+						(missing.Count > 0 ? "\nExpected but not produced:\n  " + string.Join("\n  ", missing) : "") +
+						(unexpected.Count > 0 ? "\nProduced but no baseline (regenerate with WRITE_EXPECTED):\n  " + string.Join("\n  ", unexpected) : ""));
+				}
+
+				foreach (var key in expected.Keys.OrderBy(k => k, StringComparer.Ordinal))
+				{
+					if (!string.Equals(expected[key], actual[key], StringComparison.Ordinal))
+					{
+						throw new InvalidOperationException(
+							$"Generated source content for '{key}' did not match its baseline " +
+							"(regenerate with WRITE_EXPECTED if the change is intended).\n" +
+							$"--- expected (baseline) ---\n{expected[key]}\n--- actual (generated) ---\n{actual[key]}");
+					}
+				}
 			}
 
 			private static string GetFileNameFromTree(SyntaxTree tree)
