@@ -53,6 +53,12 @@
 		     Override either way with -p:BuildNativeMac=true|false. -->
 		<BuildNativeMac Condition="'$(BuildNativeMac)' == '' and $([MSBuild]::IsOsPlatform('OSX')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</BuildNativeMac>
 		<BuildNativeMac Condition="'$(BuildNativeMac)' == ''">false</BuildNativeMac>
+
+		<!-- Contribute the freshly-built native dylib to the package at pack time.
+		     A static globbed <None Pack="true"> would be evaluated BEFORE the native
+		     build runs (and build.sh wipes build/ first), so it would capture nothing
+		     on a clean pack. A target-time item list reliably picks up the dylib. -->
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddNativeMacToPackage</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
 	<Target Name="BuildCodeBrixNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' == 'true'">
@@ -63,9 +69,15 @@
 		<Message Importance="high" Text="Skipping native macOS build (BuildNativeMac=false — e.g. Intel Mac without Xcode). Managed build only; libCodeBrixNativeMac.dylib will be absent, so native-dependent tests won't run here." />
 	</Target>
 
-	<ItemGroup>
-		<None Include="$(MSBuildThisFileDirectory)PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.*" PackagePath="runtimes/osx/native" Pack="true" Visible="False" />
-	</ItemGroup>
+	<Target Name="_AddNativeMacToPackage" DependsOnTargets="BuildCodeBrixNativeMac" Condition="'$(BuildNativeMac)' == 'true'">
+		<Error Condition="!Exists('$(MSBuildThisFileDirectory)PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.dylib')"
+			   Text="Native macOS dylib not found at PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.dylib — the native build did not produce it, so the package would be managed-only." />
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.dylib">
+				<PackagePath>runtimes/osx/native</PackagePath>
+			</TfmSpecificPackageFile>
+		</ItemGroup>
+	</Target>
 
 	<ItemGroup>
 		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />

@@ -9,55 +9,55 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (*uno_webview_javascript_fn_ptr)(NSInteger /* handle */, const char* _Nullable /* result */, const char* _Nullable /* error */);
+typedef void (*codebrix_webview_javascript_fn_ptr)(NSInteger /* handle */, const char* _Nullable /* result */, const char* _Nullable /* error */);
 
-uno_webview_javascript_fn_ptr uno_get_execute_callback(void);
-void uno_set_execute_callback(uno_webview_javascript_fn_ptr p);
+codebrix_webview_javascript_fn_ptr codebrix_get_execute_callback(void);
+void codebrix_set_execute_callback(codebrix_webview_javascript_fn_ptr p);
 
-uno_webview_javascript_fn_ptr uno_get_invoke_callback(void);
-void uno_set_invoke_callback(uno_webview_javascript_fn_ptr p);
+codebrix_webview_javascript_fn_ptr codebrix_get_invoke_callback(void);
+void codebrix_set_invoke_callback(codebrix_webview_javascript_fn_ptr p);
 
-typedef bool (*uno_webview_navigation_starting_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */);
-uno_webview_navigation_starting_fn_ptr uno_get_webview_navigation_starting_callback(void);
+typedef bool (*codebrix_webview_navigation_starting_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */);
+codebrix_webview_navigation_starting_fn_ptr codebrix_get_webview_navigation_starting_callback(void);
 
-typedef void (*uno_webview_navigation_finishing_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */);
-uno_webview_navigation_finishing_fn_ptr uno_get_webview_navigation_finishing_callback(void);
-uno_webview_navigation_finishing_fn_ptr uno_get_webview_receive_web_message_callback(void);
+typedef void (*codebrix_webview_navigation_finishing_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */);
+codebrix_webview_navigation_finishing_fn_ptr codebrix_get_webview_navigation_finishing_callback(void);
+codebrix_webview_navigation_finishing_fn_ptr codebrix_get_webview_receive_web_message_callback(void);
 
-typedef void (*uno_webview_navigation_failing_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */, int status);
-uno_webview_navigation_failing_fn_ptr uno_get_webview_navigation_failing_callback(void);
+typedef void (*codebrix_webview_navigation_failing_fn_ptr)(WKWebView* /* handle */, const char* _Nullable /* url */, int status);
+codebrix_webview_navigation_failing_fn_ptr codebrix_get_webview_navigation_failing_callback(void);
 
-typedef void (*uno_webview_webview_notification_fn_ptr)(WKWebView* /* handle */, NSInteger /* keyId */);
-uno_webview_webview_notification_fn_ptr uno_get_webview_notification_callback(void);
+typedef void (*codebrix_webview_webview_notification_fn_ptr)(WKWebView* /* handle */, NSInteger /* keyId */);
+codebrix_webview_webview_notification_fn_ptr codebrix_get_webview_notification_callback(void);
 
-void uno_set_webview_navigation_callbacks(uno_webview_navigation_starting_fn_ptr starting, uno_webview_navigation_finishing_fn_ptr finishing, uno_webview_webview_notification_fn_ptr notification, uno_webview_navigation_finishing_fn_ptr web_message, uno_webview_navigation_failing_fn_ptr failing);
+void codebrix_set_webview_navigation_callbacks(codebrix_webview_navigation_starting_fn_ptr starting, codebrix_webview_navigation_finishing_fn_ptr finishing, codebrix_webview_webview_notification_fn_ptr notification, codebrix_webview_navigation_finishing_fn_ptr web_message, codebrix_webview_navigation_failing_fn_ptr failing);
 
-typedef bool (*uno_webview_unsupported_scheme_identified_fn_ptr)(WKWebView* /* handle */, const char* /* url */);
-uno_webview_unsupported_scheme_identified_fn_ptr uno_get_webview_unsupported_scheme_identified_callback(void);
-void uno_set_webview_unsupported_scheme_identified_callback(uno_webview_unsupported_scheme_identified_fn_ptr fn_ptr);
+typedef bool (*codebrix_webview_unsupported_scheme_identified_fn_ptr)(WKWebView* /* handle */, const char* /* url */);
+codebrix_webview_unsupported_scheme_identified_fn_ptr codebrix_get_webview_unsupported_scheme_identified_callback(void);
+void codebrix_set_webview_unsupported_scheme_identified_callback(codebrix_webview_unsupported_scheme_identified_fn_ptr fn_ptr);
 
-NSView* uno_webview_create(NSWindow *window, const char *ok, const char *cancel);
+NSView* codebrix_webview_create(NSWindow *window, const char *ok, const char *cancel);
 
-typedef int (*uno_webview_new_window_requested_fn_ptr)(WKWebView* /* handle */, const char* /* targetUrl */, const char* /* refererUrl */);
-uno_webview_new_window_requested_fn_ptr uno_get_webview_new_window_requested_callback(void);
-void uno_set_webview_new_window_requested_callback(uno_webview_new_window_requested_fn_ptr fn_ptr);
+typedef int (*codebrix_webview_new_window_requested_fn_ptr)(WKWebView* /* handle */, const char* /* targetUrl */, const char* /* refererUrl */);
+codebrix_webview_new_window_requested_fn_ptr codebrix_get_webview_new_window_requested_callback(void);
+void codebrix_set_webview_new_window_requested_callback(codebrix_webview_new_window_requested_fn_ptr fn_ptr);
 
-const char* uno_webview_get_title(WKWebView *webview);
+const char* codebrix_webview_get_title(WKWebView *webview);
 
-bool uno_webview_can_go_back(WKWebView *webview);
-bool uno_webview_can_go_forward(WKWebView *webview);
+bool codebrix_webview_can_go_back(WKWebView *webview);
+bool codebrix_webview_can_go_forward(WKWebView *webview);
 
-void uno_webview_go_back(WKWebView *webview);
-void uno_webview_go_forward(WKWebView *webview);
+void codebrix_webview_go_back(WKWebView *webview);
+void codebrix_webview_go_forward(WKWebView *webview);
 
-void uno_webview_navigate(WKWebView *webview, const char* url, const char *jsonHeaders);
-void uno_webview_load_html(WKWebView *webview, const char* html);
+void codebrix_webview_navigate(WKWebView *webview, const char* url, const char *jsonHeaders);
+void codebrix_webview_load_html(WKWebView *webview, const char* html);
 
-void uno_webview_reload(WKWebView *webview);
-void uno_webview_stop(WKWebView *webview);
+void codebrix_webview_reload(WKWebView *webview);
+void codebrix_webview_stop(WKWebView *webview);
 
-void uno_webview_execute_script(WKWebView *webview, NSInteger handle, const char *javascript);
-void uno_webview_invoke_script(WKWebView *webview, NSInteger handle, const char *javascript);
+void codebrix_webview_execute_script(WKWebView *webview, NSInteger handle, const char *javascript);
+void codebrix_webview_invoke_script(WKWebView *webview, NSInteger handle, const char *javascript);
 
 // https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2weberrorstatus
 typedef NS_ENUM(uint32, CoreWebView2WebErrorStatus) {

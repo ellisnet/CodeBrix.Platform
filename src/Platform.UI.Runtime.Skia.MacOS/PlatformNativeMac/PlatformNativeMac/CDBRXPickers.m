@@ -62,7 +62,7 @@ NSMutableArray<NSString*>* get_allowed(char* filters[], int filterSize)
     return allowed;
 }
 
-char* uno_pick_single_folder(const char* _Nullable prompt, const char* _Nullable identifier, int32_t suggestedStartLocation)
+char* codebrix_pick_single_folder(const char* _Nullable prompt, const char* _Nullable identifier, int32_t suggestedStartLocation)
 {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FolderPicker.macOS.cs
@@ -82,19 +82,19 @@ char* uno_pick_single_folder(const char* _Nullable prompt, const char* _Nullable
         NSURL *url = panel.URL;
         if (url) {
 #if DEBUG
-            NSLog(@"uno_pick_single_folder -> %s", url.path.UTF8String);
+            NSLog(@"codebrix_pick_single_folder -> %s", url.path.UTF8String);
 #endif
             // we need to dupe since it's NS_RETURNS_INNER_POINTER and dotnet will (try to) free it
             return strdup(url.path.UTF8String);
         }
     }
 #if DEBUG
-    NSLog(@"uno_pick_single_folder -> nil");
+    NSLog(@"codebrix_pick_single_folder -> nil");
 #endif
     return nil;
 }
 
-char* uno_pick_single_file(const char* _Nullable prompt, const char* _Nullable identifier, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
+char* codebrix_pick_single_file(const char* _Nullable prompt, const char* _Nullable identifier, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
 {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileOpenPicker.macOS.cs
@@ -114,19 +114,19 @@ char* uno_pick_single_file(const char* _Nullable prompt, const char* _Nullable i
         NSURL *url = panel.URL;
         if (url) {
 #if DEBUG
-            NSLog(@"uno_pick_single_open_file -> %s", url.path.UTF8String);
+            NSLog(@"codebrix_pick_single_open_file -> %s", url.path.UTF8String);
 #endif
             // we need to dupe since it's NS_RETURNS_INNER_POINTER and dotnet will (try to) free it
             return strdup(url.path.UTF8String);
         }
     }
 #if DEBUG
-    NSLog(@"uno_pick_single_open_file -> nil");
+    NSLog(@"codebrix_pick_single_open_file -> nil");
 #endif
     return nil;
 }
 
-char** uno_pick_multiple_files(const char* _Nullable prompt, const char* _Nullable identifier, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
+char** codebrix_pick_multiple_files(const char* _Nullable prompt, const char* _Nullable identifier, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
 {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileOpenPicker.macOS.cs
@@ -152,7 +152,7 @@ char** uno_pick_multiple_files(const char* _Nullable prompt, const char* _Nullab
                 char *url = strdup([urls objectAtIndex:i].path.UTF8String);
                 array[i] = url;
 #if DEBUG
-                NSLog(@"uno_pick_multiple_files -> %lu %s", i, url);
+                NSLog(@"codebrix_pick_multiple_files -> %lu %s", i, url);
 #endif
             }
             array[count] = nil;
@@ -160,12 +160,12 @@ char** uno_pick_multiple_files(const char* _Nullable prompt, const char* _Nullab
         }
     }
 #if DEBUG
-    NSLog(@"uno_pick_multiple_files -> nil");
+    NSLog(@"codebrix_pick_multiple_files -> nil");
 #endif
     return nil;
 }
 
-char* uno_pick_save_file(const char* _Nullable prompt, const char* _Nullable identifier, const char* _Nullable suggestedFileName, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
+char* codebrix_pick_save_file(const char* _Nullable prompt, const char* _Nullable identifier, const char* _Nullable suggestedFileName, PickerLocationId suggestedStartLocation, char* filters[], int filterSize)
 {
     NSSavePanel *panel = [NSSavePanel savePanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileSavePicker.macOS.cs
@@ -185,14 +185,14 @@ char* uno_pick_save_file(const char* _Nullable prompt, const char* _Nullable ide
         NSURL *url = panel.URL;
         if (url) {
 #if DEBUG
-            NSLog(@"uno_pick_single_save_file -> %s", url.path.UTF8String);
+            NSLog(@"codebrix_pick_single_save_file -> %s", url.path.UTF8String);
 #endif
             // we need to dupe since it's NS_RETURNS_INNER_POINTER and dotnet will (try to) free it
             return strdup(url.path.UTF8String);
         }
     }
 #if DEBUG
-    NSLog(@"uno_pick_single_save_file -> nil");
+    NSLog(@"codebrix_pick_single_save_file -> nil");
 #endif
     return nil;
 }

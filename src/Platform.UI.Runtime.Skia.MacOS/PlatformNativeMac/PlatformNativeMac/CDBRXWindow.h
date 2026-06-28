@@ -9,13 +9,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (*uno_drawable_resize_fn_ptr)(void* /* window */, double /* width */, double /* height */);
-uno_drawable_resize_fn_ptr uno_get_resize_callback(void);
-void uno_set_resize_callback(uno_drawable_resize_fn_ptr p);
+typedef void (*codebrix_drawable_resize_fn_ptr)(void* /* window */, double /* width */, double /* height */);
+codebrix_drawable_resize_fn_ptr codebrix_get_resize_callback(void);
+void codebrix_set_resize_callback(codebrix_drawable_resize_fn_ptr p);
 
 typedef void (*window_move_or_resize_fn_ptr)(NSWindow* /* window */, double /* x or width */, double /* y or height */);
-window_move_or_resize_fn_ptr uno_get_window_move_callback(void);
-window_move_or_resize_fn_ptr uno_get_window_resize_callback(void);
+window_move_or_resize_fn_ptr codebrix_get_window_move_callback(void);
+window_move_or_resize_fn_ptr codebrix_get_window_resize_callback(void);
 
 @interface windowDidChangeScreenNoteClass : NSObject
 
@@ -57,39 +57,39 @@ typedef NS_ENUM(sint32, OverlappedPresenterState) {
 
 @end
 
-NSWindow* uno_app_get_main_window(void);
+NSWindow* codebrix_app_get_main_window(void);
 
-NSWindow* uno_window_create(double width, double height);
-void uno_window_activate(NSWindow *window);
-void uno_window_invalidate(NSWindow *window);
-void uno_window_close(NSWindow *window);
-void uno_window_move(NSWindow *window, double x, double y);
-bool uno_window_resize(NSWindow *window, double width, double height);
+NSWindow* codebrix_window_create(double width, double height);
+void codebrix_window_activate(NSWindow *window);
+void codebrix_window_invalidate(NSWindow *window);
+void codebrix_window_close(NSWindow *window);
+void codebrix_window_move(NSWindow *window, double x, double y);
+bool codebrix_window_resize(NSWindow *window, double width, double height);
 
-void uno_window_get_position(NSWindow *window, double *x, double *y);
-char* uno_window_get_title(NSWindow *window);
-void uno_window_set_title(NSWindow *window, const char* title);
+void codebrix_window_get_position(NSWindow *window, double *x, double *y);
+char* codebrix_window_get_title(NSWindow *window);
+void codebrix_window_set_title(NSWindow *window, const char* title);
 
-bool uno_window_is_full_screen(NSWindow *window);
-bool uno_window_enter_full_screen(NSWindow *window);
-void uno_window_exit_full_screen(NSWindow *window);
+bool codebrix_window_is_full_screen(NSWindow *window);
+bool codebrix_window_enter_full_screen(NSWindow *window);
+void codebrix_window_exit_full_screen(NSWindow *window);
 
-void uno_window_maximize(NSWindow *window);
-void uno_window_minimize(NSWindow *window, bool activateWindow);
-void uno_window_restore(UNOWindow *window, bool activateWindow);
+void codebrix_window_maximize(NSWindow *window);
+void codebrix_window_minimize(NSWindow *window, bool activateWindow);
+void codebrix_window_restore(UNOWindow *window, bool activateWindow);
 
-bool uno_window_clip_svg(UNOWindow* window, const char* svg);
+bool codebrix_window_clip_svg(UNOWindow* window, const char* svg);
 
-OverlappedPresenterState uno_window_get_overlapped_presenter_state(UNOWindow *window);
+OverlappedPresenterState codebrix_window_get_overlapped_presenter_state(UNOWindow *window);
 
-void uno_window_set_always_on_top(NSWindow* window, bool isAlwaysOnTop);
-void uno_window_set_border_and_title_bar(NSWindow *window, bool hasBorder, bool hasTitleBar);
-void uno_window_set_maximizable(NSWindow* window, bool isMaximizable);
-void uno_window_set_minimizable(NSWindow* window, bool isMinimizable);
-bool uno_window_set_modal(NSWindow *window, bool isModal);
-void uno_window_set_resizable(NSWindow *window, bool isResizable);
-void uno_window_set_min_size(NSWindow* window, double width, double height);
-void uno_window_set_max_size(NSWindow* window, double width, double height);
+void codebrix_window_set_always_on_top(NSWindow* window, bool isAlwaysOnTop);
+void codebrix_window_set_border_and_title_bar(NSWindow *window, bool hasBorder, bool hasTitleBar);
+void codebrix_window_set_maximizable(NSWindow* window, bool isMaximizable);
+void codebrix_window_set_minimizable(NSWindow* window, bool isMinimizable);
+bool codebrix_window_set_modal(NSWindow *window, bool isModal);
+void codebrix_window_set_resizable(NSWindow *window, bool isResizable);
+void codebrix_window_set_min_size(NSWindow* window, double width, double height);
+void codebrix_window_set_max_size(NSWindow* window, double width, double height);
 
 // https://learn.microsoft.com/en-us/uwp/api/windows.system.virtualkey?view=winrt-22621
 typedef NS_ENUM(sint32, VirtualKey) {
@@ -318,32 +318,32 @@ struct MouseEventData {
 
 typedef int32_t (*window_key_callback_fn_ptr)(UNOWindow* window, VirtualKey key, VirtualKeyModifiers mods, uint32 scanCode, UniChar unicode);
 typedef int32_t (*window_mouse_callback_fn_ptr)(UNOWindow* window, struct MouseEventData *data);
-void uno_set_window_events_callbacks(window_key_callback_fn_ptr keyDown, window_key_callback_fn_ptr keyUp, window_mouse_callback_fn_ptr pointer, window_move_or_resize_fn_ptr move, window_move_or_resize_fn_ptr resize);
+void codebrix_set_window_events_callbacks(window_key_callback_fn_ptr keyDown, window_key_callback_fn_ptr keyUp, window_mouse_callback_fn_ptr pointer, window_move_or_resize_fn_ptr move, window_move_or_resize_fn_ptr resize);
 
 typedef bool (*window_should_close_fn_ptr)(UNOWindow* window);
-window_should_close_fn_ptr uno_get_window_should_close_callback(void);
+window_should_close_fn_ptr codebrix_get_window_should_close_callback(void);
 
 typedef void (*window_close_fn_ptr)(UNOWindow* window);
-window_close_fn_ptr uno_get_window_close_callback(void);
+window_close_fn_ptr codebrix_get_window_close_callback(void);
 
-void uno_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close);
+void codebrix_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close);
 
 typedef void (*window_close_fn_ptr)(UNOWindow* window);
-window_close_fn_ptr uno_get_window_close_callback(void);
+window_close_fn_ptr codebrix_get_window_close_callback(void);
 
-void uno_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close);
+void codebrix_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close);
 
-void uno_window_get_metal_handles(UNOWindow* window, void*_Nonnull* _Nonnull device, void*_Nonnull* _Nonnull queue);
+void codebrix_window_get_metal_handles(UNOWindow* window, void*_Nonnull* _Nonnull device, void*_Nonnull* _Nonnull queue);
 
 typedef void (*window_did_change_screen_fn_ptr)(NSWindow* window, uint32 width, uint32 height, CGFloat backingScaleFactor);
-window_did_change_screen_fn_ptr uno_get_window_did_change_screen_callback(void);
+window_did_change_screen_fn_ptr codebrix_get_window_did_change_screen_callback(void);
 
 typedef void (*window_did_change_screen_parameters_fn_ptr)(NSWindow* window);
-window_did_change_screen_parameters_fn_ptr uno_get_window_did_change_screen_parameters_callback(void);
+window_did_change_screen_parameters_fn_ptr codebrix_get_window_did_change_screen_parameters_callback(void);
 
-void uno_set_window_screen_change_callbacks(window_did_change_screen_fn_ptr screen, window_did_change_screen_parameters_fn_ptr parameters);
+void codebrix_set_window_screen_change_callbacks(window_did_change_screen_fn_ptr screen, window_did_change_screen_parameters_fn_ptr parameters);
 
-void uno_window_notify_screen_change(NSWindow *window);
+void codebrix_window_notify_screen_change(NSWindow *window);
 
 
 @interface UNOMetalFlippedView : MTKView

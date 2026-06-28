@@ -6,12 +6,12 @@
 
 static clipboard_changed_fn_ptr clipboard_changed;
 
-void uno_clipboard_clear(void)
+void codebrix_clipboard_clear(void)
 {
     [[NSPasteboard generalPasteboard] clearContents];
 }
 
-void uno_clipboard_get_content(struct ClipboardData* data)
+void codebrix_clipboard_get_content(struct ClipboardData* data)
 {
     NSPasteboard *pasteboard = [NSPasteboard generalPasteboard];
 
@@ -35,7 +35,7 @@ void uno_clipboard_get_content(struct ClipboardData* data)
 
     if (image) {
 #if DEBUG
-        NSLog(@"uno_clipboard_get_content bitmap %s", data->bitmapFormat);
+        NSLog(@"codebrix_clipboard_get_content bitmap %s", data->bitmapFormat);
 #endif
         // if we have a `public.file-url` then we can return the path to the file, which avoids loading it into the app's memory (until/if needed)
         if (furl) {
@@ -80,7 +80,7 @@ void uno_clipboard_get_content(struct ClipboardData* data)
     }
 }
 
-bool uno_clipboard_set_content(struct ClipboardData* data)
+bool codebrix_clipboard_set_content(struct ClipboardData* data)
 {
     int arraySize = 0;
     if (data->htmlContent)
@@ -134,7 +134,7 @@ bool uno_clipboard_set_content(struct ClipboardData* data)
         result &= [pasteboard setData:content forType:NSPasteboardTypePNG];
     }
 #if DEBUG
-    NSLog(@"uno_clipboard_set_content %d -> %s", arraySize, result ? "TRUE" : "FALSE");
+    NSLog(@"codebrix_clipboard_set_content %d -> %s", arraySize, result ? "TRUE" : "FALSE");
 #endif
     return result;
 }
@@ -142,29 +142,29 @@ bool uno_clipboard_set_content(struct ClipboardData* data)
 static NSTimer *timer;
 static NSInteger lastCount;
 
-void uno_clipboard_start_content_changed(void)
+void codebrix_clipboard_start_content_changed(void)
 {
     lastCount = [[NSPasteboard generalPasteboard] changeCount];
     timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:true block:^(NSTimer * _Nonnull timer) {
         NSInteger currentCount = [[NSPasteboard generalPasteboard] changeCount];
         if (lastCount != currentCount) {
-            uno_clipboard_get_content_changed_callback()();
+            codebrix_clipboard_get_content_changed_callback()();
             lastCount = currentCount;
         }
     }];
 }
 
-void uno_clipboard_stop_content_changed(void)
+void codebrix_clipboard_stop_content_changed(void)
 {
     [timer invalidate];
 }
 
-clipboard_changed_fn_ptr uno_clipboard_get_content_changed_callback(void)
+clipboard_changed_fn_ptr codebrix_clipboard_get_content_changed_callback(void)
 {
     return clipboard_changed;
 }
 
-void uno_clipboard_set_content_changed_callback(clipboard_changed_fn_ptr p)
+void codebrix_clipboard_set_content_changed_callback(clipboard_changed_fn_ptr p)
 {
     clipboard_changed = p;
 }

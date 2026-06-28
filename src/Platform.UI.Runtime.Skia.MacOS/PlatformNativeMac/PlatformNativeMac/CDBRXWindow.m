@@ -17,26 +17,26 @@ static window_did_change_screen_parameters_fn_ptr window_did_change_screen_param
 // libSkiaSharp
 extern void* gr_direct_context_make_metal(id device, id queue);
 
-static uno_drawable_resize_fn_ptr window_resize;
+static codebrix_drawable_resize_fn_ptr window_resize;
 static metal_draw_fn_ptr metal_draw;
 static soft_draw_fn_ptr soft_draw;
 
-inline uno_drawable_resize_fn_ptr uno_get_resize_callback(void)
+inline codebrix_drawable_resize_fn_ptr codebrix_get_resize_callback(void)
 {
     return window_resize;
 }
 
-inline metal_draw_fn_ptr uno_get_metal_draw_callback(void)
+inline metal_draw_fn_ptr codebrix_get_metal_draw_callback(void)
 {
     return metal_draw;
 }
 
-inline soft_draw_fn_ptr uno_get_soft_draw_callback(void)
+inline soft_draw_fn_ptr codebrix_get_soft_draw_callback(void)
 {
     return soft_draw;
 }
 
-void uno_set_drawing_callbacks(metal_draw_fn_ptr metal, soft_draw_fn_ptr soft, uno_drawable_resize_fn_ptr resize)
+void codebrix_set_drawing_callbacks(metal_draw_fn_ptr metal, soft_draw_fn_ptr soft, codebrix_drawable_resize_fn_ptr resize)
 {
     metal_draw = metal;
     soft_draw = soft;
@@ -63,7 +63,7 @@ void uno_set_drawing_callbacks(metal_draw_fn_ptr metal, soft_draw_fn_ptr soft, u
 #if DEBUG
     NSLog(@"    ScreenHeightInRawPixels %g ScreenWidthInRawPixels %g RawPixelsPerViewPixel %g", s.height, s.width, screen.backingScaleFactor);
 #endif
-    uno_get_window_did_change_screen_callback()(window, (uint)s.height, (uint)s.width, screen.backingScaleFactor);
+    codebrix_get_window_did_change_screen_callback()(window, (uint)s.height, (uint)s.width, screen.backingScaleFactor);
 }
 
 - (void) applicationDidChangeScreenParametersNotification:(NSNotification*) note
@@ -72,18 +72,18 @@ void uno_set_drawing_callbacks(metal_draw_fn_ptr metal, soft_draw_fn_ptr soft, u
 #if DEBUG
     NSLog(@"NSApplicationDidChangeScreenParametersNotification %@", window);
 #endif
-    uno_get_window_did_change_screen_parameters_callback()(window);
+    codebrix_get_window_did_change_screen_parameters_callback()(window);
 }
 
 @end
 
-NSWindow* uno_app_get_main_window(void)
+NSWindow* codebrix_app_get_main_window(void)
 {
     if (!main_window) {
-        main_window = uno_window_create(800, 600);
+        main_window = codebrix_window_create(800, 600);
     }
 #if DEBUG
-    NSLog(@"uno_app_get_main_window %p", main_window);
+    NSLog(@"codebrix_app_get_main_window %p", main_window);
 #endif
     return main_window;
 }
@@ -105,7 +105,7 @@ NSWindow* uno_app_get_main_window(void)
 
 @end
 
-NSWindow* uno_window_create(double width, double height)
+NSWindow* codebrix_window_create(double width, double height)
 {
     CGRect size = NSMakeRect(0, 0, width, height);
     UNOWindow *window = [[UNOWindow alloc] initWithContentRect:size
@@ -114,7 +114,7 @@ NSWindow* uno_window_create(double width, double height)
     
     NSViewController *vc = [[NSViewController alloc] init];
     
-    id device = uno_application_get_metal_device();
+    id device = codebrix_application_get_metal_device();
     if (device) {
         UNOMetalFlippedView *v = [[UNOMetalFlippedView alloc] initWithFrame:size device:device];
         v.enableSetNeedsDisplay = YES;
@@ -145,30 +145,30 @@ NSWindow* uno_window_create(double width, double height)
     return window;
 }
 
-void uno_window_activate(UNOWindow *window)
+void codebrix_window_activate(UNOWindow *window)
 {
 #if DEBUG
-    NSLog(@"uno_window_activate %@ state %d", window, window.overlappedPresenterState);
+    NSLog(@"codebrix_window_activate %@ state %d", window, window.overlappedPresenterState);
 #endif
     switch (window.overlappedPresenterState) {
         case OverlappedPresenterStateRestored: {
             // ordering to front can move the window (but not resize it) from what was set before activating it, so we move it back
             CGPoint current = window.frame.origin;
-            // don't call `uno_window_restore` since we want the pre-activation state (not the current one) to be used
+            // don't call `codebrix_window_restore` since we want the pre-activation state (not the current one) to be used
             [window orderFrontRegardless];
             [window setFrameOrigin:current];
             break;
         }
         case OverlappedPresenterStateMinimized:
-            uno_window_minimize(window, false);
+            codebrix_window_minimize(window, false);
             break;
         case OverlappedPresenterStateMaximized:
-            uno_window_maximize(window);
+            codebrix_window_maximize(window);
             break;
     }
 }
 
-void uno_window_notify_screen_change(NSWindow *window)
+void codebrix_window_notify_screen_change(NSWindow *window)
 {
     assert(windowDidChangeScreen);
     NSNotification *nw = [[NSNotification alloc] initWithName:NSWindowDidChangeScreenNotification object:window userInfo:nil];
@@ -176,34 +176,34 @@ void uno_window_notify_screen_change(NSWindow *window)
     [windowDidChangeScreen applicationDidChangeScreenParametersNotification:nw];
 }
 
-void uno_window_invalidate(NSWindow *window)
+void codebrix_window_invalidate(NSWindow *window)
 {
 #if DEBUG
-    NSLog(@"uno_window_invalidate %@ view: %p", window, window.contentViewController.view);
+    NSLog(@"codebrix_window_invalidate %@ view: %p", window, window.contentViewController.view);
 #endif
     window.contentViewController.view.needsDisplay = true;
 }
 
-void uno_window_close(NSWindow *window)
+void codebrix_window_close(NSWindow *window)
 {
 #if DEBUG
-    NSLog(@"uno_window_close %@", window);
+    NSLog(@"codebrix_window_close %@", window);
 #endif
     [window performClose:nil];
 }
 
-void uno_window_move(NSWindow *window, double x, double y)
+void codebrix_window_move(NSWindow *window, double x, double y)
 {
 #if DEBUG
-    NSLog(@"uno_window_move %@ x: %g y: %g", window, x, y);
+    NSLog(@"codebrix_window_move %@ x: %g y: %g", window, x, y);
 #endif
     [window setFrameOrigin:NSMakePoint(x, y)];
 }
 
-bool uno_window_resize(NSWindow *window, double width, double height)
+bool codebrix_window_resize(NSWindow *window, double width, double height)
 {
 #if DEBUG
-    NSLog (@"uno_window_resize %@ %f %f", window, width, height);
+    NSLog (@"codebrix_window_resize %@ %f %f", window, width, height);
 #endif
     bool result = false;
     if (window) {
@@ -217,55 +217,55 @@ bool uno_window_resize(NSWindow *window, double width, double height)
     return result;
 }
 
-void uno_window_set_min_size(NSWindow *window, double width, double height)
+void codebrix_window_set_min_size(NSWindow *window, double width, double height)
 {
 #if DEBUG
-    NSLog (@"uno_window_set_min_size %@ %f %f", window, width, height);
+    NSLog (@"codebrix_window_set_min_size %@ %f %f", window, width, height);
 #endif
     window.minSize = CGSizeMake(width, height);
 }
 
-void uno_window_set_max_size(NSWindow *window, double width, double height)
+void codebrix_window_set_max_size(NSWindow *window, double width, double height)
 {
 #if DEBUG
-    NSLog (@"uno_window_set_max_size %@ %f %f", window, width, height);
+    NSLog (@"codebrix_window_set_max_size %@ %f %f", window, width, height);
 #endif
     window.maxSize = CGSizeMake(width, height);
 }
 
-void uno_window_get_position(NSWindow *window, double *x, double *y)
+void codebrix_window_get_position(NSWindow *window, double *x, double *y)
 {
     CGPoint origin = window.frame.origin;
 #if DEBUG
-    NSLog (@"uno_window_get_position %@ %f %f", window, origin.x, origin.y);
+    NSLog (@"codebrix_window_get_position %@ %f %f", window, origin.x, origin.y);
 #endif
     *x = origin.x;
     *y = origin.y;
 }
 
-char* uno_window_get_title(NSWindow *window)
+char* codebrix_window_get_title(NSWindow *window)
 {
     return strdup(window.title.UTF8String);
 }
 
-void uno_window_set_title(NSWindow *window, const char* title)
+void codebrix_window_set_title(NSWindow *window, const char* title)
 {
     window.title = [NSString stringWithUTF8String:title];
 }
 
-bool uno_window_is_full_screen(NSWindow *window)
+bool codebrix_window_is_full_screen(NSWindow *window)
 {
     bool result = window != nil;
     if (result) {
         result = (window.styleMask & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen;
     }
 #if DEBUG
-    NSLog(@"uno_window_is_full_screen %@ %s", window, result ? "true" : "false");
+    NSLog(@"codebrix_window_is_full_screen %@ %s", window, result ? "true" : "false");
 #endif
     return result;
 }
 
-bool uno_window_enter_full_screen(NSWindow *window)
+bool codebrix_window_enter_full_screen(NSWindow *window)
 {
     bool result = window != nil;
     if (result && (window.styleMask & NSWindowStyleMaskFullScreen) != NSWindowStyleMaskFullScreen) {
@@ -273,34 +273,34 @@ bool uno_window_enter_full_screen(NSWindow *window)
         result = true;
     }
 #if DEBUG
-    NSLog(@"uno_window_enter_full_screen %@ %s", window, result ? "true" : "false");
+    NSLog(@"codebrix_window_enter_full_screen %@ %s", window, result ? "true" : "false");
 #endif
     return result;
 }
 
-void uno_window_exit_full_screen(NSWindow *window)
+void codebrix_window_exit_full_screen(NSWindow *window)
 {
     if (window && (window.styleMask & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen) {
         [window toggleFullScreen:nil];
     }
 #if DEBUG
-    NSLog(@"uno_window_exit_full_screen %@", window);
+    NSLog(@"codebrix_window_exit_full_screen %@", window);
 #endif
 }
 
 // on macOS double-clicking on the titlebar maximize the window (not the green icon)
-void uno_window_maximize(NSWindow *window)
+void codebrix_window_maximize(NSWindow *window)
 {
 #if DEBUG
-    NSLog(@"uno_window_maximize %@", window);
+    NSLog(@"codebrix_window_maximize %@", window);
 #endif
     [window performZoom:nil];
 }
 
-void uno_window_minimize(NSWindow *window, bool activateWindow)
+void codebrix_window_minimize(NSWindow *window, bool activateWindow)
 {
 #if DEBUG
-    NSLog(@"uno_window_minimize %@ %s", window, activateWindow ? "true" : "false");
+    NSLog(@"codebrix_window_minimize %@ %s", window, activateWindow ? "true" : "false");
 #endif
     [window performMiniaturize:nil];
     if (activateWindow && window.canBecomeMainWindow) {
@@ -308,12 +308,12 @@ void uno_window_minimize(NSWindow *window, bool activateWindow)
     }
 }
 
-void uno_window_restore(UNOWindow *window, bool activateWindow)
+void codebrix_window_restore(UNOWindow *window, bool activateWindow)
 {
 #if DEBUG
-    NSLog(@"uno_window_restore %@ %s", window, activateWindow ? "true" : "false");
+    NSLog(@"codebrix_window_restore %@ %s", window, activateWindow ? "true" : "false");
 #endif
-    switch(uno_window_get_overlapped_presenter_state(window)) {
+    switch(codebrix_window_get_overlapped_presenter_state(window)) {
         case OverlappedPresenterStateMaximized:
             [window zoom:nil];
             break;
@@ -328,15 +328,15 @@ void uno_window_restore(UNOWindow *window, bool activateWindow)
     }
 }
 
-OverlappedPresenterState uno_window_get_overlapped_presenter_state(UNOWindow *window)
+OverlappedPresenterState codebrix_window_get_overlapped_presenter_state(UNOWindow *window)
 {
 #if DEBUG
-    NSLog(@"uno_window_get_overlapped_presenter_state %@ state %d", window, window.overlappedPresenterState);
+    NSLog(@"codebrix_window_get_overlapped_presenter_state %@ state %d", window, window.overlappedPresenterState);
 #endif
     return window.overlappedPresenterState;
 }
 
-void uno_window_set_always_on_top(NSWindow* window, bool isAlwaysOnTop)
+void codebrix_window_set_always_on_top(NSWindow* window, bool isAlwaysOnTop)
 {
     NSWindowLevel level = window.level;
     if (isAlwaysOnTop) {
@@ -345,12 +345,12 @@ void uno_window_set_always_on_top(NSWindow* window, bool isAlwaysOnTop)
         level = NSNormalWindowLevel;
     }
 #if DEBUG
-    NSLog(@"uno_window_set_always_on_top %@ 0x%x %s 0x%x", window, (uint)level, isAlwaysOnTop ? "true" : "false", (uint)level);
+    NSLog(@"codebrix_window_set_always_on_top %@ 0x%x %s 0x%x", window, (uint)level, isAlwaysOnTop ? "true" : "false", (uint)level);
 #endif
     window.level = level;
 }
 
-void uno_window_set_border_and_title_bar(NSWindow *window, bool hasBorder, bool hasTitleBar)
+void codebrix_window_set_border_and_title_bar(NSWindow *window, bool hasBorder, bool hasTitleBar)
 {
     NSWindowStyleMask style = window.styleMask;
     if (!hasBorder)
@@ -362,13 +362,13 @@ void uno_window_set_border_and_title_bar(NSWindow *window, bool hasBorder, bool 
     else
         style ^= NSWindowStyleMaskTitled;
 #if DEBUG
-    NSLog(@"uno_window_set_border_and_title_bar %@ 0x%x hasBorder %s hasTitleBar %s 0x%x", window, (uint)window.styleMask,
+    NSLog(@"codebrix_window_set_border_and_title_bar %@ 0x%x hasBorder %s hasTitleBar %s 0x%x", window, (uint)window.styleMask,
           hasBorder ? "true" : "false", hasTitleBar ? "true" : "false", (uint)style);
 #endif
     window.styleMask = style;
 }
 
-void uno_window_set_maximizable(NSWindow* window, bool isMaximizable)
+void codebrix_window_set_maximizable(NSWindow* window, bool isMaximizable)
 {
 #if DEBUG
     NSWindowCollectionBehavior cb = window.collectionBehavior;
@@ -383,11 +383,11 @@ void uno_window_set_maximizable(NSWindow* window, bool isMaximizable)
         [[window standardWindowButton:NSWindowZoomButton] setEnabled:NO];
     }
 #if DEBUG
-    NSLog(@"uno_window_set_maximizable %@ 0x%x %s 0x%x", window, (uint)cb, isMaximizable ? "true" : "false", (uint)window.collectionBehavior);
+    NSLog(@"codebrix_window_set_maximizable %@ 0x%x %s 0x%x", window, (uint)cb, isMaximizable ? "true" : "false", (uint)window.collectionBehavior);
 #endif
 }
 
-void uno_window_set_minimizable(NSWindow* window, bool isMinimizable)
+void codebrix_window_set_minimizable(NSWindow* window, bool isMinimizable)
 {
     NSWindowStyleMask style = window.styleMask;
     if (isMinimizable)
@@ -395,18 +395,18 @@ void uno_window_set_minimizable(NSWindow* window, bool isMinimizable)
     else
         style ^= NSWindowStyleMaskMiniaturizable;
 #if DEBUG
-    NSLog(@"uno_window_set_minimizable %@ 0x%x %s 0x%x", window, (uint)window.styleMask, isMinimizable ? "true" : "false", (uint)style);
+    NSLog(@"codebrix_window_set_minimizable %@ 0x%x %s 0x%x", window, (uint)window.styleMask, isMinimizable ? "true" : "false", (uint)style);
 #endif
     window.styleMask = style;
 }
 
-bool uno_window_set_modal(NSWindow *window, bool isModal)
+bool codebrix_window_set_modal(NSWindow *window, bool isModal)
 {
     // this is a read-only property so we simply log if we can't change it to the requested value
     return isModal == window.isModalPanel;
 }
 
-void uno_window_set_resizable(NSWindow *window, bool isResizable)
+void codebrix_window_set_resizable(NSWindow *window, bool isResizable)
 {
     NSWindowStyleMask style = window.styleMask;
     if (isResizable)
@@ -414,22 +414,22 @@ void uno_window_set_resizable(NSWindow *window, bool isResizable)
     else
         style ^= NSWindowStyleMaskResizable;
 #if DEBUG
-    NSLog(@"uno_window_set_resizable %@ 0x%x %s 0x%x", window, (uint)window.styleMask, isResizable ? "true" : "false", (uint)style);
+    NSLog(@"codebrix_window_set_resizable %@ 0x%x %s 0x%x", window, (uint)window.styleMask, isResizable ? "true" : "false", (uint)style);
 #endif
     window.styleMask = style;
 }
 
-inline window_did_change_screen_fn_ptr uno_get_window_did_change_screen_callback(void)
+inline window_did_change_screen_fn_ptr codebrix_get_window_did_change_screen_callback(void)
 {
     return window_did_change_screen;
 }
 
-inline window_did_change_screen_parameters_fn_ptr uno_get_window_did_change_screen_parameters_callback(void)
+inline window_did_change_screen_parameters_fn_ptr codebrix_get_window_did_change_screen_parameters_callback(void)
 {
     return window_did_change_screen_parameters;
 }
 
-void uno_set_window_screen_change_callbacks(window_did_change_screen_fn_ptr screen, window_did_change_screen_parameters_fn_ptr parameters)
+void codebrix_set_window_screen_change_callbacks(window_did_change_screen_fn_ptr screen, window_did_change_screen_parameters_fn_ptr parameters)
 {
     windowDidChangeScreen = [windowDidChangeScreenNoteClass init];
     window_did_change_screen = screen;
@@ -439,12 +439,12 @@ void uno_set_window_screen_change_callbacks(window_did_change_screen_fn_ptr scre
 static window_key_callback_fn_ptr window_key_down;
 static window_key_callback_fn_ptr window_key_up;
 
-inline static window_key_callback_fn_ptr uno_get_window_key_down_callback(void)
+inline static window_key_callback_fn_ptr codebrix_get_window_key_down_callback(void)
 {
     return window_key_down;
 }
 
-inline static window_key_callback_fn_ptr uno_get_window_key_up_callback(void)
+inline static window_key_callback_fn_ptr codebrix_get_window_key_up_callback(void)
 {
     return window_key_up;
 }
@@ -622,26 +622,26 @@ UniChar get_unicode(NSEvent *event)
 
 static window_mouse_callback_fn_ptr window_mouse_event;
 
-inline static window_mouse_callback_fn_ptr uno_get_window_mouse_event_callback(void)
+inline static window_mouse_callback_fn_ptr codebrix_get_window_mouse_event_callback(void)
 {
     return window_mouse_event;
 }
 
 static window_move_or_resize_fn_ptr window_move_event;
 
-inline static window_move_or_resize_fn_ptr uno_get_window_move_event_callback(void)
+inline static window_move_or_resize_fn_ptr codebrix_get_window_move_event_callback(void)
 {
     return window_move_event;
 }
 
 static window_move_or_resize_fn_ptr window_resize_event;
 
-inline static window_move_or_resize_fn_ptr uno_get_window_resize_event_callback(void)
+inline static window_move_or_resize_fn_ptr codebrix_get_window_resize_event_callback(void)
 {
     return window_resize_event;
 }
 
-void uno_set_window_events_callbacks(window_key_callback_fn_ptr keyDown,
+void codebrix_set_window_events_callbacks(window_key_callback_fn_ptr keyDown,
     window_key_callback_fn_ptr keyUp,
     window_mouse_callback_fn_ptr pointer,
     window_move_or_resize_fn_ptr move,
@@ -656,30 +656,30 @@ void uno_set_window_events_callbacks(window_key_callback_fn_ptr keyDown,
 
 static window_should_close_fn_ptr window_should_close;
 
-inline window_should_close_fn_ptr uno_get_window_should_close_callback(void)
+inline window_should_close_fn_ptr codebrix_get_window_should_close_callback(void)
 {
     return window_should_close;
 }
 
 static window_close_fn_ptr window_close;
 
-inline window_close_fn_ptr uno_get_window_close_callback(void)
+inline window_close_fn_ptr codebrix_get_window_close_callback(void)
 {
     return window_close;
 }
 
-void uno_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close)
+void codebrix_set_window_close_callbacks(window_should_close_fn_ptr shouldClose, window_close_fn_ptr close)
 {
     window_should_close = shouldClose;
     window_close = close;
 }
 
-void uno_window_get_metal_handles(UNOWindow* window, void** device, void** queue)
+void codebrix_window_get_metal_handles(UNOWindow* window, void** device, void** queue)
 {
-    *device = (__bridge void *)(uno_application_get_metal_device());
+    *device = (__bridge void *)(codebrix_application_get_metal_device());
     *queue = (__bridge void *)(window.metalViewDelegate.queue);
 #if DEBUG
-    NSLog(@"uno_window_get_metal device %p queue %p", device, queue);
+    NSLog(@"codebrix_window_get_metal device %p queue %p", device, queue);
 #endif
 }
 
@@ -688,7 +688,7 @@ CGFloat readNextCoord(const char *svg, int *position, long length)
     CGFloat result = NAN;
     if (*position >= length) {
 #if DEBUG
-        NSLog(@"uno_window_clip_svg readNextCoord position:%d >= length:%ld", *position, length);
+        NSLog(@"codebrix_window_clip_svg readNextCoord position:%d >= length:%ld", *position, length);
 #endif
         return result;
     }
@@ -699,12 +699,12 @@ CGFloat readNextCoord(const char *svg, int *position, long length)
     return result;
 }
 
-bool uno_window_clip_svg(UNOWindow* window, const char* svg)
+bool codebrix_window_clip_svg(UNOWindow* window, const char* svg)
 {
     if (svg) {
         CGFloat scale = window.screen.backingScaleFactor;
 #if DEBUG
-        NSLog(@"uno_window_clip_svg %@ %@ %s scale: %g", window, window.contentView.layer.description, svg, scale);
+        NSLog(@"codebrix_window_clip_svg %@ %@ %s scale: %g", window, window.contentView.layer.description, svg, scale);
 #endif
         NSArray<__kindof NSView *> *subviews = window.contentViewController.view.subviews;
         for (int i = 0; i < subviews.count; i++) {
@@ -717,7 +717,7 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
             CGFloat vx = frame.origin.x;
             CGFloat vy = frame.origin.y;
 #if DEBUG
-            NSLog(@"uno_window_clip_svg subview %d %@ layer %@ mask %@", i, view, view.layer, view.layer.mask);
+            NSLog(@"codebrix_window_clip_svg subview %d %@ layer %@ mask %@", i, view, view.layer, view.layer.mask);
 #endif
             CGMutablePathRef path = CGPathCreateMutable();
             // small subset of an SVG path parser handling trusted input of integer-based points
@@ -733,7 +733,7 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
                         y = readNextCoord(svg, &i, length);
                         // there might not be a separator (not required before the next op)
 #if DEBUG_PARSER
-                        NSLog(@"uno_window_clip_svg parsing CGPathMoveToPoint %g %g - position %d", x, y, i);
+                        NSLog(@"codebrix_window_clip_svg parsing CGPathMoveToPoint %g %g - position %d", x, y, i);
 #endif
                         x = (x / scale - vx);
                         y = (y / scale - vy);
@@ -746,7 +746,7 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
                         y = readNextCoord(svg, &i, length);
                         // there might not be a separator (not required before the next op)
 #if DEBUG_PARSER
-                        NSLog(@"uno_window_clip_svg parsing CGPathAddLineToPoint %g %g - position %d", x, y, i);
+                        NSLog(@"codebrix_window_clip_svg parsing CGPathAddLineToPoint %g %g - position %d", x, y, i);
 #endif
                         x = (x / scale - vx);
                         y = (y / scale - vy);
@@ -763,7 +763,7 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
                         y2 = readNextCoord(svg, &i, length);
                         // there might not be a separator (not required before the next op)
 #if DEBUG_PARSER
-                        NSLog(@"uno_window_clip_svg parsing CGPathAddQuadCurveToPoint %g %g %g %g - position %d", x, y, x2, y2, i);
+                        NSLog(@"codebrix_window_clip_svg parsing CGPathAddQuadCurveToPoint %g %g %g %g - position %d", x, y, x2, y2, i);
 #endif
                         x = (x / scale - vx);
                         y = (y / scale - vy);
@@ -774,14 +774,14 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
                     case 'Z':
                         i++; // skip Z
 #if DEBUG_PARSER
-                        NSLog(@"uno_window_clip_svg parsing CGPathCloseSubpath - position %d", i);
+                        NSLog(@"codebrix_window_clip_svg parsing CGPathCloseSubpath - position %d", i);
 #endif
                         CGPathCloseSubpath(path);
                         break;
 #if DEBUG
                     default:
                         if (op != ' ') {
-                            NSLog(@"uno_window_clip_svg parsing unknown op %c at position %d", op, i);
+                            NSLog(@"codebrix_window_clip_svg parsing unknown op %c at position %d", op, i);
                         }
                         i++; // skip unknown op
                         break;
@@ -798,13 +798,13 @@ bool uno_window_clip_svg(UNOWindow* window, const char* svg)
         }
     } else {
 #if DEBUG
-        NSLog(@"uno_window_clip_svg %@ %@ reset", window, window.contentView.layer.description);
+        NSLog(@"codebrix_window_clip_svg %@ %@ reset", window, window.contentView.layer.description);
 #endif
         NSArray<__kindof NSView *> *subviews = window.contentViewController.view.subviews;
         for (int i = 0; i < subviews.count; i++) {
             NSView* view = subviews[i];
 #if DEBUG
-            NSLog(@"uno_window_clip_svg reset subview %d %@ layer %@ mask %@", i, view, view.layer, view.layer.mask);
+            NSLog(@"codebrix_window_clip_svg reset subview %d %@ layer %@ mask %@", i, view, view.layer, view.layer.mask);
 #endif
             CAShapeLayer* mask = view.layer.mask;
             if (mask != nil) {
@@ -912,7 +912,7 @@ NSOperatingSystemVersion _osVersion;
         case NSEventTypeKeyDown: {
             unsigned short scanCode = event.keyCode;
             UniChar unicode = get_unicode(event);
-            handled = uno_get_window_key_down_callback()(self, get_virtual_key(scanCode), get_modifiers(event.modifierFlags), scanCode, unicode);
+            handled = codebrix_get_window_key_down_callback()(self, get_virtual_key(scanCode), get_modifiers(event.modifierFlags), scanCode, unicode);
 #if DEBUG
             NSLog(@"NSEventTypeKeyDown: %@ window %p unicode %d handled? %s", event, self, unicode, handled ? "true" : "false");
 #endif
@@ -921,7 +921,7 @@ NSOperatingSystemVersion _osVersion;
         case NSEventTypeKeyUp: {
             unsigned short scanCode = event.keyCode;
             UniChar unicode = get_unicode(event);
-            handled = uno_get_window_key_up_callback()(self, get_virtual_key(scanCode), get_modifiers(event.modifierFlags), scanCode, unicode);
+            handled = codebrix_get_window_key_up_callback()(self, get_virtual_key(scanCode), get_modifiers(event.modifierFlags), scanCode, unicode);
 #if DEBUG
             NSLog(@"NSEventTypeKeyUp: %@ window %p unicode %d handled? %s", event, self, unicode, handled ? "true" : "false");
 #endif
@@ -1011,7 +1011,7 @@ NSOperatingSystemVersion _osVersion;
             data.frameId = (uint)(ts * 10.0);
             data.timestamp = (uint64)(ts * 1000000.0);
 
-            handled = uno_get_window_mouse_event_callback()(self, &data);
+            handled = codebrix_get_window_mouse_event_callback()(self, &data);
 #if DEBUG_MOUSE // very noisy
             NSLog(@"NSEventTypeMouse*: %@ %g %g handled? %s", event, data.x, data.y, handled ? "true" : "false");
 #endif
@@ -1041,10 +1041,10 @@ NSOperatingSystemVersion _osVersion;
 
     bool handled = false;
     if (down) {
-        handled |= uno_get_window_key_down_callback()(self, key, mod, scanCode, unicode);
+        handled |= codebrix_get_window_key_down_callback()(self, key, mod, scanCode, unicode);
     }
     if (up) {
-        handled |= uno_get_window_key_up_callback()(self, key, mod, scanCode, unicode);
+        handled |= codebrix_get_window_key_up_callback()(self, key, mod, scanCode, unicode);
     }
 #if DEBUG
     NSLog(@"NSEventTypeFlagsChanged: down: %s up: %s", down ? "TRUE" : "false", up ? "TRUE" : "false");
@@ -1123,7 +1123,7 @@ NSOperatingSystemVersion _osVersion;
 #if DEBUG
     NSLog(@"UNOWindow %p windowDidMove %@ x: %g y: %g", self, notification, position.x, position.y);
 #endif
-    uno_get_window_move_event_callback()(self, position.x, position.y);
+    codebrix_get_window_move_event_callback()(self, position.x, position.y);
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
@@ -1134,14 +1134,14 @@ NSOperatingSystemVersion _osVersion;
 #if DEBUG
         NSLog(@"UNOWindow %p windowDidResize %@ w: %g h: %g", self, notification, size.width, size.height);
 #endif
-        uno_get_window_resize_event_callback()(self, size.width, size.height);
+        codebrix_get_window_resize_event_callback()(self, size.width, size.height);
     }
 }
 
 - (bool)windowShouldClose:(NSWindow *)sender
 {
     // see `AppWindow.Closing`
-    bool result = uno_get_window_should_close_callback()(self) ? YES : NO;
+    bool result = codebrix_get_window_should_close_callback()(self) ? YES : NO;
 #if DEBUG
     NSLog(@"UNOWindow %p windowShouldClose %@ -> %s", self, sender, result ? "true" : "false");
 #endif
@@ -1157,7 +1157,7 @@ NSOperatingSystemVersion _osVersion;
     [center removeObserver:windowDidChangeScreen name:NSWindowDidChangeScreenNotification object:self];
     [center removeObserver:windowDidChangeScreen name:NSApplicationDidChangeScreenParametersNotification object:self];
 
-    uno_get_window_close_callback()(self);
+    codebrix_get_window_close_callback()(self);
 }
 
 @end

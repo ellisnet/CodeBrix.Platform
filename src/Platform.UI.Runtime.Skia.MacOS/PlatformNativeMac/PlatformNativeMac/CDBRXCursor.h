@@ -28,9 +28,9 @@ typedef NS_ENUM(uint32, CoreCursorType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-void uno_cursor_hide(void);
-void uno_cursor_show(void);
-bool uno_cursor_set(CoreCursorType cursorType);
+void codebrix_cursor_hide(void);
+void codebrix_cursor_show(void);
+bool codebrix_cursor_set(CoreCursorType cursorType);
 
 // adapted from https://gitlab.gnome.org/GNOME/gtk/-/blob/main/gdk/macos/gdkmacoscursor.c
 @interface NSCursor()

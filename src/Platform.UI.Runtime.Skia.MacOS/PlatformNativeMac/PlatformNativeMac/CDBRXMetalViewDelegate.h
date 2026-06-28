@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 typedef void (*metal_draw_fn_ptr)(void* /* window */, double /* width */, double /* height */, void* _Nullable /* texture */);
-metal_draw_fn_ptr uno_get_metal_draw_callback(void);
-void uno_set_draw_callback(metal_draw_fn_ptr p);
+metal_draw_fn_ptr codebrix_get_metal_draw_callback(void);
+void codebrix_set_draw_callback(metal_draw_fn_ptr p);
 
 NS_ASSUME_NONNULL_END

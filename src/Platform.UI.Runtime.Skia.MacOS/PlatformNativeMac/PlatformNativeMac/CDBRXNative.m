@@ -37,7 +37,7 @@ static NSMutableSet<NSView*> *transients;
 
 @end
 
-NSView* uno_native_create_sample(NSWindow *window, const char* _Nullable text)
+NSView* codebrix_native_create_sample(NSWindow *window, const char* _Nullable text)
 {
     // no NSLabel on macOS
     NSTextField* label = [[NSTextField alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)];
@@ -51,26 +51,26 @@ NSView* uno_native_create_sample(NSWindow *window, const char* _Nullable text)
     UNORedView* sample = [[UNORedView alloc] initWithFrame:label.frame];
     [sample addSubview:label];
 #if DEBUG
-    NSLog(@"uno_native_create_sample #%p label: %@", sample, label.stringValue);
+    NSLog(@"codebrix_native_create_sample #%p label: %@", sample, label.stringValue);
 #endif
     sample.originalSuperView = window.contentViewController.view;
     return sample;
 }
 
-void uno_native_arrange(NSView<UNONativeElement> *element, double arrangeLeft, double arrangeTop, double arrangeWidth, double arrangeHeight)
+void codebrix_native_arrange(NSView<UNONativeElement> *element, double arrangeLeft, double arrangeTop, double arrangeWidth, double arrangeHeight)
 {
     NSRect arrange = NSMakeRect(arrangeLeft, arrangeTop, arrangeWidth, arrangeHeight);
     element.frame = arrange;
 #if DEBUG
-    NSLog(@"uno_native_arrange %p arrange(%g,%g,%g,%g)", element,
+    NSLog(@"codebrix_native_arrange %p arrange(%g,%g,%g,%g)", element,
           arrangeLeft, arrangeTop, arrangeWidth, arrangeHeight);
 #endif
 }
 
-void uno_native_attach(NSView<UNONativeElement>* element)
+void codebrix_native_attach(NSView<UNONativeElement>* element)
 {
 #if DEBUG
-    NSLog(@"!!uno_native_attach %p", element);
+    NSLog(@"!!codebrix_native_attach %p", element);
 #endif
     bool already_attached = NO;
     if (!elements) {
@@ -79,7 +79,7 @@ void uno_native_attach(NSView<UNONativeElement>* element)
         already_attached = [elements containsObject:element];
     }
 #if DEBUG
-    NSLog(@"uno_native_attach %p -> %s attached", element, already_attached ? "already" : "not previously");
+    NSLog(@"codebrix_native_attach %p -> %s attached", element, already_attached ? "already" : "not previously");
 #endif
     if (!already_attached) {
         // note: it's too early to add a mask since the layer has not been set yet
@@ -88,10 +88,10 @@ void uno_native_attach(NSView<UNONativeElement>* element)
     [element.originalSuperView addSubview:element];
 }
 
-void uno_native_detach(NSView<UNONativeElement>* element)
+void codebrix_native_detach(NSView<UNONativeElement>* element)
 {
 #if DEBUG
-    NSLog(@"uno_native_detach %p", element);
+    NSLog(@"codebrix_native_detach %p", element);
 #endif
     element.layer.mask = nil;
 
@@ -104,16 +104,16 @@ void uno_native_detach(NSView<UNONativeElement>* element)
     [element removeFromSuperview];
 }
 
-bool uno_native_is_attached(NSView<UNONativeElement>* element)
+bool codebrix_native_is_attached(NSView<UNONativeElement>* element)
 {
     bool attached = elements ? [elements containsObject:element] : NO;
 #if DEBUG
-    NSLog(@"uno_native_is_attached %s", attached ? "YES" : "NO");
+    NSLog(@"codebrix_native_is_attached %s", attached ? "YES" : "NO");
 #endif
     return attached;
 }
 
-void uno_native_measure(NSView<UNONativeElement>* element, double childWidth, double childHeight, double availableWidth, double availableHeight, double* width, double* height)
+void codebrix_native_measure(NSView<UNONativeElement>* element, double childWidth, double childHeight, double availableWidth, double availableHeight, double* width, double* height)
 {
     CGSize size = element.subviews.firstObject.frame.size;
     
@@ -131,22 +131,22 @@ void uno_native_measure(NSView<UNONativeElement>* element, double childWidth, do
     *width = resolvedWidth;
     *height = resolvedHeight;
 #if DEBUG
-    NSLog(@"uno_native_measure %p : child %g x %g / available %g x %g -> %g x %g", element, childWidth, childHeight, availableWidth, availableHeight, *width, *height);
+    NSLog(@"codebrix_native_measure %p : child %g x %g / available %g x %g -> %g x %g", element, childWidth, childHeight, availableWidth, availableHeight, *width, *height);
 #endif
 }
 
-void uno_native_set_opacity(NSView<UNONativeElement>* element, double opacity)
+void codebrix_native_set_opacity(NSView<UNONativeElement>* element, double opacity)
 {
 #if DEBUG
-    NSLog(@"uno_native_set_opacity #%p : %g -> %g", element, element.alphaValue, opacity);
+    NSLog(@"codebrix_native_set_opacity #%p : %g -> %g", element, element.alphaValue, opacity);
 #endif
     element.alphaValue = opacity;
 }
 
-void uno_native_dispose(NSView<UNONativeElement>* element)
+void codebrix_native_dispose(NSView<UNONativeElement>* element)
 {
 #if DEBUG
-    NSLog(@"uno_native_dispose #%p", element);
+    NSLog(@"codebrix_native_dispose #%p", element);
 #endif
     [element dispose];
     [transients removeObject:element];

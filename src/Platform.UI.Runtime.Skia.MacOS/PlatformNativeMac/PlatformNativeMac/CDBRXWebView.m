@@ -5,61 +5,61 @@
 #import "CDBRXNative.h"
 #import "CDBRXWebView.h"
 
-static uno_webview_javascript_fn_ptr execute;
-static uno_webview_javascript_fn_ptr invoke;
+static codebrix_webview_javascript_fn_ptr execute;
+static codebrix_webview_javascript_fn_ptr invoke;
 
-inline uno_webview_javascript_fn_ptr uno_get_execute_callback(void)
+inline codebrix_webview_javascript_fn_ptr codebrix_get_execute_callback(void)
 {
     return execute;
 }
 
-void uno_set_execute_callback(uno_webview_javascript_fn_ptr p)
+void codebrix_set_execute_callback(codebrix_webview_javascript_fn_ptr p)
 {
     execute = p;
 }
 
-inline uno_webview_javascript_fn_ptr uno_get_invoke_callback(void)
+inline codebrix_webview_javascript_fn_ptr codebrix_get_invoke_callback(void)
 {
     return invoke;
 }
 
-void uno_set_invoke_callback(uno_webview_javascript_fn_ptr p)
+void codebrix_set_invoke_callback(codebrix_webview_javascript_fn_ptr p)
 {
     invoke = p;
 }
 
-static uno_webview_navigation_starting_fn_ptr navigation_starting;
-static uno_webview_navigation_finishing_fn_ptr navigation_finishing;
-static uno_webview_webview_notification_fn_ptr property_change_notification;
-static uno_webview_navigation_finishing_fn_ptr receive_web_message;
-static uno_webview_navigation_failing_fn_ptr navigation_failing;
+static codebrix_webview_navigation_starting_fn_ptr navigation_starting;
+static codebrix_webview_navigation_finishing_fn_ptr navigation_finishing;
+static codebrix_webview_webview_notification_fn_ptr property_change_notification;
+static codebrix_webview_navigation_finishing_fn_ptr receive_web_message;
+static codebrix_webview_navigation_failing_fn_ptr navigation_failing;
 
-inline uno_webview_navigation_starting_fn_ptr uno_get_webview_navigation_starting_callback(void)
+inline codebrix_webview_navigation_starting_fn_ptr codebrix_get_webview_navigation_starting_callback(void)
 {
     return navigation_starting;
 }
 
-inline uno_webview_navigation_finishing_fn_ptr uno_get_webview_navigation_finishing_callback(void)
+inline codebrix_webview_navigation_finishing_fn_ptr codebrix_get_webview_navigation_finishing_callback(void)
 {
     return navigation_finishing;
 }
 
-inline uno_webview_webview_notification_fn_ptr uno_get_webview_notification_callback(void)
+inline codebrix_webview_webview_notification_fn_ptr codebrix_get_webview_notification_callback(void)
 {
     return property_change_notification;
 }
 
-inline uno_webview_navigation_finishing_fn_ptr uno_get_webview_receive_web_message_callback(void)
+inline codebrix_webview_navigation_finishing_fn_ptr codebrix_get_webview_receive_web_message_callback(void)
 {
     return receive_web_message;
 }
 
-inline uno_webview_navigation_failing_fn_ptr uno_get_webview_navigation_failing_callback(void)
+inline codebrix_webview_navigation_failing_fn_ptr codebrix_get_webview_navigation_failing_callback(void)
 {
     return navigation_failing;
 }
 
-void uno_set_webview_navigation_callbacks(uno_webview_navigation_starting_fn_ptr starting, uno_webview_navigation_finishing_fn_ptr finishing, uno_webview_webview_notification_fn_ptr notification, uno_webview_navigation_finishing_fn_ptr web_message, uno_webview_navigation_failing_fn_ptr failing)
+void codebrix_set_webview_navigation_callbacks(codebrix_webview_navigation_starting_fn_ptr starting, codebrix_webview_navigation_finishing_fn_ptr finishing, codebrix_webview_webview_notification_fn_ptr notification, codebrix_webview_navigation_finishing_fn_ptr web_message, codebrix_webview_navigation_failing_fn_ptr failing)
 {
     navigation_starting = starting;
     navigation_finishing = finishing;
@@ -68,20 +68,20 @@ void uno_set_webview_navigation_callbacks(uno_webview_navigation_starting_fn_ptr
     navigation_failing = failing;
 }
 
-static uno_webview_unsupported_scheme_identified_fn_ptr unsupported_scheme_identified;
+static codebrix_webview_unsupported_scheme_identified_fn_ptr unsupported_scheme_identified;
 
-inline uno_webview_unsupported_scheme_identified_fn_ptr uno_get_webview_unsupported_scheme_identified_callback(void)
+inline codebrix_webview_unsupported_scheme_identified_fn_ptr codebrix_get_webview_unsupported_scheme_identified_callback(void)
 {
     return unsupported_scheme_identified;
 }
 
-void uno_set_webview_unsupported_scheme_identified_callback(uno_webview_unsupported_scheme_identified_fn_ptr fn_ptr)
+void codebrix_set_webview_unsupported_scheme_identified_callback(codebrix_webview_unsupported_scheme_identified_fn_ptr fn_ptr)
 {
     unsupported_scheme_identified = fn_ptr;
 }
 
 
-NSView* uno_webview_create(NSWindow *window, const char *ok, const char *cancel)
+NSView* codebrix_webview_create(NSWindow *window, const char *ok, const char *cancel)
 {
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
     if (@available(macOS 11, *)) {
@@ -95,7 +95,7 @@ NSView* uno_webview_create(NSWindow *window, const char *ok, const char *cancel)
     
     UNOWebView* webview = [[UNOWebView alloc] initWithFrame:NSMakeRect(0,0,0,0) configuration:config];
 #if DEBUG
-    NSLog(@"uno_webview_create %p", webview);
+    NSLog(@"codebrix_webview_create %p", webview);
 #endif
     webview.okString = [NSString stringWithUTF8String:ok];
     webview.cancelString = [NSString stringWithUTF8String:cancel];
@@ -104,43 +104,43 @@ NSView* uno_webview_create(NSWindow *window, const char *ok, const char *cancel)
     return webview;
 }
 
-const char* uno_webview_get_title(WKWebView *webview)
+const char* codebrix_webview_get_title(WKWebView *webview)
 {
     return strdup(webview.title.UTF8String);
 }
 
-bool uno_webview_can_go_back(WKWebView *webview)
+bool codebrix_webview_can_go_back(WKWebView *webview)
 {
     return webview.canGoBack;
 }
 
-bool uno_webview_can_go_forward(WKWebView *webview)
+bool codebrix_webview_can_go_forward(WKWebView *webview)
 {
     return webview.canGoForward;
 }
 
-void uno_webview_go_back(WKWebView *webview)
+void codebrix_webview_go_back(WKWebView *webview)
 {
 #if DEBUG
-    NSLog(@"uno_webview_go_back %p", webview);
+    NSLog(@"codebrix_webview_go_back %p", webview);
 #endif
     [webview goBack];
 }
 
-void uno_webview_go_forward(WKWebView *webview)
+void codebrix_webview_go_forward(WKWebView *webview)
 {
 #if DEBUG
-    NSLog(@"uno_webview_go_forward %p", webview);
+    NSLog(@"codebrix_webview_go_forward %p", webview);
 #endif
     [webview goForward];
 }
 
-void uno_webview_navigate(WKWebView *webview, const char* url, const char *jsonHeaders)
+void codebrix_webview_navigate(WKWebView *webview, const char* url, const char *jsonHeaders)
 {
     NSString *s = [NSString stringWithUTF8String:url];
     // note that if the app is not bundled then we get `/usr/local/share/dotnet/` and won't find the resources
     // this is covered inside managed code
-    if (uno_application_is_bundled()) {
+    if (codebrix_application_is_bundled()) {
         // convert [BundlePath] and [ResourcePath] to bundle specific paths
         s = [s stringByReplacingOccurrencesOfString:@"[BundlePath]" withString:NSBundle.mainBundle.bundlePath];
         s = [s stringByReplacingOccurrencesOfString:@"[ResourcePath]" withString:NSBundle.mainBundle.resourcePath];
@@ -154,7 +154,7 @@ void uno_webview_navigate(WKWebView *webview, const char* url, const char *jsonH
         headers = [NSJSONSerialization JSONObjectWithData:d options:NSJSONReadingMutableContainers error: &e];
 #if DEBUG
         if (e) {
-            NSLog(@"uno_webview_navigate %p headers %@ error: %@", webview, headers, e);
+            NSLog(@"codebrix_webview_navigate %p headers %@ error: %@", webview, headers, e);
         }
 #endif
     }
@@ -171,42 +171,42 @@ void uno_webview_navigate(WKWebView *webview, const char* url, const char *jsonH
         }
     }
 #if DEBUG
-    NSLog(@"uno_webview_navigate %p url: %@ headers %@", webview, s, headers);
+    NSLog(@"codebrix_webview_navigate %p url: %@ headers %@", webview, s, headers);
 #endif
     [webview loadRequest:r];
 }
 
-void uno_webview_load_html(WKWebView *webview, const char* html)
+void codebrix_webview_load_html(WKWebView *webview, const char* html)
 {
     NSString *data = [NSString stringWithUTF8String:html];
 #if DEBUG
-    NSLog(@"uno_webview_load_html %@", data);
+    NSLog(@"codebrix_webview_load_html %@", data);
 #endif
     // a nil baseURL slows downs things causing timeouts in tests
     NSURL* blank = [NSURL URLWithString:@"about:blank"];
     [webview loadHTMLString:data baseURL:blank];
 }
 
-void uno_webview_reload(WKWebView *webview)
+void codebrix_webview_reload(WKWebView *webview)
 {
 #if DEBUG
-    NSLog(@"uno_webview_reload %p", webview);
+    NSLog(@"codebrix_webview_reload %p", webview);
 #endif
     [webview reload];
 }
 
-void uno_webview_stop(WKWebView *webview)
+void codebrix_webview_stop(WKWebView *webview)
 {
 #if DEBUG
-    NSLog(@"uno_webview_stop %p", webview);
+    NSLog(@"codebrix_webview_stop %p", webview);
 #endif
     [webview stopLoading];
 }
 
-void uno_webview_execute_script(WKWebView *webview, NSInteger handle, const char *javascript)
+void codebrix_webview_execute_script(WKWebView *webview, NSInteger handle, const char *javascript)
 {
 #if DEBUG
-    NSLog(@"uno_webview_execute_script %p handle: 0x%lx javascript: %s", webview, handle, javascript);
+    NSLog(@"codebrix_webview_execute_script %p handle: 0x%lx javascript: %s", webview, handle, javascript);
 #endif
     NSString *js = [NSString stringWithUTF8String:javascript];
     [webview evaluateJavaScript:js completionHandler:^(NSObject* result, NSError *error) {
@@ -214,24 +214,24 @@ void uno_webview_execute_script(WKWebView *webview, NSInteger handle, const char
         const char* e = nil;
         if (error) {
 #if DEBUG
-            NSLog(@"uno_webview_execute_script %p completionHandler error: %@", webview, error);
+            NSLog(@"codebrix_webview_execute_script %p completionHandler error: %@", webview, error);
 #endif
             e = error.description.UTF8String;
         } else if (result != nil) {
             if ([NSJSONSerialization isValidJSONObject:result]) {
 #if DEBUG
-                NSLog(@"uno_webview_execute_script %p completionHandler json: %@ string %@", webview, result, ((NSObject*)result).description);
+                NSLog(@"codebrix_webview_execute_script %p completionHandler json: %@ string %@", webview, result, ((NSObject*)result).description);
 #endif
                 NSError *jsonError;
                 NSData *data = [NSJSONSerialization dataWithJSONObject:result options:0 error:&jsonError];
                 if (jsonError) {
 #if DEBUG
-                    NSLog(@"uno_webview_execute_script %p completionHandler jsonError: %@", webview, jsonError);
+                    NSLog(@"codebrix_webview_execute_script %p completionHandler jsonError: %@", webview, jsonError);
 #endif
                     e = jsonError.description.UTF8String;
                 } else {
 #if DEBUG
-                    NSLog(@"uno_webview_execute_script %p completionHandler data: %@", webview, data);
+                    NSLog(@"codebrix_webview_execute_script %p completionHandler data: %@", webview, data);
 #endif
                     r = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] UTF8String];
                 }
@@ -240,38 +240,38 @@ void uno_webview_execute_script(WKWebView *webview, NSInteger handle, const char
                 NSString *s = [((NSString*) result) stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
                 NSString *quoted = [NSString stringWithFormat:@"\"%@\"", s];
 #if DEBUG
-                NSLog(@"uno_webview_execute_script %p completionHandler string: %@", webview, quoted);
+                NSLog(@"codebrix_webview_execute_script %p completionHandler string: %@", webview, quoted);
 #endif
                 r = quoted.UTF8String;
             } else {
                 NSString *s = result.description;
 #if DEBUG
-                NSLog(@"uno_webview_execute_script %p completionHandler object: %@", webview, s);
+                NSLog(@"codebrix_webview_execute_script %p completionHandler object: %@", webview, s);
 #endif
                 r = s.UTF8String;
             }
         }
-        uno_get_execute_callback()(handle, r, e);
+        codebrix_get_execute_callback()(handle, r, e);
     }];
 }
 
-void uno_webview_invoke_script(WKWebView *webview, NSInteger handle, const char *javascript)
+void codebrix_webview_invoke_script(WKWebView *webview, NSInteger handle, const char *javascript)
 {
 #if DEBUG
-    NSLog(@"uno_webview_invoke_script %p handle: 0x%lx javascript: %s", webview, handle, javascript);
+    NSLog(@"codebrix_webview_invoke_script %p handle: 0x%lx javascript: %s", webview, handle, javascript);
 #endif
     NSString *js = [NSString stringWithUTF8String:javascript];
     [webview evaluateJavaScript:js completionHandler:^(NSString *result, NSError *error) {
 #if DEBUG
-        NSLog(@"uno_webview_invoke_script %p completionHandler result: %@ error: %@", webview, result, error);
+        NSLog(@"codebrix_webview_invoke_script %p completionHandler result: %@ error: %@", webview, result, error);
 #endif
         const char* r = result ? result.UTF8String : nil;
         const char* e = error ? error.description.UTF8String : nil;
-        uno_get_invoke_callback()(handle, r, e);
+        codebrix_get_invoke_callback()(handle, r, e);
     }];
 }
 
-void uno_webview_set_scrolling_enabled(UNOWebView* webview, bool enabled)
+void codebrix_webview_set_scrolling_enabled(UNOWebView* webview, bool enabled)
 {
     webview.scrollingEnabled = enabled;
 }
@@ -319,7 +319,7 @@ void uno_webview_set_scrolling_enabled(UNOWebView* webview, bool enabled)
         keyId = 3;
     }
     if (keyId != -1) {
-        uno_get_webview_notification_callback()(self, keyId);
+        codebrix_get_webview_notification_callback()(self, keyId);
     }
     [super didChangeValueForKey:key];
 }
@@ -409,14 +409,14 @@ void uno_webview_set_scrolling_enabled(UNOWebView* webview, bool enabled)
     }];
 }
 
-static uno_webview_new_window_requested_fn_ptr new_window_requested;
+static codebrix_webview_new_window_requested_fn_ptr new_window_requested;
 
-inline uno_webview_new_window_requested_fn_ptr uno_get_webview_new_window_requested_callback(void)
+inline codebrix_webview_new_window_requested_fn_ptr codebrix_get_webview_new_window_requested_callback(void)
 {
     return new_window_requested;
 }
 
-void uno_set_webview_new_window_requested_callback(uno_webview_new_window_requested_fn_ptr fn_ptr)
+void codebrix_set_webview_new_window_requested_callback(codebrix_webview_new_window_requested_fn_ptr fn_ptr)
 {
     new_window_requested = fn_ptr;
 }
@@ -430,7 +430,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
     NSLog(@"createWebViewWithConfiguration: fired for URL: %@", navigationAction.request.URL);
 #endif
 
-    uno_webview_new_window_requested_fn_ptr callback = uno_get_webview_new_window_requested_callback();
+    codebrix_webview_new_window_requested_fn_ptr callback = codebrix_get_webview_new_window_requested_callback();
     
     assert(callback);
 #if DEBUG
@@ -478,7 +478,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
 #if DEBUG
     NSLog(@"didStartProvisionalNavigation webView %p nagivation %@ URL: %@", webView, navigation, webView.URL);
 #endif
-    uno_get_webview_navigation_starting_callback()(webView, webView.URL.absoluteString.UTF8String);
+    codebrix_get_webview_navigation_starting_callback()(webView, webView.URL.absoluteString.UTF8String);
 }
 
 - (void)webView:(WKWebView *)webView didFailProvisionalNavigation:(null_unspecified WKNavigation *)navigation withError:(NSError *)error {
@@ -544,7 +544,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
             status = CoreWebView2WebErrorStatusUnexpectedError;
             break;
     }
-    uno_get_webview_navigation_failing_callback()(webView, webView.URL.absoluteString.UTF8String, status);
+    codebrix_get_webview_navigation_failing_callback()(webView, webView.URL.absoluteString.UTF8String, status);
 }
 
 // note: this is NOT called when navigating to a different anchor of the same URL
@@ -553,14 +553,14 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
     NSLog(@"didFinishNavigation webView %p URL: %@", webView, webView.URL);
 #endif
     ((UNOWebView*)webView).lastNavigationUrl = webView.URL;
-    uno_get_webview_navigation_finishing_callback()(webView, webView.URL.absoluteString.UTF8String);
+    codebrix_get_webview_navigation_finishing_callback()(webView, webView.URL.absoluteString.UTF8String);
 }
 
 - (void)webView:(WKWebView *)webView didReceiveServerRedirectForProvisionalNavigation:(null_unspecified WKNavigation *)navigation {
 #if DEBUG
     NSLog(@"didReceiveServerRedirectForProvisionalNavigation webView %p", webView);
 #endif
-    uno_get_webview_navigation_starting_callback()(webView, webView.URL.absoluteString.UTF8String);
+    codebrix_get_webview_navigation_starting_callback()(webView, webView.URL.absoluteString.UTF8String);
 }
 
 - (bool)isAnchorNavigation:(UNOWebView*) webView url:(NSURL*) newUrl {
@@ -586,7 +586,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
     } else if ([self isAnchorNavigation: (UNOWebView*)webView url: requestUrl]) {
         const char *url = requestUrl.absoluteString.UTF8String;
         // fake starting event
-        bool cancel = uno_get_webview_navigation_starting_callback()(webView, url);
+        bool cancel = codebrix_get_webview_navigation_starting_callback()(webView, url);
 #if DEBUG
         NSLog(@"decidePolicyForNavigationAction webView %p URL: %@ previousURL %@ -> %s", webView, requestUrl, ((UNOWebView*)webView).lastNavigationUrl, cancel ? "Cancel" : "Allow");
 #endif
@@ -595,14 +595,14 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
         ((UNOWebView*)webView).lastNavigationUrl = requestUrl;
         
         // fake finishing event
-        uno_get_webview_navigation_finishing_callback()(webView, url);
+        codebrix_get_webview_navigation_finishing_callback()(webView, url);
     } else {
         bool isUnsupportedScheme = [scheme caseInsensitiveCompare:@"http"] != NSOrderedSame &&
         [scheme caseInsensitiveCompare:@"https"] != NSOrderedSame &&
         [scheme caseInsensitiveCompare:@"file"] != NSOrderedSame;
         if (isUnsupportedScheme) {
             const char *url = requestUrl.absoluteString.UTF8String;
-            bool cancelled = uno_get_webview_unsupported_scheme_identified_callback()(webView, url);
+            bool cancelled = codebrix_get_webview_unsupported_scheme_identified_callback()(webView, url);
 #if DEBUG
             NSLog(@"decidePolicyForNavigationAction webView %p URL: %@ scheme %@ action: %s", webView, requestUrl, scheme, cancelled ? "Cancel" : "Allow");
 #endif
@@ -629,7 +629,7 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
 #if DEBUG
             NSLog(@"didReceiveScriptMessage body %s", body);
 #endif
-            uno_get_webview_receive_web_message_callback()(self, body);
+            codebrix_get_webview_receive_web_message_callback()(self, body);
         } else {
 #if DEBUG
             NSLog(@"didReceiveScriptMessage (not a string) body: %@", message.body);

@@ -4,18 +4,18 @@
 
 #import "CDBRXCursor.h"
 
-void uno_cursor_hide(void)
+void codebrix_cursor_hide(void)
 {
     [NSCursor hide];
 }
 
-void uno_cursor_show(void)
+void codebrix_cursor_show(void)
 {
     [NSCursor unhide];
 }
 
 // macOS ships with more cursors than what AppKit API provides :(
-bool uno_cursor_set(CoreCursorType cursorType)
+bool codebrix_cursor_set(CoreCursorType cursorType)
 {
     NSCursor *cursor;
     bool result = true;

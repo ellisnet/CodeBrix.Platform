@@ -45,7 +45,7 @@
 
     CGSize size = view.drawableSize;
     // call managed code
-    uno_get_metal_draw_callback()((__bridge void*) view.window, size.width, size.height, (__bridge void*) drawable.texture);
+    codebrix_get_metal_draw_callback()((__bridge void*) view.window, size.width, size.height, (__bridge void*) drawable.texture);
 
 #if DEBUG
     id<MTLCommandBuffer> commandBuffer = nil;
@@ -95,7 +95,7 @@
 #if DEBUG
     NSLog (@"drawableSizeWillChange: %p %f x %f @ %gx", view.window, size.width, size.height, scale);
 #endif
-    uno_get_resize_callback()((__bridge void*) view.window, size.width / scale, size.height / scale);
+    codebrix_get_resize_callback()((__bridge void*) view.window, size.width / scale, size.height / scale);
 }
 
 @end

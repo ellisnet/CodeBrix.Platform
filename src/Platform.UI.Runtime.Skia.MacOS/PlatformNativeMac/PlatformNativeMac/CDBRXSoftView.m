@@ -21,7 +21,7 @@
     int rowBytes = 0;
     void *data = nil;
     // call managed code
-    uno_get_soft_draw_callback()((__bridge void*) self.window, width, height, &data, &rowBytes, &size);
+    codebrix_get_soft_draw_callback()((__bridge void*) self.window, width, height, &data, &rowBytes, &size);
     if (size == 0) {
         return;
     }
@@ -65,7 +65,7 @@
     NSLog(@"setFrameSize: %p %f x %f", self.window, newSize.width, newSize.height);
 #endif
     [super setFrameSize:newSize];
-    uno_get_resize_callback()((__bridge void*) self.window, newSize.width, newSize.height);
+    codebrix_get_resize_callback()((__bridge void*) self.window, newSize.width, newSize.height);
 }
 
 @end

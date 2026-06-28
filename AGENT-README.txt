@@ -733,6 +733,84 @@ Study these files to scaffold your own app:
 
 ================================================================================
 
+BUILDING THE NUGET PACKAGES  (maintainers only)
+===============================================
+This section is for maintainers building/publishing CodeBrix.Platform itself —
+NOT for app authors consuming the packages. The package set is produced by the
+pack-only driver project:
+
+    build/CodeBrix.Platform.Build.csproj
+
+It gathers the already-built Release outputs of the platform projects and packs
+them into NuGet packages under:
+
+    nugets/<Configuration>/<BuildVersion>/
+
+VERSIONING: the driver computes a date-stamped BuildVersion automatically
+(format 1.<years-since-2026>.<dayOfYear>.<minuteOfDay>, all from UTC now) and
+stamps that ONE version on every package in the run. Packing only runs in the
+Release configuration. You can override the version with -p:BuildVersion=1.x.y.z
+to reuse an EXISTING version instead of stamping a fresh one.
+
+--- ON WINDOWS: build the ENTIRE package set (auto version) ---
+
+This is the normal full build. BuildVersion is auto-computed, so you do NOT set
+it. Build the solution in Release first (the packer gathers already-built
+Release outputs), then build the driver in Release:
+
+    dotnet build CodeBrix.Platform.Windows.slnx -c Release
+    dotnet build build\CodeBrix.Platform.Build.csproj -c Release
+
+All packages land in  nugets\Release\<auto-version>\  sharing that one version.
+
+--- ON macOS (Apple Silicon): build ONLY the macOS package (pinned version) ---
+
+The macOS head package contains a native dylib that can ONLY be built on Apple
+Silicon, so it is NOT produced by the Windows run above. Rebuild it on an Apple
+Silicon Mac, pinning the version to the SAME version the Windows run already
+produced and published to nuget.org. That keeps its sibling dependencies
+(aggregate / base runtime / FrameBuffer) version-locked to the published set, so
+publishing ONLY the rebuilt macOS package still restores cleanly.
+
+Do NOT run the full driver on macOS — it would also try to pack the Windows-only
+packages. Instead pack just the macOS csproj (exactly what the driver does for
+that one project) from the repo root, substituting the published version for
+1.0.179.226 below:
+
+    dotnet pack src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj \
+      -c Release \
+      -p:PackageVersion=1.0.179.226 \
+      --output nugets/Release/1.0.179.226
+
+-p:PackageVersion (NOT -p:Version) sets only the NuGet package version while
+still flowing to the ProjectReference dependency versions. This produces:
+
+    nugets/Release/1.0.179.226/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.179.226.nupkg
+
+PREREQUISITES on the Mac: full Xcode installed (the native build uses xcodebuild;
+the driver only enables the native step on Apple Silicon) and the native build
+script src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/build.sh must be
+executable (chmod +x). A correctly built macOS package is a universal binary and
+runs on both Apple Silicon and Intel Macs.
+
+VERIFY THE macOS PACKAGE BEFORE UPLOADING. A managed-only package (no native
+dylib) packs WITHOUT error on any machine where the native step is skipped (e.g.
+not Apple Silicon, or BuildNativeMac=false) and is useless at runtime. After
+packing, confirm the native universal binary is inside the .nupkg:
+
+    unzip -l nugets/Release/<version>/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.<version>.nupkg \
+      | grep runtimes/osx/native
+    # Must list: runtimes/osx/native/libCodeBrixNativeMac.dylib
+    # Then confirm it is a fat binary (extract it first, then):
+    #   lipo -info .../runtimes/osx/native/libCodeBrixNativeMac.dylib
+    #   expect: "Architectures in the fat file: ... x86_64 arm64"
+
+On an Apple-Silicon build the csproj FAILS the pack with an explicit error if the
+native dylib is absent (so a green pack there means the dylib is present); the
+verify step above still matters when packing anywhere the native step is skipped.
+
+================================================================================
+
 PROVENANCE
 ==========
 The CodeBrix.Platform codebase is a fork of the Uno Platform (version 6.5.x),
