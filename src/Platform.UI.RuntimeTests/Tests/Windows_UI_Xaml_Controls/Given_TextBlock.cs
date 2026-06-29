@@ -138,8 +138,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(skFont.ContainsGlyph(SUT.Text[0]));
 
 			var fallbackFont = SKFontManager.Default.MatchCharacter(SUT.Text[0]);
+			using var fallbackSkFont = new SKFont(fallbackFont);
 
-			Assert.IsTrue(fallbackFont.ContainsGlyph(SUT.Text[0]));
+			Assert.IsTrue(fallbackSkFont.ContainsGlyph(SUT.Text[0]));
 
 			var expected = new TextBlock { Text = "示例文本", FontSize = 24, FontFamily = new FontFamily(fallbackFont.FamilyName) };
 
@@ -171,8 +172,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(skFont.ContainsGlyph(SUT.Text[0]));
 
 			var fallbackFont = SKFontManager.Default.MatchCharacter(SUT.Text[0]);
+			using var fallbackSkFont = new SKFont(fallbackFont);
 
-			Assert.IsTrue(fallbackFont.ContainsGlyph(SUT.Text[0]));
+			Assert.IsTrue(fallbackSkFont.ContainsGlyph(SUT.Text[0]));
 
 			var expected = new TextBlock
 			{

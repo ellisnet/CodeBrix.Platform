@@ -82,8 +82,13 @@ internal static class SkiaRenderHelper
 		var rect = new SKRect(0f, 0f, width, height);
 
 		var parentClipPath = _spareParentClipPath;
-		parentClipPath.Rewind();
-		parentClipPath.AddRect(rect);
+		parentClipPath.Reset();
+		using (var parentRectBuilder = new SKPathBuilder())
+		{
+			parentRectBuilder.AddRect(rect);
+			using var parentRectPath = parentRectBuilder.Snapshot();
+			parentClipPath.Op(parentRectPath, SKPathOp.Union, parentClipPath);
+		}
 
 		var nativeVisualsInZOrder = new List<Visual>();
 		rootVisual.GetNativeViewPathAndZOrder(parentClipPath, clipPath, nativeVisualsInZOrder);
@@ -94,8 +99,9 @@ internal static class SkiaRenderHelper
 		}
 		else
 		{
-			var invertedPath = new SKPath();
-			invertedPath.AddRect(rect);
+			using var invertedPathBuilder = new SKPathBuilder();
+			invertedPathBuilder.AddRect(rect);
+			var invertedPath = invertedPathBuilder.Snapshot();
 			invertedPath.Op(clipPath, SKPathOp.Difference, invertedPath);
 
 			clipPath.Dispose();
@@ -112,8 +118,9 @@ internal static class SkiaRenderHelper
 		}
 		else
 		{
-			var result = new SKPath();
-			result.AddRect(new SKRect(0f, 0f, width, height));
+			using var resultBuilder = new SKPathBuilder();
+			resultBuilder.AddRect(new SKRect(0f, 0f, width, height));
+			var result = resultBuilder.Snapshot();
 			result.Op(_emptyClipPath, SKPathOp.Difference, result);
 
 			_invertedClipPathWidth = width;
@@ -187,7 +194,7 @@ internal static class SkiaRenderHelper
 				canvas.Scale(scale, scale);
 			}
 			canvas.DrawRect(new SKRect(0, 0, rect.Width, rect.Height), _blackPaint);
-			canvas.DrawText(text, 0, -rect.Top, _font, _redPaint);
+			canvas.DrawText(text, 0, -rect.Top, SKTextAlign.Left, _font, _redPaint);
 			if (Scale is not null)
 			{
 				canvas.Restore();

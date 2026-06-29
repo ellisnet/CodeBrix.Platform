@@ -74,7 +74,7 @@ internal static class FrameProviderFactory
 		var newBitmap = new SKBitmap(info);
 		using var canvas = new SKCanvas(newBitmap);
 		canvas.SetMatrix(matrix);
-		canvas.DrawBitmap(bitmap, 0, 0);
+		canvas.DrawBitmap(bitmap, new SKPoint(0, 0), SKSamplingOptions.Default);
 		return SKImage.FromBitmap(newBitmap);
 	}
 
@@ -98,16 +98,16 @@ internal static class FrameProviderFactory
 	private static bool SkEncodedOriginSwapsWidthHeight(SKEncodedOrigin origin)
 	{
 		return origin is
-			// Reflected across x - axis.Rotated 90° counter - clockwise.
+			// Reflected across x - axis.Rotated 90ï¿½ counter - clockwise.
 			SKEncodedOrigin.LeftTop or
 
-			// Rotated 90° clockwise.
+			// Rotated 90ï¿½ clockwise.
 			SKEncodedOrigin.RightTop or
 
-			// Reflected across x-axis. Rotated 90° clockwise.
+			// Reflected across x-axis. Rotated 90ï¿½ clockwise.
 			SKEncodedOrigin.RightBottom or
 
-			// Rotated 90° counter-clockwise.
+			// Rotated 90ï¿½ counter-clockwise.
 			SKEncodedOrigin.LeftBottom;
 	}
 

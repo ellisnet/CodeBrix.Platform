@@ -9,7 +9,7 @@
 		version segment is reserved for glue-only fixes between SkiaSharp bumps.
 		See src/AddIns/CodeBrix.Platform.SkiaSharp.Views/PORTING-NOTES.md.
 		-->
-		<version>3.119.4</version>
+		<version>4.148.0</version>
 		<title>CodeBrix.Platform.SkiaSharp.Views</title>
 		<authors>Jeremy Ellis and contributors</authors>
 		<requireLicenseAcceptance>true</requireLicenseAcceptance>
@@ -19,7 +19,7 @@
 		<readme>README.md</readme>
 		<description>
 			SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications.
-			Vendored from SkiaSharp v3.119.4 (MIT) and compiled against CodeBrix.Platform.
+			Vendored from SkiaSharp v4.148.0 (MIT) and compiled against CodeBrix.Platform.
 		</description>
 		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</copyright>
 		<tags>skiasharp;skia;views;canvas;skxamlcanvas;CodeBrix</tags>
@@ -27,7 +27,7 @@
 
 		<dependencies>
 			<group targetFramework="net10.0">
-				<dependency id="SkiaSharp" version="3.119.4" exclude="Build,Analyzers" />
+				<dependency id="SkiaSharp" version="4.148.0" exclude="Build,Analyzers" />
 				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
 			</group>
 		</dependencies>

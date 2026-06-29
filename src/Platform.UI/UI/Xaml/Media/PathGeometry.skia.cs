@@ -11,7 +11,7 @@ namespace Microsoft.UI.Xaml.Media
 
 		private SKPath GetSKPath(bool skipUnfilled)
 		{
-			var path = new SKPath();
+			using var path = new SKPathBuilder();
 
 			foreach (PathFigure figure in Figures)
 			{
@@ -60,7 +60,7 @@ namespace Microsoft.UI.Xaml.Media
 
 			path.FillType = FillRule.ToSkiaFillType();
 
-			return path;
+			return path.Snapshot();
 		}
 	}
 }

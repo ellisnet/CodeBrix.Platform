@@ -14,7 +14,7 @@ namespace Microsoft.UI.Composition;
 /// </summary>
 internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 {
-	private static readonly SKPath _sparePrePaintingClippingPath = new SKPath();
+	private static readonly SKPathBuilder _sparePrePaintingClippingPath = new SKPathBuilder();
 
 	// state set from outside and used inside the class
 	private CornerRadius _cornerRadius;
@@ -151,11 +151,10 @@ internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 		{
 			if (base.GetPrePaintingClipping(dst))
 			{
-				var path = _sparePrePaintingClippingPath;
+				_sparePrePaintingClippingPath.AddRoundRect(rect);
 
-				path.Rewind();
+				using var path = _sparePrePaintingClippingPath.Detach();
 
-				path.AddRoundRect(rect);
 				dst.Op(path, SKPathOp.Intersect, dst);
 
 				return true;
@@ -163,7 +162,9 @@ internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 			else
 			{
 				dst.Reset();
-				dst.AddRoundRect(rect);
+				_sparePrePaintingClippingPath.AddRoundRect(rect);
+				using var elsePath = _sparePrePaintingClippingPath.Detach();
+				dst.Op(elsePath, SKPathOp.Union, dst);
 				return true;
 			}
 		}
@@ -332,7 +333,7 @@ internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 
 	private static unsafe SKPath CreateBackgroundPath(bool useInnerBorderBoundsAsAreaForBackground, SKSize innerArea, SKSize outerArea, SKPoint* outerRadii, SKPoint* innerRadii)
 	{
-		var backgroundPath = new SKPath();
+		using var backgroundPath = new SKPathBuilder();
 		var roundRect = new SKRoundRect();
 		var rect = useInnerBorderBoundsAsAreaForBackground
 			? new SKRect(0, 0, innerArea.Width, innerArea.Height)
@@ -344,12 +345,12 @@ internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 		backgroundPath.AddRoundRect(roundRect);
 		backgroundPath.Close();
 
-		return backgroundPath;
+		return backgroundPath.Snapshot();
 	}
 
 	private unsafe SKPath CreateBorderPath(SKRect innerArea, SKRect outerArea, SKPoint* outerRadii, SKPoint* innerRadii)
 	{
-		var borderPath = new SKPath();
+		using var borderPath = new SKPathBuilder();
 
 		borderPath.FillType = SKPathFillType.EvenOdd;
 
@@ -368,7 +369,7 @@ internal class BorderVisual(Compositor compositor) : ContainerVisual(compositor)
 			borderPath.Close();
 		}
 
-		return borderPath;
+		return borderPath.Snapshot();
 	}
 
 	internal override bool CanPaint() =>

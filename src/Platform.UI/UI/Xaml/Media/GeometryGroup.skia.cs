@@ -7,7 +7,7 @@ namespace Microsoft.UI.Xaml.Media
 	{
 		internal override SKPath GetSKPath()
 		{
-			var path = new SKPath();
+			using var path = new SKPathBuilder();
 
 			foreach (var geometry in Children)
 			{
@@ -16,7 +16,7 @@ namespace Microsoft.UI.Xaml.Media
 			}
 
 			path.FillType = FillRule.ToSkiaFillType();
-			return path;
+			return path.Snapshot();
 		}
 	}
 }

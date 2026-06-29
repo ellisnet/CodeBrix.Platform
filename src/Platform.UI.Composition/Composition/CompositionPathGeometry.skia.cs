@@ -82,7 +82,7 @@ public partial class CompositionPathGeometry : CompositionGeometry, ID2D1Geometr
 
 	private SkiaGeometrySource2D? InternalBuildPathGeometry()
 	{
-		SKPath path = new();
+		using var path = new SKPathBuilder();
 		foreach (var command in _commands)
 		{
 			switch (command.Type)
@@ -183,7 +183,7 @@ public partial class CompositionPathGeometry : CompositionGeometry, ID2D1Geometr
 			}
 		}
 
-		return new SkiaGeometrySource2D(path);
+		return new SkiaGeometrySource2D(path.Snapshot());
 	}
 
 	private static object[] ValidateCommandParameters(CompositionPathCommand command, int expectedParameterCount)

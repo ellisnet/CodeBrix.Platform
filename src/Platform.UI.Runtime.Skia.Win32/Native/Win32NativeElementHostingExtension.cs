@@ -101,12 +101,17 @@ internal class Win32NativeElementHostingExtension : ContentPresenter.INativeElem
 	{
 		if (path != _lastClipPath)
 		{
-			_lastClipPath.Rewind();
-			_lastClipPath.AddPath(path);
+			_lastClipPath.Reset();
+			_lastClipPath.Op(path, SKPathOp.Union, _lastClipPath);
 		}
 
-		_tempPath.Rewind();
-		_tempPath.AddRect(_lastArrangeRect.ToSKRect());
+		_tempPath.Reset();
+		using (var rectBuilder = new SKPathBuilder())
+		{
+			rectBuilder.AddRect(_lastArrangeRect.ToSKRect());
+			using var rectPath = rectBuilder.Snapshot();
+			_tempPath.Op(rectPath, SKPathOp.Union, _tempPath);
+		}
 		path.Op(_tempPath, SKPathOp.Intersect, _tempPath);
 		_tempPath.Transform(SKMatrix.CreateTranslation((float)-_lastArrangeRect.X, (float)-_lastArrangeRect.Y));
 

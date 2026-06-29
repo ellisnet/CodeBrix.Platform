@@ -365,7 +365,7 @@ public partial class Visual : global::Microsoft.UI.Composition.CompositionObject
 
 			var preClip = _spareRenderPath;
 
-			preClip.Rewind();
+			preClip.Reset();
 
 			if (GetPrePaintingClipping(preClip))
 			{
@@ -540,15 +540,18 @@ public partial class Visual : global::Microsoft.UI.Composition.CompositionObject
 
 		var localClipCombinedByClipFromParent = _pathPool.Allocate();
 		using var rentedArrayDisposable = new DisposableStruct<SKPath>(static path => _pathPool.Free(path), localClipCombinedByClipFromParent);
-		localClipCombinedByClipFromParent.Rewind();
+		localClipCombinedByClipFromParent.Reset();
 
 		if (GetPrePaintingClipping(_spareRenderPath))
 		{
-			localClipCombinedByClipFromParent.AddPath(_spareRenderPath);
+			localClipCombinedByClipFromParent.Op(_spareRenderPath, SKPathOp.Union, localClipCombinedByClipFromParent);
 		}
 		else
 		{
-			localClipCombinedByClipFromParent.AddRect(new SKRect(0, 0, Size.X, Size.Y));
+			using var sizeRectBuilder = new SKPathBuilder();
+			sizeRectBuilder.AddRect(new SKRect(0, 0, Size.X, Size.Y));
+			using var sizeRectPath = sizeRectBuilder.Snapshot();
+			localClipCombinedByClipFromParent.Op(sizeRectPath, SKPathOp.Union, localClipCombinedByClipFromParent);
 		}
 		localClipCombinedByClipFromParent.Transform(TotalMatrix.ToSKMatrix(), localClipCombinedByClipFromParent);
 		localClipCombinedByClipFromParent.Op(clipFromParent, SKPathOp.Intersect, localClipCombinedByClipFromParent);
@@ -607,7 +610,7 @@ public partial class Visual : global::Microsoft.UI.Composition.CompositionObject
 		if (Clip is not null)
 		{
 			dst.Reset();
-			dst.AddPath(Clip?.GetClipPath(this));
+			dst.Op(Clip?.GetClipPath(this), SKPathOp.Union, dst);
 			return true;
 		}
 		return false;

@@ -118,7 +118,10 @@ public partial class ContainerVisual : Visual
 		}
 
 		var clipRect = rect.ToSKRect();
-		dst.AddRect(clipRect);
+		using var clipRectBuilder = new SKPathBuilder();
+		clipRectBuilder.AddRect(clipRect);
+		using var clipRectPath = clipRectBuilder.Snapshot();
+		dst.Op(clipRectPath, SKPathOp.Union, dst);
 		if (isAncestorClip)
 		{
 			Matrix4x4.Invert(TotalMatrix, out var totalMatrixInverted);
@@ -158,7 +161,7 @@ public partial class ContainerVisual : Visual
 	{
 		var prePaintingClipPath = _sparePrePaintingClippingPath;
 
-		prePaintingClipPath.Rewind();
+		prePaintingClipPath.Reset();
 
 		if (base.GetPrePaintingClipping(dst))
 		{
@@ -189,7 +192,7 @@ public partial class ContainerVisual : Visual
 			if (GetArrangeClipPathInElementCoordinateSpace(prePaintingClipPath))
 			{
 				dst.Reset();
-				dst.AddPath(prePaintingClipPath);
+				dst.Op(prePaintingClipPath, SKPathOp.Union, dst);
 
 				return true;
 			}

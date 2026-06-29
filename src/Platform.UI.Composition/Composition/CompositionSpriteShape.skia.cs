@@ -11,7 +11,7 @@ namespace Microsoft.UI.Composition
 	public partial class CompositionSpriteShape : CompositionShape
 	{
 		private static readonly SKPaint _spareHitTestPaint = new();
-		private static readonly SKPath _spareHitTestPath = new();
+		private static readonly SKPathBuilder _spareHitTestPath = new();
 		// We don't call SKPaint.Reset() after usage, so make sure
 		// that only SKPaint.Color is being set
 		private static readonly SKPaint _spareColorPaint = new();
@@ -40,7 +40,7 @@ namespace Microsoft.UI.Composition
 		internal override bool CanPaint() => (FillBrush?.CanPaint() ?? false) || (StrokeBrush?.CanPaint() ?? false);
 
 		private static readonly SKPaint _sparePaint = new SKPaint();
-		private static readonly SKPath _sparePath = new SKPath();
+		private static readonly SKPathBuilder _sparePath = new SKPathBuilder();
 
 		internal override void Paint(in Visual.PaintingSession session)
 		{
@@ -56,9 +56,8 @@ namespace Microsoft.UI.Composition
 						fillPaint.PathEffect = SKPathEffect.CreateTrim(Geometry.TrimStart, Geometry.TrimEnd);
 					}
 
-					var fillPath = _sparePath;
-					fillPath.Rewind();
-					finalFillGeometryWithTransformations.GetFillPath(fillPaint, fillPath);
+					finalFillGeometryWithTransformations.GetFillPath(fillPaint, _sparePath);
+					using var fillPath = _sparePath.Detach();
 
 					session.Canvas.Save();
 					session.Canvas.ClipPath(fillPath, antialias: true);
@@ -113,10 +112,9 @@ namespace Microsoft.UI.Composition
 					// On Windows, the stroke is simply 1px, it doesn't scale with the height.
 					// So, to get a correct stroke geometry, we must apply the transformations first.
 
-					var strokeFillPath = _sparePath;
-					strokeFillPath.Rewind();
 					// Get the stroke geometry, after scaling has been applied.
-					geometryWithTransformations.GetFillPath(strokePaint, strokeFillPath);
+					geometryWithTransformations.GetFillPath(strokePaint, _sparePath);
+					using var strokeFillPath = _sparePath.Detach();
 
 					session.Canvas.ClipPath(strokeFillPath, antialias: true);
 					stroke.Paint(session.Canvas, session.Opacity, strokeFillPath.Bounds);
@@ -184,11 +182,8 @@ namespace Microsoft.UI.Composition
 
 					strokePaint.StrokeWidth = StrokeThickness;
 
-					var hitTestStrokeFillPath = _spareHitTestPath;
-
-					hitTestStrokeFillPath.Rewind();
-
-					geometryWithTransformations.GetFillPath(strokePaint, hitTestStrokeFillPath);
+					geometryWithTransformations.GetFillPath(strokePaint, _spareHitTestPath);
+					using var hitTestStrokeFillPath = _spareHitTestPath.Detach();
 					if (hitTestStrokeFillPath.Contains((float)point.X, (float)point.Y))
 					{
 						return true;

@@ -27,7 +27,11 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 	{
 		private readonly List<Point> _points = new List<Point>();
 		private readonly StreamGeometry _owner;
+#if __SKIA__
+		private SkiaSharp.SKPathBuilder bezierPath = new SkiaSharp.SKPathBuilder();
+#else
 		private Path bezierPath = new Path();
+#endif
 
 		internal PathStreamGeometryContext(StreamGeometry owner)
 		{
@@ -230,7 +234,11 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 
 		public override void Dispose()
 		{
+#if __SKIA__
+			_owner.Close(bezierPath.Snapshot());
+#else
 			_owner.Close(bezierPath);
+#endif
 		}
 	}
 }

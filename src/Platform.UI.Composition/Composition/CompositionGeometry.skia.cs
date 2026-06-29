@@ -17,17 +17,17 @@ namespace Microsoft.UI.Composition
 
 		internal static SKPath BuildLineGeometry(Vector2 start, Vector2 end)
 		{
-			SKPath path = new SKPath();
+			using var path = new SKPathBuilder();
 
 			path.MoveTo(start.ToSKPoint());
 			path.LineTo(end.ToSKPoint());
 
-			return path;
+			return path.Snapshot();
 		}
 
 		internal static SKPath BuildRectangleGeometry(Vector2 offset, Vector2 size)
 		{
-			SKPath path = new SKPath();
+			using var path = new SKPathBuilder();
 
 			// Top left
 			path.MoveTo(new SKPoint(offset.X, offset.Y));
@@ -40,7 +40,7 @@ namespace Microsoft.UI.Composition
 			// Top left
 			path.Close();
 
-			return path;
+			return path.Snapshot();
 		}
 
 		internal static SKPath BuildRoundedRectangleGeometry(Vector2 offset, Vector2 size, Vector2 cornerRadius)
@@ -51,7 +51,7 @@ namespace Microsoft.UI.Composition
 			float bezierX = (float)((1.0 - CIRCLE_BEZIER_KAPPA) * radiusX);
 			float bezierY = (float)((1.0 - CIRCLE_BEZIER_KAPPA) * radiusY);
 
-			SKPath path = new SKPath();
+			using var path = new SKPathBuilder();
 			var lastPoint = new SKPoint(offset.X + radiusX, offset.Y);
 
 			path.MoveTo(lastPoint);
@@ -96,7 +96,7 @@ namespace Microsoft.UI.Composition
 
 			path.Close();
 
-			return path;
+			return path.Snapshot();
 		}
 
 		internal static SKPath BuildEllipseGeometry(Vector2 center, Vector2 radius)
@@ -112,7 +112,7 @@ namespace Microsoft.UI.Composition
 			// - WPF starts with bottom right ellipse arc.
 			// - TODO: Verify UWP behavior
 
-			SKPath path = new SKPath();
+			using var path = new SKPathBuilder();
 
 			path.MoveTo(new SKPoint(rect.Right, rect.Top + radius.Y));
 			// Bottom-right Arc
@@ -141,7 +141,7 @@ namespace Microsoft.UI.Composition
 
 			path.Close();
 
-			return path;
+			return path.Snapshot();
 		}
 
 		private static float Clamp(float value, float minValue, float maxValue)

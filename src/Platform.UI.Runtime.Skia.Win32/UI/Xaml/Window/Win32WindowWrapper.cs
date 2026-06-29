@@ -617,7 +617,7 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 			var canvas = surface.Canvas;
 			canvas.Translate(0, image.Height);
 			canvas.Scale(1, -1);
-			canvas.DrawImage(image, 0, 0);
+			canvas.DrawImage(image, 0, 0, SKSamplingOptions.Default);
 			surface.Snapshot().ReadPixels(info, (IntPtr)(presBits + Marshal.SizeOf<BITMAPINFOHEADER>()));
 		}
 
