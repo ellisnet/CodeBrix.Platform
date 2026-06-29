@@ -238,7 +238,16 @@
 		<IsSampleProject>$(MSBuildProjectName.Contains('Sample'))</IsSampleProject>
 		<IsSampleProject Condition="'$(IsSampleProject)'=='false'">$(MSBuildProjectName.Contains('CodeBrixIslands'))</IsSampleProject>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-		
+
+		<!-- SkiaSharp 4.x marks the SKPath mutation methods (MoveTo/LineTo/CubicTo/AddRoundRect/Rewind/
+		     Close/...) and the SKCanvas.DrawBitmap(...SKPaint) overload as [Obsolete] (CS0618), steering
+		     toward SKPathBuilder / the SKSamplingOptions overload. The vendored Uno composition + imaging
+		     code (Platform.UI.Composition, Platform.UWP) still uses the old shims, exactly as upstream Uno
+		     does today, and they remain fully functional at runtime. Demote CS0618 to a (still-visible)
+		     warning so it doesn't fail the TreatWarningsAsErrors build, WITHOUT masking any other warning.
+		     Revisit/remove when migrating to SKPathBuilder (ideally mirroring Uno once they migrate). -->
+		<WarningsNotAsErrors>$(WarningsNotAsErrors);CS0618</WarningsNotAsErrors>
+
 		<WarningsNotAsErrors Condition="'$(Configuration)' == 'Debug'">$(WarningsNotAsErrors);IDE0051;IDE0055</WarningsNotAsErrors>
 		
 		<!-- Disable package checks. (NU1701 removed from this list: nothing in this fork

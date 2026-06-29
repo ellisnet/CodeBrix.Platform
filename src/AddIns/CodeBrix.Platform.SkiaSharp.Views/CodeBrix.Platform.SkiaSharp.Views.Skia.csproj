@@ -37,8 +37,8 @@
 		vendored sources against the matching SkiaSharp tag. The fourth version
 		segment is reserved for glue-only fixes between SkiaSharp bumps.
 		-->
-		<Version>3.119.4</Version>
-		<PackageVersion>3.119.4</PackageVersion>
+		<Version>4.148.0</Version>
+		<PackageVersion>4.148.0</PackageVersion>
 
 		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
 		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>

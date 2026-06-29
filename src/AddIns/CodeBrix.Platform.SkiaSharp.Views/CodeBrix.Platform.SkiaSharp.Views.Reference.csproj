@@ -23,8 +23,8 @@
 		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;WINUI;CODEBRIX_REFERENCE_API</DefineConstants>
 
 		<!-- See the .Skia flavor csproj: version is tied to the vendored SkiaSharp version. -->
-		<Version>3.119.4</Version>
-		<PackageVersion>3.119.4</PackageVersion>
+		<Version>4.148.0</Version>
+		<PackageVersion>4.148.0</PackageVersion>
 
 		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
 		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>
