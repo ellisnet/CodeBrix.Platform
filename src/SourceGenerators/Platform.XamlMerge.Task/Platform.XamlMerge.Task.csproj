@@ -28,7 +28,16 @@
 		<PackageReference Include="Microsoft.Build.Framework" Version="18.7.1" ExcludeAssets="runtime" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.7.1" ExcludeAssets="runtime" PrivateAssets="all" />
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.7.1" ExcludeAssets="runtime" PrivateAssets="all" />
-		<!-- Upstream also referenced Mono.Cecil (PrivateAssets) but no source uses it; dropped. -->
+
+    <!--
+    We shouldn't need a package reference to System.Security.Cryptography.Xml - but the package is 
+    transitively referenced by the Microsoft.Build.Tasks.Core package referenced above.  And if we
+    don't specify the version of System.Security.Cryptography.Xml, then an older, vulnerable version
+    is pulled into the project.  So, we are "manually" specifying a newer version that does not
+    have a severe vulnerability. Hopefully in the future, the other packages will not try to pull
+    in a vulnerable version - and we get rid of this "manual" package reference.
+    -->
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.9" />
 	</ItemGroup>
 
 	<Target Name="_copyTasksBuildTime" AfterTargets="Build">

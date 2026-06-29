@@ -243,17 +243,8 @@
 		
 		<!-- Disable package checks. (NU1701 removed from this list: nothing in this fork
 		     resolves .NET Framework package assets anymore, so it must stay an error.) -->
-		<WarningsNotAsErrors Condition="'$(Configuration)' == 'Debug'">$(WarningsNotAsErrors);NU1202;NU1901;NU1902;NU1903;NU1904;NU1604</WarningsNotAsErrors>
+		<WarningsNotAsErrors Condition="'$(Configuration)' == 'Debug'">$(WarningsNotAsErrors);NU1202;NU1901;NU1902;NU1904;NU1604</WarningsNotAsErrors>
 
-		<!-- TEMPORARY (added 2026-06-26): fully suppress NU1903 in ALL configurations.
-		     Platform.UI.Tasks transitively references System.Security.Cryptography.Xml
-		     10.0.4, which has a high-severity advisory; in Release (TreatWarningsAsErrors)
-		     this fails the build before any packaging can run. This NoWarn unblocks the
-		     Release package build.
-		     MUST BE REVERTED once that package is bumped to a non-vulnerable version.
-		     See memory: build_nu1903_temporary_suppression. -->
-		<NoWarn>$(NoWarn);NU1903</NoWarn>
-		
 		<!-- Disable warning about cross platform call sites -->
 		<NoWarn>$(NoWarn);CA1416</NoWarn>
 

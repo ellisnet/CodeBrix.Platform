@@ -29,6 +29,16 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.VisualBasic.Workspaces" Version="$(SyncGeneratorCodeAnalysisVersion)" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.Common" Version="$(SyncGeneratorCodeAnalysisVersion)" />
 		<PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="$(SyncGeneratorCodeAnalysisVersion)" />
+
+    <!--
+    We shouldn't need a package reference to System.Security.Cryptography.Xml - but the package is 
+    transitively referenced by the Microsoft.Build.Tasks.Core package referenced above.  And if we
+    don't specify the version of System.Security.Cryptography.Xml, then an older, vulnerable version
+    is pulled into the project.  So, we are "manually" specifying a newer version that does not
+    have a severe vulnerability. Hopefully in the future, the other packages will not try to pull
+    in a vulnerable version - and we get rid of this "manual" package reference.
+    -->
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.9" />
 	</ItemGroup>
 
 	<ItemGroup>

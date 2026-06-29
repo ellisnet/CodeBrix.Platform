@@ -29,7 +29,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.165.1288" />
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.296">
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.298">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

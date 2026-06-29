@@ -76,7 +76,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2270" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
 
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4 " Condition="'$(CODEBRIX_UWP_BUILD)'=='true'" />
 

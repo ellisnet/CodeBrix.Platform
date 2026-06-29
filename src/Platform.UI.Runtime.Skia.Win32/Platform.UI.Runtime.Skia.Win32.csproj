@@ -38,7 +38,7 @@
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.WebView2" Aliases="mswebview2" PrivateAssets="all" />
 
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.296">
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.298">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

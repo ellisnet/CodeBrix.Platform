@@ -33,7 +33,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Identity.Client" Version="4.84.2" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.85.2" />
 	</ItemGroup>
 
 	<Import Project="..\..\..\build\nuget\platform.winui.cross-runtime.targets" />
