@@ -609,15 +609,31 @@ VirtualKeyModifiers get_modifiers(NSEventModifierFlags mods)
 
 UniChar get_unicode(NSEvent *event)
 {
-    UniCharCount count = 1;
-    UniChar unicode[count];
-    CGEventKeyboardGetUnicodeString(event.CGEvent, count, &count, unicode);
+    UniCharCount maxLength = 1;
+    UniCharCount actualLength = 0;
+    // IMPORTANT: initialize to 0. For keystrokes that produce no text (e.g. the
+    // Cmd+V paste shortcut, or modifier-only events), CGEventKeyboardGetUnicodeString
+    // sets actualLength to 0 and does NOT write to the buffer. If we returned the
+    // buffer unconditionally it would be uninitialized stack memory, which on x86_64
+    // intermittently came back as a stray control character (e.g. U+0001 / SOH) and
+    // got inserted into TextBoxes. arm64 happened to read 0 from that slot, hiding it.
+    UniChar unicode = 0;
+    CGEventKeyboardGetUnicodeString(event.CGEvent, maxLength, &actualLength, &unicode);
 #if DEBUG
-    if (count > 1) {
+    if (actualLength > 1) {
         NSLog(@"get_unicode - more than one unicode character returned");
     }
 #endif
-    return unicode[0];
+    UniChar result = (actualLength > 0) ? unicode : 0;
+    // Don't deliver C0 control characters as inserted text. A real Control combo
+    // (e.g. Ctrl+A) can legitimately yield U+0001 (SOH) here; macOS text fields
+    // never insert such characters, and doing so put stray control chars into
+    // TextBoxes. Tab/LF/CR are preserved so multiline input still works; "real"
+    // editing keys (Enter, Tab, Backspace, Escape) travel via VirtualKey, not here.
+    if (result < 0x20 && result != 0x09 && result != 0x0A && result != 0x0D) {
+        result = 0;
+    }
+    return result;
 }
 
 static window_mouse_callback_fn_ptr window_mouse_event;
