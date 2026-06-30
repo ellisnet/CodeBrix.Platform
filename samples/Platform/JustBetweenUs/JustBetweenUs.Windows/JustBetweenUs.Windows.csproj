@@ -12,6 +12,12 @@
          is outside the src tree so it does not inherit them from Directory.Build, hence they
          are set explicitly here. -->
     <DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__;HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING;CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE;CODEBRIX_HAS_NO_IDEPENDENCYOBJECT;CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_SKIA_WIN32;__DESKTOP__;__CODEBRIX_SKIA__;__CODEBRIX_SKIA_WIN32__</DefineConstants>
+
+    <!-- MSB3277: benign WindowsBase 4.0.0.0 (ref-pack facade) vs 5.0.0.0 conflict flowing in via
+         the Skia runtime's transitive Microsoft.Web.WebView2.Wpf reference. RAR picks the 4.0
+         facade for the build; the real WindowsBase 5.x loads at runtime. The platform's own
+         runtime csproj NoWarns it for the same reason. -->
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
   </PropertyGroup>
 
   <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
