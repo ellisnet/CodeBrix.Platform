@@ -89,7 +89,7 @@
 		<PackageReference Update="NUnit" Version="4.6.0" />
 		<PackageReference Update="NUnit3TestAdapter" Version="6.2.0" />
 		<PackageReference Update="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingPlatformVersion)" />
-		<PackageReference Update="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.181.244" />
+		<PackageReference Update="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.181.669" />
     <!--The version of this NuGet.Packaging package MUST be compatible with the Microsoft.CodeAnalysis.Testing package version that is being used-->
 		<PackageReference Update="NuGet.Packaging" Version="7.6.0" />
 
