@@ -23,6 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="..\Platform.Simple\SimpleCommand.cs" Link="Simple\SimpleCommand.cs" />
+		<Compile Include="..\Platform.Simple\SimpleDialog.cs" Link="Simple\SimpleDialog.cs" />
+		<Compile Include="..\Platform.Simple\SimpleEnum.cs" Link="Simple\SimpleEnum.cs" />
+		<Compile Include="..\Platform.Simple\SimpleMessaging.cs" Link="Simple\SimpleMessaging.cs" />
+		<Compile Include="..\Platform.Simple\SimpleOsInfo.cs" Link="Simple\SimpleOsInfo.cs" />
+		<Compile Include="..\Platform.Simple\SimpleServiceResolver.cs" Link="Simple\SimpleServiceResolver.cs" />
+		<Compile Include="..\Platform.Simple\SimpleViewModel.cs" Link="Simple\SimpleViewModel.cs" />
 		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
 	</ItemGroup>
 
@@ -45,6 +52,15 @@
 		</ProjectReference>
 		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj">
 		</ProjectReference>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Simple\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.9" />
 	</ItemGroup>
 
 	<!-- Override existing target, this project cannot be published -->

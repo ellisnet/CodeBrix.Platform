@@ -1,6 +1,7 @@
-using System;
+using CodeBrix.Platform.Simple;
 using JustBetweenUs.ViewModels;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using Windows.ApplicationModel.DataTransfer;
 
 namespace JustBetweenUs.Views;

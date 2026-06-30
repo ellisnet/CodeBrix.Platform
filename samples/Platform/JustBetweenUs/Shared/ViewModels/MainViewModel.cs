@@ -1,4 +1,5 @@
-﻿using JustBetweenUs.Encryption.Services;
+﻿using CodeBrix.Platform.Simple;
+using JustBetweenUs.Encryption.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

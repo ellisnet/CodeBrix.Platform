@@ -1,4 +1,6 @@
+using CodeBrix.Platform.Simple;
 using JustBetweenUs.Encryption;
+using JustBetweenUs.Helpers;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -18,7 +20,7 @@ public partial class App : Application
         //Set Open Sans as the default font for all text in application
         global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily = "ms-appx:///CodeBrix.Platform.Fonts.OpenSans/Fonts/OpenSans.ttf";
 
-        SimpleServiceResolver.CreateInstance(services =>
+        SimpleServiceResolver.CreateInstance(HostHelper.GetHost(), services =>
         {
             //Register my custom services here
             services.AddEncryption();
