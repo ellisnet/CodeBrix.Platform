@@ -23,7 +23,12 @@
 		<UseCommonOverridePackage>true</UseCommonOverridePackage>
 
 		<!-- Ignore NU5104 for net7.0 System.Drawing.Common -->
-		<NoWarn>$(NoWarn);NU5104</NoWarn>
+		<!-- MSB3277: the transitive Microsoft.Web.WebView2.Wpf assembly (net5.0-windows) references
+		     WindowsBase 5.0.0.0, while this plain-net10.0 cross-build resolves the 4.0.0.0 facade from
+		     the shared-framework ref pack. The conflict is a build-time RAR artifact only: on the
+		     Windows runtime the real WindowsBase 5.x loads, so the emitted assembly is correct.
+		     Suppress the unresolvable-conflict noise; this is not masking a real binding problem. -->
+		<NoWarn>$(NoWarn);NU5104;MSB3277</NoWarn>
 
 		<Nullable>enable</Nullable>
 	</PropertyGroup>

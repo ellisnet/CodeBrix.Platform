@@ -25,6 +25,11 @@
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
+		<!-- MSB3277: pulled in transitively via Platform.UI.Runtime.Skia.Win32, whose WebView2.Wpf
+		     (net5.0-windows) reference wants WindowsBase 5.0.0.0, while this plain-net10.0 cross-build
+		     resolves the 4.0.0.0 ref-pack facade. Build-time RAR artifact only; the real WindowsBase 5.x
+		     loads on the Windows runtime. Suppress the conflict noise; not masking a real problem. -->
+		<NoWarn>$(NoWarn);MSB3277</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
