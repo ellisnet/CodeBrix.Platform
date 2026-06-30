@@ -1,0 +1,99 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Match the namespace used by the app code -->
+    <RootNamespace>JustBetweenUs</RootNamespace>
+
+    <!-- CodeBrix.Platform needs this define for its internal conditional compilation -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;RESOLVE_SERVICES;SIMPLE_ENUM;SIMPLE_MESSAGING</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Shared\ViewModels\EncryptionMode.cs" Link="ViewModels\EncryptionMode.cs" />
+    <Compile Include="..\Shared\ViewModels\MainViewModel.cs" Link="ViewModels\MainViewModel.cs" />
+    <Compile Include="..\Shared\ViewModels\SimpleViewModel.cs" Link="ViewModels\SimpleViewModel.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Shared\Assets\star_icon.json" Link="Assets\star_icon.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.9" />
+
+    <!-- CodeBrix.Platform packages are now ProjectReferences (see ItemGroups below).
+         The remaining PackageReferences here are genuinely external packages. -->
+
+    <!-- Lottie/Skottie animation support. SkiaSharp.Skottie is external and stays a
+         package; CodeBrix.Platform.Lottie is now a ProjectReference. -->
+    <PackageReference Include="SkiaSharp.Skottie" Version="4.148.0" />
+
+    <!-- Bundled Open Sans font -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
+
+    <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
+         declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
+         (Platform.WinUI.nuspec), so replacing that package with project references dropped it;
+         re-added here. Version matches the platform's pin in src/Directory.Build.targets. -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.181.669" />
+
+    <!-- SVG rendering support for SvgImageSource on Skia targets. CodeBrix.SkiaSvg is an
+         external package and stays; CodeBrix.Platform.Svg is now a ProjectReference. -->
+    <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.180.239" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Assets\" />
+    <Folder Include="ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\Shared\Assets\clipboard.svg" Link="Assets\clipboard.svg" />
+    <EmbeddedResource Include="..\Shared\Assets\padlock-icon.svg" Link="Assets\padlock-icon.svg" />
+    <EmbeddedResource Include="..\Shared\Assets\unlocked-icon.svg" Link="Assets\unlocked-icon.svg" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform core, formerly the CodeBrix.Platform.ApacheLicenseForever NuGet.
+    Referenced from source instead of the package. Only the three top-level UI projects
+    are listed; their .Skia/.Reference dependencies (Foundation, WinRT/UWP, Composition,
+    Xaml, FluentTheme v1/v2) flow in transitively. Variants mirror the repo's own
+    from-source Skia build (src/Platform.UI/Platform.UI.Skia.csproj).
+    NOTE: the XAML source-generator + build-task wiring does NOT flow across a
+    ProjectReference; it must be added to the XAML-compiling head projects
+    (JustBetweenUs.Windows / JustBetweenUs.WpfSkia), not here.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+
+    <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
+         in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
+         CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
+         Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
+         Referenced here in Core so both heads inherit them. -->
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform add-ins, each formerly a separate NuGet:
+      Graphics2DSK    <- CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever  (Crossruntime variant)
+      SkiaSharp.Views <- CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever  (Skia-only; no ref split)
+      Lottie          <- CodeBrix.Platform.Lottie.ApacheLicenseForever        (Skia variant)
+      Svg             <- CodeBrix.Platform.Svg.ApacheLicenseForever           (Skia variant)
+    Skia variants match the repo's own from-source build. The external packages these
+    depend on (SkiaSharp.Skottie, CodeBrix.SkiaSvg) remain PackageReferences above.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.Lottie\Platform.UI.Lottie.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\JustBetweenUs.Encryption\JustBetweenUs.Encryption.csproj" />
+  </ItemGroup>
+</Project>
