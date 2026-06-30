@@ -25,8 +25,8 @@
   </Folder>
   <Folder Name="/Platform/Runtime/">
     <Project Path="../../../src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
-    <Project Path="../../../src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.X11/Platform.UI.Runtime.Skia.X11.csproj" />
   </Folder>
   <Folder Name="/Platform/Source Generators/">
     <Project Path="../../../src/SourceGenerators/System.Xaml/Platform.Xaml.csproj" />
@@ -49,5 +49,7 @@
   </Folder>
   <Project Path="JustBetweenUs.Core/JustBetweenUs.Core.csproj" />
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
+  <Project Path="JustBetweenUs.Linux/JustBetweenUs.Linux.csproj" />
+  <Project Path="JustBetweenUs.LinuxFrameBuffer/JustBetweenUs.LinuxFrameBuffer.csproj" />
   <Project Path="JustBetweenUs.UI/JustBetweenUs.UI.shproj" Id="13903639-2fee-43d3-a920-4fb073e6702b" />
 </Solution>
