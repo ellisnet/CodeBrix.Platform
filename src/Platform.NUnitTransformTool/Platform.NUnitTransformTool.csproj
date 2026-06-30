@@ -18,7 +18,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.165.386" />
+		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.181.238" />
 	</ItemGroup>
 
 </Project>
