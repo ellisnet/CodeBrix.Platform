@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+
+    <!-- Uno needs this define for its internal conditional compilation -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <ItemGroup>
+    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <None Remove="**\*.xaml" />
+  </ItemGroup>
+
+  <!-- Shared UI files (linked from JustBetweenUs.Shared) -->
+  <Import Project="..\JustBetweenUs.UI\JustBetweenUs.UI.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\JustBetweenUs.Core\JustBetweenUs.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    Platform-specific package: Skia FrameBuffer backend for Linux.
+    Suitable for embedded/kiosk systems without X11.
+    All other packages come from JustBetweenUs.Core.
+  -->
+  <ItemGroup>
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever" Version="1.0.180.353" />
+  </ItemGroup>
+</Project>

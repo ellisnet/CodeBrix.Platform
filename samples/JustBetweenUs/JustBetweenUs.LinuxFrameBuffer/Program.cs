@@ -1,0 +1,22 @@
+using CodeBrix.Platform.UI.Hosting;
+using System;
+
+// ReSharper disable CheckNamespace
+
+namespace JustBetweenUs;
+
+internal class Program
+{
+    [STAThread]
+    public static void Main(string[] args)
+    {
+        App.InitializeLogging();
+
+        var host = CodeBrixPlatformHostBuilder.Create()
+            .App(() => new App())
+            .UseLinuxFrameBuffer()
+            .Build();
+
+        host.Run();
+    }
+}

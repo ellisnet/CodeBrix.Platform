@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <!-- WPF host: the Skia.Wpf runtime package flows a Microsoft.WindowsDesktop.App.WPF
+         FrameworkReference, so the SDK requires a Windows target platform (NETSDK1136).
+         We do NOT set <UseWPF> — that would make WPF's build targets treat our Uno .xaml
+         <Page> items as WPF XAML. WPF is loaded at runtime by the Uno host. -->
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>Exe</OutputType>
+
+    <!-- Uno needs this define for its internal conditional compilation -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <ItemGroup>
+    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <None Remove="**\*.xaml" />
+  </ItemGroup>
+
+  <!-- Shared UI files (linked from JustBetweenUs.UI) -->
+  <Import Project="..\JustBetweenUs.UI\JustBetweenUs.UI.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\JustBetweenUs.Core\JustBetweenUs.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    Platform-specific package: Skia-on-WPF backend for Windows desktops.
+    The package targets net10.0 and pulls WPF in via a FrameworkReference; the
+    Uno WPF host loads the WindowsDesktop framework at runtime, so this head does
+    NOT need <UseWPF> or a net10.0-windows TFM.
+    All other packages come from JustBetweenUs.Core.
+  -->
+  <ItemGroup>
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever" Version="1.0.180.353" />
+  </ItemGroup>
+
+</Project>
