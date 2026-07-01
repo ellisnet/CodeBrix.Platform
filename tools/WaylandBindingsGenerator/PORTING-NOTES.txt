@@ -1,0 +1,78 @@
+WAYLAND BINDINGS GENERATOR — PORTING NOTES
+==========================================
+
+WHAT THIS IS
+------------
+A frozen, CodeBrix-owned fork of the NWayland .NET Wayland bindings GENERATOR,
+vendored one-and-done per the plan in
+~/ClaudeHome/REPORT_codebrix_native_wayland_head_feasibility_2026-07-01.txt
+(decision 2.(1)) and the allow-list in THIRD-PARTY-NOTICES_wayland_addendum.txt
+(Part B1). This is a DEV-ONLY tool: it is never packed into any NuGet. Its
+output (the committed C# bindings in
+src/Platform.UI.Runtime.Skia.Wayland/Wayland_Bindings/) and the absorbed
+client-support types (Wayland_Interop/ in the same project) ARE shipped.
+
+UPSTREAM PROVENANCE (vendored 2026-07-01)
+-----------------------------------------
+  NWayland            https://github.com/AvaloniaUI/NWayland
+                      commit dd37f6d80e6e18ad6c2e868190899b8a808f851d (2026-06-29)
+                      License: MIT (verbatim copy in LICENSE-NWayland.md)
+  wayland (core XML)  https://gitlab.freedesktop.org/wayland/wayland
+                      commit 3e673a438b0a9749e3bdf5cac4befac86333024c (2026-03-19)
+                      License: MIT/X11 (protocols/wayland/COPYING)
+  wayland-protocols   https://gitlab.freedesktop.org/wayland/wayland-protocols
+                      commit 02e63e74a807afed95bc25a386173110afef24e3 (2026-04-01)
+                      License: MIT (protocols/wayland-protocols/COPYING)
+
+NWayland is a bindings-only, MIT repository. Nothing here comes from Avalonia's
+AGPL Wayland backend (which is a different repository and is on the FORBIDDEN
+list — addendum Part F). The plasma-wayland-protocols and wlr-protocols
+submodules of upstream NWayland were NOT vendored (not on the allow-list, not
+needed).
+
+WHAT WAS TAKEN
+--------------
+  src/NWayland.Generator/                 -> src/NWayland.Generator/ (this tool)
+      EquatableArray.cs, NWaylandGeneratorInputModel.cs, NwGeneratorException.cs,
+      Polyfil.cs, Generator/*.cs
+      NOT taken: NWaylandRoslynGenerator.cs (Roslyn build-time wrapper — we run
+      standalone), the .targets files, packaging metadata, launchSettings.json.
+  src/NWayland/ (the CLIENT runtime-support library, ~2900 lines)
+      -> absorbed into src/Platform.UI.Runtime.Skia.Wayland/Wayland_Interop/
+      (see that folder's files for per-file provenance headers). This satisfies
+      the one-and-done acceptance criterion: ZERO NWayland package reference
+      exists at build or run time anywhere in the repo.
+  src/StandaloneGeneratorRunner/Program.cs was used as the MODEL for our own
+      src/GeneratorRunner/ (rewritten, ours).
+  Protocol XML from the upstream freedesktop repos -> protocols/ (pinned copies;
+      future protocol updates come from upstream freedesktop, never from a fresh
+      NWayland pull).
+
+FORK PATCHES (diff against upstream NWayland.Generator)
+-------------------------------------------------------
+  1. Emitted-namespace retarget (mechanical sed over Generator/*.cs):
+         global::NWayland.Protocols.Wayland -> global::CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland
+         global::NWayland.Interop.          -> global::CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop.
+         global::NWayland.Server.           -> global::CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop.Server.
+         global::NWayland.                  -> global::CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop.
+     plus the using-directive emission in WaylandProtocolGenerator.cs (now the
+     InteropNs / CoreProtocolNs constants). The same mapping was applied to the
+     absorbed runtime-support namespaces.
+  2. GeneratedFileHeader replaced with a provenance header + unconditional
+     "#pragma warning disable" (output is committed, always release-grade).
+  3. Server-side codegen disabled (WithServer call removed in
+     WaylandProtocolGenerator.cs) — the head is a pure Wayland client. The
+     Server/ServerListener generator sources are kept, unpatched apart from the
+     sed, for diffability with upstream; they are never invoked.
+  4. Project files rewritten (netstandard2.0 classlib + net10.0 console runner,
+     IsPackable=false, no signing, no Roslyn-component packaging).
+
+REGENERATING THE BINDINGS
+-------------------------
+  dotnet run --project tools/WaylandBindingsGenerator/src/GeneratorRunner
+(from anywhere inside the repo). Output overwrites
+src/Platform.UI.Runtime.Skia.Wayland/Wayland_Bindings/waylandbindings_*.g.cs —
+review and commit the diff. To pick up a NEW protocol or a new protocol
+VERSION: copy the XML from upstream freedesktop into protocols/, add it to
+ProtocolXmlFiles in src/GeneratorRunner/Program.cs, update the upstream commit
+SHA above, re-run.

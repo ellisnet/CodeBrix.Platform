@@ -76,6 +76,7 @@
     <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.X11/Platform.UI.Runtime.Skia.X11.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Wayland/Platform.UI.Runtime.Skia.Wayland.csproj" />
   </Folder>
   <Folder Name="/Solution Items/src/">
     <File Path="src/Directory.Build.props" />

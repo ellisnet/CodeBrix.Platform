@@ -27,6 +27,7 @@
     <Project Path="../../../src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
     <Project Path="../../../src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
     <Project Path="../../../src/Platform.UI.Runtime.Skia.X11/Platform.UI.Runtime.Skia.X11.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.Wayland/Platform.UI.Runtime.Skia.Wayland.csproj" />
   </Folder>
   <Folder Name="/Platform/Source Generators/">
     <Project Path="../../../src/SourceGenerators/System.Xaml/Platform.Xaml.csproj" />
@@ -51,5 +52,6 @@
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
   <Project Path="JustBetweenUs.Linux/JustBetweenUs.Linux.csproj" />
   <Project Path="JustBetweenUs.LinuxFrameBuffer/JustBetweenUs.LinuxFrameBuffer.csproj" />
+  <Project Path="JustBetweenUs.LinuxWayland/JustBetweenUs.LinuxWayland.csproj" />
   <Project Path="JustBetweenUs.UI/JustBetweenUs.UI.shproj" Id="13903639-2fee-43d3-a920-4fb073e6702b" />
 </Solution>

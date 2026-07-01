@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.WebAssembly.Browser")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.MacOS")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Android")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.AppleUIKit")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost.Skia.Wpf")]
