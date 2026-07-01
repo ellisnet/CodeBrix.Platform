@@ -317,6 +317,17 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	private static FontDetails? GetFallbackFont(int codepoint, float fontSize, FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle)
 	{
+		// Line-break and other control characters have no visible glyph, so they must never trigger
+		// font fallback. On some hosts (e.g. Linux with the LyX math fonts installed) SKFontManager's
+		// MatchCharacter(U+000A) resolves to a math font such as esint10, whose shaped glyph paints a
+		// stray "elongated f"/integral stroke at the end of every broken line. Returning null keeps the
+		// character in the caller's own font (via "?? inline.FontDetails"), where it maps to an inkless
+		// .notdef. This is a no-op on platforms where fallback already resolved to nothing visible.
+		if (codepoint <= 0xFFFF && char.IsControl((char)codepoint))
+		{
+			return null;
+		}
+
 		var symbolsFont = FontDetailsCache.GetFont(FeatureConfiguration.Font.SymbolsFont, fontSize, fontWeight, fontStretch, fontStyle).details;
 		if (symbolsFont.SKFont.ContainsGlyph(codepoint))
 		{
