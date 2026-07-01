@@ -11,8 +11,7 @@
 
 		<RootNamespace>CodeBrix.Platform.WinUI.Graphics3DGL</RootNamespace>
 		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-		<!-- Not yet migrated to the shared CodeBrix.Platform ship-metadata; keep the legacy icon
-		     and opt out of the central README/notices packing so this auto-pack stays green. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as package content via the ItemGroup below. PackageReadmeFile is intentionally left unset so the docs pack as plain content and GeneratePackageOnBuild stays green. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageReadmeFile></PackageReadmeFile>
 
@@ -88,6 +87,9 @@
 
 	<ItemGroup>
 		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" />
 		<Content Include="Assets\**\*.*" CopyToOutputDirectory="PreserveNewest" />
 	</ItemGroup>
 	

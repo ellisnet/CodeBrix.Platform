@@ -22,6 +22,9 @@
 
   <files>
 	<file src="..\..\icon-codebrix-128.png" target="/" />
+	<file src="..\..\README.md" target="/" />
+	<file src="..\..\AGENT-README.txt" target="/" />
+	<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 	<file src="_._" target="lib\netstandard1.0" />
   </files>
 </package>

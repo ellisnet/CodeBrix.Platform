@@ -10,8 +10,7 @@
 		<RootNamespace>CodeBrix.Platform.UI.WebView.Skia.X11</RootNamespace>
 
 		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-		<!-- Not yet migrated to the shared CodeBrix.Platform ship-metadata; keep the legacy icon
-		     and opt out of the central README/notices packing so this auto-pack stays green. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as package content via the ItemGroup below. PackageReadmeFile is intentionally left unset so the docs pack as plain content and GeneratePackageOnBuild stays green. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageReadmeFile></PackageReadmeFile>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.WebView.Skia.X11</PackageId>
@@ -40,6 +39,9 @@
 
 	<ItemGroup>
 		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />

@@ -18,6 +18,9 @@
 	<files>
 		<!-- Icon File -->
 		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
 		<!-- net10.0-ios26.0 -->
 

@@ -210,39 +210,13 @@ public class Win32MediaPlayerPresenterExtension : IMediaPlayerPresenterExtension
 					vlcPlayer.AspectRatio = null;
 					break;
 				case Stretch.Uniform:
-					// https://code.videolan.org/videolan/LibVLCSharp/-/blob/3.x/src/LibVLCSharp/Shared/MediaPlayerElement/AspectRatioManager.cs
-					{
-						var videoTrack = _playerExtension?.VlcPlayer.Media?.Tracks.FirstOrDefault(t => t.TrackType == TrackType.Video).Data.Video;
-						if (videoTrack == null)
-						{
-							break;
-						}
-						var track = (VideoTrack)videoTrack;
-						var videoWidth = track.Width;
-						var videoHeight = track.Height;
-						if (videoWidth == 0 || videoHeight == 0)
-						{
-							vlcPlayer.Scale = 0;
-						}
-						else
-						{
-							if (track.SarNum != track.SarDen)
-							{
-								videoWidth = videoWidth * track.SarNum / track.SarDen;
-							}
-
-							var ar = videoWidth / (double)videoHeight;
-							var videoViewWidth = _presenter.ActualWidth;
-							var videoViewHeight = _presenter.ActualHeight;
-							var dar = videoViewWidth / videoViewHeight;
-
-							var rawPixelsPerViewPixel = XamlRoot.GetDisplayInformation(_presenter.XamlRoot).RawPixelsPerViewPixel;
-							var displayWidth = videoViewWidth * rawPixelsPerViewPixel;
-							var displayHeight = videoViewHeight * rawPixelsPerViewPixel;
-							vlcPlayer.Scale = (float)(dar >= ar ? (displayWidth / videoWidth) : (displayHeight / videoHeight));
-						}
-						vlcPlayer.AspectRatio = null;
-					}
+					// Uniform (fit-screen) scaling is computed inside MediaPlayerCore
+					// (its LGPL AspectRatioManager port of LibVLCSharp); this head only
+					// supplies the target view size and the display scaling factor.
+					vlcPlayer.ApplyUniformScale(
+						_presenter.ActualWidth,
+						_presenter.ActualHeight,
+						XamlRoot.GetDisplayInformation(_presenter.XamlRoot).RawPixelsPerViewPixel);
 					break;
 			}
 		}

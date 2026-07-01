@@ -111,6 +111,7 @@ The components in this part are present as source code in this repository
     EventDescriptor.cs, EventOpcode.cs). The .Providers sibling was not vendored.
     (The upstream License.md header carries a copy/paste artifact naming
     "Uno.MonoAnalyzers"; the Apache-2.0 grant itself is unambiguous.)
+    (See PORTING-NOTES.md in that folder.)
 
 4.  Uno.XamlMerge.Task   (build-time only; NOT shipped in any package)
     Project URL:  https://github.com/unoplatform/uno.xamlmerge.task
@@ -159,7 +160,7 @@ The components in this part are present as source code in this repository
                   Portions Copyright (c) Xamarin, Inc.
     License:      MIT License
 
-    Approximately 110 source files under src/SourceGenerators/System.Xaml/
+    Approximately 124 source files under src/SourceGenerators/System.Xaml/
     (XamlReader/Writer, the XAML schema/type system, and markup-extension
     support), derived from the Mono implementation of System.Xaml.
 
@@ -175,9 +176,9 @@ The components in this part are present as source code in this repository
       - src/CodeBrix.Platform.Extensions/Internal/ObjectPool.cs and
         PooledStringBuilder.cs  <- dotnet/roslyn (Microsoft.CodeAnalysis
         pooled-object helpers)
-      - src/CodeBrix.Platform.Extensions/Internal/StringBuilderCache.cs  <-
+      - src/CodeBrix.Platform.Extensions/Core/StringBuilderCache.cs  <-
         dotnet/runtime (System.Text.StringBuilderCache)
-      - src/AddIns/Platform.UI.Lottie/System.Json/ (7 files)  <- dotnet/corefx
+      - src/AddIns/Platform.UI.Lottie/System.Json/ (6 files)  <- dotnet/corefx
         System.Json
       - assorted compatibility / COM-interop helpers (e.g. _Compat/Nullable.cs,
         Win32/XamlHost COM interop)
@@ -201,7 +202,10 @@ The components in this part are present as source code in this repository
 
     src/Platform.UI/Media/PathMarkupParser.cs (Avalonia original with 2018 Uno
     modifications) and the DRM bindings under the Linux FrameBuffer head
-    (DrmBindings.cs).
+    (DrmBindings.cs). The overall STRUCTURE of the X11 clipboard implementation
+    (src/Platform.UI.Runtime.Skia.X11/ApplicationModel/DataTransfer/
+    X11ClipboardExtension.cs) also follows Avalonia's X11Clipboard.cs; the actual
+    clipboard logic in that file is ported from xsel (see item 15).
 
 11. X11 / X.Org / xkbcommon / freedesktop.org bindings
     Project URLs: https://gitlab.freedesktop.org/xorg
@@ -245,17 +249,65 @@ The components in this part are present as source code in this repository
     Copyright:    Copyright 2014 The Flutter Authors. All rights reserved.
     License:      BSD 3-Clause License
 
-    A portion of the Uno Platform (carried into this fork) implements an
-    algorithm derived from Flutter.
+    A portion of the Uno Platform implements an algorithm derived from Flutter.
+    A source-wide search of this fork finds no file that explicitly names or
+    references Flutter; this notice is retained out of caution in case any
+    Flutter-derived logic remains within the carried-over Uno Platform source.
 
 --------------------------------------------------------------------------------
- Microsoft Public License (MS-PL)  (full text in Part D)
+ HPND-style permissive grant ("... without fee")  (see the X11 License note in
+ Part D; the original notice is preserved verbatim in the source file)
 --------------------------------------------------------------------------------
 
-15. Combinatorial.MSTest
-    License:      Microsoft Public License (MS-PL)
+15. xsel  (Conrad Parker)
+    Project URL:  https://github.com/kfish/xsel
+    Source:       xsel.c  (referenced at commit 0ee15bf)
+    Copyright:    Copyright (c) 2001 Conrad Parker <conrad@vergenet.net>
+    License:      HPND-style permissive grant ("Permission to use, copy, modify,
+                  distribute, and sell this software and its documentation for
+                  any purpose is hereby granted without fee ...")
 
-    Test-infrastructure helper used by the Uno-derived test projects.
+    The X11 clipboard read/paste logic in
+    src/Platform.UI.Runtime.Skia.X11/ApplicationModel/DataTransfer/
+    X11ClipboardExtension.cs is ported from xsel. That file's overall structure
+    also follows Avalonia's X11Clipboard.cs (see item 10). The file header
+    preserves Conrad Parker's original permission notice verbatim, alongside a
+    .NET Foundation MIT header carried from the upstream (Uno / Avalonia)
+    lineage. This grant is the same HPND family as the X.Org headers in item 11
+    (representative text in Part D).
+
+--------------------------------------------------------------------------------
+ BSD 2-Clause License  (full text in Part D)
+--------------------------------------------------------------------------------
+
+16. x_clipboard  (Edward Rosten)
+    Project URL:  https://github.com/edrosten/x_clipboard
+    Source:       paste.cc  (referenced at commit 164edd5)
+    Copyright:    Copyright Edward Rosten 2006--2013
+    License:      BSD 2-Clause License
+
+    The X11 drag-and-drop paste logic in
+    src/Platform.UI.Runtime.Skia.X11/ApplicationModel/DataTransfer/DragDrop/
+    X11DragDropExtension.cs is derived from Edward Rosten's x_clipboard
+    (paste.cc). The original BSD 2-Clause notice is preserved verbatim in the
+    file header.
+
+--------------------------------------------------------------------------------
+ zlib License  (full text in Part D)
+--------------------------------------------------------------------------------
+
+17. SDL — Simple DirectMedia Layer  (Sam Lantinga / the SDL contributors)
+    Project URL:  https://github.com/libsdl-org/SDL
+    Source:       src/video/windows/SDL_windowsclipboard.c  (referenced at
+                  commit 9f8157f)
+    Copyright:    Copyright (c) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+    License:      zlib License
+
+    The Win32 clipboard logic in
+    src/Platform.UI.Runtime.Skia.Win32/ApplicationMode/DataTransfer/
+    Win32ClipboardExtension.cs is derived from SDL's Windows clipboard
+    implementation. The original zlib notice is preserved verbatim in the file
+    header.
 
 ================================================================================
  PART C — BUNDLED ASSET FILES
@@ -269,6 +321,12 @@ Asset files (non-source) carried in this repository, by origin:
       indeterminate ProgressRing Lottie animations.
     - src/Platform.UI/Resources/NoiseAsset256x256.png — the AcrylicBrush noise
       texture.
+    - src/AddIns/Platform.UI.MediaPlayer.Skia.X11/Assets/libvlc_init_sample.mp4
+      and the identical copy under .../Platform.UI.MediaPlayer.Skia.Win32/Assets/
+      — a short clip embedded as an EmbeddedResource and played once (paused) to
+      eagerly initialize the libvlc engine at startup. Carried byte-for-byte
+      from the Uno Platform repo (src/AddIns/Uno.UI.MediaPlayer.Skia.{X11,Win32}/
+      Assets/, added upstream 2025-05-15); Apache-2.0, covered by item 1.
 
   Test-only assets (NOT shipped in any package):
     - src/Platform.UI.RuntimeTests/Assets/Fonts/Roboto-Regular.ttf — the Google
@@ -315,8 +373,9 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
  The X11 License  (covers the X.Org / xkbcommon / freedesktop bindings in
- item 11; the various upstream headers are MIT/X11/HPND-equivalent permissive
- grants — this representative X11 text is provided for reference)
+ item 11, and the xsel-derived clipboard logic in item 15; the various upstream
+ headers are MIT/X11/HPND-equivalent permissive grants — this representative
+ X11 text is provided for reference)
 --------------------------------------------------------------------------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -337,11 +396,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Some upstream X.Org headers (e.g. the Frederic Lepied input header) use the
-older HPND/X-Consortium phrasing: "Permission to use, copy, modify, distribute,
-and sell this software and its documentation for any purpose is hereby granted
-without fee, provided that [the] copyright notice appear in all copies ...".
-The original header text is preserved verbatim in each such source file.
+Some upstream headers (e.g. the Frederic Lepied X.Org input header, and Conrad
+Parker's xsel notice — item 15) use the older HPND/X-Consortium phrasing:
+"Permission to use, copy, modify, distribute, and sell this software and its
+documentation for any purpose is hereby granted without fee, provided that [the]
+copyright notice appear in all copies ...". The original header text is
+preserved verbatim in each such source file.
 
 --------------------------------------------------------------------------------
  BSD 3-Clause License  (Flutter, item 14)
@@ -374,56 +434,53 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
- Microsoft Public License (MS-PL)  (Combinatorial.MSTest, item 15)
+ BSD 2-Clause License  (x_clipboard / Edward Rosten, item 16)
 --------------------------------------------------------------------------------
 
-This license governs use of the accompanying software. If you use the software,
-you accept this license. If you do not accept the license, do not use the
-software.
+Copyright Edward Rosten 2006--2013.
 
-1. Definitions
- The terms "reproduce," "reproduction," "derivative works," and "distribution"
- have the same meaning here as under U.S. copyright law.
- A "contribution" is the original software, or any additions or changes to the
- software.
- A "contributor" is any person that distributes its contribution under this
- license.
- "Licensed patents" are a contributor's patent claims that read directly on its
- contribution.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
 
-2. Grant of Rights
- (A) Copyright Grant- Subject to the terms of this license, including the
- license conditions and limitations in section 3, each contributor grants you a
- non-exclusive, worldwide, royalty-free copyright license to reproduce its
- contribution, prepare derivative works of its contribution, and distribute its
- contribution or any derivative works that you create.
- (B) Patent Grant- Subject to the terms of this license, including the license
- conditions and limitations in section 3, each contributor grants you a
- non-exclusive, worldwide, royalty-free license under its licensed patents to
- make, have made, use, sell, offer for sale, import, and/or otherwise dispose of
- its contribution in the software or derivative works of the contribution in the
- software.
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND OTHER CONTRIBUTORS ``AS IS''
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR OTHER CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
 
-3. Conditions and Limitations
- (A) No Trademark License- This license does not grant you rights to use any
- contributors' name, logo, or trademarks.
- (B) If you bring a patent claim against any contributor over patents that you
- claim are infringed by the software, your patent license from such contributor
- to the software ends automatically.
- (C) If you distribute any portion of the software, you must retain all
- copyright, patent, trademark, and attribution notices that are present in the
- software.
- (D) If you distribute any portion of the software in source code form, you may
- do so only under this license by including a complete copy of this license with
- your distribution. If you distribute any portion of the software in compiled or
- object code form, you may only do so under a license that complies with this
- license.
- (E) The software is licensed "as-is." You bear the risk of using it. The
- contributors give no express warranties, guarantees or conditions. You may have
- additional consumer rights under your local laws which this license cannot
- change. To the extent permitted under your local laws, the contributors exclude
- the implied warranties of merchantability, fitness for a particular purpose and
- non-infringement.
+--------------------------------------------------------------------------------
+ zlib License  (SDL / Sam Lantinga, item 17)
+--------------------------------------------------------------------------------
+
+Copyright (c) 1997-2024 Sam Lantinga <slouken@libsdl.org>
+
+This software is provided 'as-is', without any express or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
 
 ================================================================================
 

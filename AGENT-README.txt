@@ -30,10 +30,15 @@ Licenses:                 Apache-2.0 (most packages), MIT (the SkiaSharp.Views
                           suffix — see "THE NUGET PACKAGES" below.
 
 IMPORTANT: Throughout this guide, NuGet package NAMES carry a license suffix
-(".ApacheLicenseForever" or ".MitLicenseForever") while NAMESPACES do NOT. For
-example, the package "CodeBrix.Platform.ApacheLicenseForever" provides the
-namespaces "CodeBrix.Platform.UI.*", "Microsoft.UI.Xaml.*", and so on. Do not
-confuse package ids with namespaces.
+(".ApacheLicenseForever", ".MitLicenseForever", or — for the LibVLC-based media
+packages — ".LgplLicenseForever") while NAMESPACES do NOT. For example, the
+package "CodeBrix.Platform.ApacheLicenseForever" provides the namespaces
+"CodeBrix.Platform.UI.*", "Microsoft.UI.Xaml.*", and so on. Do not confuse
+package ids with namespaces. The suffix reflects the license under which that
+package is delivered; the vast majority of the framework is Apache-2.0. The ONLY
+LGPL packages are the optional media-player add-ons (see "MEDIA PLAYER ADD-ON
+PACKAGES" below) and the CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever
+library they depend on.
 
 ================================================================================
 
@@ -124,6 +129,22 @@ package is versioned to track the SkiaSharp release it vendors).
   NOTE: On Windows you have two choices. The Win32 head is the simplest and most
   common. The WPF head is for hosting CodeBrix.Platform content inside a WPF
   desktop app context (see the WPF-specific section below).
+
+--- MEDIA PLAYER ADD-ON PACKAGES (optional; one per desktop head) ---
+
+  CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever    Linux desktop (X11)
+  CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32.LgplLicenseForever  Windows (Win32 host)
+      Adds MediaPlayerElement (audio / video playback) to the matching desktop
+      head. These are the ONLY CodeBrix.Platform packages that are NOT Apache-2.0:
+      playback is delivered via LibVLC, so each add-on depends on
+      "CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" (a managed port of
+      LibVLCSharp) plus the native "VideoLAN.LibVLC.*" runtime — all
+      LGPL-2.1-or-later. The add-on packages therefore carry the
+      ".LgplLicenseForever" suffix as truth-in-labeling: referencing one pulls
+      LGPL-licensed media playback into your app. Reference an add-on only in the
+      matching head project, and only if your app plays media. (Design note: the
+      LibVLC-specific aspect-ratio math lives in MediaPlayerCore, not in these
+      add-ons, so the add-ons' own source stays free of LibVLCSharp-derived code.)
 
 --- COMPANION PACKAGES used by the reference app (NOT produced by this repo) ---
 
