@@ -1,0 +1,229 @@
+THIRD-PARTY SOFTWARE NOTICES — WAYLAND HEAD ADDENDUM
+(FORWARD-LOOKING, PRE-VETTED ALLOW-LIST AND GUARD-RAIL)
+
+================================================================================
+ WHAT THIS FILE IS  (READ FIRST)
+================================================================================
+
+This file is NOT a record of third-party code already present in this
+repository — that is THIRD-PARTY-NOTICES.txt, in the same folder.
+
+This file is a FORWARD-LOOKING, pre-vetted ALLOW-LIST for the upcoming native
+Wayland head project (the planned "CodeBrix.Platform.UI.Runtime.Skia.Wayland"
+project and its "CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever"
+NuGet package). It exists for two reasons:
+
+  1. GUARD-RAIL (while the work is in progress). During the Wayland head work
+     we may PULL CODE FROM, VENDOR, GENERATE FROM, or even merely READ ONLY the
+     sources enumerated in Parts B through E below. If a source is NOT listed
+     here, we do not pull from it and we do not read it. When a genuinely new
+     need arises, the source must first be added to this file (and license-
+     vetted) BEFORE anyone touches it. "Vet first, then use."
+
+  2. STAGING AREA (for when the work is done). Each source actually used will
+     be migrated into THIRD-PARTY-NOTICES.txt (as a numbered item plus, where
+     needed, its full license text in that file's Part D) once the Wayland head
+     ships. See Part G.
+
+Background and rationale live in:
+  ~/ClaudeHome/REPORT_codebrix_native_wayland_head_feasibility_2026-07-01.txt
+
+================================================================================
+ THE HARD LICENSING BORDER  (NON-NEGOTIABLE)
+================================================================================
+
+IN-BOUNDS  (permissive; may enter the repo and the NuGet):
+    MIT / Expat, Apache-2.0, BSD-2-Clause, BSD-3-Clause, zlib, ISC,
+    X11, HPND ("permission ... without fee"), and public-domain / CC0.
+
+OUT-OF-BOUNDS  (must never enter the repo or the NuGet):
+    ANY copyleft — GPL, LGPL, MPL, EPL, EUPL, AGPL (weak or strong) —
+    AND anything commercial / source-available / non-standard
+    (e.g. BSL, SSPL, Elastic, "custom", "all rights reserved").
+
+RUNTIME-STACK EXCEPTION:
+    Runtime P/Invoke or dlopen of SYSTEM-PROVIDED libraries is allowed
+    regardless of THEIR license, because we neither read, vendor, fork, nor
+    redistribute their source. (Every Linux binary links glibc (LGPL); a
+    Wayland client loads Mesa; libdecor may load a GTK or cairo plugin at
+    runtime.) The border above governs INCORPORATED / DISTRIBUTED SOURCE only.
+
+TARGET IS REAL, NATIVE WAYLAND — a genuine libwayland-client + xdg-shell wire-
+protocol client. This project is NOT XWayland (the X11 compatibility server the
+existing X11 head runs under on a Wayland desktop). No X11 code is in scope.
+
+================================================================================
+ PART A — DELIVERABLE & IN-REPO TEMPLATE  (already ours; Apache-2.0)
+================================================================================
+
+Already present in this repository, Apache-2.0, and covered by
+THIRD-PARTY-NOTICES.txt item 1 (Uno Platform fork). Listed here only to record
+that copying FROM them into the new Wayland head is explicitly allowed:
+
+  - src/Platform.UI.Runtime.Skia.X11/  — the architectural template: input
+    mapping, xdg-desktop-portal / DBus code, storage, host plumbing, packaging.
+  - src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/  — the software-render
+    pattern AND, importantly, Devices/Input/xkbcommon_bindings.cs plus its
+    keyboard input source, which the Wayland head REUSES for keymap parsing and
+    client-side key repeat (see Part D, libxkbcommon).
+
+================================================================================
+ PART B — VENDOR / FORK INTO THE TREE  (a ONE-AND-DONE import)
+================================================================================
+
+B1. NWayland  (the AvaloniaUI .NET Wayland protocol BINDINGS GENERATOR)
+    Project URL:  https://github.com/AvaloniaUI/NWayland
+    License:      MIT  (verified 2026-07-01: GitHub reports spdx_id "MIT")
+    Scope:        We take ONLY the MIT bindings generator. We do NOT take,
+                  read, or reference Avalonia's Wayland BACKEND (AGPL — see
+                  Part F). NWayland is a separate, bindings-only, MIT repo.
+
+    Use: fork / vendor a SNAPSHOT of the generator into the tree as a DEV-ONLY
+    tool (e.g. under tools/ or a non-packed src/ project). Run it to emit C#
+    proxy bindings which are COMMITTED to the Wayland head's Wayland_Bindings/
+    folder (mirroring the committed-and-hand-written X11_Bindings/ precedent).
+
+    ONE-AND-DONE requirements (so we never depend on Avalonia again):
+      - Record the imported commit SHA + a verbatim copy of NWayland's MIT
+        LICENSE alongside the vendored tool (the PORTING-NOTES pattern).
+      - Absorb / inline any runtime support types the generated code needs, so
+        that ZERO NWayland NuGet reference exists at build time or run time.
+      - Thereafter, protocol updates (future Wayland versions) come from the
+        upstream XML in Part C, run through OUR forked generator — never from a
+        fresh Avalonia pull.
+
+    Alternative generator, STUDY-ONLY (not the chosen path): WaylandSharp — see
+    Part E.
+
+================================================================================
+ PART C — GENERATE-FROM  (protocol spec inputs; MIT; re-pulled from upstream)
+================================================================================
+
+The Wayland protocol definitions are DATA (XML) fed to our forked generator.
+They come from the canonical upstream freedesktop.org projects — NOT from any
+bindings library — so future protocol versions are always pulled from the
+standard itself.
+
+C1. wayland  (core protocol: wayland.xml)
+    Project URL:  https://gitlab.freedesktop.org/wayland/wayland
+    License:      MIT / Expat  (each protocol XML carries an MIT <copyright>)
+    Interfaces of interest: wl_display, wl_registry, wl_compositor, wl_surface,
+    wl_seat, wl_keyboard, wl_pointer, wl_touch, wl_output, wl_shm,
+    wl_data_device_manager, wl_callback.
+
+C2. wayland-protocols  (extension protocols)
+    Project URL:  https://gitlab.freedesktop.org/wayland/wayland-protocols
+    License:      MIT / Expat
+    Protocols of interest: xdg-shell (wm_base/surface/toplevel/popup),
+    xdg-decoration-unstable-v1, viewporter, fractional-scale-v1,
+    cursor-shape-v1, text-input-v3 (IME; later), primary-selection (later).
+
+================================================================================
+ PART D — RUNTIME NATIVE LIBRARIES  (P/Invoke / dlopen; NOT vendored)
+================================================================================
+
+Bound to at run time via P/Invoke. Their source is never vendored or read, so
+the runtime-stack exception applies; licenses are recorded here for provenance.
+Licenses below were verified 2026-07-01 against the copies installed on the
+development machine.
+
+D1. libwayland-client / libwayland-cursor / libwayland-egl
+    License: X11 (MIT-family permissive)   — Debian "License: X11".
+    The core client library, cursor-theme helper, and the EGL window shim.
+
+D2. libxkbcommon
+    License: MIT / Expat.
+    Keymap parsing from the compositor-supplied keymap FD. NOTE: we primarily
+    REUSE the existing in-repo bindings (Part A, FrameBuffer head's
+    xkbcommon_bindings.cs) rather than writing new ones.
+
+D3. libdecor
+    License: MIT / Expat  (Debian "License: Expat").
+    Client-side window decorations (title bar, buttons, move/resize) on
+    compositors that do not draw server-side decorations (notably GNOME).
+    NOTE: libdecor may dlopen a GTK or cairo plugin at RUN TIME to theme the
+    decorations; those plugins (LGPL / MPL) are OS-provided and are never read,
+    vendored, or shipped by us — allowed under the runtime-stack exception.
+    (A GPL-3.0+ build-helper script exists inside libdecor's own source tree;
+    it is irrelevant because we bind only the MIT library and never vendor its
+    source.)
+
+D4. EGL / GLES  (Mesa)  — phase 2+/GPU path only
+    License: MIT.
+    For the later wl_egl_window + EGL/GLES -> SkiaSharp GRContext GPU path.
+
+================================================================================
+ PART E — STUDY-ONLY  (permissive; may be READ for protocol-usage patterns)
+================================================================================
+
+These are permissively licensed and MAY be read for reference on how to drive
+the Wayland protocol, decorations, input, etc. They are NOT to be copied
+wholesale. If any specific code is actually taken from one of them, that code
+must be added to THIRD-PARTY-NOTICES.txt (with its attribution + license text)
+BEFORE it is committed — the same discipline already applied to the SDL,
+x_clipboard, and xsel ports (THIRD-PARTY-NOTICES.txt items 15-17).
+
+  - Weston reference-compositor SAMPLE CLIENTS ....... MIT
+  - GLFW ............................................. zlib
+  - SDL ............................................. zlib
+        (we already vendor SDL's Win32 clipboard code under zlib —
+         THIRD-PARTY-NOTICES.txt item 17)
+  - winit ........................................... Apache-2.0 / MIT
+  - WaylandSharp (X9VoiD) — alternative MIT generator  MIT
+
+  CLIPBOARD & DRAG-AND-DROP — designated pull source. The Wayland clipboard/DnD
+  model (wl_data_device_manager / wl_data_device / wl_data_source /
+  wl_data_offer, driven by input serials + keyboard focus) is a FRESH
+  implementation; the X11 head's xsel / x_clipboard code
+  (THIRD-PARTY-NOTICES.txt items 15-16) does NOT port. Primary source: SDL's
+  Wayland data-device implementation (src/video/wayland/SDL_waylanddatamanager.c
+  and siblings) — zlib, the SAME project + license we already vendor the Win32
+  clipboard from (item 17), so its zlib text is already in THIRD-PARTY-NOTICES.txt
+  Part D. Secondary references: GLFW's Wayland data-device code (zlib) and
+  Weston's sample clients (MIT). Any logic actually taken is ported to C#
+  P/Invoke over our generated wl_data_device bindings and attributed in
+  THIRD-PARTY-NOTICES.txt BEFORE commit.
+
+================================================================================
+ PART F — FORBIDDEN  (NEVER read, pull, vendor, fork, or copy the SOURCE)
+================================================================================
+
+Copyleft or commercial source. These MUST NOT be read or incorporated. (Some
+may still be PRESENT as system runtime libraries — e.g. GTK loaded by a libdecor
+plugin — which is permitted under the runtime-stack exception; the ban here is
+on their SOURCE.)
+
+  - Avalonia's Wayland BACKEND (AGPL) — the hard line. It is DISTINCT from the
+    MIT NWayland generator in Part B; do not confuse the two, and do not read
+    the backend.
+  - GTK (LGPL), Qt (LGPL / GPL).
+  - mutter / Muffin (GNOME/Cinnamon, GPL), KWin (KDE, GPL), and any other
+    compositor's GPL source.
+  - Any GPL / LGPL / MPL / EPL / EUPL / AGPL, or any commercial /
+    source-available / non-standard source, from anywhere.
+
+================================================================================
+ PART G — MERGE PLAN  (folding this into THIRD-PARTY-NOTICES.txt when done)
+================================================================================
+
+When the Wayland head ships, update THIRD-PARTY-NOTICES.txt as follows:
+
+  - NWayland (Part B1): add an MIT item. Because the generator is a DEV-ONLY
+    tool that is NOT shipped in any package, mark it "build-time only; NOT
+    shipped" (as is already done for Uno.XamlMerge.Task, item 4). The COMMITTED
+    generated bindings are our own Apache-2.0 output and are covered by the
+    repository's own license; note that they were generated from the MIT
+    protocol XML of Part C.
+  - wayland / wayland-protocols XML (Part C): note as the MIT spec source the
+    committed bindings were generated from.
+  - Native libraries (Part D): these are P/Invoked, not vendored, so per
+    THIRD-PARTY-NOTICES.txt's stated scope they are NOT documented there as
+    in-repo source; they need no item unless source is ever vendored.
+  - Study-only (Part E): add an item ONLY for any source actually copied.
+  - Confirm MIT and zlib full license texts already exist in
+    THIRD-PARTY-NOTICES.txt Part D (they do); add any other permissive license
+    text only if a newly-used source requires one.
+
+================================================================================
+
+END OF WAYLAND HEAD ADDENDUM
