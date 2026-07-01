@@ -21,7 +21,7 @@
 			<group targetFramework="net10.0">
 				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
 				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="4.148.0" />
-				<dependency id="CodeBrix.SkiaSvg.MitLicenseForever" version="1.0.117" />
+				<dependency id="CodeBrix.SkiaSvg.MitLicenseForever" version="1.0.180.239" />
 				<dependency id="System.Json" version="4.7.1" />
 			</group>
 

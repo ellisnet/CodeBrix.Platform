@@ -40,7 +40,7 @@
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
 		<PackageReference Include="HarfbuzzSharp" />
 		<PackageReference Include="SkiaSharp" />
-		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.165.1288" />
+		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.182.1157" />
 	</ItemGroup>
 
 	<ItemGroup>

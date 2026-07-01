@@ -6,7 +6,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.Tests; //Was previously: Uno.UI.
 
 internal record class _Dotnet(string Moniker, ReferenceAssemblies ReferenceAssemblies)
 {
-	public ReferenceAssemblies WithCodeBrixPackage(string version = "1.0.179.226")
+	public ReferenceAssemblies WithCodeBrixPackage(string version = "1.0.182.216")
 		=> ReferenceAssemblies.AddPackages([new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", version)]);
 
 	public static _Dotnet Current = new("net10.0", ReferenceAssemblies.Net.Net100);

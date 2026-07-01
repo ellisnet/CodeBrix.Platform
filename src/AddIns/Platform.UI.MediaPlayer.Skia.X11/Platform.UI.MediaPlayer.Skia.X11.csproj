@@ -27,7 +27,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.165.1288" />
+		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.182.1157" />
 		
 		<ProjectReference Include="..\..\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
