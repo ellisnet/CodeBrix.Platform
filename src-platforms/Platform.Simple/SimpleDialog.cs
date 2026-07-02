@@ -1,3 +1,5 @@
+#pragma warning disable CS1591
+
 using System;
 using System.Text;
 using System.Threading.Tasks;

@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Mobile/">
+    <Project Path="Platform.Mobile/Core/CodeBrix.Platform.Mobile.Core.csproj" />
+  </Folder>
+  <Folder Name="/WinUI/">
+    <Project Path="Platform.WinUI/Core/CodeBrix.Platform.WinUI.Core.csproj" />
+  </Folder>
+  <Folder Name="/WPF/">
+    <Project Path="Platform.WPF/Core/CodeBrix.Platform.WPF.Core.csproj" />
+  </Folder>
+</Solution>

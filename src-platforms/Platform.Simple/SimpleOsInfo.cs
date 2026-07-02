@@ -1,11 +1,41 @@
+#pragma warning disable CS1591
+
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+
+#if (WIN_UI || HAS_CODEBRIX) //WIN_UI needs to be manually defined on Win UI projects (and CodeBrix.Platform net10.0-windows projects)
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+#elif MAUI //Needs to be manually defined on .NET MAUI projects
+using Microsoft.Maui;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Controls.PlatformConfiguration;
+using Microsoft.Maui.Devices;
+#else
+using System.Windows;
+//IMPORTANT: If this code is being placed in a project that is not the main WPF application project - i.e. if it is placed in a
+//  class library that is referenced by the WPF application - then the project must be set to use the Windows SDK for compilation,
+//  with the following in the .csproj file:
+/*
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+*/
+//Note that this also means that any projects that reference the project containing this code, must also have the TargetFramework
+//  set to 'net10.0-windows' - e.g. Tests projects that test the view models that inherit from SimpleViewModel.
+//  (This is not relevant to WIN_UI or HAS_CODEBRIX or MAUI projects that include this file.)
+#endif
 
 namespace CodeBrix.Platform.Simple;
 

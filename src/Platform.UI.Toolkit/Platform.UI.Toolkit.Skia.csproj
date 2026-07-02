@@ -23,13 +23,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\Platform.Simple\SimpleCommand.cs" Link="Simple\SimpleCommand.cs" />
-		<Compile Include="..\Platform.Simple\SimpleDialog.cs" Link="Simple\SimpleDialog.cs" />
-		<Compile Include="..\Platform.Simple\SimpleEnum.cs" Link="Simple\SimpleEnum.cs" />
-		<Compile Include="..\Platform.Simple\SimpleMessaging.cs" Link="Simple\SimpleMessaging.cs" />
-		<Compile Include="..\Platform.Simple\SimpleOsInfo.cs" Link="Simple\SimpleOsInfo.cs" />
-		<Compile Include="..\Platform.Simple\SimpleServiceResolver.cs" Link="Simple\SimpleServiceResolver.cs" />
-		<Compile Include="..\Platform.Simple\SimpleViewModel.cs" Link="Simple\SimpleViewModel.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleCommand.cs" Link="Simple\SimpleCommand.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleDialog.cs" Link="Simple\SimpleDialog.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleEnum.cs" Link="Simple\SimpleEnum.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleMessaging.cs" Link="Simple\SimpleMessaging.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleOsInfo.cs" Link="Simple\SimpleOsInfo.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleServiceResolver.cs" Link="Simple\SimpleServiceResolver.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleViewModel.cs" Link="Simple\SimpleViewModel.cs" />
 		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
 	</ItemGroup>
 

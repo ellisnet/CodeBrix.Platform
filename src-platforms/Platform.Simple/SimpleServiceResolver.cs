@@ -1,3 +1,5 @@
+#pragma warning disable CS1591
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;

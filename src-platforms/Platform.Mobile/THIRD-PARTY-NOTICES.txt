@@ -1,0 +1,22 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+CodeBrix.Platform.Mobile provides the platform-agnostic CodeBrix "Simple" MVVM
+toolkit (SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution
+and OS info) compiled for .NET MAUI applications.
+
+CodeBrix.Platform.Mobile does not incorporate any third-party source code into
+its own assemblies. Its source is the CodeBrix.Platform.Simple files authored
+within the CodeBrix.Platform project, compiled here for the .NET MAUI target.
+
+Jeremy Ellis and contributors license the CodeBrix.Platform.Mobile project to
+you under the terms set forth in the LICENSE file, which is located at the root
+of this repository (Apache License, Version 2.0).
+
+If you have any questions about any third-party code or services referenced
+here, or if you believe that any third-party code has been included in
+CodeBrix.Platform.Mobile in error, please open a new issue at:
+https://github.com/ellisnet/CodeBrix.Platform/issues
+
+================================================================================
+
+END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

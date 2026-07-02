@@ -3,6 +3,19 @@
 	<Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
 	<Import Project="crosstargeting_override.props" Condition="exists('crosstargeting_override.props')" />
 
+	<!--
+	Moved here from the repo-root Directory.Build.props so they apply ONLY to
+	the Uno-derived packages under src/ (every current CodeBrix.Platform package
+	lives here) and do NOT leak into standalone package trees placed outside
+	src/. PackageIcon/PackageReadmeFile name packed files (inheriting them
+	without packing the files causes NU5046); PackageTags are Uno-flavored.
+	-->
+	<PropertyGroup>
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageTags>skia;runtime;desktop;host;dotnet;CodeBrix</PackageTags>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<DebugType>portable</DebugType>
 		<DebugSymbols>True</DebugSymbols>

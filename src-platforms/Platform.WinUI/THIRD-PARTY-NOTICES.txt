@@ -1,0 +1,24 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+CodeBrix.Platform.WinUI provides the platform-agnostic CodeBrix "Simple" MVVM
+toolkit (SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution
+and OS info) compiled for WinUI (Windows App SDK) applications.
+
+CodeBrix.Platform.WinUI does not incorporate any third-party source code into
+its own assemblies. Its source is the CodeBrix.Platform.Simple files authored
+within the CodeBrix.Platform project, compiled here for the WinUI target. It
+takes a package dependency on Microsoft.WindowsAppSDK, which is licensed by
+Microsoft under its own terms and is not redistributed as source here.
+
+Jeremy Ellis and contributors license the CodeBrix.Platform.WinUI project to you
+under the terms set forth in the LICENSE file, which is located at the root of
+this repository (Apache License, Version 2.0).
+
+If you have any questions about any third-party code or services referenced
+here, or if you believe that any third-party code has been included in
+CodeBrix.Platform.WinUI in error, please open a new issue at:
+https://github.com/ellisnet/CodeBrix.Platform/issues
+
+================================================================================
+
+END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

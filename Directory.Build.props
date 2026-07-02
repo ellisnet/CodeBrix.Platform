@@ -9,11 +9,19 @@
 		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors</Copyright>
 		<Authors>Jeremy Ellis and contributors</Authors>
 		<Product>CodeBrix.Platform</Product>
-		<PackageIcon>icon-codebrix-128.png</PackageIcon>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-		<PackageTags>skia;runtime;desktop;host;dotnet;CodeBrix</PackageTags>
 		<PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+
+		<!--
+		PackageIcon, PackageReadmeFile and PackageTags were moved OUT of this
+		repo-root props and DOWN into src/Directory.Build.props. They name a
+		packed icon/readme file (which would cause NU5046 in any project that
+		inherits them without packing those files) and carry Uno-flavored tags,
+		so they belong only to the Uno-derived packages under src/. Keeping them
+		here would leak into any standalone (non-Uno) package tree placed
+		outside src/.
+		-->
+
 
 		<!-- Disable source link when not building on GitHub -->
 		<SourceLinkEnabled Condition="'$(BUILD_REPOSITORY_PROVIDER)'!='GitHub'">false</SourceLinkEnabled>

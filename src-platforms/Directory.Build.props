@@ -1,0 +1,26 @@
+<Project>
+
+  <!--
+  ============================================================================
+  Standalone build boundary for the src-platforms tree.
+  ============================================================================
+  This file exists ONLY to STOP MSBuild from walking further up the directory
+  tree and importing the Uno-derived build machinery:
+
+    * ../Directory.Build.props       (repo root - package identity + fork flags)
+    * ../src/Directory.Build.props    (heavy Uno build: Version=255.255.255.255,
+                                       TreatWarningsAsErrors, LangVersion 13,
+                                       NetAnalyzers, SourceLink, PackageIcon/
+                                       PackageReadmeFile/PackageTags, etc.)
+
+  MSBuild imports only the FIRST Directory.Build.props it finds walking up, so
+  this deliberately non-importing file makes every project under src-platforms
+  build as an INDEPENDENT, non-Uno package tree - exactly like a standalone
+  CodeBrix.* library repo, where each packable .csproj declares its own NuGet
+  metadata and the canonical date-stamped version block.
+
+  Do NOT add <Import Project="$([MSBuild]::GetPathOfFileAbove(...))" /> here -
+  that would re-couple this tree to the Uno build and defeat the isolation.
+  -->
+
+</Project>
