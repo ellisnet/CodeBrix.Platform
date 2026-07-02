@@ -13,47 +13,56 @@ namespace CodeBrix.Platform.WinUI.Controls;
 /// </summary>
 public sealed class EmbeddedImageButton : Button
 {
+    /// <summary>Initializes a new <see cref="EmbeddedImageButton"/>.</summary>
     public EmbeddedImageButton()
     {
         DefaultStyleKey = typeof(Button);
         CornerRadius = new CornerRadius(4);
     }
 
+    /// <summary>Identifies the <see cref="ImageUriSource"/> dependency property.</summary>
     public static readonly DependencyProperty ImageUriSourceProperty =
         DependencyProperty.Register(
             nameof(ImageUriSource), typeof(string), typeof(EmbeddedImageButton),
             new PropertyMetadata(null, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="Text"/> dependency property.</summary>
     public static readonly DependencyProperty TextProperty =
         DependencyProperty.Register(
             nameof(Text), typeof(string), typeof(EmbeddedImageButton),
             new PropertyMetadata(null, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="ImagePosition"/> dependency property.</summary>
     public static readonly DependencyProperty ImagePositionProperty =
         DependencyProperty.Register(
             nameof(ImagePosition), typeof(ImagePosition), typeof(EmbeddedImageButton),
             new PropertyMetadata(ImagePosition.Left, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="Spacing"/> dependency property.</summary>
     public static readonly DependencyProperty SpacingProperty =
         DependencyProperty.Register(
             nameof(Spacing), typeof(double), typeof(EmbeddedImageButton),
             new PropertyMetadata(10.0, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="ImageWidth"/> dependency property.</summary>
     public static readonly DependencyProperty ImageWidthProperty =
         DependencyProperty.Register(
             nameof(ImageWidth), typeof(double), typeof(EmbeddedImageButton),
             new PropertyMetadata(double.NaN, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="ImageHeight"/> dependency property.</summary>
     public static readonly DependencyProperty ImageHeightProperty =
         DependencyProperty.Register(
             nameof(ImageHeight), typeof(double), typeof(EmbeddedImageButton),
             new PropertyMetadata(double.NaN, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="TextVerticalAlignment"/> dependency property.</summary>
     public static readonly DependencyProperty TextVerticalAlignmentProperty =
         DependencyProperty.Register(
             nameof(TextVerticalAlignment), typeof(VerticalAlignment), typeof(EmbeddedImageButton),
             new PropertyMetadata(VerticalAlignment.Center, OnLayoutPropertyChanged));
 
+    /// <summary>Identifies the <see cref="TextHorizontalAlignment"/> dependency property.</summary>
     public static readonly DependencyProperty TextHorizontalAlignmentProperty =
         DependencyProperty.Register(
             nameof(TextHorizontalAlignment), typeof(HorizontalAlignment), typeof(EmbeddedImageButton),

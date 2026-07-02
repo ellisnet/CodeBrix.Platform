@@ -5,12 +5,18 @@ toolkit (SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution
 and OS info) compiled for .NET MAUI applications.
 
 CodeBrix.Platform.Mobile does not incorporate any third-party source code into
-its own assemblies. Its source is the CodeBrix.Platform.Simple files authored
-within the CodeBrix.Platform project, compiled here for the .NET MAUI target.
+its own assemblies. Its source is the CodeBrix.Platform.Simple files (at
+src-platforms/Platform.Simple in this repository), original code authored by
+Jeremy Ellis over a number of years and compiled here for the .NET MAUI target.
+
+It depends on NuGet packages (Microsoft.Maui.* and Microsoft.Extensions.*
+abstractions) that are licensed by their own authors under their own terms;
+their source code is not included in this repository.
 
 Jeremy Ellis and contributors license the CodeBrix.Platform.Mobile project to
 you under the terms set forth in the LICENSE file, which is located at the root
-of this repository (Apache License, Version 2.0).
+of this repository (Apache License, Version 2.0):
+https://www.apache.org/licenses/LICENSE-2.0
 
 If you have any questions about any third-party code or services referenced
 here, or if you believe that any third-party code has been included in

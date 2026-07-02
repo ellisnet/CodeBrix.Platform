@@ -1,8 +1,9 @@
 # CodeBrix.Platform.WPF
 
-MVVM primitives for **WPF** applications — the platform-agnostic CodeBrix
-"Simple" toolkit (`SimpleViewModel`, `SimpleCommand`, dialogs, messaging,
-service resolution and OS info) compiled for WPF.
+Toolkit-style libraries for **WPF** applications — starting with the
+platform-agnostic CodeBrix "Simple" MVVM toolkit (`SimpleViewModel`,
+`SimpleCommand`, dialogs, messaging, service resolution and OS info) compiled
+for WPF.
 
 These packages are **not** Uno-based and share no code with the Uno-derived
 `CodeBrix.Platform.*` packages. The only shared source is the linked

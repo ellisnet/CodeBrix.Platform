@@ -1,23 +1,132 @@
 THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
 
-CodeBrix.Platform.WinUI provides the platform-agnostic CodeBrix "Simple" MVVM
-toolkit (SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution
-and OS info) compiled for WinUI (Windows App SDK) applications.
+CodeBrix.Platform.WinUI is a family of NuGet packages for WinUI (Windows App
+SDK) applications:
 
-CodeBrix.Platform.WinUI does not incorporate any third-party source code into
-its own assemblies. Its source is the CodeBrix.Platform.Simple files authored
-within the CodeBrix.Platform project, compiled here for the WinUI target. It
-takes a package dependency on Microsoft.WindowsAppSDK, which is licensed by
-Microsoft under its own terms and is not redistributed as source here.
+  * CodeBrix.Platform.WinUI.ApacheLicenseForever (Core) - the platform-agnostic
+    CodeBrix "Simple" MVVM toolkit (SimpleViewModel, SimpleCommand, dialogs,
+    messaging, service resolution and OS info) compiled for WinUI.
+  * CodeBrix.Platform.WinUI.Skia.ApacheLicenseForever - Skia-rendered image
+    controls (EmbeddedImage, EmbeddedImageButton) with vector-direct SVG
+    rendering.
+  * CodeBrix.Platform.WinUI.Lottie.ApacheLicenseForever - Skia-rendered Lottie
+    animation player (AnimatedVisualPlayer, LottieVisualSource,
+    ThemableLottieVisualSource).
 
-Jeremy Ellis and contributors license the CodeBrix.Platform.WinUI project to you
-under the terms set forth in the LICENSE file, which is located at the root of
-this repository (Apache License, Version 2.0).
+Jeremy Ellis and contributors license the CodeBrix.Platform.WinUI projects to
+you under the terms set forth in the LICENSE file, which is located at the root
+of this repository (Apache License, Version 2.0).
+
+--------------------------------------------------------------------------------
+ORIGINAL CODE
+--------------------------------------------------------------------------------
+
+The Core package (the CodeBrix "Simple" toolkit, source at
+src-platforms/Platform.Simple) was authored by Jeremy Ellis and contains no
+third-party source code.
+
+--------------------------------------------------------------------------------
+CODE PORTED OR DERIVED FROM OTHER PROJECTS
+--------------------------------------------------------------------------------
+
+The Skia and Lottie packages contain code ported or derived from the Uno-based
+CodeBrix.Platform code elsewhere in this repository, which is itself a fork of
+the Uno Platform. Provenance, by area:
+
+1. SVG rendering and image scaling (CodeBrix.Platform.WinUI.Skia)
+
+   The vector-direct SVG rendering in EmbeddedImage, and the stretch/scale math
+   in ImageSizeHelper, are ported from the Uno-based CodeBrix.Platform sources
+   in this repository:
+     - src/AddIns/Platform.UI.Svg (SvgProvider.cs, SvgCanvas.cs)
+     - src/Platform.UI/UI/Xaml/Controls/Image/ImageSizeHelper.cs
+   Those files were previously part of the Uno Platform (namespaces Uno.UI.Svg
+   and Microsoft.UI.Xaml.Controls in the Uno.UI codebase).
+
+   Origin:    Uno Platform - https://github.com/unoplatform/uno
+   Copyright: (c) Uno Platform contributors
+   License:   Apache License, Version 2.0
+
+2. Lottie player and animated visual sources (CodeBrix.Platform.WinUI.Lottie)
+
+   LottieVisualSourceBase (including the Skottie playback/rendering engine),
+   LottieVisualSource, ThemableLottieVisualSource, LottieVisualOptions, and the
+   source-driven player contract implemented by this package's
+   AnimatedVisualPlayer are ported from the Uno-based CodeBrix.Platform sources
+   in this repository:
+     - src/AddIns/Platform.UI.Lottie
+   Those files were previously part of the Uno Platform (namespace
+   Uno.UI.Lottie / CommunityToolkit.WinUI.Lottie type names in the Uno.UI
+   codebase).
+
+   Origin:    Uno Platform - https://github.com/unoplatform/uno
+   Copyright: (c) Uno Platform contributors
+   License:   Apache License, Version 2.0
+
+3. PropertyBindingsParser.cs (CodeBrix.Platform.WinUI.Lottie)
+
+   The CSS-var-style property-binding parser used for Lottie color theming
+   came to this repository through the Uno Platform, and originates from the
+   Lottie-Windows project.
+
+   Origin:    Lottie-Windows (Windows Community Toolkit) -
+              https://github.com/windows-toolkit/Lottie-Windows
+              (source/LottieToWinComp/PropertyBindingsParser.cs)
+   Copyright: Licensed to the .NET Foundation under one or more agreements.
+   License:   MIT License (see text below)
+
+4. System.Json/*.cs (CodeBrix.Platform.WinUI.Lottie)
+
+   A vendored copy (compiled as internal types) of the System.Json mutable
+   JSON DOM, used for Lottie color theming because System.Text.Json documents
+   are read-only. It came to this repository through the Uno Platform, and
+   originates from the .NET corefx repository (the per-file headers record the
+   exact corefx export point).
+
+   Origin:    dotnet/corefx - https://github.com/dotnet/corefx
+   Copyright: Licensed to the .NET Foundation under one or more agreements.
+   License:   MIT License (see text below)
+
+--------------------------------------------------------------------------------
+
+These packages also depend on NuGet packages (Microsoft.WindowsAppSDK,
+SkiaSharp and related packages, CodeBrix.SkiaSvg) that are licensed by their
+own authors under their own terms; their source code is not included in this
+repository.
 
 If you have any questions about any third-party code or services referenced
 here, or if you believe that any third-party code has been included in
 CodeBrix.Platform.WinUI in error, please open a new issue at:
 https://github.com/ellisnet/CodeBrix.Platform/issues
+
+================================================================================
+
+MIT License text (applies to the items above marked MIT):
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+The Apache License, Version 2.0 (applies to the items above marked Apache,
+and to the CodeBrix.Platform.WinUI packages themselves) can be found in the
+LICENSE file at the root of this repository, and at:
+https://www.apache.org/licenses/LICENSE-2.0
 
 ================================================================================
 

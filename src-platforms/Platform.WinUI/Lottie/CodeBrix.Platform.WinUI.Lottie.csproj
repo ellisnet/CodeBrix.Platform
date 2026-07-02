@@ -1,9 +1,49 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <UseWinUI>true</UseWinUI>
+    <AssemblyName>CodeBrix.Platform.WinUI.Lottie</AssemblyName>
+    <RootNamespace>CodeBrix.Platform.WinUI.Lottie</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!--
+    Package / assembly version: date-stamped and auto-incrementing.
+    Same scheme as CodeBrix.Platform.WinUI.Core - see the comment block in
+    Core\CodeBrix.Platform.WinUI.Core.csproj for the full explanation.
+
+    Format:  1.<years since base year>.<day of year>.<minute of day>  (all UTC)
+  -->
+  <PropertyGroup>
+    <_VersionBaseYear>2026</_VersionBaseYear>
+    <_VersionYears>$([MSBuild]::Subtract($([System.DateTime]::UtcNow.Year), $(_VersionBaseYear)))</_VersionYears>
+    <_VersionDayOfYear>$([System.DateTime]::UtcNow.DayOfYear)</_VersionDayOfYear>
+    <_VersionMinuteOfDay>$([System.Convert]::ToInt32($([System.Math]::Floor($([System.DateTime]::UtcNow.TimeOfDay.TotalMinutes)))))</_VersionMinuteOfDay>
+    <BuildVersion>1.$(_VersionYears).$(_VersionDayOfYear).$(_VersionMinuteOfDay)</BuildVersion>
+    <Version>$(BuildVersion)</Version>
+    <AssemblyVersion>$(BuildVersion)</AssemblyVersion>
+    <FileVersion>$(BuildVersion)</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>CodeBrix.Platform.WinUI.Lottie.ApacheLicenseForever</PackageId>
+    <Product>CodeBrix.Platform.WinUI.Lottie</Product>
+    <Title>CodeBrix.Platform.WinUI.Lottie</Title>
+    <Authors>Jeremy Ellis</Authors>
+    <Description>CodeBrix Toolkit for use with WinUI applications - providing Lottie animation parsing and rendering functionality.</Description>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageIcon>icon-codebrix-128.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <Copyright>Copyright (c) 2026 Jeremy Ellis and contributors</Copyright>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <IsPackable>true</IsPackable>
+    <PackageTags>winui;windowsappsdk;lottie;skottie;skia;skiasharp;animation;dotnet;CodeBrix</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,16 +53,13 @@
 
   <ItemGroup>
     <PackageReference Include="SkiaSharp.Skottie" Version="4.148.0" />
+  </ItemGroup>
 
-    <!--TODO: We want the following package references to go away-->
-    <!-- Native (non-CodeBrix) Lottie player for the info-button star animation. -->
-    <PackageReference Include="CommunityToolkit.WinUI.Lottie" Version="8.2.250604" />
-    <!-- Win2D backs the Lottie player. An explicit reference is required: Lottie's
-         transitive floor is an old Win2D (1.0.5.1) that uses the legacy win10-* RID
-         folders, which .NET 10 no longer maps from win-arm64 — so its native
-         Microsoft.Graphics.Canvas.dll fails to deploy on ARM64. 1.4.0 uses the modern
-         runtimes/win-<arch>/native layout and deploys correctly on x64 and ARM64. -->
-    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
+  <ItemGroup>
+    <None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="" />
+    <None Include="..\AGENT-README.txt" Pack="true" PackagePath="" />
+    <None Include="..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>

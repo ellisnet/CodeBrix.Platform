@@ -54,7 +54,7 @@
     <Product>CodeBrix.Platform.WPF</Product>
     <Title>CodeBrix.Platform.WPF</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>MVVM primitives -- SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution and OS info -- for WPF applications. The platform-agnostic CodeBrix "Simple" toolkit, compiled for WPF.</Description>
+    <Description>CodeBrix Toolkit for use with WPF applications.</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform</RepositoryUrl>

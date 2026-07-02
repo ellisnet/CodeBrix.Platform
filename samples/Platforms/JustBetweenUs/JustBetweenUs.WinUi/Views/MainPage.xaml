@@ -6,7 +6,7 @@
     xmlns:local="using:JustBetweenUs.WinUi.Views"
     xmlns:vm="using:JustBetweenUs.ViewModels"
     xmlns:controls="using:CodeBrix.Platform.WinUI.Controls"
-    xmlns:lottie="using:CommunityToolkit.WinUI.Lottie"
+    xmlns:lottie="using:CodeBrix.Platform.WinUI.Lottie"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -90,12 +90,12 @@
                 VerticalAlignment="Center" HorizontalAlignment="Left"
                 Command="{Binding ShowOsInfoCommand}">
             <StackPanel Orientation="Horizontal">
-                <AnimatedVisualPlayer AutoPlay="True"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"
-                                      Height="40" Width="50">
+                <lottie:AnimatedVisualPlayer AutoPlay="True"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Height="40" Width="50">
                     <lottie:LottieVisualSource UriSource="ms-appx:///Assets/star_icon.json" />
-                </AnimatedVisualPlayer>
+                </lottie:AnimatedVisualPlayer>
             </StackPanel>
         </Button>
 

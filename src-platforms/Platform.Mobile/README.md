@@ -1,8 +1,9 @@
 # CodeBrix.Platform.Mobile
 
-MVVM primitives for **.NET MAUI** applications — the platform-agnostic CodeBrix
-"Simple" toolkit (`SimpleViewModel`, `SimpleCommand`, dialogs, messaging,
-service resolution and OS info) compiled for MAUI targets.
+Toolkit-style libraries for **.NET MAUI** applications — starting with the
+platform-agnostic CodeBrix "Simple" MVVM toolkit (`SimpleViewModel`,
+`SimpleCommand`, dialogs, messaging, service resolution and OS info) compiled
+for MAUI targets.
 
 These packages are **not** Uno-based and share no code with the Uno-derived
 `CodeBrix.Platform.*` packages. The only shared source is the linked

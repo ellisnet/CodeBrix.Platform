@@ -68,7 +68,7 @@
     <Product>CodeBrix.Platform.Mobile</Product>
     <Title>CodeBrix.Platform.Mobile</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>MVVM primitives -- SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution and OS info -- for .NET MAUI applications. The platform-agnostic CodeBrix "Simple" toolkit, compiled for .NET MAUI.</Description>
+    <Description>CodeBrix Toolkit for use with .NET MAUI applications.</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform</RepositoryUrl>

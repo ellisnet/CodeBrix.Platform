@@ -62,7 +62,7 @@
     <Product>CodeBrix.Platform.WinUI</Product>
     <Title>CodeBrix.Platform.WinUI</Title>
     <Authors>Jeremy Ellis</Authors>
-    <Description>MVVM primitives -- SimpleViewModel, SimpleCommand, dialogs, messaging, service resolution and OS info -- for WinUI (Windows App SDK) applications. The platform-agnostic CodeBrix "Simple" toolkit, compiled for WinUI.</Description>
+    <Description>CodeBrix Toolkit for use with WinUI applications.</Description>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/ellisnet/CodeBrix.Platform</PackageProjectUrl>
     <RepositoryUrl>https://github.com/ellisnet/CodeBrix.Platform</RepositoryUrl>
