@@ -31,7 +31,7 @@ When you use the export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libfreetype.so.6 c
   smoothly.
   
 So, I am having to run the app, for now, with:
-> LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libfreetype.so.6 dotnet run JustBetweenUs.Linux.csproj
+> LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libfreetype.so.6 dotnet run JustBetweenUs.LinuxX11.csproj
 
 More notes about the current bug:
 The community and maintainers are fully aware of the missing DT_NEEDED entries for 

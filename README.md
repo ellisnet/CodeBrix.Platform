@@ -12,7 +12,8 @@ executables.
 ## Supported targets
 
 - **Windows** — Win32 host or WPF host
-- **Linux** — X11 desktop, or framebuffer (for kiosk/embedded devices)
+- **Linux** — X11 desktop, native Wayland desktop, or framebuffer (for
+  kiosk/embedded devices)
 - **macOS** — Apple Silicon and Intel
 
 > Mobile (iOS/Android) and WebAssembly/browser targets are out of scope for this
@@ -42,6 +43,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
 | `CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever` | Windows (WPF) host |
 | `CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever` | Linux (X11) host |
+| `CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever` | Linux (native Wayland) host |
 | `CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever` | Linux framebuffer host |
 | `CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever` | macOS host |
 
@@ -51,7 +53,7 @@ head project references exactly one of the `Runtime.Skia.*` host packages.
 ## Getting started
 
 The fastest way to learn the structure is the canonical reference application,
-**JustBetweenUs**, which ships a complete app across all five platform heads:
+**JustBetweenUs**, which ships a complete app across all six platform heads:
 
 > **https://github.com/ellisnet/JustBetweenUs** — see the `CodeBrixPlatform/`
 > folder (on the `main` branch).
@@ -63,7 +65,7 @@ using CodeBrix.Platform.UI.Hosting;
 
 var host = CodeBrixPlatformHostBuilder.Create()
     .App(() => new App())
-    .UseWindowsWin32()   // or UseWindowsWpf / UseLinuxX11 / UseLinuxFrameBuffer / UseMacOS
+    .UseWindowsWin32()   // or UseWindowsWpf / UseLinuxX11 / UseLinuxWayland / UseLinuxFrameBuffer / UseMacOS
     .Build();
 
 host.Run();

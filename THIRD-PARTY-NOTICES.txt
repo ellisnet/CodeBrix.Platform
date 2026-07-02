@@ -213,10 +213,13 @@ The components in this part are present as source code in this repository
     License:      MIT License / X11 License / HPND-style permissive grants
                   (full X11 text in Part D)
 
-    The Linux Skia heads (src/Platform.UI.Runtime.Skia.X11/ and
-    src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/) contain bindings and
+    The Linux Skia heads (src/Platform.UI.Runtime.Skia.X11/,
+    src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/, and
+    src/Platform.UI.Runtime.Skia.Wayland/) contain bindings and
     helpers derived from the X.Org, xkbcommon, and freedesktop.org projects
-    (Xlib, XInput, xkbcommon, DRM/KMS, evdev). Copyright is held by numerous
+    (Xlib, XInput, xkbcommon, DRM/KMS, evdev; for the Wayland head, hand-bound
+    declarations mirroring the MIT/Expat C APIs of libdecor and
+    libwayland-cursor in src/Platform.UI.Runtime.Skia.Wayland/Native/). Copyright is held by numerous
     upstream authors, including: The Open Group (1985-1998), Silicon Graphics
     Inc. (1993), Frederic Lepied (1996-1997, an "X Consortium / permission to
     use without fee" HPND-style grant), Red Hat, Inc. (2009), Peter Hutterer
@@ -300,14 +303,60 @@ The components in this part are present as source code in this repository
     Project URL:  https://github.com/libsdl-org/SDL
     Source:       src/video/windows/SDL_windowsclipboard.c  (referenced at
                   commit 9f8157f)
+                  src/video/wayland/SDL_waylanddatamanager.c and siblings
+                  (Wayland data-device model)
     Copyright:    Copyright (c) 1997-2024 Sam Lantinga <slouken@libsdl.org>
     License:      zlib License
 
     The Win32 clipboard logic in
     src/Platform.UI.Runtime.Skia.Win32/ApplicationMode/DataTransfer/
     Win32ClipboardExtension.cs is derived from SDL's Windows clipboard
-    implementation. The original zlib notice is preserved verbatim in the file
-    header.
+    implementation.
+
+    The Wayland clipboard logic in
+    src/Platform.UI.Runtime.Skia.Wayland/ApplicationModel/DataTransfer/
+    WaylandClipboardExtension.cs is a fresh implementation over our generated
+    wl_data_device_manager / wl_data_device / wl_data_source / wl_data_offer
+    bindings, following the serial/focus-based data-device model of SDL's
+    Wayland backend (src/video/wayland/SDL_waylanddatamanager.c). Same SDL
+    project and zlib license as the Win32 port above.
+
+    The original zlib notice is preserved verbatim in each derived file's header.
+
+18. NWayland  (Steven Kirk / the AvaloniaUI contributors)
+    Project URL:  https://github.com/AvaloniaUI/NWayland
+    Source:       commit dd37f6d80e6e18ad6c2e868190899b8a808f851d
+    Copyright:    Copyright (c) 2014 Steven Kirk
+    License:      MIT License  (full text in Part D)
+
+    BUILD-TIME ONLY; NOT SHIPPED. A frozen fork of NWayland's protocol bindings
+    GENERATOR lives under tools/WaylandBindingsGenerator/ as a dev-only tool (it
+    is not packed into any NuGet package — the same treatment as Uno.XamlMerge.Task,
+    item 4). Its committed OUTPUT — the C# Wayland protocol proxies in
+    src/Platform.UI.Runtime.Skia.Wayland/Wayland_Bindings/ — plus NWayland's client
+    runtime-support types absorbed into that project's Wayland_Interop/ folder, are
+    covered by this MIT notice; the per-file headers there record the exact upstream
+    source path at the pinned commit. The bindings are generated from the MIT
+    Wayland protocol XML of item 19. No NWayland NuGet package is referenced at
+    build or run time.
+
+19. Wayland protocol definitions  (wayland + wayland-protocols)
+    Project URLs: https://gitlab.freedesktop.org/wayland/wayland
+                  https://gitlab.freedesktop.org/wayland/wayland-protocols
+    Source:       wayland  commit 3e673a438b0a9749e3bdf5cac4befac86333024c
+                  wayland-protocols  commit 02e63e74a807afed95bc25a386173110afef24e3
+    License:      MIT / Expat License  (full text in Part D)
+
+    The MIT-licensed protocol XML (wayland.xml + selected wayland-protocols files)
+    is the spec input the committed Wayland bindings (item 18) are generated from.
+    Pinned copies live under tools/WaylandBindingsGenerator/protocols/ for
+    reproducible regeneration; they are a dev-only input and are not shipped.
+
+    (The libdecor, libwayland-client/-cursor/-egl, libxkbcommon and Mesa EGL/GLES
+    native libraries used by the Wayland runtime host are P/Invoked at run time,
+    never vendored, so per this file's stated scope they are not documented here
+    as in-repo source; the hand-bound declaration files themselves are covered
+    by item 11.)
 
 ================================================================================
  PART C — BUNDLED ASSET FILES

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="README.md" />
+    <File Path="PORTING-NOTES.txt" />
+    <File Path="LICENSE-NWayland.md" />
+  </Folder>
+  <Project Path="src/NWayland.Generator/NWayland.Generator.csproj" />
+  <Project Path="src/GeneratorRunner/GeneratorRunner.csproj" />
+</Solution>

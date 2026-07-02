@@ -95,6 +95,7 @@
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.MacOS\Platform.UI.Runtime.Skia.MacOS.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wayland\Platform.UI.Runtime.Skia.Wayland.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

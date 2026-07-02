@@ -19,8 +19,8 @@ Key facts:
   - Target framework: .NET 10.0 (net10.0). The WPF head uses net10.0-windows.
   - UI API surface: WinUI / Microsoft.UI.Xaml (controls, XAML, x:Bind, etc.).
   - Rendering: Skia (SkiaSharp) on every platform.
-  - Supported desktop targets: Windows (Win32 or WPF host), Linux (X11 or
-    framebuffer), macOS (Apple Silicon and Intel).
+  - Supported desktop targets: Windows (Win32 or WPF host), Linux (X11, native
+    Wayland, or framebuffer), macOS (Apple Silicon and Intel).
   - Out of scope for this fork: mobile (iOS/Android), WebAssembly/browser.
 
 Source repository:        https://github.com/ellisnet/CodeBrix.Platform
@@ -61,7 +61,8 @@ canonical structure; follow it exactly.
        each head project that imports its .projitems file.
 
   3. ONE .<Platform> HEAD PROJECT PER TARGET  (a net10.0 executable, OutputType=Exe)
-     - One per platform you ship: Windows, WpfSkia, Linux, LinuxFrameBuffer, MacOs.
+     - One per platform you ship: Windows, WpfSkia, LinuxX11, LinuxWayland,
+       LinuxFrameBuffer, MacOs.
      - Each head is tiny: it imports the .UI shared project, references the
        .Core project, references EXACTLY ONE platform "head" NuGet package, and
        contains a Program.cs with the startup bootstrap.
@@ -118,7 +119,8 @@ package is versioned to track the SkiaSharp release it vendors).
   CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever      Windows (Win32 host)
   CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever        Windows (WPF host)
   CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever        Linux desktop (X11)
-  CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever Linux framebuffer (no X11; kiosk/embedded)
+  CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever    Linux desktop (native Wayland)
+  CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever Linux framebuffer (no desktop; kiosk/embedded)
   CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever      macOS (Apple Silicon + Intel)
 
   NOTE: A base package, "CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever",
@@ -129,6 +131,14 @@ package is versioned to track the SkiaSharp release it vendors).
   NOTE: On Windows you have two choices. The Win32 head is the simplest and most
   common. The WPF head is for hosting CodeBrix.Platform content inside a WPF
   desktop app context (see the WPF-specific section below).
+
+  NOTE: On desktop Linux you also have two choices. The X11 head is the
+  broad-compatibility option: it runs on X11 desktops AND on Wayland desktops
+  (through XWayland, the X11 compatibility layer). The Wayland head is a pure,
+  native Wayland client: it requires a Wayland compositor and fails fast with a
+  clean error when none is present (it never falls back to X11/XWayland). Ship
+  the X11 head for maximum reach, the Wayland head for a native, forward-looking
+  Wayland experience — or both, as separate heads.
 
 --- MEDIA PLAYER ADD-ON PACKAGES (optional; one per desktop head) ---
 
@@ -145,6 +155,9 @@ package is versioned to track the SkiaSharp release it vendors).
       matching head project, and only if your app plays media. (Design note: the
       LibVLC-specific aspect-ratio math lives in MediaPlayerCore, not in these
       add-ons, so the add-ons' own source stays free of LibVLCSharp-derived code.)
+      There is deliberately NO media add-on for the Wayland head yet: that head
+      is kept permissively licensed (Apache/MIT) top to bottom. If your Linux app
+      needs MediaPlayerElement today, use the X11 head.
 
 --- COMPANION PACKAGES used by the reference app (NOT produced by this repo) ---
 
@@ -354,9 +367,10 @@ and (3) for the WPF head, the target framework. A standard (non-WPF) head:
 
 For the OTHER non-WPF heads, change ONLY the head package line:
 
-    Linux (X11):          CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever
-    Linux (framebuffer):  CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever
-    macOS:                CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever
+    Linux (X11):            CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever
+    Linux (native Wayland): CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever
+    Linux (framebuffer):    CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever
+    macOS:                  CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever
 
 --- THE WPF HEAD IS SPECIAL ---
 
@@ -434,6 +448,7 @@ use whichever you prefer:
   Windows (Win32)         ...Runtime.Skia.Win32...              .UseWindowsWin32()
   Windows (WPF)           ...Runtime.Skia.Wpf...                .UseWindowsWpf()
   Linux (X11)             ...Runtime.Skia.X11...                .UseLinuxX11()
+  Linux (native Wayland)  ...Runtime.Skia.Wayland...            .UseLinuxWayland()
   Linux (framebuffer)     ...Runtime.Skia.FrameBuffer...        .UseLinuxFrameBuffer()
   macOS                   ...Runtime.Skia.MacOS...              .UseMacOS()
 
@@ -668,13 +683,36 @@ macOS:
     runs on both Apple Silicon and Intel Macs.
 
 LINUX (X11):
-  - Standard desktop Linux. Use the X11 head.
+  - The broad-compatibility desktop Linux head: runs on X11 desktops and on
+    Wayland desktops via XWayland.
   - On some Linux ARM64 systems (e.g. Raspberry Pi), the native SkiaSharp library
     may fail to auto-load FreeType, throwing an "undefined symbol" error at
     startup. If you hit this, preload FreeType when launching, e.g.:
         LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libfreetype.so.6 dotnet run ...
     This is a SkiaSharp native-asset packaging issue, not a CodeBrix.Platform
     issue, and is expected to resolve in newer SkiaSharp native packages.
+
+LINUX (native Wayland):
+  - A pure Wayland client: it speaks the Wayland protocol directly and never
+    uses X11/XWayland. It REQUIRES a Wayland compositor; without one it fails
+    fast at startup with a clean "This application requires a Wayland
+    compositor." message and exit code 1 (use the X11 head for X11/XWayland
+    environments).
+  - Permissively licensed (Apache/MIT) top to bottom — no LGPL/GPL components —
+    unlike other .NET native-Wayland offerings.
+  - Window decorations: on KDE/wlroots-family compositors the server draws them;
+    on GNOME/Cinnamon they are drawn client-side via the system's libdecor
+    library. For a native-looking title bar on Debian/Ubuntu-family desktops the
+    libdecor GTK plugin should be present (packages "libdecor-0-0" +
+    "libdecor-0-plugin-1-gtk"; preinstalled on most GNOME desktops).
+  - Rendering is software (shared-memory) by default — universal and proven. A
+    GPU (EGL/GLES) path is opt-in via the environment variable
+    CODEBRIX_WAYLAND_USE_GPU=1; it falls back to software if GL is unavailable.
+  - Not yet implemented in this head (deferred): popup windows for flyout-based
+    controls (ComboBox dropdowns, MenuFlyout, ToolTip), drag-and-drop,
+    fractional (non-integer) display scaling, and IME text input. Text clipboard
+    (copy AND paste) works. Prefer the X11 head if your UI depends heavily on
+    flyout controls today.
 
 LINUX (framebuffer):
   - Use the framebuffer head for embedded/kiosk devices with no X11/desktop
@@ -718,6 +756,11 @@ COMMON PITFALLS TO AVOID
 10. DO NOT call CodeBrixPlatformHostBuilder before App.InitializeLogging(). The
     reference app calls InitializeLogging() first in every head's Main.
 
+11. DO NOT expect the Wayland head to run in an X11-only session — it requires a
+    Wayland compositor and fails fast (by design) when none is present. For an
+    app that must run everywhere on desktop Linux, ship the X11 head (alone, or
+    alongside a Wayland head).
+
 ================================================================================
 
 THE CANONICAL REFERENCE APPLICATION
@@ -737,7 +780,8 @@ Project map (under CodeBrixPlatform/):
                                  App.xaml, App.xaml.cs, Views/MainPage.xaml(.cs).
     JustBetweenUs.Windows/       Windows (Win32) head  -> .UseWindowsWin32()
     JustBetweenUs.WpfSkia/       Windows (WPF) head    -> .UseWindowsWpf() + software render
-    JustBetweenUs.Linux/         Linux (X11) head      -> .UseLinuxX11()
+    JustBetweenUs.LinuxX11/      Linux (X11) head      -> .UseLinuxX11()
+    JustBetweenUs.LinuxWayland/  Linux (native Wayland) head -> .UseLinuxWayland()
     JustBetweenUs.LinuxFrameBuffer/  Linux framebuffer -> .UseLinuxFrameBuffer()
     JustBetweenUs.MacOs/         macOS head            -> .UseMacOS()
 
@@ -862,6 +906,7 @@ Head packages (exactly one per head) and bootstrap call:
     Windows/Win32  ->  CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever       .UseWindowsWin32()
     Windows/WPF    ->  CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever         .UseWindowsWpf()  (+ Software render)
     Linux/X11      ->  CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever         .UseLinuxX11()
+    Linux/Wayland  ->  CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever     .UseLinuxWayland()  (needs a Wayland compositor)
     Linux/FB       ->  CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever .UseLinuxFrameBuffer()
     macOS          ->  CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever       .UseMacOS()
 
