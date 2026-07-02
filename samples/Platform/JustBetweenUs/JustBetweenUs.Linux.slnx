@@ -50,7 +50,7 @@
   </Folder>
   <Project Path="JustBetweenUs.Core/JustBetweenUs.Core.csproj" />
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
-  <Project Path="JustBetweenUs.Linux/JustBetweenUs.Linux.csproj" />
+  <Project Path="JustBetweenUs.LinuxX11/JustBetweenUs.LinuxX11.csproj" />
   <Project Path="JustBetweenUs.LinuxFrameBuffer/JustBetweenUs.LinuxFrameBuffer.csproj" />
   <Project Path="JustBetweenUs.LinuxWayland/JustBetweenUs.LinuxWayland.csproj" />
   <Project Path="JustBetweenUs.UI/JustBetweenUs.UI.shproj" Id="13903639-2fee-43d3-a920-4fb073e6702b" />

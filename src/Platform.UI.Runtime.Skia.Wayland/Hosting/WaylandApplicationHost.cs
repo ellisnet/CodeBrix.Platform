@@ -42,7 +42,7 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 		ApiExtensibility.Register<FolderPicker>(typeof(IFolderPickerExtension), o => new LinuxFilePickerExtension(o));
 		ApiExtensibility.Register<FileSavePicker>(typeof(IFileSavePickerExtension), o => new LinuxFileSaverExtension(o));
 
-		ApiExtensibility.Register(typeof(CodeBrix.Platform.ApplicationModel.DataTransfer.IClipboardExtension), _ => new WaylandClipboardExtension());
+		ApiExtensibility.Register(typeof(CodeBrix.Platform.ApplicationModel.DataTransfer.IClipboardExtension), _ => WaylandClipboardExtension.Instance);
 
 		ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => LinuxSystemThemeHelper.Instance);
 
@@ -94,6 +94,12 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 			Environment.ExitCode = 1;
 			return Task.CompletedTask;
 		}
+
+		// Bind the clipboard's wl_data_device before the first window (and thus the first
+		// keyboard-focus enter) exists: the compositor only delivers selection offers to
+		// data devices present at focus time, so a device bound lazily by the first paste
+		// or copy misses the running focus session and that paste reads empty.
+		_ = WaylandClipboardExtension.Instance;
 
 		_eventLoop.Schedule(StartApp);
 

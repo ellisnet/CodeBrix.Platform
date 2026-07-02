@@ -64,29 +64,41 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 		set
 		{
 			_pointerCursor = value;
-
-			// Prefer cursor-shape-v1 (the compositor themes the cursor for us). Setting a null
-			// CoreCursor to hide the pointer, and a libwayland-cursor theme fallback for older
-			// compositors, are later refinements.
-			var shape = value?.Type switch
-			{
-				CoreCursorType.Arrow => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Default,
-				CoreCursorType.Cross => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Crosshair,
-				CoreCursorType.Hand => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Pointer,
-				CoreCursorType.Help => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Help,
-				CoreCursorType.IBeam => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Text,
-				CoreCursorType.SizeAll => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Move,
-				CoreCursorType.SizeNortheastSouthwest => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NeswResize,
-				CoreCursorType.SizeNorthSouth => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NsResize,
-				CoreCursorType.SizeNorthwestSoutheast => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NwseResize,
-				CoreCursorType.SizeWestEast => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.EwResize,
-				CoreCursorType.UniversalNo => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NotAllowed,
-				CoreCursorType.Wait => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Wait,
-				_ => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Default,
-			};
-
-			_ = _host.Connection?.SeatManager.SetCursorShape(shape);
+			ApplyCursor(value);
 		}
+	}
+
+	/// <summary>
+	/// The cursor is undefined on every wl_pointer.enter: the compositor keeps whatever shape
+	/// was last set (e.g. libdecor's resize arrows on the window edge) until the client sets
+	/// one for the new enter serial. The seat manager calls this on each enter of the content
+	/// surface to re-assert the XAML-selected cursor.
+	/// </summary>
+	internal void ReapplyCursor() => ApplyCursor(_pointerCursor);
+
+	private void ApplyCursor(CoreCursor? value)
+	{
+		// Prefer cursor-shape-v1 (the compositor themes the cursor for us). Setting a null
+		// CoreCursor to hide the pointer, and a libwayland-cursor theme fallback for older
+		// compositors, are later refinements.
+		var shape = value?.Type switch
+		{
+			CoreCursorType.Arrow => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Default,
+			CoreCursorType.Cross => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Crosshair,
+			CoreCursorType.Hand => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Pointer,
+			CoreCursorType.Help => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Help,
+			CoreCursorType.IBeam => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Text,
+			CoreCursorType.SizeAll => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Move,
+			CoreCursorType.SizeNortheastSouthwest => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NeswResize,
+			CoreCursorType.SizeNorthSouth => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NsResize,
+			CoreCursorType.SizeNorthwestSoutheast => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NwseResize,
+			CoreCursorType.SizeWestEast => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.EwResize,
+			CoreCursorType.UniversalNo => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.NotAllowed,
+			CoreCursorType.Wait => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Wait,
+			_ => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Default,
+		};
+
+		_ = _host.Connection?.SeatManager.SetCursorShape(shape);
 	}
 
 	public Point PointerPosition => _pointerPosition;

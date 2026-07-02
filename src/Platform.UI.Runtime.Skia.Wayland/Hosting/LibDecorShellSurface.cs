@@ -29,10 +29,16 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	private readonly LibDecor.FrameConfigureDelegate _configureDelegate;
 	private readonly LibDecor.FrameCloseDelegate _closeDelegate;
 	private readonly LibDecor.FrameCommitDelegate _commitDelegate;
-	private LibDecor.libdecor_frame_interface _frameInterface;
+	// Unmanaged copy of the libdecor_frame_interface: libdecor retains the pointer and calls
+	// through it for the frame's lifetime, so it cannot point at (movable) managed memory.
+	private IntPtr _frameInterfacePtr;
 
 	private int _currentWidth;
 	private int _currentHeight;
+
+	// libdecor's GTK plugin is single-threaded; every libdecor call must hold this gate
+	// (shared with the connection's event pump — see WaylandConnection.LibDecorGate).
+	private object Gate => _connection.LibDecorGate;
 
 	public event Action<int, int, bool>? Configured;
 	public event Action? CloseRequested;
@@ -62,18 +68,25 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		_configureDelegate = OnConfigure;
 		_closeDelegate = OnClose;
 		_commitDelegate = OnCommit;
-		_frameInterface = new LibDecor.libdecor_frame_interface
+		var frameInterface = new LibDecor.libdecor_frame_interface
 		{
 			configure = Marshal.GetFunctionPointerForDelegate(_configureDelegate),
 			close = Marshal.GetFunctionPointerForDelegate(_closeDelegate),
 			commit = Marshal.GetFunctionPointerForDelegate(_commitDelegate),
 		};
+		_frameInterfacePtr = Marshal.AllocHGlobal(Marshal.SizeOf<LibDecor.libdecor_frame_interface>());
+		Marshal.StructureToPtr(frameInterface, _frameInterfacePtr, false);
 
 		_selfHandle = GCHandle.Alloc(this, GCHandleType.Normal);
-		_frame = LibDecor.libdecor_decorate(libdecorContext, _surface.Handle, ref _frameInterface, GCHandle.ToIntPtr(_selfHandle));
+		lock (Gate)
+		{
+			_frame = LibDecor.libdecor_decorate(libdecorContext, _surface.Handle, _frameInterfacePtr, GCHandle.ToIntPtr(_selfHandle));
+		}
 		if (_frame == IntPtr.Zero)
 		{
 			_selfHandle.Free();
+			Marshal.FreeHGlobal(_frameInterfacePtr);
+			_frameInterfacePtr = IntPtr.Zero;
 			throw new InvalidOperationException("libdecor_decorate returned NULL.");
 		}
 	}
@@ -94,9 +107,13 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		_currentHeight = height;
 
 		// Acknowledge the configure by committing a state of the chosen content size.
-		var state = LibDecor.libdecor_state_new(width, height);
-		LibDecor.libdecor_frame_commit(frame, state, configuration);
-		LibDecor.libdecor_state_free(state);
+		// (Invoked from a dispatch that already holds the gate; the lock is reentrant.)
+		lock (Gate)
+		{
+			var state = LibDecor.libdecor_state_new(width, height);
+			LibDecor.libdecor_frame_commit(frame, state, configuration);
+			LibDecor.libdecor_state_free(state);
+		}
 
 		var activated = LibDecor.libdecor_configuration_get_window_state(configuration, out var windowState)
 			&& (windowState & LibDecor.libdecor_window_state.LIBDECOR_WINDOW_STATE_ACTIVE) != 0;
@@ -117,7 +134,10 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	{
 		if (_frame != IntPtr.Zero)
 		{
-			LibDecor.libdecor_frame_set_title(_frame, title);
+			lock (Gate)
+			{
+				LibDecor.libdecor_frame_set_title(_frame, title);
+			}
 		}
 	}
 
@@ -125,7 +145,10 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	{
 		if (_frame != IntPtr.Zero)
 		{
-			LibDecor.libdecor_frame_set_app_id(_frame, appId);
+			lock (Gate)
+			{
+				LibDecor.libdecor_frame_set_app_id(_frame, appId);
+			}
 		}
 	}
 
@@ -135,13 +158,16 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		{
 			return;
 		}
-		if (maximized)
+		lock (Gate)
 		{
-			LibDecor.libdecor_frame_set_maximized(_frame);
-		}
-		else
-		{
-			LibDecor.libdecor_frame_unset_maximized(_frame);
+			if (maximized)
+			{
+				LibDecor.libdecor_frame_set_maximized(_frame);
+			}
+			else
+			{
+				LibDecor.libdecor_frame_unset_maximized(_frame);
+			}
 		}
 	}
 
@@ -149,7 +175,10 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	{
 		if (_frame != IntPtr.Zero)
 		{
-			LibDecor.libdecor_frame_set_minimized(_frame);
+			lock (Gate)
+			{
+				LibDecor.libdecor_frame_set_minimized(_frame);
+			}
 		}
 	}
 
@@ -159,13 +188,16 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		{
 			return;
 		}
-		if (fullscreen)
+		lock (Gate)
 		{
-			LibDecor.libdecor_frame_set_fullscreen(_frame, IntPtr.Zero);
-		}
-		else
-		{
-			LibDecor.libdecor_frame_unset_fullscreen(_frame);
+			if (fullscreen)
+			{
+				LibDecor.libdecor_frame_set_fullscreen(_frame, IntPtr.Zero);
+			}
+			else
+			{
+				LibDecor.libdecor_frame_unset_fullscreen(_frame);
+			}
 		}
 	}
 
@@ -181,7 +213,10 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 
 	public void MapInitial()
 	{
-		LibDecor.libdecor_frame_map(_frame);
+		lock (Gate)
+		{
+			LibDecor.libdecor_frame_map(_frame);
+		}
 		_connection.Flush();
 	}
 
@@ -189,12 +224,22 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	{
 		if (_frame != IntPtr.Zero)
 		{
-			LibDecor.libdecor_frame_unref(_frame);
+			lock (Gate)
+			{
+				LibDecor.libdecor_frame_unref(_frame);
+			}
 			_frame = IntPtr.Zero;
 		}
 
 		_surface.Destroy();
 		_connection.Flush();
+
+		// Only after the frame is gone: libdecor calls through this memory until unref.
+		if (_frameInterfacePtr != IntPtr.Zero)
+		{
+			Marshal.FreeHGlobal(_frameInterfacePtr);
+			_frameInterfacePtr = IntPtr.Zero;
+		}
 
 		if (_selfHandle.IsAllocated)
 		{

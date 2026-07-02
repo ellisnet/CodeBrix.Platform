@@ -75,8 +75,21 @@ internal sealed class WaylandConnection : IDisposable
 	// libdecor negotiates SSD vs CSD internally, giving decorated windows on GNOME too.
 	private IntPtr _libdecorContext;
 	private LibDecor.LibDecorErrorDelegate? _libdecorErrorDelegate;
-	private LibDecor.libdecor_interface _libdecorInterface;
+	// Unmanaged copy of the libdecor_interface: libdecor retains the pointer and calls
+	// through it for the context's lifetime, so it cannot point at (movable) managed memory.
+	private IntPtr _libdecorInterfacePtr;
 	private readonly object _libdecorGate = new();
+
+	/// <summary>
+	/// Serializes every entry into libdecor. Its GTK decoration plugin is single-threaded
+	/// (concurrent entry segfaults inside GTK widget layout), and libdecor is entered from
+	/// two threads here: the event pump (dispatch -> configure/commit callbacks ->
+	/// libdecor_frame_commit) and the UI thread (decorate, map, set_title, ...). Every
+	/// libdecor call — including the pump's dispatch, whose listeners run libdecor-gtk
+	/// code — must hold this gate. The gate is reentrant (Monitor), so frame callbacks
+	/// invoked from a dispatch that already holds it may take it again freely.
+	/// </summary>
+	internal object LibDecorGate => _libdecorGate;
 
 	/// <summary>
 	/// Returns the shared libdecor context, creating it on first use, or IntPtr.Zero when
@@ -97,11 +110,14 @@ internal sealed class WaylandConnection : IDisposable
 			}
 
 			_libdecorErrorDelegate = OnLibDecorError;
-			_libdecorInterface = new LibDecor.libdecor_interface
+			var iface = new LibDecor.libdecor_interface
 			{
 				error = System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(_libdecorErrorDelegate),
 			};
-			_libdecorContext = LibDecor.libdecor_new(Display.Handle, ref _libdecorInterface);
+			_libdecorInterfacePtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(
+				System.Runtime.InteropServices.Marshal.SizeOf<LibDecor.libdecor_interface>());
+			System.Runtime.InteropServices.Marshal.StructureToPtr(iface, _libdecorInterfacePtr, false);
+			_libdecorContext = LibDecor.libdecor_new(Display.Handle, _libdecorInterfacePtr);
 			return _libdecorContext;
 		}
 	}
@@ -281,13 +297,19 @@ internal sealed class WaylandConnection : IDisposable
 				// lock (so other threads can marshal requests + flush freely), then read
 				// and dispatch. Display.Dispose() shuts the socket down, which wakes the
 				// poll with POLLHUP and lets the pump exit.
-				_ = Display.DispatchPending();
-
-				// libdecor shares our wl_display; give it a chance to process its own state
-				// (it added globals/listeners on the same connection). Non-blocking.
-				if (_libdecorContext != IntPtr.Zero)
+				// Dispatch under the libdecor gate: libdecor registers its own listeners on
+				// this display, so DispatchPending (not just libdecor_dispatch) can run
+				// libdecor-gtk code. See LibDecorGate.
+				lock (_libdecorGate)
 				{
-					_ = LibDecor.libdecor_dispatch(_libdecorContext, 0);
+					_ = Display.DispatchPending();
+
+					// libdecor shares our wl_display; give it a chance to process its own state
+					// (it added globals/listeners on the same connection). Non-blocking.
+					if (_libdecorContext != IntPtr.Zero)
+					{
+						_ = LibDecor.libdecor_dispatch(_libdecorContext, 0);
+					}
 				}
 
 				if (Display.PrepareRead() != 0)
@@ -368,10 +390,18 @@ internal sealed class WaylandConnection : IDisposable
 			_instance = null;
 		}
 
-		if (_libdecorContext != IntPtr.Zero)
+		lock (_libdecorGate)
 		{
-			LibDecor.libdecor_unref(_libdecorContext);
-			_libdecorContext = IntPtr.Zero;
+			if (_libdecorContext != IntPtr.Zero)
+			{
+				LibDecor.libdecor_unref(_libdecorContext);
+				_libdecorContext = IntPtr.Zero;
+			}
+			if (_libdecorInterfacePtr != IntPtr.Zero)
+			{
+				System.Runtime.InteropServices.Marshal.FreeHGlobal(_libdecorInterfacePtr);
+				_libdecorInterfacePtr = IntPtr.Zero;
+			}
 		}
 
 		Display.Dispose(); // shuts down the socket, waking the pump

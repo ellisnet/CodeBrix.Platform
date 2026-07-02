@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
 using Windows.Foundation;
@@ -31,6 +32,14 @@ internal sealed class WaylandSeatManager
 	private Point _pointerPosition;
 	private uint _lastPointerEnterSerial;
 	private uint _lastInputSerial;
+
+	// Cursor-theme fallback state, used when the compositor does not advertise
+	// cursor-shape-v1 (notably Muffin/Cinnamon; GNOME and KDE do advertise it).
+	private readonly object _cursorGate = new();
+	private IntPtr _cursorTheme;
+	private bool _cursorThemeLoadAttempted;
+	private WlSurface? _cursorSurface;
+	private readonly Dictionary<string, (WlBuffer Buffer, int Width, int Height, int HotspotX, int HotspotY)> _cursorCache = new();
 
 	// Keyboard state (event-pump thread).
 	private WaylandXamlRootHost? _keyboardFocusHost;
@@ -143,19 +152,110 @@ internal sealed class WaylandSeatManager
 	}
 
 	/// <summary>
-	/// Sets the pointer cursor via cursor-shape-v1 when advertised. Returns false when the
-	/// protocol is unavailable (the caller may then fall back to a libwayland-cursor theme,
-	/// which is a later effort). Uses the last pointer-enter serial, as the protocol requires.
+	/// Sets the pointer cursor: via cursor-shape-v1 when the compositor advertises it (the
+	/// compositor themes the cursor for us), else by attaching the matching XCursor-theme
+	/// image from libwayland-cursor to a cursor surface. Uses the last pointer-enter serial,
+	/// as both paths require.
 	/// </summary>
 	internal bool SetCursorShape(WpCursorShapeDeviceV1.ShapeEnum shape)
 	{
-		if (_cursorShapeDevice is not { } device)
+		if (_cursorShapeDevice is { } device)
+		{
+			device.SetShape(_lastPointerEnterSerial, shape);
+			_connection.Flush();
+			return true;
+		}
+
+		return SetThemedCursor(shape);
+	}
+
+	private bool SetThemedCursor(WpCursorShapeDeviceV1.ShapeEnum shape)
+	{
+		if (_pointer is not { } pointer)
 		{
 			return false;
 		}
-		device.SetShape(_lastPointerEnterSerial, shape);
-		_connection.Flush();
-		return true;
+
+		lock (_cursorGate)
+		{
+			if (!EnsureCursorTheme() || ResolveThemedCursor(shape) is not { } cursor)
+			{
+				return false;
+			}
+
+			_cursorSurface ??= _connection.Compositor.CreateSurface();
+			_cursorSurface.Attach(cursor.Buffer, 0, 0);
+			_cursorSurface.Damage(0, 0, cursor.Width, cursor.Height);
+			_cursorSurface.Commit();
+			pointer.SetCursor(_lastPointerEnterSerial, _cursorSurface, cursor.HotspotX, cursor.HotspotY);
+			_connection.Flush();
+			return true;
+		}
+	}
+
+	// Must hold _cursorGate.
+	private bool EnsureCursorTheme()
+	{
+		if (_cursorTheme != IntPtr.Zero)
+		{
+			return true;
+		}
+		if (_cursorThemeLoadAttempted)
+		{
+			return false;
+		}
+		_cursorThemeLoadAttempted = true;
+
+		var themeName = Environment.GetEnvironmentVariable("XCURSOR_THEME");
+		var size = int.TryParse(Environment.GetEnvironmentVariable("XCURSOR_SIZE"), out var parsed) && parsed > 0
+			? parsed
+			: 24;
+		_cursorTheme = LibWaylandCursor.wl_cursor_theme_load(
+			string.IsNullOrEmpty(themeName) ? null : themeName, size, _connection.Shm.Handle);
+
+		if (_cursorTheme == IntPtr.Zero && this.Log().IsEnabled(LogLevel.Warning))
+		{
+			this.Log().Warn("No cursor-shape-v1 protocol and no loadable XCursor theme; the pointer cursor cannot be set.");
+		}
+		return _cursorTheme != IntPtr.Zero;
+	}
+
+	// Must hold _cursorGate.
+	private (WlBuffer Buffer, int Width, int Height, int HotspotX, int HotspotY)? ResolveThemedCursor(WpCursorShapeDeviceV1.ShapeEnum shape)
+	{
+		// The cursor-spec name first, then the legacy XCursor alias older themes still use.
+		var (name, legacyName) = shape switch
+		{
+			WpCursorShapeDeviceV1.ShapeEnum.Crosshair => ("crosshair", "cross"),
+			WpCursorShapeDeviceV1.ShapeEnum.Pointer => ("pointer", "hand2"),
+			WpCursorShapeDeviceV1.ShapeEnum.Help => ("help", "question_arrow"),
+			WpCursorShapeDeviceV1.ShapeEnum.Text => ("text", "xterm"),
+			WpCursorShapeDeviceV1.ShapeEnum.Move => ("move", "fleur"),
+			WpCursorShapeDeviceV1.ShapeEnum.NeswResize => ("nesw-resize", "fd_double_arrow"),
+			WpCursorShapeDeviceV1.ShapeEnum.NsResize => ("ns-resize", "sb_v_double_arrow"),
+			WpCursorShapeDeviceV1.ShapeEnum.NwseResize => ("nwse-resize", "bd_double_arrow"),
+			WpCursorShapeDeviceV1.ShapeEnum.EwResize => ("ew-resize", "sb_h_double_arrow"),
+			WpCursorShapeDeviceV1.ShapeEnum.NotAllowed => ("not-allowed", "crossed_circle"),
+			WpCursorShapeDeviceV1.ShapeEnum.Wait => ("wait", "watch"),
+			_ => ("default", "left_ptr"),
+		};
+
+		if (_cursorCache.TryGetValue(name, out var cached))
+		{
+			return cached;
+		}
+
+		if (!LibWaylandCursor.TryGetCursorImage(_cursorTheme, name, out var raw, out var width, out var height, out var hotspotX, out var hotspotY)
+			&& !LibWaylandCursor.TryGetCursorImage(_cursorTheme, legacyName, out raw, out width, out height, out hotspotX, out hotspotY))
+		{
+			return null;
+		}
+
+		// The wl_buffer belongs to the theme; import it borrowed so we never destroy it.
+		var buffer = WlBuffer.Import(_connection.Display, null, raw, ownsHandle: false, listener: null);
+		var entry = (buffer, width, height, hotspotX, hotspotY);
+		_cursorCache[name] = entry;
+		return entry;
 	}
 
 	internal Point PointerPosition => _pointerPosition;
@@ -170,6 +270,12 @@ internal sealed class WaylandSeatManager
 		_lastInputSerial = serial;
 		_pointerPosition = new Point(x, y);
 		_pointerFocusHost = WaylandXamlRootHost.GetHostFromSurface(surface);
+
+		// The cursor shape is undefined on enter — without a set the compositor keeps the
+		// previous one (e.g. libdecor's resize arrow from the window edge). Re-assert the
+		// window's cursor against this enter's serial before delivering the event.
+		_pointerFocusHost?.PointerSource?.ReapplyCursor();
+
 		_pointerFocusHost?.PointerSource?.ProcessEnter(_pointerPosition, CurrentModifiers);
 	}
 

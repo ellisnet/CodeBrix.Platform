@@ -32,7 +32,7 @@
 
   <!--
     Platform-specific runtime: the NATIVE WAYLAND Skia backend for Linux desktops (requires a
-    Wayland compositor; it never falls back to X11/XWayland — that is what JustBetweenUs.Linux,
+    Wayland compositor; it never falls back to X11/XWayland — that is what JustBetweenUs.LinuxX11,
     the X11 head, is for). All other platform references come transitively via JustBetweenUs.Core.
   -->
   <ItemGroup>

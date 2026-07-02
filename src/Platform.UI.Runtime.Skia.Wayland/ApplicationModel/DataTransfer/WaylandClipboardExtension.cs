@@ -49,12 +49,34 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 
 	private static readonly string[] OfferedTextMimes = { MimeTextPlainUtf8, MimeUtf8String, MimeTextPlain, MimeText };
 
+	/// <summary>The process-wide instance (also handed out by the ApiExtensibility factory).</summary>
+	/// <remarks>
+	/// The application host touches this right after the Wayland connection is established:
+	/// the compositor only delivers selection offers to data devices that already exist when
+	/// keyboard focus enters (or when the selection changes while focused), so the device must
+	/// be bound before the first window — a device bound lazily by the first paste has never
+	/// received an offer, and that paste would come back empty.
+	/// </remarks>
+	internal static WaylandClipboardExtension Instance { get; } = new();
+
+	private WaylandClipboardExtension()
+	{
+		_ = Connection; // bind the data device eagerly (no-op when no compositor is present)
+	}
+
 	private readonly object _gate = new();
+
+	// Signals the first wl_data_device.selection event (even a nil one) ever received.
+	private readonly ManualResetEventSlim _selectionReceived = new(false);
 	private WaylandConnection? _connection;
 	private WlDataDevice? _dataDevice;
 
 	// The offer currently held by the compositor's selection (from wl_data_device.selection).
 	private WlDataOffer? _currentOffer;
+
+	// The offer most recently introduced by wl_data_device.data_offer; it becomes the
+	// selection (or a drag-and-drop offer, unhandled here) in a follow-up event.
+	private WlDataOffer? _pendingOffer;
 
 	// The text we are currently the selection owner of (streamed on wl_data_source.send).
 	private string? _ownedText;
@@ -104,8 +126,24 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 
 		_dataDevice = manager.GetDataDevice(seat, new WlDataDevice.Listener.Relay
 		{
+			// The new-id MUST be consumed: otherwise the interop destroys the offer proxy
+			// as it goes out of scope, and the selection event that follows resolves its
+			// (now dead) offer argument to null — paste would never see any content.
+			OnDataOffer = (_, id) => OnDataOffer(id.GetAndConsume()),
 			OnSelection = (_, offer) => OnSelection(offer),
 		});
+		connection.Flush();
+	}
+
+	// Event-pump thread.
+	private void OnDataOffer(WlDataOffer offer)
+	{
+		lock (_gate)
+		{
+			// A newly introduced offer supersedes a pending one that never became the selection.
+			_pendingOffer?.Destroy();
+			_pendingOffer = offer;
+		}
 	}
 
 	// Event-pump thread.
@@ -113,8 +151,20 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 	{
 		lock (_gate)
 		{
+			if (_pendingOffer != null && !ReferenceEquals(_pendingOffer, offer))
+			{
+				_pendingOffer.Destroy();
+			}
+			_pendingOffer = null;
+
+			// Per protocol, the previous selection offer must be destroyed on this event.
+			if (_currentOffer != null && !ReferenceEquals(_currentOffer, offer))
+			{
+				_currentOffer.Destroy();
+			}
 			_currentOffer = offer;
 		}
+		_selectionReceived.Set();
 		ContentChanged?.Invoke(this, new object());
 	}
 
@@ -239,20 +289,30 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 	{
 		var package = new DataPackage();
 
-		WlDataOffer? offer;
-		WaylandConnection? connection;
-		lock (_gate)
+		// Goes through the property so a paste-first process still wires the data device.
+		if (Connection is { } connection)
 		{
-			offer = _currentOffer;
-			connection = _connection;
-		}
-
-		if (offer != null && connection != null)
-		{
-			var text = ReceiveText(offer, connection);
-			if (text != null)
+			// Selection offers arrive asynchronously on the event pump; when none has ever
+			// been delivered yet (device bound moments ago), give the first paste a bounded
+			// window instead of reading a guaranteed-empty state.
+			if (!_selectionReceived.IsSet)
 			{
-				package.SetText(text);
+				_ = _selectionReceived.Wait(TimeSpan.FromMilliseconds(150));
+			}
+
+			WlDataOffer? offer;
+			lock (_gate)
+			{
+				offer = _currentOffer;
+			}
+
+			if (offer != null)
+			{
+				var text = ReceiveText(offer, connection);
+				if (text != null)
+				{
+					package.SetText(text);
+				}
 			}
 		}
 

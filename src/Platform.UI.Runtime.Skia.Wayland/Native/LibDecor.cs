@@ -93,8 +93,11 @@ internal static partial class LibDecor
 		public IntPtr reserved8;
 	}
 
+	// The iface pointers are RETAINED by libdecor and called through for the object's whole
+	// lifetime (like wl_listener), so they must point at unmanaged memory that outlives the
+	// context/frame — never at a managed struct pinned only for the call.
 	[LibraryImport(LibName)]
-	internal static partial IntPtr libdecor_new(IntPtr display, ref libdecor_interface iface);
+	internal static partial IntPtr libdecor_new(IntPtr display, IntPtr iface);
 
 	[LibraryImport(LibName)]
 	internal static partial void libdecor_unref(IntPtr context);
@@ -106,7 +109,7 @@ internal static partial class LibDecor
 	internal static partial int libdecor_dispatch(IntPtr context, int timeout);
 
 	[LibraryImport(LibName)]
-	internal static partial IntPtr libdecor_decorate(IntPtr context, IntPtr surface, ref libdecor_frame_interface iface, IntPtr userData);
+	internal static partial IntPtr libdecor_decorate(IntPtr context, IntPtr surface, IntPtr iface, IntPtr userData);
 
 	[LibraryImport(LibName)]
 	internal static partial void libdecor_frame_unref(IntPtr frame);

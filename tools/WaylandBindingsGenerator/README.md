@@ -19,5 +19,5 @@ then review and commit the diff under `Wayland_Bindings/`.
 
 See `PORTING-NOTES.txt` for upstream commit SHAs, the fork patch list, and how
 to add or upgrade a protocol; `LICENSE-NWayland.md` holds the upstream MIT
-license text. Provenance and the licensing guard-rail for the whole Wayland
-head effort live in `THIRD-PARTY-NOTICES_wayland_addendum.txt` at the repo root.
+license text. Provenance and licensing for the whole Wayland head effort are
+documented in `THIRD-PARTY-NOTICES.txt` at the repo root (items 11, 17, 18, 19).

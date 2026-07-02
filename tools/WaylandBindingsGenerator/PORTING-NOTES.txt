@@ -6,8 +6,8 @@ WHAT THIS IS
 A frozen, CodeBrix-owned fork of the NWayland .NET Wayland bindings GENERATOR,
 vendored one-and-done per the plan in
 ~/ClaudeHome/REPORT_codebrix_native_wayland_head_feasibility_2026-07-01.txt
-(decision 2.(1)) and the allow-list in THIRD-PARTY-NOTICES_wayland_addendum.txt
-(Part B1). This is a DEV-ONLY tool: it is never packed into any NuGet. Its
+(decision 2.(1)); licensing/provenance now documented in THIRD-PARTY-NOTICES.txt
+(item 18 — the dev-time allow-list addendum was merged there and removed). This is a DEV-ONLY tool: it is never packed into any NuGet. Its
 output (the committed C# bindings in
 src/Platform.UI.Runtime.Skia.Wayland/Wayland_Bindings/) and the absorbed
 client-support types (Wayland_Interop/ in the same project) ARE shipped.
