@@ -1,0 +1,40 @@
+<Page x:Class="FileFolderDialogDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:FileFolderDialogDemo.Views"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="File/Folder Dialog Demo" FontSize="24" Margin="0,0,0,16" />
+
+        <StackPanel x:Name="ButtonsPanel" Grid.Row="1" Spacing="10" MaxWidth="420"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+
+            <Button Content="Select File (any type)" HorizontalAlignment="Stretch"
+                    Height="40" Click="SelectFileButton_Click" />
+
+            <Button Content="Select File (.txt / .md only)" HorizontalAlignment="Stretch"
+                    Height="40" Click="SelectFilteredFileButton_Click" />
+
+            <Button Content="Select Multiple Files" HorizontalAlignment="Stretch"
+                    Height="40" Click="SelectMultipleFilesButton_Click" />
+
+            <Button Content="Save File (writes a small .txt file)" HorizontalAlignment="Stretch"
+                    Height="40" Click="SaveFileButton_Click" />
+
+            <Button Content="Select Folder" HorizontalAlignment="Stretch"
+                    Height="40" Click="SelectFolderButton_Click" />
+
+        </StackPanel>
+
+        <TextBlock x:Name="StatusText" Grid.Row="2" Text="Ready" TextWrapping="Wrap" />
+
+    </Grid>
+</Page>

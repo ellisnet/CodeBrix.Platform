@@ -18,6 +18,7 @@ internal class Program
 		"protocols/wayland-protocols/tablet-v2.xml", // dependency of cursor-shape-v1
 		"protocols/wayland-protocols/text-input-unstable-v3.xml",
 		"protocols/wayland-protocols/primary-selection-unstable-v1.xml",
+		"protocols/wayland-protocols/xdg-foreign-unstable-v2.xml",
 	};
 
 	// Namespace the generated protocol classes live in; each protocol gets a

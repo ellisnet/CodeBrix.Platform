@@ -103,6 +103,13 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 	public static WaylandXamlRootHost? GetHostFromWindow(Window window)
 		=> _windowToHost.TryGetValue(window, out var host) ? host : null;
 
+	// Same indirection as the X11 head's X11Helper.XamlRootHostFromApplicationView.
+	public static WaylandXamlRootHost? GetHostFromApplicationView(ApplicationView view)
+		=> Microsoft.UI.Windowing.AppWindow.GetFromWindowId(view.WindowId) is { } appWindow &&
+			Window.GetFromAppWindow(appWindow) is { } window
+				? GetHostFromWindow(window)
+				: null;
+
 	public Task Closed { get; }
 
 	public bool IsClosed => _closed.Task.IsCompleted;

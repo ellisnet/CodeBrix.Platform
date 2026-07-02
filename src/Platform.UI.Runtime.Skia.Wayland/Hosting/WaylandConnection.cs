@@ -8,6 +8,7 @@ using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Viewporter;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.CursorShapeV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgDecorationUnstableV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgForeignUnstableV2;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgShell;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
@@ -136,6 +137,13 @@ internal sealed class WaylandConnection : IDisposable
 	public WlDataDeviceManager? DataDeviceManager { get; }
 	public WpCursorShapeManagerV1? CursorShapeManager { get; }
 
+	/// <summary>
+	/// xdg-foreign-unstable-v2 exporter, used to hand a toplevel surface handle to another
+	/// process (e.g. the FileChooser portal's parent_window). Null when the compositor does
+	/// not advertise it; callers fall back to whatever unparented behavior they have.
+	/// </summary>
+	public ZxdgExporterV2? Exporter { get; }
+
 	internal sealed class OutputInfo
 	{
 		public WlOutput? Output;
@@ -215,6 +223,7 @@ internal sealed class WaylandConnection : IDisposable
 		FractionalScaleManager = Bind<WpFractionalScaleManagerV1>(_registry, "wp_fractional_scale_manager_v1");
 		DataDeviceManager = Bind<WlDataDeviceManager>(_registry, "wl_data_device_manager");
 		CursorShapeManager = Bind<WpCursorShapeManagerV1>(_registry, "wp_cursor_shape_manager_v1");
+		Exporter = Bind<ZxdgExporterV2>(_registry, "zxdg_exporter_v2");
 
 		// Second roundtrip: let the bound globals deliver their initial state
 		// (wl_shm formats, wl_output geometry/mode/scale, wl_seat capabilities).

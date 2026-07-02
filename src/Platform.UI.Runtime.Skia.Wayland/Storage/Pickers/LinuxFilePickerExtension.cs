@@ -95,9 +95,17 @@ internal class LinuxFilePickerExtension(IFilePicker picker) : IFileOpenPickerExt
 				return ImmutableList<string>.Empty;
 			}
 
-			// Parenting the portal dialog to our window would need an xdg-foreign exported
-			// handle ("wayland:HANDLE"); that protocol is not wired yet, so the dialog opens
-			// unparented (empty parent_window), which the portal accepts.
+			// Parent the portal dialog to our window: export the toplevel through
+			// xdg-foreign-unstable-v2 and pass its handle as "wayland:HANDLE". Falls back to
+			// an unparented dialog (empty parent_window, which the portal accepts) when the
+			// compositor lacks zxdg_exporter_v2 or the handle cannot be obtained. The export
+			// stays alive (via `using`) until this method returns — destroying it earlier
+			// would invalidate the handle while the dialog is up.
+			using var toplevelExport =
+				WaylandXamlRootHost.GetHostFromApplicationView(ApplicationView.GetForCurrentViewSafe()) is { } host
+					? await WaylandToplevelExport.TryExportAsync(host, TimeSpan.FromSeconds(1))
+					: null;
+			var parentWindow = toplevelExport is null ? string.Empty : "wayland:" + toplevelExport.Handle;
 
 			var handleToken = "CodeBrixFileChooser" + Random.Shared.NextInt64();
 			var requestPath = $"{ResultObjectPathPrefix}/{connection.UniqueName![1..].Replace(".", "_")}/{handleToken}";
@@ -129,7 +137,7 @@ internal class LinuxFilePickerExtension(IFilePicker picker) : IFileOpenPickerExt
 			}
 
 			var actualRequestPath = await chooser.OpenFileAsync(
-				parentWindow: string.Empty,
+				parentWindow: parentWindow,
 				title: (multiple, directory) switch
 				{
 					(true, true) => ResourceAccessor.GetLocalizedStringResource("FILE_PICKER_TITLE_DIRECTORY_MULTIPLE"),
