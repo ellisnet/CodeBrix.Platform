@@ -71,6 +71,7 @@
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.Win32/Platform.UI.MediaPlayer.Skia.Win32.csproj" />
+    <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia/Platform.UI.MediaPlayer.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.X11/Platform.UI.MediaPlayer.Skia.X11.csproj" />
     <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Skia.csproj" />

@@ -101,6 +101,13 @@
 		     family release. (The legacy Platform.UI.WebView.Skia.X11 AddIn is deliberately NOT
 		     listed - it is unsupported, slated for deletion, and must never be published.) -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia.Linux\Platform.UI.WebView.Skia.Linux.csproj" />
+
+		<!-- The MediaPlayer AddIn (CodeBrix.Platform.MediaPlayer.LgplLicenseForever) ships with every
+		     family release: one windowing-agnostic vmem package for the Win32, WPF, X11, Wayland, and
+		     FrameBuffer heads (macOS uses its built-in AVFoundation support). (The legacy
+		     Platform.UI.MediaPlayer.Skia.X11 / .Win32 AddIns are deliberately NOT listed - they use
+		     native child-window embedding, are superseded by this AddIn, and must never be published.) -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.MediaPlayer.Skia\Platform.UI.MediaPlayer.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

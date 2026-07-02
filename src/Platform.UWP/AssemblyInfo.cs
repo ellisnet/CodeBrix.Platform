@@ -16,6 +16,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.GooglePlay")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Svg")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Foldable")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.X11")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.Win32")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.WebAssembly")]

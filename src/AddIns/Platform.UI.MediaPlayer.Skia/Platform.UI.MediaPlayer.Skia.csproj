@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.MediaPlayer.Skia</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.MediaPlayer.Skia</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the WebView AddIn's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.MediaPlayer.LgplLicenseForever</PackageId>
+		<Description>This package provides MediaPlayerElement support for CodeBrix.Platform Skia apps on five heads: Windows (Win32 and Skia-on-WPF) and Linux (X11, Wayland, and FrameBuffer). Video is decoded by LibVLC into memory and composited directly into the Skia scene, so no native child windows (and no XWayland) are involved. Reference it once, in your app's .Core project: every head gets it, the Windows and Linux heads activate it, and it is inert on the macOS head (which has built-in AVFoundation media support). The native libvlc runtime is required at runtime: on Linux install it via the system package manager (sudo apt install libvlc5 vlc-plugin-base); on Windows add the VideoLAN.LibVLC.Windows package to your Windows head project(s). This package (and its CodeBrix.Platform.MediaPlayerCore dependency) is LGPL-2.1-or-later licensed.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" Version="3.0.183.1173" />
+		<PackageReference Include="SkiaSharp" />
+
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
+		     same family version as this build (the whole family ships together). Extensions.Logging is
+		     PrivateAssets="all" because it has no standalone nuget - its assembly ships inside the main
+		     framework package. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+		<EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\libvlc_init_sample.mp4" />
+	</ItemGroup>
+</Project>

@@ -140,30 +140,42 @@ package is versioned to track the SkiaSharp release it vendors).
   the X11 head for maximum reach, the Wayland head for a native, forward-looking
   Wayland experience — or both, as separate heads.
 
---- MEDIA PLAYER ADD-ON PACKAGES (optional; one per desktop head) ---
+--- MEDIA PLAYER ADD-ON PACKAGE (optional; ONE package covers five heads) ---
 
-  STATUS: IN PROGRESS - NOT YET PUBLISHED. These two add-on packages are
-  untested/incomplete and have NOT been published to nuget.org (they are also
-  not packed by the central build driver - they only self-pack into their own
-  bin folders). Do not reference them, and do not publish their nupkgs, until
-  they are finished and deliberately added to the release pipeline.
-
-  CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever    Linux desktop (X11)
-  CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32.LgplLicenseForever  Windows (Win32 host)
-      Adds MediaPlayerElement (audio / video playback) to the matching desktop
-      head. These are the ONLY CodeBrix.Platform packages that are NOT Apache-2.0:
-      playback is delivered via LibVLC, so each add-on depends on
+  CodeBrix.Platform.MediaPlayer.LgplLicenseForever      Win32, WPF, X11, Wayland, FrameBuffer
+      Adds MediaPlayerElement (audio / video playback) to every Skia head except
+      macOS. LibVLC decodes into memory (the "vmem" output, via MediaPlayerCore's
+      VideoFrameSink) and the frames are composited directly into the Skia scene
+      (src/AddIns/Platform.UI.MediaPlayer.Skia) - no native child windows, no
+      airspace problems, and NO XWayland: the Wayland head stays native. Reference
+      it ONCE, in your app's .Core project, like the WebView add-on: every head
+      inherits it, the Windows and Linux heads activate it (OS-gated ApiExtension
+      registrations), and it is inert on the macOS head, which has built-in
+      AVFoundation media support and needs no package or libvlc at all.
+      This is the ONLY published CodeBrix.Platform package that is NOT Apache-2.0:
+      playback is delivered via LibVLC, so it depends on
       "CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever" (a managed port of
-      LibVLCSharp) plus the native "VideoLAN.LibVLC.*" runtime — all
-      LGPL-2.1-or-later. The add-on packages therefore carry the
-      ".LgplLicenseForever" suffix as truth-in-labeling: referencing one pulls
-      LGPL-licensed media playback into your app. Reference an add-on only in the
-      matching head project, and only if your app plays media. (Design note: the
-      LibVLC-specific aspect-ratio math lives in MediaPlayerCore, not in these
-      add-ons, so the add-ons' own source stays free of LibVLCSharp-derived code.)
-      There is deliberately NO media add-on for the Wayland head yet: that head
-      is kept permissively licensed (Apache/MIT) top to bottom. If your Linux app
-      needs MediaPlayerElement today, use the X11 head.
+      LibVLCSharp) - all LGPL-2.1-or-later; the ".LgplLicenseForever" suffix is
+      truth-in-labeling. The native libvlc runtime is NOT shipped in the package:
+      on Linux install it via the system package manager
+      (sudo apt install libvlc5 vlc-plugin-base - the base plugin set is enough,
+      the full vlc application is NOT needed), and on Windows add the
+      "VideoLAN.LibVLC.Windows" package to the Windows head project(s) only.
+      Linux hardware decoding (optional): Debian's libvlc probes VAAPI/VDPAU
+      regardless of --avcodec-hw, and with only vlc-plugin-base installed those
+      probes fail (no GPU-surface-to-CPU converter) and VLC falls back to
+      software decoding - playback works, at the cost of ~2s extra startup and
+      "Failed to adapt decoder format to display" log noise. Installing
+      vlc-plugin-video-output adds the VAAPI converter (libvaapi_filters) so
+      hardware decode-with-copyback succeeds on the first attempt.
+      Sample: samples/CodeBrixPlatform/MediaPlayerDemo.
+
+      LEGACY, NEVER PUBLISH: Platform.UI.MediaPlayer.Skia.X11 / .Win32
+      (package ids CodeBrix.Platform.WinUI.MediaPlayer.Skia.{X11,Win32}.LgplLicenseForever)
+      are the superseded native-child-window add-ons (set_xwindow / set_hwnd
+      embedding; X11/Win32 only, incompatible with Wayland and FrameBuffer). They
+      remain in-repo for reference, are not packed by the central build driver,
+      and must never be published.
 
 --- WEBVIEW ADD-ON PACKAGE (optional; ONE package covers every head) ---
 

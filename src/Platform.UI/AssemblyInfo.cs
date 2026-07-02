@@ -28,6 +28,7 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v1")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v2")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.X11")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.Win32")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.WebAssembly")]
