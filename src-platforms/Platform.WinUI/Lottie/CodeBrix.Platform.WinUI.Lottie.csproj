@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <UseWinUI>true</UseWinUI>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core\CodeBrix.Platform.WinUI.Core.csproj" />
+    <ProjectReference Include="..\Skia\CodeBrix.Platform.WinUI.Skia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="SkiaSharp.Skottie" Version="4.148.0" />
+
+    <!--TODO: We want the following package references to go away-->
+    <!-- Native (non-CodeBrix) Lottie player for the info-button star animation. -->
+    <PackageReference Include="CommunityToolkit.WinUI.Lottie" Version="8.2.250604" />
+    <!-- Win2D backs the Lottie player. An explicit reference is required: Lottie's
+         transitive floor is an old Win2D (1.0.5.1) that uses the legacy win10-* RID
+         folders, which .NET 10 no longer maps from win-arm64 — so its native
+         Microsoft.Graphics.Canvas.dll fails to deploy on ARM64. 1.4.0 uses the modern
+         runtimes/win-<arch>/native layout and deploys correctly on x64 and ARM64. -->
+    <PackageReference Include="Microsoft.Graphics.Win2D" Version="1.4.0" />
+  </ItemGroup>
+
+</Project>

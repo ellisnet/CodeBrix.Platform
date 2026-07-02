@@ -1,0 +1,21 @@
+<Solution>
+  <Folder Name="/Mobile/">
+    <Project Path="Mobile/JustBetweenUs.Mobile.csproj" />
+  </Folder>
+  <Folder Name="/Platform/">
+    <Project Path="../../../src-platforms/Platform.Mobile/Core/CodeBrix.Platform.Mobile.Core.csproj" />
+    <Project Path="../../../src-platforms/Platform.WinUI/Core/CodeBrix.Platform.WinUI.Core.csproj" />
+    <Project Path="../../../src-platforms/Platform.WinUI/Lottie/CodeBrix.Platform.WinUI.Lottie.csproj" />
+    <Project Path="../../../src-platforms/Platform.WinUI/Skia/CodeBrix.Platform.WinUI.Skia.csproj" />
+    <Project Path="../../../src-platforms/Platform.WPF/Core/CodeBrix.Platform.WPF.Core.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/JustBetweenUs.Encryption.Tests/JustBetweenUs.Encryption.Tests.csproj" />
+  </Folder>
+  <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
+  <Project Path="JustBetweenUs.WinUi/JustBetweenUs.WinUi.csproj">
+    <Platform Project="x64" />
+    <Deploy />
+  </Project>
+  <Project Path="JustBetweenUs.Wpf/JustBetweenUs.Wpf.csproj" />
+</Solution>

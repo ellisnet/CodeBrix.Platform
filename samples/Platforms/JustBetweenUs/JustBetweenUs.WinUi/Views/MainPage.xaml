@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="JustBetweenUs.WinUi.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JustBetweenUs.WinUi.Views"
+    xmlns:vm="using:JustBetweenUs.ViewModels"
+    xmlns:controls="using:CodeBrix.Platform.WinUI.Controls"
+    xmlns:lottie="using:CommunityToolkit.WinUI.Lottie"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.DataContext>
+        <vm:MainViewModel />
+    </Page.DataContext>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="100" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <ComboBox HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="300"
+                ItemsSource="{Binding EncryptionModes}"
+                SelectedItem="{Binding SelectedEncryptionModeText, Mode=TwoWay}" />
+            <TextBlock Margin="20, 0, 20, 0" VerticalAlignment="Center">Encryption Key:</TextBlock>
+            <TextBox Height="40" Width="180" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                     Text="{Binding EncryptionKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" Padding="4,4,10,4">
+            <TextBox HorizontalTextAlignment="Start" VerticalContentAlignment="Top"
+               TextWrapping="Wrap" AcceptsReturn="True" Margin="2" IsReadOnly="False"
+               Text="{Binding EnteredText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </ScrollViewer>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center">
+
+            <controls:EmbeddedImageButton Margin="0,0,20,0" Width="140" Height="90"
+                VerticalAlignment="Center" HorizontalAlignment="Right"
+                Background="#FFB85555"
+                Command="{Binding EncryptCommand}"
+                ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.padlock-icon.svg"
+                Text="Encrypt" ImageWidth="40" ImageHeight="40" Spacing="6" ImagePosition="Top" />
+
+            <controls:EmbeddedImageButton Margin="20,0,0,0" Width="140" Height="90"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Background="#FFB85555"
+                Command="{Binding DecryptCommand}"
+                ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.unlocked-icon.svg"
+                Text="Decrypt" ImageWidth="40" ImageHeight="40" Spacing="6" ImagePosition="Top" />
+
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto" Padding="4,4,10,4">
+            <TextBox HorizontalTextAlignment="Start" VerticalContentAlignment="Top"
+               TextWrapping="Wrap" AcceptsReturn="True" Margin="2" IsReadOnly="True"
+               Text="{Binding ProcessedText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+        </ScrollViewer>
+
+        <controls:EmbeddedImageButton Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Width="220" Height="50"
+            VerticalAlignment="Center" HorizontalAlignment="Center"
+            Background="#FFB85555"
+            Command="{Binding CopyToClipboardCommand}"
+            ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.clipboard.svg">
+            Copy to Clipboard
+        </controls:EmbeddedImageButton>
+
+        <Button Grid.Row="4" Grid.Column="1" Width="80" Height="50"
+                VerticalAlignment="Center" HorizontalAlignment="Left"
+                Command="{Binding ShowOsInfoCommand}">
+            <StackPanel Orientation="Horizontal">
+                <AnimatedVisualPlayer AutoPlay="True"
+                                      HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"
+                                      Height="40" Width="50">
+                    <lottie:LottieVisualSource UriSource="ms-appx:///Assets/star_icon.json" />
+                </AnimatedVisualPlayer>
+            </StackPanel>
+        </Button>
+
+    </Grid>
+</Page>
