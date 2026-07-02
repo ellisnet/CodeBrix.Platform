@@ -840,17 +840,17 @@ publishing ONLY the rebuilt macOS package still restores cleanly.
 Do NOT run the full driver on macOS — it would also try to pack the Windows-only
 packages. Instead pack just the macOS csproj (exactly what the driver does for
 that one project) from the repo root, substituting the published version for
-1.0.182.216 below:
+1.0.183.233 below:
 
     dotnet pack src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj \
       -c Release \
-      -p:PackageVersion=1.0.182.216 \
-      --output nugets/Release/1.0.182.216
+      -p:PackageVersion=1.0.183.233 \
+      --output nugets/Release/1.0.183.233
 
 -p:PackageVersion (NOT -p:Version) sets only the NuGet package version while
 still flowing to the ProjectReference dependency versions. This produces:
 
-    nugets/Release/1.0.182.216/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.182.216.nupkg
+    nugets/Release/1.0.183.233/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.183.233.nupkg
 
 PREREQUISITES on the Mac: full Xcode installed (the native build uses xcodebuild;
 the driver only enables the native step on Apple Silicon) and the native build
