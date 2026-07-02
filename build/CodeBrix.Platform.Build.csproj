@@ -96,6 +96,11 @@
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.MacOS\Platform.UI.Runtime.Skia.MacOS.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wayland\Platform.UI.Runtime.Skia.Wayland.csproj" />
+
+		<!-- The WebView AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever) ships with every
+		     family release. (The legacy Platform.UI.WebView.Skia.X11 AddIn is deliberately NOT
+		     listed - it is unsupported, slated for deletion, and must never be published.) -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia.Linux\Platform.UI.WebView.Skia.Linux.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

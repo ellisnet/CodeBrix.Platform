@@ -430,6 +430,9 @@ internal static partial class NativeCodeBrix
 	[LibraryImport("libCodeBrixNativeMac.dylib")]
 	internal static partial void codebrix_webview_set_scrolling_enabled(nint webview, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
+	[LibraryImport("libCodeBrixNativeMac.dylib", StringMarshalling = StringMarshalling.Utf8)]
+	internal static partial void codebrix_webview_set_user_agent(nint webview, string? userAgent);
+
 	[LibraryImport("libCodeBrixNativeMac.dylib")]
 	internal static unsafe partial void codebrix_mediaplayer_set_callbacks(
 		delegate* unmanaged[Cdecl]<IntPtr, double, void> periodicPositionUpdate,

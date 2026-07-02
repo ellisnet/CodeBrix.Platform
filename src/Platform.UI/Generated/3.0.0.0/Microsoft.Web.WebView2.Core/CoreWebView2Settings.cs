@@ -135,20 +135,7 @@ namespace Microsoft.Web.WebView2.Core
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string UserAgent
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2Settings.UserAgent is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2Settings", "string CoreWebView2Settings.UserAgent");
-			}
-		}
-#endif
+		// Skipping already declared property UserAgent
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
 		public bool AreBrowserAcceleratorKeysEnabled

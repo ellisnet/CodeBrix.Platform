@@ -32,6 +32,7 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.Win32")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia.X11")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia.Linux")]
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.HotDesign.Client")]
 

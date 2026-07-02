@@ -276,6 +276,12 @@ void codebrix_webview_set_scrolling_enabled(UNOWebView* webview, bool enabled)
     webview.scrollingEnabled = enabled;
 }
 
+void codebrix_webview_set_user_agent(WKWebView* webview, const char* user_agent)
+{
+    // nil restores WKWebView's default User-Agent.
+    webview.customUserAgent = user_agent ? [NSString stringWithUTF8String:user_agent] : nil;
+}
+
 @implementation UNOWebView : WKWebView
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {

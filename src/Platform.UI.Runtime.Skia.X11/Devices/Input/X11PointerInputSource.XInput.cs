@@ -198,12 +198,18 @@ internal partial class X11PointerInputSource
 			// information on what this is.
 			// Unlike the equivalent core protocol events, this only works for an actual mouse with
 			// a real wheel. A touchpad does not behave the same way.
+			// data.detail is the plain button number (4-7 for scroll), same as the core protocol's
+			// ev.button. Real wheels arrive here only via the smooth-scroll valuator XI_Motion path
+			// below, because the server marks their legacy button events XIPointerEmulated and those
+			// are discarded before reaching this method; this branch covers non-emulated legacy
+			// scroll buttons (XTest-synthesized input, virtual/remoting pointer devices without
+			// scroll valuator classes).
 			(wheelDelta, isHorizontalMouseWheel) = data.detail switch
 			{
-				1 << SCROLL_RIGHT => (-ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, true),
-				1 << SCROLL_DOWN => (-ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, false),
-				1 << SCROLL_LEFT => (ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, true),
-				1 << SCROLL_UP => (ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, false),
+				SCROLL_RIGHT => (-ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, true),
+				SCROLL_DOWN => (-ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, false),
+				SCROLL_LEFT => (ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, true),
+				SCROLL_UP => (ScrollContentPresenter.ScrollViewerDefaultMouseWheelDelta, false),
 				_ => (0, false)
 			};
 		}

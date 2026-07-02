@@ -32,6 +32,13 @@ using Window = Gtk.Window;
 	ownerType: typeof(CoreWebView2),
 	operatingSystemCondition: "linux")]
 
+//TODO: DELETE this legacy AddIn in a future release. It is superseded by the WPE-based
+//      Platform.UI.WebView.Skia.Linux AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever),
+//      which covers X11 AND Wayland AND FrameBuffer without GTK window embedding. This
+//      project's package (CodeBrix.Platform.WinUI.WebView.Skia.X11) was never published to
+//      nuget.org and never will be - do not publish the nupkg that Release builds produce.
+//      Kept temporarily on the "just in case" principle (decision 2026-07-02).
+
 namespace CodeBrix.Platform.UI.WebView.Skia.X11; //Was previously: Uno.UI.WebView.Skia.X11
 
 public class X11NativeWebViewProvider(CoreWebView2 coreWebView2) : INativeWebViewProvider
@@ -320,6 +327,12 @@ public class X11NativeWebView : INativeWebView
 			this.Log().Error($"{nameof(SetScrollingEnabled)} is not supported on the X11 target.");
 		}
 	}
+
+	public void SetUserAgent(string userAgent) => RunOnGtkThread(() =>
+	{
+		// An empty value restores the WebKitGTK default User-Agent.
+		_webview.Settings.UserAgent = string.IsNullOrEmpty(userAgent) ? null : userAgent;
+	});
 
 	private void WebViewOnLoadChanged(object o, LoadChangedArgs args)
 	{

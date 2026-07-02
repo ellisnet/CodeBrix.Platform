@@ -33,6 +33,7 @@ public partial class CoreWebView2
 	{
 		HostToFolderMap = _hostToFolderMap.AsReadOnly();
 		_owner = owner;
+		Settings.UserAgentChanged += userAgent => _nativeWebView?.SetUserAgent(userAgent);
 	}
 
 	internal IWebView Owner => _owner;
@@ -160,6 +161,12 @@ public partial class CoreWebView2
 	internal void OnOwnerApplyTemplate()
 	{
 		_nativeWebView = GetNativeWebViewFromTemplate();
+
+		// Apply any custom User-Agent that was set before the native WebView existed.
+		if (Settings.UserAgent is { Length: > 0 } userAgent)
+		{
+			_nativeWebView?.SetUserAgent(userAgent);
+		}
 
 		// Signal that native WebView is now initialized
 		_nativeWebViewInitializedTcs.TrySetResult(true);

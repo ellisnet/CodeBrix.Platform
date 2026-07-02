@@ -59,6 +59,8 @@ void codebrix_webview_stop(WKWebView *webview);
 void codebrix_webview_execute_script(WKWebView *webview, NSInteger handle, const char *javascript);
 void codebrix_webview_invoke_script(WKWebView *webview, NSInteger handle, const char *javascript);
 
+void codebrix_webview_set_user_agent(WKWebView *webview, const char* user_agent);
+
 // https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.core.corewebview2weberrorstatus
 typedef NS_ENUM(uint32, CoreWebView2WebErrorStatus) {
     CoreWebView2WebErrorStatusUnknown = 0,

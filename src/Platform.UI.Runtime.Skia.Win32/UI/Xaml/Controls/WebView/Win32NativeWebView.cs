@@ -67,6 +67,7 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 
 	private Dictionary<ulong, string> _navigationIdToUriMap = new();
 	private string _documentTitle = string.Empty;
+	private string? _defaultUserAgent;
 	private readonly NativeWebView.CoreWebView2Controller _controller;
 
 	private HWND ParentHwnd => (_presenter.XamlRoot?.HostWindow?.NativeWindow as Win32NativeWindow)?.Hwnd is IntPtr hwnd ? (HWND)hwnd : HWND.Null;
@@ -424,6 +425,13 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 
 	public void SetScrollingEnabled(bool isScrollingEnabled)
 	{
+	}
+
+	public void SetUserAgent(string userAgent)
+	{
+		// Capture the engine default the first time, so an empty value can restore it.
+		_defaultUserAgent ??= _nativeWebView.Settings.UserAgent;
+		_nativeWebView.Settings.UserAgent = string.IsNullOrEmpty(userAgent) ? _defaultUserAgent : userAgent;
 	}
 
 	public void Stop()

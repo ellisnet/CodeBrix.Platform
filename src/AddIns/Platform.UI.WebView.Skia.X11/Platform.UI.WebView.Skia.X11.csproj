@@ -1,4 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!-- TODO: DELETE this legacy AddIn project in a future release (also remove its entries in the
+	     three root .slnx files, its _AdjustedOutputProjects line in src/Directory.Build.props, and
+	     its InternalsVisibleTo grants in Platform.UI/Platform.UWP AssemblyInfo.cs). Superseded by
+	     the WPE-based Platform.UI.WebView.Skia.Linux AddIn (CodeBrix.Platform.WebView.
+	     ApacheLicenseForever). The nupkg this project self-packs in Release builds was never
+	     published to nuget.org and must NOT be published. Kept temporarily on the "just in case"
+	     principle (decision 2026-07-02). -->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>

@@ -29,6 +29,7 @@ internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMap
 	private List<Func<Task>> _actions = new();
 	private Dictionary<ulong, string> _navigationIdToUriMap = new();
 	private string _documentTitle = string.Empty;
+	private string? _defaultUserAgent;
 
 	public WpfNativeWebView(WpfWebView2 nativeWebView, CoreWebView2 coreWebView2)
 	{
@@ -186,6 +187,15 @@ internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMap
 
 	public void Stop()
 		=> ExecuteEnsuringCoreWebView2(_nativeWebView.Stop);
+
+	public void SetUserAgent(string userAgent)
+		=> ExecuteEnsuringCoreWebView2(() =>
+		{
+			// Capture the engine default the first time, so an empty value can restore it.
+			var settings = _nativeWebView.CoreWebView2.Settings;
+			_defaultUserAgent ??= settings.UserAgent;
+			settings.UserAgent = string.IsNullOrEmpty(userAgent) ? _defaultUserAgent : userAgent;
+		});
 
 	private void ExecuteEnsuringCoreWebView2(Action action)
 	{

@@ -20,6 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia.Win32")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia.X11")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia.Linux")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost")]
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]

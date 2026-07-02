@@ -40,6 +40,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.Lottie.ApacheLicenseForever` | Lottie / Skottie animations |
 | `CodeBrix.Platform.Svg.ApacheLicenseForever` | SVG (`SvgImageSource`) support |
 | `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` | SkiaSharp XAML views |
+| `CodeBrix.Platform.WebView.ApacheLicenseForever` | WebView on every head (adds Linux support via the system WPE WebKit engine) |
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
 | `CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever` | Windows (WPF) host |
 | `CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever` | Linux (X11) host |
@@ -49,6 +50,15 @@ A CodeBrix.Platform solution has three kinds of projects:
 
 The framework and extension packages are referenced by the `.Core` library; each
 head project references exactly one of the `Runtime.Skia.*` host packages.
+
+The WebView package is referenced once, in the `.Core` library, like the other
+extension packages — every head gets it, it activates on the Linux heads, and it
+is inert on Windows/WPF/macOS (which have built-in WebView support). On Linux it
+uses the distro's WPE WebKit engine at run time, which must be installed:
+
+```
+sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
+```
 
 ## Getting started
 

@@ -111,6 +111,7 @@
     <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Windows.csproj" />
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebView.Skia.Linux/Platform.UI.WebView.Skia.Linux.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia.X11/Platform.UI.WebView.Skia.X11.csproj" />
     <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
     <!-- CodeBrix.Platform macOS solution: Uno.WinUI.Graphics2DSK.Windows excluded —

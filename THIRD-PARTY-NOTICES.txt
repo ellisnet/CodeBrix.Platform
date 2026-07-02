@@ -358,6 +358,25 @@ The components in this part are present as source code in this repository
     as in-repo source; the hand-bound declaration files themselves are covered
     by item 11.)
 
+20. WPE WebKit / libwpe / WPEBackend-fdo binding declarations
+    Project URLs: https://wpewebkit.org/
+                  https://github.com/WebPlatformForEmbedded/libwpe
+                  https://github.com/Igalia/WPEBackend-fdo
+    License:      BSD-2-Clause (libwpe, WPEBackend-fdo); the WPE WebKit and
+                  GLib/GObject C APIs are LGPL-2.1; wayland-server is
+                  MIT / Expat  (BSD-2-Clause and MIT texts in Part D)
+
+    The Linux WebView AddIn (src/AddIns/Platform.UI.WebView.Skia.Linux/) contains
+    hand-bound P/Invoke declarations under Interop/ mirroring the C APIs of
+    libwpe 1.16.2, WPEBackend-fdo 1.16.0, WPE WebKit 2.48.x (wpe-webkit-2.0 API,
+    including its bundled JavaScriptCore GLib API), GLib/GObject 2.84, libsoup 3,
+    and libwayland-server 1.23 (struct layouts, enum values, and function
+    signatures transcribed from the upstream headers; the XKB keysym constants in
+    Input/XkbKeyMapper.cs are the standard X11 keysym table values, covered by
+    item 11). The engine libraries themselves are system-installed and P/Invoked
+    at run time, never vendored, so per this file's stated scope they are not
+    documented here as in-repo source.
+
 ================================================================================
  PART C — BUNDLED ASSET FILES
 ================================================================================
@@ -483,7 +502,9 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
- BSD 2-Clause License  (x_clipboard / Edward Rosten, item 16)
+ BSD 2-Clause License  (x_clipboard / Edward Rosten, item 16; also the license
+ of the libwpe and WPEBackend-fdo headers mirrored by item 20, whose copyright
+ is held by Igalia, S.L. and other WPE contributors)
 --------------------------------------------------------------------------------
 
 Copyright Edward Rosten 2006--2013.

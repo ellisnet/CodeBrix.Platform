@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Match the namespace used by the app code -->
+    <RootNamespace>WebViewDemo</RootNamespace>
+
+    <!-- CodeBrix.Platform needs this define for its internal conditional compilation -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;RESOLVE_SERVICES;SIMPLE_ENUM;SIMPLE_MESSAGING</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.9" />
+
+    <!-- CodeBrix.Platform packages are now ProjectReferences (see ItemGroups below).
+         The remaining PackageReferences here are genuinely external packages. -->
+
+    <!-- Bundled Open Sans font -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
+
+    <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
+         declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
+         (Platform.WinUI.nuspec), so replacing that package with project references dropped it;
+         re-added here. Version matches the platform's pin in src/Directory.Build.targets. -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.181.669" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform core, formerly the CodeBrix.Platform.ApacheLicenseForever NuGet.
+    Referenced from source instead of the package. Only the three top-level UI projects
+    are listed; their .Skia/.Reference dependencies (Foundation, WinRT/UWP, Composition,
+    Xaml, FluentTheme v1/v2) flow in transitively. Variants mirror the repo's own
+    from-source Skia build (src/Platform.UI/Platform.UI.Skia.csproj).
+    NOTE: the XAML source-generator + build-task wiring does NOT flow across a
+    ProjectReference; it must be added to the XAML-compiling head projects
+    (the Linux heads), not here.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+
+    <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
+         in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
+         CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
+         Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
+         Referenced here in Core so all heads inherit them. -->
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+
+    <!-- The WebView AddIn (WPE WebKit offscreen), formerly the
+         CodeBrix.Platform.WebView.ApacheLicenseForever NuGet. Referenced ONCE here in Core,
+         like the other extension add-ons: every head inherits it transitively, the Linux heads
+         activate it (its ApiExtension registration is OS-gated to Linux and discovered by the
+         XAML source generator through the heads' transitive references), and it is inert on
+         non-Linux heads. Requires the system WPE WebKit engine at run time:
+         sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1 -->
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.WebView.Skia.Linux\Platform.UI.WebView.Skia.Linux.csproj" />
+  </ItemGroup>
+</Project>

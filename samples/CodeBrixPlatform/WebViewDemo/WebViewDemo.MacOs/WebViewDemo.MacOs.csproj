@@ -1,0 +1,99 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+
+    <!-- Runtime identity. Formerly set by the Skia.MacOS runtime package's buildTransitive props. -->
+    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+    <IsCodeBrixHead Condition="'$(OutputType)'=='Exe' OR '$(OutputType)'=='WinExe'">true</IsCodeBrixHead>
+
+    <!-- CodeBrix.Platform feature defines. The NuGet supplied these via its buildTransitive
+         targets (platform.winui.common.targets + the Skia.MacOS runtime targets); this head is
+         outside the src tree so it does not inherit them from Directory.Build, hence they are set
+         explicitly here. The Skia.MacOS runtime defines HAS_CODEBRIX_SKIA_MACOS / __CODEBRIX_SKIA_MACOS__. -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__;HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING;CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE;CODEBRIX_HAS_NO_IDEPENDENCYOBJECT;CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_SKIA_MACOS;__DESKTOP__;__CODEBRIX_SKIA__;__CODEBRIX_SKIA_MACOS__</DefineConstants>
+
+    <!-- MSB3277: benign reference-version conflicts that can flow in transitively via the Skia
+         runtimes (same rationale as the platform's own runtime csprojs, which NoWarn it). -->
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <ItemGroup>
+    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <None Remove="**\*.xaml" />
+  </ItemGroup>
+
+  <!-- Shared UI files (linked from WebViewDemo.UI) -->
+  <Import Project="..\WebViewDemo.UI\WebViewDemo.UI.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\WebViewDemo.Core\WebViewDemo.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    Platform-specific runtime: Skia macOS backend, formerly the
+    CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever NuGet. The macOS runtime references
+    the Linux.FrameBuffer runtime (it builds on its frame-buffer functionality), so that flows in
+    transitively. The native macOS dylib is built only on Apple Silicon; on Windows/Intel the
+    managed build still succeeds (the head just can't run without the native libs). All other
+    platform references come transitively via WebViewDemo.Core.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Runtime.Skia.MacOS\Platform.UI.Runtime.Skia.MacOS.csproj" />
+  </ItemGroup>
+
+  <!--
+    XAML source-generator + build-task pipeline. The NuGet flowed this into heads via its
+    buildTransitive targets; it does NOT flow across a ProjectReference, so a head that compiles
+    .xaml must wire it up directly. Mirrors the repo's own from-source build
+    (src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj).
+  -->
+  <PropertyGroup>
+    <CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DocsGeneration)'==''">
+    <ProjectReference Include="..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+      <UndefineProperties>TargetFramework</UndefineProperties>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+  <Import Project="..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+  <!--
+    Runtime-replace, reproduced (build-integrated). Platform.UI.Skia compiles against the
+    .Reference WinRT projection and the .Reference Composition/Dispatching layers; the NuGet's
+    runtime-replace targets swapped in the .Skia implementations. We consume the platform via
+    project references (no NuGet), so reference resolution puts the .Reference variants of these
+    same-named/same-versioned assemblies in the copy-local list. The Reference variants lack
+    Skia-only types (e.g. Windows.UI.ViewManagement.IApplicationViewExtension in
+    CodeBrix.Platform.dll) -> TypeLoadException in the host.
+
+    We edit the copy-local list right after reference resolution and before the output copy: drop
+    the .Reference entries and add the .Skia ones, so the normal CopyFilesToOutputDirectory places
+    the .Skia builds. Only the three assemblies that actually differ are swapped (Foundation is
+    byte-identical; UI/Toolkit/FluentTheme already resolve to .Skia). Compile still uses the
+    .Reference API surface (identical), so only runtime copy is affected. Same swap as the other heads.
+  -->
+  <Target Name="_WvdUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+    <PropertyGroup>
+      <_WvdSkiaUwp>$(MSBuildThisFileDirectory)..\..\..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_WvdSkiaUwp>
+      <_WvdSkiaComp>$(MSBuildThisFileDirectory)..\..\..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_WvdSkiaComp>
+      <_WvdSkiaDisp>$(MSBuildThisFileDirectory)..\..\..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_WvdSkiaDisp>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+      <!-- Add the .Skia variants in their place. -->
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_WvdSkiaUwp)\CodeBrix.Platform.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_WvdSkiaUwp)\CodeBrix.Platform.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_WvdSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_WvdSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_WvdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_WvdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_WvdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

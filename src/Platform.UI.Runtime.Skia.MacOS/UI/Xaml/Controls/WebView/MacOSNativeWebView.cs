@@ -1,5 +1,6 @@
 #nullable enable
 
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -235,6 +236,23 @@ internal class MacOSNativeWebView : MacOSNativeElement, INativeWebView
 	public void SetScrollingEnabled(bool isScrollingEnabled)
 	{
 		NativeCodeBrix.codebrix_webview_set_scrolling_enabled(_webview, isScrollingEnabled);
+	}
+
+	public void SetUserAgent(string userAgent)
+	{
+		try
+		{
+			// null restores WKWebView's default User-Agent.
+			NativeCodeBrix.codebrix_webview_set_user_agent(_webview, string.IsNullOrEmpty(userAgent) ? null : userAgent);
+		}
+		catch (EntryPointNotFoundException e)
+		{
+			// A libCodeBrixNativeMac.dylib from before the User-Agent API was added.
+			if (this.Log().IsEnabled(LogLevel.Warning))
+			{
+				this.Log().Warn($"Setting the WebView User-Agent requires an updated libCodeBrixNativeMac.dylib: {e.Message}");
+			}
+		}
 	}
 
 	public void Stop() => NativeCodeBrix.codebrix_webview_stop(_webview);

@@ -142,6 +142,12 @@ package is versioned to track the SkiaSharp release it vendors).
 
 --- MEDIA PLAYER ADD-ON PACKAGES (optional; one per desktop head) ---
 
+  STATUS: IN PROGRESS - NOT YET PUBLISHED. These two add-on packages are
+  untested/incomplete and have NOT been published to nuget.org (they are also
+  not packed by the central build driver - they only self-pack into their own
+  bin folders). Do not reference them, and do not publish their nupkgs, until
+  they are finished and deliberately added to the release pipeline.
+
   CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever    Linux desktop (X11)
   CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32.LgplLicenseForever  Windows (Win32 host)
       Adds MediaPlayerElement (audio / video playback) to the matching desktop
@@ -158,6 +164,56 @@ package is versioned to track the SkiaSharp release it vendors).
       There is deliberately NO media add-on for the Wayland head yet: that head
       is kept permissively licensed (Apache/MIT) top to bottom. If your Linux app
       needs MediaPlayerElement today, use the X11 head.
+
+--- WEBVIEW ADD-ON PACKAGE (optional; ONE package covers every head) ---
+
+  CodeBrix.Platform.WebView.ApacheLicenseForever                     all heads
+      Makes the XAML WebView2 control work on ALL Skia heads with a single
+      package. The Windows (Win32), Skia-on-WPF, and macOS heads already have
+      built-in WebView support (Microsoft Edge WebView2 / WKWebView) — on those
+      platforms this package is inert and harmless to reference. What it
+      actually delivers is Linux: on the X11, Wayland, AND FrameBuffer heads the
+      web content is rendered offscreen by the system-installed WPE WebKit
+      engine and composited directly into the Skia scene (no native child
+      windows, no airspace problems — clipping, transforms, and z-order behave
+      like any other XAML content). No engine binaries ship in the package; it
+      is 100% Apache-2.0 managed code that P/Invokes the distro's WPE WebKit at
+      run time. Linux machines must have the engine installed:
+          sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
+      When the engine is missing, creating a WebView throws
+      PlatformNotSupportedException naming the missing library and that exact
+      apt command. Reference this package ONCE, in the .Core project, like the
+      other extension add-ons: every head gets it transitively, it activates on
+      the Linux heads, and it is inert (a small do-nothing assembly) on the
+      Windows, WPF, and macOS heads.
+      CUSTOM USER-AGENT: on every head, app code can set the User-Agent string
+      the WebView sends (an empty string restores the engine's default):
+          myWebView.CoreWebView2.Settings.UserAgent = "MyApp/1.0";
+      It may be set before or after the control loads, and applies to the next
+      request. Backed natively on all six heads (WPE WebKit on Linux, Edge
+      WebView2 on Windows/WPF, WKWebView customUserAgent on macOS). The default
+      (no value set) is each engine's own desktop User-Agent - on Linux:
+          Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/60.5 Safari/605.1.15
+      Page-to-host messaging supports both the WebView2 idiom
+      (window.chrome.webview.postMessage) and the WebKit idiom
+      (window.webkit.messageHandlers.codebrixWebView.postMessage).
+      This package ships at the same version as the rest of the family (the
+      whole family is always published together) and requires a core of the
+      same generation: the AddIn implements internal framework seams, so the
+      core's InternalsVisibleTo grants must match. It supersedes the in-repo
+      legacy Platform.UI.WebView.Skia.X11 project (GTK/WebKitGTK window
+      embedding, X11-only, never published); never reference both.
+      TODO / PLANNED DELETION: the legacy Platform.UI.WebView.Skia.X11 project
+      is slated to be DELETED from this repository in a future release (kept
+      temporarily "just in case", decision 2026-07-02). It is NOT supported.
+      Its self-packed nupkg (CodeBrix.Platform.WinUI.WebView.Skia.X11), which
+      Release builds still produce, must NEVER be published to nuget.org. When
+      deleting it, also remove: its entries in the three root .slnx files, its
+      _AdjustedOutputProjects line in src/Directory.Build.props, and its
+      InternalsVisibleTo grants in Platform.UI + Platform.UWP AssemblyInfo.cs.
+      Known v1 limitations on Linux: no IME (composed CJK/deadkey) text input,
+      popups/new windows navigate the current view, and the mouse cursor does
+      not change shape over links.
 
 --- COMPANION PACKAGES used by the reference app (NOT produced by this repo) ---
 
@@ -177,7 +233,14 @@ WHICH PACKAGE GOES WHERE  (the single most important rule)
   - The .Core project references the FRAMEWORK + EXTENSION packages and your
     companion packages. It NEVER references a head package.
   - Each HEAD project references EXACTLY ONE platform head package, plus the
-    .Core project, plus the .UI shared project. It adds nothing else UI-related.
+    .Core project, plus the .UI shared project. It adds nothing else UI-related,
+    with ONE allowed exception, optional: the media-player add-on that matches
+    that head (see "MEDIA PLAYER ADD-ON PACKAGES").
+  - The WebView add-on (CodeBrix.Platform.WebView.ApacheLicenseForever) goes in
+    .Core with the other extension add-ons — one reference, all heads get it,
+    Linux heads activate it, the rest ignore it. On Linux machines the system
+    WPE WebKit engine must be installed for it to work:
+        sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
 
 If you put a head package in .Core, or more than one head package in a single
 head project, the build will be wrong. One head project == one head package.
@@ -249,6 +312,8 @@ Holds app logic + ALL framework/extension package references. Example .csproj:
         <!-- Optional extensions — include only what you use: -->
         <PackageReference Include="CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever" />
         <PackageReference Include="CodeBrix.Platform.Lottie.ApacheLicenseForever" />
+        <!-- WebView2 control on every head (Linux needs the system WPE WebKit engine): -->
+        <PackageReference Include="CodeBrix.Platform.WebView.ApacheLicenseForever" />
         <PackageReference Include="SkiaSharp.Skottie" />
         <PackageReference Include="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" />
         <PackageReference Include="CodeBrix.Platform.Svg.ApacheLicenseForever" />

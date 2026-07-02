@@ -30,4 +30,13 @@ internal partial interface INativeWebView
 	Task<string?> InvokeScriptAsync(string script, string[]? arguments, CancellationToken token);
 
 	void SetScrollingEnabled(bool isScrollingEnabled);
+
+	/// <summary>
+	/// Applies the value of Microsoft.Web.WebView2.Core.CoreWebView2Settings.UserAgent.
+	/// Called when the native web view is created (if a custom value was already set) and
+	/// again whenever the value changes. An empty string restores the native engine's
+	/// default User-Agent. Implementations whose native web view cannot change its
+	/// User-Agent should log a warning and otherwise no-op.
+	/// </summary>
+	void SetUserAgent(string userAgent);
 }
