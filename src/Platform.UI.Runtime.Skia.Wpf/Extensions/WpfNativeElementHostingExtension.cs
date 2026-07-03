@@ -72,6 +72,16 @@ internal partial class WpfNativeElementHostingExtension : ContentPresenter.INati
 	{
 		if (content is System.Windows.UIElement contentAsUIElement)
 		{
+			// An HwndHost-based native control (e.g. WebView2) sizes its child HWND from WPF's own
+			// layout pass, not from the manual Arrange() below. In a Canvas with no explicit
+			// Width/Height it measures to a 0x0 DesiredSize, so the hosted window collapses and the
+			// content never shows. Pin an explicit size so the layout pass sizes the child window.
+			if (contentAsUIElement is System.Windows.FrameworkElement contentAsFE)
+			{
+				contentAsFE.Width = arrangeRect.Width;
+				contentAsFE.Height = arrangeRect.Height;
+			}
+
 			WpfCanvas.SetLeft(contentAsUIElement, arrangeRect.X);
 			WpfCanvas.SetTop(contentAsUIElement, arrangeRect.Y);
 

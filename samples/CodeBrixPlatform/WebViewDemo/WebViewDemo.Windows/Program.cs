@@ -1,6 +1,5 @@
 using CodeBrix.Platform.UI.Hosting;
 using System;
-using System.Threading.Tasks;
 
 // ReSharper disable CheckNamespace
 
@@ -8,8 +7,12 @@ namespace WebViewDemo;
 
 internal class Program
 {
+    // Must be a synchronous STA Main: WebView2 (CoreWebView2Environment.CreateAsync) requires the
+    // UI thread to be an STA. With 'async Task Main' the [STAThread] attribute is ignored and the
+    // thread runs as MTA, so WebView2 creation throws RPC_E_CHANGED_MODE ("Cannot change thread mode
+    // after it is set."). host.Run() pumps the Win32 message loop synchronously on this STA thread.
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         App.InitializeLogging();
 
@@ -18,6 +21,6 @@ internal class Program
             .UseWindowsWin32()
             .Build();
 
-        await host.RunAsync();
+        host.Run();
     }
 }

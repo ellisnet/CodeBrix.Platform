@@ -140,9 +140,18 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 		// ReSharper disable once AsyncVoidLambda
 		NativeDispatcher.Main.EnqueueAsync(async () =>
 		{
-			var userDataFolder = Path.Combine(ApplicationData.Current.LocalFolder.Path, "WebView2");
-			var env = await NativeWebView.CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
-			tcs.SetResult(await env.CreateCoreWebView2ControllerAsync(_hwnd));
+			try
+			{
+				var userDataFolder = Path.Combine(ApplicationData.Current.LocalFolder.Path, "WebView2");
+				var env = await NativeWebView.CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+				tcs.SetResult(await env.CreateCoreWebView2ControllerAsync(_hwnd));
+			}
+			catch (Exception ex)
+			{
+				// Surface the failure on the constructor's thread (below) instead of letting it go
+				// unhandled on the dispatcher (which would also spin the pump loop forever).
+				tcs.SetException(ex);
+			}
 		});
 
 		while (!tcs.Task.IsCompleted)
@@ -150,7 +159,36 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 			Win32EventLoop.RunOnce();
 		}
 
-		_controller = tcs.Task.Result;
+		try
+		{
+			_controller = tcs.Task.GetAwaiter().GetResult();
+		}
+		catch (COMException comEx) when (comEx.HResult == unchecked((int)0x80010106)) // RPC_E_CHANGED_MODE
+		{
+			// WebView2 (CoreWebView2Environment.CreateAsync) requires the host's UI thread to be a
+			// single-threaded apartment (STA). The most common cause is starting the host from an
+			// 'async Task Main': the compiler ignores [STAThread] on an async Main, so the thread
+			// runs as MTA and WebView2 fails with RPC_E_CHANGED_MODE ("Cannot change thread mode
+			// after it is set.").
+			throw new InvalidOperationException(
+				$"The WebView control could not be initialized because the host's UI thread is a " +
+				$"{Thread.CurrentThread.GetApartmentState()} apartment, but WebView2 requires a " +
+				"single-threaded apartment (STA). A console application's Main runs as MTA by default, " +
+				"so BOTH of the following are required in your app's entry point:" + Environment.NewLine +
+				"  1. Decorate Main with the [STAThread] attribute (this alone is easy to miss - " +
+				"without it the thread is MTA even for a synchronous Main)." + Environment.NewLine +
+				"  2. Use a synchronous 'static void Main' that calls 'host.Run()' - NOT an " +
+				"'async Task Main' with 'await host.RunAsync()', because [STAThread] is silently " +
+				"ignored on an async Main and the thread reverts to MTA." + Environment.NewLine +
+				"Example:" + Environment.NewLine +
+				"    [STAThread]" + Environment.NewLine +
+				"    public static void Main(string[] args)" + Environment.NewLine +
+				"    {" + Environment.NewLine +
+				"        var host = CodeBrixPlatformHostBuilder.Create().App(() => new App()).UseWindowsWin32().Build();" + Environment.NewLine +
+				"        host.Run();" + Environment.NewLine +
+				"    }",
+				comEx);
+		}
 		_nativeWebView = _controller.CoreWebView2;
 		_nativeWebView.Settings.IsScriptEnabled = true;
 		_nativeWebView.Settings.IsWebMessageEnabled = true;

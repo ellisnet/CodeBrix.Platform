@@ -17,6 +17,10 @@ namespace Microsoft.UI.Xaml.Controls;
 #endif
 public partial class WebView2 : Control, IWebView
 {
+	// Default page navigated to on launch when the consumer opts in via NavigateToGoddessUrlOnLaunch
+	// and leaves Source unset. See OnApplyTemplate.
+	private const string GoddessUrl = "https://en.wikipedia.org/wiki/Inanna";
+
 	private bool _sourceChangeFromCore;
 	private bool _coreWebView2Initialized;
 
@@ -48,7 +52,18 @@ public partial class WebView2 : Control, IWebView
 
 	CoreDispatcher IWebView.Dispatcher => Dispatcher;
 
-	protected override void OnApplyTemplate() => CoreWebView2.OnOwnerApplyTemplate();
+	protected override void OnApplyTemplate()
+	{
+		CoreWebView2.OnOwnerApplyTemplate();
+
+		// Opt-in convenience: when the consumer sets NavigateToGoddessUrlOnLaunch to true and leaves
+		// Source unset, navigate to GoddessUrl on launch as though Source had been set to it. Both
+		// conditions are required - a provided Source always wins, and the flag defaults to false.
+		if (Source is null && NavigateToGoddessUrlOnLaunch)
+		{
+			Source = new Uri(GoddessUrl);
+		}
+	}
 
 	private void WebView2_Loaded(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
 	{
@@ -87,6 +102,12 @@ public partial class WebView2 : Control, IWebView
 	public void GoBack() => CoreWebView2.GoBack();
 
 	public void NavigateToString(string htmlContent) => CoreWebView2.NavigateToString(htmlContent);
+
+	/// <summary>
+	/// Navigates to the default GoddessUrl. This is a shortcut for setting <see cref="Source"/> to
+	/// that value, and behaves identically to a normal source-driven navigation.
+	/// </summary>
+	public void NavigateToGoddessUrl() => Source = new Uri(GoddessUrl);
 
 	private void EnsureCoreWebView2()
 	{

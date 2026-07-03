@@ -60,6 +60,24 @@ public partial class WebView2
 				}
 			}));
 
+	/// <summary>
+	/// Gets or sets a value that indicates whether the control should navigate to a default page on
+	/// launch when no <see cref="Source"/> has been provided. When <c>true</c> and <see cref="Source"/>
+	/// is left unset, the control behaves as though <see cref="Source"/> had been set to the default
+	/// page. Defaults to <c>false</c>.
+	/// </summary>
+	public bool NavigateToGoddessUrlOnLaunch
+	{
+		get => (bool)GetValue(NavigateToGoddessUrlOnLaunchProperty);
+		set => SetValue(NavigateToGoddessUrlOnLaunchProperty, value);
+	}
+
+	/// <summary>
+	/// Identifies the NavigateToGoddessUrlOnLaunch dependency property.
+	/// </summary>
+	public static DependencyProperty NavigateToGoddessUrlOnLaunchProperty { get; } =
+		DependencyProperty.Register(nameof(NavigateToGoddessUrlOnLaunch), typeof(bool), typeof(WebView2), new FrameworkPropertyMetadata(false));
+
 	public bool IsScrollEnabled
 	{
 		get => (bool)GetValue(IsScrollEnabledProperty);
