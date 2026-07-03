@@ -37,6 +37,7 @@
     <Project Path="../../../src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj" />
   </Folder>
   <Folder Name="/Platform/AddIns/">
+    <Project Path="../../../src/AddIns/Platform.UI.MediaPlayer.Skia/Platform.UI.MediaPlayer.Skia.csproj" />
     <Project Path="../../../src/AddIns/Platform.UI.WebView.Skia.Linux/Platform.UI.WebView.Skia.Linux.csproj" />
   </Folder>
   <Folder Name="/Platform/Tools/">
