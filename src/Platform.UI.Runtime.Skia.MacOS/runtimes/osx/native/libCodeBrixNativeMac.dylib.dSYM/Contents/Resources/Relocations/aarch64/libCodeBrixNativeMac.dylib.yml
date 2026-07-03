@@ -77,7 +77,7 @@ relocations:
   - { offset: 0x17980D, size: 0x8, addend: 0x0, symName: _codebrix_app_get_main_window, symObjAddr: 0x13C, symBinAddr: 0x259C, symSize: 0x60 }
   - { offset: 0x179836, size: 0x8, addend: 0x0, symName: _codebrix_window_create, symObjAddr: 0x19C, symBinAddr: 0x25FC, symSize: 0x200 }
   - { offset: 0x17990C, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x39C, symBinAddr: 0x27FC, symSize: 0x8 }
-  - { offset: 0x179923, size: 0x8, addend: 0x0, symName: _codebrix_window_create.cold.1, symObjAddr: 0x1E10, symBinAddr: 0x9358, symSize: 0x28 }
+  - { offset: 0x179923, size: 0x8, addend: 0x0, symName: _codebrix_window_create.cold.1, symObjAddr: 0x1E10, symBinAddr: 0x93E0, symSize: 0x28 }
   - { offset: 0x17993B, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x39C, symBinAddr: 0x27FC, symSize: 0x8 }
   - { offset: 0x17996E, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView initWithFrame:device:]', symObjAddr: 0x3A4, symBinAddr: 0x2804, symSize: 0x34 }
   - { offset: 0x1799C1, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView clipLayer]', symObjAddr: 0x3D8, symBinAddr: 0x2838, symSize: 0x10 }
@@ -88,7 +88,7 @@ relocations:
   - { offset: 0x179B5D, size: 0x8, addend: 0x0, symName: _codebrix_window_maximize, symObjAddr: 0x4E4, symBinAddr: 0x2944, symSize: 0x8 }
   - { offset: 0x179B7A, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change, symObjAddr: 0x4EC, symBinAddr: 0x294C, symSize: 0x84 }
   - { offset: 0x179BB4, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x570, symBinAddr: 0x29D0, symSize: 0x4C }
-  - { offset: 0x179BBF, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change.cold.1, symObjAddr: 0x1E38, symBinAddr: 0x9380, symSize: 0x28 }
+  - { offset: 0x179BBF, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change.cold.1, symObjAddr: 0x1E38, symBinAddr: 0x9408, symSize: 0x28 }
   - { offset: 0x179BD7, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x570, symBinAddr: 0x29D0, symSize: 0x4C }
   - { offset: 0x179BFE, size: 0x8, addend: 0x0, symName: _codebrix_window_close, symObjAddr: 0x5BC, symBinAddr: 0x2A1C, symSize: 0x8 }
   - { offset: 0x179C23, size: 0x8, addend: 0x0, symName: _codebrix_window_move, symObjAddr: 0x5C4, symBinAddr: 0x2A24, symSize: 0x4 }
@@ -248,15 +248,15 @@ relocations:
   - { offset: 0x17D8D5, size: 0x8, addend: 0x0, symName: '+[UNOCursor waitCursor]', symObjAddr: 0x27C, symBinAddr: 0x6930, symSize: 0x28 }
   - { offset: 0x17D91C, size: 0x8, addend: 0x0, symName: '-[UNOCursor _coreCursorType]', symObjAddr: 0x2A4, symBinAddr: 0x6958, symSize: 0x10 }
   - { offset: 0x17DA27, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x6968, symSize: 0xC }
-  - { offset: 0x17DA9D, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0xE418, symBinAddr: 0x1AC30, symSize: 0x0 }
-  - { offset: 0x17DAD9, size: 0x8, addend: 0x0, symName: _invoke, symObjAddr: 0xE420, symBinAddr: 0x1AC38, symSize: 0x0 }
-  - { offset: 0x17DAEF, size: 0x8, addend: 0x0, symName: _navigation_starting, symObjAddr: 0xE428, symBinAddr: 0x1AC40, symSize: 0x0 }
-  - { offset: 0x17DB31, size: 0x8, addend: 0x0, symName: _navigation_finishing, symObjAddr: 0xE430, symBinAddr: 0x1AC48, symSize: 0x0 }
-  - { offset: 0x17DB63, size: 0x8, addend: 0x0, symName: _property_change_notification, symObjAddr: 0xE438, symBinAddr: 0x1AC50, symSize: 0x0 }
-  - { offset: 0x17DB95, size: 0x8, addend: 0x0, symName: _receive_web_message, symObjAddr: 0xE440, symBinAddr: 0x1AC58, symSize: 0x0 }
-  - { offset: 0x17DBAB, size: 0x8, addend: 0x0, symName: _navigation_failing, symObjAddr: 0xE448, symBinAddr: 0x1AC60, symSize: 0x0 }
-  - { offset: 0x17DBE9, size: 0x8, addend: 0x0, symName: _unsupported_scheme_identified, symObjAddr: 0xE450, symBinAddr: 0x1AC68, symSize: 0x0 }
-  - { offset: 0x17DC0B, size: 0x8, addend: 0x0, symName: _new_window_requested, symObjAddr: 0xE458, symBinAddr: 0x1AC70, symSize: 0x0 }
+  - { offset: 0x17DA9D, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0xE638, symBinAddr: 0x1AC30, symSize: 0x0 }
+  - { offset: 0x17DAD9, size: 0x8, addend: 0x0, symName: _invoke, symObjAddr: 0xE640, symBinAddr: 0x1AC38, symSize: 0x0 }
+  - { offset: 0x17DAEF, size: 0x8, addend: 0x0, symName: _navigation_starting, symObjAddr: 0xE648, symBinAddr: 0x1AC40, symSize: 0x0 }
+  - { offset: 0x17DB31, size: 0x8, addend: 0x0, symName: _navigation_finishing, symObjAddr: 0xE650, symBinAddr: 0x1AC48, symSize: 0x0 }
+  - { offset: 0x17DB63, size: 0x8, addend: 0x0, symName: _property_change_notification, symObjAddr: 0xE658, symBinAddr: 0x1AC50, symSize: 0x0 }
+  - { offset: 0x17DB95, size: 0x8, addend: 0x0, symName: _receive_web_message, symObjAddr: 0xE660, symBinAddr: 0x1AC58, symSize: 0x0 }
+  - { offset: 0x17DBAB, size: 0x8, addend: 0x0, symName: _navigation_failing, symObjAddr: 0xE668, symBinAddr: 0x1AC60, symSize: 0x0 }
+  - { offset: 0x17DBE9, size: 0x8, addend: 0x0, symName: _unsupported_scheme_identified, symObjAddr: 0xE670, symBinAddr: 0x1AC68, symSize: 0x0 }
+  - { offset: 0x17DC0B, size: 0x8, addend: 0x0, symName: _new_window_requested, symObjAddr: 0xE678, symBinAddr: 0x1AC70, symSize: 0x0 }
   - { offset: 0x17DCF4, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x6968, symSize: 0xC }
   - { offset: 0x17DD08, size: 0x8, addend: 0x0, symName: _codebrix_set_execute_callback, symObjAddr: 0xC, symBinAddr: 0x6974, symSize: 0xC }
   - { offset: 0x17DD2D, size: 0x8, addend: 0x0, symName: _codebrix_get_invoke_callback, symObjAddr: 0x18, symBinAddr: 0x6980, symSize: 0xC }
@@ -284,60 +284,61 @@ relocations:
   - { offset: 0x17E327, size: 0x8, addend: 0x0, symName: _codebrix_webview_invoke_script, symObjAddr: 0x92C, symBinAddr: 0x7294, symSize: 0xA8 }
   - { offset: 0x17E390, size: 0x8, addend: 0x0, symName: ___codebrix_webview_invoke_script_block_invoke, symObjAddr: 0x9D4, symBinAddr: 0x733C, symSize: 0xB8 }
   - { offset: 0x17E452, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_scrolling_enabled, symObjAddr: 0xA8C, symBinAddr: 0x73F4, symSize: 0x8 }
-  - { offset: 0x17E48A, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithCoder:]', symObjAddr: 0xA94, symBinAddr: 0x73FC, symSize: 0x34 }
-  - { offset: 0x17E4D3, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithFrame:configuration:]', symObjAddr: 0xAC8, symBinAddr: 0x7430, symSize: 0x12C }
-  - { offset: 0x17E556, size: 0x8, addend: 0x0, symName: '-[UNOWebView didChangeValueForKey:]', symObjAddr: 0xBF4, symBinAddr: 0x755C, symSize: 0xD4 }
-  - { offset: 0x17E5D6, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollWheel:]', symObjAddr: 0xCC8, symBinAddr: 0x7630, symSize: 0x8C }
-  - { offset: 0x17E61B, size: 0x8, addend: 0x0, symName: '-[UNOWebView dispose]', symObjAddr: 0xD54, symBinAddr: 0x76BC, symSize: 0x80 }
-  - { offset: 0x17E64F, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0xDD4, symBinAddr: 0x773C, symSize: 0x170 }
-  - { offset: 0x17E6E1, size: 0x8, addend: 0x0, symName: '___94-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0xF44, symBinAddr: 0x78AC, symSize: 0x14 }
-  - { offset: 0x17E73C, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32b, symObjAddr: 0xF58, symBinAddr: 0x78C0, symSize: 0x10 }
-  - { offset: 0x17E765, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0xF70, symBinAddr: 0x78D0, symSize: 0x88 }
-  - { offset: 0x17E7F6, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]', symObjAddr: 0xFF8, symBinAddr: 0x7958, symSize: 0x1E0 }
-  - { offset: 0x17E8AA, size: 0x8, addend: 0x0, symName: '___107-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x11D8, symBinAddr: 0x7B38, symSize: 0x64 }
-  - { offset: 0x17E938, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s40b, symObjAddr: 0x123C, symBinAddr: 0x7B9C, symSize: 0x34 }
-  - { offset: 0x17E961, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s40s, symObjAddr: 0x1270, symBinAddr: 0x7BD0, symSize: 0x28 }
-  - { offset: 0x17E980, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]', symObjAddr: 0x1298, symBinAddr: 0x7BF8, symSize: 0x138 }
-  - { offset: 0x17EA01, size: 0x8, addend: 0x0, symName: '___84-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x13D0, symBinAddr: 0x7D30, symSize: 0x64 }
-  - { offset: 0x17EA8F, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_new_window_requested_callback, symObjAddr: 0x1434, symBinAddr: 0x7D94, symSize: 0xC }
-  - { offset: 0x17EAA3, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_new_window_requested_callback, symObjAddr: 0x1440, symBinAddr: 0x7DA0, symSize: 0xC }
-  - { offset: 0x17EAD8, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:]', symObjAddr: 0x144C, symBinAddr: 0x7DAC, symSize: 0x230 }
-  - { offset: 0x17EBC8, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x167C, symBinAddr: 0x7FDC, symSize: 0x80 }
-  - { offset: 0x17EBD3, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:].cold.1', symObjAddr: 0x1FE8, symBinAddr: 0x93A8, symSize: 0x28 }
-  - { offset: 0x17EBF8, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x167C, symBinAddr: 0x7FDC, symSize: 0x80 }
-  - { offset: 0x17EC7D, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFailProvisionalNavigation:withError:]', symObjAddr: 0x16FC, symBinAddr: 0x805C, symSize: 0x14C }
-  - { offset: 0x17ED2B, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFinishNavigation:]', symObjAddr: 0x1848, symBinAddr: 0x81A8, symSize: 0xA8 }
-  - { offset: 0x17EDA3, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didReceiveServerRedirectForProvisionalNavigation:]', symObjAddr: 0x18F0, symBinAddr: 0x8250, symSize: 0x80 }
-  - { offset: 0x17EE1B, size: 0x8, addend: 0x0, symName: '-[UNOWebView isAnchorNavigation:url:]', symObjAddr: 0x1970, symBinAddr: 0x82D0, symSize: 0x160 }
-  - { offset: 0x17EEC0, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationAction:decisionHandler:]', symObjAddr: 0x1AD0, symBinAddr: 0x8430, symSize: 0x274 }
-  - { offset: 0x17F086, size: 0x8, addend: 0x0, symName: '-[UNOWebView userContentController:didReceiveScriptMessage:]', symObjAddr: 0x1D44, symBinAddr: 0x86A4, symSize: 0xDC }
-  - { offset: 0x17F129, size: 0x8, addend: 0x0, symName: '-[UNOWebView originalSuperView]', symObjAddr: 0x1E20, symBinAddr: 0x8780, symSize: 0x10 }
-  - { offset: 0x17F161, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOriginalSuperView:]', symObjAddr: 0x1E30, symBinAddr: 0x8790, symSize: 0x40 }
-  - { offset: 0x17F1A3, size: 0x8, addend: 0x0, symName: '-[UNOWebView okString]', symObjAddr: 0x1E70, symBinAddr: 0x87D0, symSize: 0x10 }
-  - { offset: 0x17F1DA, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOkString:]', symObjAddr: 0x1E80, symBinAddr: 0x87E0, symSize: 0x40 }
-  - { offset: 0x17F21B, size: 0x8, addend: 0x0, symName: '-[UNOWebView cancelString]', symObjAddr: 0x1EC0, symBinAddr: 0x8820, symSize: 0x10 }
-  - { offset: 0x17F252, size: 0x8, addend: 0x0, symName: '-[UNOWebView setCancelString:]', symObjAddr: 0x1ED0, symBinAddr: 0x8830, symSize: 0x40 }
-  - { offset: 0x17F293, size: 0x8, addend: 0x0, symName: '-[UNOWebView lastNavigationUrl]', symObjAddr: 0x1F10, symBinAddr: 0x8870, symSize: 0x10 }
-  - { offset: 0x17F2CA, size: 0x8, addend: 0x0, symName: '-[UNOWebView setLastNavigationUrl:]', symObjAddr: 0x1F20, symBinAddr: 0x8880, symSize: 0x40 }
-  - { offset: 0x17F30B, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollingEnabled]', symObjAddr: 0x1F60, symBinAddr: 0x88C0, symSize: 0x10 }
-  - { offset: 0x17F342, size: 0x8, addend: 0x0, symName: '-[UNOWebView setScrollingEnabled:]', symObjAddr: 0x1F70, symBinAddr: 0x88D0, symSize: 0x10 }
-  - { offset: 0x17F37D, size: 0x8, addend: 0x0, symName: '-[UNOWebView .cxx_destruct]', symObjAddr: 0x1F80, symBinAddr: 0x88E0, symSize: 0x68 }
-  - { offset: 0x17F90C, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x8948, symSize: 0x18 }
-  - { offset: 0x17F926, size: 0x8, addend: 0x0, symName: _elements, symObjAddr: 0x34F0, symBinAddr: 0x1AC78, symSize: 0x0 }
-  - { offset: 0x17F941, size: 0x8, addend: 0x0, symName: _transients, symObjAddr: 0x34F8, symBinAddr: 0x1AC80, symSize: 0x0 }
-  - { offset: 0x17F977, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x8948, symSize: 0x18 }
-  - { offset: 0x17F9AE, size: 0x8, addend: 0x0, symName: '-[UNORedView updateLayer]', symObjAddr: 0x18, symBinAddr: 0x8960, symSize: 0x70 }
-  - { offset: 0x17F9E1, size: 0x8, addend: 0x0, symName: '-[UNORedView detach]', symObjAddr: 0x88, symBinAddr: 0x89D0, symSize: 0x4 }
-  - { offset: 0x17FA10, size: 0x8, addend: 0x0, symName: '-[UNORedView dispose]', symObjAddr: 0x8C, symBinAddr: 0x89D4, symSize: 0x44 }
-  - { offset: 0x17FA43, size: 0x8, addend: 0x0, symName: '-[UNORedView originalSuperView]', symObjAddr: 0xD0, symBinAddr: 0x8A18, symSize: 0x10 }
-  - { offset: 0x17FA7A, size: 0x8, addend: 0x0, symName: '-[UNORedView setOriginalSuperView:]', symObjAddr: 0xE0, symBinAddr: 0x8A28, symSize: 0x40 }
-  - { offset: 0x17FABB, size: 0x8, addend: 0x0, symName: '-[UNORedView .cxx_destruct]', symObjAddr: 0x120, symBinAddr: 0x8A68, symSize: 0x14 }
-  - { offset: 0x17FAEE, size: 0x8, addend: 0x0, symName: _codebrix_native_create_sample, symObjAddr: 0x134, symBinAddr: 0x8A7C, symSize: 0x16C }
-  - { offset: 0x17FB49, size: 0x8, addend: 0x0, symName: _codebrix_native_arrange, symObjAddr: 0x2A0, symBinAddr: 0x8BE8, symSize: 0x4 }
-  - { offset: 0x17FBBA, size: 0x8, addend: 0x0, symName: _codebrix_native_attach, symObjAddr: 0x2A4, symBinAddr: 0x8BEC, symSize: 0x94 }
-  - { offset: 0x17FBF1, size: 0x8, addend: 0x0, symName: _codebrix_native_detach, symObjAddr: 0x338, symBinAddr: 0x8C80, symSize: 0x9C }
-  - { offset: 0x17FC18, size: 0x8, addend: 0x0, symName: _codebrix_native_is_attached, symObjAddr: 0x3D4, symBinAddr: 0x8D1C, symSize: 0x18 }
-  - { offset: 0x17FC74, size: 0x8, addend: 0x0, symName: _codebrix_native_measure, symObjAddr: 0x3EC, symBinAddr: 0x8D34, symSize: 0xFC }
-  - { offset: 0x17FD69, size: 0x8, addend: 0x0, symName: _codebrix_native_set_opacity, symObjAddr: 0x4E8, symBinAddr: 0x8E30, symSize: 0x4 }
-  - { offset: 0x17FD9D, size: 0x8, addend: 0x0, symName: _codebrix_native_dispose, symObjAddr: 0x4EC, symBinAddr: 0x8E34, symSize: 0x3C }
+  - { offset: 0x17E48A, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_user_agent, symObjAddr: 0xA94, symBinAddr: 0x73FC, symSize: 0x88 }
+  - { offset: 0x17E4C4, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithCoder:]', symObjAddr: 0xB1C, symBinAddr: 0x7484, symSize: 0x34 }
+  - { offset: 0x17E50D, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithFrame:configuration:]', symObjAddr: 0xB50, symBinAddr: 0x74B8, symSize: 0x12C }
+  - { offset: 0x17E590, size: 0x8, addend: 0x0, symName: '-[UNOWebView didChangeValueForKey:]', symObjAddr: 0xC7C, symBinAddr: 0x75E4, symSize: 0xD4 }
+  - { offset: 0x17E610, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollWheel:]', symObjAddr: 0xD50, symBinAddr: 0x76B8, symSize: 0x8C }
+  - { offset: 0x17E655, size: 0x8, addend: 0x0, symName: '-[UNOWebView dispose]', symObjAddr: 0xDDC, symBinAddr: 0x7744, symSize: 0x80 }
+  - { offset: 0x17E689, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0xE5C, symBinAddr: 0x77C4, symSize: 0x170 }
+  - { offset: 0x17E71B, size: 0x8, addend: 0x0, symName: '___94-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0xFCC, symBinAddr: 0x7934, symSize: 0x14 }
+  - { offset: 0x17E776, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32b, symObjAddr: 0xFE0, symBinAddr: 0x7948, symSize: 0x10 }
+  - { offset: 0x17E79F, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0xFF8, symBinAddr: 0x7958, symSize: 0x88 }
+  - { offset: 0x17E830, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]', symObjAddr: 0x1080, symBinAddr: 0x79E0, symSize: 0x1E0 }
+  - { offset: 0x17E8E4, size: 0x8, addend: 0x0, symName: '___107-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1260, symBinAddr: 0x7BC0, symSize: 0x64 }
+  - { offset: 0x17E972, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s40b, symObjAddr: 0x12C4, symBinAddr: 0x7C24, symSize: 0x34 }
+  - { offset: 0x17E99B, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s40s, symObjAddr: 0x12F8, symBinAddr: 0x7C58, symSize: 0x28 }
+  - { offset: 0x17E9BA, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]', symObjAddr: 0x1320, symBinAddr: 0x7C80, symSize: 0x138 }
+  - { offset: 0x17EA3B, size: 0x8, addend: 0x0, symName: '___84-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1458, symBinAddr: 0x7DB8, symSize: 0x64 }
+  - { offset: 0x17EAC9, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_new_window_requested_callback, symObjAddr: 0x14BC, symBinAddr: 0x7E1C, symSize: 0xC }
+  - { offset: 0x17EADD, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_new_window_requested_callback, symObjAddr: 0x14C8, symBinAddr: 0x7E28, symSize: 0xC }
+  - { offset: 0x17EB12, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:]', symObjAddr: 0x14D4, symBinAddr: 0x7E34, symSize: 0x230 }
+  - { offset: 0x17EC02, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x1704, symBinAddr: 0x8064, symSize: 0x80 }
+  - { offset: 0x17EC0D, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:].cold.1', symObjAddr: 0x2070, symBinAddr: 0x9430, symSize: 0x28 }
+  - { offset: 0x17EC32, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x1704, symBinAddr: 0x8064, symSize: 0x80 }
+  - { offset: 0x17ECB7, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFailProvisionalNavigation:withError:]', symObjAddr: 0x1784, symBinAddr: 0x80E4, symSize: 0x14C }
+  - { offset: 0x17ED65, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFinishNavigation:]', symObjAddr: 0x18D0, symBinAddr: 0x8230, symSize: 0xA8 }
+  - { offset: 0x17EDDD, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didReceiveServerRedirectForProvisionalNavigation:]', symObjAddr: 0x1978, symBinAddr: 0x82D8, symSize: 0x80 }
+  - { offset: 0x17EE55, size: 0x8, addend: 0x0, symName: '-[UNOWebView isAnchorNavigation:url:]', symObjAddr: 0x19F8, symBinAddr: 0x8358, symSize: 0x160 }
+  - { offset: 0x17EEFA, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationAction:decisionHandler:]', symObjAddr: 0x1B58, symBinAddr: 0x84B8, symSize: 0x274 }
+  - { offset: 0x17F0C0, size: 0x8, addend: 0x0, symName: '-[UNOWebView userContentController:didReceiveScriptMessage:]', symObjAddr: 0x1DCC, symBinAddr: 0x872C, symSize: 0xDC }
+  - { offset: 0x17F163, size: 0x8, addend: 0x0, symName: '-[UNOWebView originalSuperView]', symObjAddr: 0x1EA8, symBinAddr: 0x8808, symSize: 0x10 }
+  - { offset: 0x17F19B, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOriginalSuperView:]', symObjAddr: 0x1EB8, symBinAddr: 0x8818, symSize: 0x40 }
+  - { offset: 0x17F1DD, size: 0x8, addend: 0x0, symName: '-[UNOWebView okString]', symObjAddr: 0x1EF8, symBinAddr: 0x8858, symSize: 0x10 }
+  - { offset: 0x17F214, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOkString:]', symObjAddr: 0x1F08, symBinAddr: 0x8868, symSize: 0x40 }
+  - { offset: 0x17F255, size: 0x8, addend: 0x0, symName: '-[UNOWebView cancelString]', symObjAddr: 0x1F48, symBinAddr: 0x88A8, symSize: 0x10 }
+  - { offset: 0x17F28C, size: 0x8, addend: 0x0, symName: '-[UNOWebView setCancelString:]', symObjAddr: 0x1F58, symBinAddr: 0x88B8, symSize: 0x40 }
+  - { offset: 0x17F2CD, size: 0x8, addend: 0x0, symName: '-[UNOWebView lastNavigationUrl]', symObjAddr: 0x1F98, symBinAddr: 0x88F8, symSize: 0x10 }
+  - { offset: 0x17F304, size: 0x8, addend: 0x0, symName: '-[UNOWebView setLastNavigationUrl:]', symObjAddr: 0x1FA8, symBinAddr: 0x8908, symSize: 0x40 }
+  - { offset: 0x17F345, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollingEnabled]', symObjAddr: 0x1FE8, symBinAddr: 0x8948, symSize: 0x10 }
+  - { offset: 0x17F37C, size: 0x8, addend: 0x0, symName: '-[UNOWebView setScrollingEnabled:]', symObjAddr: 0x1FF8, symBinAddr: 0x8958, symSize: 0x10 }
+  - { offset: 0x17F3B7, size: 0x8, addend: 0x0, symName: '-[UNOWebView .cxx_destruct]', symObjAddr: 0x2008, symBinAddr: 0x8968, symSize: 0x68 }
+  - { offset: 0x17F946, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x89D0, symSize: 0x18 }
+  - { offset: 0x17F960, size: 0x8, addend: 0x0, symName: _elements, symObjAddr: 0x34F0, symBinAddr: 0x1AC78, symSize: 0x0 }
+  - { offset: 0x17F97B, size: 0x8, addend: 0x0, symName: _transients, symObjAddr: 0x34F8, symBinAddr: 0x1AC80, symSize: 0x0 }
+  - { offset: 0x17F9B1, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x89D0, symSize: 0x18 }
+  - { offset: 0x17F9E8, size: 0x8, addend: 0x0, symName: '-[UNORedView updateLayer]', symObjAddr: 0x18, symBinAddr: 0x89E8, symSize: 0x70 }
+  - { offset: 0x17FA1B, size: 0x8, addend: 0x0, symName: '-[UNORedView detach]', symObjAddr: 0x88, symBinAddr: 0x8A58, symSize: 0x4 }
+  - { offset: 0x17FA4A, size: 0x8, addend: 0x0, symName: '-[UNORedView dispose]', symObjAddr: 0x8C, symBinAddr: 0x8A5C, symSize: 0x44 }
+  - { offset: 0x17FA7D, size: 0x8, addend: 0x0, symName: '-[UNORedView originalSuperView]', symObjAddr: 0xD0, symBinAddr: 0x8AA0, symSize: 0x10 }
+  - { offset: 0x17FAB4, size: 0x8, addend: 0x0, symName: '-[UNORedView setOriginalSuperView:]', symObjAddr: 0xE0, symBinAddr: 0x8AB0, symSize: 0x40 }
+  - { offset: 0x17FAF5, size: 0x8, addend: 0x0, symName: '-[UNORedView .cxx_destruct]', symObjAddr: 0x120, symBinAddr: 0x8AF0, symSize: 0x14 }
+  - { offset: 0x17FB28, size: 0x8, addend: 0x0, symName: _codebrix_native_create_sample, symObjAddr: 0x134, symBinAddr: 0x8B04, symSize: 0x16C }
+  - { offset: 0x17FB83, size: 0x8, addend: 0x0, symName: _codebrix_native_arrange, symObjAddr: 0x2A0, symBinAddr: 0x8C70, symSize: 0x4 }
+  - { offset: 0x17FBF4, size: 0x8, addend: 0x0, symName: _codebrix_native_attach, symObjAddr: 0x2A4, symBinAddr: 0x8C74, symSize: 0x94 }
+  - { offset: 0x17FC2B, size: 0x8, addend: 0x0, symName: _codebrix_native_detach, symObjAddr: 0x338, symBinAddr: 0x8D08, symSize: 0x9C }
+  - { offset: 0x17FC52, size: 0x8, addend: 0x0, symName: _codebrix_native_is_attached, symObjAddr: 0x3D4, symBinAddr: 0x8DA4, symSize: 0x18 }
+  - { offset: 0x17FCAE, size: 0x8, addend: 0x0, symName: _codebrix_native_measure, symObjAddr: 0x3EC, symBinAddr: 0x8DBC, symSize: 0xFC }
+  - { offset: 0x17FDA3, size: 0x8, addend: 0x0, symName: _codebrix_native_set_opacity, symObjAddr: 0x4E8, symBinAddr: 0x8EB8, symSize: 0x4 }
+  - { offset: 0x17FDD7, size: 0x8, addend: 0x0, symName: _codebrix_native_dispose, symObjAddr: 0x4EC, symBinAddr: 0x8EBC, symSize: 0x3C }
 ...
