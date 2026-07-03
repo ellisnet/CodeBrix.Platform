@@ -13,7 +13,7 @@
     <Project Path="Tests/JustBetweenUs.Encryption.Tests/JustBetweenUs.Encryption.Tests.csproj" />
   </Folder>
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
-  <Project Path="JustBetweenUs.WinUi/JustBetweenUs.WinUi.csproj">
+  <Project Path="JustBetweenUs.WinUI/JustBetweenUs.WinUI.csproj">
     <Platform Project="x64" />
     <Deploy />
   </Project>

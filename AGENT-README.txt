@@ -61,8 +61,9 @@ canonical structure; follow it exactly.
        each head project that imports its .projitems file.
 
   3. ONE .<Platform> HEAD PROJECT PER TARGET  (a net10.0 executable, OutputType=Exe)
-     - One per platform you ship: Windows, WpfSkia, LinuxX11, LinuxWayland,
-       LinuxFrameBuffer, MacOs.
+     - One per platform you ship: Win32Skia, WinWpfSkia, LinuxX11, LinuxWayland,
+       LinuxFrameBuffer, MacOS.  (The names matter - see "PROJECT & HEAD NAMING"
+       below. In particular, NEVER name the Win32 head ".Windows".)
      - Each head is tiny: it imports the .UI shared project, references the
        .Core project, references EXACTLY ONE platform "head" NuGet package, and
        contains a Program.cs with the startup bootstrap.
@@ -79,6 +80,76 @@ Dependency flow (arrows = "references"):
 Why this split? The framework, your view models, and your XAML are 100% shared.
 Only the head project and its single head package change per platform. Adding a
 new platform target = adding one more thin head project.
+
+================================================================================
+
+PROJECT & HEAD NAMING
+=====================
+Name projects so they never collide with an SDK namespace, stay distinct from
+each other and from the solution file, and read clearly. The layout below is
+canonical — follow it.
+
+THE RULE THAT MATTERS MOST: never give a head project a name whose segments match
+a top-level SDK namespace your code uses unqualified — above all "Windows" (the
+root of the WinRT "Windows.*" namespaces), and also "System". A head named
+"MyApp.Windows" gives that project its own "MyApp.Windows" namespace, which
+SHADOWS the global "Windows" namespace: an inline reference such as
+"Windows.System.VirtualKey" in shared code then binds to "MyApp.Windows" and
+fails to compile with CS0234 — on that ONE head only, which is baffling to
+diagnose. (A "using Windows.System;" directive still resolves globally, so the
+breakage is inconsistent and easy to miss.) This is why the Skia-on-Win32 head is
+named ".Win32Skia", never ".Windows".
+
+Also keep every project name distinct from the solution file's base name (a
+"MyApp.Windows.csproj" sitting next to a "MyApp.Windows.slnx" is confusing), and
+use the exact casing shown below.
+
+RECOMMENDED LAYOUT (for an app named "MyApp"):
+
+  1) CodeBrix.Platform (Skia-based) projects.
+     Put these under a "CodeBrixPlatform" solution folder when the solution also
+     contains non-Skia heads:
+
+       MyApp.Core             shared class library: view models, services, and the
+                              framework + extension package references (NOT a head)
+       MyApp.UI               shared PROJECT (.shproj/.projitems, NOT an assembly):
+                              App.xaml + the Views/XAML  (see note below)
+       MyApp.LinuxFrameBuffer Linux framebuffer head
+       MyApp.LinuxWayland     Linux native-Wayland head
+       MyApp.LinuxX11         Linux X11 head
+       MyApp.MacOS            macOS head
+       MyApp.Win32Skia        Skia-on-Win32 head   (NEVER "MyApp.Windows")
+       MyApp.WinWpfSkia       Skia-on-WPF head
+
+     The "Skia" suffix appears ONLY on the two Windows heads, because Windows is
+     the only OS that also ships a native head (WinUI / WPF) to disambiguate from.
+     The Linux and macOS heads have no native counterpart, so they take no suffix.
+
+     Why .UI is a shared project and not folded into .Core: the CodeBrix.Platform
+     (Uno) XAML source-generator + build-task wiring does NOT flow across a
+     ProjectReference. The XAML must be compiled INTO each head, which is exactly
+     what a Shared Project (its .projitems imported by each head) does and a
+     referenced .Core assembly cannot. Do not "tidy" the Views into .Core.
+
+  2) .NET MAUI project.
+     Put it under a "Mobile" solution folder when the solution also contains
+     non-mobile heads:
+
+       MyApp.Mobile           the .NET MAUI head
+
+  3) Native (non-Skia, non-MAUI) heads:
+
+       MyApp.WinUI            native WinUI 3 head
+       MyApp.Wpf              native WPF head
+
+OPTIONAL SUGGESTIONS:
+  - If a solution has several native heads and you want them grouped, a "Native"
+    solution folder for MyApp.WinUI / MyApp.Wpf is one option — but it is not
+    required, and keeping them at the solution root is equally fine.
+  - If you ever hit a namespace collision you cannot resolve by renaming, setting
+    <RootNamespace>MyApp</RootNamespace> on the affected head keeps its generated
+    code out of the colliding segment. Use this as a targeted fix for a specific
+    collision, not as a blanket policy across all heads.
 
 ================================================================================
 
@@ -278,10 +349,11 @@ STEP 2 — Create the .UI Shared Project (App.xaml + Views). A Shared Project is
 the exact file contents to create (App.xaml, App.xaml.cs, Views/MainPage.xaml,
 Views/MainPage.xaml.cs, the .projitems, and the .shproj).
 
-STEP 3 — Create one head project per target. For a Windows (Win32) head:
+STEP 3 — Create one head project per target. For the Skia-on-Win32 head (name it
+".Win32Skia", never ".Windows" — see "PROJECT & HEAD NAMING"):
 
-    dotnet new console -n MyApp.Windows --framework net10.0
-    cd MyApp.Windows
+    dotnet new console -n MyApp.Win32Skia --framework net10.0
+    cd MyApp.Win32Skia
     dotnet add package CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever
     dotnet add reference ../MyApp.Core/MyApp.Core.csproj
     cd ..
@@ -297,8 +369,8 @@ see its dedicated section).
 
 STEP 5 — Build and run a head:
 
-    dotnet build MyApp.Windows/MyApp.Windows.csproj
-    dotnet run --project MyApp.Windows/MyApp.Windows.csproj
+    dotnet build MyApp.Win32Skia/MyApp.Win32Skia.csproj
+    dotnet run --project MyApp.Win32Skia/MyApp.Win32Skia.csproj
 
 ================================================================================
 

@@ -45,6 +45,6 @@
   </Folder>
   <Project Path="MediaPlayerDemo.Core/MediaPlayerDemo.Core.csproj" />
   <Project Path="MediaPlayerDemo.UI/MediaPlayerDemo.UI.shproj" Id="7d71149e-519b-41e6-b8d0-58e82613a098" />
-  <Project Path="MediaPlayerDemo.Windows/MediaPlayerDemo.Windows.csproj" />
-  <Project Path="MediaPlayerDemo.WpfSkia/MediaPlayerDemo.WpfSkia.csproj" />
+  <Project Path="MediaPlayerDemo.Win32Skia/MediaPlayerDemo.Win32Skia.csproj" />
+  <Project Path="MediaPlayerDemo.WinWpfSkia/MediaPlayerDemo.WinWpfSkia.csproj" />
 </Solution>

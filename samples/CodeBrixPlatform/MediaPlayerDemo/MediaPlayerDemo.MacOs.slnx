@@ -42,6 +42,6 @@
     <Project Path="../../../src/Platform.Analyzers/Platform.Analyzers.csproj" />
   </Folder>
   <Project Path="MediaPlayerDemo.Core/MediaPlayerDemo.Core.csproj" />
-  <Project Path="MediaPlayerDemo.MacOs/MediaPlayerDemo.MacOs.csproj" />
+  <Project Path="MediaPlayerDemo.MacOS/MediaPlayerDemo.MacOS.csproj" />
   <Project Path="MediaPlayerDemo.UI/MediaPlayerDemo.UI.shproj" Id="7d71149e-519b-41e6-b8d0-58e82613a098" />
 </Solution>

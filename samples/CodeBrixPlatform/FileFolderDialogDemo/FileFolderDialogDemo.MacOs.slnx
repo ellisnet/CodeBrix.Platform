@@ -39,6 +39,6 @@
     <Project Path="../../../src/Platform.Analyzers/Platform.Analyzers.csproj" />
   </Folder>
   <Project Path="FileFolderDialogDemo.Core/FileFolderDialogDemo.Core.csproj" />
-  <Project Path="FileFolderDialogDemo.MacOs/FileFolderDialogDemo.MacOs.csproj" />
+  <Project Path="FileFolderDialogDemo.MacOS/FileFolderDialogDemo.MacOS.csproj" />
   <Project Path="FileFolderDialogDemo.UI/FileFolderDialogDemo.UI.shproj" Id="22697f3c-ede3-479f-b36c-abe52b73cf0d" />
 </Solution>

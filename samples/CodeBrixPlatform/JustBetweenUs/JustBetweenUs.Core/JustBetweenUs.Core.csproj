@@ -60,7 +60,7 @@
     from-source Skia build (src/Platform.UI/Platform.UI.Skia.csproj).
     NOTE: the XAML source-generator + build-task wiring does NOT flow across a
     ProjectReference; it must be added to the XAML-compiling head projects
-    (JustBetweenUs.Windows / JustBetweenUs.WpfSkia), not here.
+    (JustBetweenUs.Win32Skia / JustBetweenUs.WinWpfSkia), not here.
   -->
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />

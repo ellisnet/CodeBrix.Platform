@@ -42,6 +42,6 @@
     <Project Path="../../../src/Platform.Analyzers/Platform.Analyzers.csproj" />
   </Folder>
   <Project Path="WebViewDemo.Core/WebViewDemo.Core.csproj" />
-  <Project Path="WebViewDemo.MacOs/WebViewDemo.MacOs.csproj" />
+  <Project Path="WebViewDemo.MacOS/WebViewDemo.MacOS.csproj" />
   <Project Path="WebViewDemo.UI/WebViewDemo.UI.shproj" Id="a8c24281-eba3-43b7-b3cd-eeb39ec40536" />
 </Solution>

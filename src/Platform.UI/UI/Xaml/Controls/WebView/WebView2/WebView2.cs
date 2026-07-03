@@ -46,6 +46,28 @@ public partial class WebView2 : Control, IWebView
 
 	public CoreWebView2 CoreWebView2 { get; }
 
+	/// <summary>
+	/// Gets the current top-level document URL straight from the underlying
+	/// <see cref="CoreWebView2"/> engine — its <see cref="Microsoft.Web.WebView2.Core.CoreWebView2.Source"/>
+	/// value reported verbatim, with no transformation.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Prefer this over the <see cref="Source"/> dependency property when you need the URL the
+	/// control is <em>currently</em> displaying — for example inside a navigation callback, or
+	/// after a server redirect or a user/link navigation. <see cref="Source"/> is a mirror the
+	/// control updates from <c>CoreWebView2.SourceChanged</c> and is intended for <em>setting</em>
+	/// / binding a target URL, so it can momentarily lag the engine's live value; this property
+	/// never does, because it reads the engine directly.
+	/// </para>
+	/// <para>
+	/// Returns <c>null</c> when the underlying <see cref="CoreWebView2"/> instance is not
+	/// available. This is a read-only, point-in-time value: it does not raise change
+	/// notifications and is not intended to be used as a binding target.
+	/// </para>
+	/// </remarks>
+	public string? SourceFromCore => CoreWebView2?.Source;
+
 	bool IWebView.IsLoaded => IsLoaded;
 
 	bool IWebView.SwitchSourceBeforeNavigating => false; // WebView2 switches source only when navigation completes.

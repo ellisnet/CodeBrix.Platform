@@ -49,6 +49,6 @@
   </Folder>
   <Project Path="JustBetweenUs.Core/JustBetweenUs.Core.csproj" />
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
-  <Project Path="JustBetweenUs.MacOs/JustBetweenUs.MacOs.csproj" />
+  <Project Path="JustBetweenUs.MacOS/JustBetweenUs.MacOS.csproj" />
   <Project Path="JustBetweenUs.UI/JustBetweenUs.UI.shproj" Id="13903639-2fee-43d3-a920-4fb073e6702b" />
 </Solution>

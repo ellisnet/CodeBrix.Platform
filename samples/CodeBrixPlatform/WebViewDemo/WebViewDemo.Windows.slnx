@@ -44,6 +44,6 @@
   </Folder>
   <Project Path="WebViewDemo.Core/WebViewDemo.Core.csproj" />
   <Project Path="WebViewDemo.UI/WebViewDemo.UI.shproj" Id="a8c24281-eba3-43b7-b3cd-eeb39ec40536" />
-  <Project Path="WebViewDemo.Windows/WebViewDemo.Windows.csproj" />
-  <Project Path="WebViewDemo.WpfSkia/WebViewDemo.WpfSkia.csproj" />
+  <Project Path="WebViewDemo.Win32Skia/WebViewDemo.Win32Skia.csproj" />
+  <Project Path="WebViewDemo.WinWpfSkia/WebViewDemo.WinWpfSkia.csproj" />
 </Solution>

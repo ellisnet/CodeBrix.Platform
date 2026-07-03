@@ -41,6 +41,6 @@
   </Folder>
   <Project Path="FileFolderDialogDemo.Core/FileFolderDialogDemo.Core.csproj" />
   <Project Path="FileFolderDialogDemo.UI/FileFolderDialogDemo.UI.shproj" Id="22697f3c-ede3-479f-b36c-abe52b73cf0d" />
-  <Project Path="FileFolderDialogDemo.Windows/FileFolderDialogDemo.Windows.csproj" />
-  <Project Path="FileFolderDialogDemo.WpfSkia/FileFolderDialogDemo.WpfSkia.csproj" />
+  <Project Path="FileFolderDialogDemo.Win32Skia/FileFolderDialogDemo.Win32Skia.csproj" />
+  <Project Path="FileFolderDialogDemo.WinWpfSkia/FileFolderDialogDemo.WinWpfSkia.csproj" />
 </Solution>

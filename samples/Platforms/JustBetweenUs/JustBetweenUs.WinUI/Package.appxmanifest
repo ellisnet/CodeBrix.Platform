@@ -15,7 +15,7 @@
   <mp:PhoneIdentity PhoneProductId="a7f99875-4974-4a24-831e-8b238ba19abc" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>JustBetweenUs.WinUi</DisplayName>
+    <DisplayName>JustBetweenUs.WinUI</DisplayName>
     <PublisherDisplayName>jerem</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
@@ -34,8 +34,8 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="JustBetweenUs.WinUi"
-        Description="JustBetweenUs.WinUi"
+        DisplayName="JustBetweenUs.WinUI"
+        Description="JustBetweenUs.WinUI"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png">

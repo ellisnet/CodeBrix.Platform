@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Page
-    x:Class="JustBetweenUs.WinUi.Views.MainPage"
+    x:Class="JustBetweenUs.WinUI.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:JustBetweenUs.WinUi.Views"
+    xmlns:local="using:JustBetweenUs.WinUI.Views"
     xmlns:vm="using:JustBetweenUs.ViewModels"
     xmlns:controls="using:CodeBrix.Platform.WinUI.Controls"
     xmlns:lottie="using:CodeBrix.Platform.WinUI.Lottie"
@@ -60,14 +60,14 @@
                 VerticalAlignment="Center" HorizontalAlignment="Right"
                 Background="#FFB85555"
                 Command="{Binding EncryptCommand}"
-                ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.padlock-icon.svg"
+                ImageUriSource="embedded://JustBetweenUs.WinUI/JustBetweenUs.WinUI.Assets.padlock-icon.svg"
                 Text="Encrypt" ImageWidth="40" ImageHeight="40" Spacing="6" ImagePosition="Top" />
 
             <controls:EmbeddedImageButton Margin="20,0,0,0" Width="140" Height="90"
                 VerticalAlignment="Center" HorizontalAlignment="Left"
                 Background="#FFB85555"
                 Command="{Binding DecryptCommand}"
-                ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.unlocked-icon.svg"
+                ImageUriSource="embedded://JustBetweenUs.WinUI/JustBetweenUs.WinUI.Assets.unlocked-icon.svg"
                 Text="Decrypt" ImageWidth="40" ImageHeight="40" Spacing="6" ImagePosition="Top" />
 
         </StackPanel>
@@ -82,7 +82,7 @@
             VerticalAlignment="Center" HorizontalAlignment="Center"
             Background="#FFB85555"
             Command="{Binding CopyToClipboardCommand}"
-            ImageUriSource="embedded://JustBetweenUs.WinUi/JustBetweenUs.WinUi.Assets.clipboard.svg">
+            ImageUriSource="embedded://JustBetweenUs.WinUI/JustBetweenUs.WinUI.Assets.clipboard.svg">
             Copy to Clipboard
         </controls:EmbeddedImageButton>
 

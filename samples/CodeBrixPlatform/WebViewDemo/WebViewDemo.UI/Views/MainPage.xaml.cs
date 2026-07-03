@@ -48,7 +48,16 @@ public sealed partial class MainPage : Page
 
     private void Browser_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
     {
-        AddressBox.Text = Browser.Source?.ToString() ?? string.Empty;
+        // Reading the current URL: use CoreWebView2.Source, NOT the XAML Source property.
+        //   - Source (the DependencyProperty) is for *setting* / binding a target URL. It is a
+        //     mirror the control updates from CoreWebView2.SourceChanged, so inside a navigation
+        //     callback - and after server redirects or user/link navigations - it can still hold
+        //     the previously requested URL.
+        //   - CoreWebView2.Source is the engine's own live value: the authoritative current
+        //     top-level document URL. Read it here to know "where am I now?".
+        // (This is true of the native WinUI/WPF WebView2 as well - it is the shared WebView2
+        //  API contract, not specific to CodeBrix.Platform.)
+        AddressBox.Text = sender.CoreWebView2?.Source ?? Browser.Source?.ToString() ?? string.Empty;
 
         var title = Browser.CoreWebView2?.DocumentTitle;
         StatusText.Text = args.IsSuccess

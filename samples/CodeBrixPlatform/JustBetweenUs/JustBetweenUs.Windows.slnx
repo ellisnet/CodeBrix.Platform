@@ -51,6 +51,6 @@
   <Project Path="JustBetweenUs.Core/JustBetweenUs.Core.csproj" />
   <Project Path="JustBetweenUs.Encryption/JustBetweenUs.Encryption.csproj" />
   <Project Path="JustBetweenUs.UI/JustBetweenUs.UI.shproj" Id="13903639-2fee-43d3-a920-4fb073e6702b" />
-  <Project Path="JustBetweenUs.Windows/JustBetweenUs.Windows.csproj" />
-  <Project Path="JustBetweenUs.WpfSkia/JustBetweenUs.WpfSkia.csproj" />
+  <Project Path="JustBetweenUs.Win32Skia/JustBetweenUs.Win32Skia.csproj" />
+  <Project Path="JustBetweenUs.WinWpfSkia/JustBetweenUs.WinWpfSkia.csproj" />
 </Solution>
