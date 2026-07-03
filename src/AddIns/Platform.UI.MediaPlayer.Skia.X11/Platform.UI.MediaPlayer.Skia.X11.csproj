@@ -16,6 +16,9 @@
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageReadmeFile></PackageReadmeFile>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever</PackageId>
+		<!-- LGPL-2.1-or-later (LibVLC-based), overriding the repo-wide Apache-2.0 default. This legacy
+		     add-on is never published, but keep the license honest with its ".LgplLicenseForever" id. -->
+		<PackageLicenseExpression>LGPL-2.1-or-later</PackageLicenseExpression>
 		<Description>This package provides support for MediaPlayerElement for CodeBrix.Platform Skia+X11 apps</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
