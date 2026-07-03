@@ -34,6 +34,10 @@ internal class Win32FileFolderPickerExtension(IFilePicker picker) : IFileOpenPic
 
 	private unsafe Task<IReadOnlyList<StorageFile>> PickFiles(bool directory, bool single)
 	{
+		// IFileOpenDialog.Show (below) is modal and STA-only; on an MTA thread it hangs. Fail fast
+		// with actionable guidance instead.
+		Win32PickerThreadGuard.EnsureStaThread(directory ? "folder picker dialog" : "file picker dialog");
+
 		using ComScope<IFileOpenDialog> iFileOpenDialog = default;
 		var fileOpenDialogClsid = CLSID.FileOpenDialog;
 		var iFileOpenDialogRiid = IFileOpenDialog.IID_Guid;

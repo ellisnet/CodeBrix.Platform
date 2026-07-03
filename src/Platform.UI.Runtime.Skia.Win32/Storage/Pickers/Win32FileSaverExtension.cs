@@ -25,6 +25,10 @@ internal class Win32FileSaverExtension(FileSavePicker picker) : IFileSavePickerE
 {
 	public unsafe Task<StorageFile?> PickSaveFileAsync(CancellationToken token)
 	{
+		// IFileSaveDialog.Show (below) is modal and STA-only; on an MTA thread it hangs. Fail fast
+		// with actionable guidance instead.
+		Win32PickerThreadGuard.EnsureStaThread("file save dialog");
+
 		using ComScope<IFileSaveDialog> iFileSaveDialog = default;
 		var fileSaveDialogClsid = CLSID.FileSaveDialog;
 		var iFileSaveDialogRiid = IFileSaveDialog.IID_Guid;

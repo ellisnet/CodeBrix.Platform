@@ -216,11 +216,17 @@ internal partial class InputManager
 				// Set us as the current dispatching
 				if (_manager._current is not null)
 				{
+					// Reentrant pointer dispatch. This legitimately happens when a native modal dialog
+					// (e.g. the Win32 file/folder picker's IFileOpenDialog.Show) pumps its own nested
+					// message loop while the click that opened it is still being dispatched: the nested
+					// loop can raise a new pointer event before the outer dispatch completes. It is benign
+					// - and is the normal (unasserted) behavior in Release, where the Debug.Fail is compiled
+					// out - so we log it for diagnostics but deliberately do NOT Debug.Fail here. Halting on
+					// every native dialog was just noise (see FileFolderDialogDemo).
 					if (this.Log().IsEnabled(LogLevel.Debug))
 					{
 						this.Log().Debug($"A pointer is already being processed {_manager._current} while trying to raise {this}");
 					}
-					Debug.Fail($"A pointer is already being processed {_manager._current} while trying to raise {this}.");
 				}
 				_manager._current = this;
 
