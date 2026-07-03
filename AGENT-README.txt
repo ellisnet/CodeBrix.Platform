@@ -211,6 +211,44 @@ package is versioned to track the SkiaSharp release it vendors).
   the X11 head for maximum reach, the Wayland head for a native, forward-looking
   Wayland experience — or both, as separate heads.
 
+--- PERMANENT WAYLAND DIFFERENCES (protocol-inherent; not bugs, not planned work) ---
+
+  The Wayland protocol deliberately withholds some window control from clients.
+  APIs that work on the X11 head but are PERMANENT no-ops on the Wayland head
+  (each logs a one-time Warning naming the API on first use):
+
+  - AppWindow.Move / any window positioning. The compositor owns placement;
+    clients cannot set global window coordinates, and cannot read them back
+    either - AppWindow.Position always reports (0,0) on Wayland.
+  - AppWindow.Resize and ApplicationView.TryResizeView. A client cannot force
+    its outer window size; the compositor has the last word. (The window's
+    INITIAL size, via ApplicationView.PreferredLaunchViewSize, does work.)
+  - OverlappedPresenter.IsAlwaysOnTop. Core Wayland/xdg-shell has no
+    always-on-top for regular application windows.
+  - OverlappedPresenter.IsMinimizable / IsMaximizable. xdg-shell cannot remove
+    those capabilities; compositor/decoration policy decides.
+  - Minimized-state READBACK. A client can request minimize, but Wayland never
+    tells it whether/when the window was unminimized, so
+    OverlappedPresenter.State may report Minimized while the window is visible
+    again. (Maximize/restore state DOES reflect correctly, including external
+    maximize from the titlebar.)
+
+  Related notes:
+  - Native content in a ContentPresenter is not hosted yet on Wayland (needs
+    subsurfaces; parity plan P7). Until then the content is ignored with a
+    one-time warning. The shipping WebView (offscreen WPE) and MediaPlayer
+    (vmem) add-ins are windowing-agnostic by design and are NOT affected.
+  - The window/taskbar icon comes from a .desktop file whose name matches the
+    app id (the appxmanifest package name, falling back to the entry assembly
+    name), placed in ~/.local/share/applications or /usr/share/applications
+    with an Icon= entry. The xdg-toplevel-icon-v1 protocol is pinned in the
+    bindings for a future in-process path, but common desktops (including
+    Cinnamon/Muffin) do not support it yet.
+  - Window self-activation (Window.Activate()) rides xdg-activation-v1 and is
+    subject to compositor focus-stealing policy: without a recent user
+    interaction the compositor may only flag the window as demanding attention
+    rather than focusing it.
+
 --- MEDIA PLAYER ADD-ON PACKAGE (optional; ONE package covers five heads) ---
 
   CodeBrix.Platform.MediaPlayer.LgplLicenseForever      Win32, WPF, X11, Wayland, FrameBuffer
@@ -857,11 +895,19 @@ LINUX (native Wayland):
   - Rendering is software (shared-memory) by default — universal and proven. A
     GPU (EGL/GLES) path is opt-in via the environment variable
     CODEBRIX_WAYLAND_USE_GPU=1; it falls back to software if GL is unavailable.
-  - Not yet implemented in this head (deferred): popup windows for flyout-based
-    controls (ComboBox dropdowns, MenuFlyout, ToolTip), drag-and-drop,
-    fractional (non-integer) display scaling, and IME text input. Text clipboard
-    (copy AND paste) works. Prefer the X11 head if your UI depends heavily on
-    flyout controls today.
+  - Working, at parity with the X11 head: flyout-based controls (ComboBox
+    dropdowns, MenuFlyout, ToolTip, dialogs), rich clipboard (text, HTML, PNG
+    images, file lists, custom formats — copy AND paste), ACCEPTING
+    drag-and-drop from other applications (initiating a drag is not implemented
+    on the X11 head either), fractional (non-integer) display scaling, custom
+    title bars (ExtendContentIntoTitleBar), and window activation
+    (xdg-activation; compositor focus policy applies).
+  - Not yet implemented in this head (deferred): touch input, native-view
+    hosting in a ContentPresenter (needs subsurfaces), and IME text input (IME
+    is missing on the X11 head too).
+  - For the protocol-inherent gaps that will never change (window positioning,
+    forced resize, always-on-top, and friends) see the "PERMANENT WAYLAND
+    DIFFERENCES" section earlier in this file.
 
 LINUX (framebuffer):
   - Use the framebuffer head for embedded/kiosk devices with no X11/desktop
