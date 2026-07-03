@@ -35,6 +35,9 @@
 		<file src="..\..\README.md" target="/" />
 		<file src="..\..\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+		<!-- The CodeBrix-family package catalog travels ONLY in this core package
+		     (deliberately not added to any other nuspec/csproj-packed package). -->
+		<file src="..\..\CODEBRIX_PLATFORM_README.md" target="/" />
 
 		<!-- ============================================================ -->
 		<!-- net10.0 reference assemblies (lib)                           -->
