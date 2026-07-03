@@ -58,6 +58,16 @@ internal abstract class NativeWindowWrapperBase : INativeWindowWrapper
 	{
 		_window = window;
 		_xamlRoot = xamlRoot;
+
+		// Relay the WinUI title-bar mode to the platform head (which hides/shows the native
+		// decorations accordingly). Without this relay the per-head ExtendContentIntoTitleBar
+		// overrides are never reached. Wrapper and window lifetimes match, so the
+		// subscription needs no teardown.
+		window.AppWindow.TitleBar.ExtendsContentIntoTitleBarChanged += ExtendContentIntoTitleBar;
+		if (window.AppWindow.TitleBar.ExtendsContentIntoTitleBar)
+		{
+			ExtendContentIntoTitleBar(true);
+		}
 	}
 
 	public abstract object? NativeWindow { get; }

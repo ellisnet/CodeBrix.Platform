@@ -47,6 +47,11 @@ WHAT WAS TAKEN
   Protocol XML from the upstream freedesktop repos -> protocols/ (pinned copies;
       future protocol updates come from upstream freedesktop, never from a fresh
       NWayland pull).
+      2026-07-03: added xdg-activation-v1.xml and xdg-toplevel-icon-v1.xml
+      (both MIT, fetched from wayland-protocols main: staging/xdg-activation,
+      staging/xdg-toplevel-icon) for the window-API parity work — activation is
+      wired to Window.Activate(); the toplevel-icon binding is pinned for a
+      future in-process window-icon path.
 
 FORK PATCHES (diff against upstream NWayland.Generator)
 -------------------------------------------------------

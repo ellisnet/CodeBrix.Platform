@@ -25,11 +25,16 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 	private int _currentWidth;
 	private int _currentHeight;
 	private bool _activated;
+	private bool _pendingMaximized;
+	private bool _pendingFullscreen;
+	private bool _maximized;
+	private bool _fullscreen;
 	private readonly int _defaultWidth;
 	private readonly int _defaultHeight;
 
 	public event Action<int, int, bool>? Configured;
 	public event Action? CloseRequested;
+	public event Action<bool, bool>? WindowStateChanged;
 
 	event Action<int, int, bool> IWaylandShellSurface.Configured
 	{
@@ -41,6 +46,12 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 	{
 		add => CloseRequested += value;
 		remove => CloseRequested -= value;
+	}
+
+	event Action<bool, bool> IWaylandShellSurface.WindowStateChanged
+	{
+		add => WindowStateChanged += value;
+		remove => WindowStateChanged -= value;
 	}
 
 	public WlSurface Surface => _surface;
@@ -80,12 +91,21 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 		}
 
 		_activated = false;
+		_pendingMaximized = false;
+		_pendingFullscreen = false;
 		foreach (var state in states)
 		{
-			if (state == XdgToplevel.StateEnum.Activated)
+			switch (state)
 			{
-				_activated = true;
-				break;
+				case XdgToplevel.StateEnum.Activated:
+					_activated = true;
+					break;
+				case XdgToplevel.StateEnum.Maximized:
+					_pendingMaximized = true;
+					break;
+				case XdgToplevel.StateEnum.Fullscreen:
+					_pendingFullscreen = true;
+					break;
 			}
 		}
 	}
@@ -99,12 +119,29 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 		_currentWidth = width;
 		_currentHeight = height;
 
+		if (_pendingMaximized != _maximized || _pendingFullscreen != _fullscreen)
+		{
+			_maximized = _pendingMaximized;
+			_fullscreen = _pendingFullscreen;
+			WindowStateChanged?.Invoke(_maximized, _fullscreen);
+		}
+
 		Configured?.Invoke(width, height, _activated);
 	}
 
 	public void SetTitle(string title) => _toplevel.SetTitle(title);
 
 	public void SetAppId(string appId) => _toplevel.SetAppId(appId);
+
+	public void SetDecorationsVisible(bool visible)
+	{
+		// Without a decoration manager this path is already undecorated; with one, flipping
+		// to client-side (and drawing none) is the "hidden decorations" state.
+		_decoration?.SetMode(visible
+			? ZxdgToplevelDecorationV1.ModeEnum.ServerSide
+			: ZxdgToplevelDecorationV1.ModeEnum.ClientSide);
+		_connection.Flush();
+	}
 
 	public void SetMaximized(bool maximized)
 	{
@@ -116,9 +153,16 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 		{
 			_toplevel.UnsetMaximized();
 		}
+		// Flush so the request is not stuck in the client send buffer until an unrelated
+		// flush happens (observed as maximize/restore applying seconds late).
+		_connection.Flush();
 	}
 
-	public void SetMinimized() => _toplevel.SetMinimized();
+	public void SetMinimized()
+	{
+		_toplevel.SetMinimized();
+		_connection.Flush();
+	}
 
 	public void SetFullscreen(bool fullscreen)
 	{
@@ -130,12 +174,14 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 		{
 			_toplevel.UnsetFullscreen();
 		}
+		_connection.Flush();
 	}
 
 	public void SetMinMaxSize(int minWidth, int minHeight, int maxWidth, int maxHeight)
 	{
 		_toplevel.SetMinSize(minWidth, minHeight);
 		_toplevel.SetMaxSize(maxWidth, maxHeight);
+		_connection.Flush();
 	}
 
 	public void MapInitial()

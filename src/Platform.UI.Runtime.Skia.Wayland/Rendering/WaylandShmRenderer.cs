@@ -29,9 +29,12 @@ internal sealed class WaylandShmRenderer : IWaylandRenderer
 
 	private readonly object _gate = new();
 	private readonly IXamlRootHost _host;
+	private readonly WaylandXamlRootHost? _waylandHost;
 	private readonly WaylandConnection _connection;
 	private readonly WlSurface _wlSurface;
 	private readonly BufferSlot[] _slots = new BufferSlot[SlotCount];
+	private int _lastViewportWidth = -1;
+	private int _lastViewportHeight = -1;
 
 	private SKColor _background = SKColors.White;
 	private WlShmPool? _pool;
@@ -51,6 +54,7 @@ internal sealed class WaylandShmRenderer : IWaylandRenderer
 	public WaylandShmRenderer(IXamlRootHost host, WaylandConnection connection, WlSurface wlSurface)
 	{
 		_host = host;
+		_waylandHost = host as WaylandXamlRootHost;
 		_connection = connection;
 		_wlSurface = wlSurface;
 		for (var i = 0; i < SlotCount; i++)
@@ -112,10 +116,23 @@ internal sealed class WaylandShmRenderer : IWaylandRenderer
 			}
 
 			slot.Busy = true;
-			// The compositor needs to know the buffer is _bufferScale× the logical size so it
-			// scales it down for display (integer HiDPI). DamageBuffer coordinates are in buffer
-			// (physical) pixels, which is what _width/_height hold.
+			// The compositor needs to know how the (physical-pixel) buffer maps to the
+			// window's logical size. With wp_viewporter the viewport destination carries the
+			// logical size and the buffer scale stays 1 (this is what makes FRACTIONAL scales
+			// exact); without it, wl_surface.set_buffer_scale advertises the integer factor.
+			// DamageBuffer coordinates are buffer (physical) pixels, which _width/_height hold.
 			_wlSurface.SetBufferScale(_bufferScale);
+			if (_waylandHost is { Viewport: { } viewport })
+			{
+				var logical = _waylandHost.CurrentSize;
+				if (logical.Width > 0 && logical.Height > 0
+					&& (logical.Width != _lastViewportWidth || logical.Height != _lastViewportHeight))
+				{
+					viewport.SetDestination(logical.Width, logical.Height);
+					_lastViewportWidth = logical.Width;
+					_lastViewportHeight = logical.Height;
+				}
+			}
 			_wlSurface.Attach(slot.Buffer, 0, 0);
 			_wlSurface.DamageBuffer(0, 0, _width, _height);
 			_framePending = true;
@@ -195,10 +212,13 @@ internal sealed class WaylandShmRenderer : IWaylandRenderer
 
 		ReleaseBuffers();
 
-		// The integer output scale the buffers are rendered at. The size arriving here is
-		// already physical pixels (Uno renders at logical × RasterizationScale), so the buffer
-		// dimensions are physical and we advertise the scale via wl_surface.set_buffer_scale.
-		_bufferScale = Math.Max(1, _connection.PrimaryOutput.Scale);
+		// The size arriving here is already physical pixels (Uno renders at logical ×
+		// RasterizationScale). With a viewport the buffer scale stays 1 (the viewport
+		// destination maps the buffer onto the logical size, fractional factors included);
+		// otherwise advertise the window's integer scale via wl_surface.set_buffer_scale.
+		_bufferScale = _waylandHost is { Viewport: not null }
+			? 1
+			: Math.Max(1, (int)Math.Round(_waylandHost?.EffectiveScale ?? _connection.PrimaryOutput.Scale));
 
 		_width = width;
 		_height = height;

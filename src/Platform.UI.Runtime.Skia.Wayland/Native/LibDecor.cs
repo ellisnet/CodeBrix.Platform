@@ -146,6 +146,13 @@ internal static partial class LibDecor
 	internal static partial bool libdecor_frame_is_floating(IntPtr frame);
 
 	[LibraryImport(LibName)]
+	internal static partial void libdecor_frame_set_visibility(IntPtr frame, [MarshalAs(UnmanagedType.Bool)] bool visible);
+
+	[LibraryImport(LibName)]
+	[return: MarshalAs(UnmanagedType.Bool)]
+	internal static partial bool libdecor_frame_is_visible(IntPtr frame);
+
+	[LibraryImport(LibName)]
 	internal static partial IntPtr libdecor_frame_get_xdg_surface(IntPtr frame);
 
 	[LibraryImport(LibName)]

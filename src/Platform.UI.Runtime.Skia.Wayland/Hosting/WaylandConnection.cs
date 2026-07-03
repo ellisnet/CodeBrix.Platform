@@ -7,6 +7,7 @@ using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.FractionalScaleV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Viewporter;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.CursorShapeV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgActivationV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgDecorationUnstableV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgForeignUnstableV2;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.XdgShell;
@@ -136,6 +137,7 @@ internal sealed class WaylandConnection : IDisposable
 	public WpFractionalScaleManagerV1? FractionalScaleManager { get; }
 	public WlDataDeviceManager? DataDeviceManager { get; }
 	public WpCursorShapeManagerV1? CursorShapeManager { get; }
+	public XdgActivationV1? Activation { get; }
 
 	/// <summary>
 	/// xdg-foreign-unstable-v2 exporter, used to hand a toplevel surface handle to another
@@ -223,6 +225,7 @@ internal sealed class WaylandConnection : IDisposable
 		FractionalScaleManager = Bind<WpFractionalScaleManagerV1>(_registry, "wp_fractional_scale_manager_v1");
 		DataDeviceManager = Bind<WlDataDeviceManager>(_registry, "wl_data_device_manager");
 		CursorShapeManager = Bind<WpCursorShapeManagerV1>(_registry, "wp_cursor_shape_manager_v1");
+		Activation = Bind<XdgActivationV1>(_registry, "xdg_activation_v1");
 		Exporter = Bind<ZxdgExporterV2>(_registry, "zxdg_exporter_v2");
 
 		// Second roundtrip: let the bound globals deliver their initial state

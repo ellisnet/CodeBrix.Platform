@@ -19,6 +19,8 @@ internal class Program
 		"protocols/wayland-protocols/text-input-unstable-v3.xml",
 		"protocols/wayland-protocols/primary-selection-unstable-v1.xml",
 		"protocols/wayland-protocols/xdg-foreign-unstable-v2.xml",
+		"protocols/wayland-protocols/xdg-activation-v1.xml",
+		"protocols/wayland-protocols/xdg-toplevel-icon-v1.xml",
 	};
 
 	// Namespace the generated protocol classes live in; each protocol gets a

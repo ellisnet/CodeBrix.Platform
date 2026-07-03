@@ -22,21 +22,26 @@ internal class WaylandNativeOverlappedPresenter(WaylandXamlRootHost host) : INat
 	public void SetIsMinimizable(bool isMinimizable)
 	{
 		// Not expressible in xdg-shell; compositor/decoration policy decides.
+		WaylandNotSupported.WarnOnce(typeof(WaylandNativeOverlappedPresenter),
+			"OverlappedPresenter.IsMinimizable",
+			"xdg-shell cannot remove the minimize capability; compositor/decoration policy decides.");
 	}
 
 	public void SetIsMaximizable(bool isMaximizable)
 	{
 		// Not expressible in xdg-shell; compositor/decoration policy decides.
+		WaylandNotSupported.WarnOnce(typeof(WaylandNativeOverlappedPresenter),
+			"OverlappedPresenter.IsMaximizable",
+			"xdg-shell cannot remove the maximize capability; compositor/decoration policy decides.");
 	}
 
 	public void SetIsAlwaysOnTop(bool isAlwaysOnTop)
 	{
 		// Not expressible in core Wayland/xdg-shell for regular apps (needs
 		// wlr-layer-shell, which is compositor-specific). No-op by design.
-		if (this.Log().IsEnabled(LogLevel.Debug))
-		{
-			this.Log().Debug("Always-on-top is not available on Wayland.");
-		}
+		WaylandNotSupported.WarnOnce(typeof(WaylandNativeOverlappedPresenter),
+			"OverlappedPresenter.IsAlwaysOnTop",
+			"core Wayland/xdg-shell has no always-on-top for regular application windows (wlr-layer-shell is compositor-specific).");
 	}
 
 	public void Maximize()
@@ -59,7 +64,22 @@ internal class WaylandNativeOverlappedPresenter(WaylandXamlRootHost host) : INat
 
 	public void SetBorderAndTitleBar(bool hasBorder, bool hasTitleBar)
 	{
-		// TODO(P4): toggle decorations (xdg-decoration mode / libdecor visibility).
+		// Wayland decorations are all-or-nothing (no border-without-titlebar): the frame is
+		// shown unless the caller asked for a fully undecorated window.
+		host.ShellSurface?.SetDecorationsVisible(hasBorder || hasTitleBar);
+	}
+
+	/// <summary>
+	/// UI thread, from <see cref="WaylandXamlRootHost.WindowStateChanged"/>: reflects
+	/// compositor-side maximize/restore (titlebar button, keyboard shortcut) into the
+	/// presenter state instead of only tracking our own requests.
+	/// </summary>
+	internal void OnNativeWindowStateChanged(bool maximized, bool fullscreen)
+	{
+		if (_state != OverlappedPresenterState.Minimized || maximized)
+		{
+			_state = maximized ? OverlappedPresenterState.Maximized : OverlappedPresenterState.Restored;
+		}
 	}
 
 	public void SetSizeConstraints(int? preferredMinimumWidth, int? preferredMinimumHeight, int? preferredMaximumWidth, int? preferredMaximumHeight)

@@ -169,6 +169,23 @@ internal sealed class WaylandSeatManager
 		return SetThemedCursor(shape);
 	}
 
+	/// <summary>
+	/// Hides the pointer while it is over this client's surfaces: wl_pointer.set_cursor with
+	/// a null surface (works with and without cursor-shape-v1). The cursor re-appears when a
+	/// shape is set again (or automatically on focus of another client's surface).
+	/// </summary>
+	internal bool HideCursor()
+	{
+		if (_pointer is not { } pointer)
+		{
+			return false;
+		}
+
+		pointer.SetCursor(_lastPointerEnterSerial, null, 0, 0);
+		_connection.Flush();
+		return true;
+	}
+
 	private bool SetThemedCursor(WpCursorShapeDeviceV1.ShapeEnum shape)
 	{
 		if (_pointer is not { } pointer)

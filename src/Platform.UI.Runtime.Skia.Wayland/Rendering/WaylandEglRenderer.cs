@@ -28,8 +28,11 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 
 	private readonly object _gate = new();
 	private readonly IXamlRootHost _host;
+	private readonly WaylandXamlRootHost? _waylandHost;
 	private readonly WaylandConnection _connection;
 	private readonly WlSurface _wlSurface;
+	private int _lastViewportWidth = -1;
+	private int _lastViewportHeight = -1;
 
 	private SKColor _background = SKColors.White;
 	private IntPtr _eglDisplay;
@@ -52,6 +55,7 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 	public WaylandEglRenderer(IXamlRootHost host, WaylandConnection connection, WlSurface wlSurface)
 	{
 		_host = host;
+		_waylandHost = host as WaylandXamlRootHost;
 		_connection = connection;
 		_wlSurface = wlSurface;
 	}
@@ -65,7 +69,6 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 			return;
 		}
 
-		_bufferScale = Math.Max(1, _connection.PrimaryOutput.Scale);
 		_eglWindow = LibWaylandEgl.wl_egl_window_create(_wlSurface.Handle, width, height);
 		if (_eglWindow == IntPtr.Zero)
 		{
@@ -140,7 +143,21 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 			}
 
 			_grContext!.Flush();
+			// Same buffer->logical mapping rules as the shm renderer: viewport destination
+			// (buffer scale 1) when wp_viewporter is available — exact for fractional scales —
+			// else the window's integer buffer scale, re-read on resize so scale changes apply.
 			_wlSurface.SetBufferScale(_bufferScale);
+			if (_waylandHost is { Viewport: { } viewport })
+			{
+				var logical = _waylandHost.CurrentSize;
+				if (logical.Width > 0 && logical.Height > 0
+					&& (logical.Width != _lastViewportWidth || logical.Height != _lastViewportHeight))
+				{
+					viewport.SetDestination(logical.Width, logical.Height);
+					_lastViewportWidth = logical.Width;
+					_lastViewportHeight = logical.Height;
+				}
+			}
 
 			// eglSwapBuffers attaches+commits the GL buffer to the wl_surface and blocks for
 			// the compositor's frame.
@@ -163,6 +180,10 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 	private void Resize(int width, int height)
 	{
 		EnsureContext(width, height);
+
+		_bufferScale = _waylandHost is { Viewport: not null }
+			? 1
+			: Math.Max(1, (int)Math.Round(_waylandHost?.EffectiveScale ?? _connection.PrimaryOutput.Scale));
 
 		if (width == _width && height == _height && _surface != null)
 		{

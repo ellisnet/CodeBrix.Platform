@@ -15,6 +15,8 @@ using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Hosting;
 using CodeBrix.Platform.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.FractionalScaleV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Viewporter;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
 using Timer = System.Timers.Timer;
 
@@ -46,6 +48,9 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 	private IWaylandShellSurface? _shellSurface;
 	private WlSurface? _wlSurface;
 	private IWaylandRenderer? _renderer;
+	private WpViewport? _viewport;
+	private WpFractionalScaleV1? _fractionalScale;
+	private WaylandDisplayInformationExtension? _displayInformationExtension;
 
 	// Written on the event-pump thread, read on the UI thread after a queued callback.
 	private volatile bool _activated;
@@ -53,6 +58,11 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 	private int _width;
 	private int _height;
+
+	// The compositor's preferred fractional scale for this surface (from
+	// wp_fractional_scale_v1.preferred_scale, delivered in 1/120ths); 0 until the first event.
+	// long-boxed double so the event-pump write / any-thread read stays tear-free.
+	private long _preferredScaleBits;
 
 	public WaylandXamlRootHost(WaylandWindowWrapper wrapper, Window winUIWindow, XamlRoot xamlRoot,
 		Action configureCallback, Action closingCallback, Action<bool> focusCallback, Action<bool> visibilityCallback)
@@ -120,6 +130,16 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 	internal WaylandPointerInputSource? PointerSource { get; private set; }
 	internal WaylandKeyboardInputSource? KeyboardSource { get; private set; }
+	internal WaylandDragDropExtension? DragDropExtension { get; private set; }
+
+	internal void SetDragDropExtension(WaylandDragDropExtension dragDrop)
+	{
+		if (DragDropExtension is not null)
+		{
+			throw new InvalidOperationException($"{nameof(WaylandDragDropExtension)} is set twice on the same {nameof(WaylandXamlRootHost)}");
+		}
+		DragDropExtension = dragDrop;
+	}
 
 	public void SetPointerSource(WaylandPointerInputSource pointerSource)
 	{
@@ -143,6 +163,71 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 		=> surface != null && _surfaceToHost.TryGetValue(surface, out var host) ? host : null;
 
 	internal SizeInt32 CurrentSize => new() { Width = _width, Height = _height };
+
+	/// <summary>
+	/// The viewport for the content surface when the compositor supports wp_viewporter;
+	/// the renderers use it (with buffer scale 1) for true fractional scaling.
+	/// </summary>
+	internal WpViewport? Viewport => _viewport;
+
+	/// <summary>
+	/// The scale this window should render at: the compositor's preferred fractional scale
+	/// for the surface when wp_fractional_scale_v1 delivered one, else the primary output's
+	/// integer scale. This is the value DisplayInformation reports as RawPixelsPerViewPixel
+	/// (absent an override) and the value the renderers must reconcile buffers against.
+	/// </summary>
+	internal double EffectiveScale
+	{
+		get
+		{
+			var preferred = BitConverter.Int64BitsToDouble(Interlocked.Read(ref _preferredScaleBits));
+			if (preferred > 0)
+			{
+				return preferred;
+			}
+
+			return Math.Max(1, _connection?.PrimaryOutput.Scale ?? 1);
+		}
+	}
+
+	internal void SetDisplayInformationExtension(WaylandDisplayInformationExtension extension)
+		=> _displayInformationExtension = extension;
+
+	// Event-pump thread (or any thread): some scale source changed (fractional preferred
+	// scale, output scale). Refresh DisplayInformation, the window's RasterizationScale and
+	// the size/bounds derived from it, then repaint — mirroring the X11 head's
+	// RESOURCE_MANAGER PropertyNotify handling.
+	internal void OnScaleSourceChanged()
+	{
+		if (IsClosed)
+		{
+			return;
+		}
+
+		QueueAction(this, () =>
+		{
+			_displayInformationExtension?.UpdateDetails();
+			var scale = _displayInformationExtension?.RawPixelsPerViewPixel ?? EffectiveScale;
+			_wrapper.RasterizationScale = (float)scale;
+			_configureCallback();
+			((IXamlRootHost)this).InvalidateRender();
+		});
+	}
+
+	private void OnPreferredFractionalScale(uint scale120)
+	{
+		var newScale = scale120 / 120.0;
+		var previous = BitConverter.Int64BitsToDouble(
+			Interlocked.Exchange(ref _preferredScaleBits, BitConverter.DoubleToInt64Bits(newScale)));
+		if (Math.Abs(previous - newScale) > 0.001)
+		{
+			if (this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug($"Compositor preferred scale for the surface is now {newScale}.");
+			}
+			OnScaleSourceChanged();
+		}
+	}
 
 	private void Initialize()
 	{
@@ -176,8 +261,25 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 			_wlSurface = _shellSurface.Surface;
 			_surfaceToHost[_wlSurface] = this;
 
+			// Fractional-scaling plumbing (P2): the viewport maps the (physical-pixel) buffer
+			// onto the window's logical size, and the fractional-scale object tells us the
+			// scale the compositor prefers for this surface. Both are optional protocols.
+			if (connection.Viewporter is { } viewporter)
+			{
+				_viewport = viewporter.GetViewport(_wlSurface);
+			}
+			if (connection.FractionalScaleManager is { } fractionalScaleManager)
+			{
+				_fractionalScale = fractionalScaleManager.GetFractionalScale(_wlSurface,
+					new WpFractionalScaleV1.Listener.Relay
+					{
+						OnPreferredScale = (_, scale120) => OnPreferredFractionalScale(scale120),
+					});
+			}
+
 			_shellSurface.Configured += OnShellConfigured;
 			_shellSurface.CloseRequested += OnShellCloseRequested;
+			_shellSurface.WindowStateChanged += OnShellWindowStateChanged;
 
 			// app_id is the hook the desktop uses to associate the window with an installed
 			// .desktop file (taskbar icon, grouping). Full icon/.desktop integration is a
@@ -239,6 +341,17 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 	private void OnShellCloseRequested()
 		=> QueueAction(this, _closingCallback);
 
+	/// <summary>
+	/// Raised on the UI thread when the compositor-communicated window state changed:
+	/// (isMaximized, isFullscreen). Feeds the presenter so external maximize/restore
+	/// (titlebar button, keyboard shortcut) reflects in the WinUI API.
+	/// </summary>
+	internal event Action<bool, bool>? WindowStateChanged;
+
+	// Event-pump thread.
+	private void OnShellWindowStateChanged(bool maximized, bool fullscreen)
+		=> QueueAction(this, () => WindowStateChanged?.Invoke(maximized, fullscreen));
+
 	internal void Show()
 	{
 		_shown = true;
@@ -261,8 +374,13 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 	private void DestroyProtocolObjects()
 	{
-		// The shell surface owns and tears down the xdg_surface/xdg_toplevel (or libdecor
-		// frame) plus the content wl_surface.
+		// Per-surface add-on objects go first (the protocols require destroying them before
+		// the wl_surface); the shell surface then owns and tears down the xdg_surface/
+		// xdg_toplevel (or libdecor frame) plus the content wl_surface.
+		_fractionalScale?.Destroy();
+		_fractionalScale = null;
+		_viewport?.Destroy();
+		_viewport = null;
 		_shellSurface?.Dispose();
 		_connection?.Flush();
 	}

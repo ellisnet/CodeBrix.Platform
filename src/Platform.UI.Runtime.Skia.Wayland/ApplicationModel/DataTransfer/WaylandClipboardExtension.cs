@@ -21,24 +21,33 @@
 // 3. This notice may not be removed or altered from any source distribution.
 
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using CodeBrix.Platform.ApplicationModel.DataTransfer;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
+using SkiaSharp;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 
 /// <summary>
-/// Text clipboard over the Wayland data-device protocol. Copying installs a wl_data_source
-/// on the selection (advertising text mime types and streaming the bytes when a paste
-/// requests them); pasting reads the current wl_data_offer through a pipe. Requires an input
-/// serial and keyboard focus, so it only works while a window of this app is focused —
-/// intrinsic to Wayland's security model, not a limitation of this port.
+/// Clipboard over the Wayland data-device protocol. Copying installs a wl_data_source on the
+/// selection (advertising the package's formats and streaming the bytes when a paste requests
+/// them); pasting reads the current wl_data_offer through a pipe. Requires an input serial and
+/// keyboard focus, so it only works while a window of this app is focused — intrinsic to
+/// Wayland's security model, not a limitation of this port.
 /// </summary>
 /// <remarks>
-/// Image/HTML/URI formats and drag-and-drop are a later effort; only plain text is wired.
+/// Format parity follows the X11 head: text (several aliases), text/html, image/png (+jpeg on
+/// paste), text/uri-list mapped to StorageItems, and pass-through of custom byte[]/string
+/// formats under their own MIME names. Drag-and-drop rides its own wl_data_device events and
+/// lives in <c>WaylandDragDropExtension</c>.
 /// </remarks>
 internal sealed class WaylandClipboardExtension : IClipboardExtension
 {
@@ -46,6 +55,9 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 	private const string MimeTextPlain = "text/plain";
 	private const string MimeUtf8String = "UTF8_STRING";
 	private const string MimeText = "TEXT";
+	private const string MimeHtml = "text/html";
+	private const string MimePng = "image/png";
+	private const string MimeUriList = "text/uri-list";
 
 	private static readonly string[] OfferedTextMimes = { MimeTextPlainUtf8, MimeUtf8String, MimeTextPlain, MimeText };
 
@@ -78,8 +90,13 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 	// selection (or a drag-and-drop offer, unhandled here) in a follow-up event.
 	private WlDataOffer? _pendingOffer;
 
-	// The text we are currently the selection owner of (streamed on wl_data_source.send).
-	private string? _ownedText;
+	// The MIME types each live offer advertised (wl_data_offer.offer events).
+	private readonly Dictionary<WlDataOffer, List<string>> _offerMimes = new();
+
+	// The payloads we are currently the selection owner of, materialized at SetContent time
+	// and streamed on wl_data_source.send (the send callback runs on the event-pump thread,
+	// where reaching back into the DataPackage would be unsafe).
+	private List<(string Mime, byte[] Bytes)> _ownedEntries = new();
 	private WlDataSource? _ownedSource;
 
 	public event EventHandler<object>? ContentChanged;
@@ -129,10 +146,157 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 			// The new-id MUST be consumed: otherwise the interop destroys the offer proxy
 			// as it goes out of scope, and the selection event that follows resolves its
 			// (now dead) offer argument to null — paste would never see any content.
-			OnDataOffer = (_, id) => OnDataOffer(id.GetAndConsume()),
+			// A listener is attached at consumption so the offer's advertised MIME types
+			// (which start arriving immediately after the intro event) are recorded.
+			OnDataOffer = (_, id) => OnDataOffer(id.GetAndConsume(new WlDataOffer.Listener.Relay
+			{
+				OnOffer = (offer, mime) => OnOfferMime(offer, mime),
+			})),
 			OnSelection = (_, offer) => OnSelection(offer),
+			// Drag-and-drop shares the data device; the drag events are routed to the
+			// focused window's WaylandDragDropExtension on its UI thread.
+			OnEnter = (_, serial, surface, x, y, offer) => OnDragEnter(serial, surface, (double)x, (double)y, offer),
+			OnMotion = (_, _, x, y) => OnDragMotion((double)x, (double)y),
+			OnLeave = _ => OnDragLeave(),
+			OnDrop = _ => OnDragDrop(),
 		});
 		connection.Flush();
+	}
+
+	// The host whose surface the current drag session is over (event-pump thread).
+	private WaylandXamlRootHost? _dragHost;
+
+	// Event-pump thread.
+	private void OnDragEnter(uint serial, WlSurface? surface, double x, double y, WlDataOffer? offer)
+	{
+		string[] mimes;
+		lock (_gate)
+		{
+			if (offer != null && ReferenceEquals(_pendingOffer, offer))
+			{
+				// Ownership of the offer moves to the drag session (it is destroyed by the
+				// drag extension when the session ends).
+				_pendingOffer = null;
+			}
+			mimes = offer != null && _offerMimes.TryGetValue(offer, out var list)
+				? list.ToArray()
+				: Array.Empty<string>();
+		}
+
+		_dragHost = WaylandXamlRootHost.GetHostFromSurface(surface);
+		if (_dragHost?.DragDropExtension is { } extension)
+		{
+			var position = new Windows.Foundation.Point(x, y);
+			WaylandXamlRootHost.QueueAction(_dragHost, () => extension.ProcessDragEnter(offer, mimes, serial, position));
+		}
+		else if (offer != null)
+		{
+			// No drop target on this window: decline by destroying the offer.
+			lock (_gate)
+			{
+				DestroyOffer(offer);
+			}
+			_dragHost = null;
+		}
+	}
+
+	// Event-pump thread.
+	private void OnDragMotion(double x, double y)
+	{
+		if (_dragHost is { DragDropExtension: { } extension } host)
+		{
+			var position = new Windows.Foundation.Point(x, y);
+			WaylandXamlRootHost.QueueAction(host, () => extension.ProcessDragMotion(position));
+		}
+	}
+
+	// Event-pump thread.
+	private void OnDragLeave()
+	{
+		if (_dragHost is { DragDropExtension: { } extension } host)
+		{
+			WaylandXamlRootHost.QueueAction(host, extension.ProcessDragLeave);
+		}
+		_dragHost = null;
+	}
+
+	// Event-pump thread.
+	private void OnDragDrop()
+	{
+		if (_dragHost is { DragDropExtension: { } extension } host)
+		{
+			WaylandXamlRootHost.QueueAction(host, extension.ProcessDrop);
+		}
+	}
+
+	/// <summary>
+	/// Drops any bookkeeping for an offer whose lifetime is managed elsewhere (the drag
+	/// session destroys its own offer).
+	/// </summary>
+	internal void ForgetOffer(WlDataOffer offer)
+	{
+		lock (_gate)
+		{
+			_ = _offerMimes.Remove(offer);
+			if (ReferenceEquals(_currentOffer, offer))
+			{
+				_currentOffer = null;
+			}
+			if (ReferenceEquals(_pendingOffer, offer))
+			{
+				_pendingOffer = null;
+			}
+		}
+	}
+
+	/// <summary>
+	/// Reads the offer's advertised formats EAGERLY into the package (unlike the lazy
+	/// clipboard paste): a drag offer dies when its session ends, so data fetched lazily
+	/// after the drop would be gone. Same caching call the X11 head makes on XdndPosition.
+	/// </summary>
+	internal void FillDataPackageFromOffer(DataPackage package, WlDataOffer offer, string[] mimes, WaylandConnection connection)
+	{
+		const long MaxEagerBytes = 64 * 1024 * 1024;
+
+		var cache = new Dictionary<string, byte[]>();
+		long total = 0;
+		foreach (var mime in mimes)
+		{
+			if (cache.ContainsKey(mime))
+			{
+				continue;
+			}
+
+			if (ReceiveBytes(offer, mime, connection) is { } bytes)
+			{
+				cache[mime] = bytes;
+				package.SetData(mime, bytes);
+				total += bytes.Length;
+				if (total > MaxEagerBytes)
+				{
+					if (this.Log().IsEnabled(LogLevel.Warning))
+					{
+						this.Log().Warn($"Drag payload exceeded {MaxEagerBytes} bytes; remaining formats were not cached.");
+					}
+					break;
+				}
+			}
+		}
+
+		if (mimes.FirstOrDefault(m => Array.IndexOf(OfferedTextMimes, m) >= 0) is { } textMime
+			&& cache.TryGetValue(textMime, out var textBytes))
+		{
+			package.SetText(Encoding.UTF8.GetString(textBytes));
+		}
+
+		if (cache.TryGetValue(MimeUriList, out var uriListBytes))
+		{
+			var items = ProcessUriList(Encoding.UTF8.GetString(uriListBytes)).ToList();
+			if (items.Count > 0)
+			{
+				package.SetStorageItems(items);
+			}
+		}
 	}
 
 	// Event-pump thread.
@@ -141,8 +305,31 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		lock (_gate)
 		{
 			// A newly introduced offer supersedes a pending one that never became the selection.
-			_pendingOffer?.Destroy();
+			DestroyOffer(_pendingOffer);
 			_pendingOffer = offer;
+		}
+	}
+
+	// Event-pump thread.
+	private void OnOfferMime(WlDataOffer offer, string mime)
+	{
+		lock (_gate)
+		{
+			if (!_offerMimes.TryGetValue(offer, out var mimes))
+			{
+				_offerMimes[offer] = mimes = new List<string>();
+			}
+			mimes.Add(mime);
+		}
+	}
+
+	// Must hold _gate.
+	private void DestroyOffer(WlDataOffer? offer)
+	{
+		if (offer != null)
+		{
+			_ = _offerMimes.Remove(offer);
+			offer.Destroy();
 		}
 	}
 
@@ -153,14 +340,14 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		{
 			if (_pendingOffer != null && !ReferenceEquals(_pendingOffer, offer))
 			{
-				_pendingOffer.Destroy();
+				DestroyOffer(_pendingOffer);
 			}
 			_pendingOffer = null;
 
 			// Per protocol, the previous selection offer must be destroyed on this event.
 			if (_currentOffer != null && !ReferenceEquals(_currentOffer, offer))
 			{
-				_currentOffer.Destroy();
+				DestroyOffer(_currentOffer);
 			}
 			_currentOffer = offer;
 		}
@@ -192,29 +379,17 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 			return;
 		}
 
-		string? text = null;
-		var view = content?.GetView();
-		if (view != null && view.Contains(StandardDataFormats.Text))
-		{
-			try
-			{
-				text = view.GetTextAsync().GetResults();
-			}
-			catch
-			{
-				text = null;
-			}
-		}
+		var entries = BuildOfferedEntries(content);
 
 		lock (_gate)
 		{
-			_ownedText = text;
+			_ownedEntries = entries;
 
 			// Replace any previous source we owned.
 			_ownedSource?.Destroy();
 			_ownedSource = null;
 
-			if (text == null)
+			if (entries.Count == 0)
 			{
 				// Clearing: set an empty selection.
 				_dataDevice.SetSelection(null, connection.SeatManager.LastInputSerial);
@@ -228,7 +403,7 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 				OnCancelled = OnSourceCancelled,
 			});
 
-			foreach (var mime in OfferedTextMimes)
+			foreach (var mime in entries.Select(e => e.Mime).Distinct())
 			{
 				source.Offer(mime);
 			}
@@ -239,20 +414,154 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		}
 	}
 
+	/// <summary>
+	/// Materializes the package into (mime, bytes) pairs, mirroring the X11 head's format
+	/// story: text under its interchange aliases (a Uri falls back to its string form), HTML
+	/// as text/html, a bitmap normalized to image/png via Skia, storage items as a
+	/// text/uri-list of file:// URIs, and custom byte[]/string formats under their own names.
+	/// </summary>
+	private List<(string Mime, byte[] Bytes)> BuildOfferedEntries(DataPackage content)
+	{
+		var entries = new List<(string Mime, byte[] Bytes)>();
+		var view = content?.GetView();
+		if (view == null)
+		{
+			return entries;
+		}
+
+		string? text = null;
+		if (view.Contains(StandardDataFormats.Text))
+		{
+			text = TryGetData(view, StandardDataFormats.Text, static v => v.GetTextAsync().GetResults());
+		}
+		else if (view.Contains(StandardDataFormats.Uri))
+		{
+			text = TryGetData(view, StandardDataFormats.Uri, static v => v.GetUriAsync().GetResults()?.ToString());
+		}
+		if (text != null)
+		{
+			var textBytes = Encoding.UTF8.GetBytes(text);
+			foreach (var mime in OfferedTextMimes)
+			{
+				entries.Add((mime, textBytes));
+			}
+		}
+
+		if (view.Contains(StandardDataFormats.Html)
+			&& TryGetData(view, StandardDataFormats.Html, static v => v.GetHtmlFormatAsync().GetResults()) is { } html)
+		{
+			entries.Add((MimeHtml, Encoding.UTF8.GetBytes(html)));
+		}
+
+		if (view.Contains(StandardDataFormats.Bitmap)
+			&& TryGetData(view, StandardDataFormats.Bitmap, static v =>
+			{
+				var reference = v.GetBitmapAsync().GetResults();
+				using var stream = reference.OpenReadAsync().GetResults().AsStreamForRead();
+				using var memory = new MemoryStream();
+				stream.CopyTo(memory);
+				return memory.ToArray();
+			}) is { } imageBytes)
+		{
+			// Normalize to PNG (Linux skia builds carry no bmp codec, same constraint the
+			// X11 head notes); raw pass-through when the bytes do not decode.
+			try
+			{
+				using var bitmap = SKBitmap.Decode(imageBytes);
+				if (bitmap != null)
+				{
+					using var image = SKImage.FromBitmap(bitmap);
+					using var png = image.Encode(SKEncodedImageFormat.Png, 100);
+					entries.Add((MimePng, png.ToArray()));
+				}
+				else
+				{
+					entries.Add((MimePng, imageBytes));
+				}
+			}
+			catch
+			{
+				entries.Add((MimePng, imageBytes));
+			}
+		}
+
+		if (view.Contains(StandardDataFormats.StorageItems)
+			&& TryGetData(view, StandardDataFormats.StorageItems, static v => v.GetStorageItemsAsync().GetResults()) is { } items)
+		{
+			var builder = new StringBuilder();
+			foreach (var item in items)
+			{
+				if (!string.IsNullOrEmpty(item.Path))
+				{
+					builder.Append(new Uri(item.Path).AbsoluteUri).Append("\r\n");
+				}
+			}
+			if (builder.Length > 0)
+			{
+				entries.Add((MimeUriList, Encoding.UTF8.GetBytes(builder.ToString())));
+			}
+		}
+
+		// Custom formats under their own names (the X11 head's "last-ditch" pass-through).
+		foreach (var format in view.AvailableFormats)
+		{
+			if (format == StandardDataFormats.Text || format == StandardDataFormats.Uri
+				|| format == StandardDataFormats.Html || format == StandardDataFormats.Bitmap
+				|| format == StandardDataFormats.StorageItems)
+			{
+				continue;
+			}
+
+			var data = TryGetData(view, format, v => v.GetDataAsync(format).GetResults());
+			if (data is byte[] rawBytes)
+			{
+				entries.Add((format, rawBytes));
+			}
+			else if (data is string rawString)
+			{
+				entries.Add((format, Encoding.UTF8.GetBytes(rawString)));
+			}
+		}
+
+		return entries;
+	}
+
+	private T? TryGetData<T>(DataPackageView view, string format, Func<DataPackageView, T?> getter) where T : class
+	{
+		try
+		{
+			return getter(view);
+		}
+		catch (Exception e)
+		{
+			if (this.Log().IsEnabled(LogLevel.Warning))
+			{
+				this.Log().Warn($"Could not materialize clipboard format '{format}'; it will not be offered.", e);
+			}
+			return null;
+		}
+	}
+
 	// Event-pump thread: a paster asked us to stream the selection to fd.
 	private void OnSourceSend(string mimeType, int fd)
 	{
-		string? text;
+		byte[]? bytes = null;
 		lock (_gate)
 		{
-			text = _ownedText;
+			foreach (var entry in _ownedEntries)
+			{
+				if (entry.Mime == mimeType)
+				{
+					bytes = entry.Bytes;
+					break;
+				}
+			}
 		}
 
 		try
 		{
-			if (text != null)
+			if (bytes != null)
 			{
-				var bytes = Encoding.UTF8.GetBytes(text);
 				var offset = 0;
 				while (offset < bytes.Length)
 				{
@@ -279,7 +588,7 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 			if (ReferenceEquals(source, _ownedSource))
 			{
 				_ownedSource = null;
-				_ownedText = null;
+				_ownedEntries = new List<(string Mime, byte[] Bytes)>();
 			}
 		}
 		source.Destroy();
@@ -301,17 +610,56 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 			}
 
 			WlDataOffer? offer;
+			string[] mimes;
 			lock (_gate)
 			{
 				offer = _currentOffer;
+				mimes = offer != null && _offerMimes.TryGetValue(offer, out var list)
+					? list.ToArray()
+					: Array.Empty<string>();
 			}
 
 			if (offer != null)
 			{
-				var text = ReceiveText(offer, connection);
-				if (text != null)
+				// Every advertised MIME type is exposed under its own name as a lazy raw-bytes
+				// provider — the same shape the X11 head gives pasted data (html and images
+				// are consumed through these).
+				foreach (var mime in mimes)
 				{
-					package.SetText(text);
+					var mimeCopy = mime;
+					package.SetDataProvider(mimeCopy, async ct =>
+						await Task.Run(() => (object)(ReceiveBytes(offer, mimeCopy, connection) ?? Array.Empty<byte>()), ct));
+				}
+
+				// Text and file lists are materialized eagerly (X11 parity): text under the
+				// best matching interchange alias, uri-lists as StorageItems.
+				if (mimes.FirstOrDefault(m => Array.IndexOf(OfferedTextMimes, m) >= 0) is { } textMime)
+				{
+					var text = ReceiveText(offer, textMime, connection);
+					if (text != null)
+					{
+						package.SetText(text);
+					}
+				}
+				else if (mimes.Length == 0)
+				{
+					// Compatibility fallback for sources whose offer events were missed (the
+					// pre-P3 behavior): probe for plain text directly.
+					var text = ReceiveText(offer, MimeTextPlainUtf8, connection);
+					if (!string.IsNullOrEmpty(text))
+					{
+						package.SetText(text);
+					}
+				}
+
+				if (mimes.Contains(MimeUriList)
+					&& ReceiveBytes(offer, MimeUriList, connection) is { } uriListBytes)
+				{
+					var items = ProcessUriList(Encoding.UTF8.GetString(uriListBytes)).ToList();
+					if (items.Count > 0)
+					{
+						package.SetStorageItems(items);
+					}
 				}
 			}
 		}
@@ -319,7 +667,41 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		return package.GetView();
 	}
 
-	private string? ReceiveText(WlDataOffer offer, WaylandConnection connection)
+	/// <summary>
+	/// Maps a text/uri-list (one file:// URI per line, '#' comments) to storage items,
+	/// mirroring the X11 head's conversion.
+	/// </summary>
+	private static IEnumerable<IStorageItem> ProcessUriList(string uriList)
+	{
+		foreach (var line in uriList.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+		{
+			var entry = line.Trim();
+			if (entry.Length == 0 || entry.StartsWith("#", StringComparison.Ordinal))
+			{
+				continue;
+			}
+
+			if (!Uri.TryCreate(entry, UriKind.Absolute, out var uri) || !uri.IsFile)
+			{
+				continue;
+			}
+
+			var path = uri.LocalPath;
+			if (Directory.Exists(path))
+			{
+				yield return new StorageFolder(path);
+			}
+			else if (File.Exists(path))
+			{
+				yield return StorageFile.GetFileFromPath(path);
+			}
+		}
+	}
+
+	private string? ReceiveText(WlDataOffer offer, string mime, WaylandConnection connection)
+		=> ReceiveBytes(offer, mime, connection) is { } bytes ? Encoding.UTF8.GetString(bytes) : null;
+
+	private byte[]? ReceiveBytes(WlDataOffer offer, string mime, WaylandConnection connection)
 	{
 		// Create a pipe, hand the write end to the compositor via wl_data_offer.receive,
 		// flush, then read the selection bytes from the read end. (SDL does the same.)
@@ -333,7 +715,7 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		var writeFd = fds[1];
 		try
 		{
-			offer.Receive(MimeTextPlainUtf8, writeFd);
+			offer.Receive(mime, writeFd);
 			connection.Flush();
 
 			// Close our copy of the write end so the read sees EOF when the source is done.
@@ -356,13 +738,13 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 				}
 			}
 
-			return Encoding.UTF8.GetString(result.ToArray());
+			return result.ToArray();
 		}
 		catch (Exception e)
 		{
 			if (this.Log().IsEnabled(LogLevel.Error))
 			{
-				this.Log().Error("Failed to read the Wayland selection", e);
+				this.Log().Error($"Failed to read the Wayland selection as '{mime}'", e);
 			}
 			return null;
 		}

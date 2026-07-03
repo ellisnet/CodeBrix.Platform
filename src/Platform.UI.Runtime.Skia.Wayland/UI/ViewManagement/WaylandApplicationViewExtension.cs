@@ -11,10 +11,9 @@ internal class WaylandApplicationViewExtension(object owner) : IApplicationViewE
 	public bool TryResizeView(Size size)
 	{
 		// A Wayland client cannot force its outer window size; the compositor decides.
-		if (this.Log().IsEnabled(LogLevel.Debug))
-		{
-			this.Log().Debug($"TryResizeView({size.Width}x{size.Height}) is not available on Wayland.");
-		}
+		WaylandNotSupported.WarnOnce(typeof(WaylandApplicationViewExtension),
+			"ApplicationView.TryResizeView",
+			"a client cannot force its outer window size; the compositor decides.");
 		return false;
 	}
 }

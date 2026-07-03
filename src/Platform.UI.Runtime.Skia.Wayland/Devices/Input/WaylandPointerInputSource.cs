@@ -42,6 +42,8 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 	private bool _leftPressed;
 	private bool _middlePressed;
 	private bool _rightPressed;
+	private bool _xButton1Pressed;
+	private bool _xButton2Pressed;
 
 	public WaylandPointerInputSource(IXamlRootHost host)
 	{
@@ -78,10 +80,17 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 
 	private void ApplyCursor(CoreCursor? value)
 	{
-		// Prefer cursor-shape-v1 (the compositor themes the cursor for us). Setting a null
-		// CoreCursor to hide the pointer, and a libwayland-cursor theme fallback for older
-		// compositors, are later refinements.
-		var shape = value?.Type switch
+		// A null CoreCursor hides the pointer (WinUI convention), which on Wayland is a
+		// wl_pointer.set_cursor with a null surface.
+		if (value == null)
+		{
+			_ = _host.Connection?.SeatManager.HideCursor();
+			return;
+		}
+
+		// Prefer cursor-shape-v1 (the compositor themes the cursor for us); a
+		// libwayland-cursor theme fallback covers older compositors.
+		var shape = value.Type switch
 		{
 			CoreCursorType.Arrow => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Default,
 			CoreCursorType.Cross => Protocols.CursorShapeV1.WpCursorShapeDeviceV1.ShapeEnum.Crosshair,
@@ -147,6 +156,12 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 			case BTN_RIGHT:
 				_rightPressed = pressed;
 				break;
+			case BTN_SIDE:
+				_xButton1Pressed = pressed;
+				break;
+			case BTN_EXTRA:
+				_xButton2Pressed = pressed;
+				break;
 		}
 
 		var args = CreatePointerEventArgsFromCurrentState(time, modifiers);
@@ -187,15 +202,16 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 			IsLeftButtonPressed = _leftPressed,
 			IsMiddleButtonPressed = _middlePressed,
 			IsRightButtonPressed = _rightPressed,
+			IsXButton1Pressed = _xButton1Pressed,
+			IsXButton2Pressed = _xButton2Pressed,
 		};
 
-		var scale = ((IXamlRootHost)_host).RootElement?.XamlRoot is { } root
-			? root.RasterizationScale
-			: 1;
-
+		// wl_pointer coordinates are surface-local LOGICAL units — exactly the view units
+		// WinUI wants. (X11 divides by the scale because its input is physical pixels;
+		// copying that divide here double-scaled all hit-testing on HiDPI outputs.)
 		// wl time is milliseconds with an undefined base; WinUI wants microseconds.
 		var timeInMicroseconds = (ulong)time * 1000;
-		var position = new Point(_pointerPosition.X / scale, _pointerPosition.Y / scale);
+		var position = _pointerPosition;
 		var point = new PointerPoint(
 			frameId: time,
 			timestamp: timeInMicroseconds,

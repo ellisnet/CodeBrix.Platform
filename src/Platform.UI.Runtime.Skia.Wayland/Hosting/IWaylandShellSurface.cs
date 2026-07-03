@@ -27,7 +27,20 @@ internal interface IWaylandShellSurface : IDisposable
 	/// <summary>Raised (on the event-pump thread) when the user/compositor asks to close.</summary>
 	event Action CloseRequested;
 
+	/// <summary>
+	/// Raised (on the event-pump thread) when the compositor-communicated window state
+	/// changed: (isMaximized, isFullscreen). Lets external maximize/restore (titlebar
+	/// button, keyboard shortcut) reflect back into the WinUI presenter state.
+	/// </summary>
+	event Action<bool, bool> WindowStateChanged;
+
 	void SetTitle(string title);
+
+	/// <summary>
+	/// Shows or hides the window decorations (title bar + borders): libdecor visibility on
+	/// the libdecor path, the xdg-decoration mode on the raw xdg-shell path.
+	/// </summary>
+	void SetDecorationsVisible(bool visible);
 
 	void SetAppId(string appId);
 

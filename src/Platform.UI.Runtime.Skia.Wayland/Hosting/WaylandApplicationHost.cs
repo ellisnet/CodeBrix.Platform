@@ -34,6 +34,12 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 
 		ApiExtensibility.Register(typeof(INativeWindowFactoryExtension), _ => new WaylandNativeWindowFactoryExtension());
 
+		// Interim P7 stand-in: never hosts native content, but makes the attempt loud
+		// (one-time warning) instead of silently ignoring the content.
+		ApiExtensibility.Register<Microsoft.UI.Xaml.Controls.ContentPresenter>(
+			typeof(Microsoft.UI.Xaml.Controls.ContentPresenter.INativeElementHostingExtension),
+			o => new WaylandNativeElementHostingExtension(o));
+
 		ApiExtensibility.Register(typeof(CodeBrix.Platform.Extensions.System.ILauncherExtension), o => new CodeBrix.Platform.UI.Runtime.Skia.Extensions.System.LinuxLauncherExtension(o));
 
 		// File pickers ride xdg-desktop-portal over DBus — display-server-agnostic, so these
@@ -43,6 +49,7 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 		ApiExtensibility.Register<FileSavePicker>(typeof(IFileSavePickerExtension), o => new LinuxFileSaverExtension(o));
 
 		ApiExtensibility.Register(typeof(CodeBrix.Platform.ApplicationModel.DataTransfer.IClipboardExtension), _ => WaylandClipboardExtension.Instance);
+		ApiExtensibility.Register<DragDropManager>(typeof(Windows.ApplicationModel.DataTransfer.DragDrop.Core.IDragDropExtension), o => new WaylandDragDropExtension(o));
 
 		ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => LinuxSystemThemeHelper.Instance);
 

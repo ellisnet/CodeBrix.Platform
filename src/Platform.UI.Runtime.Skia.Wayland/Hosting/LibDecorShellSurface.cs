@@ -35,6 +35,9 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 
 	private int _currentWidth;
 	private int _currentHeight;
+	private bool _activated;
+	private bool _maximized;
+	private bool _fullscreen;
 
 	// libdecor's GTK plugin is single-threaded; every libdecor call must hold this gate
 	// (shared with the connection's event pump — see WaylandConnection.LibDecorGate).
@@ -42,6 +45,7 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 
 	public event Action<int, int, bool>? Configured;
 	public event Action? CloseRequested;
+	public event Action<bool, bool>? WindowStateChanged;
 
 	event Action<int, int, bool> IWaylandShellSurface.Configured
 	{
@@ -53,6 +57,12 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	{
 		add => CloseRequested += value;
 		remove => CloseRequested -= value;
+	}
+
+	event Action<bool, bool> IWaylandShellSurface.WindowStateChanged
+	{
+		add => WindowStateChanged += value;
+		remove => WindowStateChanged -= value;
 	}
 
 	public WlSurface Surface => _surface;
@@ -115,10 +125,25 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 			LibDecor.libdecor_state_free(state);
 		}
 
-		var activated = LibDecor.libdecor_configuration_get_window_state(configuration, out var windowState)
-			&& (windowState & LibDecor.libdecor_window_state.LIBDECOR_WINDOW_STATE_ACTIVE) != 0;
+		// A libdecor configuration may carry no window state at all (unlike a raw
+		// xdg_toplevel.configure, whose states array is always the complete set). Absent
+		// state means "unchanged" — treating it as deactivated made the host flap
+		// Deactivated/Activated, and every flap light-dismisses any open popup/flyout.
+		if (LibDecor.libdecor_configuration_get_window_state(configuration, out var windowState))
+		{
+			_activated = (windowState & LibDecor.libdecor_window_state.LIBDECOR_WINDOW_STATE_ACTIVE) != 0;
 
-		Configured?.Invoke(width, height, activated);
+			var maximized = (windowState & LibDecor.libdecor_window_state.LIBDECOR_WINDOW_STATE_MAXIMIZED) != 0;
+			var fullscreen = (windowState & LibDecor.libdecor_window_state.LIBDECOR_WINDOW_STATE_FULLSCREEN) != 0;
+			if (maximized != _maximized || fullscreen != _fullscreen)
+			{
+				_maximized = maximized;
+				_fullscreen = fullscreen;
+				WindowStateChanged?.Invoke(maximized, fullscreen);
+			}
+		}
+
+		Configured?.Invoke(width, height, _activated);
 	}
 
 	private void OnClose(IntPtr frame, IntPtr userData) => CloseRequested?.Invoke();
@@ -126,8 +151,10 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 	private void OnCommit(IntPtr frame, IntPtr userData)
 	{
 		// libdecor asks us to (re)commit the content surface, e.g. after a decoration redraw.
-		// Re-raise the last configured size so the host repaints and commits.
-		Configured?.Invoke(_currentWidth, _currentHeight, true);
+		// Re-raise the last configured size so the host repaints and commits. Activation is
+		// unchanged by a commit request — a decoration repaint frequently happens right after
+		// focus LOSS (inactive titlebar), so hardcoding 'true' here corrupted the state.
+		Configured?.Invoke(_currentWidth, _currentHeight, _activated);
 	}
 
 	public void SetTitle(string title)
@@ -152,6 +179,18 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		}
 	}
 
+	public void SetDecorationsVisible(bool visible)
+	{
+		if (_frame != IntPtr.Zero)
+		{
+			lock (Gate)
+			{
+				LibDecor.libdecor_frame_set_visibility(_frame, visible);
+			}
+			_connection.Flush();
+		}
+	}
+
 	public void SetMaximized(bool maximized)
 	{
 		if (_frame == IntPtr.Zero)
@@ -169,6 +208,9 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 				LibDecor.libdecor_frame_unset_maximized(_frame);
 			}
 		}
+		// Without the flush the request sits in the client send buffer until an unrelated
+		// flush happens — observed as maximize/restore applying seconds late (or on exit).
+		_connection.Flush();
 	}
 
 	public void SetMinimized()
@@ -179,6 +221,7 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 			{
 				LibDecor.libdecor_frame_set_minimized(_frame);
 			}
+			_connection.Flush();
 		}
 	}
 
@@ -199,6 +242,7 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 				LibDecor.libdecor_frame_unset_fullscreen(_frame);
 			}
 		}
+		_connection.Flush();
 	}
 
 	public void SetMinMaxSize(int minWidth, int minHeight, int maxWidth, int maxHeight)

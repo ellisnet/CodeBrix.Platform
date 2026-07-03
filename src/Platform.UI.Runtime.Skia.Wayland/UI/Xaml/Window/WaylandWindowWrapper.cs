@@ -21,9 +21,11 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 		_xamlRoot = xamlRoot;
 
 		_host = new WaylandXamlRootHost(this, window, xamlRoot, UpdatePositionAndSize, OnWindowClosing, OnNativeActivated, OnNativeVisibilityChanged);
-		UpdatePositionAndSize(); // set initial values
 
+		// The scale must be known before the first size derivation: physical size is
+		// computed FROM the logical configure size, unlike X11 where physical is native.
 		RasterizationScale = (float)XamlRoot.GetDisplayInformation(_xamlRoot).RawPixelsPerViewPixel;
+		UpdatePositionAndSize(); // set initial values
 	}
 
 	internal WaylandXamlRootHost Host => _host;
@@ -42,12 +44,51 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 
 	internal protected override void Activate()
 	{
-		// Wayland has no client-initiated raise/activate (that would need the
-		// xdg-activation protocol plus a valid activation token). No-op by design.
-		if (this.Log().IsEnabled(LogLevel.Debug))
+		// Client-initiated activation rides xdg-activation-v1: request a token (tied to our
+		// last input serial and surface), then activate the surface with it once the
+		// compositor delivers it. Compositor policy still has the last word — without a
+		// recent interaction it may only flag "demands attention" instead of focusing.
+		if (_host.Connection is not { Activation: { } activation } connection
+			|| _host.ShellSurface?.Surface is not { } surface
+			|| _host.IsClosed)
 		{
-			this.Log().Debug("Window self-activation is not available on Wayland.");
+			if (this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug("Window self-activation is unavailable (no xdg-activation-v1 on this compositor).");
+			}
+			return;
 		}
+
+		var token = activation.GetActivationToken(new Protocols.XdgActivationV1.XdgActivationTokenV1.Listener.Relay
+		{
+			OnDone = (tokenObject, tokenValue) =>
+			{
+				// Event-pump thread: hand the token back to activate our surface.
+				if (!_host.IsClosed)
+				{
+					activation.Activate(tokenValue, surface);
+					connection.Flush();
+				}
+				tokenObject.Destroy();
+			},
+		});
+
+		if (connection.SeatManager.Seat is { } seat)
+		{
+			token.SetSerial(connection.SeatManager.LastInputSerial, seat);
+		}
+		token.SetSurface(surface);
+		token.Commit();
+		connection.Flush();
+	}
+
+	public override void ExtendContentIntoTitleBar(bool extend)
+	{
+		base.ExtendContentIntoTitleBar(extend);
+
+		// Same shape as the X11 head (motif hints toggle): hide the native decorations so
+		// the XAML content (and any custom title bar) owns the full window surface.
+		_host.ShellSurface?.SetDecorationsVisible(!extend);
 	}
 
 	protected override void CloseCore()
@@ -79,8 +120,14 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 
 	protected override IDisposable ApplyOverlappedPresenter(OverlappedPresenter presenter)
 	{
-		presenter.SetNative(new WaylandNativeOverlappedPresenter(_host));
-		return Disposable.Create(() => presenter.SetNative(null));
+		var native = new WaylandNativeOverlappedPresenter(_host);
+		presenter.SetNative(native);
+		_host.WindowStateChanged += native.OnNativeWindowStateChanged;
+		return Disposable.Create(() =>
+		{
+			_host.WindowStateChanged -= native.OnNativeWindowStateChanged;
+			presenter.SetNative(null);
+		});
 	}
 
 	protected override IDisposable ApplyFullScreenPresenter()
@@ -102,21 +149,17 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 	public override void Move(PointInt32 position)
 	{
 		// No client-side window positioning on Wayland; the compositor owns placement.
-		if (this.Log().IsEnabled(LogLevel.Debug))
-		{
-			this.Log().Debug("Window positioning is not available on Wayland.");
-		}
+		WaylandNotSupported.WarnOnce(typeof(WaylandWindowWrapper),
+			"AppWindow.Move / window positioning",
+			"the compositor owns window placement; clients cannot set (or read back — AppWindow.Position always reports 0,0) global window coordinates.");
 	}
 
 	public override void Resize(SizeInt32 size)
 	{
 		// A Wayland client cannot force its outer size; the compositor has the last word.
-		// The next commits simply use the requested buffer size, which floating-window
-		// compositors generally accept.
-		if (this.Log().IsEnabled(LogLevel.Debug))
-		{
-			this.Log().Debug($"Resize requested to {size.Width}x{size.Height}");
-		}
+		WaylandNotSupported.WarnOnce(typeof(WaylandWindowWrapper),
+			"AppWindow.Resize",
+			"a client cannot force its outer window size; the compositor has the last word.");
 	}
 
 	private void UpdatePositionAndSize()
@@ -125,12 +168,19 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 		// for "unknown" here.
 		Position = new PointInt32 { X = 0, Y = 0 };
 
-		var size = _host.CurrentSize;
-		SetSizes(size, size);
+		// The configure size is LOGICAL (unlike X11, whose native window size is physical
+		// pixels): Bounds take it as-is, and the physical size reported through
+		// AppWindow.Size is derived by multiplying the scale back on.
+		var logicalSize = _host.CurrentSize;
+		var scale = RasterizationScale;
+		var physicalSize = new SizeInt32
+		{
+			Width = (int)Math.Round(logicalSize.Width * scale),
+			Height = (int)Math.Round(logicalSize.Height * scale),
+		};
+		SetSizes(physicalSize, physicalSize);
 
-		var scale = _xamlRoot.RasterizationScale;
-		var newWindowSize = new Size(size.Width / scale, size.Height / scale);
-		var bounds = new Rect(default, newWindowSize);
+		var bounds = new Rect(default, new Size(logicalSize.Width, logicalSize.Height));
 		SetBoundsAndVisibleBounds(bounds, bounds);
 	}
 
