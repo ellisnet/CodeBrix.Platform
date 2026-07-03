@@ -12,7 +12,7 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<RollForward>Major</RollForward>
 
-		<SyncGeneratorCodeAnalysisVersion>5.3.0</SyncGeneratorCodeAnalysisVersion>
+		<SyncGeneratorCodeAnalysisVersion>5.6.0</SyncGeneratorCodeAnalysisVersion>
 		<NoWarn>$(NoWarn);RS1024</NoWarn> <!-- RS1024: Use SymbolEqualityComparer -->
 	</PropertyGroup>
 

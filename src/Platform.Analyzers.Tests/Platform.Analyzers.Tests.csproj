@@ -10,7 +10,7 @@
 		<TargetFramework>$(NetCurrent)</TargetFramework>
 		<IsPackable>false</IsPackable>
 		<OutputType>Exe</OutputType>
-		<CodeAnalysisVersionForAnalyzersTests>5.3.0</CodeAnalysisVersionForAnalyzersTests>
+		<CodeAnalysisVersionForAnalyzersTests>5.6.0</CodeAnalysisVersionForAnalyzersTests>
 	</PropertyGroup>
 
 	<ItemGroup>
