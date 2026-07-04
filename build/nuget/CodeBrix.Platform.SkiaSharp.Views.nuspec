@@ -17,10 +17,7 @@
 		<license type="expression">MIT</license>
 		<icon>icon-codebrix-128.png</icon>
 		<readme>README.md</readme>
-		<description>
-			SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications.
-			Vendored from SkiaSharp v4.148.0 (MIT) and compiled against CodeBrix.Platform.
-		</description>
+		<description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications.</description>
 		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</copyright>
 		<tags>skiasharp;skia;views;canvas;skxamlcanvas;CodeBrix</tags>
 		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
