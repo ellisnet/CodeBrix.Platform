@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System;
 using System.Windows;
@@ -51,43 +51,48 @@ internal class SoftwareWpfRenderer : IWpfRenderer
 
 		_bitmap?.Lock();
 		var surface = _bitmap is not null ? SKSurface.Create(new SKImageInfo(_bitmap.PixelWidth, _bitmap.PixelHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul), _bitmap.BackBuffer, _bitmap.BackBufferStride) : null;
-		var nativeElementClipPath = ((Microsoft.UI.Xaml.Media.CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(surface?.Canvas, size =>
+		try
 		{
-			_bitmap?.Unlock();
-			_bitmap = new WriteableBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32, null);
-			_bitmap.Lock();
-			//Release the surface that wrapped the previous back buffer before replacing it
-			surface?.Dispose();
-			surface = SKSurface.Create(new SKImageInfo(_bitmap.PixelWidth, _bitmap.PixelHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul), _bitmap.BackBuffer, _bitmap.BackBufferStride);
-			return surface.Canvas;
-		});
-
-		if (_host.NativeOverlayLayer is { } nativeLayer)
-		{
-			nativeLayer.Clip ??= new PathGeometry();
-			((PathGeometry)nativeLayer.Clip).Figures = PathFigureCollection.Parse(nativeElementClipPath.ToSvgPathData());
-		}
-		else
-		{
-			if (this.Log().IsEnabled(LogLevel.Error))
+			var nativeElementClipPath = ((Microsoft.UI.Xaml.Media.CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(surface?.Canvas, size =>
 			{
-				this.Log().Error($"Airspace clipping failed because ${nameof(_host.NativeOverlayLayer)} is null");
+				_bitmap?.Unlock();
+				_bitmap = new WriteableBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32, null);
+				_bitmap.Lock();
+				//Release the surface that wrapped the previous back buffer before replacing it
+				surface?.Dispose();
+				surface = SKSurface.Create(new SKImageInfo(_bitmap.PixelWidth, _bitmap.PixelHeight, SKImageInfo.PlatformColorType, SKAlphaType.Premul), _bitmap.BackBuffer, _bitmap.BackBufferStride);
+				return surface.Canvas;
+			});
+
+			if (_host.NativeOverlayLayer is { } nativeLayer)
+			{
+				nativeLayer.Clip ??= new PathGeometry();
+				((PathGeometry)nativeLayer.Clip).Figures = PathFigureCollection.Parse(nativeElementClipPath.ToSvgPathData());
+			}
+			else
+			{
+				if (this.Log().IsEnabled(LogLevel.Error))
+				{
+					this.Log().Error($"Airspace clipping failed because ${nameof(_host.NativeOverlayLayer)} is null");
+				}
+			}
+
+			// draw the bitmap to the screen
+			if (_bitmap is not null)
+			{
+				_bitmap.AddDirtyRect(new Int32Rect(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight));
+				_bitmap.Unlock();
+				drawingContext.DrawImage(_bitmap, new Rect(0, 0, _hostControl.ActualWidth, _hostControl.ActualHeight));
 			}
 		}
-
-		// draw the bitmap to the screen
-		if (_bitmap is not null)
+		finally
 		{
-			_bitmap.AddDirtyRect(new Int32Rect(0, 0, _bitmap.PixelWidth, _bitmap.PixelHeight));
-			_bitmap.Unlock();
-			drawingContext.DrawImage(_bitmap, new Rect(0, 0, _hostControl.ActualWidth, _hostControl.ActualHeight));
+			//A fresh SKSurface wraps the WriteableBitmap back buffer every frame and MUST be
+			//  released each frame - even if a frame throws. Leaking it (the previous behavior)
+			//  piled up native SKSurface objects whose finalizer-thread destruction races the
+			//  render thread, corrupting native memory and surfacing as an access violation
+			//  (ExecutionEngineException) after drawing (rendering many frames) for a while.
+			surface?.Dispose();
 		}
-
-		//A fresh SKSurface wraps the WriteableBitmap back buffer every frame and MUST be
-		//  disposed each frame. Leaking it (the previous behavior) piled up native SKSurface
-		//  objects whose finalizers later flushed to an unlocked/replaced back buffer,
-		//  surfacing as a native access violation (ExecutionEngineException) after drawing
-		//  (i.e. rendering many frames) for a while.
-		surface?.Dispose();
 	}
 }
