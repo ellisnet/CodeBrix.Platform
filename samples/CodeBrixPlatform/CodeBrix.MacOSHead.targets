@@ -1,0 +1,99 @@
+<Project>
+
+  <!--
+    Shared build logic for the CodeBrix.Platform macOS sample heads (the *.MacOS heads under
+    samples/CodeBrixPlatform). These heads consume the platform from source via ProjectReference
+    instead of the NuGet packages, so two things the NuGet normally provides must be reproduced
+    here. Rather than copy this into every head, each *.MacOS.csproj imports this one file:
+
+        <Import Project="..\..\CodeBrix.MacOSHead.targets" />
+
+    A new macOS sample head only needs that single import line to pick up both fixes.
+
+    GATING: this file is imported only by the *.MacOS heads, and every target below is additionally
+    gated on $(_IsCodeBrixMacOSHead) (project name ends with ".MacOS"). So even if this file were
+    imported by a non-macOS head by mistake, it would be inert. Nothing here affects the Win32 /
+    Wpf / X11 / Wayland / WinUI heads, which never import it.
+
+    Paths are relative to THIS file's directory (samples/CodeBrixPlatform), so "..\..\src" is the
+    repo's src tree (two levels up), not the four levels a head folder would need.
+  -->
+
+  <PropertyGroup>
+    <_IsCodeBrixMacOSHead Condition="$(MSBuildProjectName.EndsWith('.MacOS'))">true</_IsCodeBrixMacOSHead>
+  </PropertyGroup>
+
+  <!--
+    Runtime-replace, reproduced (build-integrated). Platform.UI.Skia compiles against the
+    .Reference WinRT projection and the .Reference Composition/Dispatching layers; the NuGet's
+    runtime-replace targets swapped in the .Skia implementations. We consume the platform via
+    project references (no NuGet), so reference resolution puts the .Reference variants of these
+    same-named/same-versioned assemblies in the copy-local list. The Reference variants lack
+    Skia-only types (e.g. Windows.UI.ViewManagement.IApplicationViewExtension in
+    CodeBrix.Platform.dll) -> TypeLoadException in the host.
+
+    We edit the copy-local list right after reference resolution and before the output copy: drop
+    the .Reference entries and add the .Skia ones, so the normal CopyFilesToOutputDirectory places
+    the .Skia builds. Four assemblies are swapped (CodeBrix.Platform, .UI.Composition,
+    .UI.Dispatching, and .Foundation); UI/Toolkit/FluentTheme already resolve to .Skia. Compile
+    still uses the .Reference API surface (identical), so only runtime copy is affected.
+
+    Foundation must be swapped too: the .Skia and .Reference Foundation are NOT byte-identical.
+    Platform.Foundation/AssemblyInfo.skia.cs adds InternalsVisibleTo("...Runtime.Skia.MacOS"),
+    which is present only in the .Skia variant. The MacOS runtime compiles against .Skia Foundation
+    (so Disposable.Create etc. are legal), but if the .Reference Foundation (no IVT) is left in the
+    output, the runtime hits MethodAccessException on those internal calls.
+  -->
+  <Target Name="_CodeBrixMacOSUseSkiaRuntimeAssemblies"
+          AfterTargets="ResolveAssemblyReferences"
+          Condition="'$(_IsCodeBrixMacOSHead)' == 'true'">
+    <PropertyGroup>
+      <_CbMacSkiaUwp>$(MSBuildThisFileDirectory)..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbMacSkiaUwp>
+      <_CbMacSkiaComp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbMacSkiaComp>
+      <_CbMacSkiaDisp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbMacSkiaDisp>
+      <_CbMacSkiaFound>$(MSBuildThisFileDirectory)..\..\src\Platform.Foundation\bin\Platform.Foundation.Skia\$(Configuration)\net10.0</_CbMacSkiaFound>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching' or '%(FileName)' == 'CodeBrix.Platform.Foundation'" />
+      <!-- Add the .Skia variants in their place. -->
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.dll" Condition="Exists('$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.pdb" Condition="Exists('$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.pdb')" />
+    </ItemGroup>
+  </Target>
+
+  <!--
+    Native macOS dylib copy (from-source / ProjectReference build). The NuGet package ships
+    libCodeBrixNativeMac.dylib under runtimes/osx/native, and NuGet's runtime-asset resolution
+    copies it into a consuming head's output automatically. We consume the runtime via a project
+    reference instead, so nothing copies it: the managed build succeeds but the host crashes at
+    launch with DllNotFoundException on libCodeBrixNativeMac.dylib. Copy it from the runtime
+    project into this head's output.
+
+    We also strip com.apple.quarantine from the copy. The committed dylib gets that bit stamped on
+    it when the repo is cloned through a quarantine-applying git client (e.g. Sourcetree), and
+    Gatekeeper then blocks the dlopen ("could not verify ... free of malware"). Removing it is safe
+    for a locally-built, ad-hoc-signed binary; `|| true` keeps the build green when it is absent.
+  -->
+  <Target Name="_CopyCodeBrixNativeMacDylib"
+          AfterTargets="Build"
+          Condition="'$(_IsCodeBrixMacOSHead)' == 'true' and $([MSBuild]::IsOsPlatform('OSX'))">
+    <PropertyGroup>
+      <_CodeBrixNativeMacDylib>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Runtime.Skia.MacOS\runtimes\osx\native\libCodeBrixNativeMac.dylib</_CodeBrixNativeMacDylib>
+    </PropertyGroup>
+    <Copy SourceFiles="$(_CodeBrixNativeMacDylib)"
+          DestinationFolder="$(OutDir)runtimes\osx\native"
+          SkipUnchangedFiles="true"
+          Condition="Exists('$(_CodeBrixNativeMacDylib)')" />
+    <Exec Command="xattr -d com.apple.quarantine &quot;$(OutDir)runtimes/osx/native/libCodeBrixNativeMac.dylib&quot; 2&gt;/dev/null || true"
+          Condition="Exists('$(OutDir)runtimes/osx/native/libCodeBrixNativeMac.dylib')" />
+  </Target>
+
+</Project>
