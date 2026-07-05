@@ -455,31 +455,90 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 		if (_renderer == null && _connection is { } connection && _wlSurface is { } surface)
 		{
-			// wl_shm software rendering is the default (universal, proven). The EGL/GPU path
-			// (P7) is opt-in via WaylandHostBuilder.RenderingBackend / FeatureConfiguration
-			// (which take precedence) or the CODEBRIX_WAYLAND_USE_GPU=1 environment variable;
-			// it falls back to software if the GL context cannot be created.
-			var useGpu = FeatureConfiguration.Rendering.UseOpenGLOnWayland
-				?? string.Equals(
-					Environment.GetEnvironmentVariable("CODEBRIX_WAYLAND_USE_GPU"), "1", StringComparison.Ordinal);
-			if (useGpu)
+			// Vulkan (falling back to wl_shm software rendering) is the default. Backend
+			// selection precedence: WaylandHostBuilder.RenderingBackend / FeatureConfiguration
+			// first, then the environment: CODEBRIX_WAYLAND_NO_GPU=1 forces software rendering
+			// and CODEBRIX_WAYLAND_USE_EGL=1 selects OpenGL ES. Vulkan and OpenGL ES are peers:
+			// each falls back directly to software when its support is missing (Vulkan never
+			// falls back to EGL). With ForceVulkanOnWayland (VulkanForced) there is no fallback
+			// at all: the application exits so a missing-Vulkan device cannot be mistaken for a
+			// working Vulkan configuration.
+			var forceVulkan = FeatureConfiguration.Rendering.ForceVulkanOnWayland;
+			var useVulkan = forceVulkan ? true : FeatureConfiguration.Rendering.UseVulkanOnWayland;
+			var useEgl = FeatureConfiguration.Rendering.UseOpenGLOnWayland;
+			if (useVulkan == null && useEgl == null)
+			{
+				if (IsEnvironmentFlagSet("CODEBRIX_WAYLAND_NO_GPU"))
+				{
+					useVulkan = false;
+					useEgl = false;
+				}
+				else if (IsEnvironmentFlagSet("CODEBRIX_WAYLAND_USE_EGL"))
+				{
+					useVulkan = false;
+					useEgl = true;
+				}
+				else
+				{
+					useVulkan = true;
+				}
+			}
+
+			if (useVulkan ?? false)
 			{
 				try
 				{
-					_renderer = new WaylandEglRenderer(this, connection, surface);
+					_renderer = WaylandVulkanRenderer.Create(this, connection, surface);
 				}
 				catch (Exception e)
 				{
+					if (forceVulkan)
+					{
+						// Fail fast, mirroring the missing-compositor exit: a clean, on-brand
+						// message and a non-zero exit code, no raw stack trace. This runs on a
+						// render-timer callback where a rethrown exception would be swallowed,
+						// so the exit must be explicit.
+						const string message =
+							"This application requires Vulkan rendering (WaylandRenderingBackend.VulkanForced), " +
+							"but a Vulkan renderer could not be created on this device.";
+						Console.Error.WriteLine(message);
+						Console.Error.WriteLine($"Vulkan initialization failure: {e.Message}");
+						if (this.Log().IsEnabled(LogLevel.Error))
+						{
+							this.Log().Error(message, e);
+						}
+						Environment.Exit(1);
+					}
+
 					if (this.Log().IsEnabled(LogLevel.Warning))
 					{
-						this.Log().Warn("Wayland GPU (EGL) renderer unavailable; falling back to wl_shm software rendering.", e);
+						this.Log().Warn("Wayland GPU (Vulkan) renderer unavailable; falling back to wl_shm software rendering.", e);
 					}
 					_renderer = new WaylandShmRenderer(this, connection, surface);
 				}
 			}
-			else
+
+			if (_renderer == null)
 			{
-				_renderer = new WaylandShmRenderer(this, connection, surface);
+				if (useEgl ?? false)
+				{
+					try
+					{
+						_renderer = new WaylandEglRenderer(this, connection, surface);
+					}
+					catch (Exception e)
+					{
+						if (this.Log().IsEnabled(LogLevel.Warning))
+						{
+							this.Log().Warn("Wayland GPU (EGL) renderer unavailable; falling back to wl_shm software rendering.", e);
+						}
+						_renderer = new WaylandShmRenderer(this, connection, surface);
+					}
+				}
+				else
+				{
+					_renderer = new WaylandShmRenderer(this, connection, surface);
+				}
 			}
 
 			UpdateRendererBackground();
@@ -487,6 +546,9 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 		return _renderer;
 	}
+
+	private static bool IsEnvironmentFlagSet(string name)
+		=> string.Equals(Environment.GetEnvironmentVariable(name), "1", StringComparison.Ordinal);
 
 	private void UpdateRendererBackground()
 	{

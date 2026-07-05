@@ -905,10 +905,35 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			public static bool PreferGLESOverGLOnX11 { get; set; }
 
 			/// <summary>
+			/// Determines if Vulkan rendering should be enabled on the Wayland target, presenting
+			/// natively via VK_KHR_wayland_surface. If null (the default), Vulkan is used unless
+			/// <see cref="UseOpenGLOnWayland"/> is set or an environment variable selects another
+			/// renderer (CODEBRIX_WAYLAND_NO_GPU=1 forces wl_shm software rendering,
+			/// CODEBRIX_WAYLAND_USE_EGL=1 selects OpenGL ES). When true, Vulkan is attempted with
+			/// a fallback to wl_shm software rendering — never to OpenGL ES: Vulkan and OpenGL ES
+			/// are peer GPU paths that each fall back directly to software. When false, Vulkan is
+			/// not used and <see cref="UseOpenGLOnWayland"/> decides the renderer.
+			/// </summary>
+			public static bool? UseVulkanOnWayland { get; set; }
+
+			/// <summary>
+			/// When true, Vulkan rendering on the Wayland target is required: if the Vulkan
+			/// renderer cannot be created, the application writes a clear error to stderr and
+			/// exits with a non-zero exit code instead of falling back to wl_shm software
+			/// rendering. Normally set via <c>WaylandRenderingBackend.VulkanForced</c>; useful
+			/// to verify that a device really renders with Vulkan rather than silently falling
+			/// back to software.
+			/// </summary>
+			public static bool ForceVulkanOnWayland { get; set; }
+
+			/// <summary>
 			/// Determines if OpenGL ES (EGL) rendering should be enabled on the Wayland target.
-			/// If null (the default), the CODEBRIX_WAYLAND_USE_GPU environment variable decides
-			/// (wl_shm software rendering when unset). When true, OpenGL ES is attempted with a
-			/// fallback to software rendering; when false, software rendering is forced.
+			/// If null (the default), the environment decides: CODEBRIX_WAYLAND_USE_EGL=1 selects
+			/// OpenGL ES and CODEBRIX_WAYLAND_NO_GPU=1 forces wl_shm software rendering (with
+			/// neither set, Vulkan is the default renderer). When true, OpenGL ES is attempted
+			/// with a fallback to software rendering; when false, software rendering is forced.
+			/// This property is only consulted when <see cref="UseVulkanOnWayland"/> did not
+			/// select the Vulkan renderer.
 			/// </summary>
 			public static bool? UseOpenGLOnWayland { get; set; }
 

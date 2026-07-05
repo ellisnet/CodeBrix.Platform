@@ -259,6 +259,17 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 
 	private void DisposeCachedSkiaSurface()
 	{
+		if (_cachedSkSurface != null && _grContext != null)
+		{
+			// Submit any ops still recorded against the wrapped render image while the
+			// VkImage is alive. Skia's drawing manager keeps unflushed ops (e.g. a
+			// Canvas.Clear recorded just before a resize) referencing the wrapped image;
+			// destroying the image first leaves the eventual GrContext.Flush() beginning
+			// a render pass on freed driver memory (observed as an ANV segfault when
+			// resizing the Wayland head).
+			_cachedSkSurface.Canvas.Flush();
+			_grContext.Flush();
+		}
 		if (_device != null)
 		{
 			// Wait for GPU to finish all pending work before disposing Skia resources
@@ -284,7 +295,7 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 
 	/// <summary>
 	/// Ensure the cached Skia surface is created. Call while holding the device lock.
-	/// Used by platforms (Win32) that use a split StartPaint/EndPaint pattern.
+	/// Used by platforms (Wayland) that use a split render pattern instead of <see cref="RenderFrame"/>.
 	/// </summary>
 	public void EnsureCachedSurface()
 	{
@@ -294,7 +305,7 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 	/// <summary>
 	/// Blit the intermediate render image to the swapchain and present.
 	/// Call after Skia canvas/context flush, while holding the device lock.
-	/// Used by platforms (Win32) that use a split StartPaint/EndPaint pattern.
+	/// Used by platforms (Wayland) that use a split render pattern instead of <see cref="RenderFrame"/>.
 	/// </summary>
 	public void BlitAndPresent()
 	{

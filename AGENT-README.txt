@@ -240,6 +240,14 @@ package is versioned to track the SkiaSharp release it vendors).
     maximize from the titlebar.)
 
   Related notes:
+  - Drag & drop MAY NOT WORK on the Wayland head, depending on the compositor.
+    The head's drop-target support (wl_data_device) is implemented and behaves
+    correctly per protocol, but compositors with experimental Wayland sessions
+    can deliver unusable drag events: on Cinnamon/Muffin (observed 2026-07),
+    drags from XWayland sources arrive with garbage enter coordinates
+    (wl_fixed minimum), so hit-testing never finds a drop target and the drop
+    silently does nothing. This is a compositor-side bug, not planned work in
+    this repo; drag & drop works normally on the X11 head.
   - Native content in a ContentPresenter is not hosted yet on Wayland (needs
     subsurfaces; parity plan P7). Until then the content is ignored with a
     one-time warning. The shipping WebView (offscreen WPE) and MediaPlayer
@@ -904,16 +912,40 @@ LINUX (native Wayland):
     library. For a native-looking title bar on Debian/Ubuntu-family desktops the
     libdecor GTK plugin should be present (packages "libdecor-0-0" +
     "libdecor-0-plugin-1-gtk"; preinstalled on most GNOME desktops).
-  - Rendering is software (shared-memory) by default — universal and proven. A
-    GPU (EGL/GLES) path is opt-in via the environment variable
-    CODEBRIX_WAYLAND_USE_GPU=1; it falls back to software if GL is unavailable.
+  - Rendering defaults to Vulkan (VK_KHR_wayland_surface), falling back to
+    wl_shm software rendering when Vulkan is unavailable. The two GPU paths
+    (Vulkan and OpenGL ES via EGL) are peers: each falls back directly to
+    software, never to the other. An explicit backend can be selected in code:
+
+        .UseLinuxWayland(wayland =>
+            wayland.RenderingBackend(WaylandRenderingBackend.Vulkan))
+
+    with WaylandRenderingBackend members:
+        Default      Vulkan, falling back to software (same as omitting this).
+        Vulkan       Same Vulkan-else-software selection, stated explicitly.
+        VulkanForced Vulkan with NO fallback: if the Vulkan renderer cannot be
+                     created, the app prints a clean two-line "requires Vulkan
+                     rendering" message to stderr and exits with code 1. Use
+                     this when silent software fallback could be mistaken for
+                     working Vulkan (e.g. hardware qualification, perf tests).
+        OpenGLES     OpenGL ES via EGL, falling back to software.
+        Software     wl_shm software rendering only.
+    The same choices exist as feature flags (set before Build()):
+    FeatureConfiguration.Rendering.UseVulkanOnWayland, .UseOpenGLOnWayland,
+    and .ForceVulkanOnWayland.
+    Environment variables are consulted ONLY when neither the builder backend
+    nor the feature flags decided: CODEBRIX_WAYLAND_NO_GPU=1 forces software
+    rendering; CODEBRIX_WAYLAND_USE_EGL=1 selects the OpenGL ES path. If both
+    are set, NO_GPU wins. Code always beats environment.
   - Working, at parity with the X11 head: flyout-based controls (ComboBox
     dropdowns, MenuFlyout, ToolTip, dialogs), rich clipboard (text, HTML, PNG
-    images, file lists, custom formats — copy AND paste), ACCEPTING
-    drag-and-drop from other applications (initiating a drag is not implemented
-    on the X11 head either), fractional (non-integer) display scaling, custom
-    title bars (ExtendContentIntoTitleBar), and window activation
-    (xdg-activation; compositor focus policy applies).
+    images, file lists, custom formats — copy AND paste), fractional
+    (non-integer) display scaling, custom title bars
+    (ExtendContentIntoTitleBar), and window activation (xdg-activation;
+    compositor focus policy applies). ACCEPTING drag-and-drop from other
+    applications is implemented (initiating a drag is not implemented on the
+    X11 head either) but may not work on some compositors — see the "Drag &
+    drop MAY NOT WORK" note in the PERMANENT WAYLAND DIFFERENCES section.
   - Not yet implemented in this head (deferred): touch input, native-view
     hosting in a ContentPresenter (needs subsurfaces), and IME text input (IME
     is missing on the X11 head too).

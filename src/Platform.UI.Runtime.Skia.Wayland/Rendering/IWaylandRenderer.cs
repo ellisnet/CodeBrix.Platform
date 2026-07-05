@@ -4,9 +4,10 @@ using SkiaSharp;
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 
 /// <summary>
-/// A window renderer: presents the XAML content of one window into its wl_surface. Two
+/// A window renderer: presents the XAML content of one window into its wl_surface. Three
 /// implementations exist — the default <see cref="WaylandShmRenderer"/> (software, wl_shm)
-/// and the opt-in <see cref="WaylandEglRenderer"/> (GPU, EGL/GLES).
+/// and the opt-in <see cref="WaylandEglRenderer"/> (GPU, EGL/GLES) and
+/// <see cref="WaylandVulkanRenderer"/> (GPU, Vulkan).
 /// </summary>
 internal interface IWaylandRenderer : IDisposable
 {

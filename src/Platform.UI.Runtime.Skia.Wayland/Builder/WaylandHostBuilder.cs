@@ -15,8 +15,9 @@ public partial class WaylandHostBuilder : IPlatformHostBuilder
 
 	/// <summary>
 	/// Sets the rendering backend for the Wayland host.
-	/// This takes precedence over <see cref="FeatureConfiguration.Rendering.UseOpenGLOnWayland"/>
-	/// and the CODEBRIX_WAYLAND_USE_GPU environment variable if set.
+	/// This takes precedence over <see cref="FeatureConfiguration.Rendering.UseVulkanOnWayland"/>,
+	/// <see cref="FeatureConfiguration.Rendering.UseOpenGLOnWayland"/> and the
+	/// CODEBRIX_WAYLAND_NO_GPU / CODEBRIX_WAYLAND_USE_EGL environment variables if set.
 	/// </summary>
 	public WaylandHostBuilder RenderingBackend(WaylandRenderingBackend backend)
 	{
@@ -54,17 +55,22 @@ public partial class WaylandHostBuilder : IPlatformHostBuilder
 	{
 		switch (backend)
 		{
-			// Not selectable yet: there is no Vulkan renderer for the Wayland head. Uncomment
-			// this case together with the WaylandRenderingBackend.Vulkan enum member when one
-			// is added (it will also need a FeatureConfiguration.Rendering.UseVulkanOnWayland
-			// flag, mirroring the X11 head's UseVulkanOnX11).
-			//case WaylandRenderingBackend.Vulkan:
-			//	FeatureConfiguration.Rendering.UseVulkanOnWayland = true;
-			//	break;
+			case WaylandRenderingBackend.Vulkan:
+				FeatureConfiguration.Rendering.UseVulkanOnWayland = true;
+				FeatureConfiguration.Rendering.ForceVulkanOnWayland = false;
+				break;
+			case WaylandRenderingBackend.VulkanForced:
+				FeatureConfiguration.Rendering.UseVulkanOnWayland = true;
+				FeatureConfiguration.Rendering.ForceVulkanOnWayland = true;
+				break;
 			case WaylandRenderingBackend.OpenGLES:
+				FeatureConfiguration.Rendering.UseVulkanOnWayland = false;
+				FeatureConfiguration.Rendering.ForceVulkanOnWayland = false;
 				FeatureConfiguration.Rendering.UseOpenGLOnWayland = true;
 				break;
 			case WaylandRenderingBackend.Software:
+				FeatureConfiguration.Rendering.UseVulkanOnWayland = false;
+				FeatureConfiguration.Rendering.ForceVulkanOnWayland = false;
 				FeatureConfiguration.Rendering.UseOpenGLOnWayland = false;
 				break;
 			case WaylandRenderingBackend.Default:

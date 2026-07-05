@@ -12,8 +12,10 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 /// <summary>
 /// GPU renderer (P7, opt-in): a wl_egl_window wraps the content wl_surface, EGL/GLES provides
 /// the GL context, and Skia renders through a <see cref="GRContext"/> — the same shape as the
-/// X11 head's EGL path. Enabled with the CODEBRIX_WAYLAND_USE_GPU=1 environment variable;
-/// otherwise the software <see cref="WaylandShmRenderer"/> is used.
+/// X11 head's EGL path. Enabled with the CODEBRIX_WAYLAND_USE_EGL=1 environment variable,
+/// <c>WaylandRenderingBackend.OpenGLES</c> or
+/// <c>FeatureConfiguration.Rendering.UseOpenGLOnWayland</c>; falls back to the software
+/// <see cref="WaylandShmRenderer"/> if the GL context cannot be created.
 /// </summary>
 /// <remarks>
 /// EGL_PLATFORM_WAYLAND_KHR (0x31D8) tells eglGetPlatformDisplay the native display is a
