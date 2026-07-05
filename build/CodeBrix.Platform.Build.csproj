@@ -100,7 +100,7 @@
 		<!-- The WebView AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever) ships with every
 		     family release. (The legacy Platform.UI.WebView.Skia.X11 AddIn is deliberately NOT
 		     listed - it is unsupported, slated for deletion, and must never be published.) -->
-		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia.Linux\Platform.UI.WebView.Skia.Linux.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
 
 		<!-- The MediaPlayer AddIn (CodeBrix.Platform.MediaPlayer.LgplLicenseForever) ships with every
 		     family release: one windowing-agnostic vmem package for the Win32, WPF, X11, Wayland, and

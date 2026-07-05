@@ -56,6 +56,6 @@
          XAML source generator through the heads' transitive references), and it is inert on
          non-Linux heads. Requires the system WPE WebKit engine at run time:
          sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1 -->
-    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.WebView.Skia.Linux\Platform.UI.WebView.Skia.Linux.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
   </ItemGroup>
 </Project>

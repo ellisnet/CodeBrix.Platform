@@ -290,23 +290,29 @@ package is versioned to track the SkiaSharp release it vendors).
 
   CodeBrix.Platform.WebView.ApacheLicenseForever                     all heads
       Makes the XAML WebView2 control work on ALL Skia heads with a single
-      package. The Windows (Win32), Skia-on-WPF, and macOS heads already have
-      built-in WebView support (Microsoft Edge WebView2 / WKWebView) — on those
-      platforms this package is inert and harmless to reference. What it
-      actually delivers is Linux: on the X11, Wayland, AND FrameBuffer heads the
-      web content is rendered offscreen by the system-installed WPE WebKit
-      engine and composited directly into the Skia scene (no native child
-      windows, no airspace problems — clipping, transforms, and z-order behave
-      like any other XAML content). No engine binaries ship in the package; it
-      is 100% Apache-2.0 managed code that P/Invokes the distro's WPE WebKit at
-      run time. Linux machines must have the engine installed:
+      package. What it delivers differs by head:
+        - Windows (Win32) and Skia-on-WPF: the package bundles the Microsoft
+          Edge WebView2 SDK redistributable (the native loader plus the managed
+          WebView2 control assemblies) and copies it to the app output, backing
+          the control with the Microsoft Edge WebView2 runtime. Only the SDK is
+          shipped here — the Edge WebView2 runtime itself comes from the end
+          user's Windows install. See THIRD-PARTY-NOTICES.txt (item 21).
+        - macOS: inert — WKWebView is built into the OS.
+        - Linux (X11, Wayland, AND FrameBuffer): web content is rendered
+          offscreen by the system-installed WPE WebKit engine and composited
+          directly into the Skia scene (no native child windows, no airspace
+          problems — clipping, transforms, and z-order behave like any other
+          XAML content). This Linux path is 100% Apache-2.0 managed code that
+          P/Invokes the distro's WPE WebKit at run time; no WPE engine binaries
+          ship in the package. Linux machines must have the engine installed:
           sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
       When the engine is missing, creating a WebView throws
       PlatformNotSupportedException naming the missing library and that exact
       apt command. Reference this package ONCE, in the .Core project, like the
-      other extension add-ons: every head gets it transitively, it activates on
-      the Linux heads, and it is inert (a small do-nothing assembly) on the
-      Windows, WPF, and macOS heads.
+      other extension add-ons: every head gets it transitively. It activates the
+      WPE path on the Linux heads, delivers the Microsoft Edge WebView2 payload
+      to the app output on the Windows and Skia-on-WPF heads, and is inert on
+      macOS (WKWebView is built in).
       CUSTOM USER-AGENT: on every head, app code can set the User-Agent string
       the WebView sends (an empty string restores the engine's default):
           myWebView.CoreWebView2.Settings.UserAgent = "MyApp/1.0";

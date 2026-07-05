@@ -6,8 +6,8 @@
 	<Import Project="../../targetframework-override-noplatform.props" />
 
 	<PropertyGroup>
-		<AssemblyName>CodeBrix.Platform.UI.WebView.Skia.Linux</AssemblyName>
-		<RootNamespace>CodeBrix.Platform.UI.WebView.Skia.Linux</RootNamespace>
+		<AssemblyName>CodeBrix.Platform.UI.WebView.Skia</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.WebView.Skia</RootNamespace>
 
 		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
 		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
@@ -18,7 +18,7 @@
 		     matching the Lottie package's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WebView.ApacheLicenseForever</PackageId>
-		<Description>This package provides WebView support for CodeBrix.Platform Skia apps on Linux - all three heads: X11, Wayland, and FrameBuffer. Web content is rendered offscreen by the system-installed WPE WebKit engine (sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1) and composited directly into the Skia scene; no engine binaries are shipped in this package. Reference it once, in your app's .Core project, like the other extension add-ons: every head gets it, the Linux heads activate it, and it is inert on the Windows, Skia-on-WPF, and macOS heads (which have built-in WebView support).</Description>
+		<Description>WebView support for CodeBrix.Platform Skia apps. Reference it once in your app's .Core project and the XAML WebView2 control works on every head: Windows (Win32), Skia-on-WPF, Linux (X11, Wayland, FrameBuffer), and macOS. Linux heads require the system WPE WebKit engine.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

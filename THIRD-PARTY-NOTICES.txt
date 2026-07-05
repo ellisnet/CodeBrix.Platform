@@ -18,10 +18,13 @@ documented below. This file is intended to be a comprehensive "one-stop"
 record of the provenance and licensing of every body of source code and asset
 file that was pulled into this repository from an outside project.
 
-This file documents only source code and asset files that are present in this
-repository. Functionality obtained by referencing a published NuGet package
-(whose source is not part of this repository) is NOT documented here; such
-packages carry their own license and notice files.
+This file documents source code and asset files that are present in this
+repository, plus any third-party BINARIES that this repository's packaging build
+bundles and redistributes inside a published CodeBrix package. Functionality
+obtained by merely referencing a published NuGet package (whose source is not
+part of this repository, and whose compiled bits CodeBrix does not redistribute)
+is NOT documented here; such packages carry their own license and notice files.
+The redistributed binaries are documented in Part E.
 
 If you have any questions about any Third Party Code noticed here, or if you
 believe that any Third Party Code noticed here has been included in
@@ -29,7 +32,8 @@ CodeBrix.Platform in error, please open a new issue at:
 https://github.com/ellisnet/CodeBrix.Platform/issues
 
 The full text of each distinct license referenced below is reproduced in
-Part D. The Apache License, Version 2.0 (used by this repository itself and by
+Part D (the redistributed-binary license in Part E accompanies its own entry
+there). The Apache License, Version 2.0 (used by this repository itself and by
 several of the components below) is reproduced in the LICENSE file at the root
 of this repository and is not duplicated here.
 
@@ -366,7 +370,7 @@ The components in this part are present as source code in this repository
                   GLib/GObject C APIs are LGPL-2.1; wayland-server is
                   MIT / Expat  (BSD-2-Clause and MIT texts in Part D)
 
-    The Linux WebView AddIn (src/AddIns/Platform.UI.WebView.Skia.Linux/) contains
+    The WebView AddIn (src/AddIns/Platform.UI.WebView.Skia/) contains
     hand-bound P/Invoke declarations under Interop/ mirroring the C APIs of
     libwpe 1.16.2, WPEBackend-fdo 1.16.0, WPE WebKit 2.48.x (wpe-webkit-2.0 API,
     including its bundled JavaScriptCore GLib API), GLib/GObject 2.84, libsoup 3,
@@ -551,6 +555,63 @@ freely, subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
+
+================================================================================
+ PART E — REDISTRIBUTED THIRD-PARTY BINARIES
+================================================================================
+
+The binaries listed here are NOT part of this repository's source tree. They are
+Microsoft-provided redistributables that this repository's packaging build pulls
+from their official NuGet package and bundles, UNMODIFIED, inside a published
+CodeBrix package. They appear in this notice file because CodeBrix redistributes
+the compiled bits; the applicable license permits binary redistribution provided
+the copyright notice and disclaimer are reproduced, which is done below.
+
+21. Microsoft Edge WebView2 SDK  (Microsoft.Web.WebView2, version 1.0.4022.49)
+    Bundled into: the CodeBrix.Platform.WebView.ApacheLicenseForever package,
+    under buildTransitive/webview2/. On the Windows (Win32) and Skia-on-WPF
+    heads these files are copied to the application output to back the XAML
+    WebView2 control with the Microsoft Edge WebView2 runtime; the Linux and
+    macOS heads carry but do not use them. The bundled files are the managed
+    control assemblies (Microsoft.Web.WebView2.Core.dll, .WinForms.dll and
+    .Wpf.dll) plus the native loader (runtimes/win-{x64,x86,arm64}/native/
+    WebView2Loader.dll). NO Microsoft Edge browser / WebView2 runtime binaries
+    are included — that runtime is supplied by the end user's Windows install.
+    License: the Microsoft Edge WebView2 SDK license, a BSD-3-Clause-style
+    permissive binary-redistribution grant, reproduced in full below.
+    Source:  https://www.nuget.org/packages/Microsoft.Web.WebView2
+
+--------------------------------------------------------------------------------
+ Microsoft Edge WebView2 SDK License  (item 21)
+--------------------------------------------------------------------------------
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+   * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+   * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+   * The name of Microsoft Corporation, or the names of its contributors
+may not be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ================================================================================
 

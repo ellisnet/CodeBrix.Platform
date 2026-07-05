@@ -33,7 +33,7 @@ using Window = Gtk.Window;
 	operatingSystemCondition: "linux")]
 
 //TODO: DELETE this legacy AddIn in a future release. It is superseded by the WPE-based
-//      Platform.UI.WebView.Skia.Linux AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever),
+//      Platform.UI.WebView.Skia AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever),
 //      which covers X11 AND Wayland AND FrameBuffer without GTK window embedding. This
 //      project's package (CodeBrix.Platform.WinUI.WebView.Skia.X11) was never published to
 //      nuget.org and never will be - do not publish the nupkg that Release builds produce.

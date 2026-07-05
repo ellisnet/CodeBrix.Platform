@@ -38,7 +38,7 @@
   </Folder>
   <Folder Name="/Platform/AddIns/">
     <Project Path="../../../src/AddIns/Platform.UI.MediaPlayer.Skia/Platform.UI.MediaPlayer.Skia.csproj" />
-    <Project Path="../../../src/AddIns/Platform.UI.WebView.Skia.Linux/Platform.UI.WebView.Skia.Linux.csproj" />
+    <Project Path="../../../src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj" />
   </Folder>
   <Folder Name="/Platform/Tools/">
     <Project Path="../../../src/Platform.Analyzers/Platform.Analyzers.csproj" />
