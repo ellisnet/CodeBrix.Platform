@@ -4,33 +4,54 @@
 	<!--
 		Windows WebView2 runtime delivery.
 
-		The XAML WebView2 control needs the Microsoft Edge WebView2 runtime assemblies present in
-		the head's output folder at run time. The head compiles ONLY against the CoreWebView2 facade
-		baked into CodeBrix.Platform.dll, so these must be copied to output as plain files and NEVER
-		added as <Reference> items - a real Microsoft.Web.WebView2.Core reference would collide with
-		that facade (CS0433). Copy-only output delivery is exactly what the from-source WebViewDemo
-		produces, and it is sufficient.
+		The XAML WebView2 control is backed at run time by the Microsoft Edge WebView2 runtime, whose
+		managed assemblies the WPF/Win32 host resolves via Assembly.Load(...). The .NET host resolves
+		those loads against the app's deps.json - NOT by scanning the output folder - so the assemblies
+		must be registered as RUNTIME assemblies (deps.json entries), not merely copied as content. A
+		plain <Content> copy lands the file on disk but leaves it invisible to the loader
+		(FileNotFoundException despite the file being present).
 
-		This add-on package flows to every head (referenced once in .Core), but only the Windows
-		heads actually need WebView2. The Skia.Win32 and Skia.Wpf runtime packages advertise
-		CodeBrixWindowsWebViewHost=true from their buildTransitive props; TFM alone cannot tell a
-		Win32 head from a Linux head (both are net10.0). On the Linux and macOS heads the flag is
-		unset, so the bundled payload just rides along unused and nothing is copied.
+		So the three managed assemblies are added as ALIASED, copy-local <Reference> items: a reference
+		is what puts them into deps.json (and copies them to bin). The alias keeps them out of the
+		global namespace so they do NOT collide (CS0433) with the CoreWebView2 facade compiled into
+		CodeBrix.Platform.dll - the head's own code binds to that facade, while these real assemblies
+		bind only at run time. This mirrors what the from-source WebViewDemo produces (its deps.json
+		lists Microsoft.Web.WebView2.*), which is the behavior we must reproduce.
+
+		This add-on package flows to every head (referenced once in .Core), but only the Windows heads
+		need WebView2 - and only they can reference these Windows assemblies. The Skia.Win32 and
+		Skia.Wpf runtime packages advertise CodeBrixWindowsWebViewHost=true from their buildTransitive
+		props; TFM alone cannot tell a Win32 head from a Linux head (both are net10.0). On the Linux and
+		macOS heads the flag is unset, so nothing here applies.
 	-->
+	<PropertyGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
+		<!-- Benign WindowsBase 4.0 (ref-pack facade) vs 5.0 conflict flowing in via WebView2.Wpf; the
+		     platform's own runtime csproj NoWarns it for the same reason. -->
+		<NoWarn>$(NoWarn);MSB3277</NoWarn>
+	</PropertyGroup>
+
 	<ItemGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
 
-		<!-- Managed WebView2 assemblies -> next to the app executable. -->
-		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Core.dll"
-				 Link="Microsoft.Web.WebView2.Core.dll"
-				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
-		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.WinForms.dll"
-				 Link="Microsoft.Web.WebView2.WinForms.dll"
-				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
-		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Wpf.dll"
-				 Link="Microsoft.Web.WebView2.Wpf.dll"
-				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+		<!-- Managed WebView2 assemblies -> aliased, copy-local references (deps.json + bin). -->
+		<Reference Include="Microsoft.Web.WebView2.Core">
+			<HintPath>$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Core.dll</HintPath>
+			<Aliases>codebrixmswebview2</Aliases>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="Microsoft.Web.WebView2.WinForms">
+			<HintPath>$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.WinForms.dll</HintPath>
+			<Aliases>codebrixmswebview2</Aliases>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="Microsoft.Web.WebView2.Wpf">
+			<HintPath>$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Wpf.dll</HintPath>
+			<Aliases>codebrixmswebview2</Aliases>
+			<Private>true</Private>
+		</Reference>
 
-		<!-- Native loader -> runtimes\win-<arch>\native\ (WebView2's managed loader probes here). -->
+		<!-- Native loader -> runtimes\win-<arch>\native\. Plain content copy: WebView2's managed core
+		     P/Invokes WebView2Loader.dll by probing the app dir and this subfolder, so the native
+		     piece does not need a deps.json entry. -->
 		<Content Include="$(MSBuildThisFileDirectory)webview2\runtimes\win-x64\native\WebView2Loader.dll"
 				 Link="runtimes\win-x64\native\WebView2Loader.dll"
 				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
