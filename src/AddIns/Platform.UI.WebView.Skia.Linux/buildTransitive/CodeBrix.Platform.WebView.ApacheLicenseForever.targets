@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--
+		Windows WebView2 runtime delivery.
+
+		The XAML WebView2 control needs the Microsoft Edge WebView2 runtime assemblies present in
+		the head's output folder at run time. The head compiles ONLY against the CoreWebView2 facade
+		baked into CodeBrix.Platform.dll, so these must be copied to output as plain files and NEVER
+		added as <Reference> items - a real Microsoft.Web.WebView2.Core reference would collide with
+		that facade (CS0433). Copy-only output delivery is exactly what the from-source WebViewDemo
+		produces, and it is sufficient.
+
+		This add-on package flows to every head (referenced once in .Core), but only the Windows
+		heads actually need WebView2. The Skia.Win32 and Skia.Wpf runtime packages advertise
+		CodeBrixWindowsWebViewHost=true from their buildTransitive props; TFM alone cannot tell a
+		Win32 head from a Linux head (both are net10.0). On the Linux and macOS heads the flag is
+		unset, so the bundled payload just rides along unused and nothing is copied.
+	-->
+	<ItemGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
+
+		<!-- Managed WebView2 assemblies -> next to the app executable. -->
+		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Core.dll"
+				 Link="Microsoft.Web.WebView2.Core.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.WinForms.dll"
+				 Link="Microsoft.Web.WebView2.WinForms.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+		<Content Include="$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Wpf.dll"
+				 Link="Microsoft.Web.WebView2.Wpf.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+
+		<!-- Native loader -> runtimes\win-<arch>\native\ (WebView2's managed loader probes here). -->
+		<Content Include="$(MSBuildThisFileDirectory)webview2\runtimes\win-x64\native\WebView2Loader.dll"
+				 Link="runtimes\win-x64\native\WebView2Loader.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+		<Content Include="$(MSBuildThisFileDirectory)webview2\runtimes\win-x86\native\WebView2Loader.dll"
+				 Link="runtimes\win-x86\native\WebView2Loader.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+		<Content Include="$(MSBuildThisFileDirectory)webview2\runtimes\win-arm64\native\WebView2Loader.dll"
+				 Link="runtimes\win-arm64\native\WebView2Loader.dll"
+				 CopyToOutputDirectory="PreserveNewest" Pack="false" Visible="false" />
+
+	</ItemGroup>
+
+</Project>

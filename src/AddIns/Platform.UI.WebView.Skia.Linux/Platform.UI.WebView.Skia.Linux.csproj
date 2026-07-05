@@ -38,6 +38,44 @@
 		     framework package. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+
+		<!-- Pack-time ONLY: locates the Microsoft Edge WebView2 redistributable so its runtime assets
+		     can be bundled into this package (see the buildTransitive .targets and the ItemGroup below).
+		     ExcludeAssets="all" so nothing is referenced or copied into THIS (Linux) add-on's own build;
+		     PrivateAssets="all" so it never flows to consumers as a dependency. Version comes from the
+		     PackageReference Update in src/Directory.Build.targets, matching the runtime packages. -->
+		<PackageReference Include="Microsoft.Web.WebView2" GeneratePathProperty="true" PrivateAssets="all" ExcludeAssets="all" />
+	</ItemGroup>
+
+	<!--
+		Bundle the Microsoft Edge WebView2 runtime redistributable into buildTransitive\webview2 so the
+		Windows heads (Skia.Win32 / Skia.Wpf) can copy it to their output. The variants match what
+		Microsoft.Web.WebView2's own build/Common.targets selects for net5.0+ managed heads (Core and
+		WinForms from netcoreapp3.0, Wpf from net5.0-windows) plus the three native loaders. These are
+		packed only - they never enter this add-on's own build output. The Linux/macOS heads carry but
+		never use them. See THIRD-PARTY-NOTICES.txt for the WebView2 redistributable notice.
+	-->
+	<ItemGroup>
+		<None Include="$(PkgMicrosoft_Web_WebView2)\lib_manual\netcoreapp3.0\Microsoft.Web.WebView2.Core.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\Microsoft.Web.WebView2.Core.dll" Visible="false" />
+		<None Include="$(PkgMicrosoft_Web_WebView2)\lib_manual\netcoreapp3.0\Microsoft.Web.WebView2.WinForms.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\Microsoft.Web.WebView2.WinForms.dll" Visible="false" />
+		<None Include="$(PkgMicrosoft_Web_WebView2)\lib_manual\net5.0-windows10.0.17763.0\Microsoft.Web.WebView2.Wpf.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\Microsoft.Web.WebView2.Wpf.dll" Visible="false" />
+		<None Include="$(PkgMicrosoft_Web_WebView2)\runtimes\win-x64\native\WebView2Loader.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\runtimes\win-x64\native\WebView2Loader.dll" Visible="false" />
+		<None Include="$(PkgMicrosoft_Web_WebView2)\runtimes\win-x86\native\WebView2Loader.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\runtimes\win-x86\native\WebView2Loader.dll" Visible="false" />
+		<None Include="$(PkgMicrosoft_Web_WebView2)\runtimes\win-arm64\native\WebView2Loader.dll"
+			  Pack="true" PackagePath="buildTransitive\webview2\runtimes\win-arm64\native\WebView2Loader.dll" Visible="false" />
+
+		<!-- Auto-imported into consuming heads by NuGet (file name must equal the package id). Packed
+		     as Content (not None) so it does not collide with the SDK's default None glob for this
+		     in-project file - matches how the runtime packages pack their buildTransitive files. -->
+		<Content Include="buildTransitive\CodeBrix.Platform.WebView.ApacheLicenseForever.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.WebView.ApacheLicenseForever.targets</PackagePath>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>

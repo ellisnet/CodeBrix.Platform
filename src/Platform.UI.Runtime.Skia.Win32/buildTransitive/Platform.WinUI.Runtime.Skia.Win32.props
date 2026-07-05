@@ -3,5 +3,10 @@
 	<PropertyGroup>
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<SupportsFontManifest>true</SupportsFontManifest>
+
+		<!-- "I am a Windows WebView2-capable head." The WebView add-on
+		     (CodeBrix.Platform.WebView.ApacheLicenseForever) keys its Windows WebView2 payload copy
+		     off this flag, since TFM cannot distinguish a Win32 head from a Linux head (both net10.0). -->
+		<CodeBrixWindowsWebViewHost>true</CodeBrixWindowsWebViewHost>
 	</PropertyGroup>
 </Project>

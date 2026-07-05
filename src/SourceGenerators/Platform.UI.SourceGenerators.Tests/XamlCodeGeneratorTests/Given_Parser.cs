@@ -843,7 +843,7 @@ public partial class Given_Parser
 					"""
 				}
 			},
-			ReferenceAssemblies = _Dotnet.Current.WithCodeBrixPackage("1.0.183.233"),
+			ReferenceAssemblies = _Dotnet.Current.WithCodeBrixPackage("1.0.185.1199"),
 		}.AddGeneratedSources();
 
 		await test.RunAsync();
