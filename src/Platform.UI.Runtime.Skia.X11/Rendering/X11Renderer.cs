@@ -34,6 +34,10 @@ internal abstract class X11Renderer : IDisposable
 
 		var display = _x11Window.Display;
 		var window = _x11Window.Window;
+		// Note for a future Vulkan/render-loop update: upstream (Uno 6.7.x) narrows this lock to
+		// only the MakeCurrent/UpdateSize/Flush calls, but that change is coupled to its dedicated
+		// render-thread + FramePacer refactor. With this head's timer-driven rendering (ThreadPool
+		// callbacks), the render must stay fully serialized by this display lock.
 		using var lockDisposable = X11Helper.XLock(display);
 
 		if (_host is X11XamlRootHost { Closed.IsCompleted: true })

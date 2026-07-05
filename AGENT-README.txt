@@ -211,6 +211,12 @@ package is versioned to track the SkiaSharp release it vendors).
   the X11 head for maximum reach, the Wayland head for a native, forward-looking
   Wayland experience — or both, as separate heads.
 
+  NOTE: The X11 head renders with OpenGL, falling back to software rendering.
+  A Vulkan renderer (pulled from the Uno Platform 6.7.x development line) also
+  exists in the repo but is NOT a supported configuration yet: it is gated
+  behind an internal-only FeatureConfiguration.Rendering.UseVulkanOnX11 flag
+  with no public API to enable it, and package consumers cannot select it.
+
 --- PERMANENT WAYLAND DIFFERENCES (protocol-inherent; not bugs, not planned work) ---
 
   The Wayland protocol deliberately withholds some window control from clients.

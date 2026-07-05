@@ -7,9 +7,21 @@ namespace CodeBrix.Platform.UI.Hosting; //Was previously: Uno.UI.Hosting
 public partial class WaylandHostBuilder : IPlatformHostBuilder
 {
 	private int _renderFrameRate = 60;
+	private WaylandRenderingBackend? _renderingBackend;
 
 	internal WaylandHostBuilder()
 	{
+	}
+
+	/// <summary>
+	/// Sets the rendering backend for the Wayland host.
+	/// This takes precedence over <see cref="FeatureConfiguration.Rendering.UseOpenGLOnWayland"/>
+	/// and the CODEBRIX_WAYLAND_USE_GPU environment variable if set.
+	/// </summary>
+	public WaylandHostBuilder RenderingBackend(WaylandRenderingBackend backend)
+	{
+		_renderingBackend = backend;
+		return this;
 	}
 
 	/// <summary>
@@ -29,5 +41,35 @@ public partial class WaylandHostBuilder : IPlatformHostBuilder
 	bool IPlatformHostBuilder.IsSupported => OperatingSystem.IsLinux();
 
 	CodeBrixPlatformHost IPlatformHostBuilder.Create(Func<Microsoft.UI.Xaml.Application> appBuilder, Type appType)
-		=> new WaylandApplicationHost(appBuilder, _renderFrameRate);
+	{
+		if (_renderingBackend is { } backend)
+		{
+			ApplyRenderingBackend(backend);
+		}
+
+		return new WaylandApplicationHost(appBuilder, _renderFrameRate);
+	}
+
+	private static void ApplyRenderingBackend(WaylandRenderingBackend backend)
+	{
+		switch (backend)
+		{
+			// Not selectable yet: there is no Vulkan renderer for the Wayland head. Uncomment
+			// this case together with the WaylandRenderingBackend.Vulkan enum member when one
+			// is added (it will also need a FeatureConfiguration.Rendering.UseVulkanOnWayland
+			// flag, mirroring the X11 head's UseVulkanOnX11).
+			//case WaylandRenderingBackend.Vulkan:
+			//	FeatureConfiguration.Rendering.UseVulkanOnWayland = true;
+			//	break;
+			case WaylandRenderingBackend.OpenGLES:
+				FeatureConfiguration.Rendering.UseOpenGLOnWayland = true;
+				break;
+			case WaylandRenderingBackend.Software:
+				FeatureConfiguration.Rendering.UseOpenGLOnWayland = false;
+				break;
+			case WaylandRenderingBackend.Default:
+			default:
+				break;
+		}
+	}
 }

@@ -456,10 +456,12 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 		if (_renderer == null && _connection is { } connection && _wlSurface is { } surface)
 		{
 			// wl_shm software rendering is the default (universal, proven). The EGL/GPU path
-			// (P7) is opt-in via CODEBRIX_WAYLAND_USE_GPU=1; it falls back to software if the
-			// GL context cannot be created.
-			var useGpu = string.Equals(
-				Environment.GetEnvironmentVariable("CODEBRIX_WAYLAND_USE_GPU"), "1", StringComparison.Ordinal);
+			// (P7) is opt-in via WaylandHostBuilder.RenderingBackend / FeatureConfiguration
+			// (which take precedence) or the CODEBRIX_WAYLAND_USE_GPU=1 environment variable;
+			// it falls back to software if the GL context cannot be created.
+			var useGpu = FeatureConfiguration.Rendering.UseOpenGLOnWayland
+				?? string.Equals(
+					Environment.GetEnvironmentVariable("CODEBRIX_WAYLAND_USE_GPU"), "1", StringComparison.Ordinal);
 			if (useGpu)
 			{
 				try

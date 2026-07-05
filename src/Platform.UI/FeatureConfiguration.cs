@@ -880,6 +880,18 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 		public static class Rendering
 		{
 			/// <summary>
+			/// Determines if Vulkan rendering should be enabled on the X11 target.
+			/// When true, attempts to use Vulkan for hardware-accelerated rendering. Falls back to
+			/// OpenGL (or software rendering) if Vulkan is unavailable.
+			/// </summary>
+			/// <remarks>
+			/// Intentionally internal for now: the Vulkan renderer is present in the repo but not yet
+			/// offered to consumers of the CodeBrix.Platform packages. Make this public (and expose a
+			/// host-builder API) when Vulkan rendering is officially offered.
+			/// </remarks>
+			internal static bool UseVulkanOnX11 { get; set; }
+
+			/// <summary>
 			/// Determines if OpenGL rendering should be enabled on the X11 target. If null, defaults to
 			/// OpenGL if available. Otherwise, software rendering will be used.
 			/// </summary>
@@ -891,6 +903,14 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// to create a GL/GlES context but even when true, if the preferred API fails, the other will be attempted.
 			/// </summary>
 			public static bool PreferGLESOverGLOnX11 { get; set; }
+
+			/// <summary>
+			/// Determines if OpenGL ES (EGL) rendering should be enabled on the Wayland target.
+			/// If null (the default), the CODEBRIX_WAYLAND_USE_GPU environment variable decides
+			/// (wl_shm software rendering when unset). When true, OpenGL ES is attempted with a
+			/// fallback to software rendering; when false, software rendering is forced.
+			/// </summary>
+			public static bool? UseOpenGLOnWayland { get; set; }
 
 			/// <summary>
 			/// Determines if OpenGL rendering should be enabled on the Win32 target. If null, defaults to

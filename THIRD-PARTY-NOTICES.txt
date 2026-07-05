@@ -49,8 +49,10 @@ of this repository and is not duplicated here.
     License:      Apache License, Version 2.0
 
     The entire CodeBrix.Platform repository is derived from the Uno Platform
-    (the release/stable/6.5 line). The great majority of the source under
-    src/ is Uno Platform source, modified for this fork:
+    (the release/stable/6.5 line, plus selected portions pulled from the 6.7.x
+    development line, such as the Vulkan rendering support under
+    src/Platform.UI/Vulkan/ and the X11 Vulkan renderer). The great majority
+    of the source under src/ is Uno Platform source, modified for this fork:
 
       - retargeted to .NET 10 only (the mobile, WebAssembly, and UWP heads are
         not built; much of that source is stripped or left dormant);
@@ -210,6 +212,12 @@ The components in this part are present as source code in this repository
     (src/Platform.UI.Runtime.Skia.X11/ApplicationModel/DataTransfer/
     X11ClipboardExtension.cs) also follows Avalonia's X11Clipboard.cs; the actual
     clipboard logic in that file is ported from xsel (see item 15).
+
+    The Vulkan rendering support under src/Platform.UI/Vulkan/ (instance/device/
+    swapchain interop and hand-rolled Vulkan bindings, adapted via the Uno
+    Platform 6.7.x development line) is based on Avalonia's Avalonia.Vulkan
+    (https://github.com/AvaloniaUI/Avalonia/tree/master/src/Avalonia.Vulkan);
+    the affected files carry the Avalonia MIT attribution in their headers.
 
 11. X11 / X.Org / xkbcommon / freedesktop.org bindings
     Project URLs: https://gitlab.freedesktop.org/xorg
