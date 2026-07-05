@@ -25,9 +25,12 @@
 		macOS heads the flag is unset, so nothing here applies.
 	-->
 	<PropertyGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
-		<!-- Benign WindowsBase 4.0 (ref-pack facade) vs 5.0 conflict flowing in via WebView2.Wpf; the
-		     platform's own runtime csproj NoWarns it for the same reason. -->
-		<NoWarn>$(NoWarn);MSB3277</NoWarn>
+		<!-- Silence the benign WindowsBase 4.0 (ref-pack facade) vs 5.0 conflict that WebView2.Wpf's
+		     dependency introduces at build time (the real 5.0 loads fine at run time). MSB3277 is an
+		     MSBuild/RAR warning, NOT a compiler warning, so $(NoWarn) does not suppress it -
+		     $(MSBuildWarningsAsMessages), which the engine consults when the warning is raised, does.
+		     Scoped to the Windows heads (where our WebView2.Wpf reference exists) via the flag. -->
+		<MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
