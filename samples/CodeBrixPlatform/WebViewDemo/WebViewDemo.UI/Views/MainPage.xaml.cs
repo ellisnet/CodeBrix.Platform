@@ -46,6 +46,25 @@ public sealed partial class MainPage : Page
         }
     }
 
+    // Simulates WikipediaPublisher's completion alert: a modal ContentDialog (the same control
+    // SimpleDialog is built on) shown over the WebView2. On the WinWpfSkia head this exercises the
+    // airspace fix - while the dialog dims the app, the native WebView must hide (not stay lit on
+    // top of the dialog), and must reappear when OK is clicked.
+    private async void UrlButton_Click(object sender, RoutedEventArgs e)
+    {
+        var url = Browser.CoreWebView2?.Source ?? Browser.Source?.ToString() ?? "(no URL yet)";
+
+        var dialog = new ContentDialog
+        {
+            Title = "Current URL",
+            Content = new TextBlock { Text = url, TextWrapping = TextWrapping.Wrap },
+            CloseButtonText = "OK",
+            XamlRoot = XamlRoot,
+        };
+
+        await dialog.ShowAsync();
+    }
+
     private void Browser_NavigationCompleted(WebView2 sender, CoreWebView2NavigationCompletedEventArgs args)
     {
         // Reading the current URL: use CoreWebView2.Source, NOT the XAML Source property.

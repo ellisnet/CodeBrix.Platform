@@ -66,6 +66,18 @@ internal class SoftwareWpfRenderer : IWpfRenderer
 
 			if (_host.NativeOverlayLayer is { } nativeLayer)
 			{
+				// Airspace: the WPF Clip geometry set below does NOT clip an HwndHost's native surface
+				// (e.g. a WebView2). When the clip path collapses - i.e. the native elements are fully
+				// occluded, such as behind a modal ContentDialog's full-window smoke layer - the native
+				// surface would otherwise keep painting on top of the dialog, leaving it invisible and the
+				// app unusable. WebView2 DOES honor Visibility, so hide the whole native overlay when
+				// nothing native is visible, and show it again when the path reappears. This mirrors the
+				// Win32 head, which clips the native window to the (now empty) region via SetWindowRgn.
+				var clipBounds = nativeElementClipPath.Bounds;
+				nativeLayer.Visibility = nativeElementClipPath.IsEmpty || clipBounds.Width < 1 || clipBounds.Height < 1
+					? System.Windows.Visibility.Hidden
+					: System.Windows.Visibility.Visible;
+
 				nativeLayer.Clip ??= new PathGeometry();
 				((PathGeometry)nativeLayer.Clip).Figures = PathFigureCollection.Parse(nativeElementClipPath.ToSvgPathData());
 			}
