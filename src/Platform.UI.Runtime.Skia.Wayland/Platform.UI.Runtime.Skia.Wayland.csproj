@@ -16,7 +16,14 @@
 		<!-- Packed by build/CodeBrix.Platform.Build.csproj with the shared date-stamped version. -->
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<Title>CodeBrix.Platform.Runtime.Skia.Wayland</Title>
-		<Description>Native Wayland Skia runtime host for CodeBrix.Platform applications (requires a Wayland compositor).</Description>
+		<Description>Native Wayland Skia runtime host for CodeBrix.Platform applications (requires a Wayland compositor). Renders with Vulkan by default (VK_KHR_wayland_surface) - with OpenGL (ES/EGL) and software rendering options available.</Description>
+
+		<!-- Extend the family-wide PackageTags (from src/Directory.Build.props) with the
+		     capabilities unique to this head so a NuGet search for "wayland" / "vulkan"
+		     surfaces it. This is the ONLY head that is a native Wayland client and defaults
+		     to the Vulkan renderer; the X11 head is deliberately not tagged (it reaches
+		     Wayland only via XWayland, and its Vulkan path is internal-only/unsupported). -->
+		<PackageTags>$(PackageTags);wayland;vulkan;linux</PackageTags>
 
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever</PackageId>
 

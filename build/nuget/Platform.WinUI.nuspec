@@ -12,7 +12,7 @@
 		<readme>README.md</readme>
 		<description>The core CodeBrix.Platform UI package for desktop apps (C# and XAML on .NET 10 / Skia). Self-contained: bundles the CodeBrix.Platform Foundation, WinRT, Dispatching and Foundation.Logging assemblies.</description>
 		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
-		<tags>ui;xaml;skia;desktop;cross-platform;dotnet;CodeBrix</tags>
+		<tags>ui;xaml;skia;desktop;cross-platform;dotnet;linux;wayland;vulkan;CodeBrix</tags>
 		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
 
 		<dependencies>
