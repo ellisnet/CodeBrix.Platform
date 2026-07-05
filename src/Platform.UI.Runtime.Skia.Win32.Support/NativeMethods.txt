@@ -231,6 +231,7 @@ SetActiveWindow
 SetCapture
 SetClipboardData
 SetCursor
+SetFocus
 SetLayeredWindowAttributes
 SetParent
 SetPixelFormat

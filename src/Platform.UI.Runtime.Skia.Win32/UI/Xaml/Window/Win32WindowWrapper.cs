@@ -290,6 +290,16 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				break;
 			case PInvoke.WM_POINTERDOWN or PInvoke.WM_POINTERUP or PInvoke.WM_POINTERWHEEL or PInvoke.WM_POINTERHWHEEL
 				or PInvoke.WM_POINTERENTER or PInvoke.WM_POINTERLEAVE or PInvoke.WM_POINTERUPDATE:
+				if (msg == PInvoke.WM_POINTERDOWN)
+				{
+					// A press in the Skia client area must give THIS window the OS keyboard focus, so
+					// typed input reaches the focused XAML control. We return 0 for WM_POINTER* (below)
+					// instead of chaining to DefWindowProc, which suppresses Windows' default
+					// click-to-activate/focus - so without this a client-area click never grants keyboard
+					// focus and controls stay effectively read-only until the window is activated another
+					// way (e.g. clicking the title bar or re-activating the window).
+					PInvoke.SetFocus(_hwnd);
+				}
 				OnPointer(msg, wParam, _hwnd);
 				return new LRESULT(0);
 			case PInvoke.WM_POINTERCAPTURECHANGED:
@@ -475,6 +485,11 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 	{
 		var success = PInvoke.SetActiveWindow(_hwnd) != HWND.Null;
 		if (!success) { this.LogError()?.Error($"{nameof(PInvoke.SetActiveWindow)} failed: {Win32Helper.GetErrorMessage()}"); }
+		// SetActiveWindow makes this the active top-level window, but does not by itself guarantee it
+		// holds the OS keyboard focus at startup. Without this, a control auto-focused on launch shows
+		// a caret yet receives no keystrokes until the window is deactivated and re-activated. Take the
+		// keyboard focus explicitly so the initial activation behaves like a real one.
+		PInvoke.SetFocus(_hwnd);
 	}
 
 	protected override void ShowCore()
