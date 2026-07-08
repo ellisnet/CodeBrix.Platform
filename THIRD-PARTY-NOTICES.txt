@@ -32,7 +32,7 @@ CodeBrix.Platform in error, please open a new issue at:
 https://github.com/ellisnet/CodeBrix.Platform/issues
 
 The full text of each distinct license referenced below is reproduced in
-Part D (the redistributed-binary license in Part E accompanies its own entry
+Part D (the redistributed-binary licenses in Part E accompany their own entries
 there). The Apache License, Version 2.0 (used by this repository itself and by
 several of the components below) is reproduced in the LICENSE file at the root
 of this repository and is not duplicated here.
@@ -568,12 +568,14 @@ freely, subject to the following restrictions:
  PART E — REDISTRIBUTED THIRD-PARTY BINARIES
 ================================================================================
 
-The binaries listed here are NOT part of this repository's source tree. They are
-Microsoft-provided redistributables that this repository's packaging build pulls
-from their official NuGet package and bundles, UNMODIFIED, inside a published
-CodeBrix package. They appear in this notice file because CodeBrix redistributes
-the compiled bits; the applicable license permits binary redistribution provided
-the copyright notice and disclaimer are reproduced, which is done below.
+The items listed here are third-party BINARIES (not source code) that are
+bundled, UNMODIFIED, inside a published CodeBrix package — either pulled by the
+packaging build from their official distribution point (item 21) or carried in
+this repository so package builds have no external download dependency
+(item 22). They appear in this notice file because CodeBrix redistributes the
+compiled bits; in each case the applicable license permits binary
+redistribution provided the copyright notice and disclaimer are reproduced,
+which is done below.
 
 21. Microsoft Edge WebView2 SDK  (Microsoft.Web.WebView2, version 1.0.4078.44)
     Bundled into: the CodeBrix.Platform.WebView.ApacheLicenseForever package,
@@ -620,6 +622,57 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+22. ANGLE — Almost Native Graphics Layer Engine  (The ANGLE Project / Google)
+    Bundled into: the CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
+    package, under runtimes/osx/native/. On the macOS head these two dylibs
+    (libEGL.dylib, libGLESv2.dylib) provide the OpenGL ES / EGL implementation
+    that backs GLCanvasElement; the other heads carry but do not use them.
+    The files are VENDORED IN THIS REPOSITORY at
+    src/AddIns/Platform.WinUI.Graphics3DGL/angle_binaries/osx/ so that package
+    builds have no external download dependency. They are the unmodified ANGLE
+    builds originally published by the Silk.NET project
+    (Silk.NET.OpenGLES.ANGLE.Native, Silk.NET repo commit a9c75a6).
+    License: BSD 3-Clause License, reproduced in full below.
+    Source:  https://chromium.googlesource.com/angle/angle
+             https://github.com/dotnet/Silk.NET
+
+--------------------------------------------------------------------------------
+ ANGLE License  (item 22)
+--------------------------------------------------------------------------------
+
+Copyright 2018 The ANGLE Project Authors.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+
+    Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+    Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+
+    Neither the name of TransGaming Inc., Google Inc., 3DLabs Inc.
+    Ltd., nor the names of their contributors may be used to endorse
+    or promote products derived from this software without specific
+    prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
 
 ================================================================================
 
