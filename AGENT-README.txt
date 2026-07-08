@@ -172,6 +172,16 @@ package is versioned to track the SkiaSharp release it vendors).
       Immediate-mode 2D drawing surface backed by SkiaSharp, for custom drawing
       inside XAML.
 
+  CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever     [optional]
+      OpenGL 3D drawing surface (GLCanvasElement) for embedding GPU-rendered
+      content inside XAML; renders offscreen and composites into the Skia
+      scene. Depends on CodeBrix.Platform.OpenGL.MitLicenseForever (added
+      automatically). Requires an OpenGL 3.0+ context from the head; all six
+      heads provide one: Win32/WPF (WGL), X11 (GLX), macOS (bundled ANGLE),
+      Wayland (EGL, works under the default Vulkan presenter), FrameBuffer
+      (DRM/GBM, or Mesa llvmpipe software GL on GPU-less systems — install
+      libegl1 + libgl1-mesa-dri there).
+
   CodeBrix.Platform.Lottie.ApacheLicenseForever           [optional]
       Lottie / Skottie vector animation playback in XAML. Pair it with the
       "SkiaSharp.Skottie" package.
@@ -859,6 +869,9 @@ Each optional capability is one (or two) package references in the .Core project
   2D SkiaSharp drawing:
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
 
+  3D OpenGL drawing (GLCanvasElement):
+      CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
+
   Lottie animations:
       CodeBrix.Platform.Lottie.ApacheLicenseForever
       SkiaSharp.Skottie
@@ -1137,6 +1150,7 @@ Host builder:     CodeBrixPlatformHostBuilder.Create() (namespace CodeBrix.Platf
 Core framework pkg:   CodeBrix.Platform.ApacheLicenseForever            (in .Core)
 Extensions (in .Core):
     Graphics2DSK ->   CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
+    Graphics3DGL ->   CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
     Lottie       ->   CodeBrix.Platform.Lottie.ApacheLicenseForever (+ SkiaSharp.Skottie)
     Svg          ->   CodeBrix.Platform.Svg.ApacheLicenseForever (+ CodeBrix.SkiaSvg.MitLicenseForever)
     Skia views   ->   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever

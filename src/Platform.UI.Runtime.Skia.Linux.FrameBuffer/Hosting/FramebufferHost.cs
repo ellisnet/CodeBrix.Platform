@@ -125,6 +125,11 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IApplicationViewExtension), o => new ApplicationViewExtension(o));
 			ApiExtensibility.Register(typeof(Windows.Graphics.Display.IDisplayInformationExtension), o => new DisplayInformationExtension(o, DisplayScale));
 
+			// Offscreen EGL GL context for GLCanvasElement (Graphics3DGL AddIn): DRM/GBM render
+			// node when a GPU exists, otherwise Mesa's surfaceless platform (llvmpipe software
+			// rendering — requires Mesa's software GL to be installed on GPU-less systems).
+			ApiExtensibility.Register<Microsoft.UI.Xaml.XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), _ => new FrameBufferNativeOpenGLWrapper());
+
 			void Dispatch(System.Action d, NativeDispatcherPriority p)
 				=> _eventLoop.Schedule(d);
 

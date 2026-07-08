@@ -40,6 +40,10 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 			typeof(Microsoft.UI.Xaml.Controls.ContentPresenter.INativeElementHostingExtension),
 			o => new WaylandNativeElementHostingExtension(o));
 
+		// Offscreen EGL-pbuffer GL context for GLCanvasElement (Graphics3DGL AddIn); independent
+		// of the presentation backend, so it works under the default Vulkan renderer too.
+		ApiExtensibility.Register<XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), xamlRoot => new WaylandNativeOpenGLWrapper(xamlRoot));
+
 		ApiExtensibility.Register(typeof(CodeBrix.Platform.Extensions.System.ILauncherExtension), o => new CodeBrix.Platform.UI.Runtime.Skia.Extensions.System.LinuxLauncherExtension(o));
 
 		// File pickers ride xdg-desktop-portal over DBus — display-server-agnostic, so these

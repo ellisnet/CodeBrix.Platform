@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+	<metadata minClientVersion="5.0">
+		<id>CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever</id>
+		<version>$codebrixversion$</version>
+		<title>CodeBrix.Platform.Graphics3DGL</title>
+		<authors>Jeremy Ellis and contributors</authors>
+		<requireLicenseAcceptance>true</requireLicenseAcceptance>
+		<icon>icon-codebrix-128.png</icon>
+		<readme>README.md</readme>
+		<projectUrl>https://github.com/ellisnet/CodeBrix.Platform</projectUrl>
+		<license type="expression">Apache-2.0</license>
+		<description>3D graphics extensions (OpenGL) for CodeBrix.Platform applications — provides the GLCanvasElement XAML element.</description>
+		<copyright>Copyright (c) 2026 Jeremy Ellis and contributors</copyright>
+		<tags>graphics;3d;opengl;gl;angle;CodeBrix</tags>
+		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
+		<dependencies>
+			<group targetFramework="net10.0">
+				<dependency id="CodeBrix.Platform.OpenGL.MitLicenseForever" version="1.0.165.1357" />
+			</group>
+		</dependencies>
+	</metadata>
+
+	<files>
+		<file src="..\..\icon-codebrix-128.png" target="/" />
+		<file src="..\..\README.md" target="/" />
+		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
+
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.pdb" target="lib\net10.0" />
+
+		<!-- macOS ANGLE dylibs (BSD 3-Clause; THIRD-PARTY-NOTICES Part E, item 22).
+		     Fetched by the project's GetAngle target during build. -->
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\angle_binaries\osx\libEGL.dylib" target="runtimes\osx\native" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\angle_binaries\osx\libGLESv2.dylib" target="runtimes\osx\native" />
+	</files>
+
+</package>

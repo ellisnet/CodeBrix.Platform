@@ -111,6 +111,14 @@ An optional extension package providing an immediate-mode 2D drawing surface bac
 
 ---
 
+**CodeBrix.Platform.Graphics3DGL**
+NuGet Package ID: `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing `GLCanvasElement` — a XAML element for embedding OpenGL-rendered 3D content inside CodeBrix.Platform applications. Rendering happens in an offscreen OpenGL framebuffer (through the `CodeBrix.Platform.OpenGL.MitLicenseForever` bindings package, which this package depends on) and is composited into the Skia scene, so it is independent of the head's presentation backend. It requires an OpenGL 3.0+ context, and every platform head supplies one: Windows Win32 and WPF (WGL), Linux X11 (GLX), macOS (via the bundled ANGLE libraries — see THIRD-PARTY-NOTICES), Linux Wayland (EGL — works under the head's default Vulkan presenter), and Linux FrameBuffer (DRM/GBM when a GPU is present, otherwise Mesa's llvmpipe software renderer — on GPU-less systems install Mesa's software GL, e.g. `libegl1` and `libgl1-mesa-dri`). The code for this package was derived from the open source library Uno Platform version 6.5.x.
+
+---
+
 **CodeBrix.Platform.Lottie**
 NuGet Package ID: `CodeBrix.Platform.Lottie.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

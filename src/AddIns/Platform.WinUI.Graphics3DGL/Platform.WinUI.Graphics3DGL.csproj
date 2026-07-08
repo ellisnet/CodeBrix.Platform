@@ -10,10 +10,11 @@
 		<TargetFrameworks Condition="'$(BuildGraphics3DGLForWindows)' != ''">$(TargetFrameworks);$(NetUWPOrWinUI)</TargetFrameworks>
 
 		<RootNamespace>CodeBrix.Platform.WinUI.Graphics3DGL</RootNamespace>
-		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as package content via the ItemGroup below. PackageReadmeFile is intentionally left unset so the docs pack as plain content and GeneratePackageOnBuild stays green. -->
-		<PackageIcon>icon-codebrix-128.png</PackageIcon>
-		<PackageReadmeFile></PackageReadmeFile>
+		<!-- Packaging is nuspec-driven: build/nuget/Platform.WinUI.Graphics3DGL.nuspec packed by
+		     build/CodeBrix.Platform.Build.csproj (as CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever).
+		     Do NOT self-pack this project — GeneratePackageOnBuild must stay off so the legacy
+		     WinUI-named package id is never produced. -->
+		<IsPackable>false</IsPackable>
 
 		<Nullable>enable</Nullable>
 		
@@ -74,15 +75,15 @@
 		<DefaultItemExcludes>$(DefaultItemExcludes);angle/**</DefaultItemExcludes>
 	</PropertyGroup>
 
-	<Target Name="GetAngle" BeforeTargets="Build">
-		<DownloadFile Condition="!exists('$(MSBuildThisFileDirectory)angle_binaries/osx/libEGL.dylib')" SourceUrl="https://github.com/dotnet/Silk.NET/raw/a9c75a61528ee7b4e55442f5141cb132f10d72ff/src/Native/Silk.NET.OpenGLES.ANGLE.Native/runtimes/osx/native/libEGL.dylib" DestinationFolder="$(MSBuildThisFileDirectory)angle_binaries/osx">
-		</DownloadFile>
-		<DownloadFile Condition="!exists('$(MSBuildThisFileDirectory)angle_binaries/osx/libGLESv2.dylib')" SourceUrl="https://github.com/dotnet/Silk.NET/raw/a9c75a61528ee7b4e55442f5141cb132f10d72ff/src/Native/Silk.NET.OpenGLES.ANGLE.Native/runtimes/osx/native/libGLESv2.dylib" DestinationFolder="$(MSBuildThisFileDirectory)angle_binaries/osx">
-		</DownloadFile>
-	</Target>
+	<!-- The macOS ANGLE dylibs under angle_binaries/osx are VENDORED IN THIS REPOSITORY
+	     (BSD 3-Clause; THIRD-PARTY-NOTICES Part E, item 22) so package builds never depend
+	     on an external download. They were originally the unmodified builds published by
+	     the Silk.NET project (Silk.NET repo commit a9c75a6, Silk.NET.OpenGLES.ANGLE.Native,
+	     runtimes/osx/native). Do not add download or clean steps for them. -->
 
-	<Target Name="CleanAngle" AfterTargets="Clean">
-		<RemoveDir Directories="$(MSBuildThisFileDirectory)angle_binaries" />
+	<Target Name="VerifyAngleBinaries" BeforeTargets="Build">
+		<Error Condition="!exists('$(MSBuildThisFileDirectory)angle_binaries/osx/libEGL.dylib') or !exists('$(MSBuildThisFileDirectory)angle_binaries/osx/libGLESv2.dylib')"
+		       Text="The vendored ANGLE dylibs are missing from angle_binaries/osx — they are committed repo files; restore them from git." />
 	</Target>
 
 	<ItemGroup>

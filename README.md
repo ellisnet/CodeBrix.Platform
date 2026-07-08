@@ -37,6 +37,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | --- | --- |
 | `CodeBrix.Platform.ApacheLicenseForever` | The core UI framework (required) |
 | `CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever` | 2D SkiaSharp drawing |
+| `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever` | 3D OpenGL drawing (`GLCanvasElement`) |
 | `CodeBrix.Platform.Lottie.ApacheLicenseForever` | Lottie / Skottie animations |
 | `CodeBrix.Platform.Svg.ApacheLicenseForever` | SVG (`SvgImageSource`) support |
 | `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` | SkiaSharp XAML views |
