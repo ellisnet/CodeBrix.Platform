@@ -1080,6 +1080,21 @@ Release outputs), then build the driver in Release:
 
 All packages land in  nugets\Release\<auto-version>\  sharing that one version.
 
+BUILD FAILS WITH CS2012 (task DLL locked): the solution build may fail with
+    error CS2012: Cannot open '...\Platform.XamlMerge.Task\obj\Release\
+    CodeBrix.Platform.XamlMerge.Task.v0.dll' for writing -- The process cannot
+    access the file ... because it is being used by another process.
+This is NOT a code error. The XamlMerge.Task assembly is an MSBuild build-task
+DLL, and a lingering MSBuild node / compiler server (MSBuild node reuse or
+VBCSCompiler) from a prior build is still holding it open. Fix: shut down the
+build servers, then rebuild:
+    dotnet build-server shutdown
+    dotnet build CodeBrix.Platform.Windows.slnx -c Release -nodeReuse:false
+Passing -nodeReuse:false keeps the node from re-locking the DLL across back-to-
+back Release builds (harmless to add to the driver build too). An open Visual
+Studio instance can also hold the lock; close it if the shutdown does not clear
+it. (Observed 2026-07-08.)
+
 --- ON macOS (Apple Silicon): build ONLY the macOS package (pinned version) ---
 
 The macOS head package contains a native dylib that can ONLY be built on Apple
@@ -1092,17 +1107,17 @@ publishing ONLY the rebuilt macOS package still restores cleanly.
 Do NOT run the full driver on macOS — it would also try to pack the Windows-only
 packages. Instead pack just the macOS csproj (exactly what the driver does for
 that one project) from the repo root, substituting the published version for
-1.0.186.1273 below:
+1.0.189.446 below:
 
     dotnet pack src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj \
       -c Release \
-      -p:PackageVersion=1.0.186.1273 \
-      --output nugets/Release/1.0.186.1273
+      -p:PackageVersion=1.0.189.446 \
+      --output nugets/Release/1.0.189.446
 
 -p:PackageVersion (NOT -p:Version) sets only the NuGet package version while
 still flowing to the ProjectReference dependency versions. This produces:
 
-    nugets/Release/1.0.186.1273/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.186.1273.nupkg
+    nugets/Release/1.0.189.446/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.189.446.nupkg
 
 PREREQUISITES on the Mac: full Xcode installed (the native build uses xcodebuild;
 the driver only enables the native step on Apple Silicon) and the native build

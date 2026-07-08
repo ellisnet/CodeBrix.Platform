@@ -14,8 +14,8 @@ public class CodeBrixMissingAssemblyAnalyzerTests
 {
 	// CodeBrix.Platform ships a single aggregate package (no UI/WinUI split). Requires the
 	// package on a restorable feed (nuget.org once published, or src/PackageCache).
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.186.1273")];
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackageWithLottie = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.186.1273"), new PackageIdentity("CodeBrix.Platform.Lottie.ApacheLicenseForever", "1.0.186.1273")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.189.446")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackageWithLottie = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.189.446"), new PackageIdentity("CodeBrix.Platform.Lottie.ApacheLicenseForever", "1.0.189.446")];
 
 	private static readonly ReferenceAssemblies _net100WithCodeBrix = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackage);
 	private static readonly ReferenceAssemblies _net100WithCodeBrixAndLottie = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackageWithLottie);
