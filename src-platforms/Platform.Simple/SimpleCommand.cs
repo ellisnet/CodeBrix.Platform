@@ -214,18 +214,23 @@ public class SimpleCommand : ICommand, IDisposable
 
     public bool CanExecute(object parameter)
     {
-        var result = false;
+        if (!IsExecutable) { return false; }
 
-        if (IsExecutable && _canExecuteWithParam != null)
+        if (_canExecuteWithParam != null)
         {
-            result = _canExecuteWithParam.Invoke(parameter);
+            return _canExecuteWithParam.Invoke(parameter);
         }
-        else if (IsExecutable && _canExecuteNoParam != null)
+        if (_canExecuteNoParam != null)
         {
-            result = _canExecuteNoParam.Invoke();
+            return _canExecuteNoParam.Invoke();
         }
 
-        return result;
+        //No can-execute delegate supplied (the action-only constructors):
+        //  an executable command with no gate is always allowed to run - the
+        //  standard ICommand convention. (Previously this fell through to
+        //  false, which left action-only commands permanently disabled for
+        //  any consumer that honors CanExecute, e.g. a bound XAML Button.)
+        return true;
     }
 
     // ReSharper disable AsyncVoidMethod
