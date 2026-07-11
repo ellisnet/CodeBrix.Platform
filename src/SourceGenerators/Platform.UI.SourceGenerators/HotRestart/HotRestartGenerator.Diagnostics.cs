@@ -4,6 +4,8 @@ using System;
 using System.Globalization;
 using Microsoft.CodeAnalysis;
 
+//CodeBrix warning-cleanup 2026-07-10: descriptors kept as-is (English-only strings, existing help-link conventions); RS1007 (localizability) and RS1015 (helpLinkUri) suggestions suppressed rather than restructured.
+#pragma warning disable RS1007, RS1015
 namespace CodeBrix.Platform.UI.SourceGenerators.HotRestart; //Was previously: Uno.UI.SourceGenerators.HotRestart
 
 public partial class HotRestartGenerator

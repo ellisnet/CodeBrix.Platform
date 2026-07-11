@@ -21,6 +21,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 
+//CodeBrix warning-cleanup 2026-07-10: instantiated by GroupBy(...) usage and library consumers across assemblies (analyzer cannot see cross-compilation instantiation); CA1812 suppressed, code retained.
+#pragma warning disable CA1812
 namespace CodeBrix.Platform.Extensions; // was previously: Uno
 
 internal class Grouping<TKey, TValues>

@@ -14,6 +14,8 @@ using CodeBrix.Platform.UI.SourceGenerators.Helpers;
 using CodeBrix.Platform.UI.SourceGenerators.Internal.Extensions;
 using CodeBrix.Platform.UI.SourceGenerators.XamlGenerator;
 
+//CodeBrix warning-cleanup 2026-07-10: this project does not opt into EnforceExtendedAnalyzerRules; RS1036 suggestion suppressed by design.
+#pragma warning disable RS1036
 namespace CodeBrix.Platform.UI.SourceGenerators.DependencyObject //Was previously: Uno.UI.SourceGenerators.DependencyObject
 {
 	[Generator]

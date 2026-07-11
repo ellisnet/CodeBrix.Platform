@@ -1,6 +1,8 @@
 #if !IS_UNIT_TESTS
 #nullable enable
 
+//CodeBrix warning-cleanup 2026-07-10: explicit static constructor retained deliberately (native/platform init, ordered initialization, or precise before-first-use timing); CA1810 suppressed rather than converting to field initializers.
+#pragma warning disable CA1810
 using System.Collections.Generic;
 using CodeBrix.Platform.Helpers;
 

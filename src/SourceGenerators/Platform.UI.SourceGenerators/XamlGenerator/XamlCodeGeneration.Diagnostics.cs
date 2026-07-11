@@ -1,5 +1,7 @@
 using Microsoft.CodeAnalysis;
 
+//CodeBrix warning-cleanup 2026-07-10: descriptors kept as-is (English-only strings, existing help-link conventions, no customTags); RS1007/RS1015/RS1028 suggestions suppressed rather than restructured.
+#pragma warning disable RS1007, RS1015, RS1028
 namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: Uno.UI.SourceGenerators.XamlGenerator
 {
 	public static class XamlCodeGenerationDiagnostics

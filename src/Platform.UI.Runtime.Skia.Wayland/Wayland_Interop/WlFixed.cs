@@ -25,6 +25,7 @@
 // (see tools/WaylandBindingsGenerator/PORTING-NOTES.txt)
 
 using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop //Was previously: namespace NWayland
@@ -82,6 +83,6 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop //Was previously:
 
         public static bool operator >=(WlFixed left, WlFixed right) => left._value >= right._value;
 
-        public override string ToString() => ((double)this).ToString("G");
+        public override string ToString() => ((double)this).ToString("G", CultureInfo.InvariantCulture);
     }
 }

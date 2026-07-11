@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -101,11 +102,11 @@ internal static class VisualExtensions
 				.Append(spacing)
 				.Append(innerView == viewOfInterest ? "*>" : ">")
 				.Append(innerView + namePart)
-				.Append($" size:{size}")
-				.Append($" offset:{offset}")
-				.Append($" opacity:{opacity}")
-				.Append($" viewBox:{viewBox}")
-				.Append($" clip:{clip}")
+				.Append(CultureInfo.InvariantCulture, $" size:{size}")
+				.Append(CultureInfo.InvariantCulture, $" offset:{offset}")
+				.Append(CultureInfo.InvariantCulture, $" opacity:{opacity}")
+				.Append(CultureInfo.InvariantCulture, $" viewBox:{viewBox}")
+				.Append(CultureInfo.InvariantCulture, $" clip:{clip}")
 				.AppendLine();
 		}
 	}

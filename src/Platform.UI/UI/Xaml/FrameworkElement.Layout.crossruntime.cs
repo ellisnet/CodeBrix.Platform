@@ -18,6 +18,8 @@ using CodeBrix.Platform.UI.Xaml.Core;
 using CodeBrix.Platform.UI.Xaml.Core.Scaling;
 using CodeBrix.Platform.UI.Extensions;
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace Microsoft.UI.Xaml
 {
 	public partial class FrameworkElement

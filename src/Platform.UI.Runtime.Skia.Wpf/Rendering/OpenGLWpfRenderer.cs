@@ -14,6 +14,8 @@ using CodeBrix.Platform.UI.Runtime.Skia.Wpf.Hosting;
 using WinUI = Microsoft.UI.Xaml;
 using WpfControl = global::System.Windows.Controls.Control;
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace CodeBrix.Platform.UI.Runtime.Skia.Wpf.Rendering; //Was previously: Uno.UI.Runtime.Skia.Wpf.Rendering
 
 internal partial class OpenGLWpfRenderer : IWpfRenderer

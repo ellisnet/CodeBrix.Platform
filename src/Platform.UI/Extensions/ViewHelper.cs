@@ -1,4 +1,6 @@
 ﻿#if IS_UNIT_TESTS || CODEBRIX_REFERENCE_API
+//CodeBrix warning-cleanup 2026-07-10: explicit static constructor retained deliberately (native/platform init, ordered initialization, or precise before-first-use timing); CA1810 suppressed rather than converting to field initializers.
+#pragma warning disable CA1810
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;

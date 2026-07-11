@@ -2,6 +2,8 @@ using Windows.Foundation;
 using Windows.UI.ViewManagement;
 using CodeBrix.Platform.Foundation.Logging;
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 
 internal class WaylandApplicationViewExtension(object owner) : IApplicationViewExtension

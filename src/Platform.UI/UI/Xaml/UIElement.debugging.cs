@@ -1,4 +1,6 @@
 ﻿#if DEBUG
+//CodeBrix warning-cleanup 2026-07-10: multiple enumeration retained to preserve current enumeration semantics; CA1851 suppressed rather than materializing (which would change lazy-vs-eager behavior).
+#pragma warning disable CA1851
 using Windows.Foundation;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
@@ -16,6 +18,7 @@ using CodeBrix.Platform.UI.Controls;
 using CodeBrix.Platform.UI.Media;
 using System;
 using System.Collections;
+using System.Globalization;
 using System.Numerics;
 using System.Reflection;
 using Microsoft.UI.Xaml.Markup;
@@ -230,11 +233,11 @@ namespace Microsoft.UI.Xaml
 					var groups = VisualStateManager.GetVisualStateGroups(root);
 					if (groups != null)
 					{
-						sb.Append($"Parent: {control}, ");
+						sb.Append(CultureInfo.InvariantCulture, $"Parent: {control}, ");
 						sb.Append("States: [");
 						foreach (var group in groups)
 						{
-							sb.Append($"{group}: {group.CurrentState}, ");
+							sb.Append(CultureInfo.InvariantCulture, $"{group}: {group.CurrentState}, ");
 						}
 						sb.Append(" ]; ");
 					}

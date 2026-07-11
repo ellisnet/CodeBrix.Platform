@@ -35,6 +35,8 @@ using _View = Android.Views.View;
 using _View = Microsoft.UI.Xaml.DependencyObject;
 #endif
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace Microsoft.UI.Xaml
 {
 	partial class FrameworkElement : IFrameworkElement_EffectiveViewport

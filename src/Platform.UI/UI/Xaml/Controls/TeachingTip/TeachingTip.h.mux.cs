@@ -22,6 +22,8 @@ using Windows.UI.Xaml.Controls.Primitives;
 
 #pragma warning disable IDE0051 // Some of the constants in this file are defined in the WinUI source but are not used.
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace Microsoft.UI.Xaml.Controls;
 
 partial class TeachingTip

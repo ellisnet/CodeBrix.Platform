@@ -1,4 +1,8 @@
-﻿using System;
+﻿//CodeBrix warning-cleanup 2026-07-10: synchronous call retained deliberately (hosting/event-loop, disposal, or build-time tooling where sync execution is intended); CA1849 suppressed rather than changing async timing.
+#pragma warning disable CA1849
+//CodeBrix warning-cleanup 2026-07-10: multiple enumeration retained to preserve current enumeration semantics; CA1851 suppressed rather than materializing (which would change lazy-vs-eager behavior).
+#pragma warning disable CA1851
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;

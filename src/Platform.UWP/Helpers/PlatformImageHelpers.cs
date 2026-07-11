@@ -1,5 +1,7 @@
 ﻿using Windows.Graphics.Display;
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace CodeBrix.Platform.Helpers; //Was previously: Uno.Helpers
 
 internal static partial class PlatformImageHelpers

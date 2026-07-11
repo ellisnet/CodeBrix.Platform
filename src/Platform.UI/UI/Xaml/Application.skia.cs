@@ -28,6 +28,8 @@ using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 using DispatcherQueue = Windows.System.DispatcherQueue;
 #endif
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace Microsoft.UI.Xaml
 {
 	public partial class Application : IApplicationEvents

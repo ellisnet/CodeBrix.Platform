@@ -9,6 +9,7 @@ using _View = Microsoft.UI.Xaml.UIElement;
 #endif
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using CodeBrix.Platform.Extensions;
@@ -84,7 +85,7 @@ namespace CodeBrix.Platform.UI.Extensions //Was previously: Uno.UI.Extensions
 			{
 				if (element.ReadLocalValue(property) is int value)
 				{
-					sb.Append($" {property.OwnerType.Name}.{property.Name}={value}");
+					sb.Append(CultureInfo.InvariantCulture, $" {property.OwnerType.Name}.{property.Name}={value}");
 				}
 			}
 

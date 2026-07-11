@@ -6,6 +6,10 @@ using System.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 
+//CodeBrix warning-cleanup 2026-07-10: analyzer-authoring metadata suggestions intentionally suppressed. Descriptor kept as-is: English-only strings (RS1007), existing message wording incl. trailing period (RS1032), no helpLinkUri/customTags (RS1015/RS1028), release tracking not adopted (RS2008), and project does not opt into EnforceExtendedAnalyzerRules (RS1036).
+#pragma warning disable RS1007, RS1015, RS1028, RS1032, RS1036, RS2008
+//CodeBrix warning-cleanup 2026-07-10: instantiated by the Roslyn host via reflection ([DiagnosticAnalyzer] attribute); CA1812 suppressed, code retained.
+#pragma warning disable CA1812
 namespace CodeBrix.Platform.UI.SourceGenerators.Internal; //Was previously: Uno.UI.SourceGenerators.Internal
 
 /// <summary>

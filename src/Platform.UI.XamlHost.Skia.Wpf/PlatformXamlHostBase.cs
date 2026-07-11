@@ -3,6 +3,8 @@
 // See the LICENSE file in the project root for more information.
 // https://github.com/CommunityToolkit/Microsoft.Toolkit.Win32/blob/master/Microsoft.Toolkit.Wpf.UI.XamlHost/WindowsXamlHost.cs
 
+//CodeBrix warning-cleanup 2026-07-10: explicit static constructor retained deliberately (native/platform init, ordered initialization, or precise before-first-use timing); CA1810 suppressed rather than converting to field initializers.
+#pragma warning disable CA1810
 using System;
 using System.Windows.Threading;
 using CodeBrix.Platform.UI.Runtime.Skia.Wpf;

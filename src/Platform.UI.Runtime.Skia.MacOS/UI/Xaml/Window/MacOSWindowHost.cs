@@ -20,6 +20,8 @@ using Windows.UI.Input;
 using Microsoft.UI.Xaml.Media;
 using Window = Microsoft.UI.Xaml.Window;
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace CodeBrix.Platform.UI.Runtime.Skia.MacOS; //Was previously: Uno.UI.Runtime.Skia.MacOS
 
 internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, ICodeBrixCorePointerInputSource

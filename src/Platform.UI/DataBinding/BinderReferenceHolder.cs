@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -261,7 +262,7 @@ namespace CodeBrix.Platform.UI.DataBinding //Was previously: Uno.UI.DataBinding
 					};
 
 			var sb = new StringBuilder();
-			sb.Append($"Detailed {referenceType} DependencyObject references delta: \r\n");
+			sb.Append(CultureInfo.InvariantCulture, $"Detailed {referenceType} DependencyObject references delta: \r\n");
 
 			foreach (var activref in q)
 			{

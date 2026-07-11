@@ -9,6 +9,8 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Operations;
 
+//CodeBrix warning-cleanup 2026-07-10: analyzer-authoring metadata suggestions intentionally suppressed (English-only descriptors; no customTags; project does not opt into EnforceExtendedAnalyzerRules). Descriptors kept as-is rather than restructured.
+#pragma warning disable RS1007, RS1028, RS1036
 namespace CodeBrix.Platform.Analyzers //Was previously: Uno.Analyzers
 {
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]

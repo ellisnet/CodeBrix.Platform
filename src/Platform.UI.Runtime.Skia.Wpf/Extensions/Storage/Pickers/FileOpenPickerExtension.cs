@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -57,14 +58,14 @@ namespace CodeBrix.Platform.Extensions.Storage.Pickers
 				}
 				else
 				{
-					filterBuilder.Append($"|{fileType}|*{fileType}");
+					filterBuilder.Append(CultureInfo.InvariantCulture, $"|{fileType}|*{fileType}");
 				}
 			}
 
 			if (filterIndex == -1)
 			{
 				var fullFilter = string.Join(";", _picker.FileTypeFilter.Select(fileType => $"*{fileType}"));
-				filterBuilder.Append($"|All|{fullFilter}");
+				filterBuilder.Append(CultureInfo.InvariantCulture, $"|All|{fullFilter}");
 				filterIndex = fileTypeFilterCount + 1;
 			}
 

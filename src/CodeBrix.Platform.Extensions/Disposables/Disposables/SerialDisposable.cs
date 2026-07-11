@@ -18,6 +18,8 @@
 // ******************************************************************
 using System;
 
+//CodeBrix warning-cleanup 2026-07-10: instantiated by library consumers across assemblies (analyzer cannot see cross-compilation instantiation); CA1812 suppressed, code retained.
+#pragma warning disable CA1812
 namespace CodeBrix.Platform.Extensions.Disposables;
 
 /// <summary>

@@ -4,6 +4,8 @@ using System;
 using System.Globalization;
 using Microsoft.CodeAnalysis;
 
+//CodeBrix warning-cleanup 2026-07-10: descriptor Title/MessageFormat kept as plain strings (analyzers ship English-only); RS1007 localizability suggestion suppressed rather than restructured.
+#pragma warning disable RS1007
 namespace CodeBrix.Platform.UI.SourceGenerators.DependencyObject; //Was previously: Uno.UI.SourceGenerators.DependencyObject
 
 public partial class DependencyObjectGenerator

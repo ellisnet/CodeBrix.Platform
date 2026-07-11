@@ -13,6 +13,8 @@ using WUX = Microsoft.UI.Xaml;
 //so that for active input fields the native overlay is closed and changes are committed to underlying TextBox text
 //before potential data binding changes. https://github.com/unoplatform/uno/issues/8978[focus]
 
+//CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
+#pragma warning disable CA1823
 namespace CodeBrix.Platform.UI.XamlHost.Skia.Wpf //Was previously: Uno.UI.XamlHost.Skia.Wpf
 {
 	/// <summary>

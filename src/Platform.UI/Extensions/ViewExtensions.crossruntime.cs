@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Linq;
 using Microsoft.UI.Xaml;
@@ -106,8 +107,8 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 					.Append(spacing)
 					.Append(innerView == viewOfInterest ? "*>" : ">")
 					.Append(innerView + namePart)
-					.Append($"-({layoutSlot.Width:F1}x{layoutSlot.Height:F1})@({layoutSlot.X:F1},{layoutSlot.Y:F1})")
-					.Append($" d:{desiredSize}")
+					.Append(CultureInfo.InvariantCulture, $"-({layoutSlot.Width:F1}x{layoutSlot.Height:F1})@({layoutSlot.X:F1},{layoutSlot.Y:F1})")
+					.Append(CultureInfo.InvariantCulture, $" d:{desiredSize}")
 					.Append(fe != null ? $" HA={fe.HorizontalAlignment},VA={fe.VerticalAlignment}" : "")
 					.Append(fe != null && fe.Margin != default ? $" Margin={fe.Margin}" : "")
 					.Append(fe != null && fe.TryGetBorderThickness(out var b) && b != default ? $" Border={b}" : "")

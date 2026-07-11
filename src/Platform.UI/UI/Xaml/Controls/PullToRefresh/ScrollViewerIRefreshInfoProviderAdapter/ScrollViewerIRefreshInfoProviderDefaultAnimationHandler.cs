@@ -3,6 +3,8 @@
 // Licensed under the MIT License. See LICENSE in the project root for license information.
 // MUX Reference ScrollViewerIRefreshInfoProviderDefaultAnimationHandler.cpp, commit 87ce7c0
 
+//CodeBrix warning-cleanup 2026-07-10: synchronous call retained deliberately (hosting/event-loop, disposal, or build-time tooling where sync execution is intended); CA1849 suppressed rather than changing async timing.
+#pragma warning disable CA1849
 using System;
 using System.Numerics;
 using System.Threading.Tasks;

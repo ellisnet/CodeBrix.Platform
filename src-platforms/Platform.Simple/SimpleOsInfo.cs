@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -110,13 +111,13 @@ public class OsVersionInfo
                 sb.Append(MajorVersion);
                 if (MinorVersion.HasValue)
                 {
-                    sb.Append($".{MinorVersion.Value}");
+                    sb.Append(CultureInfo.InvariantCulture, $".{MinorVersion.Value}");
                     if (BuildVersion.HasValue)
                     {
-                        sb.Append($".{BuildVersion.Value}");
+                        sb.Append(CultureInfo.InvariantCulture, $".{BuildVersion.Value}");
                         if (RevisionVersion.HasValue)
                         {
-                            sb.Append($".{RevisionVersion.Value}");
+                            sb.Append(CultureInfo.InvariantCulture, $".{RevisionVersion.Value}");
                         }
                     }
                 }
@@ -150,7 +151,7 @@ public class OsVersionInfo
 
             if (!string.IsNullOrWhiteSpace(details))
             {
-                sb.Append($"({details.Trim()}) ");
+                sb.Append(CultureInfo.InvariantCulture, $"({details.Trim()}) ");
             }
 
             return sb.ToString().Trim();
@@ -808,7 +809,7 @@ public class SimpleOsInfo
 #pragma warning disable Uno0001  //This code section is only active on Android
             var encoded = Windows.System.Profile.AnalyticsInfo.VersionInfo.DeviceFamilyVersion;
 #pragma warning restore Uno0001
-            var v = ulong.Parse(encoded);
+            var v = ulong.Parse(encoded, CultureInfo.InvariantCulture);
             major = (int)(ushort)((v & 0xFFFF000000000000L) >> 48);
             minor = (int)(ushort)((v & 0x0000FFFF00000000L) >> 32);
             build = (int)(ushort)((v & 0x00000000FFFF0000L) >> 16);
@@ -1023,21 +1024,21 @@ public class SimpleOsInfo
         if (IsLinux && (!string.IsNullOrWhiteSpace(distroInfo)))
         {
             var distro = distroInfo.Trim().ToLowerInvariant();
-            if (distro.StartsWith(DebianDistroIdentifier))
+            if (distro.StartsWith(DebianDistroIdentifier, StringComparison.Ordinal))
             {
                 result = IdentifiedLinuxDistro.Debian;
             }
-            else if (distro.StartsWith(LmdeDistroIdentifier)
-                     || distro.StartsWith($"linux {MintDistroIdentifier} {DebianDistroIdentifier}"))
+            else if (distro.StartsWith(LmdeDistroIdentifier, StringComparison.Ordinal)
+                     || distro.StartsWith($"linux {MintDistroIdentifier} {DebianDistroIdentifier}", StringComparison.Ordinal))
             {
                 result = IdentifiedLinuxDistro.LMDE;
             }
-            else if (distro.StartsWith(MintDistroIdentifier)
-                     || distro.StartsWith($"linux {MintDistroIdentifier}"))
+            else if (distro.StartsWith(MintDistroIdentifier, StringComparison.Ordinal)
+                     || distro.StartsWith($"linux {MintDistroIdentifier}", StringComparison.Ordinal))
             {
                 result = IdentifiedLinuxDistro.Mint;
             }
-            else if (distro.StartsWith(UbuntuDistroIdentifier))
+            else if (distro.StartsWith(UbuntuDistroIdentifier, StringComparison.Ordinal))
             {
                 result = IdentifiedLinuxDistro.Ubuntu;
             }

@@ -676,7 +676,7 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		foreach (var line in uriList.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
 		{
 			var entry = line.Trim();
-			if (entry.Length == 0 || entry.StartsWith("#", StringComparison.Ordinal))
+			if (entry.Length == 0 || entry.StartsWith('#'))
 			{
 				continue;
 			}

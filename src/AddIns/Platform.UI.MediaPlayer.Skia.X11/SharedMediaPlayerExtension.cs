@@ -22,6 +22,8 @@ using Windows.Web.Http.Headers;
 using CodeBrix.Platform.Extensions.Logging;
 using System.Timers;
 
+//CodeBrix warning-cleanup 2026-07-10: instantiated via its public constructor / GetByMediaPlayer factory by the media-player presenter extension; CA1812 suppressed, code retained.
+#pragma warning disable CA1812
 #if IS_MPE_WIN32
 namespace CodeBrix.Platform.UI.MediaPlayer.Skia.Win32; //Was previously: Uno.UI.MediaPlayer.Skia.Win32
 #else

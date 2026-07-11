@@ -1,6 +1,8 @@
 #pragma warning disable 108 // new keyword hiding
 #pragma warning disable 114 // new keyword hiding
 
+//CodeBrix warning-cleanup 2026-07-10: explicit static constructor retained deliberately (native/platform init, ordered initialization, or precise before-first-use timing); CA1810 suppressed rather than converting to field initializers.
+#pragma warning disable CA1810
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
