@@ -796,7 +796,7 @@ public partial class Given_Parser
 					"""
 				}
 			},
-			ReferenceAssemblies = _Dotnet.Current.ReferenceAssemblies.AddPackages([new PackageIdentity("CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever", "4.148.0")]),
+			ReferenceAssemblies = _Dotnet.Current.ReferenceAssemblies.AddPackages([new PackageIdentity("CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever", "4.150.0")]),
 		}.AddGeneratedSources();
 
 		await test.RunAsync();
@@ -843,7 +843,7 @@ public partial class Given_Parser
 					"""
 				}
 			},
-			ReferenceAssemblies = _Dotnet.Current.WithCodeBrixPackage("1.0.189.446"),
+			ReferenceAssemblies = _Dotnet.Current.WithCodeBrixPackage("1.0.193.1124"),
 		}.AddGeneratedSources();
 
 		await test.RunAsync();
