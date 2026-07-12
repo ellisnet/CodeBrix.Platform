@@ -272,10 +272,14 @@ public static class SimpleEnumHelper
         {
             foreach (var member in Enum.GetValues(enumType).Cast<TEnum>())
             {
+                //Members without a SimpleEnumAttribute are stored with a null info value
+                //  (see CheckDictionaries), so the null check must come before GetType().
                 if (dictionary.Any(a => a.Key == member.ToString()
+                                        && a.Value != null
                                         && a.Value.GetType().IsAssignableTo(infoType)))
                 {
                     var value = (TInfo)dictionary.Single(s => s.Key == member.ToString()
+                                                    && s.Value != null
                                                     && s.Value.GetType().IsAssignableTo(infoType)).Value;
                     result.Add(member, value);
                 }

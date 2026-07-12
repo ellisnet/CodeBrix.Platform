@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetUnitTests)</TargetFrameworks>
+		<OutputType>Exe</OutputType>
+		<IsPackable>false</IsPackable>
+		<AssemblyName>CodeBrix.Platform.UI.Toolkit.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Toolkit.Tests</RootNamespace>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<ItemGroup Label="GlobalUsings">
+		<Using Include="SilverAssertions" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MSTest" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Tests.csproj">
+			<Name>CodeBrix.Platform.UI.Toolkit</Name>
+		</ProjectReference>
+	</ItemGroup>
+</Project>

@@ -112,6 +112,7 @@
     <Project Path="src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Tests.csproj" />
     <Project Path="src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Tests.csproj" />
     <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Tests.csproj" />
+    <Project Path="src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
     <!-- CodeBrix.Platform fork: the upstream System.Xaml.Tests.MS (net461) and Uno.Xaml.Tests
          (net462) conformance-test projects were removed entirely — CodeBrix.Platform does not
