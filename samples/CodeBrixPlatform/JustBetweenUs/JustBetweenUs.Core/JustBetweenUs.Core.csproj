@@ -25,7 +25,7 @@
 
     <!-- Lottie/Skottie animation support. SkiaSharp.Skottie is external and stays a
          package; CodeBrix.Platform.Lottie is now a ProjectReference. -->
-    <PackageReference Include="SkiaSharp.Skottie" Version="4.148.0" />
+    <PackageReference Include="SkiaSharp.Skottie" Version="4.150.0" />
 
     <!-- Bundled Open Sans font -->
     <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
