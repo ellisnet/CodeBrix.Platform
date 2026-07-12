@@ -592,9 +592,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 
 			await UITestHelper.Load(setup);
 
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "invalid SUT.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "invalid SUT.SelectedNode.Content");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "selected node is not selected");
 #endif
@@ -643,9 +643,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 
 			await UITestHelper.Load(setup);
 
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "invalid SUT.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "invalid SUT.SelectedNode.Content");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "selected node is not selected");
 #endif
@@ -694,8 +694,8 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			await UITestHelper.Load(setup);
 
 			// assert: before expanding
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[collapsed]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[collapsed]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[collapsed]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[collapsed]invalid SUT.SelectedItem");
 			Assert.IsNull(SUT.SelectedNode, "[collapsed]invalid SUT.SelectedNode should be null");
 			Assert.IsNull(SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem)), "[collapsed]selected node should not exist yet");
 
@@ -707,11 +707,11 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			}
 
 			// assert: after expanding
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[expanded]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[expanded]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[expanded]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[expanded]invalid SUT.SelectedItem");
 			// TreeView.SelectedNode: on windows, this value remains null before AND after expanded/materialization.
 			// It seems to be only set from UI? Setting SelectedItem to materialized item doesn't seem to update SelectedNode..?
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "[expanded]invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "[expanded]invalid SUT.SelectedNode.Content");
 			//Assert.AreEqual(null, SUT.SelectedNode, "[expanded]invalid SUT.SelectedNode should still be null");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "[expanded]selected node is not selected");
@@ -774,11 +774,11 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			}
 
 			// assert: after expanding
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[expanded]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[expanded]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[expanded]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[expanded]invalid SUT.SelectedItem");
 			// TreeView.SelectedNode: on windows, this value remains null before AND after expanded/materialization.
 			// It seems to be only set from UI? Setting SelectedItem to materialized item doesn't seem to update SelectedNode..?
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "[expanded]invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "[expanded]invalid SUT.SelectedNode.Content");
 			//Assert.AreEqual(null, SUT.SelectedNode, "[expanded]invalid SUT.SelectedNode should still be null");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "[expanded]selected node is not selected");
@@ -829,9 +829,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			await UITestHelper.Load(setup);
 
 			// step 0: starting with parent expanded
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[step0]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[step0]invalid SUT.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "[step0]invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[step0]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[step0]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "[step0]invalid SUT.SelectedNode.Content");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "[step0]target node is not selected");
 #endif
@@ -900,9 +900,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			await UITestHelper.Load(setup);
 
 			// step 0: starting with parent expanded
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[step0]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[step0]invalid SUT.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "[step0]invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[step0]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[step0]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "[step0]invalid SUT.SelectedNode.Content");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "[step0]target node is not selected");
 #endif
@@ -921,9 +921,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			tvm.GetNode("11").IsExpanded = true;
 			await UITestHelper.WaitForIdle();
 			SUT.ToString();
-			Assert.AreEqual(targetItem, tvm.SelectedItem, "[step2]invalid tvm.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedItem, "[step2]invalid SUT.SelectedItem");
-			Assert.AreEqual(targetItem, SUT.SelectedNode?.Content, "[step2]invalid SUT.SelectedNode.Content");
+			Assert.AreSame(targetItem, tvm.SelectedItem, "[step2]invalid tvm.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedItem, "[step2]invalid SUT.SelectedItem");
+			Assert.AreSame(targetItem, SUT.SelectedNode?.Content, "[step2]invalid SUT.SelectedNode.Content");
 #if HAS_CODEBRIX
 			Assert.AreEqual(TreeNodeSelectionState.Selected, SUT.NodeFromContainer(SUT.ContainerFromItem(targetItem))?.SelectionState, "[step2]target node is not selected");
 #endif

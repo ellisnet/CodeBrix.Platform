@@ -118,7 +118,7 @@ namespace CodeBrix.Platform.UI.Tests.CollectionViewTests //Was previously: Uno.U
 			var groups = view.CollectionGroups.Cast<ICollectionViewGroup>().ToArray();
 			var group = groups.First();
 
-			Assert.AreEqual(items.First(), group.Group);
+			Assert.AreSame(items.First(), group.Group);
 			Assert.IsTrue(group.GroupItems.SequenceEqual(items.First()));
 			"".ToString();
 		}

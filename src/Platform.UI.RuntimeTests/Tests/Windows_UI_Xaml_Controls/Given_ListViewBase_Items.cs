@@ -157,11 +157,11 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 			listView.ItemsSource = new List<int>() { 1 };
 
-			Assert.AreEqual(oldItems, listView.Items);
+			Assert.AreSame(oldItems, listView.Items);
 
 			listView.ItemsSource = new ObservableCollection<int>() { 3, 1 };
 
-			Assert.AreEqual(oldItems, listView.Items);
+			Assert.AreSame(oldItems, listView.Items);
 		}
 
 		[TestMethod]
