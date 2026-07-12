@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Http;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeBrix.Platform.Extensions;
@@ -19,6 +20,7 @@ public partial class CoreWebView2
 {
 	internal const string BlankUrl = "about:blank";
 	internal const string DataUriFormatString = "data:text/html;charset=utf-8;base64,{0}";
+	private static readonly CompositeFormat DataUriCompositeFormat = CompositeFormat.Parse(DataUriFormatString);
 	internal static readonly Uri BlankUri = new Uri(BlankUrl);
 
 	private readonly Dictionary<string, string> _hostToFolderMap = new();
@@ -200,7 +202,7 @@ public partial class CoreWebView2
 			// Convert to data URI string
 			var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(htmlContent);
 			var base64String = System.Convert.ToBase64String(plainTextBytes);
-			uriString = string.Format(CultureInfo.InvariantCulture, DataUriFormatString, base64String);
+			uriString = string.Format(CultureInfo.InvariantCulture, DataUriCompositeFormat, base64String);
 		}
 
 		var newNavigationId = Interlocked.Increment(ref _navigationId);

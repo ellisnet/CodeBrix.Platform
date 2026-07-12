@@ -1,4 +1,9 @@
-﻿using System;
+﻿// CA1805: fields below are explicitly initialized to their default value; this is
+// vendored SkiaSharp source (mono/SkiaSharp), so suppress file-wide instead of
+// editing the declarations and creating upstream merge friction.
+#pragma warning disable CA1805
+
+using System;
 using CodeBrix.Platform;
 using CodeBrix.Platform.Extensions;
 using Windows.ApplicationModel;

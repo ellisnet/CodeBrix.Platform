@@ -667,13 +667,15 @@ internal sealed class WaylandClipboardExtension : IClipboardExtension
 		return package.GetView();
 	}
 
+	private static readonly string[] _uriListLineSeparators = { "\r\n", "\n" };
+
 	/// <summary>
 	/// Maps a text/uri-list (one file:// URI per line, '#' comments) to storage items,
 	/// mirroring the X11 head's conversion.
 	/// </summary>
 	private static IEnumerable<IStorageItem> ProcessUriList(string uriList)
 	{
-		foreach (var line in uriList.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries))
+		foreach (var line in uriList.Split(_uriListLineSeparators, StringSplitOptions.RemoveEmptyEntries))
 		{
 			var entry = line.Trim();
 			if (entry.Length == 0 || entry.StartsWith('#'))

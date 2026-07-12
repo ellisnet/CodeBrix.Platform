@@ -75,7 +75,7 @@ namespace CodeBrix.Platform.UI.Tasks.BatchMerge //Was previously: Uno.UI.Tasks.B
             if (newIgnorablesAttribute is not null)
             {
                 var mergedIgnorables = (_ignorablesAttribute?.Value ?? "")
-                    .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(' ', StringSplitOptions.RemoveEmptyEntries)
                     .Union(newIgnorablesAttribute.Value.Split(' '));
 
                 UpdateIgnorables(string.Join(" ", mergedIgnorables));

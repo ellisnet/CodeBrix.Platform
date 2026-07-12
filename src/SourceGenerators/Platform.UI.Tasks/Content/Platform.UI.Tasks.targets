@@ -4,6 +4,18 @@
 		<CodeBrixUIMSBuildTasksPath Condition="'$(CodeBrixUIMSBuildTasksPath)'==''">CodeBrix.Platform.UI.Tasks</CodeBrixUIMSBuildTasksPath>
 		<UmbrellaMSBuildTasksImported>true</UmbrellaMSBuildTasksImported>
 
+		<!--
+		UNOB0003 (emitted by ResourcesGenerationTask via Log.LogWarning) fires for a handful of
+		inherited WinUI locale folders whose tags the resource language-qualifier parser cannot
+		classify (zh-CN, zh-TW, pa-IN, quz-PE, ca-Es-VALENCIA). Those .resw are skipped for both
+		the PRI (.upri) and mobile outputs. This is a DEFERRED SUPPRESSION, not a fix: it demotes
+		the notice to a build message so it stops inflating the warning count. The real fix is the
+		"Add support for resources without a language qualifier" TODO in ResourcesGenerationTask.cs.
+		NOTE: this is a task warning, so it must be suppressed via MSBuildWarningsAsMessages —
+		the C# compiler's NoWarn does not apply to it.
+		-->
+		<MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);UNOB0003</MSBuildWarningsAsMessages>
+
 		<_IsXamlTrimmingAvailable>true</_IsXamlTrimmingAvailable>
 		<_IsXamlTrimmingAvailable Condition="'$(MSBuildRuntimeType)'!='Core' and !$([MSBuild]::IsOSPlatform('windows'))">false</_IsXamlTrimmingAvailable>
 	</PropertyGroup>

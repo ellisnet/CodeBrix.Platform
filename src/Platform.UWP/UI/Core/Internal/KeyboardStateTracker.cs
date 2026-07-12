@@ -42,13 +42,13 @@ internal static partial class KeyboardStateTracker
 
 	internal static void OnKeyDown(VirtualKey key)
 	{
-		if (!_keyStates.ContainsKey(key))
+		if (!_keyStates.TryGetValue(key, out var state))
 		{
 			// The first key press should not cause Locked state.
-			_keyStates[key] = CoreVirtualKeyStates.Down;
+			state = CoreVirtualKeyStates.Down;
 		}
 
-		if (!_keyStates[key].HasFlag(CoreVirtualKeyStates.Locked))
+		if (!state.HasFlag(CoreVirtualKeyStates.Locked))
 		{
 			_keyStates[key] = CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked;
 		}
@@ -62,13 +62,13 @@ internal static partial class KeyboardStateTracker
 
 	internal static void OnKeyUp(VirtualKey key)
 	{
-		if (!_keyStates.ContainsKey(key))
+		if (!_keyStates.TryGetValue(key, out var state))
 		{
 			// Edge case - key is released without previous press.
-			_keyStates[key] = CoreVirtualKeyStates.None;
+			state = CoreVirtualKeyStates.None;
 		}
 
-		if (_keyStates[key].HasFlag(CoreVirtualKeyStates.Locked))
+		if (state.HasFlag(CoreVirtualKeyStates.Locked))
 		{
 			_keyStates[key] = CoreVirtualKeyStates.None | CoreVirtualKeyStates.Locked;
 		}

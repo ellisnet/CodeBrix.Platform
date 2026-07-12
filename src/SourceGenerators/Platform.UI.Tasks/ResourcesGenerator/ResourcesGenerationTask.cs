@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Windows.ApplicationModel.Resources.Core;
@@ -20,6 +21,8 @@ public class ResourcesGenerationTask_v0 : Task
 	Tool name: {0}
 	Source: {1}
 ";
+	private static readonly CompositeFormat CommentCompositeFormat = CompositeFormat.Parse(CommentPattern);
+
 	[Required]
 	public ITaskItem[] Resources { get; set; }
 
@@ -87,7 +90,7 @@ public class ResourcesGenerationTask_v0 : Task
 		var resourceFile = resource.ItemSpec;
 		var sourceLastWriteTime = new FileInfo(resourceFile).LastWriteTimeUtc;
 		var resources = WindowsResourcesReader.Read(resourceFile);
-		var comment = string.Format(CultureInfo.InvariantCulture, CommentPattern, this.GetType().Name, resourceFile);
+		var comment = string.Format(CultureInfo.InvariantCulture, CommentCompositeFormat, this.GetType().Name, resourceFile);
 
 		TraceLog($"{resources.Count} resources found");
 

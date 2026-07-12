@@ -3,6 +3,10 @@
 
 // Modified for Uno support by David John Oliver, Jerome Laban
 
+// CA1805: members below are explicitly initialized to their default value for
+// readability; suppressed file-wide rather than editing each declaration.
+#pragma warning disable CA1805
+
 #nullable disable
 
 using System;
