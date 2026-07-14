@@ -37,8 +37,9 @@ namespace CodeBrix.Platform.WinUI.Graphics3DGL; //Was previously: Uno.WinUI.Grap
 /// A <see cref="FrameworkElement"/> that exposes the ability to draw 3D graphics using OpenGL and Silk.NET.
 /// </summary>
 /// <remarks>
-/// This is only available on WinUI and on skia-based targets running with hardware acceleration.
-/// This is currently only available on the WPF and X11 targets (and WinUI).
+/// This is available on WinUI and on the CodeBrix.Platform Skia-based heads that provide a
+/// native OpenGL context: Windows (Win32-Skia and WPF-Skia), Linux (X11, Wayland, and Frame
+/// Buffer), and macOS.
 /// </remarks>
 public abstract partial class GLCanvasElement : Grid, INativeContext
 {
@@ -377,6 +378,16 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 			return;
 		}
 
+		// A zero-sized surface (the element is collapsed or not yet arranged) would build an
+		// incomplete framebuffer and throw. Skip until there is a real size; SizeChanged rebuilds
+		// it once the element is measured. Without this guard, a canvas that loads while collapsed
+		// throws here inside OnLoaded, which skips the Init(gl) call that follows UpdateFramebuffer,
+		// so the subclass is never initialized before its first RenderOverride.
+		if (RenderSize.Width <= 0 || RenderSize.Height <= 0)
+		{
+			return;
+		}
+
 		global::System.Diagnostics.Debug.Assert(_gl is not null);
 
 		if (this.Log().IsEnabled(LogLevel.Debug))
@@ -406,12 +417,14 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 
 	private unsafe void Render()
 	{
-		if (!IsLoaded || _nativeOpenGlWrapper is null)
+		// _details/_backBuffer are null until UpdateFramebuffer has run with a real (non-zero) size,
+		// which may be after the first paint is requested; skip painting until then.
+		if (!IsLoaded || _nativeOpenGlWrapper is null || _details is null || _backBuffer is null)
 		{
 			return;
 		}
 
-		global::System.Diagnostics.Debug.Assert(_gl is not null && _details is not null && _backBuffer is not null);
+		global::System.Diagnostics.Debug.Assert(_gl is not null);
 
 		using var _ = _nativeOpenGlWrapper!.MakeCurrent();
 

@@ -18,7 +18,13 @@ public abstract partial class GLCanvasElement
 		{
 			_gl = gl;
 
-			Framebuffer = gl.GenBuffer();
+			// Must be a framebuffer name (glGenFramebuffers), NOT a buffer name (glGenBuffers):
+			// GL ES / ANGLE tolerate binding an arbitrary name as a framebuffer, but desktop GL
+			// core profile (e.g. the X11 head's GLX context) raises INVALID_OPERATION on
+			// glBindFramebuffer with a non-framebuffer name, leaving the FBO unbound so all
+			// off-screen rendering and read-back produce garbage. Dispose already deletes it with
+			// glDeleteFramebuffers, so the previous glGenBuffers was doubly wrong.
+			Framebuffer = gl.GenFramebuffer();
 			gl.BindFramebuffer(GLEnum.Framebuffer, Framebuffer);
 			{
 				_textureColorBuffer = gl.GenTexture();
@@ -39,7 +45,10 @@ public abstract partial class GLCanvasElement
 				_renderBuffer = gl.GenRenderbuffer();
 				gl.BindRenderbuffer(GLEnum.Renderbuffer, _renderBuffer);
 				{
-					gl.RenderbufferStorage(GLEnum.Renderbuffer, InternalFormat.Depth24Stencil8, (uint)renderSize.Width, (uint)renderSize.Width);
+					// Height must be renderSize.Height (was renderSize.Width): a depth/stencil buffer
+					// smaller than the colour attachment would clip rendering on canvases taller than
+					// they are wide, since a framebuffer's usable area is the minimum of its attachments.
+					gl.RenderbufferStorage(GLEnum.Renderbuffer, InternalFormat.Depth24Stencil8, (uint)renderSize.Width, (uint)renderSize.Height);
 					gl.FramebufferRenderbuffer(GLEnum.Framebuffer, GLEnum.DepthStencilAttachment,
 						GLEnum.Renderbuffer, _renderBuffer);
 				}
