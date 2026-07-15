@@ -38,7 +38,7 @@
     have a severe vulnerability. Hopefully in the future, the other packages will not try to pull
     in a vulnerable version - and we get rid of this "manual" package reference.
     -->
-		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.9" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>
