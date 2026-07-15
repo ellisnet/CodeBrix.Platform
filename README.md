@@ -82,7 +82,7 @@ var host = CodeBrixPlatformHostBuilder.Create()
 host.Run();
 ```
 
-## For AI coding agents
+## For coding agents
 
 A detailed, machine-oriented guide for setting up a complete CodeBrix.Platform
 application is included in **`AGENT-README.txt`** (shipped in the root of every
