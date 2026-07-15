@@ -32,7 +32,7 @@ public class CodeBrixInitializeComponentAnalyzerTests
 		}
 		""";
 
-	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.195.787")];
+	private static readonly ImmutableArray<PackageIdentity> _codebrixPackage = [new PackageIdentity("CodeBrix.Platform.ApacheLicenseForever", "1.0.196.385")];
 
 	private static readonly ReferenceAssemblies _net100WithCodeBrix = ReferenceAssemblies.Net.Net100.AddPackages(_codebrixPackage);
 
