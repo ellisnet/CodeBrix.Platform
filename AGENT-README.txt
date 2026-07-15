@@ -673,6 +673,14 @@ use whichever you prefer:
   "CodeBrix.Platform.UI.Hosting" namespace, surfaced by the corresponding head
   package. A head sees only the one ".Use…()" method that matches its package.
 
+--- OPTIONAL host-builder flag: .UseDirectSkiaCanvasMode() (EXPERIMENTAL) ---
+
+EXPERIMENTAL: chaining ".UseDirectSkiaCanvasMode()" onto the host builder makes
+SKXamlCanvas draw each frame straight into its on-screen bitmap buffer (one fewer
+full-frame copy per paint); it is an app-wide, one-way opt-in that changes nothing
+if omitted. Enable it only to test performance/stability — it may change or be
+removed.
+
 --- THE WPF HEAD NEEDS A SOFTWARE-RENDERING LINE ---
 
 The WPF host's default OpenGL renderer draws via raw OpenGL onto WPF's own

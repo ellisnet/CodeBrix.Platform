@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using CodeBrix.Platform.UI.Hosting;
 
 #if WINUI
 using Microsoft.UI.Xaml.Controls;
@@ -50,6 +51,15 @@ namespace SkiaSharp.Views.UWP
 
 			var info = CreateBitmap(out var unscaledSize, out var dpi);
 
+			// Opt-in (app-wide, via UseDirectSkiaCanvasMode()): draw straight into the on-screen
+			// WriteableBitmap buffer, skipping the staging buffer and the per-frame copy below. When
+			// the mode is off, everything below runs exactly as before.
+			if (DirectSkiaCanvasMode.IsEnabled)
+			{
+				DoInvalidateDirect(info, unscaledSize, dpi);
+				return;
+			}
+
 			using (var surface = SKSurface.Create(info, pixelsHandle.AddrOfPinnedObject(), info.RowBytes))
 			{
 				var userVisibleSize = IgnorePixelScaling ? unscaledSize : info.Size;
@@ -65,16 +75,41 @@ namespace SkiaSharp.Views.UWP
 				OnPaintSurface(new SKPaintSurfaceEventArgs(surface, info.WithSize(userVisibleSize), info));
 			}
 
-			// This implementation is not fast enough, and providing the original pixel buffer
-			// is needed, yet the internal `IBufferByteAccess` interface is not yet available in Uno.
-			// Once it is, we can replace this implementation and provide the pinned array directly
-			// to skia.
+			// Copy the staging buffer into the WriteableBitmap. (The direct path above avoids this
+			// copy by drawing into the bitmap's own buffer.)
 			using (var data = bitmap.PixelBuffer.AsStream())
 			{
 				data.Write(pixels, 0, pixels.Length);
 				data.Flush();
 			}
 
+			bitmap.Invalidate();
+		}
+
+		// Direct present path used only when DirectSkiaCanvasMode.IsEnabled. Renders the frame straight
+		// into the WriteableBitmap's own pixel buffer, which is pinned only for the duration of the
+		// paint (so the whole draw happens inside the callback), then presents it — one fewer
+		// full-frame copy than the default path.
+		private void DoInvalidateDirect(SKImageInfo info, SKSizeI unscaledSize, float dpi)
+		{
+			var userVisibleSize = IgnorePixelScaling ? unscaledSize : info.Size;
+			CanvasSize = userVisibleSize;
+
+			global::Windows.Storage.Streams.Buffer.Cast(bitmap.PixelBuffer).ApplyActionOnRawBufferPtr(ptr =>
+			{
+				using var surface = SKSurface.Create(info, ptr, info.RowBytes);
+
+				if (IgnorePixelScaling)
+				{
+					var canvas = surface.Canvas;
+					canvas.Scale(dpi);
+					canvas.Save();
+				}
+
+				OnPaintSurface(new SKPaintSurfaceEventArgs(surface, info.WithSize(userVisibleSize), info));
+			});
+
+			bitmap.PixelBuffer.Length = (uint)info.BytesSize;
 			bitmap.Invalidate();
 		}
 
@@ -101,7 +136,9 @@ namespace SkiaSharp.Views.UWP
 				Background = brush;
 			}
 
-			if (pixels == null || pixelWidth != info.Width || pixelHeight != info.Height)
+			// Direct mode draws into the bitmap's own buffer, so the staging `pixels` array is never
+			// needed. When the mode is off, this condition is exactly the original.
+			if (!DirectSkiaCanvasMode.IsEnabled && (pixels == null || pixelWidth != info.Width || pixelHeight != info.Height))
 			{
 				FreeBitmap();
 
@@ -121,6 +158,12 @@ namespace SkiaSharp.Views.UWP
 			{
 				pixelsHandle.Free();
 				pixels = null;
+				bitmap = null;
+			}
+			else if (DirectSkiaCanvasMode.IsEnabled)
+			{
+				// Direct mode never allocates `pixels`, so drop the bitmap here too (e.g. on resize).
+				// Inert when the mode is off — the branch above is then the only one that runs.
 				bitmap = null;
 			}
 		}

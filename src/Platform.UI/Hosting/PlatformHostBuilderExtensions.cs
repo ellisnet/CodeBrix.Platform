@@ -25,4 +25,24 @@ public static class CodeBrixPlatformHostBuilderExtensions
 		builder.AfterInitAction = action;
 		return builder;
 	}
+
+	/// <summary>
+	/// Opts the whole application into the direct <see cref="SkiaSharp.Views.Windows.SKXamlCanvas"/>
+	/// present path: <c>SKXamlCanvas</c> draws each frame straight into its on-screen
+	/// <c>WriteableBitmap</c> buffer instead of drawing into an intermediate staging buffer and
+	/// copying, removing one full-frame copy per paint. - EXPERIMENTAL
+	/// </summary>
+	/// <remarks>
+	/// Call this once in the host-builder chain (order relative to the <c>Use…</c> head call does not
+	/// matter). It is a one-way, app-wide latch: it cannot be turned off, and there is no per-canvas
+	/// override — the whole app either runs in this mode or does not. If this is not called, the
+	/// <c>SKXamlCanvas</c> present path is unchanged. See <see cref="DirectSkiaCanvasMode"/>.
+	/// </remarks>
+	/// <param name="builder">The host builder.</param>
+	/// <returns>The same host builder, for chaining.</returns>
+	public static ICodeBrixPlatformHostBuilder UseDirectSkiaCanvasMode(this ICodeBrixPlatformHostBuilder builder)
+	{
+		DirectSkiaCanvasMode.Enable();
+		return builder;
+	}
 }

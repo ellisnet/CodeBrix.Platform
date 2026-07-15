@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using CodeBrix.Platform.OpenGL;
 using Microsoft.UI.Xaml;
+using SkiaSharp;
 
 #if !WINAPPSDK
 using CodeBrix.Platform.Foundation.Extensibility;
@@ -126,6 +127,90 @@ public sealed class OffscreenGLContext : IDisposable
 	/// </summary>
 	/// <returns>A disposable that restores the previously-current context.</returns>
 	public IDisposable MakeCurrent() => _wrapper.MakeCurrent();
+
+	/// <summary>
+	/// Returns the address of the named native GL function, for building a SkiaSharp
+	/// <see cref="GRGlInterface"/> (or resolving any other GL entry point). Call inside a
+	/// <see cref="MakeCurrent"/> scope.
+	/// </summary>
+	/// <param name="name">The name of the native GL function to resolve.</param>
+	/// <returns>
+	/// The function's address, or <see cref="IntPtr.Zero"/> when the running GL implementation does
+	/// not expose it.
+	/// </returns>
+	public IntPtr GetProcAddress(string name) => _wrapper.GetProcAddress(name);
+
+	/// <summary>
+	/// Builds a SkiaSharp <see cref="GRContext"/> on this off-screen OpenGL context, so GPU-accelerated
+	/// Skia can render into an <see cref="SKSurface"/> backed by this context. This is the generic
+	/// GPU-Skia entry point: a data-viz control, an image/effects pipeline, an off-screen rasterizer,
+	/// or a game engine can all draw into a GPU <see cref="SKSurface"/>, read the pixels back and
+	/// composite them onto an ordinary on-screen canvas.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// This method owns the per-head desktop-GL-vs-GLES branch (X11/Win32/WPF are desktop GL;
+	/// Wayland/macOS/Frame Buffer are GLES) so no consumer has to re-implement it. The head is
+	/// detected from the loaded head-runtime assembly; whichever flavor that implies is tried first
+	/// and, if it fails, the other flavor is tried, so the result is robust even on an unrecognized
+	/// host.
+	/// </para>
+	/// <para>
+	/// The context is made current for the duration of creation (<see cref="MakeCurrent"/>
+	/// saves/restores the head's own context, so this never disturbs the compositor even when they
+	/// share the UI thread). Keep the returned <see cref="GRContext"/> on the thread it was created on
+	/// and make this context current again before drawing with it. Dispose the <see cref="GRContext"/>
+	/// before disposing this <see cref="OffscreenGLContext"/>.
+	/// </para>
+	/// </remarks>
+	/// <returns>A GPU <see cref="GRContext"/> bound to this off-screen OpenGL context.</returns>
+	/// <exception cref="InvalidOperationException">
+	/// Thrown when neither a desktop-GL nor a GLES <see cref="GRGlInterface"/>/<see cref="GRContext"/>
+	/// could be created on this context.
+	/// </exception>
+	public GRContext CreateGrContext()
+	{
+		// GRGlInterface/GRContext creation reads the current GL context, so make ours current here.
+		// This is safe to nest inside a caller's own MakeCurrent() (save/restore is balanced).
+		using (_wrapper.MakeCurrent())
+		{
+			var useGles = Graphics3DGLHeadDetection.CurrentHeadUsesGles();
+
+			// Try the flavor the head implies first, then fall back to the other so a misdetected or
+			// unrecognized host still succeeds where a context genuinely exists.
+			var context = TryCreateGrContext(useGles) ?? TryCreateGrContext(!useGles);
+			if (context is null)
+			{
+				throw new InvalidOperationException(
+					"Failed to create a GRContext on the off-screen OpenGL context: both the desktop-GL "
+					+ "and the GLES GRGlInterface/GRContext creation paths returned null. Ensure this is "
+					+ "called on a head that provides a native OpenGL context, with the context current.");
+			}
+
+			return context;
+		}
+	}
+
+	// Assembles a GRGlInterface for the requested flavor and, from it, a GRContext. Returns null (and
+	// disposes any partially-created interface) when this GL flavor is not the one this context speaks.
+	private GRContext? TryCreateGrContext(bool useGles)
+	{
+		var glInterface = useGles
+			? GRGlInterface.CreateGles(GetProcAddress)
+			: GRGlInterface.Create(GetProcAddress);
+		if (glInterface is null)
+		{
+			return null;
+		}
+
+		var context = GRContext.CreateGl(glInterface);
+		if (context is null)
+		{
+			glInterface.Dispose();
+		}
+
+		return context;
+	}
 
 	/// <summary>Destroys the context and releases its native resources.</summary>
 	public void Dispose()

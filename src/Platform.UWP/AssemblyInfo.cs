@@ -26,6 +26,10 @@ using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]
 
+// Lets SKXamlCanvas reach the fast raw-buffer accessor (Windows.Storage.Streams.Buffer's internal
+// Cast/ApplyActionOnRawBufferPtr) for the opt-in UseDirectSkiaCanvasMode() one-copy present path.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views")]
+
 [assembly: InternalsVisibleTo("SamplesApp")]
 [assembly: InternalsVisibleTo("SamplesApp.Droid")]
 [assembly: InternalsVisibleTo("SamplesApp.macOS")]
