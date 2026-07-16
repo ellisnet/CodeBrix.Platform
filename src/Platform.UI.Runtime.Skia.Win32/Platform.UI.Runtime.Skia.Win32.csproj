@@ -47,6 +47,11 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<!-- SkiaSharp must be referenced directly (like HarfBuzzSharp below) so that it — and
+		     its transitive SkiaSharp.NativeAssets.Win32 native — flow to consuming apps. The
+		     only other SkiaSharp reference reaches this project through the folded Platform.UWP
+		     project, which is PrivateAssets="all" and therefore does not propagate to consumers. -->
+		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="HarfBuzzSharp" />
 		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
 	</ItemGroup>
