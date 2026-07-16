@@ -22,7 +22,12 @@ public abstract class CodeBrixPlatformHost
 	public void Run()
 	{
 		var task = RunCore();
-		if (task != Task.CompletedTask)
+		if (task.IsFaulted)
+		{
+			//Surface the real startup exception instead of the misleading RunAsync message below.
+			task.GetAwaiter().GetResult();
+		}
+		if (!task.IsCompleted)
 		{
 			throw new InvalidOperationException($"Running host {this} requires calling 'await host.RunAsync()' instead of 'host.Run()'.");
 		}
