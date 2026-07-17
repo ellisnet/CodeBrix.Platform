@@ -52,6 +52,12 @@ WHAT WAS TAKEN
       staging/xdg-toplevel-icon) for the window-API parity work — activation is
       wired to Window.Activate(); the toplevel-icon binding is pinned for a
       future in-process window-icon path.
+      2026-07-17: added relative-pointer-unstable-v1.xml and
+      pointer-constraints-unstable-v1.xml (both MIT, copied from the Debian
+      wayland-protocols 1.44-1 package: unstable/relative-pointer,
+      unstable/pointer-constraints) for the relative mouse
+      (MouseDevice.MouseMoved) support — relative pointer streams unaccelerated
+      deltas; pointer lock confines/freezes the cursor during a session.
 
 FORK PATCHES (diff against upstream NWayland.Generator)
 -------------------------------------------------------

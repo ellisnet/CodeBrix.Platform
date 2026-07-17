@@ -23,12 +23,13 @@ using CodeBrix.Platform.UI.Runtime.Skia.Wpf.Hosting;
 using CodeBrix.Platform.UI.Runtime.Skia.Wpf.UI.Controls;
 using Point = System.Windows.Point;
 using Rect = Windows.Foundation.Rect;
+using WinMouseDevice = Windows.Devices.Input.MouseDevice;
 using WpfControl = System.Windows.Controls.Control;
 using WpfMouseEventArgs = System.Windows.Input.MouseEventArgs;
 
 namespace CodeBrix.Platform.UI.XamlHost.Skia.Wpf; //Was previously: Uno.UI.XamlHost.Skia.Wpf
 
-internal sealed class WpfCorePointerInputSource : ICodeBrixCorePointerInputSource
+internal sealed class WpfCorePointerInputSource : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 #pragma warning disable CS0067 // Some event are not raised on WPF ... yet!
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
@@ -44,6 +45,8 @@ internal sealed class WpfCorePointerInputSource : ICodeBrixCorePointerInputSourc
 	private readonly FrameworkElement _renderLayer = default!;
 	private readonly WpfControl? _host;
 	private PointerEventArgs? _previous;
+	private HwndSource? _hwndSource;
+	private WinMouseDevice? _relativeMouseDevice;
 
 	private bool _queueExited;
 
@@ -93,6 +96,129 @@ internal sealed class WpfCorePointerInputSource : ICodeBrixCorePointerInputSourc
 			var fromDependencyObject = PresentationSource.FromDependencyObject(win);
 			var hwndSource = fromDependencyObject as HwndSource;
 			hwndSource?.AddHook(OnWmMessage);
+			_hwndSource = hwndSource;
+
+			if (_relativeMouseDevice is not null)
+			{
+				// A relative mouse session was requested before the native window existed.
+				RegisterForRawInput();
+				ApplyPointerConfinement();
+			}
+		}
+	}
+
+	public void StartRelativeMouse(WinMouseDevice device)
+	{
+		_relativeMouseDevice = device;
+
+		if (_hwndSource is not null)
+		{
+			RegisterForRawInput();
+			ApplyPointerConfinement();
+		}
+	}
+
+	public void StopRelativeMouse()
+	{
+		_relativeMouseDevice = null;
+
+		if (_hwndSource is null)
+		{
+			return;
+		}
+
+		var devices = new[]
+		{
+			new RelativeMouseNativeMethods.RAWINPUTDEVICE
+			{
+				usUsagePage = RelativeMouseNativeMethods.HID_USAGE_PAGE_GENERIC,
+				usUsage = RelativeMouseNativeMethods.HID_USAGE_GENERIC_MOUSE,
+				dwFlags = RelativeMouseNativeMethods.RIDEV_REMOVE,
+				hwndTarget = IntPtr.Zero // required to be null for RIDEV_REMOVE
+			}
+		};
+		_ = RelativeMouseNativeMethods.RegisterRawInputDevices(
+			devices, 1, (uint)System.Runtime.InteropServices.Marshal.SizeOf<RelativeMouseNativeMethods.RAWINPUTDEVICE>());
+		_ = RelativeMouseNativeMethods.ClipCursorRelease(IntPtr.Zero);
+	}
+
+	private void RegisterForRawInput()
+	{
+		var devices = new[]
+		{
+			new RelativeMouseNativeMethods.RAWINPUTDEVICE
+			{
+				usUsagePage = RelativeMouseNativeMethods.HID_USAGE_PAGE_GENERIC,
+				usUsage = RelativeMouseNativeMethods.HID_USAGE_GENERIC_MOUSE,
+				dwFlags = 0, // deliver WM_INPUT to hwndTarget while its thread is in the foreground
+				hwndTarget = _hwndSource!.Handle
+			}
+		};
+		if (!RelativeMouseNativeMethods.RegisterRawInputDevices(
+			devices, 1, (uint)System.Runtime.InteropServices.Marshal.SizeOf<RelativeMouseNativeMethods.RAWINPUTDEVICE>()))
+		{
+			this.Log().Error($"{nameof(RelativeMouseNativeMethods.RegisterRawInputDevices)} failed.");
+		}
+	}
+
+	// Confines the cursor to the client area while a relative mouse session is active.
+	// Windows clears the clip rect on focus loss and window moves, so this is re-applied
+	// from WM_SIZE/WM_MOVE/WM_ACTIVATE.
+	private void ApplyPointerConfinement()
+	{
+		if (_relativeMouseDevice is null || _hwndSource is null)
+		{
+			return;
+		}
+
+		var hwnd = _hwndSource.Handle;
+		if (!RelativeMouseNativeMethods.GetClientRect(hwnd, out var clientRect))
+		{
+			return;
+		}
+
+		var topLeft = new RelativeMouseNativeMethods.NativePoint { X = clientRect.left, Y = clientRect.top };
+		var bottomRight = new RelativeMouseNativeMethods.NativePoint { X = clientRect.right, Y = clientRect.bottom };
+		_ = RelativeMouseNativeMethods.ClientToScreen(hwnd, ref topLeft);
+		_ = RelativeMouseNativeMethods.ClientToScreen(hwnd, ref bottomRight);
+
+		var clipRect = new RelativeMouseNativeMethods.NativeRect
+		{
+			left = topLeft.X,
+			top = topLeft.Y,
+			right = bottomRight.X,
+			bottom = bottomRight.Y
+		};
+		_ = RelativeMouseNativeMethods.ClipCursor(ref clipRect);
+	}
+
+	private void OnWmInput(IntPtr lParam)
+	{
+		if (_relativeMouseDevice is not { } relativeDevice)
+		{
+			return;
+		}
+
+		var rawInput = default(RelativeMouseNativeMethods.RAWINPUT);
+		var size = (uint)System.Runtime.InteropServices.Marshal.SizeOf<RelativeMouseNativeMethods.RAWINPUT>();
+		var headerSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf<RelativeMouseNativeMethods.RAWINPUTHEADER>();
+		var bytesCopied = RelativeMouseNativeMethods.GetRawInputData(
+			lParam, RelativeMouseNativeMethods.RID_INPUT, ref rawInput, ref size, headerSize);
+
+		if (bytesCopied == unchecked((uint)-1))
+		{
+			return;
+		}
+
+		if (rawInput.header.dwType == RelativeMouseNativeMethods.RIM_TYPEMOUSE
+			&& (rawInput.mouse.usFlags & RelativeMouseNativeMethods.MOUSE_MOVE_ABSOLUTE) == 0)
+		{
+			var deltaX = rawInput.mouse.lLastX;
+			var deltaY = rawInput.mouse.lLastY;
+			if (deltaX != 0 || deltaY != 0)
+			{
+				relativeDevice.RaiseMouseMoved(deltaX, deltaY);
+			}
 		}
 	}
 
@@ -228,6 +354,22 @@ internal sealed class WpfCorePointerInputSource : ICodeBrixCorePointerInputSourc
 		switch (msg)
 		{
 			case Win32Messages.WM_DPICHANGED:
+				break;
+			case RelativeMouseNativeMethods.WM_INPUT:
+				// lparamOriginal is a HRAWINPUT handle — must not be truncated to 32 bits.
+				OnWmInput(lparamOriginal);
+				break;
+			case RelativeMouseNativeMethods.WM_SIZE:
+			case RelativeMouseNativeMethods.WM_MOVE:
+				ApplyPointerConfinement();
+				break;
+			case RelativeMouseNativeMethods.WM_ACTIVATE:
+				if (GetLoWord(wparam) != RelativeMouseNativeMethods.WA_INACTIVE)
+				{
+					// Windows clears the cursor clip rect on deactivation; restore it (no-op
+					// unless a relative mouse session is active).
+					ApplyPointerConfinement();
+				}
 				break;
 			case Win32Messages.WM_MOUSEHWHEEL:
 			case Win32Messages.WM_MOUSEWHEEL:

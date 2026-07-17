@@ -63,7 +63,26 @@ internal partial class FrameBufferPointerInputSource
 		{
 			var dx = libinput_event_pointer_get_dx(rawPointerEvent);
 			var dy = libinput_event_pointer_get_dy(rawPointerEvent);
-			MousePosition += new Point(dx, dy);
+
+			if (_relativeMouseDevice is { } relativeDevice)
+			{
+				// MouseDelta is integral; carry the fractional remainders between events.
+				var totalDx = dx + _relativeDxRemainder;
+				var totalDy = dy + _relativeDyRemainder;
+				var deltaX = (int)totalDx;
+				var deltaY = (int)totalDy;
+				_relativeDxRemainder = totalDx - deltaX;
+				_relativeDyRemainder = totalDy - deltaY;
+
+				if (deltaX != 0 || deltaY != 0)
+				{
+					RaiseRelativeMouseMoved(relativeDevice, deltaX, deltaY);
+				}
+			}
+			else
+			{
+				MousePosition += new Point(dx, dy);
+			}
 
 			raisePointerEvent = RaisePointerMoved;
 		}

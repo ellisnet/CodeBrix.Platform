@@ -92,6 +92,16 @@ internal partial class X11PointerInputSource
 
 	// These are only written and read inside HandleXI2(), so no synchronization needed.
 	private readonly Dictionary<int, Dictionary<int, double>> _valuatorValues = new(); // device id -> valuator number -> value
+
+	// Fractional raw-motion remainders carried between XI_RawMotion events (X11 event thread only).
+	private double _relativeDxRemainder;
+	private double _relativeDyRemainder;
+
+	// Duplicate-delivery suppression state for XI_RawMotion (X11 event thread only).
+	private IntPtr _lastRawMotionTime;
+	private double _lastRawMotionDx;
+	private double _lastRawMotionDy;
+	private bool _lastRawMotionWasDropped;
 	private readonly Dictionary<int, DeviceInfo> _deviceInfoCache = new(); // device id -> device info
 
 	// Excerpt from https://www.x.org/releases/X11R7.7/doc/inputproto/XI2proto.txt
@@ -389,6 +399,69 @@ internal partial class X11PointerInputSource
 
 		switch (evtype)
 		{
+			case XiEventType.XI_RawMotion:
+				{
+					// Only selected while a relative mouse session is active (see StartRelativeMouse).
+					if (_relativeMouseDevice is not { } relativeDevice)
+					{
+						break;
+					}
+
+					double dx = 0;
+					double dy = 0;
+					IntPtr rawEventTime;
+					unsafe
+					{
+						var rawEvent = ev.GenericEventCookie.GetEvent<XIRawEvent>();
+						rawEventTime = rawEvent.time;
+						// One raw_values entry per set valuator mask bit; valuator 0 is x, 1 is y.
+						var values = rawEvent.raw_values;
+						for (var i = 0; i < rawEvent.valuators.MaskLen * 8; i++)
+						{
+							if (XLib.XIMaskIsSet(rawEvent.valuators.Mask, i))
+							{
+								var value = *values++;
+								if (i == 0)
+								{
+									dx = value;
+								}
+								else if (i == 1)
+								{
+									dy = value;
+								}
+							}
+						}
+					}
+
+					// The server delivers each raw event to this client TWICE while our own
+					// pointer grab (the session's confinement) is active: once for the
+					// root-window raw selection and once via the grab. Drop exactly one copy
+					// of an identical back-to-back pair.
+					if (rawEventTime == _lastRawMotionTime && dx == _lastRawMotionDx && dy == _lastRawMotionDy
+						&& !_lastRawMotionWasDropped)
+					{
+						_lastRawMotionWasDropped = true;
+						break;
+					}
+					_lastRawMotionWasDropped = false;
+					_lastRawMotionTime = rawEventTime;
+					_lastRawMotionDx = dx;
+					_lastRawMotionDy = dy;
+
+					// MouseDelta is integral; carry the fractional remainders between events.
+					var totalDx = dx + _relativeDxRemainder;
+					var totalDy = dy + _relativeDyRemainder;
+					var deltaX = (int)totalDx;
+					var deltaY = (int)totalDy;
+					_relativeDxRemainder = totalDx - deltaX;
+					_relativeDyRemainder = totalDy - deltaY;
+
+					if (deltaX != 0 || deltaY != 0)
+					{
+						X11XamlRootHost.QueueAction(_host, () => relativeDevice.RaiseMouseMoved(deltaX, deltaY));
+					}
+				}
+				break;
 			case XiEventType.XI_Enter:
 			case XiEventType.XI_Leave:
 				{

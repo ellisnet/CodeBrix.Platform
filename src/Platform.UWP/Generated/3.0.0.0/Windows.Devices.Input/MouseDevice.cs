@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Input
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MouseDevice
@@ -15,28 +15,7 @@ namespace Windows.Devices.Input
 #endif
 		// Forced skipping of method Windows.Devices.Input.MouseDevice.MouseMoved.add
 		// Forced skipping of method Windows.Devices.Input.MouseDevice.MouseMoved.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static global::Windows.Devices.Input.MouseDevice GetForCurrentView()
-		{
-			throw new global::System.NotImplementedException("The member MouseDevice MouseDevice.GetForCurrentView() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Devices.Input.MouseDevice, global::Windows.Devices.Input.MouseEventArgs> MouseMoved
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Devices.Input.MouseDevice", "event TypedEventHandler<MouseDevice, MouseEventArgs> MouseDevice.MouseMoved");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Devices.Input.MouseDevice", "event TypedEventHandler<MouseDevice, MouseEventArgs> MouseDevice.MouseMoved");
-			}
-		}
-#endif
+		// Skipping already declared method Windows.Devices.Input.MouseDevice.GetForCurrentView()
+		// Skipping already declared event MouseMoved
 	}
 }

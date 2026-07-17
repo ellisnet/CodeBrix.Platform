@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading;
+using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.System;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.CursorShapeV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.PointerConstraintsUnstableV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.RelativePointerUnstableV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
@@ -40,6 +43,15 @@ internal sealed class WaylandSeatManager
 	private bool _cursorThemeLoadAttempted;
 	private WlSurface? _cursorSurface;
 	private readonly Dictionary<string, (WlBuffer Buffer, int Width, int Height, int HotspotX, int HotspotY)> _cursorCache = new();
+
+	// Relative mouse session state. Start/Stop run on the UI thread (MouseDevice
+	// subscription changes); relative motion arrives on the event-pump thread.
+	private volatile MouseDevice? _relativeMouseDevice;
+	private WaylandXamlRootHost? _relativeMouseHost;
+	private ZwpRelativePointerV1? _relativePointer;
+	private ZwpLockedPointerV1? _lockedPointer;
+	private double _relativeDxRemainder;
+	private double _relativeDyRemainder;
 
 	// Keyboard state (event-pump thread).
 	private WaylandXamlRootHost? _keyboardFocusHost;
@@ -280,6 +292,90 @@ internal sealed class WaylandSeatManager
 	internal uint LastInputSerial => _lastInputSerial;
 	internal WlSeat? Seat => _seat;
 	internal WlPointer? Pointer => _pointer;
+
+	internal void StartRelativeMouse(WaylandXamlRootHost host, MouseDevice device)
+	{
+		StopRelativeMouse();
+
+		if (_pointer is not { } pointer)
+		{
+			if (this.Log().IsEnabled(LogLevel.Warning))
+			{
+				this.Log().LogWarning("No wl_pointer is available; relative mouse (MouseDevice.MouseMoved) cannot start.");
+			}
+			return;
+		}
+
+		if (_connection.RelativePointerManager is not { } relativePointerManager
+			|| _connection.PointerConstraints is not { } pointerConstraints)
+		{
+			if (this.Log().IsEnabled(LogLevel.Error))
+			{
+				this.Log().LogError("The compositor does not advertise zwp_relative_pointer_manager_v1 and zwp_pointer_constraints_v1; relative mouse (MouseDevice.MouseMoved) is not available.");
+			}
+			return;
+		}
+
+		if (host.WlSurface is not { } surface)
+		{
+			return;
+		}
+
+		_relativeMouseHost = host;
+		_relativeDxRemainder = 0;
+		_relativeDyRemainder = 0;
+		_relativePointer = relativePointerManager.GetRelativePointer(pointer, new ZwpRelativePointerV1.Listener.Relay
+		{
+			OnRelativeMotion = (_, _, _, _, _, dxUnaccel, dyUnaccel) => OnRelativeMotion((double)dxUnaccel, (double)dyUnaccel),
+		});
+		// Lock (freeze) rather than confine: the session consumes deltas with the cursor
+		// hidden, and a locked pointer cannot leave the surface — which is the confinement
+		// the session needs.
+		_lockedPointer = pointerConstraints.LockPointer(surface, pointer, null, ZwpPointerConstraintsV1.LifetimeEnum.Persistent);
+		_relativeMouseDevice = device;
+		_connection.Flush();
+	}
+
+	internal void StopRelativeMouse()
+	{
+		_relativeMouseDevice = null;
+		_relativeMouseHost = null;
+
+		if (_lockedPointer is { } lockedPointer)
+		{
+			_lockedPointer = null;
+			lockedPointer.Destroy();
+		}
+
+		if (_relativePointer is { } relativePointer)
+		{
+			_relativePointer = null;
+			relativePointer.Destroy();
+		}
+
+		_connection.Flush();
+	}
+
+	private void OnRelativeMotion(double dx, double dy)
+	{
+		if (_relativeMouseDevice is not { } device || _relativeMouseHost is not { } host)
+		{
+			return;
+		}
+
+		// MouseDelta is integral; carry the fractional remainders between events.
+		var totalDx = dx + _relativeDxRemainder;
+		var totalDy = dy + _relativeDyRemainder;
+		var deltaX = (int)totalDx;
+		var deltaY = (int)totalDy;
+		_relativeDxRemainder = totalDx - deltaX;
+		_relativeDyRemainder = totalDy - deltaY;
+
+		if (deltaX != 0 || deltaY != 0)
+		{
+			WaylandXamlRootHost.QueueAction(host, () => device.RaiseMouseMoved(deltaX, deltaY));
+		}
+	}
 
 	private void OnPointerEnter(uint serial, WlSurface? surface, double x, double y)
 	{

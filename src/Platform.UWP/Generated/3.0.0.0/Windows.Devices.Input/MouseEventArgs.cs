@@ -3,26 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Input
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MouseEventArgs
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		internal MouseEventArgs()
-		{
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public global::Windows.Devices.Input.MouseDelta MouseDelta
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MouseDelta MouseEventArgs.MouseDelta is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared method Windows.Devices.Input.MouseEventArgs.MouseEventArgs()
+		// Skipping already declared property MouseDelta
 		// Forced skipping of method Windows.Devices.Input.MouseEventArgs.MouseDelta.get
 	}
 }

@@ -269,6 +269,24 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
+	internal unsafe struct XIRawEvent
+	{
+		public XEventName type; /* GenericEvent */
+		public UIntPtr serial; /* # of last request processed by server */
+		public Bool send_event; /* true if this came from a SendEvent request */
+		public IntPtr display; /* Display the event was read from */
+		public int extension; /* XI extension offset */
+		public XiEventType evtype; /* XI_RawMotion etc. */
+		public IntPtr time;
+		public int deviceid;
+		public int sourceid;
+		public int detail;
+		public int flags;
+		public XIValuatorState valuators; /* Values is the accelerated/transformed values */
+		public double* raw_values; /* untransformed device values, one per set valuator mask bit */
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
 	internal struct XIEnterLeaveEvent
 	{
 		public XEventName type; /* GenericEvent */

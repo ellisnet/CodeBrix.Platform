@@ -13,6 +13,11 @@ internal class X11KeyboardInputSource : ICodeBrixKeyboardInputSource
 
 	private X11XamlRootHost _host;
 
+	// With detectable autorepeat enabled on the connection (see X11XamlRootHost.Initialize),
+	// a held key delivers repeated KeyPress events; this per-keycode count marks them as
+	// repeats (WasKeyDown/RepeatCount) the way the Wayland head's repeat timer does.
+	private readonly uint[] _keycodeRepeatCounts = new uint[256];
+
 	public X11KeyboardInputSource(IXamlRootHost host)
 	{
 		if (host is not X11XamlRootHost)
@@ -50,6 +55,19 @@ internal class X11KeyboardInputSource : ICodeBrixKeyboardInputSource
 				this.Log().Trace($"ProcessKeyboardEvent pressed={pressed}: {keyEvent.keycode} -> {X11KeyTransform.VirtualKeyFromKeySym(keySym)} utf8:{symbols?[0]}");
 			}
 
+			uint repeatCount = 1;
+			var wasKeyDown = false;
+			var keycodeIndex = keyEvent.keycode & 0xFF;
+			if (pressed)
+			{
+				repeatCount = ++_keycodeRepeatCounts[keycodeIndex];
+				wasKeyDown = repeatCount > 1;
+			}
+			else
+			{
+				_keycodeRepeatCounts[keycodeIndex] = 0;
+			}
+
 			var args = new KeyEventArgs(
 				"keyboard",
 				X11KeyTransform.VirtualKeyFromKeySym(keySym),
@@ -57,7 +75,8 @@ internal class X11KeyboardInputSource : ICodeBrixKeyboardInputSource
 				new CorePhysicalKeyStatus
 				{
 					ScanCode = (uint)keyEvent.keycode,
-					RepeatCount = 1,
+					RepeatCount = repeatCount,
+					WasKeyDown = wasKeyDown,
 				},
 				unicodeKey: symbols?[0]);
 

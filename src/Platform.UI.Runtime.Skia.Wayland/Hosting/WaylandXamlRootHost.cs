@@ -162,6 +162,8 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 	internal static WaylandXamlRootHost? GetHostFromSurface(WlSurface? surface)
 		=> surface != null && _surfaceToHost.TryGetValue(surface, out var host) ? host : null;
 
+	internal WlSurface? WlSurface => _wlSurface;
+
 	internal SizeInt32 CurrentSize => new() { Width = _width, Height = _height };
 
 	/// <summary>

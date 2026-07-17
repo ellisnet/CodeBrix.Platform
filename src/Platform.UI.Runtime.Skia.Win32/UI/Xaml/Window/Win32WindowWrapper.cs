@@ -220,6 +220,12 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				break;
 			case PInvoke.WM_ACTIVATE:
 				OnWmActivate(wParam);
+				if (Win32Helper.LOWORD(wParam) != PInvoke.WA_INACTIVE)
+				{
+					// Windows clears the cursor clip rect on deactivation; restore it (no-op
+					// unless a relative mouse session is active).
+					ApplyPointerConfinement();
+				}
 				return new LRESULT(0);
 			case PInvoke.WM_CLOSE:
 				if (OnWmClose())
@@ -238,6 +244,7 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				UpdateDisplayInfo();
 				OnWindowSizeOrLocationChanged();
 				UpdateWindowState(wParam);
+				ApplyPointerConfinement();
 				return new LRESULT(0);
 			case PInvoke.WM_MOVE:
 				this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_MOVE)} message.");
@@ -249,6 +256,7 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				// WM_PAINT message that follows the movement of the window. However, we ignore WM_PAINT and depend on InvalidateRender
 				// and our render timer.
 				SynchronousRenderAndDraw(false);
+				ApplyPointerConfinement();
 				return new LRESULT(0);
 			case PInvoke.WM_GETMINMAXINFO:
 				this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_GETMINMAXINFO)} message.");
@@ -308,6 +316,9 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_POINTERCAPTURECHANGED)} message.");
 				OnPointerCaptureChanged(wParam);
 				return new LRESULT(0);
+			case PInvoke.WM_INPUT:
+				OnWmInput(lParam);
+				break; // WM_INPUT must still reach DefWindowProc for system cleanup
 			case PInvoke.WM_SETCURSOR:
 				this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_SETCURSOR)} message.");
 				if ((uint)Win32Helper.LOWORD(lParam) is not (PInvoke.HTBOTTOM or PInvoke.HTBOTTOMLEFT or PInvoke.HTBOTTOMRIGHT

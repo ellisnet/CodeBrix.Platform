@@ -32,6 +32,13 @@ void codebrix_cursor_hide(void);
 void codebrix_cursor_show(void);
 bool codebrix_cursor_set(CoreCursorType cursorType);
 
+// Relative mouse (mouse-look) support: while a session is active the on-screen cursor is
+// frozen (CGAssociateMouseAndMouseCursorPosition) and raw motion deltas stream to the callback.
+typedef void (*codebrix_mouse_relative_delta_fn_ptr)(double deltaX, double deltaY);
+
+void codebrix_mouse_relative_begin(codebrix_mouse_relative_delta_fn_ptr callback);
+void codebrix_mouse_relative_end(void);
+
 // adapted from https://gitlab.gnome.org/GNOME/gtk/-/blob/main/gdk/macos/gdkmacoscursor.c
 @interface NSCursor()
 -(long long)_coreCursorType;

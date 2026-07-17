@@ -90,6 +90,19 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 		internal static partial bool XQueryExtension(IntPtr display, [MarshalAs(UnmanagedType.LPStr)] string name,
 			out int majorOpcode, out int firstEvent, out int firstError);
 
+		[LibraryImport(libX11)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		internal static partial bool XkbSetDetectableAutoRepeat(IntPtr display,
+			[MarshalAs(UnmanagedType.Bool)] bool detectable, [MarshalAs(UnmanagedType.Bool)] out bool supported);
+
+		[LibraryImport(libX11)]
+		internal static partial int XGrabPointer(IntPtr display, IntPtr grab_window,
+			[MarshalAs(UnmanagedType.Bool)] bool owner_events, uint event_mask, int pointer_mode,
+			int keyboard_mode, IntPtr confine_to, IntPtr cursor, IntPtr time);
+
+		[LibraryImport(libX11)]
+		internal static partial int XUngrabPointer(IntPtr display, IntPtr time);
+
 		[LibraryImport(libXInput)]
 		internal static partial int XIQueryVersion(IntPtr dpy, ref int major, ref int minor);
 

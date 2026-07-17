@@ -333,6 +333,12 @@ internal partial class X11XamlRootHost : IXamlRootHost
 			throw new InvalidOperationException("XLIB ERROR: Cannot connect to X server");
 		}
 
+		// Held keys must arrive as repeated KeyPress events with one final KeyRelease (the
+		// behavior of the Wayland/Windows heads), not as synthetic Release+Press pairs.
+		// Detectable autorepeat is per-connection, and key events are selected on this
+		// (root window) connection.
+		_ = XLib.XkbSetDetectableAutoRepeat(display, true, out _);
+
 		int screen = XLib.XDefaultScreen(display);
 
 		var size = ApplicationView.PreferredLaunchViewSize;

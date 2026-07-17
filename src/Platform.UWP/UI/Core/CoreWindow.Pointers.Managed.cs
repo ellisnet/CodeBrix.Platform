@@ -37,6 +37,8 @@ public partial class CoreWindow
 		_pointerSource.PointerReleased += (_, args) => PointerReleased?.Invoke(this, args);
 		_pointerSource.PointerWheelChanged += (_, args) => PointerWheelChanged?.Invoke(this, args);
 		_pointerSource.PointerCancelled += (_, args) => PointerCancelled?.Invoke(this, args);
+
+		MouseDevice.NotifyPointerInputSourceChanged();
 	}
 
 	public void SetPointerCapture()

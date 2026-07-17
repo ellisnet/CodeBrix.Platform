@@ -4,6 +4,8 @@ using System.Threading;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Interop;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.FractionalScaleV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.PointerConstraintsUnstableV1;
+using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.RelativePointerUnstableV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Viewporter;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.CursorShapeV1;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.Wayland;
@@ -146,6 +148,16 @@ internal sealed class WaylandConnection : IDisposable
 	/// </summary>
 	public ZxdgExporterV2? Exporter { get; }
 
+	/// <summary>
+	/// zwp_relative_pointer_manager_v1 and zwp_pointer_constraints_v1, used together for
+	/// relative mouse sessions (MouseDevice.MouseMoved). Null when the compositor does not
+	/// advertise them; relative mouse is then unavailable on this head.
+	/// </summary>
+	public ZwpRelativePointerManagerV1? RelativePointerManager { get; }
+
+	/// <inheritdoc cref="RelativePointerManager"/>
+	public ZwpPointerConstraintsV1? PointerConstraints { get; }
+
 	internal sealed class OutputInfo
 	{
 		public WlOutput? Output;
@@ -227,6 +239,8 @@ internal sealed class WaylandConnection : IDisposable
 		CursorShapeManager = Bind<WpCursorShapeManagerV1>(_registry, "wp_cursor_shape_manager_v1");
 		Activation = Bind<XdgActivationV1>(_registry, "xdg_activation_v1");
 		Exporter = Bind<ZxdgExporterV2>(_registry, "zxdg_exporter_v2");
+		RelativePointerManager = Bind<ZwpRelativePointerManagerV1>(_registry, "zwp_relative_pointer_manager_v1");
+		PointerConstraints = Bind<ZwpPointerConstraintsV1>(_registry, "zwp_pointer_constraints_v1");
 
 		// Second roundtrip: let the bound globals deliver their initial state
 		// (wl_shm formats, wl_output geometry/mode/scale, wl_seat capabilities).

@@ -341,6 +341,14 @@ internal static partial class NativeCodeBrix
 	[return: MarshalAs(UnmanagedType.I1)]
 	internal static partial bool codebrix_cursor_set(CoreCursorType cursorType);
 
+	// Present in libCodeBrixNativeMac.dylib builds that include relative mouse support;
+	// call sites must handle EntryPointNotFoundException for older dylibs.
+	[LibraryImport("libCodeBrixNativeMac.dylib")]
+	internal static unsafe partial void codebrix_mouse_relative_begin(delegate* unmanaged[Cdecl]<double, double, void> callback);
+
+	[LibraryImport("libCodeBrixNativeMac.dylib")]
+	internal static partial void codebrix_mouse_relative_end();
+
 	[LibraryImport("libCodeBrixNativeMac.dylib", StringMarshalling = StringMarshalling.Utf8)]
 	internal static partial nint codebrix_native_create_sample(nint window, string text);
 

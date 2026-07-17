@@ -12,7 +12,7 @@ using CodeBrix.Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.UI;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Skia
 
-internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInputSource
+internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 #pragma warning disable CS0067 // Some event are not raised on FrameBuffer ... yet!
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
@@ -27,6 +27,30 @@ internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInput
 
 	private Func<VirtualKeyModifiers>? _keyboardInputSource;
 	private IXamlRootHost? _host;
+
+	// Written on the UI thread (MouseDevice subscription changes), read on the libinput thread.
+	private volatile MouseDevice? _relativeMouseDevice;
+
+	// Fractional motion remainders carried between events (libinput thread only).
+	private double _relativeDxRemainder;
+	private double _relativeDyRemainder;
+
+	// libinput deltas are already relative; while a session is active, motion feeds
+	// MouseDevice.MouseMoved and the on-screen position stays frozen (which also serves
+	// as the pointer confinement for this head).
+	public void StartRelativeMouse(MouseDevice device) => _relativeMouseDevice = device;
+
+	public void StopRelativeMouse() => _relativeMouseDevice = null;
+
+	private void RaiseRelativeMouseMoved(MouseDevice device, int deltaX, int deltaY)
+	{
+		if (_host?.RootElement is { } rootElement)
+		{
+			_ = rootElement.Dispatcher.RunAsync(
+				CoreDispatcherPriority.High,
+				() => device.RaiseMouseMoved(deltaX, deltaY));
+		}
+	}
 
 	private FrameBufferPointerInputSource()
 	{

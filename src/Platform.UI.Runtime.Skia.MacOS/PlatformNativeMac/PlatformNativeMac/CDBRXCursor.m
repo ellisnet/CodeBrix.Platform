@@ -137,3 +137,37 @@ bool codebrix_cursor_set(CoreCursorType cursorType)
 }
 
 @end
+
+// Relative mouse (mouse-look) support. The local event monitor only exists while a
+// session is active; nothing here runs otherwise.
+static codebrix_mouse_relative_delta_fn_ptr codebrix_mouse_relative_callback = NULL;
+static id codebrix_mouse_relative_monitor = nil;
+
+void codebrix_mouse_relative_begin(codebrix_mouse_relative_delta_fn_ptr callback)
+{
+    codebrix_mouse_relative_callback = callback;
+    // Freeze the on-screen cursor; motion deltas keep flowing. The frozen cursor also
+    // acts as the pointer confinement while the session is active.
+    CGAssociateMouseAndMouseCursorPosition(NO);
+    if (codebrix_mouse_relative_monitor == nil) {
+        codebrix_mouse_relative_monitor = [NSEvent addLocalMonitorForEventsMatchingMask:
+                (NSEventMaskMouseMoved | NSEventMaskLeftMouseDragged | NSEventMaskRightMouseDragged | NSEventMaskOtherMouseDragged)
+            handler:^NSEvent * _Nullable(NSEvent * _Nonnull event) {
+                codebrix_mouse_relative_delta_fn_ptr callbackRef = codebrix_mouse_relative_callback;
+                if (callbackRef != NULL) {
+                    callbackRef(event.deltaX, event.deltaY);
+                }
+                return event;
+            }];
+    }
+}
+
+void codebrix_mouse_relative_end(void)
+{
+    codebrix_mouse_relative_callback = NULL;
+    if (codebrix_mouse_relative_monitor != nil) {
+        [NSEvent removeMonitor:codebrix_mouse_relative_monitor];
+        codebrix_mouse_relative_monitor = nil;
+    }
+    CGAssociateMouseAndMouseCursorPosition(YES);
+}

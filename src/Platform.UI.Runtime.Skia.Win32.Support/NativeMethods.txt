@@ -9,6 +9,8 @@ E_NOINTERFACE
 E_POINTER
 E_UNEXPECTED
 GDI_REGION_TYPE
+HID_USAGE_GENERIC_MOUSE
+HID_USAGE_PAGE_GENERIC
 HKEY_CURRENT_USER
 HTBOTTOM
 HTBOTTOMLEFT
@@ -70,6 +72,7 @@ WM_DESTROY
 WM_DPICHANGED
 WM_ERASEBKGND
 WM_GETMINMAXINFO
+WM_INPUT
 WM_KEYDOWN
 WM_KEYUP
 WM_MOVE
@@ -129,6 +132,8 @@ AddClipboardFormatListener
 BeginPaint
 BitBlt
 ChoosePixelFormat
+ClientToScreen
+ClipCursor
 CloseClipboard
 CoCreateInstance
 CreateCompatibleDC
@@ -213,8 +218,12 @@ OleInitialize
 OpenClipboard
 PeekMessage
 PostMessage
+GetRawInputData
+RAWINPUT
+RID_DEVICE_INFO_TYPE
 RegGetValue
 RegisterClassEx
+RegisterRawInputDevices
 RegisterDragDrop
 RegisterTouchWindow
 RegisterWindowMessage

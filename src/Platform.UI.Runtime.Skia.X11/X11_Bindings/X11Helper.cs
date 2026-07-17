@@ -496,6 +496,17 @@ internal static partial class X11Helper
 		IntPtr pixmap
 	);
 
+	[LibraryImport(libX11)]
+	public unsafe static partial IntPtr XCreatePixmapCursor(
+		IntPtr display,
+		IntPtr source,
+		IntPtr mask,
+		ref XColor foreground_color,
+		ref XColor background_color,
+		uint x,
+		uint y
+	);
+
 	[LibraryImport(libX11Randr)]
 	public unsafe static partial XRRScreenResources* XRRGetScreenResourcesCurrent(IntPtr dpy, IntPtr window);
 

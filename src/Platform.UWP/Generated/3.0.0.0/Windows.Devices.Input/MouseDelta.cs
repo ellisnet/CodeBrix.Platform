@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Input
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial struct MouseDelta

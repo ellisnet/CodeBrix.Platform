@@ -24,7 +24,7 @@ using Window = Microsoft.UI.Xaml.Window;
 #pragma warning disable CA1823
 namespace CodeBrix.Platform.UI.Runtime.Skia.MacOS; //Was previously: Uno.UI.Runtime.Skia.MacOS
 
-internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, ICodeBrixCorePointerInputSource
+internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 	private readonly SkiaRenderHelper.FpsHelper _fpsHelper = new();
 	private readonly MacOSWindowNative _nativeWindow;
@@ -354,6 +354,73 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 
 	private static Point _previousPosition;
 	private static PointerPointProperties? _previousProperties;
+
+	// Static because the native delta callback is process-wide (AppKit main thread only).
+	private static MouseDevice? _relativeMouseDevice;
+	private static double _relativeDxRemainder;
+	private static double _relativeDyRemainder;
+
+	public void StartRelativeMouse(MouseDevice device)
+	{
+		_relativeMouseDevice = device;
+		_relativeDxRemainder = 0;
+		_relativeDyRemainder = 0;
+		try
+		{
+			unsafe
+			{
+				NativeCodeBrix.codebrix_mouse_relative_begin(&OnRelativeMouseMoved);
+			}
+		}
+		catch (EntryPointNotFoundException)
+		{
+			_relativeMouseDevice = null;
+			if (this.Log().IsEnabled(LogLevel.Error))
+			{
+				this.Log().LogError("libCodeBrixNativeMac.dylib predates relative mouse support; MouseDevice.MouseMoved will not be raised. Rebuild the native library (PlatformNativeMac) to enable it.");
+			}
+		}
+	}
+
+	public void StopRelativeMouse()
+	{
+		if (_relativeMouseDevice is null)
+		{
+			return;
+		}
+
+		_relativeMouseDevice = null;
+		try
+		{
+			NativeCodeBrix.codebrix_mouse_relative_end();
+		}
+		catch (EntryPointNotFoundException)
+		{
+			// Begin would have failed the same way; nothing to undo.
+		}
+	}
+
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+	private static void OnRelativeMouseMoved(double deltaX, double deltaY)
+	{
+		if (_relativeMouseDevice is not { } relativeDevice)
+		{
+			return;
+		}
+
+		// MouseDelta is integral; carry the fractional remainders between events.
+		var totalDx = deltaX + _relativeDxRemainder;
+		var totalDy = deltaY + _relativeDyRemainder;
+		var intDx = (int)totalDx;
+		var intDy = (int)totalDy;
+		_relativeDxRemainder = totalDx - intDx;
+		_relativeDyRemainder = totalDy - intDy;
+
+		if (intDx != 0 || intDy != 0)
+		{
+			relativeDevice.RaiseMouseMoved(intDx, intDy);
+		}
+	}
 
 	[NotImplemented] public bool HasCapture => false;
 

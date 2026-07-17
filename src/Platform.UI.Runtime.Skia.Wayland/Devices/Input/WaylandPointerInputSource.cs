@@ -14,7 +14,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 /// <summary>
 /// Per-window pointer input source, fed by the seat manager following wl_pointer focus.
 /// </summary>
-internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSource
+internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 	// Linux evdev button codes carried by wl_pointer.button.
 	private const uint BTN_LEFT = 0x110;
@@ -59,6 +59,12 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 	}
 
 	[NotImplemented] public bool HasCapture => false;
+
+	public void StartRelativeMouse(MouseDevice device)
+		=> _host.Connection?.SeatManager.StartRelativeMouse(_host, device);
+
+	public void StopRelativeMouse()
+		=> _host.Connection?.SeatManager.StopRelativeMouse();
 
 	public CoreCursor PointerCursor
 	{

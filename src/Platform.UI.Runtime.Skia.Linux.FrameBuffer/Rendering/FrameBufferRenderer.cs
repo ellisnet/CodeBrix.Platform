@@ -82,7 +82,9 @@ internal abstract class FrameBufferRenderer
 			_surface.Canvas.Clear(SKColors.Transparent);
 			return _surface.Canvas;
 		});
-		if (_cursorVisible ?? _receivedMouseEvent)
+		// A null PointerCursor hides the pointer (WinUI convention, see the
+		// ICorePointerInputSource remarks) — on this head, by not drawing the indicator.
+		if ((_cursorVisible ?? _receivedMouseEvent) && FrameBufferPointerInputSource.Instance.PointerCursor is not null)
 		{
 			_surface?.Canvas.Scale(FrameBufferWindowWrapper.Instance.RasterizationScale);
 			_surface?.Canvas.DrawCircle(FrameBufferPointerInputSource.Instance.MousePosition.ToSkia(), _cursorRadius, _cursorPaint);

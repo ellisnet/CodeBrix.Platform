@@ -61,6 +61,13 @@ public sealed partial class MainPage : Page
 
             Log($"Loaded. scale={XamlRoot?.RasterizationScale:0.##} size={XamlRoot?.Size.Width:0}x{XamlRoot?.Size.Height:0}");
 
+            // Input probes (keyboard/cursor/relative-mouse parity): every key logs its numeric
+            // VirtualKey and repeat status to the console; F2 toggles a relative-mouse session
+            // (MouseDevice.MouseMoved delta echo with hidden cursor); F4 toggles cursor hide
+            // alone (the ProtectedCursor disposed-cursor hide convention).
+            AddHandler(KeyDownEvent, new Microsoft.UI.Xaml.Input.KeyEventHandler(OnProbeKeyDown), handledEventsToo: true);
+            AddHandler(KeyUpEvent, new Microsoft.UI.Xaml.Input.KeyEventHandler(OnProbeKeyUp), handledEventsToo: true);
+
             if (Environment.GetEnvironmentVariable("PARITYDEMO_SELFTEST") == "1")
             {
                 _ = RunSelfTestAsync();
@@ -87,6 +94,77 @@ public sealed partial class MainPage : Page
             LogScroller?.ChangeView(null, double.MaxValue, null, disableAnimation: true);
         }
     }
+
+    #region | Input probes (keyboard / cursor / relative mouse) |
+
+    private bool _relativeMouseActive;
+    private bool _cursorHidden;
+    private TypedEventHandler<Windows.Devices.Input.MouseDevice, Windows.Devices.Input.MouseEventArgs> _relativeMouseHandler;
+
+    private void OnProbeKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+    {
+        Console.WriteLine($"INPUTPROBE: KeyDown key={(int)e.Key}({e.Key}) wasDown={e.KeyStatus.WasKeyDown} repeat={e.KeyStatus.RepeatCount} scan={e.KeyStatus.ScanCode}");
+
+        if (e.Key == Windows.System.VirtualKey.F2)
+        {
+            ToggleRelativeMouse();
+        }
+        else if (e.Key == Windows.System.VirtualKey.F4)
+        {
+            _cursorHidden = !_cursorHidden;
+            SetCursorHidden(_cursorHidden);
+            Console.WriteLine($"INPUTPROBE: CursorHidden={_cursorHidden}");
+        }
+        else if (e.Key == Windows.System.VirtualKey.F6)
+        {
+            Console.WriteLine($"INPUTPROBE: TextBoxText=[{TestTextBox.Text}]");
+        }
+        else if (e.Key == Windows.System.VirtualKey.F7)
+        {
+            TestTextBox.Focus(FocusState.Programmatic);
+            Console.WriteLine("INPUTPROBE: TextBoxFocused");
+        }
+    }
+
+    private void OnProbeKeyUp(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
+        => Console.WriteLine($"INPUTPROBE: KeyUp   key={(int)e.Key}({e.Key}) scan={e.KeyStatus.ScanCode}");
+
+    private void ToggleRelativeMouse()
+    {
+        var device = Windows.Devices.Input.MouseDevice.GetForCurrentView();
+        _relativeMouseActive = !_relativeMouseActive;
+        if (_relativeMouseActive)
+        {
+            _relativeMouseHandler ??= (_, args) =>
+                Console.WriteLine($"INPUTPROBE: MouseDelta dx={args.MouseDelta.X} dy={args.MouseDelta.Y}");
+            device.MouseMoved += _relativeMouseHandler;
+            SetCursorHidden(true);
+            Console.WriteLine("INPUTPROBE: RelativeMouse ON");
+        }
+        else
+        {
+            device.MouseMoved -= _relativeMouseHandler;
+            SetCursorHidden(false);
+            Console.WriteLine("INPUTPROBE: RelativeMouse OFF");
+        }
+    }
+
+    private void SetCursorHidden(bool hidden)
+    {
+        if (hidden)
+        {
+            // WinUI convention: a disposed InputCursor assigned to ProtectedCursor means "hide".
+            var cursor = Microsoft.UI.Input.InputSystemCursor.Create(Microsoft.UI.Input.InputSystemCursorShape.Arrow);
+            cursor.Dispose();
+            ProtectedCursor = cursor;
+        }
+        else
+        {
+            ProtectedCursor = null;
+        }
+    }
+
+    #endregion
 
     private void MenuItem_Click(object sender, RoutedEventArgs e)
         => Log($"MenuFlyoutItem clicked: '{(sender as MenuFlyoutItem)?.Text}'");

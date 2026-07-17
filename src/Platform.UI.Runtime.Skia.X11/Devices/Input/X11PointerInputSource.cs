@@ -9,7 +9,7 @@ using CodeBrix.Platform.UI.Hosting;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11; //Was previously: Uno.WinUI.Runtime.Skia.X11
 
-internal partial class X11PointerInputSource : ICodeBrixCorePointerInputSource
+internal partial class X11PointerInputSource : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 #pragma warning disable CS0067 // Some event are not raised on X11 ... yet!
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
@@ -52,6 +52,15 @@ internal partial class X11PointerInputSource : ICodeBrixCorePointerInputSource
 		{
 			_pointerCursor = value;
 
+			if (value is null)
+			{
+				// A null CoreCursor hides the pointer (WinUI convention, see the
+				// ICorePointerInputSource remarks). X11 has no hide primitive, so
+				// define an all-blank pixmap cursor instead.
+				HideCursor();
+				return;
+			}
+
 			// These will have the look of the DE cursor themes if they exist (instead of the ugly x11 defaults)
 			// using the XCURSOR extension. https://wiki.archlinux.org/title/Cursor_themes
 			var shape = value.Type switch
@@ -79,6 +88,46 @@ internal partial class X11PointerInputSource : ICodeBrixCorePointerInputSource
 			var cursor = XLib.XCreateFontCursor(_host.TopX11Window.Display, shape);
 			_ = XLib.XDefineCursor(_host.TopX11Window.Display, _host.TopX11Window.Window, cursor);
 			_ = XLib.XFreeCursor(_host.TopX11Window.Display, cursor);
+		}
+	}
+
+	// Written on the UI thread (MouseDevice subscription changes), read on the X11 event thread.
+	private volatile MouseDevice? _relativeMouseDevice;
+
+	public void StartRelativeMouse(MouseDevice device)
+	{
+		_relativeMouseDevice = device;
+		_host.SetRawMotionEventsEnabled(true);
+		_host.SetPointerConfinement(true);
+	}
+
+	public void StopRelativeMouse()
+	{
+		_relativeMouseDevice = null;
+		_host.SetPointerConfinement(false);
+		_host.SetRawMotionEventsEnabled(false);
+	}
+
+	private static readonly byte[] _blankCursorBits = new byte[8]; // 8x8 all-zero bitmap
+
+	private void HideCursor()
+	{
+		var display = _host.TopX11Window.Display;
+		var window = _host.TopX11Window.Window;
+
+		using var lockDiposable = X11Helper.XLock(display);
+
+		unsafe
+		{
+			fixed (byte* bits = _blankCursorBits)
+			{
+				var pixmap = X11Helper.XCreateBitmapFromData(display, window, (IntPtr)bits, 8, 8);
+				var color = default(XColor);
+				var cursor = X11Helper.XCreatePixmapCursor(display, pixmap, pixmap, ref color, ref color, 0, 0);
+				_ = XLib.XDefineCursor(display, window, cursor);
+				_ = XLib.XFreeCursor(display, cursor);
+				_ = X11Helper.XFreePixmap(display, pixmap);
+			}
 		}
 	}
 

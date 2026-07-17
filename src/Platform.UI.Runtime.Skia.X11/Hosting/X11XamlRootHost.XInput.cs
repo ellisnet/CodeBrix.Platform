@@ -165,6 +165,76 @@ internal partial class X11XamlRootHost
 		return _xi2Details.Value;
 	}
 
+	private bool _xi2VersionAnnounced;
+
+	// Relative-mouse support (MouseDevice.MouseMoved). Everything here runs only when a
+	// relative mouse session starts/stops — never at startup — so the default pointer
+	// pipeline is untouched for apps that don't use it.
+	internal unsafe void SetRawMotionEventsEnabled(bool enabled)
+	{
+		var display = TopX11Window.Display;
+
+		using var lockDisposable = X11Helper.XLock(display);
+
+		if (GetXI2Details(display).version is XIVersion.Unsupported)
+		{
+			if (this.Log().IsEnabled(LogLevel.Error))
+			{
+				this.Log().LogError("X Input Extension 2 is not available, so relative mouse (MouseDevice.MouseMoved) is not supported on this X server.");
+			}
+			return;
+		}
+
+		if (enabled && !_xi2VersionAnnounced)
+		{
+			// Announce XI2 client support >= 2.1 so the server delivers raw events for
+			// master devices (under 2.0 semantics it only would for slave devices).
+			var major = 2;
+			var minor = 2;
+			_ = XLib.XIQueryVersion(display, ref major, ref minor);
+			_xi2VersionAnnounced = true;
+		}
+
+		// Raw events are selected on the root window of the connection and are delivered
+		// only to the selecting client. This is a separate (window, deviceid) selection from
+		// the regular XI2 masks on the top window, so neither overwrites the other.
+		var m = stackalloc XIEventMask[1];
+		var maskPtr = stackalloc int[1];
+		*maskPtr = enabled ? (1 << (int)XiEventType.XI_RawMotion) : 0;
+		m->Deviceid = (int)XiPredefinedDeviceId.XIAllMasterDevices;
+		m->MaskLen = 4;
+		m->Mask = maskPtr;
+		var _1 = XLib.XISelectEvents(display, XLib.XDefaultRootWindow(display), m, 1);
+		var _2 = XLib.XSync(display, false);
+	}
+
+	internal void SetPointerConfinement(bool confined)
+	{
+		var display = TopX11Window.Display;
+
+		using var lockDisposable = X11Helper.XLock(display);
+
+		if (confined)
+		{
+			const uint grabEventMask = (uint)(
+				EventMask.ButtonPressMask |
+				EventMask.ButtonReleaseMask |
+				EventMask.PointerMotionMask |
+				EventMask.EnterWindowMask |
+				EventMask.LeaveWindowMask);
+			const int grabModeAsync = 1;
+			_ = XLib.XGrabPointer(display, TopX11Window.Window, owner_events: true, grabEventMask,
+				grabModeAsync, grabModeAsync, confine_to: TopX11Window.Window,
+				/* None */ IntPtr.Zero, /* CurrentTime */ IntPtr.Zero);
+		}
+		else
+		{
+			_ = XLib.XUngrabPointer(display, /* CurrentTime */ IntPtr.Zero);
+		}
+
+		_ = XLib.XSync(display, false);
+	}
+
 	private unsafe void SetXIEventMask(IntPtr display, IntPtr window, int mask)
 	{
 		var m = stackalloc XIEventMask[1];

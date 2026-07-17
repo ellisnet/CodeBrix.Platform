@@ -27,6 +27,24 @@ namespace SkiaSharp.Views.UWP
 		private int pixelHeight;
 		private WriteableBitmap bitmap;
 
+		// Staging-path caches, valid while the staging buffer is unchanged: repainting at game
+		// rates (60-70+ Hz) must not allocate a fresh surface + event args per frame.
+		private SKSurface stagingSurface;
+		private SKPaintSurfaceEventArgs stagingArgs;
+		private Action<IntPtr> copyStagingToBitmapAction;
+
+		// Direct-path caches (DirectSkiaCanvasMode), revalidated against the bitmap's raw
+		// buffer pointer every frame; the per-frame values reach the cached callback via
+		// these fields because its Action<IntPtr> signature is fixed.
+		private SKSurface directSurface;
+		private IntPtr directSurfacePtr;
+		private SKImageInfo directSurfaceInfo;
+		private SKPaintSurfaceEventArgs directArgs;
+		private Action<IntPtr> directPaintAction;
+		private SKImageInfo directInfo;
+		private SKSizeI directUserVisibleSize;
+		private float directDpi;
+
 		public SKXamlCanvas()
 		{
 			Initialize();
@@ -60,28 +78,43 @@ namespace SkiaSharp.Views.UWP
 				return;
 			}
 
-			using (var surface = SKSurface.Create(info, pixelsHandle.AddrOfPinnedObject(), info.RowBytes))
 			{
 				var userVisibleSize = IgnorePixelScaling ? unscaledSize : info.Size;
 				CanvasSize = userVisibleSize;
 
+				// The surface and event args are cached while the staging buffer is unchanged
+				// (see CreateBitmap/FreeBitmap); allocating them per paint causes measurable
+				// GC churn at game frame rates.
+				stagingSurface ??= SKSurface.Create(info, pixelsHandle.AddrOfPinnedObject(), info.RowBytes);
+				if (stagingArgs is null || stagingArgs.Info.Size != userVisibleSize)
+				{
+					stagingArgs = new SKPaintSurfaceEventArgs(stagingSurface, info.WithSize(userVisibleSize), info);
+				}
+				var surface = stagingSurface;
+
+				// The disposable-per-frame surface used to discard canvas state implicitly;
+				// the cached surface must reset it explicitly or the scale would compound.
+				var canvas = surface.Canvas;
+				canvas.RestoreToCount(1);
+				canvas.ResetMatrix();
+
 				if (IgnorePixelScaling)
 				{
-					var canvas = surface.Canvas;
 					canvas.Scale(dpi);
 					canvas.Save();
 				}
 
-				OnPaintSurface(new SKPaintSurfaceEventArgs(surface, info.WithSize(userVisibleSize), info));
+				OnPaintSurface(stagingArgs);
+
+				surface.Flush();
 			}
 
-			// Copy the staging buffer into the WriteableBitmap. (The direct path above avoids this
-			// copy by drawing into the bitmap's own buffer.)
-			using (var data = bitmap.PixelBuffer.AsStream())
-			{
-				data.Write(pixels, 0, pixels.Length);
-				data.Flush();
-			}
+			// Copy the staging buffer into the WriteableBitmap without a per-frame stream
+			// wrapper. (The direct path above avoids this copy entirely by drawing into the
+			// bitmap's own buffer.)
+			copyStagingToBitmapAction ??= ptr => Marshal.Copy(pixels, 0, ptr, pixels.Length);
+			global::Windows.Storage.Streams.Buffer.Cast(bitmap.PixelBuffer).ApplyActionOnRawBufferPtr(copyStagingToBitmapAction);
+			bitmap.PixelBuffer.Length = (uint)pixels.Length;
 
 			bitmap.Invalidate();
 		}
@@ -95,22 +128,49 @@ namespace SkiaSharp.Views.UWP
 			var userVisibleSize = IgnorePixelScaling ? unscaledSize : info.Size;
 			CanvasSize = userVisibleSize;
 
-			global::Windows.Storage.Streams.Buffer.Cast(bitmap.PixelBuffer).ApplyActionOnRawBufferPtr(ptr =>
-			{
-				using var surface = SKSurface.Create(info, ptr, info.RowBytes);
-
-				if (IgnorePixelScaling)
-				{
-					var canvas = surface.Canvas;
-					canvas.Scale(dpi);
-					canvas.Save();
-				}
-
-				OnPaintSurface(new SKPaintSurfaceEventArgs(surface, info.WithSize(userVisibleSize), info));
-			});
+			directInfo = info;
+			directUserVisibleSize = userVisibleSize;
+			directDpi = dpi;
+			directPaintAction ??= DirectPaint;
+			global::Windows.Storage.Streams.Buffer.Cast(bitmap.PixelBuffer).ApplyActionOnRawBufferPtr(directPaintAction);
 
 			bitmap.PixelBuffer.Length = (uint)info.BytesSize;
 			bitmap.Invalidate();
+		}
+
+		private void DirectPaint(IntPtr ptr)
+		{
+			// The cached surface is only trusted while the bitmap's raw buffer pointer and
+			// format are unchanged — both are revalidated on every frame.
+			if (directSurface == null || directSurfacePtr != ptr || !directSurfaceInfo.Equals(directInfo))
+			{
+				directSurface?.Dispose();
+				directSurface = SKSurface.Create(directInfo, ptr, directInfo.RowBytes);
+				directSurfacePtr = ptr;
+				directSurfaceInfo = directInfo;
+				directArgs = null;
+			}
+
+			if (directArgs == null || directArgs.Info.Size != directUserVisibleSize)
+			{
+				directArgs = new SKPaintSurfaceEventArgs(directSurface, directInfo.WithSize(directUserVisibleSize), directInfo);
+			}
+
+			// The disposable-per-frame surface used to discard canvas state implicitly; the
+			// cached surface must reset it explicitly or the scale would compound.
+			var canvas = directSurface.Canvas;
+			canvas.RestoreToCount(1);
+			canvas.ResetMatrix();
+
+			if (IgnorePixelScaling)
+			{
+				canvas.Scale(directDpi);
+				canvas.Save();
+			}
+
+			OnPaintSurface(directArgs);
+
+			directSurface.Flush();
 		}
 
 		private SKImageInfo CreateBitmap(out SKSizeI unscaledSize, out float dpi)
@@ -154,6 +214,14 @@ namespace SkiaSharp.Views.UWP
 
 		private void FreeBitmap()
 		{
+			stagingSurface?.Dispose();
+			stagingSurface = null;
+			stagingArgs = null;
+			directSurface?.Dispose();
+			directSurface = null;
+			directSurfacePtr = IntPtr.Zero;
+			directArgs = null;
+
 			if (pixels != null)
 			{
 				pixelsHandle.Free();

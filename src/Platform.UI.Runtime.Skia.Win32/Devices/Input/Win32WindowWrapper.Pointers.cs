@@ -7,6 +7,7 @@ using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.Win32;
 using Windows.Win32.Foundation;
+using Windows.Win32.UI.Input;
 using Windows.Win32.UI.Input.Pointer;
 using Windows.Win32.UI.WindowsAndMessaging;
 using CodeBrix.Platform.Extensions.Disposables;
@@ -14,10 +15,113 @@ using CodeBrix.Platform.Foundation.Logging;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.Win32; //Was previously: Uno.UI.Runtime.Skia.Win32
 
-internal partial class Win32WindowWrapper : ICodeBrixCorePointerInputSource
+internal partial class Win32WindowWrapper : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
 	private static uint _currentPointerFrameId;
 	private CoreCursor? _pointerCursor;
+	private MouseDevice? _relativeMouseDevice;
+
+	public unsafe void StartRelativeMouse(MouseDevice device)
+	{
+		_relativeMouseDevice = device;
+
+		var rid = new RAWINPUTDEVICE
+		{
+			usUsagePage = PInvoke.HID_USAGE_PAGE_GENERIC,
+			usUsage = PInvoke.HID_USAGE_GENERIC_MOUSE,
+			dwFlags = 0, // deliver WM_INPUT to hwndTarget while its thread is in the foreground
+			hwndTarget = _hwnd
+		};
+		if (!PInvoke.RegisterRawInputDevices(new ReadOnlySpan<RAWINPUTDEVICE>(in rid), (uint)sizeof(RAWINPUTDEVICE)))
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.RegisterRawInputDevices)} failed: {Win32Helper.GetErrorMessage()}");
+		}
+
+		ApplyPointerConfinement();
+	}
+
+	public unsafe void StopRelativeMouse()
+	{
+		_relativeMouseDevice = null;
+
+		var rid = new RAWINPUTDEVICE
+		{
+			usUsagePage = PInvoke.HID_USAGE_PAGE_GENERIC,
+			usUsage = PInvoke.HID_USAGE_GENERIC_MOUSE,
+			dwFlags = RAWINPUTDEVICE_FLAGS.RIDEV_REMOVE,
+			hwndTarget = HWND.Null // required to be null for RIDEV_REMOVE
+		};
+		if (!PInvoke.RegisterRawInputDevices(new ReadOnlySpan<RAWINPUTDEVICE>(in rid), (uint)sizeof(RAWINPUTDEVICE)))
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.RegisterRawInputDevices)} failed: {Win32Helper.GetErrorMessage()}");
+		}
+
+		if (!PInvoke.ClipCursor((RECT?)null))
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.ClipCursor)} failed: {Win32Helper.GetErrorMessage()}");
+		}
+	}
+
+	// Confines the cursor to the client area while a relative mouse session is active.
+	// Windows clears the clip rect on focus loss and window moves, so this is re-applied
+	// from WM_SIZE/WM_MOVE/WM_ACTIVATE.
+	private void ApplyPointerConfinement()
+	{
+		if (_relativeMouseDevice is null)
+		{
+			return;
+		}
+
+		if (!PInvoke.GetClientRect(_hwnd, out var clientRect))
+		{
+			return;
+		}
+
+		var topLeft = new System.Drawing.Point(clientRect.left, clientRect.top);
+		var bottomRight = new System.Drawing.Point(clientRect.right, clientRect.bottom);
+		PInvoke.ClientToScreen(_hwnd, ref topLeft);
+		PInvoke.ClientToScreen(_hwnd, ref bottomRight);
+
+		var clipRect = new RECT { left = topLeft.X, top = topLeft.Y, right = bottomRight.X, bottom = bottomRight.Y };
+		if (!PInvoke.ClipCursor(clipRect))
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.ClipCursor)} failed: {Win32Helper.GetErrorMessage()}");
+		}
+	}
+
+	private unsafe void OnWmInput(LPARAM lParam)
+	{
+		if (_relativeMouseDevice is not { } relativeDevice)
+		{
+			return;
+		}
+
+		RAWINPUT rawInput = default;
+		var size = (uint)sizeof(RAWINPUT);
+		var bytesCopied = PInvoke.GetRawInputData(
+			new HRAWINPUT(lParam.Value),
+			RAW_INPUT_DATA_COMMAND_FLAGS.RID_INPUT,
+			&rawInput,
+			&size,
+			(uint)sizeof(RAWINPUTHEADER));
+
+		if (bytesCopied == unchecked((uint)-1))
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.GetRawInputData)} failed: {Win32Helper.GetErrorMessage()}");
+			return;
+		}
+
+		if (rawInput.header.dwType == (uint)RID_DEVICE_INFO_TYPE.RIM_TYPEMOUSE
+			&& (rawInput.data.mouse.usFlags & MOUSE_STATE.MOUSE_MOVE_ABSOLUTE) == 0)
+		{
+			var deltaX = rawInput.data.mouse.lLastX;
+			var deltaY = rawInput.data.mouse.lLastY;
+			if (deltaX != 0 || deltaY != 0)
+			{
+				relativeDevice.RaiseMouseMoved(deltaX, deltaY);
+			}
+		}
+	}
 
 #pragma warning disable CS0067 // Some event are not raised on Win32 ... yet!
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
@@ -44,7 +148,15 @@ internal partial class Win32WindowWrapper : ICodeBrixCorePointerInputSource
 
 	private unsafe void SetCursor(CoreCursor? coreCursor)
 	{
-		var cursor = coreCursor?.Type switch
+		if (coreCursor is null)
+		{
+			// A null CoreCursor hides the pointer (WinUI convention, see the
+			// ICorePointerInputSource remarks).
+			PInvoke.SetCursor(HCURSOR.Null);
+			return;
+		}
+
+		var cursor = coreCursor.Type switch
 		{
 			CoreCursorType.Arrow => PInvoke.IDC_ARROW,
 			CoreCursorType.Cross => PInvoke.IDC_CROSS,
@@ -62,7 +174,6 @@ internal partial class Win32WindowWrapper : ICodeBrixCorePointerInputSource
 			CoreCursorType.Pin => PInvoke.IDC_PIN,
 			CoreCursorType.Person => PInvoke.IDC_PERSON,
 			CoreCursorType.Custom => PInvoke.IDC_ARROW,
-			null => PInvoke.IDC_ARROW,
 			_ => throw new ArgumentOutOfRangeException()
 		};
 		var hCursor = PInvoke.LoadCursor(HINSTANCE.Null, new PCWSTR((char*)cursor));

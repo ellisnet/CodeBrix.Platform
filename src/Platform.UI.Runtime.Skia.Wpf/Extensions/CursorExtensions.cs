@@ -58,6 +58,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Wpf.Extensions //Was previously: Uno
 		public static Cursor ToCursor(this CoreCursor coreCursor) =>
 			coreCursor?.Type switch
 			{
+				// A null CoreCursor hides the pointer (WinUI convention, see the
+				// ICorePointerInputSource remarks).
+				null => Cursors.None,
 				CoreCursorType.Arrow => Cursors.Arrow,
 				CoreCursorType.Cross => Cursors.Cross,
 				CoreCursorType.Hand => Cursors.Hand,
