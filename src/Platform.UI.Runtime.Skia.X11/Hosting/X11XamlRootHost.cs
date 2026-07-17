@@ -32,6 +32,11 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		(IntPtr)EventMask.ExposureMask |
 		(IntPtr)EventMask.StructureNotifyMask |
 		(IntPtr)EventMask.VisibilityChangeMask |
+		// PropertyChangeMask is needed to observe minimize/restore on compositing WMs
+		// (Muffin/Mutter & co.): they iconify by unmapping only their own frame window,
+		// so the client window gets no UnmapNotify/VisibilityNotify — the EWMH
+		// _NET_WM_STATE property (via PropertyNotify) is the only reliable signal.
+		(IntPtr)EventMask.PropertyChangeMask |
 		(IntPtr)EventMask.KeyPressMask |
 		(IntPtr)EventMask.KeyReleaseMask |
 		(IntPtr)EventMask.NoEventMask;

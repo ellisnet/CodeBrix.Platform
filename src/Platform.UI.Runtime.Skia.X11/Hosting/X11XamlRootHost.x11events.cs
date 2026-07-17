@@ -5,6 +5,7 @@ using System.Threading;
 using Windows.System;
 using Windows.UI.Core;
 using Microsoft.UI.Windowing;
+using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI.Hosting;
 
@@ -269,17 +270,39 @@ internal partial class X11XamlRootHost
 							{
 								this.Log().Debug($"Window {x11Window.Window.ToString("X", CultureInfo.InvariantCulture)} is mapped.");
 							}
+							// Iconification (minimize) is reported only through Unmap/Map: X generates
+							// VisibilityNotify solely for mapped windows, and under a compositing WM a
+							// redirected window is never reported FullyObscured — so these two events are
+							// the only reliable visibility signal on modern desktops.
+							QueueAction(this, () => _visibilityCallback(true));
 							break;
 						case XEventName.UnmapNotify:
 							if (this.Log().IsEnabled(LogLevel.Debug))
 							{
 								this.Log().Debug($"Window {x11Window.Window.ToString("X", CultureInfo.InvariantCulture)} is unmapped.");
 							}
+							QueueAction(this, () => _visibilityCallback(false));
 							break;
 						case XEventName.ReparentNotify:
 							if (this.Log().IsEnabled(LogLevel.Debug))
 							{
 								this.Log().Debug($"Window {x11Window.Window.ToString("X", CultureInfo.InvariantCulture)} was reparented to parent window {@event.ReparentEvent.parent.ToString("X", CultureInfo.InvariantCulture)}.");
+							}
+							break;
+						case XEventName.PropertyNotify:
+							// Compositing WMs (Muffin/Mutter & co.) iconify by unmapping only their own
+							// frame window, so the client window gets no UnmapNotify or VisibilityNotify:
+							// the EWMH _NET_WM_STATE property is the only reliable minimize/restore signal
+							// there (_NET_WM_STATE_HIDDEN present <=> minimized).
+							if (@event.PropertyEvent.atom == X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE) &&
+								@event.PropertyEvent.state == (int)X11Helper.PropertyNewValue)
+							{
+								var visible = !IsNetWmStateHidden(x11Window);
+								if (this.Log().IsEnabled(LogLevel.Debug))
+								{
+									this.Log().Debug($"Window {x11Window.Window.ToString("X", CultureInfo.InvariantCulture)} {X11Helper._NET_WM_STATE} changed, hidden={!visible}.");
+								}
+								QueueAction(this, () => _visibilityCallback(visible));
 							}
 							break;
 						default:
@@ -310,6 +333,47 @@ internal partial class X11XamlRootHost
 				this.Log().Error($"XLIB ERROR: received an unexpected {@event.type} event on {windowString} {@event.AnyEvent.window.ToString("X", CultureInfo.InvariantCulture)}");
 			}
 		}
+	}
+
+	// Reads the window's EWMH _NET_WM_STATE property and reports whether it contains
+	// _NET_WM_STATE_HIDDEN (the window is minimized). Same read as
+	// X11NativeOverlappedPresenter.GetWMState.
+	private unsafe bool IsNetWmStateHidden(X11Window x11Window)
+	{
+		using var lockDisposable = X11Helper.XLock(x11Window.Display);
+
+		_ = XLib.XGetWindowProperty(
+			x11Window.Display,
+			x11Window.Window,
+			X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE),
+			0,
+			X11Helper.LONG_LENGTH,
+			false,
+			X11Helper.AnyPropertyType,
+			out IntPtr actualType,
+			out int actualFormat,
+			out IntPtr nItems,
+			out _,
+			out IntPtr prop);
+
+		using var propDisposable = new DisposableStruct<IntPtr>(static p => { _ = XLib.XFree(p); }, prop);
+
+		if (actualType == X11Helper.None || actualFormat != 32)
+		{
+			return false;
+		}
+
+		var hidden = X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE_HIDDEN);
+		var atoms = new Span<IntPtr>(prop.ToPointer(), (int)nItems);
+		foreach (var atom in atoms)
+		{
+			if (atom == hidden)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static void QueueAction(IXamlRootHost host, Action action)
