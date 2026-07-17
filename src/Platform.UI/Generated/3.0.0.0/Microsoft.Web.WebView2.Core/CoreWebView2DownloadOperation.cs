@@ -3,116 +3,21 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.Web.WebView2.Core
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CoreWebView2DownloadOperation
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		internal CoreWebView2DownloadOperation()
-		{
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public long BytesReceived
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member long CoreWebView2DownloadOperation.BytesReceived is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public bool CanResume
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool CoreWebView2DownloadOperation.CanResume is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string ContentDisposition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2DownloadOperation.ContentDisposition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string EstimatedEndTime
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2DownloadOperation.EstimatedEndTime is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public global::Microsoft.Web.WebView2.Core.CoreWebView2DownloadInterruptReason InterruptReason
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member CoreWebView2DownloadInterruptReason CoreWebView2DownloadOperation.InterruptReason is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string MimeType
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2DownloadOperation.MimeType is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string ResultFilePath
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2DownloadOperation.ResultFilePath is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public global::Microsoft.Web.WebView2.Core.CoreWebView2DownloadState State
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member CoreWebView2DownloadState CoreWebView2DownloadOperation.State is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public long TotalBytesToReceive
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member long CoreWebView2DownloadOperation.TotalBytesToReceive is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public string Uri
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string CoreWebView2DownloadOperation.Uri is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property BytesReceived
+		// Skipping already declared property CanResume
+		// Skipping already declared property ContentDisposition
+		// Skipping already declared property EstimatedEndTime
+		// Skipping already declared property InterruptReason
+		// Skipping already declared property MimeType
+		// Skipping already declared property ResultFilePath
+		// Skipping already declared property State
+		// Skipping already declared property TotalBytesToReceive
+		// Skipping already declared property Uri
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.Uri.get
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.ContentDisposition.get
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.MimeType.get
@@ -129,13 +34,10 @@ namespace Microsoft.Web.WebView2.Core
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.EstimatedEndTimeChanged.remove
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.StateChanged.add
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.StateChanged.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public void Cancel()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "void CoreWebView2DownloadOperation.Cancel()");
-		}
-#endif
+		// Skipping already declared method Cancel
+		// Skipping already declared event BytesReceivedChanged
+		// Skipping already declared event EstimatedEndTimeChanged
+		// Skipping already declared event StateChanged
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
 		public void Pause()
@@ -148,54 +50,6 @@ namespace Microsoft.Web.WebView2.Core
 		public void Resume()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "void CoreWebView2DownloadOperation.Resume()");
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation, object> BytesReceivedChanged
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.BytesReceivedChanged");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.BytesReceivedChanged");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation, object> EstimatedEndTimeChanged
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.EstimatedEndTimeChanged");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.EstimatedEndTimeChanged");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation, object> StateChanged
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.StateChanged");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "event TypedEventHandler<CoreWebView2DownloadOperation, object> CoreWebView2DownloadOperation.StateChanged");
-			}
 		}
 #endif
 	}

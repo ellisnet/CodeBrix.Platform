@@ -454,6 +454,81 @@ internal class MacOSNativeWebView : MacOSNativeElement, INativeWebView
 		return 0;
 	}
 
+	// Downloads: one seam operation per native WKDownload, keyed by the native download handle.
+	// All download callbacks arrive on the AppKit main thread, which is the UI thread here.
+	private static readonly Dictionary<nint, CoreWebView2DownloadOperation> _downloads = [];
+
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+	internal static unsafe void DownloadStartingCallback(nint handle, nint download, sbyte* url, sbyte* mimeType, sbyte* contentDisposition, long totalBytes, sbyte* suggestedFilename)
+	{
+		var webview = GetWebView(handle);
+		if (webview is null)
+		{
+			NativeCodeBrix.codebrix_webview_download_cancel(download);
+			return;
+		}
+
+		var defaultPath = DownloadDefaults.GetCollisionFreePath(
+			DownloadDefaults.GetDownloadsFolder(),
+			suggestedFilename == null ? "" : new string(suggestedFilename));
+		var operation = new CoreWebView2DownloadOperation(
+			url == null ? "" : new string(url),
+			contentDisposition == null ? "" : new string(contentDisposition),
+			mimeType == null ? "" : new string(mimeType),
+			totalBytes,
+			defaultPath,
+			cancelRequested: () => NativeCodeBrix.codebrix_webview_download_cancel(download));
+		_downloads[download] = operation;
+
+		// The native download stays parked until the app's DownloadStarting decision
+		// (including any deferral) resolves to a destination or a cancellation.
+		webview._owner.RaiseDownloadStarting(operation, args =>
+		{
+			if (args.Cancel)
+			{
+				NativeCodeBrix.codebrix_webview_download_cancel(download);
+			}
+			else
+			{
+				operation.SetResultFilePath(args.ResultFilePath);
+				NativeCodeBrix.codebrix_webview_download_set_destination(download, args.ResultFilePath);
+			}
+		});
+	}
+
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+	internal static void DownloadProgressCallback(nint download, long receivedBytes, long totalBytes)
+	{
+		if (_downloads.TryGetValue(download, out var operation))
+		{
+			operation.ReportProgress(receivedBytes, totalBytes > 0 ? totalBytes : null);
+		}
+	}
+
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
+	internal static unsafe void DownloadFinishedCallback(nint download, int success, int wasCancelled, sbyte* errorMessage)
+	{
+		if (!_downloads.Remove(download, out var operation))
+		{
+			return;
+		}
+
+		if (success != 0)
+		{
+			operation.ReportStateChanged(CoreWebView2DownloadState.Completed);
+		}
+		else
+		{
+			if (wasCancelled == 0 && errorMessage != null && typeof(MacOSNativeWebView).Log().IsEnabled(LogLevel.Error))
+			{
+				typeof(MacOSNativeWebView).Log().Error($"WebView download failed: {new string(errorMessage)}");
+			}
+			operation.ReportStateChanged(
+				CoreWebView2DownloadState.Interrupted,
+				wasCancelled != 0 ? CoreWebView2DownloadInterruptReason.UserCanceled : CoreWebView2DownloadInterruptReason.NetworkFailed);
+		}
+	}
+
 	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	internal static unsafe void DidReceiveScriptMessage(nint handle, sbyte* messageBody)
 	{

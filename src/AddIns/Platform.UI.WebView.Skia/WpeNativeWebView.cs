@@ -105,6 +105,50 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		_wpe.TitleChanged += _ => _presenter.DispatcherQueue.TryEnqueue(() => _coreWebView.OnDocumentTitleChanged());
 
 		_wpe.WebMessageReceived += message => _presenter.DispatcherQueue.TryEnqueue(() => _coreWebView.RaiseWebMessageReceived(message));
+
+		_wpe.DownloadStarting += (download, suggestedFileName) => _presenter.DispatcherQueue.TryEnqueue(() =>
+		{
+			var defaultPath = DownloadDefaults.GetCollisionFreePath(DownloadDefaults.GetDownloadsFolder(), suggestedFileName);
+			var operation = new CoreWebView2DownloadOperation(
+				download.Uri,
+				download.ContentDisposition,
+				download.MimeType,
+				download.TotalBytesToReceive,
+				defaultPath,
+				download.Cancel);
+
+			download.ProgressChanged += bytesReceived =>
+				_presenter.DispatcherQueue.TryEnqueue(() => operation.ReportProgress(bytesReceived));
+			download.Completed += () =>
+				_presenter.DispatcherQueue.TryEnqueue(() => operation.ReportStateChanged(CoreWebView2DownloadState.Completed));
+			download.Failed += (wasCanceled, isDestinationFailure, message) => _presenter.DispatcherQueue.TryEnqueue(() =>
+			{
+				if (!wasCanceled && this.Log().IsEnabled(LogLevel.Error))
+				{
+					this.Log().Error($"WebView download failed: {message}");
+				}
+				operation.ReportStateChanged(
+					CoreWebView2DownloadState.Interrupted,
+					wasCanceled ? CoreWebView2DownloadInterruptReason.UserCanceled
+						: isDestinationFailure ? CoreWebView2DownloadInterruptReason.FileFailed
+						: CoreWebView2DownloadInterruptReason.NetworkFailed);
+			});
+
+			// The engine download stays parked until the app's DownloadStarting decision
+			// (including any deferral) resolves to a destination or a cancellation.
+			_coreWebView.RaiseDownloadStarting(operation, args =>
+			{
+				if (args.Cancel)
+				{
+					download.Cancel();
+				}
+				else
+				{
+					operation.SetResultFilePath(args.ResultFilePath);
+					download.SetDestination(args.ResultFilePath);
+				}
+			});
+		});
 	}
 
 	// ---------------------------------------------------------------------

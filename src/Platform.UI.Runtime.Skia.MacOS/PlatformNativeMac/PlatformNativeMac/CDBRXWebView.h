@@ -42,6 +42,19 @@ typedef int (*codebrix_webview_new_window_requested_fn_ptr)(WKWebView* /* handle
 codebrix_webview_new_window_requested_fn_ptr codebrix_get_webview_new_window_requested_callback(void);
 void codebrix_set_webview_new_window_requested_callback(codebrix_webview_new_window_requested_fn_ptr fn_ptr);
 
+// Downloads (WKDownload, macOS 11.3+; on older macOS the download callbacks never fire).
+// The download handle is an opaque pointer (a WKDownload*) that stays valid until the
+// finished callback has run.
+typedef void (*codebrix_webview_download_starting_fn_ptr)(WKWebView* /* webview */, void* /* download */, const char* _Nullable /* url */, const char* _Nullable /* mimeType */, const char* _Nullable /* contentDisposition */, int64_t /* totalBytes; 0 when unknown */, const char* _Nullable /* suggestedFilename */);
+typedef void (*codebrix_webview_download_progress_fn_ptr)(void* /* download */, int64_t /* receivedBytes */, int64_t /* totalBytes; 0 when unknown */);
+typedef void (*codebrix_webview_download_finished_fn_ptr)(void* /* download */, int32_t /* success */, int32_t /* wasCancelled */, const char* _Nullable /* errorMessage */);
+
+void codebrix_set_webview_download_callbacks(codebrix_webview_download_starting_fn_ptr starting, codebrix_webview_download_progress_fn_ptr progress, codebrix_webview_download_finished_fn_ptr finished);
+
+// Answer to a download_starting callback: proceed writing to the given absolute path, or cancel.
+void codebrix_webview_download_set_destination(void *download, const char *path);
+void codebrix_webview_download_cancel(void *download);
+
 const char* codebrix_webview_get_title(WKWebView *webview);
 
 bool codebrix_webview_can_go_back(WKWebView *webview);

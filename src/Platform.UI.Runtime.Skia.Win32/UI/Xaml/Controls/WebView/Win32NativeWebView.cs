@@ -209,6 +209,7 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 		_nativeWebView.NavigationStarting += EventHandlerBuilder<NativeWebView.CoreWebView2NavigationStartingEventArgs>(static (@this, o, a) => @this.NativeWebView_NavigationStarting(o, a));
 		_nativeWebView.HistoryChanged += EventHandlerBuilder<object>(static (@this, o, a) => @this.CoreWebView2_HistoryChanged(o, a));
 		_nativeWebView.DocumentTitleChanged += EventHandlerBuilder<object>(static (@this, o, a) => @this.OnNativeTitleChanged(o, a));
+		_nativeWebView.DownloadStarting += EventHandlerBuilder<NativeWebView.CoreWebView2DownloadStartingEventArgs>(static (@this, o, a) => @this.NativeWebView_DownloadStarting(o, a));
 		UpdateDocumentTitle();
 
 		presenter.Content = new Win32NativeWindow(_hwnd);
@@ -377,6 +378,39 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 		{
 			_coreWebView.RaiseNavigationCompleted(null, e.IsSuccess, e.HttpStatusCode, (CoreWebView2WebErrorStatus)e.WebErrorStatus, shouldSetSource: false);
 		}
+	}
+
+	private void NativeWebView_DownloadStarting(object? sender, NativeWebView.CoreWebView2DownloadStartingEventArgs e)
+	{
+		var nativeOperation = e.DownloadOperation;
+		var operation = new CoreWebView2DownloadOperation(
+			nativeOperation.Uri,
+			nativeOperation.ContentDisposition,
+			nativeOperation.MimeType,
+			(long)(nativeOperation.TotalBytesToReceive ?? 0),
+			e.ResultFilePath,
+			cancelRequested: () => nativeOperation.Cancel());
+
+		// These subscriptions live only as long as the native download operation itself,
+		// so plain (strong) handlers are fine here.
+		nativeOperation.BytesReceivedChanged += (_, _) =>
+			operation.ReportProgress((long)nativeOperation.BytesReceived, (long)(nativeOperation.TotalBytesToReceive ?? 0));
+		nativeOperation.StateChanged += (_, _) =>
+			operation.ReportStateChanged(
+				(CoreWebView2DownloadState)nativeOperation.State,
+				(CoreWebView2DownloadInterruptReason)nativeOperation.InterruptReason);
+
+		// Keep the native download parked until the app's DownloadStarting decision
+		// (including any deferral taken from the seam args) resolves.
+		var nativeDeferral = e.GetDeferral();
+		_coreWebView.RaiseDownloadStarting(operation, args =>
+		{
+			e.Cancel = args.Cancel;
+			e.ResultFilePath = args.ResultFilePath;
+			e.Handled = args.Handled;
+			operation.SetResultFilePath(args.ResultFilePath);
+			nativeDeferral.Complete();
+		});
 	}
 
 	private void NativeWebView_NewWindowRequested(object? sender, NativeWebView.CoreWebView2NewWindowRequestedEventArgs e)

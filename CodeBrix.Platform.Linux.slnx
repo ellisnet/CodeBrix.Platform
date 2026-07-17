@@ -92,6 +92,7 @@
   <Folder Name="/AddIns/">
     <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Reference.csproj" />
     <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.AudioPlayer.Skia/Platform.UI.AudioPlayer.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.Win32/Platform.UI.MediaPlayer.Skia.Win32.csproj" />

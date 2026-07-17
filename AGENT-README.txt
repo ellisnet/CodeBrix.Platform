@@ -348,6 +348,36 @@ package is versioned to track the SkiaSharp release it vendors).
       Page-to-host messaging supports both the WebView2 idiom
       (window.chrome.webview.postMessage) and the WebKit idiom
       (window.webkit.messageHandlers.codebrixWebView.postMessage).
+      DOWNLOADS (added 2026-07-17): file downloads work on every head through the
+      standard WebView2 contract. A response the engine cannot display, one whose
+      Content-Disposition is "attachment", or an anchor with the HTML5 download
+      attribute becomes a download instead of a dead-ended navigation.
+      CoreWebView2.DownloadStarting is raised on the UI thread with
+      CoreWebView2DownloadStartingEventArgs: set Cancel to refuse, set
+      ResultFilePath to change the target, or take GetDeferral() to decide
+      asynchronously (e.g. after a save-file picker) - the download is parked
+      until the deferral completes. UNHANDLED DEFAULT: the file is saved silently
+      to the user's Downloads folder (the XDG download dir on Linux, ~/Downloads
+      elsewhere) under a collision-free name ("name (1).ext" auto-rename, the
+      WebView2 scheme). args.DownloadOperation (CoreWebView2DownloadOperation)
+      reports Uri/MimeType/ContentDisposition/TotalBytesToReceive, live
+      BytesReceived + EstimatedEndTime with BytesReceivedChanged /
+      EstimatedEndTimeChanged / StateChanged events, and supports Cancel().
+      NOT IMPLEMENTED - downloads: CoreWebView2DownloadOperation.Pause() and
+      .Resume() (no engine on any head exposes pause/resume; CanResume is always
+      false), and the DefaultDownloadDialog APIs (the Skia heads draw no built-in
+      download UI). These remain NotImplemented stubs by design.
+      Head notes: Windows (Win32/WPF) heads pass the native Edge WebView2
+      download straight through. Linux heads use WebKit's async
+      decide-destination (needs WPE WebKit >= 2.40; shipping distros have 2.48).
+      macOS uses WKDownload (macOS 11.3+; on older macOS downloads never start)
+      and requires a libCodeBrixNativeMac.dylib rebuilt from PlatformNativeMac
+      sources dated 2026-07-17 or later - with an older dylib the WebView still
+      works and a one-time warning says downloads are disabled.
+      Demo: WebViewDemo's MainPage wires DownloadStarting into its status line,
+      and setting WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL=<url> makes the app navigate
+      there and exit PASS/FAIL when the download finishes (scripted X11 smoke
+      verification; pair it with a local server that sends Content-Disposition).
       This package ships at the same version as the rest of the family (the
       whole family is always published together) and requires a core of the
       same generation: the AddIn implements internal framework seams, so the
@@ -365,6 +395,57 @@ package is versioned to track the SkiaSharp release it vendors).
       Known v1 limitations on Linux: no IME (composed CJK/deadkey) text input,
       popups/new windows navigate the current view, and the mouse cursor does
       not change shape over links.
+
+--- AUDIO PLAYER ADD-ON PACKAGE (optional; ONE package, live on ALL six heads) ---
+
+  CodeBrix.Platform.AudioPlayer.ApacheLicenseForever                 all heads
+      Audio playback (WAV + MP3) with no native setup at all: unlike the WebView
+      and MediaPlayer add-ons there is no per-OS engine and nothing to apt
+      install - playback is fully managed via the CodeBrix.Audio.MitLicenseForever
+      nuget (whose bundled codebrix_miniaudio backend covers win/linux/osx,
+      x64 + arm64), so the add-on is live on all six heads including macOS.
+      Added 2026-07-17. Source: src/AddIns/Platform.UI.AudioPlayer.Skia.
+      CONSUMPTION PATTERN: unlike the "invisible" WebView/MediaPlayer add-ons,
+      this one follows the Lottie pattern - app code references the add-on's own
+      public types directly (there is no WinUI contract control for audio):
+        xmlns:audio="using:CodeBrix.Platform.UI.AudioPlayer.Skia"
+        <audio:AudioPlayer x:Name="Player"
+            Source="embedded://MyApp.Core/MyApp.Assets.song.mp3" />
+      AudioPlayer is a non-visual [Bindable] FrameworkElement: declare it on a
+      page, control it with Play()/Pause()/Stop()/Seek(TimeSpan), and bind its
+      dependency properties - Source, AutoPlay, Position (TimeSpan) +
+      PositionSeconds (double), Duration + DurationSeconds (read-only),
+      IsPlaying (read-only), Volume (0..1), IsLooping, PositionUpdateInterval
+      (position refresh cadence, default 150 ms). Events: PlaybackEnded,
+      MediaFailed (load/play failures raise the event + log, never throw in a
+      binding path). SetSourceStream(Stream) loads from an arbitrary stream.
+      SCRUBBER BINDING (the headline feature): Position/PositionSeconds update
+      on the UI thread while playing AND are two-way bindable - writes seek the
+      audio, debounced 200 ms so a Slider drag lands ONE seek where the user
+      releases the thumb ("seek on release"):
+        <Slider Maximum="{Binding DurationSeconds, ElementName=Player}"
+                Value="{Binding PositionSeconds, ElementName=Player, Mode=TwoWay}" />
+      SOUND EFFECTS: SoundEffect.Play(source[, volume]) is fire-and-forget - each
+      play is one voice in the app's single shared output device, so effects
+      overlap each other and the AudioPlayer cheaply. Bytes are cached in memory
+      after the first play (or SoundEffect.Preload) so no disk I/O happens on
+      the real-time audio thread; SoundEffect.ClearCache() empties the cache.
+      Play returns false (and logs) instead of throwing when an effect fails.
+      SOURCES (both classes): a filesystem path, an ms-appx:///Assets/... URI,
+      an embedded://AssemblyName/Manifest.Resource.Name URI (embedded resources,
+      the same scheme the SVG and Lottie add-ons use; "." = the app assembly),
+      or a Stream.
+      SHARP EDGE (inherited from the audio engine): the shared output adopts the
+      sample rate of the first sound played, and the SoundEffect path has no
+      resampler - a WAV/MP3 at a different rate is rejected rather than played
+      at the wrong pitch. Standardize effect files on one rate, or pin the
+      output with CodeBrix.Audio's SharedAudioOutput.Configure(rate) at startup.
+      (AudioPlayer itself resamples and plays files at any rate.)
+      Depends only on CodeBrix.Audio.MitLicenseForever (pinned in the csproj) +
+      the core framework; ships at the same version as the rest of the family.
+      Sample: samples/CodeBrixPlatform/AudioPlayerDemo (six heads; setting
+      AUDIOPLAYERDEMO_SELFTEST=1 runs a scripted end-to-end playback/seek/SFX
+      verification and exits PASS/FAIL - the repo's X11 smoke check).
 
 --- COMPANION PACKAGES used by the reference app (NOT produced by this repo) ---
 

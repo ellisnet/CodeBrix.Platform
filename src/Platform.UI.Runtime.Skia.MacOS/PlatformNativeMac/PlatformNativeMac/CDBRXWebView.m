@@ -80,6 +80,181 @@ void codebrix_set_webview_unsupported_scheme_identified_callback(codebrix_webvie
     unsupported_scheme_identified = fn_ptr;
 }
 
+// downloads (WKDownload, macOS 11.3+)
+
+static codebrix_webview_download_starting_fn_ptr download_starting;
+static codebrix_webview_download_progress_fn_ptr download_progress;
+static codebrix_webview_download_finished_fn_ptr download_finished;
+
+void codebrix_set_webview_download_callbacks(codebrix_webview_download_starting_fn_ptr starting, codebrix_webview_download_progress_fn_ptr progress, codebrix_webview_download_finished_fn_ptr finished)
+{
+    download_starting = starting;
+    download_progress = progress;
+    download_finished = finished;
+}
+
+// One delegate per WKDownload. WKDownload.delegate is weak, so the delegates (which in turn
+// retain their download) are kept alive in this table until the download finishes or fails.
+static NSMutableDictionary<NSValue*, id> *download_delegates;
+
+API_AVAILABLE(macos(11.3))
+@interface CDBRXDownloadDelegate : NSObject <WKDownloadDelegate>
+@property (nonatomic, weak, nullable) WKWebView *webview;
+@property (nonatomic, retain, nullable) WKDownload *download;
+@property (nonatomic, copy, nullable) void (^destinationHandler)(NSURL * _Nullable);
+@property (nonatomic, retain, nullable) NSProgress *observedProgress;
+@end
+
+API_AVAILABLE(macos(11.3))
+static CDBRXDownloadDelegate* codebrix_download_delegate_get(void *download)
+{
+    return download == NULL ? nil : [download_delegates objectForKey:[NSValue valueWithPointer:download]];
+}
+
+API_AVAILABLE(macos(11.3))
+static void codebrix_download_attach(WKWebView *webview, WKDownload *download)
+{
+    if (download_delegates == nil) {
+        download_delegates = [[NSMutableDictionary alloc] init];
+    }
+    CDBRXDownloadDelegate *delegate = [[CDBRXDownloadDelegate alloc] init];
+    delegate.webview = webview;
+    delegate.download = download;
+    [download_delegates setObject:delegate forKey:[NSValue valueWithPointer:(__bridge void*)download]];
+    download.delegate = delegate;
+#if DEBUG
+    NSLog(@"codebrix_download_attach webView %p download %p", webview, download);
+#endif
+}
+
+@implementation CDBRXDownloadDelegate
+
+- (void)download:(WKDownload *)download decideDestinationUsingResponse:(NSURLResponse *)response suggestedFilename:(NSString *)suggestedFilename completionHandler:(void (^)(NSURL * _Nullable))completionHandler API_AVAILABLE(macos(11.3))
+{
+    self.destinationHandler = completionHandler;
+
+    const char *url = response.URL.absoluteString.UTF8String;
+    const char *mimeType = response.MIMEType.UTF8String;
+    const char *contentDisposition = NULL;
+    if ([response isKindOfClass:NSHTTPURLResponse.class]) {
+        contentDisposition = [((NSHTTPURLResponse*)response) valueForHTTPHeaderField:@"Content-Disposition"].UTF8String;
+    }
+    int64_t totalBytes = response.expectedContentLength > 0 ? response.expectedContentLength : 0;
+#if DEBUG
+    NSLog(@"decideDestinationUsingResponse download %p URL: %@ suggested %@", download, response.URL, suggestedFilename);
+#endif
+    if (download_starting != NULL) {
+        // The completion handler stays parked until the managed side answers through
+        // codebrix_webview_download_set_destination or codebrix_webview_download_cancel.
+        download_starting(self.webview, (__bridge void*)download, url, mimeType, contentDisposition, totalBytes, suggestedFilename.UTF8String);
+    } else {
+        completionHandler(nil); // no managed handler registered: refuse the download
+        self.destinationHandler = nil;
+    }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if (![keyPath isEqualToString:@"completedUnitCount"]) {
+        return;
+    }
+    NSProgress *progress = (NSProgress*)object;
+    int64_t received = progress.completedUnitCount;
+    int64_t total = progress.totalUnitCount > 0 ? progress.totalUnitCount : 0;
+    void *download;
+    if (@available(macOS 11.3, *)) {
+        download = (__bridge void*)self.download;
+    } else {
+        return;
+    }
+    // NSProgress KVO can fire on a background queue; the managed callback expects the UI thread.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (download_progress != NULL) {
+            download_progress(download, received, total);
+        }
+    });
+}
+
+- (void)startObservingProgress API_AVAILABLE(macos(11.3))
+{
+    if (self.observedProgress == nil && self.download != nil) {
+        self.observedProgress = self.download.progress;
+        [self.observedProgress addObserver:self forKeyPath:@"completedUnitCount" options:NSKeyValueObservingOptionNew context:NULL];
+    }
+}
+
+- (void)finishWithSuccess:(int32_t)success wasCancelled:(int32_t)wasCancelled errorMessage:(const char*)errorMessage API_AVAILABLE(macos(11.3))
+{
+    if (self.observedProgress != nil) {
+        [self.observedProgress removeObserver:self forKeyPath:@"completedUnitCount"];
+        self.observedProgress = nil;
+    }
+    void *download = (__bridge void*)self.download;
+    if (download_finished != NULL) {
+        download_finished(download, success, wasCancelled, errorMessage);
+    }
+    self.destinationHandler = nil;
+    [download_delegates removeObjectForKey:[NSValue valueWithPointer:download]];
+}
+
+- (void)downloadDidFinish:(WKDownload *)download API_AVAILABLE(macos(11.3))
+{
+#if DEBUG
+    NSLog(@"downloadDidFinish download %p", download);
+#endif
+    [self finishWithSuccess:1 wasCancelled:0 errorMessage:NULL];
+}
+
+- (void)download:(WKDownload *)download didFailWithError:(NSError *)error resumeData:(NSData *)resumeData API_AVAILABLE(macos(11.3))
+{
+#if DEBUG
+    NSLog(@"download %p didFailWithError %@", download, error);
+#endif
+    int32_t wasCancelled = [error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled;
+    [self finishWithSuccess:0 wasCancelled:wasCancelled errorMessage:error.localizedDescription.UTF8String];
+}
+
+@end
+
+void codebrix_webview_download_set_destination(void *download, const char *path)
+{
+    if (@available(macOS 11.3, *)) {
+        CDBRXDownloadDelegate *delegate = codebrix_download_delegate_get(download);
+#if DEBUG
+        NSLog(@"codebrix_webview_download_set_destination download %p path %s", download, path);
+#endif
+        if (delegate != nil && delegate.destinationHandler != nil) {
+            NSURL *destination = [NSURL fileURLWithPath:[NSString stringWithUTF8String:path]];
+            void (^handler)(NSURL * _Nullable) = delegate.destinationHandler;
+            delegate.destinationHandler = nil;
+            handler(destination);
+            [delegate startObservingProgress];
+        }
+    }
+}
+
+void codebrix_webview_download_cancel(void *download)
+{
+    if (@available(macOS 11.3, *)) {
+        CDBRXDownloadDelegate *delegate = codebrix_download_delegate_get(download);
+#if DEBUG
+        NSLog(@"codebrix_webview_download_cancel download %p", download);
+#endif
+        if (delegate == nil) {
+            return;
+        }
+        if (delegate.destinationHandler != nil) {
+            // Still parked at the destination decision: a nil destination cancels the download,
+            // which then reports didFailWithError (NSURLErrorCancelled).
+            void (^handler)(NSURL * _Nullable) = delegate.destinationHandler;
+            delegate.destinationHandler = nil;
+            handler(nil);
+        } else {
+            [delegate.download cancel:^(NSData * _Nullable resumeData) { }];
+        }
+    }
+}
+
 
 NSView* codebrix_webview_create(NSWindow *window, const char *ok, const char *cancel)
 {
@@ -580,10 +755,21 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
 }
 
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
-    
+
     NSURL* requestUrl = navigationAction.request.URL;
     NSString *scheme = requestUrl.scheme;
-    
+
+    if (@available(macOS 11.3, *)) {
+        // Anchor elements with the HTML5 "download" attribute.
+        if (navigationAction.shouldPerformDownload) {
+#if DEBUG
+            NSLog(@"decidePolicyForNavigationAction webView %p URL: %@ -> Download", webView, requestUrl);
+#endif
+            decisionHandler(WKNavigationActionPolicyDownload);
+            return;
+        }
+    }
+
     if ([requestUrl.scheme isEqualToString:@"mailto"] || [requestUrl.scheme isEqualToString:@"tel"]) {
         // launch the associated app
         [[NSWorkspace sharedWorkspace] openURL:requestUrl];
@@ -621,6 +807,35 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
             ((UNOWebView*)webView).lastNavigationUrl = requestUrl;
         }
     }
+}
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler {
+    if (@available(macOS 11.3, *)) {
+        // Turn a response the engine cannot display - or one the server marked as an
+        // attachment - into a download instead of a dead-ended navigation.
+        bool shouldDownload = !navigationResponse.canShowMIMEType;
+        if (!shouldDownload && [navigationResponse.response isKindOfClass:NSHTTPURLResponse.class]) {
+            NSString *disposition = [((NSHTTPURLResponse*)navigationResponse.response) valueForHTTPHeaderField:@"Content-Disposition"];
+            shouldDownload = disposition != nil &&
+                [[[disposition lowercaseString] stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet] hasPrefix:@"attachment"];
+        }
+        if (shouldDownload) {
+#if DEBUG
+            NSLog(@"decidePolicyForNavigationResponse webView %p URL: %@ -> Download", webView, navigationResponse.response.URL);
+#endif
+            decisionHandler(WKNavigationResponsePolicyDownload);
+            return;
+        }
+    }
+    decisionHandler(WKNavigationResponsePolicyAllow);
+}
+
+- (void)webView:(WKWebView *)webView navigationResponse:(WKNavigationResponse *)navigationResponse didBecomeDownload:(WKDownload *)download API_AVAILABLE(macos(11.3)) {
+    codebrix_download_attach(webView, download);
+}
+
+- (void)webView:(WKWebView *)webView navigationAction:(WKNavigationAction *)navigationAction didBecomeDownload:(WKDownload *)download API_AVAILABLE(macos(11.3)) {
+    codebrix_download_attach(webView, download);
 }
 
 // WKScriptMessageHandler

@@ -55,6 +55,7 @@ internal sealed unsafe class WpeWebView
 	public event Action<Uri?, bool, bool, bool>? NavigationCompleted; // uri, isSuccess, canGoBack, canGoForward
 	public event Action<string?>? TitleChanged;
 	public event Action<string>? WebMessageReceived;
+	public event Action<WpeDownload, string>? DownloadStarting; // download (parked), suggested file name
 
 	public string? DocumentTitle { get; private set; }
 
@@ -94,6 +95,9 @@ internal sealed unsafe class WpeWebView
 			var backendWrapper = WebKitInterop.webkit_web_view_backend_new(_backend, &OnBackendDestroyedNative, _exportable);
 			_webView = CreateWebView(backendWrapper);
 
+			ConnectSignal(_session, "download-started", (delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void>)&OnDownloadStartedNative);
+
+			ConnectSignal(_webView, "decide-policy", (delegate* unmanaged[Cdecl]<IntPtr, IntPtr, int, IntPtr, int>)&OnDecidePolicyNative);
 			ConnectSignal(_webView, "load-changed", (delegate* unmanaged[Cdecl]<IntPtr, int, IntPtr, void>)&OnLoadChangedNative);
 			ConnectSignal(_webView, "load-failed", (delegate* unmanaged[Cdecl]<IntPtr, int, IntPtr, IntPtr, IntPtr, int>)&OnLoadFailedNative);
 			ConnectSignal(_webView, "notify::title", (delegate* unmanaged[Cdecl]<IntPtr, IntPtr, IntPtr, void>)&OnTitleNotifyNative);
@@ -348,6 +352,63 @@ internal sealed unsafe class WpeWebView
 			typeof(WpeWebView).Log().Error($"The WPE web process terminated unexpectedly (reason {reason}).");
 		}
 		FromUserData(userData)?.NavigationCompleted?.Invoke(null, false, false, false);
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static int OnDecidePolicyNative(IntPtr view, IntPtr decision, int decisionType, IntPtr userData)
+	{
+		if (decisionType != WebKitInterop.PolicyDecisionTypeResponse)
+		{
+			return 0; // default handling for navigation/new-window decisions
+		}
+
+		try
+		{
+			// Turn a response the engine cannot display - or one the server marked as an
+			// attachment - into a download instead of a dead-ended navigation.
+			var shouldDownload = WebKitInterop.webkit_response_policy_decision_is_mime_type_supported(decision) == 0;
+			if (!shouldDownload)
+			{
+				var response = WebKitInterop.webkit_response_policy_decision_get_response(decision);
+				var headers = response == IntPtr.Zero ? IntPtr.Zero : WebKitInterop.webkit_uri_response_get_http_headers(response);
+				if (headers != IntPtr.Zero)
+				{
+					var disposition = Marshal.PtrToStringUTF8(WebKitInterop.soup_message_headers_get_one(headers, "Content-Disposition"));
+					shouldDownload = disposition is not null && disposition.TrimStart().StartsWith("attachment", StringComparison.OrdinalIgnoreCase);
+				}
+			}
+
+			if (shouldDownload)
+			{
+				WebKitInterop.webkit_policy_decision_download(decision);
+				return 1;
+			}
+		}
+		catch (Exception e)
+		{
+			typeof(WpeWebView).Log().Error("decide-policy handler failed.", e);
+		}
+		return 0;
+	}
+
+	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+	private static void OnDownloadStartedNative(IntPtr session, IntPtr download, IntPtr userData)
+	{
+		var self = FromUserData(userData);
+		if (self is null)
+		{
+			return;
+		}
+
+		try
+		{
+			var wrapper = new WpeDownload(download);
+			wrapper.DestinationRequested += suggestedFileName => self.DownloadStarting?.Invoke(wrapper, suggestedFileName);
+		}
+		catch (Exception e)
+		{
+			typeof(WpeWebView).Log().Error("download-started handler failed.", e);
+		}
 	}
 
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]

@@ -16,6 +16,50 @@ public sealed partial class MainPage : Page
         //Browser.CoreWebView2.Settings.UserAgent = "MyApp/1.0";
 
         Browser.NavigationCompleted += Browser_NavigationCompleted;
+        Loaded += MainPage_Loaded;
+    }
+
+    private async void MainPage_Loaded(object sender, RoutedEventArgs e)
+    {
+        await Browser.EnsureCoreWebView2Async();
+        Browser.CoreWebView2.DownloadStarting += CoreWebView2_DownloadStarting;
+
+        // Optional self-test hook: navigate straight to a download URL and exit once the
+        // download completes (used by the repo's scripted X11 smoke verification).
+        if (Environment.GetEnvironmentVariable("WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL") is { Length: > 0 } url)
+        {
+            _selfTest = true;
+            Browser.Source = new Uri(url);
+        }
+    }
+
+    private bool _selfTest;
+
+    // Demonstrates the DownloadStarting API: leave args untouched to accept the default
+    // (a collision-free name in the user's Downloads folder), or set args.ResultFilePath /
+    // args.Cancel - possibly after awaiting a deferral - to redirect or refuse the download.
+    private void CoreWebView2_DownloadStarting(CoreWebView2 sender, CoreWebView2DownloadStartingEventArgs args)
+    {
+        var operation = args.DownloadOperation;
+        StatusText.Text = $"Downloading to {args.ResultFilePath}";
+        Console.WriteLine($"WVD-SELFTEST: DOWNLOAD_STARTING uri={operation.Uri} path={args.ResultFilePath} mime={operation.MimeType} total={operation.TotalBytesToReceive}");
+
+        operation.BytesReceivedChanged += (op, _) =>
+        {
+            StatusText.Text = $"Downloading {op.ResultFilePath}: {op.BytesReceived}/{op.TotalBytesToReceive} bytes";
+            Console.WriteLine($"WVD-SELFTEST: DOWNLOAD_PROGRESS bytes={op.BytesReceived} total={op.TotalBytesToReceive} eta={op.EstimatedEndTime}");
+        };
+        operation.StateChanged += (op, _) =>
+        {
+            StatusText.Text = $"Download {op.State}: {op.ResultFilePath}";
+            Console.WriteLine($"WVD-SELFTEST: DOWNLOAD_STATE state={op.State} reason={op.InterruptReason} bytes={op.BytesReceived}");
+            if (_selfTest && op.State != CoreWebView2DownloadState.InProgress)
+            {
+                var success = op.State == CoreWebView2DownloadState.Completed && System.IO.File.Exists(op.ResultFilePath);
+                Console.WriteLine($"WVD-SELFTEST: RESULT {(success ? "PASS" : "FAIL")} file={op.ResultFilePath}");
+                Environment.Exit(success ? 0 : 1);
+            }
+        };
     }
 
     private void GoButton_Click(object sender, RoutedEventArgs e)

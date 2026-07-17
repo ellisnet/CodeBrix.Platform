@@ -21,6 +21,16 @@ internal static class WebKitInterop
 	public const int InjectedFramesAll = 0;
 	public const int InjectionTimeStart = 0;
 
+	// WebKitPolicyDecisionType
+	public const int PolicyDecisionTypeNavigationAction = 0;
+	public const int PolicyDecisionTypeNewWindowAction = 1;
+	public const int PolicyDecisionTypeResponse = 2;
+
+	// WebKitDownloadError codes (WEBKIT_DOWNLOAD_ERROR_* in the WEBKIT_DOWNLOAD_ERROR GError domain)
+	public const int DownloadErrorNetwork = 499;
+	public const int DownloadErrorCancelledByUser = 400;
+	public const int DownloadErrorDestination = 401;
+
 	// type getters (GType = 8-byte gsize)
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
 	public static extern nuint webkit_web_view_get_type();
@@ -129,9 +139,55 @@ internal static class WebKitInterop
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
 	public static extern IntPtr webkit_navigation_action_get_request(IntPtr navigationAction);
 
+	// policy decisions ("decide-policy" signal)
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_response_policy_decision_get_response(IntPtr decision); // borrowed
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern int webkit_response_policy_decision_is_mime_type_supported(IntPtr decision);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_policy_decision_download(IntPtr decision);
+
+	// downloads (the "download-started" signal on WebKitNetworkSession delivers a WebKitDownload)
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_download_get_request(IntPtr download); // borrowed
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_download_get_response(IntPtr download); // borrowed; NULL before the response arrives
+
+	// In the 2.0 API the destination is an absolute local filesystem path (not a URI).
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_download_set_destination(IntPtr download, [MarshalAs(UnmanagedType.LPUTF8Str)] string destination);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_download_set_allow_overwrite(IntPtr download, int allowed);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_download_cancel(IntPtr download);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern ulong webkit_download_get_received_data_length(IntPtr download);
+
+	// URI responses (download metadata)
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_uri_response_get_uri(IntPtr response); // borrowed
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_uri_response_get_mime_type(IntPtr response); // borrowed
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern ulong webkit_uri_response_get_content_length(IntPtr response);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_uri_response_get_http_headers(IntPtr response); // borrowed; may be NULL
+
 	// libsoup 3 (only needed to append headers on a WebKitURIRequest)
 	[DllImport("libsoup-3.0.so.0", CallingConvention = CallingConvention.Cdecl)]
 	public static extern void soup_message_headers_append(IntPtr headers, [MarshalAs(UnmanagedType.LPUTF8Str)] string name, [MarshalAs(UnmanagedType.LPUTF8Str)] string value);
+
+	[DllImport("libsoup-3.0.so.0", CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr soup_message_headers_get_one(IntPtr headers, [MarshalAs(UnmanagedType.LPUTF8Str)] string name); // borrowed; may be NULL
 
 	// JavaScript evaluation
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]

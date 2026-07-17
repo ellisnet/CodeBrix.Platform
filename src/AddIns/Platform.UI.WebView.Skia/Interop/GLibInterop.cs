@@ -80,4 +80,7 @@ internal static class GLibInterop
 		var messagePtr = Marshal.ReadIntPtr(error, 8);
 		return Marshal.PtrToStringUTF8(messagePtr);
 	}
+
+	/// <summary>Reads the code field of a GError* (domain@0, code@4, message@8 on 64-bit).</summary>
+	public static int GetErrorCode(IntPtr error) => error == IntPtr.Zero ? 0 : Marshal.ReadInt32(error, 4);
 }

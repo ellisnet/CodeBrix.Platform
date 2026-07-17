@@ -253,6 +253,27 @@ public partial class CoreWebView2
 		}
 	}
 
+	/// <summary>
+	/// Raises <see cref="DownloadStarting"/> and invokes <paramref name="completion"/> once the
+	/// decision is final: synchronously when no handler takes a deferral, otherwise when the last
+	/// taken deferral completes. Must be called on the UI thread. When the event has no
+	/// subscribers, <paramref name="completion"/> runs immediately with the default decision
+	/// (not canceled, default result file path).
+	/// </summary>
+	internal void RaiseDownloadStarting(CoreWebView2DownloadOperation downloadOperation, Action<CoreWebView2DownloadStartingEventArgs> completion)
+	{
+		var args = new CoreWebView2DownloadStartingEventArgs(downloadOperation);
+		if (DownloadStarting is null)
+		{
+			completion(args);
+			return;
+		}
+
+		args.DeferralManager.Completed += (_, _) => completion(args);
+		DownloadStarting.Invoke(this, args);
+		args.DeferralManager.EventRaiseCompleted();
+	}
+
 	internal void RaiseUnsupportedUriSchemeIdentified(Uri targetUri, out bool handled)
 	{
 		var args = new Microsoft.UI.Xaml.Controls.WebViewUnsupportedUriSchemeIdentifiedEventArgs(targetUri);

@@ -397,6 +397,18 @@ internal static partial class NativeCodeBrix
 	[LibraryImport("libCodeBrixNativeMac.dylib")]
 	internal static unsafe partial void codebrix_set_webview_unsupported_scheme_identified_callback(delegate* unmanaged[Cdecl]<IntPtr, sbyte*, int> callback);
 
+	[LibraryImport("libCodeBrixNativeMac.dylib")]
+	internal static unsafe partial void codebrix_set_webview_download_callbacks(
+		delegate* unmanaged[Cdecl]<IntPtr, IntPtr, sbyte*, sbyte*, sbyte*, long, sbyte*, void> starting,
+		delegate* unmanaged[Cdecl]<IntPtr, long, long, void> progress,
+		delegate* unmanaged[Cdecl]<IntPtr, int, int, sbyte*, void> finished);
+
+	[LibraryImport("libCodeBrixNativeMac.dylib", StringMarshalling = StringMarshalling.Utf8)]
+	internal static partial void codebrix_webview_download_set_destination(nint download, string path);
+
+	[LibraryImport("libCodeBrixNativeMac.dylib")]
+	internal static partial void codebrix_webview_download_cancel(nint download);
+
 	[LibraryImport("libCodeBrixNativeMac.dylib", StringMarshalling = StringMarshalling.Utf8)]
 	internal static partial nint codebrix_webview_create(nint window, string ok, string cancel);
 

@@ -96,6 +96,7 @@ internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMap
 	{
 		_nativeWebView.CoreWebView2.HistoryChanged += CoreWebView2_HistoryChanged;
 		_nativeWebView.CoreWebView2.DocumentTitleChanged += OnNativeTitleChanged;
+		_nativeWebView.CoreWebView2.DownloadStarting += NativeWebView_DownloadStarting;
 		UpdateDocumentTitle();
 
 		foreach (var action in _actions)
@@ -104,6 +105,38 @@ internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMap
 		}
 
 		_actions.Clear();
+	}
+
+	private void NativeWebView_DownloadStarting(object? sender, WpfWebView.Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs e)
+	{
+		var nativeOperation = e.DownloadOperation;
+		var operation = new CoreWebView2DownloadOperation(
+			nativeOperation.Uri,
+			nativeOperation.ContentDisposition,
+			nativeOperation.MimeType,
+			(long)(nativeOperation.TotalBytesToReceive ?? 0),
+			e.ResultFilePath,
+			cancelRequested: () => nativeOperation.Cancel());
+
+		// These subscriptions live only as long as the native download operation itself.
+		nativeOperation.BytesReceivedChanged += (_, _) =>
+			operation.ReportProgress((long)nativeOperation.BytesReceived, (long)(nativeOperation.TotalBytesToReceive ?? 0));
+		nativeOperation.StateChanged += (_, _) =>
+			operation.ReportStateChanged(
+				(CoreWebView2DownloadState)nativeOperation.State,
+				(CoreWebView2DownloadInterruptReason)nativeOperation.InterruptReason);
+
+		// Keep the native download parked until the app's DownloadStarting decision
+		// (including any deferral taken from the seam args) resolves.
+		var nativeDeferral = e.GetDeferral();
+		_coreWebView2.RaiseDownloadStarting(operation, args =>
+		{
+			e.Cancel = args.Cancel;
+			e.ResultFilePath = args.ResultFilePath;
+			e.Handled = args.Handled;
+			operation.SetResultFilePath(args.ResultFilePath);
+			nativeDeferral.Complete();
+		});
 	}
 
 	private void OnNativeTitleChanged(object? sender, object e) => UpdateDocumentTitle();

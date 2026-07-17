@@ -1,6 +1,9 @@
+using System;
+
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
 using CodeBrix.Platform.Foundation.Extensibility;
+using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI.Xaml.Controls;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.MacOS; //Was previously: Uno.UI.Runtime.Skia.MacOS
@@ -22,6 +25,21 @@ internal class MacOSNativeWebViewProvider : INativeWebViewProvider
 			&MacOSNativeWebView.NavigationFailingCallback);
 
 		NativeCodeBrix.codebrix_set_webview_new_window_requested_callback(&MacOSNativeWebView.NewWindowRequestedCallback);
+
+		try
+		{
+			NativeCodeBrix.codebrix_set_webview_download_callbacks(
+				&MacOSNativeWebView.DownloadStartingCallback,
+				&MacOSNativeWebView.DownloadProgressCallback,
+				&MacOSNativeWebView.DownloadFinishedCallback);
+		}
+		catch (EntryPointNotFoundException)
+		{
+			// A libCodeBrixNativeMac.dylib from before the WebView download API was added:
+			// the WebView works, but downloads never start.
+			typeof(MacOSNativeWebViewProvider).Log().Warn(
+				"WebView download support requires an updated libCodeBrixNativeMac.dylib; downloads are disabled.");
+		}
 
 		ApiExtensibility.Register<CoreWebView2>(typeof(INativeWebViewProvider), o => new MacOSNativeWebViewProvider(o));
 	}

@@ -75,5 +75,12 @@ public partial class CoreWebView2
 	/// </summary>
 	public event TypedEventHandler<CoreWebView2, CoreWebView2WebMessageReceivedEventArgs> WebMessageReceived;
 
+	/// <summary>
+	/// DownloadStarting is raised when a download begins. The event args allow the download to be
+	/// canceled, its target path changed, or the decision deferred; when the event is not handled
+	/// the file is saved to the user's Downloads folder under a collision-free name.
+	/// </summary>
+	public event TypedEventHandler<CoreWebView2, CoreWebView2DownloadStartingEventArgs> DownloadStarting;
+
 	internal event TypedEventHandler<CoreWebView2, WebViewUnsupportedUriSchemeIdentifiedEventArgs> UnsupportedUriSchemeIdentified;
 }

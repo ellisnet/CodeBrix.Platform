@@ -1,0 +1,73 @@
+<Page x:Class="AudioPlayerDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:AudioPlayerDemo.Views"
+      xmlns:audio="using:CodeBrix.Platform.UI.AudioPlayer.Skia"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+    <Page.Resources>
+        <local:TimecodeConverter x:Key="Timecode" />
+    </Page.Resources>
+
+    <StackPanel Margin="20" Spacing="14" MaxWidth="640">
+
+        <!-- The player: non-visual, declared like any other element. The song is an embedded
+             resource in AudioPlayerDemo.Core, addressed exactly like the JustBetweenUs sample
+             addresses its SVG and Lottie assets. -->
+        <audio:AudioPlayer x:Name="Player"
+                           Source="embedded://AudioPlayerDemo.Core/AudioPlayerDemo.Assets.demo_song.mp3"
+                           PlaybackEnded="Player_PlaybackEnded"
+                           MediaFailed="Player_MediaFailed" />
+
+        <TextBlock Text="AudioPlayer demo" FontSize="24" />
+
+        <!-- Timecode indicator + scrubber. The Slider follows playback through the two-way
+             binding, and dragging it seeks the audio (debounced seek-on-release). -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding Position, ElementName=Player, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+            <Slider x:Name="Scrubber" Width="420" VerticalAlignment="Center"
+                    Maximum="{Binding DurationSeconds, ElementName=Player}"
+                    Value="{Binding PositionSeconds, ElementName=Player, Mode=TwoWay}"
+                    StepFrequency="0.1" />
+            <TextBlock Text="{Binding Duration, ElementName=Player, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Transport -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Play" Click="PlayButton_Click" />
+            <Button Content="Pause" Click="PauseButton_Click" />
+            <Button Content="Stop" Click="StopButton_Click" />
+            <Button Content="Jump to 1:00" Click="JumpButton_Click" />
+            <ToggleSwitch x:Name="LoopSwitch" Header="" OnContent="Looping" OffContent="Loop"
+                          IsOn="{Binding IsLooping, ElementName=Player, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!-- Volume -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Volume" VerticalAlignment="Center" />
+            <Slider Width="200" VerticalAlignment="Center" Minimum="0" Maximum="1" StepFrequency="0.01"
+                    Value="{Binding Volume, ElementName=Player, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!-- Source switching: the same song through the two URI schemes. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Source" VerticalAlignment="Center" />
+            <Button Content="embedded://" Click="EmbeddedSourceButton_Click" />
+            <Button Content="ms-appx:///" Click="MsAppxSourceButton_Click" />
+        </StackPanel>
+
+        <!-- Fire-and-forget sound effects: each press is an overlapping voice in the shared
+             output, and they play happily on top of the running song. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Sound effects" VerticalAlignment="Center" />
+            <Button Content="Chime" Click="ChimeButton_Click" />
+            <Button Content="Click" Click="ClickButton_Click" />
+        </StackPanel>
+
+        <TextBlock x:Name="StatusText" Text="Ready" TextWrapping="Wrap" />
+
+    </StackPanel>
+</Page>
