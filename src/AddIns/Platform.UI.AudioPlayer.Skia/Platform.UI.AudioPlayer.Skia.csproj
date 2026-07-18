@@ -29,7 +29,7 @@
 	<ItemGroup>
 		<!-- The audio engine: CodeBrix.Audio (WAV/MP3 reading) + CodeBrix.Audio.Engine (device
 		     playback via the bundled codebrix_miniaudio native backend) ship in this one package. -->
-		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.196.835" />
+		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.199.38" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
 		     same family version as this build (the whole family ships together). Extensions.Logging is
