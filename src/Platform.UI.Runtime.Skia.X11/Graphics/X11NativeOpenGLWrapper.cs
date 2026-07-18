@@ -97,10 +97,16 @@ internal class X11NativeOpenGLWrapper : INativeOpenGLWrapper
 		return Disposable.Create(() => GlxInterface.glXMakeCurrent(_display, drawable, glContext));
 	}
 
-	public IntPtr GetProcAddress(string proc) => GlxInterface.glXGetProcAddress(proc);
+	// glXGetProcAddress never returns null: glvnd/Mesa return a lazily-resolved dispatch stub for
+	// any requested name, including EGL entry points a GLX context can never service. Callers
+	// null-check the result and then call it (e.g. Skia probes eglQueryString/eglGetCurrentDisplay
+	// when assembling a GRGlInterface), so forwarding those garbage stubs causes native crashes.
+	public IntPtr GetProcAddress(string proc) =>
+		proc.StartsWith("egl", StringComparison.Ordinal) ? IntPtr.Zero : GlxInterface.glXGetProcAddress(proc);
+
 	public bool TryGetProcAddress(string proc, out IntPtr addr)
 	{
-		addr = GlxInterface.glXGetProcAddress(proc);
+		addr = GetProcAddress(proc);
 		return addr != IntPtr.Zero;
 	}
 }
