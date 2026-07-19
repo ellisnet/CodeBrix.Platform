@@ -1,0 +1,52 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<!-- The entire layout engine lives in *.skia.cs files, which Platform.CrossTargetting.targets
+		     compiles ONLY into the Skia flavour. A test project on the usual $(NetUnitTests) "Tests"
+		     flavour therefore cannot see the engine at all - which is why the repo's existing
+		     Platform.UI unit tests never measure text. Binding the Skia flavour is what makes this
+		     suite possible. -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<AssemblyName>CodeBrix.Platform.UI.TextLayout.Unit.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.TextLayout.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="10.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Headless Skia and HarfBuzz need their Linux natives brought in explicitly: the head
+		     projects normally supply these, and there is no head here. ICU comes from the system
+		     dynamic linker search path on Linux, so it needs no package. -->
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -190,6 +190,38 @@ package is versioned to track the SkiaSharp release it vendors).
       SVG support (SvgImageSource) on Skia targets. Pair it with the
       "CodeBrix.SkiaSvg.MitLicenseForever" package.
 
+  CodeBrix.Platform.TextLayout.ApacheLicenseForever       [optional]
+      Pango-class text layout with NO XAML and NO application host required.
+      Shapes text with HarfBuzz, resolves bidirectional runs (UAX #9), and
+      itemises across fallback fonts, then reports the geometry an editor or a
+      renderer needs: measured size, caret rectangles, cluster-correct
+      hit-testing, per-line metrics, selection rectangles, and per-glyph or
+      combined outline SKPaths (for stroked / outlined text, which a text blob
+      cannot give you). Draws into ANY SKCanvas — an offscreen surface, a
+      document layer, a bitmap.
+      This is a FAÇADE over the very same engine that lays out every TextBlock
+      in the framework, so there is exactly one text implementation in the
+      family and no second stack to drift.
+      Added 2026-07-19. Source: src/AddIns/Platform.UI.TextLayout.
+      CONSUMPTION PATTERN: a plain code API, not a XAML control — nothing in
+      its public surface is a XAML type, so it is equally usable from a
+      document model, a game, an image pipeline, or a unit test:
+        using CodeBrix.Platform.UI.TextLayout;
+        using var layout = TextLayoutEngine.Layout("Hello", "sans-serif", 24f);
+        var caret  = layout.GetCaretRect(3);          // SKRect
+        var index  = layout.GetIndexAt(new SKPoint(x, y));
+        var runs   = layout.GetSelectionRects(0, 5);  // IReadOnlyList<SKRect>
+        layout.Draw(canvas, new SKPoint(10, 10), paint);
+      Pass a list of TextRunDescriptor instead of a string to mix fonts, sizes,
+      weights and slants in one layout. Indices are TEXT indices, never glyph
+      indices. Wrapping is OFF unless TextLayoutOptions.MaxWidth is set (so a
+      consumer that models its own lines gets exactly the lines it asked for);
+      alignment needs a MaxWidth to align within. Selection always comes back
+      as a LIST of rectangles, because one logical range can be visually
+      discontiguous across lines and across bidi run boundaries.
+      NOT in scope for v1: vertical text, ruby, and IME / preedit (an input
+      concern, not a layout one).
+
   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever     [optional]
       SkiaSharp XAML views (SKXamlCanvas, SKSwapChainPanel). Used internally by
       the Graphics2DSK / Lottie / Svg packages; reference it directly only if you
@@ -551,6 +583,8 @@ Holds app logic + ALL framework/extension package references. Example .csproj:
         <PackageReference Include="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" />
         <PackageReference Include="CodeBrix.Platform.Svg.ApacheLicenseForever" />
         <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" />
+        <!-- Text layout (shaping/bidi/caret/outlines) with no XAML and no host: -->
+        <PackageReference Include="CodeBrix.Platform.TextLayout.ApacheLicenseForever" />
         <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" />
       </ItemGroup>
     </Project>

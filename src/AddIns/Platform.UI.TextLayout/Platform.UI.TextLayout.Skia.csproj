@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.TextLayout</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.TextLayout</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the AudioPlayer add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.TextLayout.ApacheLicenseForever</PackageId>
+		<Description>Pango-class text layout for CodeBrix.Platform apps, with no XAML and no application host required. Shapes text with HarfBuzz, resolves bidirectional runs per UAX #9, itemises across fallback fonts, and reports the geometry an editor or renderer needs: measured size, caret rectangles, cluster-correct hit-testing, per-line metrics, selection rectangles, and per-glyph or combined outline paths for filled and stroked text. Draws into any SKCanvas - an offscreen surface, a document layer, a bitmap. This is a facade over the very same engine that lays out every TextBlock in the framework, so there is exactly one text implementation in the family.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp supplies the public surface's geometry types (SKRect, SKPath, SKCanvas).
+		     SkiaSharp.HarfBuzz is referenced family-wide so a consumer cannot pull it in at a version
+		     that disagrees with the pinned SkiaSharp; both versions come from the PackageReference
+		     Update entries in src/Directory.Build.targets. -->
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="SkiaSharp.HarfBuzz" />
+		<PackageReference Include="HarfBuzzSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
+		     same family version as this build (the whole family ships together). The add-in reaches
+		     the layout engine through InternalsVisibleTo, declared in src/Platform.UI/AssemblyInfo.cs. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

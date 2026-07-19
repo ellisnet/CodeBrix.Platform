@@ -135,6 +135,14 @@ An optional extension package providing SVG image support (`SvgImageSource`) on 
 
 ---
 
+**CodeBrix.Platform.TextLayout**
+NuGet Package ID: `CodeBrix.Platform.TextLayout.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package that exposes the framework's text engine as a plain code API, with no XAML and no running application required. It shapes text with HarfBuzz, resolves bidirectional runs per Unicode UAX #9, and itemizes across fallback fonts, then reports the geometry a text editor or custom renderer needs: measured size, caret rectangles, cluster-correct hit testing, per-line metrics, selection rectangles, and glyph outlines as SkiaSharp paths — per glyph or combined — for filled, stroked, and outlined text. A completed layout draws onto any `SKCanvas`, offscreen surfaces and bitmaps included. Text is supplied as a single string or as a list of styled runs mixing fonts, sizes, weights, and slants in one layout; indices are text indices rather than glyph indices, and wrapping is off unless a maximum width is given, so an application that models its own line breaks gets exactly the lines it asked for. Use it wherever text must be laid out or drawn outside the XAML visual tree — in a document model, a game, an image-processing pipeline, or a unit test. It is a façade over the same engine that renders every `TextBlock` in the framework, so while this package's own code is original to CodeBrix, the engine behind it was derived from the open source library Uno Platform version 6.5.x.
+
+---
+
 **CodeBrix.Platform.Runtime.Skia**
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

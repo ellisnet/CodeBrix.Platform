@@ -42,6 +42,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.Lottie.ApacheLicenseForever` | Lottie / Skottie animations |
 | `CodeBrix.Platform.Svg.ApacheLicenseForever` | SVG (`SvgImageSource`) support |
 | `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` | SkiaSharp XAML views |
+| `CodeBrix.Platform.TextLayout.ApacheLicenseForever` | Shaped, bidirectional text layout without XAML — measurement, caret and hit-test geometry, selection rectangles, glyph outlines, drawing to any `SKCanvas` |
 | `CodeBrix.Platform.WebView.ApacheLicenseForever` | WebView on every head (adds Linux support via the system WPE WebKit engine) |
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
 | `CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever` | Windows (WPF) host |

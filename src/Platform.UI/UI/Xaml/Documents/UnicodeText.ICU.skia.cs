@@ -1,10 +1,12 @@
 #nullable enable
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.Foundation.Logging;
 
@@ -20,7 +22,18 @@ internal readonly partial struct UnicodeText
 		// the version number. For example, there's a ubrk_open_74 in ICU v74, but not a ubrk_open.
 		private static int _icuVersion;
 		private static IntPtr _libicuuc;
-		private static readonly Dictionary<Type, object> _lookupCache = new();
+		// Concurrent because the layout engine is reachable off the UI thread through the
+		// CodeBrix.Platform.UI.TextLayout add-in - an image pipeline or a background renderer can lay
+		// text out on any thread. A plain Dictionary here corrupts under that load. Two threads racing
+		// to resolve the same symbol is harmless: they compute the same delegate.
+		private static readonly ConcurrentDictionary<Type, object> _lookupCache = new();
+
+		// Guards the one-time native load. An application head initialises ICU from a module
+		// initializer emitted by IcuDataInitializerGenerator, which runs before any user code; the
+		// flag lets a host-free caller (the TextLayout add-in, or a test) initialise on demand
+		// instead, without ever double-loading.
+		private static readonly object _initLock = new();
+		private static bool _initialized;
 
 		private const DllImportSearchPath NativeLibrarySearchDirectories =
 			  DllImportSearchPath.ApplicationDirectory
@@ -30,8 +43,42 @@ internal readonly partial struct UnicodeText
 
 		public static void SetDataAssembly(Assembly assembly)
 		{
-			_dataAssembly = assembly;
-			Init();
+			lock (_initLock)
+			{
+				_dataAssembly = assembly;
+				Init();
+				_initialized = true;
+			}
+		}
+
+		/// <summary>
+		/// Loads ICU if no application head has already done so.
+		/// </summary>
+		/// <remarks>
+		/// Heads always win this race - their module initializer runs first - so in an application
+		/// this is a no-op. It exists for callers with no head at all, where nothing would otherwise
+		/// call <see cref="SetDataAssembly"/> and the first bidi call would fail on a null library
+		/// handle. On Windows and macOS, ICU's data file is an embedded resource of the head
+		/// assembly, so the entry assembly is the best available guess when there is no head.
+		/// </remarks>
+		public static void EnsureInitialized()
+		{
+			if (Volatile.Read(ref _initialized))
+			{
+				return;
+			}
+
+			lock (_initLock)
+			{
+				if (_initialized)
+				{
+					return;
+				}
+
+				_dataAssembly ??= Assembly.GetEntryAssembly();
+				Init();
+				_initialized = true;
+			}
 		}
 
 		const int MinSupportedIcuucVersion = 50;

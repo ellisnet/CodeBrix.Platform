@@ -115,6 +115,13 @@
 		     Platform.UI.MediaPlayer.Skia.X11 / .Win32 AddIns are deliberately NOT listed - they use
 		     native child-window embedding, are superseded by this AddIn, and must never be published.) -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.MediaPlayer.Skia\Platform.UI.MediaPlayer.Skia.csproj" />
+
+		<!-- The TextLayout AddIn (CodeBrix.Platform.TextLayout.ApacheLicenseForever) ships with every
+		     family release: a host-free, XAML-free façade over the very same text engine that lays out
+		     every TextBlock in the framework. It exposes shaping, bidi, caret and cluster geometry,
+		     selection rectangles, glyph outline paths, and drawing into an arbitrary SKCanvas, for
+		     consumers that need Pango-class text without a visual tree. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

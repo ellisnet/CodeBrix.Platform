@@ -44,7 +44,10 @@ internal readonly partial struct UnicodeText : IParsedText
 	// and not a struct because we don't want to copy the same Inline for each run.
 	private class ReadonlyInlineCopy
 	{
-		public Inline Inline { get; }
+		// Null when this copy was built from a TextRunSpec rather than from a XAML Inline, i.e. on the
+		// host-free layout path used by CodeBrix.Platform.UI.TextLayout. Every read of either member
+		// must therefore be null-safe; see Draw() and GetHyperlinkAt().
+		public Inline? Inline { get; }
 		public int StartIndex { get; }
 		public int EndIndex { get; }
 		public string Text { get; }
@@ -54,7 +57,7 @@ internal readonly partial struct UnicodeText : IParsedText
 		public FontWeight FontWeight { get; }
 		public FontStretch FontStretch { get; }
 		public FontStyle FontStyle { get; }
-		public Brush Foreground { get; }
+		public Brush? Foreground { get; }
 
 		public ReadonlyInlineCopy(Inline inline, int startIndex, FlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
 		{
@@ -68,6 +71,25 @@ internal readonly partial struct UnicodeText : IParsedText
 			FontWeight = inline.FontWeight;
 			FontStretch = inline.FontStretch;
 			FontStyle = inline.FontStyle;
+			StartIndex = startIndex;
+			EndIndex = startIndex + Text.Length;
+		}
+
+		/// <summary>
+		/// Builds a copy from a host-free <see cref="TextRunSpec"/>. <see cref="Inline"/> and
+		/// <see cref="Foreground"/> are left null.
+		/// </summary>
+		public ReadonlyInlineCopy(TextRunSpec spec, int startIndex, FlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
+		{
+			Inline = null;
+			Foreground = null;
+			Text = spec.Text;
+			FlowDirection = forceDefaultFlowDirection ? defaultFlowDirection : spec.FlowDirection;
+			FontDetails = spec.FontDetails;
+			FontSize = spec.FontSize;
+			FontWeight = spec.FontWeight;
+			FontStretch = spec.FontStretch;
+			FontStyle = spec.FontStyle;
 			StartIndex = startIndex;
 			EndIndex = startIndex + Text.Length;
 		}
@@ -112,6 +134,28 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	bool IParsedText.IsBaseDirectionRightToLeft => _rtl;
 
+	// The result of turning the caller's inlines (XAML or host-free) into the engine's own
+	// representation, along with the flow direction and alignment that may have been inferred
+	// from the text while doing so.
+	private readonly record struct PreparedInlines(
+		List<ReadonlyInlineCopy> Inlines,
+		string Text,
+		FlowDirection FlowDirection,
+		TextAlignment TextAlignment);
+
+	// Everything the constructor needs to assign to its readonly fields. DesiredSizeField and
+	// DesiredSizeOut are deliberately separate: for empty text the constructor has always
+	// reported a non-zero height through the out parameter while leaving _desiredSize at
+	// default, and callers depend on that.
+	private readonly record struct CoreLayout(
+		List<LayoutedLine> Lines,
+		Cluster[] TextIndexToGlyph,
+		List<ReadonlyInlineCopy> Inlines,
+		List<int> WordBoundaries,
+		string Text,
+		Size DesiredSizeField,
+		Size DesiredSizeOut);
+
 	internal UnicodeText(
 		Size availableSize,
 		Inline[] inlines, // only leaf nodes
@@ -128,6 +172,63 @@ internal readonly partial struct UnicodeText : IParsedText
 		_size = availableSize;
 		_defaultFontDetails = defaultFontDetails;
 
+		var prepared = PrepareFromInlines(inlines, flowDirection, textAlignment);
+		_rtl = prepared.FlowDirection == FlowDirection.RightToLeft;
+		_textAlignment = prepared.TextAlignment;
+
+		var core = ComputeCore(availableSize, prepared, _rtl, defaultFontDetails, maxLines, lineHeight, lineStackingStrategy, textWrapping);
+		_lines = core.Lines;
+		_textIndexToGlyph = core.TextIndexToGlyph;
+		_inlines = core.Inlines;
+		_wordBoundaries = core.WordBoundaries;
+		_text = core.Text;
+		_desiredSize = core.DesiredSizeField;
+		desiredSize = core.DesiredSizeOut;
+	}
+
+	/// <summary>
+	/// Builds a layout from host-free run descriptors instead of XAML <see cref="Inline"/> objects.
+	/// </summary>
+	/// <remarks>
+	/// This is the construction path used by the CodeBrix.Platform.UI.TextLayout add-in. It runs the
+	/// exact same engine as the <see cref="Inline"/>-based constructor; the only difference is that
+	/// the resulting runs carry no inline back-reference and no foreground brush, so the layout can be
+	/// built with no application host present. Because a foreground brush is never available on this
+	/// path, use <see cref="DrawToCanvas"/> rather than the compositor overload.
+	/// </remarks>
+	internal UnicodeText(
+		Size availableSize,
+		TextRunSpec[] runs,
+		FontDetails defaultFontDetails,
+		int maxLines,
+		float lineHeight,
+		LineStackingStrategy lineStackingStrategy,
+		FlowDirection flowDirection,
+		TextAlignment textAlignment,
+		TextWrapping textWrapping,
+		out Size desiredSize)
+	{
+		CI.Assert(maxLines >= 0);
+		_size = availableSize;
+		_defaultFontDetails = defaultFontDetails;
+
+		var prepared = PrepareFromRunSpecs(runs, flowDirection, textAlignment);
+		_rtl = prepared.FlowDirection == FlowDirection.RightToLeft;
+		_textAlignment = prepared.TextAlignment;
+
+		var core = ComputeCore(availableSize, prepared, _rtl, defaultFontDetails, maxLines, lineHeight, lineStackingStrategy, textWrapping);
+		_lines = core.Lines;
+		_textIndexToGlyph = core.TextIndexToGlyph;
+		_inlines = core.Inlines;
+		_wordBoundaries = core.WordBoundaries;
+		_text = core.Text;
+		_desiredSize = core.DesiredSizeField;
+		desiredSize = core.DesiredSizeOut;
+	}
+
+	private static PreparedInlines PrepareFromInlines(Inline[] inlines, FlowDirection flowDirection, TextAlignment? textAlignment)
+	{
+		List<ReadonlyInlineCopy> copies;
 		string text;
 		if (textAlignment is null)
 		{
@@ -150,12 +251,12 @@ internal readonly partial struct UnicodeText : IParsedText
 			textAlignment = flowDirection is FlowDirection.LeftToRight ? TextAlignment.Left : TextAlignment.Right;
 			var copy = new ReadonlyInlineCopy(inline, 0, flowDirection, true);
 			var length = copy.Text.Length;
-			_inlines = length == 0 ? [] : [copy];
+			copies = length == 0 ? [] : [copy];
 			text = copy.Text;
 		}
 		else
 		{
-			_inlines = new();
+			copies = new();
 			var lastEnd = 0;
 			var builder = new StringBuilder();
 			foreach (var inline in inlines)
@@ -164,7 +265,7 @@ internal readonly partial struct UnicodeText : IParsedText
 				var length = copy.Text.Length;
 				if (length != 0)
 				{
-					_inlines.Add(copy);
+					copies.Add(copy);
 				}
 				lastEnd = copy.EndIndex;
 				builder.Append(copy.Text);
@@ -172,35 +273,66 @@ internal readonly partial struct UnicodeText : IParsedText
 			text = builder.ToString();
 		}
 
-		_rtl = flowDirection == FlowDirection.RightToLeft;
+		return new PreparedInlines(copies, text, flowDirection, textAlignment.Value);
+	}
 
-		if (_inlines.Count == 0)
+	private static PreparedInlines PrepareFromRunSpecs(TextRunSpec[] runs, FlowDirection flowDirection, TextAlignment textAlignment)
+	{
+		var copies = new List<ReadonlyInlineCopy>();
+		var lastEnd = 0;
+		var builder = new StringBuilder();
+		foreach (var run in runs)
 		{
-			_lines = new();
-			desiredSize = new Size(0, GetLineHeightAndBaselineOffset(lineStackingStrategy, lineHeight, defaultFontDetails, true, true).lineHeight);
-			_textIndexToGlyph = [];
-			_inlines = [];
-			_wordBoundaries = new();
-			_textAlignment = textAlignment.Value;
-			_text = "";
-			return;
+			var copy = new ReadonlyInlineCopy(run, lastEnd, flowDirection);
+			var length = copy.Text.Length;
+			if (length != 0)
+			{
+				copies.Add(copy);
+			}
+			lastEnd = copy.EndIndex;
+			builder.Append(copy.Text);
+		}
+
+		return new PreparedInlines(copies, builder.ToString(), flowDirection, textAlignment);
+	}
+
+	private static CoreLayout ComputeCore(
+		Size availableSize,
+		PreparedInlines prepared,
+		bool rtl,
+		FontDetails defaultFontDetails,
+		int maxLines,
+		float lineHeight,
+		LineStackingStrategy lineStackingStrategy,
+		TextWrapping textWrapping)
+	{
+		var inlines = prepared.Inlines;
+		var text = prepared.Text;
+
+		if (inlines.Count == 0)
+		{
+			// Note: the out-parameter height is non-zero here but the _desiredSize field is left at
+			// default. This asymmetry is long-standing behaviour that callers depend on.
+			var emptySize = new Size(0, GetLineHeightAndBaselineOffset(lineStackingStrategy, lineHeight, defaultFontDetails, true, true).lineHeight);
+			return new CoreLayout(new(), [], [], new(), "", default, emptySize);
 		}
 
 		var lineWidth = textWrapping == TextWrapping.NoWrap ? float.PositiveInfinity : (float)availableSize.Width;
-		var unlayoutedLines = SplitTextIntoLines(_rtl, _inlines, lineWidth, textWrapping);
-		var lines = LayoutLines(unlayoutedLines, textAlignment.Value, lineStackingStrategy, lineHeight, (float)availableSize.Width, defaultFontDetails);
+		var unlayoutedLines = SplitTextIntoLines(rtl, inlines, lineWidth, textWrapping);
+		var lines = LayoutLines(unlayoutedLines, prepared.TextAlignment, lineStackingStrategy, lineHeight, (float)availableSize.Width, defaultFontDetails);
 
-		_lines = maxLines == 0 || maxLines >= lines.Count ? lines : lines[..maxLines];
-		_text = text = text[.._lines[^1].endInText];
+		var clampedLines = maxLines == 0 || maxLines >= lines.Count ? lines : lines[..maxLines];
+		text = text[..clampedLines[^1].endInText];
 
-		_textIndexToGlyph = new Cluster[_text.Length];
-		CreateSourceTextFromAndToGlyphMapping(_lines, _textIndexToGlyph);
+		var textIndexToGlyph = new Cluster[text.Length];
+		CreateSourceTextFromAndToGlyphMapping(clampedLines, textIndexToGlyph);
 
-		_wordBoundaries = GetWordBreakingOpportunities(text);
+		var wordBoundaries = GetWordBreakingOpportunities(text);
 
-		var desiredHeight = _lines.Sum(l => l.lineHeight);
-		var desiredWidth = _lines.Max(l => l.runs.Sum(r => r.width));
-		_desiredSize = desiredSize = new Size(desiredWidth, desiredHeight);
+		var desiredHeight = clampedLines.Sum(l => l.lineHeight);
+		var desiredWidth = clampedLines.Max(l => l.runs.Sum(r => r.width));
+		var size = new Size(desiredWidth, desiredHeight);
+		return new CoreLayout(clampedLines, textIndexToGlyph, inlines, wordBoundaries, text, size, size);
 	}
 
 	/// <returns>The runs of each run are sorted according to the visual order.</returns>
@@ -753,7 +885,8 @@ internal readonly partial struct UnicodeText : IParsedText
 		return ret;
 	}
 
-	private List<LayoutedLine> LayoutLines(List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> lines, TextAlignment textAlignment, LineStackingStrategy lineStackingStrategy, float lineHeight, float availableWidth, FontDetails defaultFontDetails)
+	// Static because it is called from the constructor, before any instance field has been assigned.
+	private static List<LayoutedLine> LayoutLines(List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> lines, TextAlignment textAlignment, LineStackingStrategy lineStackingStrategy, float lineHeight, float availableWidth, FontDetails defaultFontDetails)
 	{
 		var layoutedLines = new List<LayoutedLine>();
 		float currentLineY = 0;
@@ -904,7 +1037,7 @@ internal readonly partial struct UnicodeText : IParsedText
 						positions[i] = new SKPoint(glyph.xPosInRun + glyph.position.GlyphPosition.XOffset * run.fontDetails.TextScale.textScaleX, line.y + glyph.position.GlyphPosition.YOffset * run.fontDetails.TextScale.textScaleY);
 					}
 
-					void DrawText(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<SKPoint> positions, Visual.PaintingSession session, Brush brush)
+					void DrawText(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<SKPoint> positions, Visual.PaintingSession session, Brush? brush)
 					{
 						textBlobBuilder.AddPositionedRun(glyphs, run.fontDetails.SKFont, positions);
 						var blob1 = textBlobBuilder.Build(); // Build resets the blob builder
@@ -963,7 +1096,9 @@ internal readonly partial struct UnicodeText : IParsedText
 		}
 	}
 
-	private static SKPaint SetupPaint(Brush foreground, float opacity)
+	// foreground is null only on the host-free TextRunSpec construction path, where no XAML brush
+	// exists. Reset() leaves the paint opaque black, which is the documented fallback for that path.
+	private static SKPaint SetupPaint(Brush? foreground, float opacity)
 	{
 		var paint = _spareDrawPaint;
 		paint.Reset();
