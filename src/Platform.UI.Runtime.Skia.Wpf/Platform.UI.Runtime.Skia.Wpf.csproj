@@ -53,6 +53,7 @@
 			transitively flowing through SkiaSharp's dependencies
 		 -->
 		<PackageReference Include="HarfBuzzSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
 	</ItemGroup>
 
 	<ItemGroup>

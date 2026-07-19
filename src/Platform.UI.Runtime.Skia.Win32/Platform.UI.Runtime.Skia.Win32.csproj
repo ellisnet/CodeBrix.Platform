@@ -53,6 +53,7 @@
 		     project, which is PrivateAssets="all" and therefore does not propagate to consumers. -->
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="HarfBuzzSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
 		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
 	</ItemGroup>
 

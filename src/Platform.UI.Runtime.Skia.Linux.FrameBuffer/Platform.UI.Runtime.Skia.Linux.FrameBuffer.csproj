@@ -37,6 +37,7 @@
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="HarfBuzzSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -97,8 +97,9 @@
 		<PackageReference Update="SkiaSharp.NativeAssets.Linux" Version="$(SkiaSharpVersion)" />
 		<PackageReference Update="SkiaSharp.Skottie" Version="$(SkiaSharpVersion)" />
 		<PackageReference Update="SkiaSharp.NativeAssets.macos" Version="$(SkiaSharpVersion)" />
+    <PackageReference Update="SkiaSharp.HarfBuzz" Version="$(SkiaSharpVersion)" />
 
-		<PackageReference Update="HarfBuzzSharp" Version="$(HarfbuzzSharpVersion)" />
+    <PackageReference Update="HarfBuzzSharp" Version="$(HarfbuzzSharpVersion)" />
 		<PackageReference Update="HarfBuzzSharp.NativeAssets.macOS" Version="$(HarfbuzzSharpVersion)" />
 		<PackageReference Update="HarfBuzzSharp.NativeAssets.Linux" Version="$(HarfbuzzSharpVersion)" />
 

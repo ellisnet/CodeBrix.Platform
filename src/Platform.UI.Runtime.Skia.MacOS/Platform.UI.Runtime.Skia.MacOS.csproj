@@ -39,6 +39,7 @@
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
 		<PackageReference Include="HarfBuzzSharp" />
 		<PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
     <PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.178.348" />
 	</ItemGroup>
 
