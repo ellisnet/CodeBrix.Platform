@@ -20,6 +20,20 @@
 		<RootNamespace>CodeBrix.Platform.UI.TextLayout.Tests</RootNamespace>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
+
+		<!-- ICU is the one part of the engine that cannot be satisfied the same way on every OS.
+		     On Linux it comes from the dynamic linker search path and needs nothing from us; on
+		     Windows and macOS it has to be shipped, and its data file has to be embedded in an
+		     assembly that the loader is then told about. $(IsCodeBrixHead) is what makes the Unicode
+		     package embed icudt.dat here - this project is not really a head, but it is the assembly
+		     that has to carry the data, which is exactly what the flag means to that package.
+		     $(SkipIcuDataInitializerGenerator) then turns OFF the head's generated module
+		     initializer, because IcuDataInitializer.cs in this project does the same job explicitly:
+		     the generated one hands ICU the ENTRY assembly, which is the test host rather than this
+		     assembly under some runners, and would double-initialise if both ran. -->
+		<CodeBrixTestsNeedIcuData Condition="$([MSBuild]::IsOSPlatform('Windows')) or $([MSBuild]::IsOSPlatform('OSX'))">true</CodeBrixTestsNeedIcuData>
+		<IsCodeBrixHead Condition="'$(CodeBrixTestsNeedIcuData)' == 'true'">true</IsCodeBrixHead>
+		<SkipIcuDataInitializerGenerator Condition="'$(CodeBrixTestsNeedIcuData)' == 'true'">true</SkipIcuDataInitializerGenerator>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,12 +50,31 @@
 		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
 		<!-- Headless Skia and HarfBuzz need their Linux natives brought in explicitly: the head
 		     projects normally supply these, and there is no head here. ICU comes from the system
 		     dynamic linker search path on Linux, so it needs no package. -->
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<!-- The same natives in their Windows flavour, plus ICU. Unlike Linux, Windows has no system
+		     ICU that the engine can dlopen, so it is shipped by the Unicode package: icuuc77.dll as
+		     a runtime asset, and icudt.dat embedded into this assembly (see $(IsCodeBrixHead)). -->
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfbuzzSharpVersion)" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<!-- macOS is in the same position as Windows: no system ICU to find, and the data archive
+		     has to be embedded here. It needs libicudata.dylib as well as libicuuc.dylib, because
+		     macOS does not pull the data library in through icuuc's load commands - the sibling
+		     UnicodeMacOs package supplies both. -->
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.178.348" />
 	</ItemGroup>
 
 	<ItemGroup>

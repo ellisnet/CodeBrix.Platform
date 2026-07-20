@@ -36,9 +36,14 @@ public class TextLayoutOptionsTests
 	[Fact]
 	public void A_bold_run_measures_wider_than_the_same_text_unbolded()
 	{
-		//Arrange
-		using var normal = TextLayoutEngine.Layout([new TextRunDescriptor("Handgloves", TestFamily, TestSize)]);
-		using var bold = TextLayoutEngine.Layout([new TextRunDescriptor("Handgloves", TestFamily, TestSize, TextFontWeight.Bold)]);
+		//Arrange - this is the one test that needs a NAMED family. "sans-serif" is a generic alias
+		// that only some platforms recognise; where it is not recognised the default face comes back
+		// for every weight, and this would compare a face against itself. See TestFonts.
+		var family = TestFonts.BoldCapableFamily;
+		Assert.SkipWhen(family is null, "No installed font family exposes distinct regular and bold faces.");
+
+		using var normal = TextLayoutEngine.Layout([new TextRunDescriptor("Handgloves", family, TestSize)]);
+		using var bold = TextLayoutEngine.Layout([new TextRunDescriptor("Handgloves", family, TestSize, TextFontWeight.Bold)]);
 
 		//Assert
 		bold.Size.Width.Should().BeGreaterThan(normal.Size.Width);
@@ -88,7 +93,21 @@ public class TextLayoutOptionsTests
 		//Assert
 		unwrapped.LineCount.Should().Be(1);
 		wrapped.LineCount.Should().BeGreaterThan(1);
-		wrapped.Size.Width.Should().BeLessThanOrEqualTo(120f);
+		wrapped.Size.Width.Should().BeLessThan(unwrapped.Size.Width);
+
+		// The measured width is NOT asserted against the max width. A wrapped line keeps the space
+		// that ended it, and that trailing space counts towards the measured width, so the reported
+		// size can legitimately overhang the max by up to one space - whether it does depends
+		// entirely on the resolved font's metrics, which differ per platform. What wrapping actually
+		// promises is about the INK: no visible glyph crosses the boundary.
+		for (var i = 0; i < wrapped.Text.Length; i++)
+		{
+			if (!char.IsWhiteSpace(wrapped.Text[i]))
+			{
+				var rect = wrapped.GetRectForIndex(i);
+				rect.Right.Should().BeLessThanOrEqualTo(120f, $"index {i} should be laid out inside the max width");
+			}
+		}
 	}
 
 	[Fact]
