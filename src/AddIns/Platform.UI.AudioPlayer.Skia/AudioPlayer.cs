@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -307,7 +309,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 
 		try
 		{
-			load();
+			RunOffSynchronizationContext(load);
 		}
 		catch (Exception e)
 		{
@@ -332,6 +334,41 @@ public sealed partial class AudioPlayer : FrameworkElement
 		{
 			Play();
 		}
+	}
+
+	/// <summary>
+	/// Runs a source load with no <see cref="SynchronizationContext"/> in scope, then waits for it.
+	/// </summary>
+	/// <remarks>
+	/// The audio metadata layer this control loads through reads its headers asynchronously and then
+	/// blocks on that read from its own synchronous entry point. Up to and including CodeBrix.Audio
+	/// 1.0.199.38 - the version pinned by this project - it does so without detaching the awaits from
+	/// the calling context. Called straight from the UI thread, the continuation is posted back to
+	/// the dispatcher that is already blocked inside that wait, and the two wait on each other -
+	/// the application hangs before it ever renders. It only bites when a read actually completes
+	/// asynchronously, which is why small files (whose reads are served from the stream buffer) load
+	/// fine and, for example, an MP3 carrying a large ID3 tag hangs. A thread-pool thread has no
+	/// synchronization context, so the continuation runs there and the load completes.
+	///
+	/// CodeBrix.Audio has since been fixed at the source (ConfigureAwait(false) throughout its
+	/// metadata layer), but this stays: it is what keeps the currently pinned package working, and
+	/// it keeps the control safe for consumers who end up on an older audio package.
+	///
+	/// Loading is cheap and does not depend on file size - the player streams the file in chunks
+	/// rather than reading it into memory, so even a very large WAV opens in a few milliseconds and
+	/// waiting here is not perceptible.
+	/// </remarks>
+	private static void RunOffSynchronizationContext(Action load)
+	{
+		if (SynchronizationContext.Current is null)
+		{
+			load();
+			return;
+		}
+
+		// GetAwaiter().GetResult() rethrows the original exception rather than an AggregateException,
+		// so LoadCore's catch block still sees the real load failure.
+		Task.Run(load).GetAwaiter().GetResult();
 	}
 
 	private void UnloadSource()

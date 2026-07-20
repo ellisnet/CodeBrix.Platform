@@ -22,6 +22,11 @@ public sealed partial class MainPage : Page
         SoundEffect.Preload(ChimeEffect);
         SoundEffect.Preload(ClickEffect);
 
+        // Load the initial second-player selection (Sample Song 1 / MP3, per the drop-down
+        // defaults set in XAML) once the page has loaded, so the synchronous file load happens
+        // off the constructor / first-render path rather than blocking the window from showing.
+        Loaded += (_, _) => LoadSecondPlayerSource();
+
         // Optional self-test hook: exercise the whole player from a script and exit (used by
         // the repo's scripted X11 smoke verification).
         if (Environment.GetEnvironmentVariable("AUDIOPLAYERDEMO_SELFTEST") == "1")
@@ -133,6 +138,65 @@ public sealed partial class MainPage : Page
     private void Player_PlaybackEnded(object sender, EventArgs e) => StatusText.Text = "Playback ended";
 
     private void Player_MediaFailed(object sender, AudioPlayerFailedEventArgs e) => StatusText.Text = $"Media failed: {e.Message}";
+
+    // ===== Second player: song/format drop-downs + its own transport =====
+
+    // The four sample songs live loose in the output's Assets folder (see AudioPlayerDemo.Core.csproj)
+    // and are addressed through the ms-appx:/// asset scheme.
+    private static readonly string[] SongFileStems = { "sample_song_1", "sample_song_2" };
+
+    /// <summary>
+    /// Reads the two drop-downs and loads the matching sample song into the second player,
+    /// stopping any current playback. The user then presses Play to start it.
+    /// </summary>
+    private void LoadSecondPlayerSource()
+    {
+        // May fire from SelectionChanged during XAML load, before every element is created.
+        if (Player2 is null || SongSelector is null || FormatSelector is null)
+        {
+            return;
+        }
+
+        var stem = SongFileStems[SongSelector.SelectedIndex < 1 ? 0 : 1];
+        // FormatSelector items are WAV (index 0), MP3 (index 1).
+        var extension = FormatSelector.SelectedIndex == 1 ? "mp3" : "wav";
+        var fileName = $"{stem}.{extension}";
+
+        // Stop whatever is currently loaded/playing before switching. Skip this on the very first
+        // load, when no source has been set yet (calling Stop on a never-loaded player is pointless
+        // and best avoided).
+        if (!string.IsNullOrEmpty(Player2.Source))
+        {
+            Player2.Stop();
+        }
+
+        Player2.Source = $"ms-appx:///Assets/{fileName}";
+        Player2Status.Text = $"Loaded {fileName} - press Play";
+    }
+
+    private void SecondPlayerSelection_Changed(object sender, SelectionChangedEventArgs e) => LoadSecondPlayerSource();
+
+    private void Play2Button_Click(object sender, RoutedEventArgs e)
+    {
+        Player2.Play();
+        Player2Status.Text = $"Playing ({Player2.Duration:mm\\:ss} total)";
+    }
+
+    private void Pause2Button_Click(object sender, RoutedEventArgs e)
+    {
+        Player2.Pause();
+        Player2Status.Text = $"Paused at {Player2.Position:mm\\:ss}";
+    }
+
+    private void Stop2Button_Click(object sender, RoutedEventArgs e)
+    {
+        Player2.Stop();
+        Player2Status.Text = "Stopped";
+    }
+
+    private void Player2_PlaybackEnded(object sender, EventArgs e) => Player2Status.Text = "Playback ended";
+
+    private void Player2_MediaFailed(object sender, AudioPlayerFailedEventArgs e) => Player2Status.Text = $"Media failed: {e.Message}";
 }
 
 /// <summary>

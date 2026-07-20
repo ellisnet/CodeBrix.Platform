@@ -69,5 +69,52 @@
 
         <TextBlock x:Name="StatusText" Text="Ready" TextWrapping="Wrap" />
 
+        <!-- ===== Second player: pick one of the full-length sample songs and a format ===== -->
+        <TextBlock Text="Play a sample song" FontSize="20" Margin="0,10,0,0" />
+
+        <!-- Song + format selection. Changing either drop-down stops the second player and loads
+             the matching file (one of the four samples/assets/sample_song_*.{wav,mp3} files);
+             the user then presses this player's Play button to start it. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Song" VerticalAlignment="Center" />
+            <ComboBox x:Name="SongSelector" Width="180" SelectedIndex="0"
+                      SelectionChanged="SecondPlayerSelection_Changed">
+                <ComboBoxItem Content="Sample Song 1" />
+                <ComboBoxItem Content="Sample Song 2" />
+            </ComboBox>
+            <TextBlock Text="Format" VerticalAlignment="Center" Margin="12,0,0,0" />
+            <ComboBox x:Name="FormatSelector" Width="140" SelectedIndex="1"
+                      SelectionChanged="SecondPlayerSelection_Changed">
+                <ComboBoxItem Content="WAV" />
+                <ComboBoxItem Content="MP3" />
+            </ComboBox>
+        </StackPanel>
+
+        <!-- The second player itself: non-visual, driven by the compact transport below. Its
+             Source is set from the drop-downs in code-behind. -->
+        <audio:AudioPlayer x:Name="Player2"
+                           PlaybackEnded="Player2_PlaybackEnded"
+                           MediaFailed="Player2_MediaFailed" />
+
+        <!-- Compact transport for the second player: timecode + scrubber. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding Position, ElementName=Player2, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+            <Slider Width="420" VerticalAlignment="Center"
+                    Maximum="{Binding DurationSeconds, ElementName=Player2}"
+                    Value="{Binding PositionSeconds, ElementName=Player2, Mode=TwoWay}"
+                    StepFrequency="0.1" />
+            <TextBlock Text="{Binding Duration, ElementName=Player2, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Play" Click="Play2Button_Click" />
+            <Button Content="Pause" Click="Pause2Button_Click" />
+            <Button Content="Stop" Click="Stop2Button_Click" />
+        </StackPanel>
+
+        <TextBlock x:Name="Player2Status" Text="Ready" TextWrapping="Wrap" />
+
     </StackPanel>
 </Page>

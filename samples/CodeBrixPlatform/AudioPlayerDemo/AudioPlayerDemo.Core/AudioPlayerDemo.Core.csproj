@@ -68,5 +68,14 @@
     <!-- The song once more as a loose output file, so the demo can also show loading the
          SAME audio through an ms-appx:///Assets/... URI. -->
     <Content Include="..\Shared\Assets\demo_song.mp3" Link="Assets\demo_song.mp3" CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- The four full-length sample songs used by the second player (the song/format drop-downs),
+         referenced in place from the repo-level samples/assets folder. These are large (the WAVs
+         are tens of MB), so they are loose copy-to-output Content addressed via
+         ms-appx:///Assets/... rather than embedded resources, to avoid bloating the assembly. -->
+    <Content Include="..\..\..\assets\sample_song_1.mp3" Link="Assets\sample_song_1.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_1.wav" Link="Assets\sample_song_1.wav" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.mp3" Link="Assets\sample_song_2.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.wav" Link="Assets\sample_song_2.wav" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
