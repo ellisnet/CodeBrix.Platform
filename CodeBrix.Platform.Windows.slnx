@@ -79,6 +79,7 @@
     <Project Path="src/AddIns/Platform.UI.MSAL/Platform.UI.MSAL.Windows.csproj" />
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.FlexPanel/Platform.UI.FlexPanel.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia.X11/Platform.UI.WebView.Skia.X11.csproj" />
@@ -116,6 +117,7 @@
     <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Tests.csproj" />
     <Project Path="src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.FlexPanel.Tests/Platform.UI.FlexPanel.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Unit.Tests.csproj" />
     <!-- CodeBrix.Platform fork: the upstream System.Xaml.Tests.MS (net461) and Uno.Xaml.Tests
          (net462) conformance-test projects were removed entirely — CodeBrix.Platform does not

@@ -1,0 +1,44 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.FlexPanel</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.FlexPanel</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.FlexPanel.ApacheLicenseForever</PackageId>
+		<Description>A CSS flexbox-style layout panel for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. FlexPanel is a XAML Panel that arranges its children in optionally wrapping rows or columns with the familiar flexbox model: Direction (row/column, both reversible), JustifyContent (including SpaceBetween/SpaceAround/SpaceEvenly), AlignItems/AlignContent, wrapping with WrapReverse, and the per-child attached properties FlexPanel.Grow, FlexPanel.Shrink, FlexPanel.Basis (absolute or percentage), FlexPanel.Order, and FlexPanel.AlignSelf. The layout engine is a managed port of the Microsoft .NET MAUI FlexLayout engine (MIT) - no native dependencies.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
+		     same family version as this build (the whole family ships together). The panel uses only
+		     public framework API (Panel, DependencyProperty, Measure/Arrange) - no InternalsVisibleTo
+		     and no framework changes are needed by this add-in. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

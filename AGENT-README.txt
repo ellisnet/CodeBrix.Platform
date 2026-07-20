@@ -168,6 +168,40 @@ package is versioned to track the SkiaSharp release it vendors).
       Every CodeBrix.Platform app references this. It is self-contained (it folds
       in the Foundation, WinRT, Dispatching, and logging assemblies).
 
+  CodeBrix.Platform.FlexPanel.ApacheLicenseForever        [optional]
+      A CSS flexbox-style XAML layout panel (FlexPanel : Panel). Children are
+      arranged in optionally wrapping rows or columns: Direction (Row default,
+      both axes reversible), JustifyContent (Start / Center / End /
+      SpaceBetween / SpaceAround / SpaceEvenly), AlignItems (+ per-child
+      AlignSelf), Wrap (NoWrap / Wrap / Reverse), and AlignContent for the
+      wrapped lines. The engine is a managed port of the .NET MAUI FlexLayout
+      engine (MIT - see THIRD-PARTY-NOTICES item 23), so layout semantics
+      match MAUI/CSS. Pure managed layout: no native dependency, live on all
+      six heads.
+      Added 2026-07-19. Source: src/AddIns/Platform.UI.FlexPanel.
+      CONSUMPTION PATTERN: follows the Lottie/AudioPlayer pattern - app code
+      references the add-on's own public types directly:
+        xmlns:flex="using:CodeBrix.Platform.UI.FlexPanel"
+        <flex:FlexPanel Direction="Row" Wrap="Wrap" JustifyContent="Center">
+          <Border flex:FlexPanel.Grow="1" ... />
+          <Border flex:FlexPanel.Basis="25%" ... />
+          <Border flex:FlexPanel.Order="-1" ... />
+        </flex:FlexPanel>
+      Per-child attached properties: Grow (float; share of free main-axis
+      space), Shrink (float, default 1; share of overflow reclaimed), Basis
+      ("Auto" | absolute like "150" | percentage like "25%" of the panel's
+      main axis), Order (int; ascending, insertion order breaks ties), and
+      AlignSelf. Child Margin participates exactly as CSS margins do, and the
+      panel has its own Padding property.
+      SHARP EDGE: a child with an explicit Width/Height cannot be stretched or
+      grown past it - the framework clamps the child inside its (grown) layout
+      slot, exactly as a Grid does. Leave the main-axis dimension unset on
+      children that should Grow, and the cross-axis dimension unset on
+      children that should stretch.
+      Sample: samples/CodeBrixPlatform/FlexPanelDemo (six heads; an
+      interactive playground - every panel property switchable live from
+      ComboBoxes, plus fixed Grow/Basis and navigation-bar examples).
+
   CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever     [optional]
       Immediate-mode 2D drawing surface backed by SkiaSharp, for custom drawing
       inside XAML.

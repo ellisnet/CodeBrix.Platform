@@ -674,6 +674,24 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 
+23. Microsoft — .NET MAUI FlexLayout engine  (dotnet/maui + xamarin/flex)
+    Project URLs: https://github.com/dotnet/maui
+                  https://github.com/xamarin/flex
+    Source:       dotnet/maui commit a4ede427ec2812ac85fb72eabc61e4bdaac3c071
+    Copyright:    Copyright (c) .NET Foundation and Contributors  (dotnet/maui)
+                  Copyright (c) 2017 - present Microsoft Corporation  (xamarin/flex)
+    License:      MIT License  (full text in Part D)
+
+    The flex layout engine of the FlexPanel AddIn
+    (src/AddIns/Platform.UI.FlexPanel/Internal/Flex.cs) is a port of
+    src/Core/src/Layouts/Flex.cs from dotnet/maui — itself Stephane Delcroix's
+    .NET port of Laurent Sansonetti's xamarin/flex C engine. The FlexPanel
+    control and its public enums re-express the MAUI FlexLayout / FlexEnums.cs
+    API surface on this framework's Panel model, and the unit tests under
+    src/AddIns/Platform.UI.FlexPanel.Tests/ are ported from the xamarin/flex C
+    test suite. Ships in the CodeBrix.Platform.FlexPanel.ApacheLicenseForever
+    package.
+
 ================================================================================
 
 END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

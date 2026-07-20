@@ -143,6 +143,14 @@ An optional extension package that exposes the framework's text engine as a plai
 
 ---
 
+**CodeBrix.Platform.FlexPanel**
+NuGet Package ID: `CodeBrix.Platform.FlexPanel.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing `FlexPanel` — a CSS flexbox-style layout panel for CodeBrix.Platform XAML. Children are arranged in optionally wrapping rows or columns using the familiar flexbox model: `Direction` selects the main axis (rows or columns, both reversible), `JustifyContent` distributes free space along it (including `SpaceBetween`, `SpaceAround`, and `SpaceEvenly`), `AlignItems` aligns children across it, `Wrap` allows multiple lines, and `AlignContent` distributes those lines. Per-child behavior is set with attached properties: `FlexPanel.Grow` and `FlexPanel.Shrink` control how a child absorbs free space or gives up overflow, `FlexPanel.Basis` sets a child's starting main-axis size (absolute, or a percentage such as `"25%"`), `FlexPanel.Order` rearranges children without reordering the XAML, and `FlexPanel.AlignSelf` overrides the panel's alignment for one child; child margins participate in the layout exactly as CSS margins do. The package is pure managed layout with no native dependencies, and works on every platform head. Use it for toolbar rows, tag and chip clouds, responsive card layouts, and any UI where flexbox thinking fits better than `Grid` rows and columns. The layout engine of this package was derived from the FlexLayout engine of the open source .NET MAUI library.
+
+---
+
 **CodeBrix.Platform.Runtime.Skia**
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
@@ -212,6 +220,14 @@ NuGet Package ID: `CodeBrix.Platform.MediaPlayer.LgplLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
 An optional add-on package that brings the XAML `MediaPlayerElement` (audio and video playback) to the Win32, WPF, X11, Wayland, and FrameBuffer heads with a single reference in the application's core library. LibVLC decodes media into memory and the frames are composited directly into the Skia scene — no native child windows, no airspace problems, and the native-Wayland head stays a pure Wayland client. The package is inert on the macOS head, which has built-in AVFoundation media support and needs neither this package nor libvlc. The native libvlc runtime is not shipped in the package: on Linux it is installed via the system package manager, and on Windows the `VideoLAN.LibVLC.Windows` package is added to the Windows head project(s). The code for this package was derived from the open source library Uno Platform version 6.5.x, with playback delivered through the `CodeBrix.Platform.MediaPlayerCore.LgplLicenseForever` package (see Section 5.3).
+
+---
+
+**CodeBrix.Platform.AudioPlayer**
+NuGet Package ID: `CodeBrix.Platform.AudioPlayer.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional add-on package providing audio playback (WAV and MP3) with a single reference in the application's core library and no native setup at all — unlike the WebView and MediaPlayer add-ons there is no per-OS engine and nothing to install, so the package is live on all six platform heads, macOS included. It provides two public types: `AudioPlayer`, a non-visual XAML-declarable element with `Play`/`Pause`/`Stop`/`Seek` control and bindable `Source`, `Volume`, `IsLooping`, `Duration`, and `Position` properties — the position is two-way bindable and debounced, so binding a `Slider` to it yields a working scrubber with clean seek-on-release behavior; and `SoundEffect`, a fire-and-forget one-liner for overlapping sound effects with in-memory caching. Both accept a filesystem path, an `ms-appx:///` asset URI, an `embedded://` embedded-resource URI, or a stream. The code for this package is original to CodeBrix, with playback delivered through the fully managed `CodeBrix.Audio.MitLicenseForever` package and its bundled native audio backend (see Section 5.3).
 
 ---
 

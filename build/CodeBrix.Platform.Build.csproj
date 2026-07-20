@@ -122,6 +122,13 @@
 		     selection rectangles, glyph outline paths, and drawing into an arbitrary SKCanvas, for
 		     consumers that need Pango-class text without a visual tree. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+
+		<!-- The FlexPanel AddIn (CodeBrix.Platform.FlexPanel.ApacheLicenseForever) ships with every
+		     family release: a CSS flexbox-style XAML layout panel (Direction / JustifyContent /
+		     AlignItems / AlignContent / Wrap plus the attached Grow, Shrink, Basis, Order and
+		     AlignSelf properties), driven by a managed port of the .NET MAUI FlexLayout engine.
+		     Pure layout - no native dependencies. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"
