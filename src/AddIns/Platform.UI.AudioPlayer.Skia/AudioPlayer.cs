@@ -341,18 +341,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 	/// </summary>
 	/// <remarks>
 	/// The audio metadata layer this control loads through reads its headers asynchronously and then
-	/// blocks on that read from its own synchronous entry point. Up to and including CodeBrix.Audio
-	/// 1.0.199.38 - the version pinned by this project - it does so without detaching the awaits from
-	/// the calling context. Called straight from the UI thread, the continuation is posted back to
-	/// the dispatcher that is already blocked inside that wait, and the two wait on each other -
-	/// the application hangs before it ever renders. It only bites when a read actually completes
-	/// asynchronously, which is why small files (whose reads are served from the stream buffer) load
-	/// fine and, for example, an MP3 carrying a large ID3 tag hangs. A thread-pool thread has no
-	/// synchronization context, so the continuation runs there and the load completes.
-	///
-	/// CodeBrix.Audio has since been fixed at the source (ConfigureAwait(false) throughout its
-	/// metadata layer), but this stays: it is what keeps the currently pinned package working, and
-	/// it keeps the control safe for consumers who end up on an older audio package.
+	/// blocks on that read from its own synchronous entry point.
 	///
 	/// Loading is cheap and does not depend on file size - the player streams the file in chunks
 	/// rather than reading it into memory, so even a very large WAV opens in a few milliseconds and
