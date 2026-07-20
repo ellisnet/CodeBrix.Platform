@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!--
+		DESIGN-TIME ONLY.
+
+		Everything in this file exists purely so that the Visual Studio XAML language
+		service (IntelliSense / squiggles) understands that a CodeBrix.Platform head
+		project speaks WinUI-flavoured XAML, and therefore resolves the default
+		xmlns "http://schemas.microsoft.com/winfx/2006/xaml/presentation" through the
+		XmlnsDefinition attributes carried by CodeBrix.Platform.UI.dll.
+
+		Without it, VS falls back to its WPF schema context, which hard-maps that URI to
+		PresentationFramework and never consults those attributes. Every element - Page,
+		Grid, TextBlock, ... - is then flagged, and VS offers the WPF-syntax fixup
+		xmlns:controls="clr-namespace:Microsoft.UI.Xaml.Controls;assembly=CodeBrix.Platform.UI"
+		(the "clr-namespace:...;assembly=..." form, rather than WinUI's "using:" form, is
+		the tell that VS picked the WPF dialect and not merely the wrong namespace map).
+
+		None of this participates in the build:
+		  * ProjectCapability and AvailableItemName are consumed by the VS project
+		    system only; command-line builds ignore them.
+		  * DefaultXamlRuntime is only read by the WPF markup compiler, which never
+		    runs here (see the UseWPF guard below).
+
+		This file used to live inside platform.winui.single-project.targets, which is
+		only imported when $(SingleProject) is set. Multi-head applications - the
+		standard CodeBrix.Platform application layout, with the XAML in a shared
+		project imported by each head - never set it, so they never got any of this.
+	-->
+
+	<PropertyGroup>
+		<!--
+			Hint VS's XAML parser that this project's XAML is the WinUI dialect.
+
+			Guarded on UseWPF/UseWindowsForms: a genuine WPF project that also hosts
+			CodeBrix.Platform XAML (via the XamlHost packages) marks its CodeBrix pages
+			with XamlRuntime="WinUI" by hand so that CleanupMarkupPass1 can split them
+			away from the real WPF pages. Defaulting the whole project to WinUI there
+			would pull the WPF pages out of MarkupCompilePass1 and break that build.
+		-->
+		<DefaultXamlRuntime Condition="'$(DefaultXamlRuntime)'=='' and '$(UseWPF)'!='true' and '$(UseWindowsForms)'!='true'">WinUI</DefaultXamlRuntime>
+	</PropertyGroup>
+
+	<!-- Item names the XAML editor expects to be legal in this project type -->
+	<ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
+		<AvailableItemName Include="PRIResource" />
+		<AvailableItemName Include="AppxManifest" />
+		<AvailableItemName Include="ApplicationDefinition" />
+		<AvailableItemName Include="Page" />
+		<AvailableItemName Include="DesignData" />
+		<AvailableItemName Include="DesignDataWithDesignTimeCreatableTypes" />
+	</ItemGroup>
+
+	<!-- The capabilities the WinUI XAML editor keys off of -->
+	<ItemGroup>
+		<ProjectCapability Include="WindowsXaml" />
+		<ProjectCapability Include="WindowsXamlPage" />
+		<ProjectCapability Include="WindowsXamlCodeBehind" />
+		<ProjectCapability Include="WindowsXamlResourceDictionary" />
+		<ProjectCapability Include="WindowsXamlUserControl" />
+		<ProjectCapability Include="WindowsUniversalMultiViews" />
+	</ItemGroup>
+
+</Project>

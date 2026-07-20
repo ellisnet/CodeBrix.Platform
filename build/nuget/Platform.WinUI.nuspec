@@ -131,6 +131,7 @@
 		<file src="platform.winui.common.targets" target="buildTransitive" />
 		<file src="platform.winui.common.props" target="buildTransitive" />
 		<file src="platform.winui.single-project.targets" target="buildTransitive" />
+		<file src="platform.winui.intellisense.targets" target="buildTransitive" />
 		<file src="platform.winui.runtime-replace.targets" target="buildTransitive" />
 		<file src="platform.winui.winappsdk.targets" target="buildTransitive" />
 		<file src="..\..\src\SourceGenerators\Platform.UI.Tasks\Content\**" target="buildTransitive" />

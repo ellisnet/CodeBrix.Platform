@@ -18,6 +18,13 @@
 	<Import Project="$(MSBuildThisFileDirectory)platform.winui.cross-runtime.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
 
 	<!--
+		Design-time-only XAML IntelliSense support for the VS XAML language service.
+		Imported unconditionally: it must apply to multi-head applications too, not just
+		single-project ones (a WinAppSDK project already has all of it from its own SDK).
+	-->
+	<Import Project="$(MSBuildThisFileDirectory)platform.winui.intellisense.targets" Condition="'$(_CodeBrixIsWinAppSDKDefined)'!='true'" />
+
+	<!--
 		If SingleProject is set, we're in a 5.1 or earlier template.
 		Starting 5.2, `SingleProject` is named `CodeBrixSingleProject`
 	-->

@@ -85,9 +85,8 @@
 		<PackageManifest Condition=" Exists('$(WindowsProjectFolder)Package.appxmanifest') ">$(WindowsProjectFolder)Package.appxmanifest</PackageManifest>
 		<_SingleProjectWindowsExcludes>$(WindowsProjectFolder)/**/.*/**</_SingleProjectWindowsExcludes>
 
-		<!-- Hint VS's XAML parser -->
-		<!-- https://github.com/unoplatform/uno/issues/15517 -->
-    	<DefaultXamlRuntime Condition="'$(DefaultXamlRuntime)'=='' and '$(TargetPlatformIdentifier)' != 'windows'">WinUI</DefaultXamlRuntime>
+		<!-- DefaultXamlRuntime now lives in platform.winui.intellisense.targets, which is
+		     imported for every project - not just single-project ones. -->
 	</PropertyGroup>
 
 	<!-- Removals -->
@@ -127,24 +126,8 @@
 	</ItemGroup>
 
 
-	<!-- Additional capabilities to enable XAML Intellisense for non UWP/WinUI native projects -->
-	<ItemGroup Condition="'$(BuildingInsideVisualStudio)'=='true'">
-		<AvailableItemName Include="PRIResource" />
-		<AvailableItemName Include="AppxManifest" />
-		<AvailableItemName Include="ApplicationDefinition" />
-		<AvailableItemName Include="Page" />
-		<AvailableItemName Include="DesignData" />
-		<AvailableItemName Include="DesignDataWithDesignTimeCreatableTypes" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectCapability Include="WindowsXaml"/>
-		<ProjectCapability Include="WindowsXamlPage"/>
-		<ProjectCapability Include="WindowsXamlCodeBehind"/>
-		<ProjectCapability Include="WindowsXamlResourceDictionary"/>
-		<ProjectCapability Include="WindowsXamlUserControl"/>
-		<ProjectCapability Include="WindowsUniversalMultiViews"/>
-	</ItemGroup>
-
+	<!-- The additional capabilities that enable XAML IntelliSense for non UWP/WinUI native
+	     projects moved to platform.winui.intellisense.targets, which is imported for every
+	     project - not just single-project ones. -->
 
 </Project>
