@@ -138,7 +138,16 @@ public sealed class OffscreenGLContext : IDisposable
 	/// The function's address, or <see cref="IntPtr.Zero"/> when the running GL implementation does
 	/// not expose it.
 	/// </returns>
-	public IntPtr GetProcAddress(string name) => _wrapper.GetProcAddress(name);
+	/// <remarks>
+	/// Deliberately non-throwing. Skia's <c>gr_glinterface_assemble_interface</c> probes for entry points
+	/// that a given implementation legitimately does not have (on WGL, for instance, it still asks for the
+	/// EGL functions such as <c>eglQueryString</c>) and requires a zero return for those. The per-head
+	/// <see cref="INativeOpenGLWrapper.GetProcAddress"/> throws instead, and that exception would escape
+	/// through the native callback and abort interface assembly, so the probe is routed through
+	/// <see cref="INativeOpenGLWrapper.TryGetProcAddress"/> here.
+	/// </remarks>
+	public IntPtr GetProcAddress(string name)
+		=> _wrapper.TryGetProcAddress(name, out var address) ? address : IntPtr.Zero;
 
 	/// <summary>
 	/// Builds a SkiaSharp <see cref="GRContext"/> on this off-screen OpenGL context, so GPU-accelerated

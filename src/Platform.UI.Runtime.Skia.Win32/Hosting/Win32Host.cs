@@ -18,6 +18,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
+using CodeBrix.Platform.ApplicationModel.Core;
 using CodeBrix.Platform.ApplicationModel.DataTransfer;
 using CodeBrix.Platform.Extensions.Storage.Pickers;
 using CodeBrix.Platform.Extensions.System;
@@ -57,6 +58,8 @@ public class Win32Host : SkiaHost, ISkiaApplicationHost
 		ApiExtensibility.Register<IXamlRootHost>(typeof(ICodeBrixCorePointerInputSource),
 			host => host as Win32WindowWrapper ?? throw new ArgumentException($"{nameof(host)} must be a {nameof(Win32WindowWrapper)} instance"));
 		ApiExtensibility.Register<AppWindow>(typeof(INativeInputNonClientPointerSource), appWindow => (Win32WindowWrapper)appWindow.NativeAppWindow);
+
+		ApiExtensibility.Register(typeof(ICoreApplicationExtension), _ => Win32CoreApplicationExtension.Instance);
 
 		ApiExtensibility.Register<ApplicationView>(typeof(IApplicationViewExtension), o => new Win32ApplicationViewExtension(o));
 		ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => Win32SystemThemeHelperExtension.Instance);

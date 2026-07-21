@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -55,6 +56,7 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 	private readonly IRenderer _renderer;
 
 	private bool _rendererDisposed;
+	private bool _destroyed;
 	private IDisposable? _backgroundDisposable;
 	private SKColor _background;
 	private bool _forcePaintOnNextEraseBkgndOrNcPaint = true;
@@ -136,6 +138,25 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 	}
 
 	public static IEnumerable<HWND> GetHwnds() => _hwndToWrapper.Keys;
+
+	/// <summary>
+	/// Forcibly destroys every window that is still alive. This is what an
+	/// <see cref="Microsoft.UI.Xaml.Application.Exit"/> call ends up doing on Win32; once the last window is gone,
+	/// <see cref="Win32Host"/>'s run loop drains its remaining messages and returns.
+	/// </summary>
+	/// <remarks>Must be called on the native dispatcher thread, since <c>DestroyWindow</c> is thread-affine.</remarks>
+	internal static void CloseAllWindows()
+	{
+		// _hwndToWrapper is never pruned (late messages like WM_NCDESTROY still need to resolve their wrapper),
+		// so entries for already-destroyed windows have to be skipped here.
+		foreach (var wrapper in _hwndToWrapper.Values.ToList())
+		{
+			if (!wrapper._destroyed)
+			{
+				wrapper.Close();
+			}
+		}
+	}
 
 	private unsafe void OnSystemThemeChanged(object? _, EventArgs __)
 	{
@@ -404,6 +425,7 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 	private void OnWmDestroy()
 	{
 		this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_DESTROY)} message.");
+		_destroyed = true;
 		Win32SystemThemeHelperExtension.Instance.SystemThemeChanged -= OnSystemThemeChanged;
 		Win32Host.UnregisterWindow(_hwnd);
 		_renderer.Dispose();
