@@ -43,10 +43,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" Version="10.0.1">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
 	</ItemGroup>
 
@@ -63,7 +59,7 @@
 		     ICU that the engine can dlopen, so it is shipped by the Unicode package: icuuc77.dll as
 		     a runtime asset, and icudt.dat embedded into this assembly (see $(IsCodeBrixHead)). -->
 		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
-		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfbuzzSharpVersion)" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfBuzzSharpVersion)" />
 		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
 	</ItemGroup>
 
