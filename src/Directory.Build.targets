@@ -75,7 +75,7 @@
 		<MSTestVersion>4.3.2</MSTestVersion>
 		<MicrosoftTestingPlatformVersion>2.2.3</MicrosoftTestingPlatformVersion>
 		<SkiaSharpVersion>4.150.1</SkiaSharpVersion>
-		<HarfbuzzSharpVersion>14.2.1.1</HarfbuzzSharpVersion>
+		<HarfBuzzSharpVersion>14.2.1.1</HarfBuzzSharpVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -99,9 +99,9 @@
 		<PackageReference Update="SkiaSharp.NativeAssets.macos" Version="$(SkiaSharpVersion)" />
     <PackageReference Update="SkiaSharp.HarfBuzz" Version="$(SkiaSharpVersion)" />
 
-    <PackageReference Update="HarfBuzzSharp" Version="$(HarfbuzzSharpVersion)" />
-		<PackageReference Update="HarfBuzzSharp.NativeAssets.macOS" Version="$(HarfbuzzSharpVersion)" />
-		<PackageReference Update="HarfBuzzSharp.NativeAssets.Linux" Version="$(HarfbuzzSharpVersion)" />
+    <PackageReference Update="HarfBuzzSharp" Version="$(HarfBuzzSharpVersion)" />
+		<PackageReference Update="HarfBuzzSharp.NativeAssets.macOS" Version="$(HarfBuzzSharpVersion)" />
+		<PackageReference Update="HarfBuzzSharp.NativeAssets.Linux" Version="$(HarfBuzzSharpVersion)" />
 
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetPrevious)' " Update="Microsoft.Win32.SystemEvents" Version="9.0.0" />
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.0-rc.2.25502.107" />
