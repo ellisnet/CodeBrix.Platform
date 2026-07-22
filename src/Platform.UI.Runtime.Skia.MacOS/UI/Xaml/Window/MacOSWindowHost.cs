@@ -204,6 +204,24 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 
 	public UIElement? RootElement => _winUIWindow.RootElement;
 
+	/// <summary>
+	/// Returns the <c>MTLDevice</c> handle backing this window's Metal render surface, or
+	/// <see langword="false"/> when the head is not in Metal mode. Used by
+	/// <see cref="MacOSNativeSkiaGpuContext"/> to build a <b>separate</b> engine <c>GRContext</c> on
+	/// the <b>same</b> GPU the compositor uses.
+	/// </summary>
+	internal bool TryGetMetalDevice(out nint device)
+	{
+		device = 0;
+		if (MacSkiaHost.Current.RenderSurfaceType != RenderSurfaceType.Metal)
+		{
+			return false;
+		}
+
+		NativeCodeBrix.codebrix_window_get_metal_handles(_nativeWindow.Handle, out device, out _);
+		return device != 0;
+	}
+
 	void IXamlRootHost.InvalidateRender() => NativeCodeBrix.codebrix_window_invalidate(_nativeWindow.Handle);
 
 	public static void Register(nint handle, XamlRoot xamlRoot, MacOSWindowHost host)
