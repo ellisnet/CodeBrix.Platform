@@ -67,7 +67,7 @@ internal class Win32NativeOpenGLWrapper : INativeOpenGLWrapper
 		if (pixelFormat == 0)
 		{
 			var choosePixelFormatError = Win32Helper.GetErrorMessage();
-			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 0;
+			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 1;
 			if (!success) { this.LogError()?.Error($"{nameof(PInvoke.ReleaseDC)} failed: {Win32Helper.GetErrorMessage()}"); }
 			throw new InvalidOperationException($"{nameof(PInvoke.ChoosePixelFormat)} failed: {choosePixelFormatError}. Falling back to software rendering.");
 		}
@@ -82,7 +82,7 @@ internal class Win32NativeOpenGLWrapper : INativeOpenGLWrapper
 		if (PInvoke.SetPixelFormat(_hdc, pixelFormat, in pfd) == 0)
 		{
 			var setPixelFormatError = Win32Helper.GetErrorMessage();
-			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 0;
+			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 1;
 			if (!success) { this.LogError()?.Error($"{nameof(PInvoke.ReleaseDC)} failed: {Win32Helper.GetErrorMessage()}"); }
 			throw new InvalidOperationException($"{nameof(PInvoke.SetPixelFormat)} failed: {setPixelFormatError}. Falling back to software rendering.");
 		}
@@ -91,7 +91,7 @@ internal class Win32NativeOpenGLWrapper : INativeOpenGLWrapper
 		if (_glContext == IntPtr.Zero)
 		{
 			var createContextError = Win32Helper.GetErrorMessage();
-			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 0;
+			var success = PInvoke.ReleaseDC(_hwnd, _hdc) == 1;
 			if (!success) { this.LogError()?.Error($"{nameof(PInvoke.ReleaseDC)} failed: {Win32Helper.GetErrorMessage()}"); }
 			throw new InvalidOperationException($"{nameof(PInvoke.wglCreateContext)} failed: {createContextError}. Falling back to software rendering.");
 		}
@@ -121,9 +121,9 @@ internal class Win32NativeOpenGLWrapper : INativeOpenGLWrapper
 
 	public void Dispose()
 	{
-		var success = PInvoke.wglDeleteContext(_glContext) == 0;
-		if (!success) { this.LogError()?.Error($"{nameof(PInvoke.wglDeleteContext)} failed."); }
-		var success2 = PInvoke.ReleaseDC(_hwnd, _hdc) == 0;
+		var success = PInvoke.wglDeleteContext(_glContext);
+		if (!success) { this.LogError()?.Error($"{nameof(PInvoke.wglDeleteContext)} failed: {Win32Helper.GetErrorMessage()}"); }
+		var success2 = PInvoke.ReleaseDC(_hwnd, _hdc) == 1;
 		if (!success2) { this.LogError()?.Error($"{nameof(PInvoke.ReleaseDC)} failed: {Win32Helper.GetErrorMessage()}"); }
 	}
 
