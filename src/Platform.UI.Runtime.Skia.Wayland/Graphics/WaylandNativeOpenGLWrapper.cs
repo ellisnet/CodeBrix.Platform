@@ -9,12 +9,14 @@ using CodeBrix.Platform.UI.Hosting;
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 
 /// <summary>
-/// EGL-pbuffer <see cref="INativeOpenGLWrapper"/> backing GLCanvasElement on the Wayland head.
+/// Offscreen EGL <see cref="INativeOpenGLWrapper"/> backing GLCanvasElement on the Wayland head.
 /// The context is created with eglGetPlatformDisplay(EGL_PLATFORM_WAYLAND_KHR, wl_display*)
-/// and renders into an offscreen pbuffer that is never attached to a wl_surface, so it works
-/// no matter which presentation backend the head is using (the default Vulkan renderer, the
-/// opt-in EGL renderer, or the wl_shm software renderer) — GLCanvasElement composites via CPU
-/// readback, never through the window's swapchain.
+/// and renders into an offscreen pbuffer — or, on EGL implementations with no pbuffer-capable
+/// configs (e.g. Mesa's Wayland platform on Raspberry Pi V3D), a surfaceless context
+/// (EGL_KHR_surfaceless_context) made current with EGL_NO_SURFACE. Nothing is ever attached
+/// to a wl_surface, so it works no matter which presentation backend the head is using (the
+/// default Vulkan renderer, the opt-in EGL renderer, or the wl_shm software renderer) —
+/// GLCanvasElement composites via CPU readback, never through the window's swapchain.
 /// </summary>
 internal sealed class WaylandNativeOpenGLWrapper : INativeOpenGLWrapper
 {

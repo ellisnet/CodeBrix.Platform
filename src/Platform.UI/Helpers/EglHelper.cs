@@ -26,6 +26,7 @@ internal class EglHelper
 	public const int EGL_RENDERABLE_TYPE = 0x3040;
 	public const int EGL_OPENGL_ES2_BIT = 0x04;
 	public const int EGL_OPENGL_ES3_BIT = 0x40;
+	public const int EGL_EXTENSIONS = 0x3055;
 
 	static EglHelper() => NativeLibrary.SetDllImportResolver(typeof(EglHelper).Assembly, Resolver);
 	private static IntPtr Resolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
@@ -98,7 +99,21 @@ internal class EglHelper
 			surface = EglCreatePbufferSurface(eglDisplay, configs[0], [EGL_NONE]);
 			if (surface == IntPtr.Zero)
 			{
-				throw new InvalidOperationException($"{nameof(EglCreatePbufferSurface)} failed: {Enum.GetName(EglGetError())}");
+				var pbufferError = EglGetError();
+				// Some EGL platforms expose no pbuffer-capable configs at all (e.g. Mesa's Wayland
+				// platform on the Raspberry Pi V3D driver, where eglCreatePbufferSurface fails with
+				// BAD_MATCH). An offscreen context doesn't actually need a surface when the
+				// surfaceless-context extension is available: callers render into FBOs and make the
+				// context current with EGL_NO_SURFACE, so fall back to returning no surface.
+				var extensions = Marshal.PtrToStringUTF8(EglQueryString(eglDisplay, EGL_EXTENSIONS));
+				if (extensions is not null && extensions.Contains("EGL_KHR_surfaceless_context", StringComparison.Ordinal))
+				{
+					surface = IntPtr.Zero; // EGL_NO_SURFACE
+				}
+				else
+				{
+					throw new InvalidOperationException($"{nameof(EglCreatePbufferSurface)} failed: {Enum.GetName(pbufferError)} (and {nameof(EglQueryString)} reports no EGL_KHR_surfaceless_context support to fall back on)");
+				}
 			}
 		}
 		else
@@ -178,6 +193,11 @@ internal class EglHelper
 
 	[DllImport(libEGL, EntryPoint = "eglGetConfigAttrib")]
 	public static extern bool EglGetConfigAttrib(IntPtr display, IntPtr config, int attribute, out int value);
+
+	// Returns a pointer to a static, NUL-terminated string owned by the EGL implementation;
+	// marshal with Marshal.PtrToStringUTF8 (do NOT declare a string return, which would free it).
+	[DllImport(libEGL, EntryPoint = "eglQueryString")]
+	public static extern IntPtr EglQueryString(IntPtr dpy, int name);
 
 	[DllImport(libEGL, EntryPoint = "eglTerminate")]
 	public static extern bool EglTerminate(IntPtr display);
