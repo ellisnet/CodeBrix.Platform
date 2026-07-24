@@ -14,6 +14,7 @@ using Windows.System;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
 using CodeBrix.Platform.UI.WebView.Skia.Linux.Input;
+using CodeBrix.Platform.UI.WebView.Skia.Linux.Interop;
 using CodeBrix.Platform.UI.Xaml.Controls;
 using JsonSerializer = System.Text.Json.JsonSerializer;
 
@@ -157,11 +158,27 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 
 	private void WireInput()
 	{
+		// Touch pointers (the FrameBuffer head's touchscreen, and the emulated head's
+		// mouse-as-finger) are handed to WPE as TOUCH events, so the engine's own touch
+		// behavior applies: a swipe pans the page (finger drags the content), a tap
+		// clicks, a long-press long-presses. Everything else stays a mouse.
 		_element.PointerMoved += (_, e) =>
 		{
 			var point = e.GetCurrentPoint(_element);
 			var (x, y) = ToPhysical(point.Position);
-			_wpe.DispatchPointerMotion(x, y, GetModifiers(e, point));
+			if (IsTouch(e))
+			{
+				// A finger that is not touching the screen does not exist, so only
+				// in-contact motion is forwarded — there is no touch hover.
+				if (point.IsInContact)
+				{
+					_wpe.DispatchTouch(LibWpe.TouchEventTypeMotion, (int)e.Pointer.PointerId, x, y, GetModifiers(e, point));
+				}
+			}
+			else
+			{
+				_wpe.DispatchPointerMotion(x, y, GetModifiers(e, point));
+			}
 			e.Handled = true;
 		};
 
@@ -171,9 +188,13 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 			_focusTarget?.Focus(FocusState.Pointer);
 
 			var point = e.GetCurrentPoint(_element);
-			if (TryGetButtonTransition(point.Properties.PointerUpdateKind, out var button, out var pressed))
+			var (x, y) = ToPhysical(point.Position);
+			if (IsTouch(e))
 			{
-				var (x, y) = ToPhysical(point.Position);
+				_wpe.DispatchTouch(LibWpe.TouchEventTypeDown, (int)e.Pointer.PointerId, x, y, GetModifiers(e, point));
+			}
+			else if (TryGetButtonTransition(point.Properties.PointerUpdateKind, out var button, out var pressed))
+			{
 				_wpe.DispatchPointerButton(x, y, button, pressed, GetModifiers(e, point));
 			}
 			e.Handled = true;
@@ -182,9 +203,13 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		_element.PointerReleased += (_, e) =>
 		{
 			var point = e.GetCurrentPoint(_element);
-			if (TryGetButtonTransition(point.Properties.PointerUpdateKind, out var button, out var pressed))
+			var (x, y) = ToPhysical(point.Position);
+			if (IsTouch(e))
 			{
-				var (x, y) = ToPhysical(point.Position);
+				_wpe.DispatchTouch(LibWpe.TouchEventTypeUp, (int)e.Pointer.PointerId, x, y, GetModifiers(e, point));
+			}
+			else if (TryGetButtonTransition(point.Properties.PointerUpdateKind, out var button, out var pressed))
+			{
 				_wpe.DispatchPointerButton(x, y, button, pressed, GetModifiers(e, point));
 			}
 			_element.ReleasePointerCapture(e.Pointer);
@@ -233,6 +258,9 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 
 	private (int X, int Y) ToPhysical(Windows.Foundation.Point position)
 		=> ((int)Math.Round(position.X * _scale), (int)Math.Round(position.Y * _scale));
+
+	private static bool IsTouch(PointerRoutedEventArgs e)
+		=> e.Pointer.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch;
 
 	private static bool TryGetButtonTransition(PointerUpdateKind kind, out uint button, out bool pressed)
 	{

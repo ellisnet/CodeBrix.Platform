@@ -566,6 +566,39 @@ internal sealed unsafe class WpeWebView
 		LibWpe.wpe_view_backend_dispatch_pointer_event(_backend, ref e);
 	});
 
+	/// <summary>
+	/// Dispatches one single-finger touch transition (see LibWpe.TouchEventType*).
+	/// WPE WebKit owns everything downstream of this — pan scrolling, kinetic
+	/// fling, tap-as-click, long-press — which is exactly why touch pointers are
+	/// handed to the engine as touch instead of being disguised as a mouse.
+	/// </summary>
+	public void DispatchTouch(int type, int id, int x, int y, uint modifiers) => WpeThread.Post(() =>
+	{
+		var raw = new LibWpe.WpeInputTouchEventRaw
+		{
+			Type = type,
+			Time = NowMs(),
+			Id = id,
+			X = x,
+			Y = y,
+		};
+		unsafe
+		{
+			// The touchpoints array is read synchronously inside the dispatch,
+			// so the stack address of this single-entry "array" stays valid.
+			var e = new LibWpe.WpeInputTouchEvent
+			{
+				TouchPoints = (IntPtr)(&raw),
+				TouchPointsLength = 1,
+				Type = type,
+				Id = id,
+				Time = raw.Time,
+				Modifiers = modifiers,
+			};
+			LibWpe.wpe_view_backend_dispatch_touch_event(_backend, ref e);
+		}
+	});
+
 	public void DispatchWheel(int x, int y, double deltaX, double deltaY, uint modifiers) => WpeThread.Post(() =>
 	{
 		var e = new LibWpe.WpeInputAxis2DEvent

@@ -36,6 +36,11 @@ internal static class LibWpe
 	public const int AxisEventTypeMotionSmooth = 2;
 	public const int AxisEventTypeMask2D = 1 << 16;
 
+	// enum wpe_input_touch_event_type
+	public const int TouchEventTypeDown = 1;
+	public const int TouchEventTypeMotion = 2;
+	public const int TouchEventTypeUp = 3;
+
 	// enum wpe_view_activity_state
 	public const uint ActivityStateVisible = 1u << 0;
 	public const uint ActivityStateFocused = 1u << 1;
@@ -104,8 +109,37 @@ internal static class LibWpe
 	[DllImport(NativeLibraries.LibWpe, CallingConvention = CallingConvention.Cdecl)]
 	public static extern void wpe_view_backend_dispatch_pointer_event(IntPtr backend, ref WpeInputPointerEvent @event);
 
+	// struct wpe_input_touch_event_raw: one touchpoint's current state. 20 bytes,
+	// all 4-byte fields (enum, uint32_t, int, int32_t, int32_t).
+	[StructLayout(LayoutKind.Sequential)]
+	public struct WpeInputTouchEventRaw
+	{
+		public int Type;
+		public uint Time;
+		public int Id;
+		public int X; // physical (backend) pixels - pre-scaled by device scale factor
+		public int Y;
+	}
+
+	// struct wpe_input_touch_event: the touchpoints pointer carries the CURRENT state of
+	// every active touchpoint (one entry for the single-finger model); type/id/time repeat
+	// the triggering point's values. 32 bytes on SysV: ptr, uint64_t length, then 4x4.
+	[StructLayout(LayoutKind.Sequential)]
+	public struct WpeInputTouchEvent
+	{
+		public IntPtr TouchPoints;
+		public ulong TouchPointsLength;
+		public int Type;
+		public int Id;
+		public uint Time;
+		public uint Modifiers;
+	}
+
 	[DllImport(NativeLibraries.LibWpe, CallingConvention = CallingConvention.Cdecl)]
 	public static extern void wpe_view_backend_dispatch_axis_event(IntPtr backend, ref WpeInputAxis2DEvent @event);
+
+	[DllImport(NativeLibraries.LibWpe, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void wpe_view_backend_dispatch_touch_event(IntPtr backend, ref WpeInputTouchEvent @event);
 
 	[DllImport(NativeLibraries.LibWpe, CallingConvention = CallingConvention.Cdecl)]
 	public static extern void wpe_view_backend_add_activity_state(IntPtr backend, uint state);
