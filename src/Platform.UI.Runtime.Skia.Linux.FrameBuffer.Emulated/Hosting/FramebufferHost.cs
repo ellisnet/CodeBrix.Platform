@@ -115,7 +115,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			ApiExtensibility.Register(typeof(INativeWindowFactoryExtension), o => new NativeWindowFactoryExtension(this));
 			ApiExtensibility.Register(typeof(CodeBrix.Platform.ApplicationModel.Core.ICoreApplicationExtension), o => _coreApplicationExtension!);
 			ApiExtensibility.Register<IXamlRootHost>(typeof(Windows.UI.Core.ICodeBrixCorePointerInputSource), o => { FrameBufferPointerInputSource.Instance.SetHost(o); return FrameBufferPointerInputSource.Instance; });
-			ApiExtensibility.Register<IXamlRootHost>(typeof(Windows.UI.Core.ICodeBrixKeyboardInputSource), o => keyboardSource);
+			ApiExtensibility.Register<IXamlRootHost>(typeof(Windows.UI.Core.ICodeBrixKeyboardInputSource), o => { keyboardSource.SetHost(o); return keyboardSource; });
 			ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IApplicationViewExtension), o => new ApplicationViewExtension(o));
 			ApiExtensibility.Register(typeof(Windows.Graphics.Display.IDisplayInformationExtension), o => new DisplayInformationExtension(o, DisplayScale));
 
@@ -140,7 +140,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
 
 			_renderer = new EmulatedRenderer(this, connection);
-			connection.StartInputLoop(FrameBufferPointerInputSource.Instance.ProcessEmulatedTouch);
+			connection.StartInputLoop(
+				FrameBufferPointerInputSource.Instance.ProcessEmulatedTouch,
+				keyboardSource.ProcessEmulatedKey);
 
 			WUX.Application.Start(CreateApp);
 		}

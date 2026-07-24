@@ -19,9 +19,10 @@ internal partial class FrameBufferPointerInputSource
 	/// release onto the same pointer shapes the real FrameBuffer head produces
 	/// for libinput touch events; a finger that is not touching the screen
 	/// produces nothing at all, so there is no hover and no move outside a
-	/// press/release pair.
+	/// press/release pair. The pointer id is honored as sent (the V1 IDE only
+	/// ever sends 0), so a future multi-finger sender needs no head change.
 	/// </summary>
-	public void ProcessEmulatedTouch(uint messageType, int deviceX, int deviceY)
+	public void ProcessEmulatedTouch(uint messageType, int pointerId, int deviceX, int deviceY)
 	{
 		// Device pixels -> logical (view) coordinates, the space pointer
 		// events are raised in. Bounds is the raw size divided by the
@@ -70,7 +71,7 @@ internal partial class FrameBufferPointerInputSource
 			frameId: (uint) timestampInMicroseconds,
 			timestamp: timestampInMicroseconds,
 			device: PointerDevice.For(PointerDeviceType.Touch),
-			pointerId: 0,
+			pointerId: (uint) pointerId,
 			rawPosition: position,
 			position: position,
 			isInContact: properties.HasPressedButton,

@@ -102,6 +102,14 @@ internal sealed class EmulatorConnection
 				error = $"Resolution lockstep violated: the environment says {width}x{height} but the emulator's shared memory says {headerWidth}x{headerHeight}.";
 				return false;
 			}
+			var headerStride = accessor.ReadUInt32(FrameBufferEmulatorProtocol.StrideOffset);
+			if (headerStride != (uint) (width * 4))
+			{
+				// v1 renders rows tightly packed; refusing a padded stride here
+				// beats silently shearing every frame.
+				error = $"The emulator's shared memory declares a stride of {headerStride} bytes; this head renders tightly packed rows ({width * 4}).";
+				return false;
+			}
 			var slot0Offset = (int) accessor.ReadUInt32(FrameBufferEmulatorProtocol.Slot0Offset);
 			var slot1Offset = (int) accessor.ReadUInt32(FrameBufferEmulatorProtocol.Slot1Offset);
 
@@ -119,7 +127,9 @@ internal sealed class EmulatorConnection
 			connection = new EmulatorConnection(width, height, sharedMemory, accessor,
 				basePointer, slot0Offset, slot1Offset, socket);
 			connection.SendMessage(FrameBufferEmulatorProtocol.HelloMessage,
-				FrameBufferEmulatorProtocol.Version, (uint) Environment.ProcessId, 0);
+				FrameBufferEmulatorProtocol.Version, (uint) Environment.ProcessId,
+				FrameBufferEmulatorProtocol.CapabilityKeyboard
+					| FrameBufferEmulatorProtocol.CapabilityTouchPointIds);
 			error = null;
 			return true;
 		}
@@ -156,11 +166,14 @@ internal sealed class EmulatorConnection
 
 	/// <summary>
 	/// Starts the input thread: blocks on the socket, dispatches touch
-	/// messages to <paramref name="onTouch"/> (message type, device x, device
-	/// y — on the input thread; the callee marshals), and powers the device
-	/// off on end-of-file.
+	/// messages to <paramref name="onTouch"/> (message type, pointer id,
+	/// device x, device y) and key messages to <paramref name="onKey"/>
+	/// (pressed, VirtualKey, hardware keycode, Unicode codepoint or 0) — both
+	/// on the input thread; the callee marshals — and powers the device off
+	/// on end-of-file.
 	/// </summary>
-	public void StartInputLoop(Action<uint, int, int> onTouch)
+	public void StartInputLoop(Action<uint, int, int, int> onTouch,
+		Action<bool, uint, uint, uint> onKey)
 	{
 		new Thread(() =>
 		{
@@ -171,12 +184,17 @@ internal sealed class EmulatorConnection
 				{
 					PowerOff();
 				}
-				var (type, a, b, _) = FrameBufferEmulatorProtocol.ReadMessage(buffer);
+				var (type, a, b, c) = FrameBufferEmulatorProtocol.ReadMessage(buffer);
 				if (type is FrameBufferEmulatorProtocol.TouchPressMessage
 					or FrameBufferEmulatorProtocol.TouchMoveMessage
 					or FrameBufferEmulatorProtocol.TouchReleaseMessage)
 				{
-					onTouch(type, (int) a, (int) b);
+					onTouch(type, (int) c, (int) a, (int) b);
+				}
+				else if (type is FrameBufferEmulatorProtocol.KeyDownMessage
+					or FrameBufferEmulatorProtocol.KeyUpMessage)
+				{
+					onKey(type == FrameBufferEmulatorProtocol.KeyDownMessage, a, b, c);
 				}
 				// Unknown message types are ignored, for forward compatibility.
 			}
