@@ -43,9 +43,6 @@
 		<PackageReference Include="CodeBrix.Platform.LinuxDBus.MitLicenseForever" Version="1.0.165.1241" />
 	</ItemGroup>
 
-	<!-- NO CodeBrix.Platform.MediaPlayerCore (LGPL) here: the core Wayland head stays
-	     permissive top to bottom. Media playback, if ever wanted, becomes a separate
-	     LGPL-suffixed add-on package — never folded into this head. -->
 	<ItemGroup>
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
