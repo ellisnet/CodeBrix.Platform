@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Match the namespace used by the app code -->
+    <RootNamespace>EmulateFrameBufferDemo</RootNamespace>
+
+    <!-- The GL model viewer passes pointers to Silk-style GL calls. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- CodeBrix.Platform needs these defines for its internal conditional compilation.
+         The NuGet supplied them via buildTransitive targets; this sample consumes the
+         platform from source instead, so they are set explicitly. -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;RESOLVE_SERVICES;SIMPLE_ENUM;SIMPLE_MESSAGING</DefineConstants>
+  </PropertyGroup>
+
+  <!-- The bundled CC0 model, copied into every head's output. -->
+  <ItemGroup>
+    <Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.10" />
+
+    <!-- Bundled Open Sans font -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
+
+    <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. It was a
+         declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package,
+         so replacing that package with project references dropped it; re-added here. -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.181.669" />
+
+    <!-- The drawing pane: DrawingCanvas plus the drawing model behind it. A different repo,
+         so this one stays a package reference. -->
+    <PackageReference Include="CodeBrix.Imaging.Drawing.ApacheLicenseForever" Version="1.0.196.349" />
+
+    <!-- glTF loading for the 3D pane's bundled model. -->
+    <PackageReference Include="SharpGLTF.Runtime" Version="1.0.6" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform core, formerly the CodeBrix.Platform.ApacheLicenseForever NuGet,
+    referenced from source so the sample builds and runs against the working tree. Only the
+    three top-level UI projects are listed; their .Skia/.Reference dependencies (Foundation,
+    UWP, Composition, Xaml, FluentTheme v1/v2) flow in transitively.
+    NOTE: the XAML source-generator + build-task wiring does NOT flow across a
+    ProjectReference; it is added to the XAML-compiling head projects, not here.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+
+    <!-- Logging assemblies the aggregate package bundled as loose DLLs; they are in no
+         transitive ProjectReference path. Used by App.xaml.cs InitializeLogging. -->
+    <ProjectReference Include="..\..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+  </ItemGroup>
+
+  <!--
+    Add-ins, referenced ONCE here so every head inherits them transitively.
+    * WebView (WPE WebKit, offscreen): its ApiExtension registration is OS-gated to Linux and
+      discovered by the XAML source generator through the heads' transitive references.
+      Requires the system WPE WebKit engine at run time:
+      sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
+    * Graphics3DGL: the GLCanvasElement the 3D pane draws into.
+    * SkiaSharp.Views: SKXamlCanvas, which CodeBrix.Imaging.Drawing's DrawingCanvas derives from.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\src\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\AddIns\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.csproj" />
+    <ProjectReference Include="..\..\..\..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+  </ItemGroup>
+</Project>
