@@ -26,6 +26,7 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Foldable")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Tizen")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.Skia")]

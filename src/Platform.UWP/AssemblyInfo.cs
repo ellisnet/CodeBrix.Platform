@@ -42,6 +42,7 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Win32")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Tizen")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.WebAssembly.Browser")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Android")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.AppleUIKit")]

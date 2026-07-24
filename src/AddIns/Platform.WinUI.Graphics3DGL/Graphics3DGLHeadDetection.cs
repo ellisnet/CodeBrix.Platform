@@ -71,10 +71,13 @@ internal static class Graphics3DGLHeadDetection
 
 		var head = assemblyName[HeadAssemblyPrefix.Length..];
 
-		// GLES heads.
+		// GLES heads. The Emulated frame buffer serves the same offscreen EGL/GLES context as the
+		// real one, so it classifies identically (an exact match — NOT a prefix — so any future
+		// "Linux.FrameBuffer.<something>" sibling has to decide its flavor here deliberately).
 		if (head == "Wayland"
 			|| head == "MacOS"
-			|| head == "Linux.FrameBuffer")
+			|| head == "Linux.FrameBuffer"
+			|| head == "Linux.FrameBuffer.Emulated")
 		{
 			usesGles = true;
 			return true;

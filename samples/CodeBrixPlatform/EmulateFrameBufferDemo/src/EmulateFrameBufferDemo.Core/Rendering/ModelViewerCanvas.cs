@@ -101,7 +101,8 @@ public sealed class ModelViewerCanvas : GLCanvasElement
     }
 
     /// <summary>The turntable angle in radians; reset by the Reset Model button.</summary>
-    public float Rotation { get; private set; }
+    // "new": UIElement also exposes a Rotation in the package's reference API.
+    public new float Rotation { get; private set; }
 
     /// <summary>Whether the turntable is turning.</summary>
     public bool IsSpinning { get; private set; } = true;

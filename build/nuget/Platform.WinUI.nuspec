@@ -42,10 +42,10 @@
 		<!-- ============================================================ -->
 		<!-- net10.0 reference assemblies (lib)                           -->
 		<!-- ============================================================ -->
-		<file src="..\..\src\Platform.UI\Bin\Platform.UI.Reference\Release\net10.0\CodeBrix.Platform.UI.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Reference\Release\net10.0\CodeBrix.Platform.UI.dll" target="lib\net10.0" />
 		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Reference\Release\net10.0\CodeBrix.Platform.UI.Composition.dll" target="lib\net10.0" />
 		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.dll" target="lib\net10.0" />
-		<file src="..\..\src\SourceGenerators\System.Xaml\Bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="lib\net10.0" />
+		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="lib\net10.0" />
 		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.dll" target="lib\net10.0" />
 		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.pdb" target="lib\net10.0" />
 		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.dll" target="lib\net10.0" />
@@ -56,8 +56,8 @@
 		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Reference\Release\net10.0\CodeBrix.Platform.UI.Toolkit.pdb" target="lib\net10.0" />
 
 		<!-- Folded-in: Foundation, WinRT (Platform), Dispatching, Foundation.Logging (reference) -->
-		<file src="..\..\src\Platform.Foundation\Bin\Platform.Foundation.Reference\Release\net10.0\CodeBrix.Platform.Foundation.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UWP\Bin\Platform.Reference\Release\net10.0\CodeBrix.Platform.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Reference\Release\net10.0\CodeBrix.Platform.Foundation.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Reference\Release\net10.0\CodeBrix.Platform.dll" target="lib\net10.0" />
 		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Reference\Release\net10.0\CodeBrix.Platform.UI.Dispatching.dll" target="lib\net10.0" />
 		<file src="..\..\src\Platform.Foundation.Logging\bin\Platform.Foundation.Logging\Release\net10.0\CodeBrix.Platform.Foundation.Logging.dll" target="lib\net10.0" />
 		<!-- Folded-in: Microsoft.Extensions.Logging adapter + Extensions.Logging (reference) -->
@@ -67,8 +67,8 @@
 		<!-- ============================================================ -->
 		<!-- net10.0 Skia runtime assemblies (runtime-replace payload)    -->
 		<!-- ============================================================ -->
-		<file src="..\..\src\Platform.UI\Bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI\Bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\Release\net10.0\CodeBrix.Platform.UI.Composition.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\Release\net10.0\CodeBrix.Platform.UI.Composition.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\*.xml" target="codebrix-platform-runtime\net10.0\skia" />
@@ -98,13 +98,13 @@
 		<!-- ============================================================ -->
 		<!-- Analyzers + Roslyn source generators                         -->
 		<!-- ============================================================ -->
-		<file src="..\..\src\Platform.Analyzers\Bin\Release\CodeBrix.Platform.Analyzers.dll" target="analyzers/dotnet/cs" />
-		<file src="..\..\src\Platform.Analyzers\Bin\Release\CodeBrix.Platform.Analyzers.pdb" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\Platform.Analyzers\bin\Release\CodeBrix.Platform.Analyzers.dll" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\Platform.Analyzers\bin\Release\CodeBrix.Platform.Analyzers.pdb" target="analyzers/dotnet/cs" />
 
-		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Bin\Release\netstandard2.0\CodeBrix.Platform.UI.SourceGenerators.dll" target="analyzers/dotnet/cs" />
-		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Bin\Release\netstandard2.0\CodeBrix.Platform.UI.SourceGenerators.pdb" target="analyzers/dotnet/cs" />
-		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.dll" target="analyzers/dotnet/cs" />
-		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\bin\Release\netstandard2.0\CodeBrix.Platform.UI.SourceGenerators.dll" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\bin\Release\netstandard2.0\CodeBrix.Platform.UI.SourceGenerators.pdb" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.dll" target="analyzers/dotnet/cs" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.SourceGenerators\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="analyzers/dotnet/cs" />
 		<!-- Telemetry DLLs (Microsoft.ApplicationInsights, DevTools.Telemetry,
 		     DiagnosticSource, DotNet.PlatformAbstractions) were dropped in this fork,
 		     so they are not packed. -->
@@ -112,8 +112,8 @@
 
 		<!-- Build-time MSBuild tasks. Folder name must match what Platform.UI.Tasks.targets
 		     resolves the task assembly from ($(MSBuildThisFileDirectory)CodeBrix.Platform.UI.Tasks\). -->
-		<file src="..\..\src\SourceGenerators\Platform.UI.Tasks\Bin\Release\*.dll" target="buildTransitive\CodeBrix.Platform.UI.Tasks" />
-		<file src="..\..\src\SourceGenerators\Platform.UI.Tasks\Bin\Release\*.pdb" target="buildTransitive\CodeBrix.Platform.UI.Tasks" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.Tasks\bin\Release\*.dll" target="buildTransitive\CodeBrix.Platform.UI.Tasks" />
+		<file src="..\..\src\SourceGenerators\Platform.UI.Tasks\bin\Release\*.pdb" target="buildTransitive\CodeBrix.Platform.UI.Tasks" />
 
 		<!-- Without tools directory, NuGet's RestoreTask won't generate the package-folder property. -->
 		<file src="_._" target="tools" />

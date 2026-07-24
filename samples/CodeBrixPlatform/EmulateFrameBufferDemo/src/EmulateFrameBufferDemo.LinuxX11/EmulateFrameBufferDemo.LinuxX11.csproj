@@ -2,19 +2,7 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-
-    <!-- Runtime identity. Formerly set by the runtime package's buildTransitive props. -->
-    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
-    <IsCodeBrixHead Condition="'$(OutputType)'=='Exe' OR '$(OutputType)'=='WinExe'">true</IsCodeBrixHead>
-
-    <!-- CodeBrix.Platform feature defines. The NuGet supplied these via its buildTransitive
-         targets; this head is outside the src tree so it does not inherit them from
-         Directory.Build, hence they are set explicitly here. -->
-    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__;HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING;CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE;CODEBRIX_HAS_NO_IDEPENDENCYOBJECT;CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_SKIA_X11;__DESKTOP__;__CODEBRIX_SKIA__;__CODEBRIX_SKIA_X11__</DefineConstants>
-
-    <!-- MSB3277: benign reference-version conflicts that flow in transitively via the Skia
-         runtimes (same rationale as the platform's own runtime csprojs, which NoWarn it). -->
-    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI</DefineConstants>
   </PropertyGroup>
 
   <!-- Tell MSBuild to treat .xaml files as CodeBrix.Platform XAML pages -->
@@ -29,58 +17,9 @@
     <ProjectReference Include="..\EmulateFrameBufferDemo.Core\EmulateFrameBufferDemo.Core.csproj" />
   </ItemGroup>
 
-  <!--
-    Platform-specific runtime: Skia X11 backend for Linux desktops. Formerly the matching
-    CodeBrix.Platform.Runtime.*.ApacheLicenseForever NuGet, now referenced from source. All
-    other platform references come transitively via EmulateFrameBufferDemo.Core.
-  -->
+  <!-- EXACTLY ONE platform head package: the Skia X11 backend for Linux desktops,
+       from the working-tree local feed (see ../../NuGet.Config). -->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\src\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever" Version="1.0.204.9999" />
   </ItemGroup>
-
-  <!--
-    XAML source-generator + build-task pipeline. The NuGet flowed this into heads via its
-    buildTransitive targets; it does NOT flow across a ProjectReference, so a head that
-    compiles .xaml must wire it up directly.
-  -->
-  <PropertyGroup>
-    <CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(DocsGeneration)'==''">
-    <ProjectReference Include="..\..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
-      <UndefineProperties>TargetFramework</UndefineProperties>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="..\..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
-  <Import Project="..\..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
-
-  <!--
-    Runtime-replace, reproduced. Platform.UI.Skia compiles against the .Reference WinRT
-    projection and the .Reference Composition/Dispatching layers; the NuGet's runtime-replace
-    targets swapped in the .Skia implementations. Consuming the platform via project references
-    puts the .Reference variants of these same-named assemblies in the copy-local list, and they
-    lack Skia-only types -> TypeLoadException at run time. Edit the copy-local list right after
-    reference resolution and before the output copy: drop the .Reference entries, add the .Skia
-    ones. Only the three assemblies that actually differ are swapped.
-  -->
-  <Target Name="_EfbdUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
-    <PropertyGroup>
-      <_EfbdSkiaUwp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_EfbdSkiaUwp>
-      <_EfbdSkiaComp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_EfbdSkiaComp>
-      <_EfbdSkiaDisp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_EfbdSkiaDisp>
-    </PropertyGroup>
-    <ItemGroup>
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_EfbdSkiaUwp)\CodeBrix.Platform.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_EfbdSkiaUwp)\CodeBrix.Platform.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_EfbdSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_EfbdSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_EfbdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_EfbdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_EfbdSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-    </ItemGroup>
-  </Target>
-
 </Project>

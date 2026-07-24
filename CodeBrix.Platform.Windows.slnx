@@ -47,6 +47,7 @@
   <Folder Name="/Runtime/">
     <Project Path="src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />

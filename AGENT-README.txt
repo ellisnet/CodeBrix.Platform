@@ -1257,6 +1257,21 @@ stamps that ONE version on every package in the run. Packing only runs in the
 Release configuration. You can override the version with -p:BuildVersion=1.x.y.z
 to reuse an EXISTING version instead of stamping a fresh one.
 
+THE EMULATED FRAME-BUFFER HEAD PACKAGE (maintainers only — deliberately NOT in
+the app-facing head-package table above):
+    CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever
+    (src/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated)
+A compile-time drop-in for the FrameBuffer head that renders offscreen at one
+fixed resolution and exchanges frames and touch input with the CodeBrix.Develop
+frame-buffer emulator over shared memory and a socket. Applications must NEVER
+reference it directly: when a .LinuxFrameBuffer head is run or debugged inside
+CodeBrix.Develop, the IDE silently builds the app against this package instead
+of the real FrameBuffer package (an MSBuild-property-injected swap; the user's
+csproj is never modified) and hosts the app's screen in its emulator window.
+It surfaces the same UseLinuxFrameBuffer() bootstrap and the same buildTransitive
+behavior as the real head, is pure managed code, packs on Windows with the rest
+of the set, and ships at the family version like every other package.
+
 --- ON WINDOWS: build the ENTIRE package set (auto version) ---
 
 This is the normal full build. BuildVersion is auto-computed, so you do NOT set

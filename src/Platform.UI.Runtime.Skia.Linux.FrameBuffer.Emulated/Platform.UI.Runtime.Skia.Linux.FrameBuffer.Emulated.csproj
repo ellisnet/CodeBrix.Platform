@@ -1,0 +1,65 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- The assembly NAME is load-bearing: Graphics3DGLHeadDetection classifies heads by
+	     scanning loaded assemblies for the "CodeBrix.Platform.UI.Runtime.Skia." prefix and
+	     matching the remainder ("Linux.FrameBuffer.Emulated" -> GLES). -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated</AssemblyName>
+	</PropertyGroup>
+
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj with the shared date-stamped version. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Title>CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated</Title>
+		<Description>Emulated Linux framebuffer Skia runtime host for CodeBrix.Platform applications: a compile-time drop-in for the FrameBuffer head that renders offscreen for the CodeBrix.Develop frame-buffer emulator. CodeBrix.Develop swaps this package in at build time — applications never reference it directly.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated</RootNamespace>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="HarfBuzzSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Pack the buildTransitive props/targets renamed to <PackageId>.props/.targets so
+		     NuGet auto-imports them for consumers (and to satisfy NU5129). -->
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.Emulated.props">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever.props</PackagePath>
+		</Content>
+		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.Emulated.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever.targets</PackagePath>
+		</Content>
+	</ItemGroup>
+
+</Project>
