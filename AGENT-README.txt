@@ -216,6 +216,47 @@ package is versioned to track the SkiaSharp release it vendors).
       (DRM/GBM, or Mesa llvmpipe software GL on GPU-less systems — install
       libegl1 + libgl1-mesa-dri there).
 
+      WINDOWS OPENGL AVAILABILITY: On Windows the WGL context needs a real
+      OpenGL driver (ICD). Most x64 machines have one from their GPU vendor,
+      but many Windows-on-ARM devices do NOT ship a desktop-OpenGL ICD; there,
+      OpenGL is supplied by Microsoft's free "OpenCL and OpenGL Compatibility
+      Pack" (the GLon12 / Mesa-over-Direct3D-12 layer), installed once per
+      device from the Microsoft Store:
+          https://apps.microsoft.com/detail/9NQPSL29BFFF
+      Without it, GLCanvasElement cannot create a context and the surface stays
+      blank. The rest of the app is unaffected: the head just renders 2D Skia
+      on the CPU. This is a device-level prerequisite the end user installs; it
+      is not something an app or the framework can supply.
+
+      DETECTING FAILURE (and prompting for the pack): GLCanvasElement exposes
+      GetGLInitializationState(), returning a GLInitializationState with a
+      .Status (GLInitializationStatus: NotYetInitialized, Initializing,
+      Initialized, InitializationFailed) and, when Status is
+      InitializationFailed, a human-readable .FailedReason (null otherwise).
+      The context is created when the element LOADS, so query it after the
+      element is loaded (its Loaded handler, or once the hosting view becomes
+      visible) — never in the constructor, where Status is still
+      NotYetInitialized. If Status is InitializationFailed the surface will
+      render nothing, so surface a message to the user; on Windows only, point
+      them at the Compatibility Pack above, which is the usual cause there:
+
+          // code-behind of the view hosting <gl:GLCanvasElement x:Name="MyGl"/>
+          MyGl.Loaded += (_, _) =>
+          {
+              var state = MyGl.GetGLInitializationState();
+              if (state.Status == GLInitializationStatus.InitializationFailed)
+              {
+                  var msg = "3D rendering is unavailable.\n\n" + state.FailedReason;
+                  if (OperatingSystem.IsWindows())
+                  {
+                      msg += "\n\nOn Windows you may need Microsoft's free "
+                          + "\"OpenCL and OpenGL Compatibility Pack\":\n"
+                          + "https://apps.microsoft.com/detail/9NQPSL29BFFF";
+                  }
+                  // show msg via SimpleDialog, a status TextBlock, etc.
+              }
+          };
+
   CodeBrix.Platform.Lottie.ApacheLicenseForever           [optional]
       Lottie / Skottie vector animation playback in XAML. Pair it with the
       "SkiaSharp.Skottie" package.
@@ -447,17 +488,7 @@ package is versioned to track the SkiaSharp release it vendors).
       This package ships at the same version as the rest of the family (the
       whole family is always published together) and requires a core of the
       same generation: the AddIn implements internal framework seams, so the
-      core's InternalsVisibleTo grants must match. It supersedes the in-repo
-      legacy Platform.UI.WebView.Skia.X11 project (GTK/WebKitGTK window
-      embedding, X11-only, never published); never reference both.
-      TODO / PLANNED DELETION: the legacy Platform.UI.WebView.Skia.X11 project
-      is slated to be DELETED from this repository in a future release (kept
-      temporarily "just in case", decision 2026-07-02). It is NOT supported.
-      Its self-packed nupkg (CodeBrix.Platform.WinUI.WebView.Skia.X11), which
-      Release builds still produce, must NEVER be published to nuget.org. When
-      deleting it, also remove: its entries in the three root .slnx files, its
-      _AdjustedOutputProjects line in src/Directory.Build.props, and its
-      InternalsVisibleTo grants in Platform.UI + Platform.UWP AssemblyInfo.cs.
+      core's InternalsVisibleTo grants must match.
       Known v1 limitations on Linux: no IME (composed CJK/deadkey) text input,
       popups/new windows navigate the current view, and the mouse cursor does
       not change shape over links.

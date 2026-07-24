@@ -44,13 +44,17 @@ namespace CodeBrix.Platform.WinUI.Graphics3DGL; //Was previously: Uno.WinUI.Grap
 public abstract partial class GLCanvasElement : Grid, INativeContext
 {
 	private const int BytesPerPixel = 4;
-	private static readonly Dictionary<XamlRoot, INativeOpenGLWrapper?> _xamlRootToWrapper = new();
+	// The per-XamlRoot wrapper cache also remembers WHY wrapper creation failed (Wrapper is null),
+	// so later GLCanvasElement instances on the same XamlRoot can report the same failure reason.
+	private static readonly Dictionary<XamlRoot, (INativeOpenGLWrapper? Wrapper, string? FailureReason)> _xamlRootToWrapper = new();
 
 	private static readonly (int major, int minor) _minVersion = (3, 0);
 
 	private readonly Func<Window>? _getWindowFunc;
 
 	private bool _changingGlInitialized;
+
+	private GLInitializationState _initializationState = new(GLInitializationStatus.NotYetInitialized);
 
 	// valid if and only if GLCanvasElement was loaded at least once and OpenGL is available on the running platform
 	private INativeOpenGLWrapper? _nativeOpenGlWrapper;
@@ -114,13 +118,15 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		SizeChanged += (_, _) => UpdateFramebuffer();
 	}
 
-	private static unsafe INativeOpenGLWrapper? GetOrCreateNativeOpenGlWrapper(XamlRoot xamlRoot, Func<Window>? getWindowFunc)
+	private static unsafe INativeOpenGLWrapper? GetOrCreateNativeOpenGlWrapper(XamlRoot xamlRoot, Func<Window>? getWindowFunc, out string? failureReason)
 	{
+		failureReason = null;
 		try
 		{
 			// This is done on the UI thread, so no concurrency concerns.
-			if (!_xamlRootToWrapper.TryGetValue(xamlRoot, out var nativeOpenGlWrapper))
+			if (!_xamlRootToWrapper.TryGetValue(xamlRoot, out var cached))
 			{
+				INativeOpenGLWrapper? nativeOpenGlWrapper;
 #if WINAPPSDK
 				nativeOpenGlWrapper = new WinUINativeOpenGLWrapper(xamlRoot, getWindowFunc!);
 #else
@@ -131,7 +137,8 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 						typeof(GLCanvasElement).Log().Error($"Couldn't create a {nameof(INativeOpenGLWrapper)} object. Make sure you are running on a platform with OpenGL support.");
 					}
 
-					_xamlRootToWrapper[xamlRoot] = null;
+					failureReason = $"Couldn't create a {nameof(INativeOpenGLWrapper)} object — the running platform (or head) does not provide OpenGL support.";
+					_xamlRootToWrapper[xamlRoot] = (null, failureReason);
 					return null;
 				}
 #endif
@@ -170,6 +177,7 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 								typeof(GLCanvasElement).Log().Error($"{nameof(GLCanvasElement)} requires at least {_minVersion.major}.{_minVersion.minor}, but found {major}.{minor}.");
 							}
 
+							failureReason = $"{nameof(GLCanvasElement)} requires OpenGL {_minVersion.major}.{_minVersion.minor} or later, but the OpenGL context that was created only provides {major}.{minor} (GL_VERSION: '{glVersionString}').";
 							abort = true;
 						}
 					}
@@ -181,10 +189,12 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 					nativeOpenGlWrapper = null;
 				}
 
-				_xamlRootToWrapper.Add(xamlRoot, nativeOpenGlWrapper);
+				_xamlRootToWrapper.Add(xamlRoot, (nativeOpenGlWrapper, failureReason));
+				return nativeOpenGlWrapper;
 			}
 
-			return nativeOpenGlWrapper;
+			failureReason = cached.FailureReason;
+			return cached.Wrapper;
 		}
 		catch (Exception e)
 		{
@@ -192,6 +202,9 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 			{
 				typeof(GLCanvasElement).Log().Error($"{nameof(INativeOpenGLWrapper)} creation failed.", e);
 			}
+
+			failureReason = $"OpenGL context creation failed with {e.GetType().Name}: {e.Message}"
+				+ (e.InnerException is { } inner ? $" ({inner.GetType().Name}: {inner.Message})" : "");
 			return null;
 		}
 	}
@@ -206,10 +219,10 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 			{
 				this.Log().Debug($"Window is closing. Destroying the {nameof(INativeOpenGLWrapper)} for this window");
 			}
-			if (_xamlRootToWrapper.Remove(XamlRoot!, out var wrapper))
+			if (_xamlRootToWrapper.Remove(XamlRoot!, out var cached))
 			{
-				using var makeCurrentDisposable = wrapper?.MakeCurrent();
-				wrapper?.Dispose();
+				using var makeCurrentDisposable = cached.Wrapper?.MakeCurrent();
+				cached.Wrapper?.Dispose();
 			}
 		});
 	}
@@ -282,12 +295,28 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		}
 	}
 
+	/// <summary>
+	/// Returns a snapshot of this element's OpenGL initialization state, including (when
+	/// initialization failed) a human-readable <see cref="GLInitializationState.FailedReason"/>
+	/// explaining why the element cannot render — information that is otherwise only logged.
+	/// Must be called on the UI thread. Note that initialization only happens when the element
+	/// is loaded into the visual tree, so the status is
+	/// <see cref="GLInitializationStatus.NotYetInitialized"/> before then (and again after the
+	/// element is unloaded).
+	/// </summary>
+	public GLInitializationState GetGLInitializationState() => _initializationState;
+
 	private void OnLoaded(object sender, RoutedEventArgs routedEventArgs)
 	{
-		_nativeOpenGlWrapper = GetOrCreateNativeOpenGlWrapper(XamlRoot!, _getWindowFunc);
+		_initializationState = new(GLInitializationStatus.Initializing);
+
+		_nativeOpenGlWrapper = GetOrCreateNativeOpenGlWrapper(XamlRoot!, _getWindowFunc, out var failureReason);
 
 		if (_nativeOpenGlWrapper is null)
 		{
+			_initializationState = new(
+				GLInitializationStatus.InitializationFailed,
+				failureReason ?? "OpenGL initialization failed for an unknown reason (see the application logs).");
 			IsGLInitialized = false;
 			return;
 		}
@@ -316,10 +345,13 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		}
 
 		IsGLInitialized = true;
+		_initializationState = new(GLInitializationStatus.Initialized);
 	}
 
 	private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
 	{
+		// Mirrors IsGLInitialized returning to null: the state is only valid while loaded.
+		_initializationState = new(GLInitializationStatus.NotYetInitialized);
 		IsGLInitialized = null;
 		if (_nativeOpenGlWrapper is null)
 		{

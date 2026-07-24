@@ -9,7 +9,7 @@
 - **Runtime Template Updates**: Modify the factory function of existing `DataTemplate` instances
 - **Automatic Control Refresh**: Controls that subscribe to template updates automatically refresh their content
 - **Opt-in System**: Disabled by default to avoid any performance impact in production
-- **Cross-platform Support**: Works on all Uno Platform targets
+- **Cross-platform Support**: Works on all CodeBrix.Platform heads
 
 ## How It Works
 
@@ -25,7 +25,7 @@
 ```csharp
 // Enable the dynamic template update system
 // WARNING: This is a debugging tool - do not use in production
-Uno.UI.TemplateManager.EnableUpdateSubscriptions();
+CodeBrix.Platform.UI.TemplateManager.EnableUpdateSubscriptions();
 ```
 
 ### Production Release Configuration (Not Recommended)
@@ -55,7 +55,7 @@ public partial class App : Application
     {
         // DANGER: Only call this if you absolutely need dynamic templates in production
         // This has performance implications and should only be used for debugging
-        Uno.UI.TemplateManager.EnableUpdateSubscriptions();
+        CodeBrix.Platform.UI.TemplateManager.EnableUpdateSubscriptions();
         
         // Rest of your application initialization...
     }
@@ -85,7 +85,7 @@ public partial class App : Application
 
 ```csharp
 #if DEBUG
-Uno.UI.TemplateManager.EnableUpdateSubscriptions();
+CodeBrix.Platform.UI.TemplateManager.EnableUpdateSubscriptions();
 #endif
 ```
 
@@ -95,7 +95,7 @@ Uno.UI.TemplateManager.EnableUpdateSubscriptions();
 // Update a template's factory function (simple view factory)
 if (Resources["MyTemplate"] is DataTemplate template)
 {
-    Uno.UI.TemplateManager.UpdateDataTemplate(template, () =>
+    CodeBrix.Platform.UI.TemplateManager.UpdateDataTemplate(template, () =>
     {
         // Return new UI element - must be compatible with View type
         return new TextBlock { Text = "Updated Content" };
@@ -105,7 +105,7 @@ if (Resources["MyTemplate"] is DataTemplate template)
 // Alternative: Update using factory updater (advanced)
 if (Resources["MyTemplate"] is DataTemplate template)
 {
-    Uno.UI.TemplateManager.UpdateDataTemplate(template, oldFactory =>
+    CodeBrix.Platform.UI.TemplateManager.UpdateDataTemplate(template, oldFactory =>
     {
         // Return a new factory that creates different content
         return (NewFrameworkTemplateBuilder)((_, _) => new TextBlock { Text = "Advanced Update" });
@@ -139,7 +139,7 @@ public class MyCustomControl : FrameworkElement
         {
             // Subscribe to template updates using the owner-based API
             // No need to keep a member IDisposable anymore
-            Uno.UI.TemplateManager.SubscribeToTemplate(
+            CodeBrix.Platform.UI.TemplateManager.SubscribeToTemplate(
                 c,
                 (DataTemplate) e.NewValue,
                 () => c.RefreshContent());
@@ -169,7 +169,7 @@ public class MyCustomControl : FrameworkElement
 
 ## Built-in Support
 
-The following Uno Platform controls already support dynamic template updates when the feature is enabled:
+The following CodeBrix.Platform controls already support dynamic template updates when the feature is enabled:
 
 - `ContentPresenter` and `ContentControl` are fully supported
 - `ItemsRepeater` - Full support with comprehensive reentrancy protection
@@ -198,7 +198,7 @@ public class MyControl : FrameworkElement
     {
         if (d is MyControl c)
         {
-            Uno.UI.TemplateManager.SubscribeToTemplate(
+            CodeBrix.Platform.UI.TemplateManager.SubscribeToTemplate(
                 c,
                 (DataTemplate)e.NewValue,
                 () => c.RefreshContent());
@@ -210,7 +210,7 @@ public class MyControl : FrameworkElement
     {
         if (disposing)
         {
-            Uno.UI.TemplateManager.UnsubscribeFromTemplate(this);
+            CodeBrix.Platform.UI.TemplateManager.UnsubscribeFromTemplate(this);
         }
         base.Dispose(disposing);
     }
@@ -218,7 +218,7 @@ public class MyControl : FrameworkElement
     // ❌ INCORRECT: Don't unsubscribe in OnUnloaded
     // protected override void OnUnloaded()
     // {
-    //     Uno.UI.TemplateManager.UnsubscribeFromTemplate(this); // DON'T DO THIS
+    //     CodeBrix.Platform.UI.TemplateManager.UnsubscribeFromTemplate(this); // DON'T DO THIS
     // }
 }
 ```
@@ -250,7 +250,7 @@ private static void OnItemTemplateChanged(DependencyObject d, DependencyProperty
 {
     if (d is MyControl c)
     {
-        Uno.UI.TemplateManager.SubscribeToTemplate(
+        CodeBrix.Platform.UI.TemplateManager.SubscribeToTemplate(
             c,
             (DataTemplate)e.NewValue,
             () => c.RefreshContent());
@@ -286,7 +286,7 @@ private static void OnItemTemplateChanged(DependencyObject d, DependencyProperty
 - `Detach(DependencyObject owner, string slotKey)`: Detach slot subscription for owner
 - Returns `true` if subscriptions are enabled and the subscription was created
 
-**Note**: Built-in Uno Platform controls use internal methods directly for performance reasons. The actual implementation in `ItemsControl` uses `TemplateUpdateSubscription.Attach` directly rather than the public `TemplateManager.SubscribeToTemplate()` API. User code should still use the public API.
+**Note**: Built-in CodeBrix.Platform controls use internal methods directly for performance reasons. The actual implementation in `ItemsControl` uses `TemplateUpdateSubscription.Attach` directly rather than the public `TemplateManager.SubscribeToTemplate()` API. User code should still use the public API.
 
 ## Example: Hot-Reload Scenario
 
@@ -296,7 +296,7 @@ public class TemplateHotReloader
 {
     public void Initialize()
     {
-        Uno.UI.TemplateManager.EnableUpdateSubscriptions();
+        CodeBrix.Platform.UI.TemplateManager.EnableUpdateSubscriptions();
         
         // Watch for XAML file changes (pseudo-code)
         FileWatcher.OnFileChanged += (file) =>
@@ -307,7 +307,7 @@ public class TemplateHotReloader
                 if (template != null)
                 {
                     // Use the simple view factory overload
-                    Uno.UI.TemplateManager.UpdateDataTemplate(template, () =>
+                    CodeBrix.Platform.UI.TemplateManager.UpdateDataTemplate(template, () =>
                     {
                         var updatedElement = LoadUpdatedTemplate(file);
                         return updatedElement; // Must return View? type

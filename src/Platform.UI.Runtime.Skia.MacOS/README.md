@@ -4,10 +4,10 @@
 
 Before you can build you need the libSkiaSharp.dylib.
 ```bash
-cd CodeBrixNativeMac
+cd PlatformNativeMac/PlatformNativeMac
 ./getSkiaSharpDylib.sh
 ```
-See [/CodeBrixNativeMac/README.md](CodeBrixNativeMac/README.md) for more info.
+See [PlatformNativeMac/PlatformNativeMac/README.md](PlatformNativeMac/PlatformNativeMac/README.md) for more info.
 
 ## Requirements
 

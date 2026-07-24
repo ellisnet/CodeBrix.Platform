@@ -1807,7 +1807,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 				// { "VisualStudioVersion", "15.0" },
 				// Important to load with Release.
 				// The projects should be restored for the generator to function properly.
-				// The BuildSyncGenerator target in Uno.UI.Build.csproj will restore for Release.
+				// The BuildSyncGenerator target in CodeBrix.Platform.Build.csproj will restore for Release.
 				{ "Configuration", "Release" },
 				//{ "BuildingInsideVisualStudio", "true" },
 				{ "SkipCodeBrixResourceGeneration", "true" }, // Required to avoid loading a non-existent task

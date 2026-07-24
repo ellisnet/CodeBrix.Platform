@@ -3,9 +3,9 @@
 	     three root .slnx files, its _AdjustedOutputProjects line in src/Directory.Build.props, and
 	     its InternalsVisibleTo grants in Platform.UI/Platform.UWP AssemblyInfo.cs). Superseded by
 	     the WPE-based Platform.UI.WebView.Skia AddIn (CodeBrix.Platform.WebView.
-	     ApacheLicenseForever). The nupkg this project self-packs in Release builds was never
-	     published to nuget.org and must NOT be published. Kept temporarily on the "just in case"
-	     principle (decision 2026-07-02). -->
+	     ApacheLicenseForever). This project is configured NOT to produce a NuGet package under any
+	     configuration (IsPackable=false); it was never published to nuget.org and must NOT be. Kept
+	     temporarily on the "just in case" principle (decision 2026-07-02). -->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -16,8 +16,9 @@
 		<AssemblyName>CodeBrix.Platform.UI.WebView.Skia.X11</AssemblyName>
 		<RootNamespace>CodeBrix.Platform.UI.WebView.Skia.X11</RootNamespace>
 
-		<GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as package content via the ItemGroup below. PackageReadmeFile is intentionally left unset so the docs pack as plain content and GeneratePackageOnBuild stays green. -->
+		<!-- This legacy, unsupported AddIn must NOT produce a NuGet package under any configuration. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>false</IsPackable>
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageReadmeFile></PackageReadmeFile>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.WinUI.WebView.Skia.X11</PackageId>
