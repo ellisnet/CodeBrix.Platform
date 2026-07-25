@@ -142,5 +142,62 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 			return s?.Split(_separators, StringSplitOptions.RemoveEmptyEntries)
 				.Select(x => x.Trim()).ToArray();
 		}
+
+		// glXCreateNewContext/glXCreateContext (without attribs) hand back whatever legacy
+		// profile the driver defaults to; on most desktop drivers that's already a high-version
+		// compatibility profile, but on some Mesa drivers (observed with the software/llvmpipe
+		// GLX path) that default is capped as low as GL 1.4, which fails to compile
+		// "#version 330 core" shaders. Request a compatibility profile with a 3.3 floor
+		// explicitly via GLX_ARB_create_context: this matches what well-behaved drivers already
+		// hand back by default (so it's a no-op there), while forcing the low-defaulting drivers
+		// up to the version the shaders need. Deliberately compatibility, not core, profile so
+		// we don't newly forbid legacy/deprecated GL usage on systems that already worked.
+		public static int[] CreateCompatibilityContextAttribs { get; } =
+		{
+			GlxConsts.GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+			GlxConsts.GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+			GlxConsts.GLX_CONTEXT_PROFILE_MASK_ARB, GlxConsts.GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+			0
+		};
+
+		public static IntPtr CreateContext(IntPtr display, IntPtr fbConfig)
+		{
+			var errorOccurred = false;
+			XErrorHandler errorHandler = (IntPtr _, ref XErrorEvent errorEvent) =>
+			{
+				errorOccurred = true;
+				return 0;
+			};
+
+			IntPtr context;
+			_ = XLib.XSetErrorHandler(errorHandler);
+			try
+			{
+				context = glXCreateContextAttribsARB(display, fbConfig, IntPtr.Zero, true, CreateCompatibilityContextAttribs);
+				_ = XLib.XSync(display, false);
+
+				if (errorOccurred)
+				{
+					context = IntPtr.Zero;
+				}
+			}
+			catch (EntryPointNotFoundException)
+			{
+				// GLX_ARB_create_context isn't available on this GLX implementation.
+				context = IntPtr.Zero;
+			}
+			finally
+			{
+				_ = XLib.XSetErrorHandler(null!);
+			}
+
+			if (context == IntPtr.Zero)
+			{
+				// Fall back to a legacy context for GLX implementations that don't support GLX_ARB_create_context.
+				context = glXCreateNewContext(display, fbConfig, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
+			}
+
+			return context;
+		}
 	}
 }

@@ -500,10 +500,10 @@ internal partial class X11XamlRootHost : IXamlRootHost
 			throw new InvalidOperationException("Could not create correct visual window.\n");
 		}
 
-		IntPtr context = GlxInterface.glXCreateNewContext(display, bestFbc, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
+		IntPtr context = GlxInterface.CreateContext(display, bestFbc);
 		if (context == IntPtr.Zero)
 		{
-			throw new InvalidOperationException($"{nameof(GlxInterface.glXCreateNewContext)} failed and returned a null context.\n");
+			throw new InvalidOperationException($"{nameof(GlxInterface.CreateContext)} failed and returned a null context.\n");
 		}
 		_ = XLib.XSync(display, false);
 

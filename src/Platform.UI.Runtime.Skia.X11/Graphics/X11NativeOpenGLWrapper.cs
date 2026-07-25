@@ -59,10 +59,10 @@ internal class X11NativeOpenGLWrapper : INativeOpenGLWrapper
 			throw new InvalidOperationException("Could not find a suitable framebuffer config.\n");
 		}
 
-		_glContext = GlxInterface.glXCreateNewContext(_display, bestFbc, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
+		_glContext = GlxInterface.CreateContext(_display, bestFbc);
 		if (_glContext == IntPtr.Zero)
 		{
-			throw new InvalidOperationException($"{nameof(GlxInterface.glXCreateNewContext)} failed.");
+			throw new InvalidOperationException($"{nameof(GlxInterface.CreateContext)} failed.");
 		}
 		_pBuffer = GlxInterface.glXCreatePbuffer(_display, bestFbc, new[] { (int)X11Helper.None });
 		if (_pBuffer == IntPtr.Zero)
