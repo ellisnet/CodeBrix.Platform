@@ -247,6 +247,13 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 		[LibraryImport(libX11)]
 		public static partial IntPtr XSetErrorHandler(XErrorHandler error_handler);
 
+		// Restores a handler previously returned by XSetErrorHandler. The managed overload above
+		// cannot round-trip its own return value, because Xlib hands back a raw function pointer
+		// rather than a delegate. Passing IntPtr.Zero restores Xlib's built-in default handler,
+		// which is the correct behaviour when no custom handler was installed.
+		[LibraryImport(libX11, EntryPoint = "XSetErrorHandler")]
+		public static partial IntPtr XSetErrorHandlerPtr(IntPtr error_handler);
+
 		[LibraryImport(libX11)]
 		public static partial int XConvertSelection(IntPtr display, IntPtr selection, IntPtr target, IntPtr property,
 			IntPtr requestor, IntPtr time);

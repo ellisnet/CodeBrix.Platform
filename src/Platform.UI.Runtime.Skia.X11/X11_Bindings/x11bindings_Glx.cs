@@ -160,44 +160,69 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 			0
 		};
 
+		// The X error handler is process-global rather than per-display, so two threads creating
+		// contexts at the same time could interleave their save/restore and leave a stale handler
+		// installed. Context creation happens once per window, so serialising it costs nothing.
+		private static readonly object _createContextLock = new();
+
 		public static IntPtr CreateContext(IntPtr display, IntPtr fbConfig)
 		{
-			var errorOccurred = false;
-			XErrorHandler errorHandler = (IntPtr _, ref XErrorEvent errorEvent) =>
+			lock (_createContextLock)
 			{
-				errorOccurred = true;
-				return 0;
-			};
-
-			IntPtr context;
-			_ = XLib.XSetErrorHandler(errorHandler);
-			try
-			{
-				context = glXCreateContextAttribsARB(display, fbConfig, IntPtr.Zero, true, CreateCompatibilityContextAttribs);
-				_ = XLib.XSync(display, false);
-
-				if (errorOccurred)
+				var errorOccurred = false;
+				XErrorHandler errorHandler = (IntPtr _, ref XErrorEvent errorEvent) =>
 				{
+					errorOccurred = true;
+					return 0;
+				};
+
+				IntPtr context;
+				// Capture the handler that is already installed instead of resetting to Xlib's
+				// default afterwards: the handler is process-wide, so other components that share
+				// this process (web view, media player, GTK) may have installed their own, and
+				// Xlib's default handler terminates the process on the next protocol error.
+				IntPtr previousErrorHandler = XLib.XSetErrorHandler(errorHandler);
+				try
+				{
+					context = glXCreateContextAttribsARB(display, fbConfig, IntPtr.Zero, true, CreateCompatibilityContextAttribs);
+					_ = XLib.XSync(display, false);
+
+					if (errorOccurred)
+					{
+						if (context != IntPtr.Zero)
+						{
+							// The driver handed back a context but something errored on this
+							// display; release it rather than leaking it, then fall back below.
+							glXDestroyContext(display, context);
+						}
+						context = IntPtr.Zero;
+					}
+				}
+				catch (EntryPointNotFoundException)
+				{
+					// GLX_ARB_create_context isn't available on this GLX implementation.
 					context = IntPtr.Zero;
 				}
-			}
-			catch (EntryPointNotFoundException)
-			{
-				// GLX_ARB_create_context isn't available on this GLX implementation.
-				context = IntPtr.Zero;
-			}
-			finally
-			{
-				_ = XLib.XSetErrorHandler(null!);
-			}
+				finally
+				{
+					_ = XLib.XSetErrorHandlerPtr(previousErrorHandler);
+					// Xlib stores the raw function pointer and keeps using it until it is replaced,
+					// but nothing reads errorHandler after it is installed, so without this the JIT
+					// is free to treat it as dead and let the GC collect the native thunk early.
+					GC.KeepAlive(errorHandler);
+				}
 
-			if (context == IntPtr.Zero)
-			{
-				// Fall back to a legacy context for GLX implementations that don't support GLX_ARB_create_context.
-				context = glXCreateNewContext(display, fbConfig, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
-			}
+				if (context == IntPtr.Zero)
+				{
+					// Fall back to a legacy context for GLX implementations that don't support
+					// GLX_ARB_create_context. Deliberately left outside the error-handler block
+					// above so this call behaves exactly as it did before a context was ever
+					// requested through GLX_ARB_create_context.
+					context = glXCreateNewContext(display, fbConfig, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
+				}
 
-			return context;
+				return context;
+			}
 		}
 	}
 }
