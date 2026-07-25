@@ -21,7 +21,7 @@
 
             <TextBox x:Name="AddressBox" Grid.Column="0" Height="40"
                      VerticalAlignment="Center" VerticalContentAlignment="Center"
-                     Text="https://download.blender.org/peach/bigbuckbunny_movies/BigBuckBunny_320x180.mp4" />
+                     Text="https://mdn.github.io/learning-area/html/multimedia-and-embedding/video-and-audio-content/rabbit320.mp4" />
             <Button Grid.Column="1" Margin="8,0,0,0" Height="40"
                     VerticalAlignment="Center" Content="Load" Click="LoadButton_Click" />
             <ComboBox x:Name="StretchBox" Grid.Column="2" Margin="8,0,0,0" Height="40"

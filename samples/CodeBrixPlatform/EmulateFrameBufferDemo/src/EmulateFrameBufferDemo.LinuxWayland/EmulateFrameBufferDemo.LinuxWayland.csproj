@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <!-- EXACTLY ONE platform head package: the native Wayland backend for Linux desktops,
-       from the working-tree local feed (see ../../NuGet.Config). -->
+       consumed from nuget.org like any real application. -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever" Version="1.0.204.9999" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever" Version="1.0.205.475" />
   </ItemGroup>
 </Project>

@@ -33,7 +33,7 @@ using System.Windows;
 namespace CodeBrix.Platform.Simple;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-public class AffectsPropertiesAttribute : Attribute
+public sealed class AffectsPropertiesAttribute : Attribute
 {
     public IList<string> AffectedProperties { get; }
 
@@ -45,7 +45,7 @@ public class AffectsPropertiesAttribute : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-public class AffectsCommandsAttribute : Attribute
+public sealed class AffectsCommandsAttribute : Attribute
 {
     public IList<string> AffectedCommands { get; }
 
@@ -57,7 +57,7 @@ public class AffectsCommandsAttribute : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-public class AffectsAllCommandsAttribute : Attribute;
+public sealed class AffectsAllCommandsAttribute : Attribute;
 
 public class SimpleCommand : ICommand, IDisposable
 {

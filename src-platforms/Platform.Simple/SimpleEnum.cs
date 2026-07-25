@@ -52,7 +52,7 @@ public interface ISimpleEnumInfoAttribute
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-public class SimpleEnumAttribute<TInfo> : Attribute, ISimpleEnumInfoAttribute
+public sealed class SimpleEnumAttribute<TInfo> : Attribute, ISimpleEnumInfoAttribute
     where TInfo : class, ISimpleEnumInfo
 {
     public SimpleEnumAttribute(string infoMemberName) =>

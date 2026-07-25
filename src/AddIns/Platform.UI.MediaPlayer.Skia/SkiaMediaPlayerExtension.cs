@@ -45,6 +45,9 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 
 	private int _vlcPlayerVolume = 100;
 
+	// Linux only: whether we've already checked, for the current media, if the OS audio layer muted our stream.
+	private bool _osLevelMuteChecked;
+
 	// the current effective url (e.g. current video in playlist) that is set natively
 	// DO NOT READ OR WRITE THIS. It's only used to RaiseSourceChanged.
 	private Uri? _uri;
@@ -53,6 +56,7 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 	{
 		set
 		{
+			_osLevelMuteChecked = false; // re-arm the OS-level mute check for each newly-set media
 			if (_uri != value)
 			{
 				IsVideo = null;
@@ -188,7 +192,14 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 	{
 		try
 		{
-			return new LibVLC("--start-paused");
+			// On Linux, force software video decoding for the memory (vmem) path. libvlc otherwise auto-selects
+			// VA-API/VDPAU hardware decoding, whose GPU-surface output cannot be converted to the BGRA system-
+			// memory frames VideoFrameSink requires - which floods the log with "Failed to create video converter"
+			// / "Too high level of recursion" / h264 "get_buffer() failed" errors before libvlc silently falls back
+			// to software. Hardware decoding never helped this path anyway (the frames must land in system memory).
+			return OperatingSystem.IsLinux()
+				? new LibVLC("--start-paused", "--avcodec-hw=none")
+				: new LibVLC("--start-paused");
 		}
 		catch (VLCException e)
 		{
@@ -475,6 +486,7 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 
 	private void OnTimeChanged(object? _, MediaPlayerTimeChangedEventArgs _1)
 	{
+		WarnIfAudioMutedAtOsLevel();
 		NativeDispatcher.Main.Enqueue(() =>
 		{
 			var oldValue = _updatingPositionFromNative;
@@ -482,6 +494,41 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 			Events?.RaisePositionChanged();
 			_updatingPositionFromNative = oldValue;
 		});
+	}
+
+	// Linux only. The OS audio server (PulseAudio/PipeWire, via WirePlumber stream-restore) can restore a
+	// previously-saved mute onto libVLC's output stream - commonly a per-application mute, or a mute for the
+	// "Movie"/video media-role that libVLC tags video playback with. When that happens the media plays silently
+	// even though the app never requested mute. We deliberately do NOT unmute it (the user may have muted it on
+	// purpose); we only log once per media so the silence is explainable in the terminal.
+	private void WarnIfAudioMutedAtOsLevel()
+	{
+		if (_osLevelMuteChecked || !OperatingSystem.IsLinux())
+		{
+			return;
+		}
+
+		// Only meaningful once an audio output actually exists. Media loads with "--start-paused", so libVLC
+		// reports Mute==false until playback is really running; wait for that before reading the mute state.
+		if (!VlcPlayer.IsPlaying)
+		{
+			return;
+		}
+
+		_osLevelMuteChecked = true;
+
+		// VlcPlayer.Mute is the real output-stream mute (which the OS audio layer may have set); Player.IsMuted is
+		// what the app asked for. If the stream is muted but the app did not request it, the mute came from the OS.
+		if (VlcPlayer.Mute
+			&& !Player.IsMuted
+			&& this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Warning))
+		{
+			this.Log().Warn(
+				"MediaPlayer audio is muted at the OS audio layer (PulseAudio/PipeWire), but the application did not " +
+				"request mute - so this media will play with no sound. This is usually a saved per-application or " +
+				"per-media-role (\"Movie\"/video) mute in the system sound mixer. Unmute it in your system sound " +
+				"settings (e.g. 'pavucontrol' -> Playback) to restore audio; the app will not override your choice.");
+		}
 	}
 
 	private void OnBuffering(object? _, MediaPlayerBufferingEventArgs _1)
@@ -506,8 +553,19 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 				// rewinding and replaying the video fails.
 				// cf. https://github.com/unoplatform/uno-private/issues/1230
 				VlcPlayer.Media.Dispose();
-				url = url.TrimStart("file:///").Replace('/', '\\');
-				VlcPlayer.Media = new CodeBrix.Platform.MediaPlayerCore.Media(_vlc, url);
+				// Recreate the media from its original location string. Mrl is already a valid URI (a network
+				// URL, or "file:///..."), so FromLocation works for both remote and local media on every OS.
+				// The previous code stripped "file:///" and converted to Windows-style backslash separators
+				// with the default FromPath, which corrupted network URLs (and Linux/macOS local paths) into a
+				// bogus relative file path - so rewind/replay only ever worked on Windows.
+				var replayMedia = new CodeBrix.Platform.MediaPlayerCore.Media(_vlc, url, FromType.FromLocation);
+				// Re-attach the parsed-metadata handler (exactly as the Uri setter does) so NaturalDuration and
+				// the transport controls' timeline are re-established for the recreated media. Without this the
+				// timeline reads 00:00 / 00:00 after an auto-rewind, because a freshly-created media has no known
+				// Duration until it is parsed.
+				var replayWeakRef = new WeakReference<SkiaMediaPlayerExtension>(this);
+				replayMedia.ParsedChanged += (_, a) => replayWeakRef.GetTarget()?.OnLoadedMetadata(a.ParsedStatus);
+				VlcPlayer.Media = replayMedia;
 				// This doesn't start the playback. It just force-loads the media. This is the behaviour only when --start-paused
 				VlcPlayer.Play();
 			}

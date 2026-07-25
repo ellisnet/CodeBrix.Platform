@@ -1,13 +1,12 @@
 <Solution>
   <!-- EmulateFrameBufferDemo.slnx
        A CodeBrix.Platform application with Linux heads only (X11, Wayland, Frame Buffer).
-       The platform is consumed from PACKAGES — exactly like a real application — packed
-       from the working tree into the local feed this folder's NuGet.Config points at
-       (see pack-local-feed.sh). That makes this sample the end-to-end proof of the
-       CodeBrix.Develop frame-buffer emulator: its .LinuxFrameBuffer head holds a real
-       PackageReference to CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever,
-       and running it in the IDE silently swaps ONLY that reference for the
-       ...FrameBuffer.Emulated... package at build time. -->
+       The platform is consumed from PACKAGES on nuget.org — exactly like a real
+       application. That makes this sample the end-to-end proof of the CodeBrix.Develop
+       frame-buffer emulator: its .LinuxFrameBuffer head holds a real PackageReference to
+       CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever, and running it in
+       the IDE silently swaps ONLY that reference for the ...FrameBuffer.Emulated... package
+       at build time. -->
   <Project Path="src/EmulateFrameBufferDemo.UI/EmulateFrameBufferDemo.UI.shproj" />
   <Project Path="src/EmulateFrameBufferDemo.Core/EmulateFrameBufferDemo.Core.csproj" />
   <Project Path="src/EmulateFrameBufferDemo.LinuxX11/EmulateFrameBufferDemo.LinuxX11.csproj" />
