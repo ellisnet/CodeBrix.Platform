@@ -72,9 +72,19 @@ internal sealed class WaylandNativeOpenGLWrapper : INativeOpenGLWrapper
 				this.Log().Error($"{nameof(EglHelper.EglMakeCurrent)} failed.");
 			}
 		}
+		// Captured by value: Dispose may have cleared the field by the time this is unwound.
+		var eglDisplay = _eglDisplay;
 		return Disposable.Create(() =>
 		{
-			if (!EglHelper.EglMakeCurrent(display, drawSurface, readSurface, glContext))
+			// Nothing was current before, so there is nothing to restore. Asking to restore it
+			// anyway means eglMakeCurrent(EGL_NO_DISPLAY, ...), which is itself an error
+			// (EGL_BAD_DISPLAY) and only ever logged a failure for doing nothing wrong. Release
+			// our context instead, which is the actual intent.
+			var restored = display == IntPtr.Zero
+				? EglHelper.EglMakeCurrent(eglDisplay, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero)
+				: EglHelper.EglMakeCurrent(display, drawSurface, readSurface, glContext);
+
+			if (!restored)
 			{
 				if (this.Log().IsEnabled(LogLevel.Error))
 				{

@@ -56,6 +56,10 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 
 	private GLInitializationState _initializationState = new(GLInitializationStatus.NotYetInitialized);
 
+	// Latches once a subclass Init/RenderOverride has thrown, so a canvas whose shaders cannot
+	// compile reports the failure and then stays quiet instead of rethrowing on every frame.
+	private bool _subclassGlFailed;
+
 	// valid if and only if GLCanvasElement was loaded at least once and OpenGL is available on the running platform
 	private INativeOpenGLWrapper? _nativeOpenGlWrapper;
 	// These are valid if and only if IsLoaded and _nativeOpenGlWrapper is not null
@@ -323,10 +327,24 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 
 		_gl = GL.GetApi(this);
 
-		using (_nativeOpenGlWrapper.MakeCurrent())
+		try
 		{
-			UpdateFramebuffer();
-			Init(_gl);
+			using (_nativeOpenGlWrapper.MakeCurrent())
+			{
+				UpdateFramebuffer();
+				Init(_gl);
+			}
+		}
+		catch (Exception e)
+		{
+			// A context can satisfy the GL_VERSION floor above and still be unable to compile the
+			// subclass's shaders (e.g. a GL 3.1 / GLSL 1.40 driver and a "#version 330 core"
+			// shader). Record it as an initialization failure so GetGLInitializationState reports
+			// the driver's own message, rather than letting it escape as an unhandled exception
+			// out of the Loaded event - which leaves the state stuck at Initializing and gives the
+			// application nothing to show the user.
+			ReportSubclassGlFailure(e, nameof(Init));
+			return;
 		}
 
 		var window =
@@ -351,6 +369,8 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	private void OnUnloaded(object sender, RoutedEventArgs routedEventArgs)
 	{
 		// Mirrors IsGLInitialized returning to null: the state is only valid while loaded.
+		// Clearing the latch lets a reload retry, in case the next context can do better.
+		_subclassGlFailed = false;
 		_initializationState = new(GLInitializationStatus.NotYetInitialized);
 		IsGLInitialized = null;
 		if (_nativeOpenGlWrapper is null)
@@ -447,11 +467,31 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		Invalidate();
 	}
 
+	/// <summary>
+	/// Records a failure thrown by a subclass's <see cref="Init"/> or <see cref="RenderOverride"/>
+	/// as an <see cref="GLInitializationStatus.InitializationFailed"/> state, so that
+	/// <see cref="GetGLInitializationState"/> can report it to the application.
+	/// </summary>
+	private void ReportSubclassGlFailure(Exception exception, string origin)
+	{
+		_subclassGlFailed = true;
+
+		if (this.Log().IsEnabled(LogLevel.Error))
+		{
+			this.Log().Error($"{nameof(GLCanvasElement)}.{origin} failed; the 3D content cannot be rendered.", exception);
+		}
+
+		_initializationState = new(GLInitializationStatus.InitializationFailed, exception.Message);
+		IsGLInitialized = false;
+	}
+
 	private unsafe void Render()
 	{
 		// _details/_backBuffer are null until UpdateFramebuffer has run with a real (non-zero) size,
 		// which may be after the first paint is requested; skip painting until then.
-		if (!IsLoaded || _nativeOpenGlWrapper is null || _details is null || _backBuffer is null)
+		// _subclassGlFailed means the subclass already threw once; the failure is recorded and
+		// retrying it every frame would only repeat it.
+		if (!IsLoaded || _nativeOpenGlWrapper is null || _details is null || _backBuffer is null || _subclassGlFailed)
 		{
 			return;
 		}
@@ -464,7 +504,18 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		{
 			_gl.Viewport(new System.Drawing.Size((int)RenderSize.Width, (int)RenderSize.Height));
 
-			RenderOverride(_gl);
+			try
+			{
+				RenderOverride(_gl);
+			}
+			catch (Exception e)
+			{
+				// Subclasses commonly initialize lazily on their first RenderOverride, so a shader
+				// that cannot compile surfaces here rather than in Init. Same treatment: record it
+				// so the application can report it, instead of throwing out of a paint.
+				ReportSubclassGlFailure(e, nameof(RenderOverride));
+				return;
+			}
 
 			_gl.ReadBuffer(GLEnum.ColorAttachment0);
 

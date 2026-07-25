@@ -165,10 +165,20 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 		// installed. Context creation happens once per window, so serialising it costs nothing.
 		private static readonly object _createContextLock = new();
 
-		public static IntPtr CreateContext(IntPtr display, IntPtr fbConfig)
+		public static IntPtr CreateContext(IntPtr display, IntPtr fbConfig) => CreateContext(display, fbConfig, out _);
+
+		/// <param name="usedLegacyFallback">
+		/// True when the GLX_ARB_create_context request above could not be satisfied and the legacy
+		/// <see cref="glXCreateNewContext"/> path produced the context instead. Callers that need a
+		/// specific GL/GLSL level can use this as a cheap "this context was NOT built to the 3.3
+		/// floor we asked for" signal, and only then pay for querying what they actually got —
+		/// leaving drivers that honoured the request on exactly the code path they use today.
+		/// </param>
+		public static IntPtr CreateContext(IntPtr display, IntPtr fbConfig, out bool usedLegacyFallback)
 		{
 			lock (_createContextLock)
 			{
+				usedLegacyFallback = false;
 				var errorOccurred = false;
 				XErrorHandler errorHandler = (IntPtr _, ref XErrorEvent errorEvent) =>
 				{
@@ -218,6 +228,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 					// GLX_ARB_create_context. Deliberately left outside the error-handler block
 					// above so this call behaves exactly as it did before a context was ever
 					// requested through GLX_ARB_create_context.
+					usedLegacyFallback = true;
 					context = glXCreateNewContext(display, fbConfig, GlxConsts.GLX_RGBA_TYPE, IntPtr.Zero, /* True */ 1);
 				}
 

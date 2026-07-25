@@ -46,7 +46,16 @@ internal class EglHelper
 		return NativeLibrary.Load(actualName, assembly, searchPath);
 	}
 
-	public static (IntPtr surface, IntPtr glContext, int major, int minor, int samples, int stencil) InitializeGles2Context(IntPtr eglDisplay, IntPtr? window = null)
+	/// <param name="preferSurfaceless">
+	/// When true and no <paramref name="window"/> is given, use a surfaceless context
+	/// (EGL_KHR_surfaceless_context) in preference to a pbuffer, rather than only as a fallback
+	/// after pbuffer creation fails. Callers that render exclusively into FBOs do not need a
+	/// surface at all, and on some EGL platforms asking for the pbuffer is actively harmful:
+	/// Mesa's X11 platform turns this zero-sized pbuffer request into an X_CreatePixmap with a
+	/// 0x0 size, which is a BadValue protocol error and therefore fatal to the process rather
+	/// than a recoverable EGL failure. Defaults to false so existing callers are unaffected.
+	/// </param>
+	public static (IntPtr surface, IntPtr glContext, int major, int minor, int samples, int stencil) InitializeGles2Context(IntPtr eglDisplay, IntPtr? window = null, bool preferSurfaceless = false)
 	{
 		if (eglDisplay == IntPtr.Zero)
 		{
@@ -94,7 +103,11 @@ internal class EglHelper
 		}
 
 		IntPtr surface;
-		if (window is null)
+		if (window is null && preferSurfaceless && SupportsSurfacelessContext(eglDisplay))
+		{
+			surface = IntPtr.Zero; // EGL_NO_SURFACE
+		}
+		else if (window is null)
 		{
 			surface = EglCreatePbufferSurface(eglDisplay, configs[0], [EGL_NONE]);
 			if (surface == IntPtr.Zero)
@@ -105,8 +118,7 @@ internal class EglHelper
 				// BAD_MATCH). An offscreen context doesn't actually need a surface when the
 				// surfaceless-context extension is available: callers render into FBOs and make the
 				// context current with EGL_NO_SURFACE, so fall back to returning no surface.
-				var extensions = Marshal.PtrToStringUTF8(EglQueryString(eglDisplay, EGL_EXTENSIONS));
-				if (extensions is not null && extensions.Contains("EGL_KHR_surfaceless_context", StringComparison.Ordinal))
+				if (SupportsSurfacelessContext(eglDisplay))
 				{
 					surface = IntPtr.Zero; // EGL_NO_SURFACE
 				}
@@ -125,6 +137,16 @@ internal class EglHelper
 			}
 		}
 		return (surface, glContext, major, minor, samples, stencil);
+	}
+
+	/// <summary>
+	/// True when the display advertises EGL_KHR_surfaceless_context, i.e. a context can be made
+	/// current with EGL_NO_SURFACE and render into FBOs without any surface existing.
+	/// </summary>
+	public static bool SupportsSurfacelessContext(IntPtr eglDisplay)
+	{
+		var extensions = Marshal.PtrToStringUTF8(EglQueryString(eglDisplay, EGL_EXTENSIONS));
+		return extensions is not null && extensions.Contains("EGL_KHR_surfaceless_context", StringComparison.Ordinal);
 	}
 
 	public static unsafe string GetGlVersionString()
