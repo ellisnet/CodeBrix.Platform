@@ -37,11 +37,14 @@
   </ItemGroup>
 
   <!--
-    The CodeBrix.Platform framework + add-ins, consumed as PACKAGES from nuget.org — the
-    same shape as a real application, which is the point of this sample: it is the
-    end-to-end test rig for the CodeBrix.Develop frame-buffer emulator, and the emulator's
-    silent head swap exists for package-consuming apps. The family packages are pinned to
-    the published version; bump them together when moving to a newer family release.
+    The CodeBrix.Platform framework + add-ins, consumed as PACKAGES — the same shape as a
+    real application, which is the point of this sample: it is the end-to-end test rig for
+    the CodeBrix.Develop frame-buffer emulator, and the emulator's silent head swap exists
+    for package-consuming apps. The family packages are pinned together; bump them as a set.
+    TEMPORARILY ON A LOCAL FEED: 1.0.205.9999 is a working-tree pack (see ./NuGet.Config and
+    ./pack-local-feed.sh), needed to test the not-yet-published orientation work in the
+    emulated head. Repoint to the published version — and delete NuGet.Config, the pack
+    script and the nugets/Release feed — after the family's next real publish.
       * WebView (WPE WebKit, offscreen): requires the system WPE WebKit engine at run time:
         sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
       * Graphics3DGL: the GLCanvasElement the 3D pane draws into.
@@ -49,9 +52,9 @@
         derives from (versioned to the SkiaSharp release it vendors, not the family version).
   -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.ApacheLicenseForever" Version="1.0.205.475" />
-    <PackageReference Include="CodeBrix.Platform.WebView.ApacheLicenseForever" Version="1.0.205.475" />
-    <PackageReference Include="CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever" Version="1.0.205.475" />
+    <PackageReference Include="CodeBrix.Platform.ApacheLicenseForever" Version="1.0.205.9999" />
+    <PackageReference Include="CodeBrix.Platform.WebView.ApacheLicenseForever" Version="1.0.205.9999" />
+    <PackageReference Include="CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever" Version="1.0.205.9999" />
     <PackageReference Include="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" Version="4.150.1" />
   </ItemGroup>
 </Project>

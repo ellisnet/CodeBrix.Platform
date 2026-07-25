@@ -105,10 +105,13 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			var connection = _connection!;
 
 			_isDispatcherThread = true;
-			// The emulated device's orientation is baked into the resolution
-			// the IDE launched us with, so rendering never rotates; the
-			// builder's Orientation option is deliberately inert here.
-			FrameBufferWindowWrapper.Init(DisplayOrientations.Landscape);
+			// How the application is mounted on the emulated panel, exactly as
+			// on the real head. The frame buffer's dimensions come from the
+			// IDE and never change, so a portrait mount does not resize
+			// anything — it draws the transposed application rotated into that
+			// same fixed buffer, and the application appears sideways, which is
+			// what a crosswise mount looks like on real hardware.
+			FrameBufferWindowWrapper.Init(_hostBuilder.DisplayOrientation, _hostBuilder.IsPreferredOrientation);
 			var keyboardSource = new EmulatedKeyboardInputSource();
 			FrameBufferPointerInputSource.Instance.Configure(keyboardSource.GetCurrentModifiersState);
 

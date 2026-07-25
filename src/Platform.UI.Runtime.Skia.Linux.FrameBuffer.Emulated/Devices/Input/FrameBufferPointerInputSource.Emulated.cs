@@ -4,6 +4,7 @@ using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.UI.Core;
 using Windows.UI.Input;
+using Windows.Graphics.Display;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.Transport;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.UI;
@@ -24,15 +25,37 @@ internal partial class FrameBufferPointerInputSource
 	/// </summary>
 	public void ProcessEmulatedTouch(uint messageType, int pointerId, int deviceX, int deviceY)
 	{
-		// Device pixels -> logical (view) coordinates, the space pointer
-		// events are raised in. Bounds is the raw size divided by the
+		// Frame-buffer pixels -> logical (view) coordinates, the space pointer
+		// events are raised in, undoing the mounted orientation exactly as the
+		// real head's GetOrientationAdjustedAbsolutionPosition does for
+		// libinput. The incoming coordinates are always in the BUFFER's space,
+		// which never changes shape; Size is the application's space and is
+		// transposed for the portrait mounts, so transpose it back to
+		// normalize against. Bounds is the application's space divided by the
 		// rasterization scale, so this stays correct under
 		// CODEBRIX_DISPLAY_SCALE_OVERRIDE.
+		var orientation = FrameBufferWindowWrapper.Instance.Orientation;
 		var bounds = FrameBufferWindowWrapper.Instance.Bounds;
 		var size = FrameBufferWindowWrapper.Instance.Size;
-		var position = new Point(
-			deviceX * bounds.Width / Math.Max(1, size.Width),
-			deviceY * bounds.Height / Math.Max(1, size.Height));
+		var isPortrait = orientation
+			is DisplayOrientations.Portrait or DisplayOrientations.PortraitFlipped;
+		var normalizedX = deviceX / (double) Math.Max(1, isPortrait ? size.Height : size.Width);
+		var normalizedY = deviceY / (double) Math.Max(1, isPortrait ? size.Width : size.Height);
+		var position = orientation switch
+		{
+			DisplayOrientations.Portrait => new Point(
+				normalizedY * bounds.Width,
+				(1 - normalizedX) * bounds.Height),
+			DisplayOrientations.LandscapeFlipped => new Point(
+				(1 - normalizedX) * bounds.Width,
+				(1 - normalizedY) * bounds.Height),
+			DisplayOrientations.PortraitFlipped => new Point(
+				(1 - normalizedY) * bounds.Width,
+				normalizedX * bounds.Height),
+			_ => new Point(
+				normalizedX * bounds.Width,
+				normalizedY * bounds.Height),
+		};
 
 		var properties = new PointerPointProperties();
 		Action<PointerEventArgs> raisePointerEvent;

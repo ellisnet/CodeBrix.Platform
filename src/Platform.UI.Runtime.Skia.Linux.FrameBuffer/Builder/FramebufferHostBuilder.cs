@@ -47,9 +47,39 @@ public class FramebufferHostBuilder : IPlatformHostBuilder
 		return this;
 	}
 
-	public FramebufferHostBuilder Orientation(DisplayOrientations orientation)
+	/// <summary>
+	/// How the application is oriented on the panel.
+	/// <para>
+	/// By DEFAULT (<paramref name="isPreferredOrientation"/> false — the legacy path)
+	/// the value is a ROTATION APPLIED to the application's canvas relative to the
+	/// panel's scanout: <see cref="DisplayOrientations.Landscape"/> is no rotation,
+	/// <see cref="DisplayOrientations.Portrait"/> a quarter turn, and so on. On a
+	/// landscape-native panel that reads naturally. On a PORTRAIT-native panel it does
+	/// not: Landscape leaves the application portrait, because Landscape names zero
+	/// rotation rather than "make me landscape".
+	/// </para>
+	/// <para>
+	/// Pass <paramref name="isPreferredOrientation"/> true to state instead which
+	/// orientation the APPLICATION WANTS TO BE, and let the rotation be worked out from
+	/// the panel's native geometry. On a landscape-native panel this is identical to the
+	/// default for every value; it differs only on a portrait-native panel, where
+	/// Landscape then yields a landscape application rendered sideways.
+	/// </para>
+	/// <para>
+	/// <see cref="DisplayOrientations.None"/> means "whatever the panel is natively" —
+	/// no rotation — and is unaffected by the flag, so it behaves the same as not
+	/// calling this method at all.
+	/// </para>
+	/// </summary>
+	/// <param name="orientation">The rotation to apply, or the orientation the
+	/// application wants to be when <paramref name="isPreferredOrientation"/> is true.</param>
+	/// <param name="isPreferredOrientation">Whether <paramref name="orientation"/> states
+	/// the orientation the application wants to be, rather than a rotation to apply.</param>
+	public FramebufferHostBuilder Orientation(DisplayOrientations orientation,
+		bool isPreferredOrientation = false)
 	{
 		DisplayOrientation = orientation;
+		IsPreferredOrientation = isPreferredOrientation;
 		return this;
 	}
 
@@ -104,6 +134,8 @@ public class FramebufferHostBuilder : IPlatformHostBuilder
 	internal float MouseCursorRadius { get; private set; } = 5;
 
 	internal DisplayOrientations DisplayOrientation { get; private set; } = DisplayOrientations.Landscape;
+
+	internal bool IsPreferredOrientation { get; private set; }
 
 	internal bool? UseDRM { get; private set; }
 

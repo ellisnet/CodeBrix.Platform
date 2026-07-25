@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <!-- EXACTLY ONE platform head package: the Skia X11 backend for Linux desktops,
-       consumed from nuget.org like any real application. -->
+       consumed as a package like any real application (temporarily from the working-tree local feed; see ../../pack-local-feed.sh). -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever" Version="1.0.205.475" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever" Version="1.0.205.9999" />
   </ItemGroup>
 </Project>

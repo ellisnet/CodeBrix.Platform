@@ -19,13 +19,14 @@
 
   <!--
     EXACTLY ONE platform head package: the Linux frame-buffer backend (no desktop;
-    kiosk/embedded), consumed from nuget.org like any real application. This single
+    kiosk/embedded), consumed as a package like any real application (temporarily from the
+    working-tree local feed; see ../../pack-local-feed.sh). This single
     line is what the CodeBrix.Develop frame-buffer emulator silently swaps for
     CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever at build
     time when this head is run or debugged in the IDE — the file you are reading is
     never modified.
   -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever" Version="1.0.205.475" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever" Version="1.0.205.9999" />
   </ItemGroup>
 </Project>
