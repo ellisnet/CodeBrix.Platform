@@ -20,7 +20,7 @@ internal class Program
             // native geometry. Without isPreferredOrientation the value would instead
             // be a rotation to apply, and Landscape would mean "no rotation".
             .UseLinuxFrameBuffer(fb => fb
-                //.Orientation(DisplayOrientations.Landscape, isPreferredOrientation: true) //wants Landscape: upright on a landscape panel, sideways on a portrait one
+                .Orientation(DisplayOrientations.Landscape, isPreferredOrientation: true) //wants Landscape: upright on a landscape panel, sideways on a portrait one
                 .AutoRotationEnabled(true))
                 //.AutoRotationEnabled(DisplayOrientations.Landscape, DisplayOrientations.LandscapeFlipped))
             //.UseLinuxFrameBuffer(fb => fb.Orientation(DisplayOrientations.LandscapeFlipped, isPreferredOrientation: true)) //wants Landscape (upside-down)
