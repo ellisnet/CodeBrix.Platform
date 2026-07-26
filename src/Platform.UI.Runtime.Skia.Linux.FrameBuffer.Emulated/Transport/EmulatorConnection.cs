@@ -129,7 +129,8 @@ internal sealed class EmulatorConnection
 			connection.SendMessage(FrameBufferEmulatorProtocol.HelloMessage,
 				FrameBufferEmulatorProtocol.Version, (uint) Environment.ProcessId,
 				FrameBufferEmulatorProtocol.CapabilityKeyboard
-					| FrameBufferEmulatorProtocol.CapabilityTouchPointIds);
+					| FrameBufferEmulatorProtocol.CapabilityTouchPointIds
+					| FrameBufferEmulatorProtocol.CapabilityRotation);
 			error = null;
 			return true;
 		}
@@ -173,7 +174,8 @@ internal sealed class EmulatorConnection
 	/// on end-of-file.
 	/// </summary>
 	public void StartInputLoop(Action<uint, int, int, int> onTouch,
-		Action<bool, uint, uint, uint> onKey)
+		Action<bool, uint, uint, uint> onKey,
+		Action<uint> onDeviceOrientation)
 	{
 		new Thread(() =>
 		{
@@ -195,6 +197,10 @@ internal sealed class EmulatorConnection
 					or FrameBufferEmulatorProtocol.KeyUpMessage)
 				{
 					onKey(type == FrameBufferEmulatorProtocol.KeyDownMessage, a, b, c);
+				}
+				else if (type == FrameBufferEmulatorProtocol.SetOrientationMessage)
+				{
+					onDeviceOrientation(a);
 				}
 				// Unknown message types are ignored, for forward compatibility.
 			}

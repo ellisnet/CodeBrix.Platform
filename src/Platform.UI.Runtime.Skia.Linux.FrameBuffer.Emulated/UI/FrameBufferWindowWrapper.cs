@@ -15,15 +15,26 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 	private static FrameBufferWindowWrapper? _instance;
 	internal static FrameBufferWindowWrapper Instance => _instance!;
 
-	public static void Init(DisplayOrientations orientation, bool isPreferredOrientation = false)
-		=> _instance = new(orientation, isPreferredOrientation);
+	public static void Init(DisplayOrientations orientation, bool isPreferredOrientation = false,
+		DisplayOrientations? autoRotationOrientations = null, bool autoRotationDisabled = false)
+		=> _instance = new(orientation, isPreferredOrientation, autoRotationOrientations, autoRotationDisabled);
 
 	public override object? NativeWindow => null;
 
 	private readonly bool _isPreferredOrientation;
+	private readonly DisplayOrientations? _autoRotationOrientations;
+	private readonly bool _autoRotationDisabled;
 	private bool _orientationResolved;
+	private Size _panelSize;
 
-	private FrameBufferWindowWrapper(DisplayOrientations orientation, bool isPreferredOrientation)
+	/// <summary>
+	/// Raised when the device has been turned to an orientation the application
+	/// honors, after the application's bounds have been updated for it.
+	/// </summary>
+	internal event Action? DeviceOrientationChanged;
+
+	private FrameBufferWindowWrapper(DisplayOrientations orientation, bool isPreferredOrientation,
+		DisplayOrientations? autoRotationOrientations, bool autoRotationDisabled)
 	{
 		if (_instance != null)
 		{
@@ -33,6 +44,56 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 
 		Orientation = orientation;
 		_isPreferredOrientation = isPreferredOrientation;
+		_autoRotationOrientations = autoRotationOrientations;
+		_autoRotationDisabled = autoRotationDisabled;
+	}
+
+	/// <summary>
+	/// The panel's own orientation — Landscape when its scanout is at least as wide
+	/// as it is tall, Portrait otherwise. Fixed for the life of the process, and
+	/// known only once <see cref="SetSize"/> has supplied the geometry.
+	/// </summary>
+	internal DisplayOrientations NativeOrientation { get; private set; } = DisplayOrientations.Landscape;
+
+	/// <summary>
+	/// The orientation the application currently IS: the device orientation its UI
+	/// is right-side-up for. Distinct from <see cref="Orientation"/>, which is the
+	/// rotation applied to the canvas to get it there.
+	/// </summary>
+	internal DisplayOrientations CurrentOrientation
+		=> FromQuarterTurns(QuarterTurns(Orientation) + QuarterTurns(NativeOrientation));
+
+	/// <summary>
+	/// The device has been turned to <paramref name="deviceOrientation"/>. Honored
+	/// only when the application accepts that orientation
+	/// (<see cref="DisplayInformation.AutoRotationPreferences"/>); otherwise NOTHING
+	/// changes and the UI stays as it was, appearing sideways or upside-down exactly
+	/// like a locked application on a turned device. Returns whether it was honored.
+	/// </summary>
+	internal bool SetDeviceOrientation(DisplayOrientations deviceOrientation)
+	{
+		// Defensive only: the renderer hands over the panel size before the transport's
+		// input loop starts, so an orientation can never arrive before this is resolved.
+		if (!_orientationResolved)
+		{
+			return false;
+		}
+		// None is "no preference stated", which allows everything — NOT "nothing".
+		var preferences = DisplayInformation.AutoRotationPreferences;
+		if (preferences != DisplayOrientations.None && !preferences.HasFlag(deviceOrientation))
+		{
+			return false;
+		}
+		var rotation = FromQuarterTurns(
+			QuarterTurns(deviceOrientation) - QuarterTurns(NativeOrientation));
+		if (rotation == Orientation)
+		{
+			return false;
+		}
+		Orientation = rotation;
+		SetSize(_panelSize);
+		DeviceOrientationChanged?.Invoke();
+		return true;
 	}
 
 	/// <summary>
@@ -85,14 +146,33 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 			return;
 		}
 		_orientationResolved = true;
-		if (!_isPreferredOrientation || Orientation == DisplayOrientations.None)
-		{
-			return;
-		}
-		var native = rawScreenSize.Width >= rawScreenSize.Height
+		_panelSize = rawScreenSize;
+		NativeOrientation = rawScreenSize.Width >= rawScreenSize.Height
 			? DisplayOrientations.Landscape
 			: DisplayOrientations.Portrait;
-		Orientation = FromQuarterTurns(QuarterTurns(Orientation) - QuarterTurns(native));
+		if (_isPreferredOrientation && Orientation != DisplayOrientations.None)
+		{
+			Orientation = FromQuarterTurns(
+				QuarterTurns(Orientation) - QuarterTurns(NativeOrientation));
+		}
+		SeedAutoRotationPreferences();
+	}
+
+	// Hands the host builder's AutoRotationEnabled setting to the property that is
+	// the single source of truth for it. Done here rather than at Init because
+	// "never rotate" can only be expressed as the orientation the application ends
+	// up in, which is not knowable until the panel is. An application that assigns
+	// AutoRotationPreferences itself at run time simply overwrites this.
+	private void SeedAutoRotationPreferences()
+	{
+		if (_autoRotationDisabled)
+		{
+			DisplayInformation.AutoRotationPreferences = CurrentOrientation;
+		}
+		else if (_autoRotationOrientations is { } orientations)
+		{
+			DisplayInformation.AutoRotationPreferences = orientations;
+		}
 	}
 
 	// Position in the quarter-turn cycle: Landscape, Portrait, LandscapeFlipped and

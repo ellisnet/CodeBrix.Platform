@@ -84,6 +84,53 @@ public class FramebufferHostBuilder : IPlatformHostBuilder
 	}
 
 	/// <summary>
+	/// The DEVICE orientations the application honors while it is running: turn the
+	/// device to one of these and the application re-lays-out so its UI is right-side-up
+	/// for it. Turn it to any other and NOTHING changes — the application stays as it
+	/// was, appearing sideways or upside-down, exactly like a locked application on a
+	/// turned device.
+	/// <para>
+	/// Sugar over <see cref="DisplayInformation.AutoRotationPreferences"/>, which this
+	/// assigns and which remains the single source of truth: an application may set that
+	/// property directly instead, or change it later at run time (per page, say), and the
+	/// later assignment simply wins.
+	/// </para>
+	/// <para>
+	/// This governs RUNNING rotation only. Which orientation the application STARTS in is
+	/// <see cref="Orientation"/>'s business, so an application may legitimately start
+	/// outside this list — it then rotates out of that orientation and never back.
+	/// </para>
+	/// </summary>
+	/// <param name="orientations">The device orientations to honor. Passing none is the
+	/// same as <c>AutoRotationEnabled(false)</c>.</param>
+	public FramebufferHostBuilder AutoRotationEnabled(params DisplayOrientations[] orientations)
+	{
+		AutoRotationOrientations = DisplayOrientations.None;
+		foreach (var orientation in orientations ?? [])
+		{
+			AutoRotationOrientations |= orientation;
+		}
+		AutoRotationDisabled = AutoRotationOrientations == DisplayOrientations.None;
+		return this;
+	}
+
+	/// <summary>
+	/// Whether the application honors device rotation at all: false locks it to whatever
+	/// orientation it started in, true honors all four. See the overload taking a list
+	/// for the detail — this is the same setting, spelled for the two extremes.
+	/// </summary>
+	/// <param name="enabled">Whether to honor device rotation.</param>
+	public FramebufferHostBuilder AutoRotationEnabled(bool enabled)
+	{
+		AutoRotationDisabled = !enabled;
+		AutoRotationOrientations = enabled
+			? DisplayOrientations.Landscape | DisplayOrientations.Portrait
+				| DisplayOrientations.LandscapeFlipped | DisplayOrientations.PortraitFlipped
+			: DisplayOrientations.None;
+		return this;
+	}
+
+	/// <summary>
 	/// Determines if OpenGLES+EGL initialized with DRM+GBM should be used for hardware-accelerated rendering on the
 	/// Linux Framebuffer target instead of software rendering. If not called, we try to create an OpenGLES context if possible.
 	/// Otherwise, software rendering will be used.
@@ -136,6 +183,15 @@ public class FramebufferHostBuilder : IPlatformHostBuilder
 	internal DisplayOrientations DisplayOrientation { get; private set; } = DisplayOrientations.Landscape;
 
 	internal bool IsPreferredOrientation { get; private set; }
+
+	// null until AutoRotationEnabled is called: the application's own
+	// AutoRotationPreferences assignment, if any, is then left entirely alone.
+	internal DisplayOrientations? AutoRotationOrientations { get; private set; }
+
+	// "Never rotate" cannot be spelled as a preferences value — None means NO
+	// PREFERENCE STATED there, which allows everything — so it is carried
+	// separately and resolved to the startup orientation once the panel is known.
+	internal bool AutoRotationDisabled { get; private set; }
 
 	internal bool? UseDRM { get; private set; }
 

@@ -111,7 +111,8 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			// anything — it draws the transposed application rotated into that
 			// same fixed buffer, and the application appears sideways, which is
 			// what a crosswise mount looks like on real hardware.
-			FrameBufferWindowWrapper.Init(_hostBuilder.DisplayOrientation, _hostBuilder.IsPreferredOrientation);
+			FrameBufferWindowWrapper.Init(_hostBuilder.DisplayOrientation, _hostBuilder.IsPreferredOrientation,
+				_hostBuilder.AutoRotationOrientations, _hostBuilder.AutoRotationDisabled);
 			var keyboardSource = new EmulatedKeyboardInputSource();
 			FrameBufferPointerInputSource.Instance.Configure(keyboardSource.GetCurrentModifiersState);
 
@@ -142,12 +143,38 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			Windows.UI.Core.CoreDispatcher.DispatchOverride = Dispatch;
 			Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
 
+			// The renderer's constructor is what first hands the frame buffer's size to
+			// the window wrapper, so the panel is resolved before the input loop below
+			// can deliver an orientation that depends on knowing it.
 			_renderer = new EmulatedRenderer(this, connection);
 			connection.StartInputLoop(
 				FrameBufferPointerInputSource.Instance.ProcessEmulatedTouch,
-				keyboardSource.ProcessEmulatedKey);
+				keyboardSource.ProcessEmulatedKey,
+				ProcessEmulatedDeviceOrientation);
 
 			WUX.Application.Start(CreateApp);
+		}
+
+		// The emulator says the device has been turned. Arrives on the transport's
+		// input thread, so it is marshalled onto the dispatcher — honoring it
+		// re-lays-out the application — and a repaint is forced afterwards, because a
+		// rotation changes how the visual tree is drawn without changing the tree.
+		private void ProcessEmulatedDeviceOrientation(uint wireOrientation)
+		{
+			var orientation = wireOrientation switch
+			{
+				FrameBufferEmulatorProtocol.OrientationPortrait => DisplayOrientations.Portrait,
+				FrameBufferEmulatorProtocol.OrientationLandscapeFlipped => DisplayOrientations.LandscapeFlipped,
+				FrameBufferEmulatorProtocol.OrientationPortraitFlipped => DisplayOrientations.PortraitFlipped,
+				_ => DisplayOrientations.Landscape,
+			};
+			_eventLoop.Schedule(() =>
+			{
+				if (FrameBufferWindowWrapper.Instance.SetDeviceOrientation(orientation))
+				{
+					_renderer?.InvalidateRender();
+				}
+			});
 		}
 
 		void IXamlRootHost.InvalidateRender() => _renderer?.InvalidateRender();

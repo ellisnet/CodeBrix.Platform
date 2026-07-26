@@ -115,7 +115,8 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 		private void InnerInitialize()
 		{
 			_isDispatcherThread = true;
-			FrameBufferWindowWrapper.Init(_hostBuilder.DisplayOrientation, _hostBuilder.IsPreferredOrientation);
+			FrameBufferWindowWrapper.Init(_hostBuilder.DisplayOrientation, _hostBuilder.IsPreferredOrientation,
+				_hostBuilder.AutoRotationOrientations, _hostBuilder.AutoRotationDisabled);
 			var keyboardSource = new FrameBufferKeyboardInputSource(this, _hostBuilder.KeymapParams);
 
 			ApiExtensibility.Register(typeof(INativeWindowFactoryExtension), o => new NativeWindowFactoryExtension(this));

@@ -21,8 +21,11 @@ namespace CodeBrix.Platform.UI.Runtime.Skia //Was previously: Uno.UI.Runtime.Ski
 			ResolutionScale ResolutionScale,
 			double? DiagonalSizeInInches);
 
+		private readonly DisplayInformation _owner;
+
 		public DisplayInformationExtension(object owner, float? scaleOverride)
 		{
+			_owner = (DisplayInformation)owner;
 			if (float.TryParse(
 				Environment.GetEnvironmentVariable(EnvironmentCodeBrixDisplayScaleOverride),
 				NumberStyles.Any,
@@ -38,6 +41,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia //Was previously: Uno.UI.Runtime.Ski
 
 			var screenSize = FrameBufferWindowWrapper.Instance.Size;
 			FrameBufferWindowWrapper.Instance.Window!.AppWindow.Changed += OnSizeChanged;
+			// Turning the device swaps the application's bounds without any window
+			// ever resizing, so the AppWindow hook above never sees it.
+			FrameBufferWindowWrapper.Instance.DeviceOrientationChanged += OnDeviceOrientationChanged;
 			_details = new(
 				(uint)screenSize.Width,
 				(uint)screenSize.Height,
@@ -70,8 +76,28 @@ namespace CodeBrix.Platform.UI.Runtime.Skia //Was previously: Uno.UI.Runtime.Ski
 								   $"ScreenInRawPixels: {ScreenWidthInRawPixels}x{ScreenHeightInRawPixels}");
 		}
 
+		// The device turned to an orientation the application honors: its bounds have
+		// already been swapped, so republish them and tell the application.
+		private void OnDeviceOrientationChanged()
+		{
+			_details = _details with
+			{
+				ScreenWidthInRawPixels = (uint)FrameBufferWindowWrapper.Instance.Size.Width,
+				ScreenHeightInRawPixels = (uint)FrameBufferWindowWrapper.Instance.Size.Height,
+			};
+			this.LogDebug()?.Debug($"Display orientation changed: " +
+								   $"CurrentOrientation: {CurrentOrientation}, " +
+								   $"ScreenInRawPixels: {ScreenWidthInRawPixels}x{ScreenHeightInRawPixels}");
+			_owner.NotifyOrientationChanged();
+		}
+
+		/// <summary>
+		/// The orientation the application currently IS — the device orientation its
+		/// UI is right-side-up for, which on a panel whose native orientation differs
+		/// is not the same as the rotation being applied to reach it.
+		/// </summary>
 		public DisplayOrientations CurrentOrientation
-			=> DisplayOrientations.Landscape;
+			=> FrameBufferWindowWrapper.Instance.CurrentOrientation;
 
 		public uint ScreenHeightInRawPixels
 			=> _details.ScreenHeightInRawPixels;
