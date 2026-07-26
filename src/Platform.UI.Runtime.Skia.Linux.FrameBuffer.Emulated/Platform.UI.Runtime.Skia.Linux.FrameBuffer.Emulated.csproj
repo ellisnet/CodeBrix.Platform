@@ -50,6 +50,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The pickers, software keyboard, and their host-builder options are single-source
+		     with the real FrameBuffer head: the files live under that head's Shared folder
+		     and are linked here so the two heads can never drift apart. -->
+		<Compile Include="..\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Shared\**\*.cs" Link="Shared\%(RecursiveDir)%(Filename)%(Extension)" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- Pack the buildTransitive props/targets renamed to <PackageId>.props/.targets so
 		     NuGet auto-imports them for consumers (and to satisfy NU5129). -->
 		<Content Include="buildTransitive\Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.Emulated.props">

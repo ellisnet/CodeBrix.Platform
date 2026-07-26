@@ -389,6 +389,53 @@ The components in this part are present as source code in this repository
     at run time, never vendored, so per this file's stated scope they are not
     documented here as in-repo source.
 
+--------------------------------------------------------------------------------
+ Unicode License v3  (full text in Part D)
+--------------------------------------------------------------------------------
+
+21. Unicode CLDR — keyboard layout data  (Unicode, Inc.)
+    Project URL:  https://github.com/unicode-org/cldr
+    Copyright:    Copyright © 1991-Present Unicode, Inc.
+    License:      Unicode License v3 (SPDX: Unicode-3.0)
+
+    The software-keyboard layout data files under
+    src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Shared/SoftwareKeyboard/
+    Layouts/ (the per-language character rows, shift and AltGr levels, and
+    long-press alternates for the on-screen keyboard of the FrameBuffer and
+    FrameBuffer.Emulated heads) are derived from the Unicode CLDR keyboard
+    data — the per-locale layout descriptions in the CLDR "keyboards" data
+    tree — transcribed into C# data declarations for this repository. The
+    xkeyboard-config project (https://gitlab.freedesktop.org/xkeyboard-config/
+    xkeyboard-config, MIT/X11-style license; the same license family as
+    item 11) was consulted as a secondary reference for national hardware
+    layout conventions; no xkeyboard-config source was copied.
+
+--------------------------------------------------------------------------------
+ Design references — no code or data incorporated
+--------------------------------------------------------------------------------
+
+22. On-screen keyboard design references
+    The interaction design of the software keyboard (three-page structure,
+    three-state shift, long-press alternate popups, layout-cycling key, and
+    per-orientation metrics) follows the conventions established by the
+    following open-source on-screen keyboards, consulted as DESIGN references
+    only — no source code, resource, or data file from any of them is present
+    in this repository:
+
+      - AOSP LatinIME (the Android Open Source Project keyboard)
+        https://android.googlesource.com/platform/packages/inputmethods/LatinIME
+        Apache License, Version 2.0
+      - FlorisBoard
+        https://github.com/florisboard/florisboard
+        Apache License, Version 2.0
+      - wvkbd  https://github.com/jjsullivan5196/wvkbd  and its ancestor
+        svkbd (suckless.org)  https://tools.suckless.org/x/svkbd/
+        MIT/X11 License
+
+    This entry is informational: because nothing was incorporated, no license
+    obligation attaches; it is recorded to document design provenance
+    completely.
+
 ================================================================================
  PART C — BUNDLED ASSET FILES
 ================================================================================
@@ -563,6 +610,48 @@ freely, subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be
    misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
+
+--------------------------------------------------------------------------------
+ Unicode License v3  (covers the CLDR-derived keyboard layout data in item 21)
+--------------------------------------------------------------------------------
+
+UNICODE LICENSE V3
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright © 1991-Present Unicode, Inc.
+
+NOTICE TO USER: Carefully read the following legal agreement. BY
+DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
+SOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of data files and any associated documentation (the "Data Files") or
+software and any associated documentation (the "Software") to deal in the
+Data Files or Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Data Files or Software, and to permit persons to whom the
+Data Files or Software are furnished to do so, provided that either (a)
+this copyright and permission notice appear with all copies of the Data
+Files or Software, or (b) this copyright and permission notice appear in
+associated Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+THIRD PARTY RIGHTS. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS
+INCLUDED IN THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT
+OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall
+not be used in advertising or otherwise to promote the sale, use or other
+dealings in these Data Files or Software without prior written
+authorization of the copyright holder.
 
 ================================================================================
  PART E — REDISTRIBUTED THIRD-PARTY BINARIES

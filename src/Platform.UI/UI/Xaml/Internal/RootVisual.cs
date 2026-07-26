@@ -46,6 +46,39 @@ internal partial class RootVisual : Panel, IRootElement
 	/// </summary>
 	internal VisualTree? AssociatedVisualTree { get; set; }
 
+	private double _contentBottomOcclusionInset;
+
+	/// <summary>
+	/// Height, in logical pixels, withheld from the BOTTOM of every root except the
+	/// popup root during measure and arrange. Zero (the default) is byte-for-byte
+	/// the historical behavior. A host that displays its own chrome over the bottom
+	/// of the window (an on-screen software keyboard, say) sets this so application
+	/// content re-lays-out into the remaining space — content can then never sit
+	/// under that chrome — while popups keep the full window to draw into.
+	/// </summary>
+	internal double ContentBottomOcclusionInset
+	{
+		get => _contentBottomOcclusionInset;
+		set
+		{
+			if (_contentBottomOcclusionInset != value)
+			{
+				_contentBottomOcclusionInset = value;
+				InvalidateMeasure();
+				InvalidateArrange();
+			}
+		}
+	}
+
+	private Size ApplyContentInset(UIElement child, Size size)
+	{
+		if (_contentBottomOcclusionInset > 0 && child != AssociatedVisualTree?.PopupRoot)
+		{
+			size = new Size(size.Width, Math.Max(0, size.Height - _contentBottomOcclusionInset));
+		}
+		return size;
+	}
+
 	/// <summary>
 	/// Updates the color of the background brush.
 	/// </summary>
@@ -66,7 +99,7 @@ internal partial class RootVisual : Panel, IRootElement
 			if (child != null)
 			{
 				// Measure child to the plugin size
-				child.Measure(availableSize);
+				child.Measure(ApplyContentInset(child, availableSize));
 			}
 		}
 
@@ -96,7 +129,8 @@ internal partial class RootVisual : Panel, IRootElement
 			{
 				child.EnsureLayoutStorage();
 
-				var childRect = new Rect(x, y, finalSize.Width, finalSize.Height);
+				var childSize = ApplyContentInset(child, finalSize);
+				var childRect = new Rect(x, y, childSize.Width, childSize.Height);
 
 				child.Arrange(childRect);
 			}

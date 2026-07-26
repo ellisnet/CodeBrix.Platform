@@ -10,13 +10,14 @@ using Windows.Foundation;
 using Windows.System;
 using Windows.UI.Core;
 using CodeBrix.Platform.UI.Runtime.Skia;
+using CodeBrix.Platform.UI.Runtime.Skia.SoftwareKeyboard;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Linux.FrameBuffer.Devices.Input;
 using static CodeBrix.Platform.UI.Runtime.Skia.Native.LibInput;
 using static CodeBrix.Platform.UI.Runtime.Skia.Native.libinput_key;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.Linux.FrameBuffer; //Was previously: Uno.WinUI.Runtime.Skia.Linux.FrameBuffer
 
-internal class FrameBufferKeyboardInputSource : ICodeBrixKeyboardInputSource
+internal class FrameBufferKeyboardInputSource : ICodeBrixKeyboardInputSource, ISoftwareKeyInjector
 {
 	private static FrameBufferKeyboardInputSource? _instance;
 
@@ -184,6 +185,23 @@ internal class FrameBufferKeyboardInputSource : ICodeBrixKeyboardInputSource
 			});
 
 		RaiseKeyEvent(KeyUp, args);
+	}
+
+	// The software keyboard's injection seam: a software key flows through the
+	// same KeyDown/KeyUp raise as a hardware key, with no xkb state involved and
+	// no modifiers (the character already carries its case), so every control
+	// works unmodified. ScanCode 0 marks "no hardware key".
+	public void InjectSoftwareKey(bool pressed, VirtualKey key, char? unicodeKey)
+	{
+		var status = new CorePhysicalKeyStatus
+		{
+			ScanCode = 0,
+			RepeatCount = 1,
+		};
+		var args = pressed
+			? new KeyEventArgs("keyboard", key, VirtualKeyModifiers.None, status, unicodeKey)
+			: new KeyEventArgs("keyboard", key, VirtualKeyModifiers.None, status);
+		RaiseKeyEvent(pressed ? KeyDown : KeyUp, args);
 	}
 
 	private void RaiseKeyEvent(TypedEventHandler<object, KeyEventArgs>? raisePointerEvent, KeyEventArgs args)

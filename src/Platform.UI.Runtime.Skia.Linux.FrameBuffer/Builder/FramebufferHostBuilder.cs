@@ -7,7 +7,7 @@ using CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Skia
 
-public class FramebufferHostBuilder : IPlatformHostBuilder
+public partial class FramebufferHostBuilder : IPlatformHostBuilder
 {
 	internal FramebufferHostBuilder()
 	{

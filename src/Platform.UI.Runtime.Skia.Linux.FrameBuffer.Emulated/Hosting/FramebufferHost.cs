@@ -128,6 +128,39 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			// surfaceless platform (llvmpipe software rendering on GPU-less systems).
 			ApiExtensibility.Register<Microsoft.UI.Xaml.XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), _ => new FrameBufferNativeOpenGLWrapper());
 
+			// The in-application pickers and the software keyboard exist ONLY when the
+			// host builder opted in, exactly as on the real FrameBuffer head; otherwise
+			// no registration happens and the pickers keep throwing
+			// NotSupportedException exactly as before.
+			if (_hostBuilder.FileOpenPickerEnabled)
+			{
+				var fileOpenOptions = _hostBuilder.FileOpenPickerOptions;
+				ApiExtensibility.Register<Windows.Storage.Pickers.FileOpenPicker>(
+					typeof(CodeBrix.Platform.Extensions.Storage.Pickers.IFileOpenPickerExtension),
+					o => new CodeBrix.Platform.UI.Runtime.Skia.Pickers.FrameBufferFileOpenPickerExtension(o, fileOpenOptions));
+			}
+			if (_hostBuilder.FileSavePickerEnabled)
+			{
+				var fileSaveOptions = _hostBuilder.FileSavePickerOptions;
+				ApiExtensibility.Register<Windows.Storage.Pickers.FileSavePicker>(
+					typeof(CodeBrix.Platform.Extensions.Storage.Pickers.IFileSavePickerExtension),
+					o => new CodeBrix.Platform.UI.Runtime.Skia.Pickers.FrameBufferFileSavePickerExtension(o, fileSaveOptions));
+			}
+			if (_hostBuilder.FolderPickerEnabled)
+			{
+				var folderOptions = _hostBuilder.FolderPickerOptions;
+				ApiExtensibility.Register<Windows.Storage.Pickers.FolderPicker>(
+					typeof(CodeBrix.Platform.Extensions.Storage.Pickers.IFolderPickerExtension),
+					o => new CodeBrix.Platform.UI.Runtime.Skia.Pickers.FrameBufferFolderPickerExtension(o, folderOptions));
+			}
+			if (_hostBuilder.SoftwareKeyboardEnabled)
+			{
+				var keyboardController = new CodeBrix.Platform.UI.Runtime.Skia.SoftwareKeyboard.SoftwareKeyboardController(
+					this, keyboardSource, _hostBuilder.SoftwareKeyboardOptions);
+				ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IInputPaneExtension), o => keyboardController);
+				ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Xaml.Controls.Extensions.ITextBoxNotificationsProviderSingleton), o => keyboardController);
+			}
+
 			void Dispatch(System.Action d, NativeDispatcherPriority p)
 				=> _eventLoop.Schedule(d);
 
