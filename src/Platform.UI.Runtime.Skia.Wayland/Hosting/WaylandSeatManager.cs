@@ -28,7 +28,16 @@ internal sealed class WaylandSeatManager
 
 	private WlPointer? _pointer;
 	private WlKeyboard? _keyboard;
+	private WlTouch? _touch;
 	private WpCursorShapeDeviceV1? _cursorShapeDevice;
+
+	// Touch state (event-pump thread). wl_touch.up carries ONLY a contact id — no surface
+	// and no coordinates — so the focus host and last known position of every live contact
+	// have to be tracked here to be able to raise the release at all. wl_touch.motion is
+	// likewise surface-less. Keyed by contact id, which the compositor reuses once a
+	// contact ends. (The frame-buffer head keeps the same kind of table against libinput
+	// slots, for exactly the same reason.)
+	private readonly Dictionary<int, (WaylandXamlRootHost Host, Point Position)> _touchContacts = new();
 
 	// Pointer state (event-pump thread).
 	private WaylandXamlRootHost? _pointerFocusHost;
@@ -87,6 +96,7 @@ internal sealed class WaylandSeatManager
 
 		var hasPointer = (capabilities & WlSeat.CapabilityEnum.Pointer) != 0;
 		var hasKeyboard = (capabilities & WlSeat.CapabilityEnum.Keyboard) != 0;
+		var hasTouch = (capabilities & WlSeat.CapabilityEnum.Touch) != 0;
 
 		if (hasPointer && _pointer == null)
 		{
@@ -129,6 +139,29 @@ internal sealed class WaylandSeatManager
 			StopRepeat();
 			_keyboard.Release();
 			_keyboard = null;
+		}
+
+		if (hasTouch && _touch == null)
+		{
+			_touch = seat.GetTouch(new WlTouch.Listener.Relay
+			{
+				OnDown = (_, serial, time, surface, id, x, y)
+					=> OnTouchDown(serial, time, surface, id, (double)x, (double)y),
+				OnUp = (_, serial, time, id) => OnTouchUp(serial, time, id),
+				OnMotion = (_, time, id, x, y) => OnTouchMotion(time, id, (double)x, (double)y),
+				OnCancel = _ => OnTouchCancel(),
+				// wl_touch.frame only marks the end of a batch of the above, and
+				// shape/orientation (v6+) describe the contact ellipse — neither carries
+				// anything the view layer consumes, so all three are deliberately unhandled.
+			});
+		}
+		else if (!hasTouch && _touch != null)
+		{
+			// A touch device going away mid-sequence still owes every live contact an end,
+			// or controls stay latched on a finger that can never lift.
+			OnTouchCancel();
+			_touch.Release();
+			_touch = null;
 		}
 	}
 
@@ -409,6 +442,63 @@ internal sealed class WaylandSeatManager
 	{
 		_lastInputSerial = serial;
 		_pointerFocusHost?.PointerSource?.ProcessButton(_pointerPosition, time, button, pressed, CurrentModifiers);
+	}
+
+	// Touch is routed per CONTACT, not per seat focus: wl_touch has no enter/leave pair, so
+	// the surface on the down event is the only routing information the protocol ever
+	// gives, and it has to be remembered for the life of that contact. Fingers on two
+	// different windows of this app stay correctly separated as a result.
+
+	private void OnTouchDown(uint serial, uint time, WlSurface? surface, int id, double x, double y)
+	{
+		_lastInputSerial = serial;
+		if (WaylandXamlRootHost.GetHostFromSurface(surface) is not { } host)
+		{
+			return;
+		}
+
+		var position = new Point(x, y);
+		_touchContacts[id] = (host, position);
+		host.PointerSource?.ProcessTouchDown(id, position, time, CurrentModifiers);
+	}
+
+	private void OnTouchMotion(uint time, int id, double x, double y)
+	{
+		// A contact this client never saw go down (or that was already cancelled) is
+		// ignored rather than guessed at — there is no surface here to route it with.
+		if (!_touchContacts.TryGetValue(id, out var contact))
+		{
+			return;
+		}
+
+		var position = new Point(x, y);
+		_touchContacts[id] = (contact.Host, position);
+		contact.Host.PointerSource?.ProcessTouchMotion(id, position, time, CurrentModifiers);
+	}
+
+	private void OnTouchUp(uint serial, uint time, int id)
+	{
+		_lastInputSerial = serial;
+		if (!_touchContacts.Remove(id, out var contact))
+		{
+			return;
+		}
+
+		// The release carries the contact's LAST known position: the protocol sends none,
+		// and the view layer needs a coherent point to hit-test the release against.
+		contact.Host.PointerSource?.ProcessTouchUp(id, contact.Position, time, CurrentModifiers);
+	}
+
+	private void OnTouchCancel()
+	{
+		// Compositor-initiated: it has claimed the whole sequence for a system gesture, so
+		// every live contact ends at once and no further events arrive for any of them.
+		foreach (var (id, contact) in _touchContacts)
+		{
+			contact.Host.PointerSource?.ProcessTouchCancel(id, contact.Position, 0, CurrentModifiers);
+		}
+
+		_touchContacts.Clear();
 	}
 
 	private void OnPointerAxis(uint time, WlPointer.AxisEnum axis, double value)

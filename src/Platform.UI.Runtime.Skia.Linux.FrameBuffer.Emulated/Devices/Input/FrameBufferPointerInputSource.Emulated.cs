@@ -59,12 +59,26 @@ internal partial class FrameBufferPointerInputSource
 
 		var properties = new PointerPointProperties();
 		Action<PointerEventArgs> raisePointerEvent;
+
+		// Entered / Pressed ... Released / Exited - the same full finger sequence
+		// the real head raises from libinput (and the X11 head from XI_TouchBegin /
+		// XI_TouchEnd), so what the emulator shows is what a touch panel does. The
+		// trailing Exited is what releases touch pointer captures: the managed
+		// input manager leaves them alone on pointer-up by design and has no
+		// auto-release fallback under managed pointers, so omitting it leaks every
+		// explicit CapturePointer and re-routes later releases to a stale target.
+		// Each pair is dispatched as ONE action so nothing interleaves between the
+		// two raises.
 		switch (messageType)
 		{
 			case FrameBufferEmulatorProtocol.TouchPressMessage:
 				properties.PointerUpdateKind = LeftButtonPressed;
 				properties.IsLeftButtonPressed = true;
-				raisePointerEvent = RaisePointerPressed;
+				raisePointerEvent = touchArgs =>
+				{
+					RaisePointerEntered(touchArgs);
+					RaisePointerPressed(touchArgs);
+				};
 				break;
 
 			case FrameBufferEmulatorProtocol.TouchMoveMessage:
@@ -75,7 +89,11 @@ internal partial class FrameBufferPointerInputSource
 			case FrameBufferEmulatorProtocol.TouchReleaseMessage:
 				properties.PointerUpdateKind = LeftButtonReleased;
 				properties.IsLeftButtonPressed = false;
-				raisePointerEvent = RaisePointerReleased;
+				raisePointerEvent = touchArgs =>
+				{
+					RaisePointerReleased(touchArgs);
+					RaisePointerExited(touchArgs);
+				};
 				break;
 
 			default:

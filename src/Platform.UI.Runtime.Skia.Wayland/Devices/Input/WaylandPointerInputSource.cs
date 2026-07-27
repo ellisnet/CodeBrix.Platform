@@ -23,7 +23,7 @@ internal partial class WaylandPointerInputSource : ICodeBrixCorePointerInputSour
 	private const uint BTN_SIDE = 0x113;
 	private const uint BTN_EXTRA = 0x114;
 
-#pragma warning disable CS0067 // touch is not wired yet, so Cancelled is never raised
+#pragma warning disable CS0067 // PointerCaptureLost is not raised by this head (the managed input manager owns capture state).
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerEntered;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerExited;

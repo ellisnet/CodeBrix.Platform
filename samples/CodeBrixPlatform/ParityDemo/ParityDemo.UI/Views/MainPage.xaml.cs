@@ -80,6 +80,10 @@ public sealed partial class MainPage : Page
             {
                 _ = RunChromeTestAsync();
             }
+            else if (Environment.GetEnvironmentVariable("PARITYDEMO_TOUCHTEST") == "1")
+            {
+                _ = RunTouchTestAsync();
+            }
         }
     }
 
@@ -261,6 +265,226 @@ public sealed partial class MainPage : Page
     private static Point CenterInRoot(FrameworkElement element)
         => element.TransformToVisual(null)
             .TransformPoint(new Point(element.ActualWidth / 2, element.ActualHeight / 2));
+
+    #region | Touch contract self-test (parity plan P8) |
+
+    /// <summary>
+    /// Injects TOUCH pointer sequences and asserts the contract a touch-capable head owes the
+    /// input manager. This is head-agnostic on purpose: it runs on X11, Wayland, Win32 and the
+    /// frame-buffer heads, so the same assertions cover every head that grows touch support.
+    ///
+    /// The first two checks reproduce a real, shipped defect as a regression test. On the
+    /// frame-buffer heads a tapped control used to light up and then wedge ALL touch input
+    /// app-wide after a single tap, because for touch the input manager deliberately does not
+    /// release pointer captures on pointer-up — it waits for the source-level Exited of the
+    /// "Up / Exited / Lost" finger sequence, and that head never sent one. Any control that
+    /// captures without explicitly releasing (in-box ScrollBar is one) then leaked its capture,
+    /// and every later release was re-routed to the stale target. A head missing the Exited
+    /// half fails 'touch-second-tap-commits' here.
+    /// </summary>
+    private async Task RunTouchTestAsync()
+    {
+        var results = new List<string>();
+
+        void Check(string name, bool pass, string detail)
+        {
+            var line = $"{(pass ? "PASS" : "FAIL")} {name}{(string.IsNullOrEmpty(detail) ? "" : $" ({detail})")}";
+            results.Add(line);
+            Log($"TOUCHTEST: {line}");
+        }
+
+        try
+        {
+            Log("TOUCHTEST: starting in 1.5s");
+            await Task.Delay(1500);
+
+            var injector = InputInjector.TryCreate();
+            Check("input-injector-available", injector != null, "");
+            if (injector == null)
+            {
+                await WriteTouchResultsAsync(results);
+                return;
+            }
+
+            injector.InitializeTouchInjection(InjectedInputVisualizationMode.Default);
+
+            // Two capture-on-press targets, side by side. They deliberately NEVER release the
+            // capture themselves — that is the whole point: the HEAD must release it, exactly
+            // as in-box ScrollBar assumes. Sequence per target is recorded for ordering checks.
+            var sequence = new List<string>();
+            var targetA = BuildCapturingTouchTarget("A", sequence);
+            var targetB = BuildCapturingTouchTarget("B", sequence);
+            var panel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 20,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                Children = { targetA, targetB },
+            };
+
+            var overlay = new Microsoft.UI.Xaml.Controls.Primitives.Popup
+            {
+                XamlRoot = XamlRoot,
+                Child = panel,
+                IsOpen = true,
+            };
+            await Task.Delay(500);
+            panel.UpdateLayout();
+
+            var pointA = CenterInRoot(targetA);
+            var pointB = CenterInRoot(targetB);
+            Check("touch-targets-laid-out",
+                targetA.ActualWidth > 0 && targetB.ActualWidth > 0,
+                $"A={pointA.X:0},{pointA.Y:0} B={pointB.X:0},{pointB.Y:0}");
+
+            // 1. First tap on A commits — this passes even with a leaking head.
+            sequence.Clear();
+            await InjectTapAsync(injector, pointA);
+            Check("touch-first-tap-commits",
+                sequence.Contains("A:Pressed") && sequence.Contains("A:Released"),
+                string.Join(",", sequence));
+
+            // 2. Second tap, on the OTHER target. With a leaked capture the release is routed
+            //    back to A and B never commits — the "types one letter then dies" signature.
+            sequence.Clear();
+            await InjectTapAsync(injector, pointB);
+            Check("touch-second-tap-commits",
+                sequence.Contains("B:Pressed") && sequence.Contains("B:Released"),
+                string.Join(",", sequence));
+            Check("touch-second-tap-not-routed-to-stale-target",
+                !sequence.Contains("A:Released"),
+                string.Join(",", sequence));
+
+            // 3. A third tap back on A: proves it is not merely alternating.
+            sequence.Clear();
+            await InjectTapAsync(injector, pointA);
+            Check("touch-third-tap-commits",
+                sequence.Contains("A:Pressed") && sequence.Contains("A:Released"),
+                string.Join(",", sequence));
+
+            // 4. Ordering within one tap: Entered before Pressed, Released before Exited.
+            sequence.Clear();
+            await InjectTapAsync(injector, pointB);
+            var pressedAt = sequence.IndexOf("B:Pressed");
+            var releasedAt = sequence.IndexOf("B:Released");
+            var exitedAt = sequence.IndexOf("B:Exited");
+            Check("touch-released-before-exited",
+                releasedAt >= 0 && exitedAt > releasedAt,
+                string.Join(",", sequence));
+            Check("touch-entered-before-pressed",
+                sequence.IndexOf("B:Entered") is var enteredAt && enteredAt >= 0 && enteredAt < pressedAt,
+                string.Join(",", sequence));
+
+            // 5. The pointer really was reported as touch, not promoted to mouse.
+            Check("touch-device-type-is-touch",
+                _lastTouchDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch,
+                $"{_lastTouchDeviceType}");
+
+            overlay.IsOpen = false;
+            injector.UninitializeTouchInjection();
+        }
+        catch (Exception e)
+        {
+            results.Add($"FAIL touchtest-exception ({e.GetType().Name}: {e.Message})");
+            Log($"TOUCHTEST: exception {e}");
+        }
+
+        await WriteTouchResultsAsync(results);
+    }
+
+    private Microsoft.UI.Input.PointerDeviceType _lastTouchDeviceType
+        = Microsoft.UI.Input.PointerDeviceType.Mouse;
+
+    /// <summary>
+    /// A tap target that captures on press and never releases — the pattern in-box ScrollBar
+    /// uses, and the one that exposes a head which does not release touch captures.
+    /// </summary>
+    private Border BuildCapturingTouchTarget(string name, List<string> sequence)
+    {
+        var target = new Border
+        {
+            Width = 120,
+            Height = 120,
+            Background = new SolidColorBrush(Microsoft.UI.Colors.SteelBlue),
+            Child = new TextBlock
+            {
+                Text = name,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            },
+        };
+
+        target.PointerEntered += (_, _) => sequence.Add($"{name}:Entered");
+        target.PointerPressed += (s, e) =>
+        {
+            _lastTouchDeviceType = e.Pointer.PointerDeviceType;
+            ((UIElement)s).CapturePointer(e.Pointer); // deliberately never released here
+            sequence.Add($"{name}:Pressed");
+        };
+        target.PointerReleased += (_, _) => sequence.Add($"{name}:Released");
+        target.PointerExited += (_, _) => sequence.Add($"{name}:Exited");
+        target.PointerCaptureLost += (_, _) => sequence.Add($"{name}:CaptureLost");
+        return target;
+    }
+
+    private static async Task InjectTapAsync(InputInjector injector, Point target)
+    {
+        var x = (int)Math.Round(target.X);
+        var y = (int)Math.Round(target.Y);
+
+        injector.InjectTouchInput(new[]
+        {
+            new InjectedInputTouchInfo
+            {
+                PointerInfo = new InjectedInputPointerInfo
+                {
+                    PointerId = 1,
+                    PixelLocation = new InjectedInputPoint { PositionX = x, PositionY = y },
+                    // FirstButton is what maps the down/up onto LeftButtonPressed/Released
+                    // (InjectedInputPointerInfo.ToPointerPoint); without it the injected
+                    // point carries PointerUpdateKind.Other and arrives as a MOVE.
+                    PointerOptions = InjectedInputPointerOptions.New
+                        | InjectedInputPointerOptions.InContact
+                        | InjectedInputPointerOptions.InRange
+                        | InjectedInputPointerOptions.FirstButton
+                        | InjectedInputPointerOptions.PointerDown,
+                },
+            },
+        });
+        await Task.Delay(150);
+
+        injector.InjectTouchInput(new[]
+        {
+            new InjectedInputTouchInfo
+            {
+                PointerInfo = new InjectedInputPointerInfo
+                {
+                    PointerId = 1,
+                    PixelLocation = new InjectedInputPoint { PositionX = x, PositionY = y },
+                    PointerOptions = InjectedInputPointerOptions.FirstButton
+                        | InjectedInputPointerOptions.PointerUp,
+                },
+            },
+        });
+        await Task.Delay(250);
+    }
+
+    private async Task WriteTouchResultsAsync(List<string> results)
+    {
+        var resultsPath = Environment.GetEnvironmentVariable("PARITYDEMO_RESULTS");
+        if (!string.IsNullOrEmpty(resultsPath))
+        {
+            File.WriteAllLines(resultsPath, results);
+        }
+
+        var failures = results.Count(r => r.StartsWith("FAIL", StringComparison.Ordinal));
+        Log($"TOUCHTEST: done, {failures} failure(s); exiting");
+        await Task.Delay(250);
+        Environment.Exit(failures);
+    }
+
+    #endregion
 
     private void DropZone_DragEnter(object sender, DragEventArgs e)
         => Log($"DropZone.DragEnter: formats [{string.Join(", ", e.DataView.AvailableFormats)}]");

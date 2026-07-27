@@ -28,4 +28,23 @@ public class SoftwareKeyboardOptions
 	/// and no globe key is shown.
 	/// </summary>
 	public IList<string>? EnabledLayouts { get; set; }
+
+	/// <summary>
+	/// Whether the keyboard shows a dismiss key — a downward-pointing triangle —
+	/// as the top-right key of every page and layout. When true (the default) the
+	/// top row's keys narrow slightly to make room for it; set false to omit the
+	/// key entirely. Tapping it hides the keyboard and keeps it hidden while the
+	/// same text control holds or regains focus; the keyboard returns when the
+	/// user taps back inside that control or when a different editable text
+	/// control gains focus. The setting is application-global.
+	/// </summary>
+	public bool ShowDismissKey { get; set; } = true;
+
+	/// <summary>
+	/// The rendered height of the keys: <see cref="SoftwareKeyHeight.FullHeight"/>
+	/// (the default), or <see cref="SoftwareKeyHeight.HalfHeight"/> to render every
+	/// key at half its standard height — the spaces between keys keep their
+	/// standard size, so the strip shrinks to a little over half its full height.
+	/// </summary>
+	public SoftwareKeyHeight KeyHeight { get; set; } = SoftwareKeyHeight.FullHeight;
 }

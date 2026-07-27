@@ -20,6 +20,37 @@ internal partial class XamlIslandRoot
 	private ContentRoot _contentRoot = null!;
 	private bool _isVisible;
 	private Size _previousIslandSize;
+	private double _contentBottomOcclusionInset;
+
+	/// <inheritdoc cref="IRootElement.ContentBottomOcclusionInset" />
+	/// <remarks>
+	/// The island is the root element on the Skia heads (Window.cs: "Skia always
+	/// uses Desktop windows", whose XamlRoot is an island), so bottom-chrome hosts
+	/// like the frame-buffer software keyboard reach THIS implementation there —
+	/// RootVisual's twin carries the same behavior for the CoreWindow tree shape.
+	/// </remarks>
+	public double ContentBottomOcclusionInset
+	{
+		get => _contentBottomOcclusionInset;
+		set
+		{
+			if (_contentBottomOcclusionInset != value)
+			{
+				_contentBottomOcclusionInset = value;
+				InvalidateMeasure();
+				InvalidateArrange();
+			}
+		}
+	}
+
+	private Size ApplyContentInset(UIElement child, Size size)
+	{
+		if (_contentBottomOcclusionInset > 0 && child != _contentRoot?.VisualTree?.PopupRoot)
+		{
+			size = new Size(size.Width, Math.Max(0, size.Height - _contentBottomOcclusionInset));
+		}
+		return size;
+	}
 
 	internal void InitializeRoot(WinUICoreServices coreServices)
 	{
@@ -50,8 +81,8 @@ internal partial class XamlIslandRoot
 			var child = children[i];
 			if (child != null)
 			{
-				// Measure child to the plugin size
-				child.Measure(availableSize);
+				// Measure child to the plugin size (minus any bottom-chrome inset)
+				child.Measure(ApplyContentInset(child, availableSize));
 
 				// The first child is the content, which is what we want the desired size to be
 				if (i == 0)
@@ -90,11 +121,12 @@ internal partial class XamlIslandRoot
 			}
 
 			var childDesiredSize = child.DesiredSize;
+			var childAvailableSize = ApplyContentInset(child, finalSize);
 			var childRect = new Rect(
 				0,
 				0,
-				Math.Max(finalSize.Width, childDesiredSize.Width),
-				Math.Max(finalSize.Height, childDesiredSize.Height));
+				Math.Max(childAvailableSize.Width, childDesiredSize.Width),
+				Math.Max(childAvailableSize.Height, childDesiredSize.Height));
 			child.Arrange(childRect);
 		}
 

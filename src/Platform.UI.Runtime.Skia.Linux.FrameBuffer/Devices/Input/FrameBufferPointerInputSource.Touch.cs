@@ -59,6 +59,20 @@ unsafe internal partial class FrameBufferPointerInputSource
 				this.Log().Trace($"ProcessTouchEvent: {rawEventType}, pointerId:{pointerId}, currentPosition:{currentPosition}, timestamp:{timestamp}");
 			}
 
+			// A finger's full sequence is Entered / Pressed ... Released / Exited,
+			// matching what the X11 head raises for XI_TouchBegin / XI_TouchEnd.
+			// The trailing Exited is NOT cosmetic: for touch pointers the managed
+			// input manager deliberately leaves captures alone on pointer-up and
+			// relies on the source-level Exited to release them (there is no
+			// auto-release safety net either - UIElement passes autoRelease: false
+			// under managed pointers). Without it every explicit CapturePointer on
+			// this head leaks, and each later release is re-routed to the stale
+			// capture target instead of the element actually touched. The leading
+			// Entered mirrors X11 for parity; the input manager also raises its own
+			// enter ahead of the press, so it is the Exited that does the work.
+			// Each pair is dispatched as ONE action so nothing can interleave
+			// between the two raises. TOUCH_CANCEL needs no Exited - the cancel
+			// path releases captures on its own.
 			switch (rawEventType)
 			{
 				case LIBINPUT_EVENT_TOUCH_MOTION:
@@ -67,12 +81,20 @@ unsafe internal partial class FrameBufferPointerInputSource
 
 				case LIBINPUT_EVENT_TOUCH_DOWN:
 					properties.PointerUpdateKind = LeftButtonPressed;
-					raisePointerEvent = RaisePointerPressed;
+					raisePointerEvent = touchArgs =>
+					{
+						RaisePointerEntered(touchArgs);
+						RaisePointerPressed(touchArgs);
+					};
 					break;
 
 				case LIBINPUT_EVENT_TOUCH_UP:
 					properties.PointerUpdateKind = LeftButtonReleased;
-					raisePointerEvent = RaisePointerReleased;
+					raisePointerEvent = touchArgs =>
+					{
+						RaisePointerReleased(touchArgs);
+						RaisePointerExited(touchArgs);
+					};
 					break;
 
 				case LIBINPUT_EVENT_TOUCH_CANCEL:
