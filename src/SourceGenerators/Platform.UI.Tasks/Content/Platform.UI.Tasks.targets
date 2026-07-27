@@ -18,29 +18,52 @@
 
 		<_IsXamlTrimmingAvailable>true</_IsXamlTrimmingAvailable>
 		<_IsXamlTrimmingAvailable Condition="'$(MSBuildRuntimeType)'!='Core' and !$([MSBuild]::IsOSPlatform('windows'))">false</_IsXamlTrimmingAvailable>
+
+		<!--
+		WORKAROUND for an MSBuild bug on Windows ARM64. Remove once MSBuild is fixed.
+
+		Our tasks are declared Runtime="NET" with TaskHostFactory, so .NET Framework
+		MSBuild — which is what Visual Studio uses, in every architecture flavor — cannot load
+		them in-process. It instead spawns the .NET SDK's MSBuild.exe as an out-of-process task
+		host and talks to it over a named pipe. On ARM64 the two ends disagree on the handshake:
+		the host omits the Arm64 flag when Architecture is unspecified ("*"), while the ARM64
+		task host always sets it, so every connect attempt is rejected and the build fails with
+		  error MSB4216: ... could not create or connect to a task host with runtime "NET"
+		                 and architecture "*"
+		followed by cascading MSB4027/MSB4028 as targets continue with no task output. Naming the
+		architecture explicitly makes both ends compute the same handshake. `dotnet build` is
+		unaffected: there MSBuild is already .NET, so both ends agree either way.
+
+		NETCoreSdkRuntimeIdentifier is the right signal because it is the architecture of the SDK
+		that *supplies* the task host — the Visual Studio host process may be amd64 while the task
+		host it launches is arm64. Non-ARM64 SDKs keep "*", i.e. the pre-existing behavior.
+		Consumers can override this property if they need to pin it themselves.
+		-->
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'=='' AND '$(NETCoreSdkRuntimeIdentifier)'!='' AND $(NETCoreSdkRuntimeIdentifier.EndsWith('-arm64'))">arm64</CodeBrixNetTaskHostArchitecture>
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'==''">*</CodeBrixNetTaskHostArchitecture>
 	</PropertyGroup>
 
 	<Import Project="platform.ui.tasks.assets.targets"/>
 
-	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator.LinkerHintGeneratorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator.LinkerDefinitionMergerTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.EmbeddedResourceInjector.EmbeddedResourceInjectorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
+	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator.LinkerHintGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator.LinkerDefinitionMergerTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.EmbeddedResourceInjector.EmbeddedResourceInjectorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" TaskFactory="TaskHostFactory"/>
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory"/>
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory"/>
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory"/>
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
+	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 
 	<Target Name="_CodeBrixLangSetup">
 		<!-- String resources -->

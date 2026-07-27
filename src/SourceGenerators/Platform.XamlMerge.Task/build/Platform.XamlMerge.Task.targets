@@ -8,8 +8,19 @@
 	instead of the NuGet package's tools folder. The assembly is loaded lazily at first task
 	use, so no exists() condition is needed; src/Platform.UI/XamlMerge.targets builds this project
 	before the merge target runs.
+
+	Naming the task host architecture works around an MSBuild ARM64 handshake bug under Visual
+	Studio; see src/SourceGenerators/Platform.UI.Tasks/Content/Platform.UI.Tasks.targets for the
+	full explanation. Defined inline rather than in a Directory.Build.* file because several
+	subtrees under src/ carry their own Directory.Build.targets, which shadow the repo root.
+	Remove once MSBuild is fixed.
 	-->
-	<UsingTask TaskName="BatchMergeXaml_v0" AssemblyFile="$(MSBuildThisFileDirectory)..\bin\$(Configuration)_Shadow\CodeBrix.Platform.XamlMerge.Task.v0.dll" Runtime="NET" TaskFactory="TaskHostFactory" />
+	<PropertyGroup>
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'=='' AND '$(NETCoreSdkRuntimeIdentifier)'!='' AND $(NETCoreSdkRuntimeIdentifier.EndsWith('-arm64'))">arm64</CodeBrixNetTaskHostArchitecture>
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'==''">*</CodeBrixNetTaskHostArchitecture>
+	</PropertyGroup>
+
+	<UsingTask TaskName="BatchMergeXaml_v0" AssemblyFile="$(MSBuildThisFileDirectory)..\bin\$(Configuration)_Shadow\CodeBrix.Platform.XamlMerge.Task.v0.dll" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>
 		<XamlMergeOutputFile Condition="'$(XamlMergeOutputFile)'==''">$(MSBuildProjectDirectory)\Generated\mergedpages.xaml</XamlMergeOutputFile>

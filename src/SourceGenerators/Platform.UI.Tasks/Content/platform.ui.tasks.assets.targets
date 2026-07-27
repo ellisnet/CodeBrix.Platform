@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+	<!--
+	CodeBrixUIMSBuildTasksPath and CodeBrixNetTaskHostArchitecture are both defined by
+	Platform.UI.Tasks.targets, which is the only file that imports this one. See the comment
+	there for why Architecture is set explicitly (MSBuild ARM64 task host handshake bug).
+	-->
 	<UsingTask
 		Condition="'$(_IsCodeBrixUISolution)'==''"
 		AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll"
 		TaskName="CodeBrix.Platform.UI.Tasks.Assets.ExpandPackageAssets_v0"
 		Runtime="NET"
+		Architecture="$(CodeBrixNetTaskHostArchitecture)"
 		TaskFactory="TaskHostFactory" />
 
 	<UsingTask
@@ -13,6 +19,7 @@
 		AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll"
 		TaskName="CodeBrix.Platform.UI.Tasks.Assets.ExpandPackageAssets_v0"
 		Runtime="NET"
+		Architecture="$(CodeBrixNetTaskHostArchitecture)"
 		TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>

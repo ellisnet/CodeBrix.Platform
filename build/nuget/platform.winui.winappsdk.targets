@@ -3,9 +3,21 @@
 	
 	<PropertyGroup>
 		<CodeBrixUIMSBuildTasksPath Condition="'$(CodeBrixUIMSBuildTasksPath)'==''">CodeBrix.Platform.UI.Tasks</CodeBrixUIMSBuildTasksPath>
+
+		<!--
+		WORKAROUND for an MSBuild bug on Windows ARM64 — see the full explanation in
+		Platform.UI.Tasks.targets. In short: .NET Framework MSBuild (Visual Studio) omits the
+		Arm64 flag from the .NET task host handshake when Architecture is unspecified ("*"),
+		but the ARM64 task host requires it, so the connection is refused with MSB4216. Naming
+		the architecture explicitly makes both ends agree. Defined here as well as in
+		Platform.UI.Tasks.targets because this file ships in a different package.
+		Remove once MSBuild is fixed.
+		-->
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'=='' AND '$(NETCoreSdkRuntimeIdentifier)'!='' AND $(NETCoreSdkRuntimeIdentifier.EndsWith('-arm64'))">arm64</CodeBrixNetTaskHostArchitecture>
+		<CodeBrixNetTaskHostArchitecture Condition="'$(CodeBrixNetTaskHostArchitecture)'==''">*</CodeBrixNetTaskHostArchitecture>
 	</PropertyGroup>
 
-	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.WinAppSDKValidations.ValidateWinAppSDKReferences_v0" Runtime="NET" TaskFactory="TaskHostFactory" />
+	<UsingTask AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.WinAppSDKValidations.ValidateWinAppSDKReferences_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 
 	<PropertyGroup>
 		<_CodeBrixRemoveReferences_BeforeTargets>
