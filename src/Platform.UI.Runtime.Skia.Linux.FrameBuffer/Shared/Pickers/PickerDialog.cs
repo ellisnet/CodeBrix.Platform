@@ -23,7 +23,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Pickers;
 /// always within the application frame, and rotated with the application. A
 /// full-size smoke layer swallows pointer input behind the dialog; the software
 /// keyboard is the deliberate exception to that modality, and the dialog moves
-/// itself clear of the keyboard whenever one is showing.
+/// itself clear of the keyboard whenever one is showing. The chrome is styled by
+/// ContentDialog's theme resources (see <see cref="DialogThemeResources"/>), so
+/// it looks like — and restyles with — the framework's own dialogs.
 /// </summary>
 internal sealed class PickerDialog
 {
@@ -34,12 +36,22 @@ internal sealed class PickerDialog
 		PickFolder,
 	}
 
-	private static readonly Color SmokeColor = Color.FromArgb(0x66, 0x00, 0x00, 0x00);
-	private static readonly Color DialogBackground = Color.FromArgb(0xFF, 0xF9, 0xF9, 0xF9);
-	private static readonly Color DialogBorder = Color.FromArgb(0xFF, 0xC0, 0xC0, 0xC0);
-	private static readonly Color SubduedText = Color.FromArgb(0xFF, 0x60, 0x60, 0x60);
+	// Fallbacks for the ContentDialog theme resources that drive the dialog chrome
+	// (see DialogThemeResources): the standard Fluent light-theme values each key
+	// carries, used only when a key cannot be resolved.
+	private static readonly Color LightDismissFallback = Color.FromArgb(0x99, 0xFF, 0xFF, 0xFF);
+	private static readonly Color SmokeFillFallback = Color.FromArgb(0x4D, 0x00, 0x00, 0x00);
+	private static readonly Color BackgroundFallback = Color.FromArgb(0xFF, 0xF3, 0xF3, 0xF3);
+	private static readonly Color TopOverlayFallback = Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF);
+	private static readonly Color SeparatorFallback = Color.FromArgb(0x0F, 0x00, 0x00, 0x00);
+	private static readonly Color BorderFallback = Color.FromArgb(0x66, 0x75, 0x75, 0x75);
+	private static readonly Color ForegroundFallback = Color.FromArgb(0xE4, 0x00, 0x00, 0x00);
+	private static readonly Color SecondaryTextFallback = Color.FromArgb(0x9E, 0x00, 0x00, 0x00);
 	private static readonly Color FolderGlyphColor = Color.FromArgb(0xFF, 0xE8, 0xA8, 0x33);
 	private static readonly Color FileGlyphColor = Color.FromArgb(0xFF, 0x8A, 0x8A, 0x8A);
+
+	private readonly Brush _secondaryTextBrush =
+		DialogThemeResources.Brush("TextFillColorSecondaryBrush", SecondaryTextFallback);
 
 	private readonly PickerMode _mode;
 	private readonly PickerNavigator _navigator;
@@ -152,33 +164,59 @@ internal sealed class PickerDialog
 
 	private void BuildVisualTree(string? suggestedFileName)
 	{
-		// The whole dialog renders with the light system look regardless of the
-		// application's theme, matching this head's standard chrome.
-		_overlay.RequestedTheme = ElementTheme.Light;
-		_overlay.Background = new SolidColorBrush(SmokeColor);
-		// Modal: the smoke layer eats every pointer event that is not for the dialog.
+		// The chrome resolves ContentDialog's theme resources at open, so the dialog
+		// renders — and can be restyled — exactly like ContentDialog: the app's
+		// active theme and any ContentDialog resource overrides apply here too.
+		var background = DialogThemeResources.Brush("ContentDialogBackground", BackgroundFallback);
+
+		// ContentDialog grays the application out with two stacked layers: its
+		// popup's light-dismiss overlay under its smoke fill. Both are replicated
+		// here, and the overlay eats every pointer event not meant for the dialog.
+		_overlay.Background = DialogThemeResources.Brush(
+			"ContentDialogLightDismissOverlayBackground", LightDismissFallback);
+		_overlay.Children.Add(new Border
+		{
+			Background = DialogThemeResources.Brush("ContentDialogSmokeFill", SmokeFillFallback),
+		});
 		_overlay.PointerPressed += (_, e) => e.Handled = true;
 		_overlay.PointerReleased += (_, e) => e.Handled = true;
 		_overlay.Tapped += (_, e) => e.Handled = true;
 
-		_dialog.Background = new SolidColorBrush(DialogBackground);
-		_dialog.BorderBrush = new SolidColorBrush(DialogBorder);
+		_dialog.Background = background;
+		_dialog.BorderBrush = DialogThemeResources.Brush("ContentDialogBorderBrush", BorderFallback);
 		_dialog.BorderThickness = new Thickness(1);
 		_dialog.CornerRadius = new CornerRadius(8);
-		_dialog.Padding = new Thickness(16);
 		_dialog.HorizontalAlignment = HorizontalAlignment.Center;
 		_dialog.VerticalAlignment = VerticalAlignment.Center;
 		_overlay.Children.Add(_dialog);
 
+		// ContentDialog's two-surface shape: white content section over the gray
+		// command strip, with the buttons living in the strip.
+		var sections = new Grid();
+		sections.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+		sections.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+		_dialog.Child = sections;
+
+		var contentSection = new Border
+		{
+			Background = DialogThemeResources.Brush("ContentDialogTopOverlay", TopOverlayFallback),
+			BorderBrush = DialogThemeResources.Brush("ContentDialogSeparatorBorderBrush", SeparatorFallback),
+			BorderThickness = new Thickness(0, 0, 0, 1),
+			CornerRadius = new CornerRadius(8, 8, 0, 0),
+			Padding = new Thickness(16),
+		};
+		Grid.SetRow(contentSection, 0);
+		sections.Children.Add(contentSection);
+
 		var layout = new Grid { RowSpacing = 8 };
-		for (var row = 0; row < 8; row++)
+		for (var row = 0; row < 7; row++)
 		{
 			layout.RowDefinitions.Add(new RowDefinition
 			{
 				Height = row == 4 ? new GridLength(1, GridUnitType.Star) : GridLength.Auto,
 			});
 		}
-		_dialog.Child = layout;
+		contentSection.Child = layout;
 
 		_title.Text = _mode switch
 		{
@@ -186,13 +224,15 @@ internal sealed class PickerDialog
 			PickerMode.SaveFile => "Save file",
 			_ => "Select folder",
 		};
-		_title.FontSize = 18;
+		// ContentDialog's title typography (its template's hard-coded values).
+		_title.FontSize = 20;
 		_title.FontWeight = Windows.UI.Text.FontWeights.SemiBold;
+		_title.Foreground = DialogThemeResources.Brush("ContentDialogForeground", ForegroundFallback);
 		Grid.SetRow(_title, 0);
 		layout.Children.Add(_title);
 
 		_pathText.FontSize = 12;
-		_pathText.Foreground = new SolidColorBrush(SubduedText);
+		_pathText.Foreground = _secondaryTextBrush;
 		_pathText.TextTrimming = TextTrimming.CharacterEllipsis;
 		Grid.SetRow(_pathText, 1);
 		layout.Children.Add(_pathText);
@@ -231,7 +271,7 @@ internal sealed class PickerDialog
 		_list.MinHeight = 160;
 		listHost.Children.Add(_list);
 		_emptyHint.Text = "No items";
-		_emptyHint.Foreground = new SolidColorBrush(SubduedText);
+		_emptyHint.Foreground = _secondaryTextBrush;
 		_emptyHint.HorizontalAlignment = HorizontalAlignment.Center;
 		_emptyHint.VerticalAlignment = VerticalAlignment.Center;
 		listHost.Children.Add(_emptyHint);
@@ -256,20 +296,32 @@ internal sealed class PickerDialog
 		Grid.SetRow(_overwriteRow, 6);
 		layout.Children.Add(_overwriteRow);
 
-		var buttons = new StackPanel
+		var commandStrip = new Border
 		{
-			Orientation = Orientation.Horizontal,
-			Spacing = 8,
-			HorizontalAlignment = HorizontalAlignment.Right,
+			Background = background,
+			CornerRadius = new CornerRadius(0, 0, 8, 8),
+			Padding = new Thickness(16),
 		};
+		Grid.SetRow(commandStrip, 1);
+		sections.Children.Add(commandStrip);
+
+		var buttons = new Grid();
+		buttons.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+		buttons.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8) });
+		buttons.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 		_commitButton.Content = _commitText;
+		_commitButton.HorizontalAlignment = HorizontalAlignment.Stretch;
 		_commitButton.Click += (_, _) => Commit();
-		var cancelButton = new Button { Content = "Cancel" };
+		var cancelButton = new Button
+		{
+			Content = "Cancel",
+			HorizontalAlignment = HorizontalAlignment.Stretch,
+		};
 		cancelButton.Click += (_, _) => Complete([]);
+		Grid.SetColumn(cancelButton, 2);
 		buttons.Children.Add(_commitButton);
 		buttons.Children.Add(cancelButton);
-		Grid.SetRow(buttons, 7);
-		layout.Children.Add(buttons);
+		commandStrip.Child = buttons;
 	}
 
 	private void BuildNewFolderRow()
@@ -491,7 +543,9 @@ internal sealed class PickerDialog
 		var keyboardHeight = Windows.UI.ViewManagement.InputPane.GetForCurrentView().OccludedRect.Height;
 		_overlay.Width = size.Width;
 		_overlay.Height = size.Height;
-		_overlay.Padding = new Thickness(0, 0, 0, Math.Min(keyboardHeight, Math.Max(0, size.Height - 120)));
+		// Margin on the dialog (not padding on the overlay) so the gray-out layers
+		// keep covering the keyboard's strip too.
+		_dialog.Margin = new Thickness(0, 0, 0, Math.Min(keyboardHeight, Math.Max(0, size.Height - 120)));
 		_dialog.Width = Math.Max(280, Math.Min(size.Width - 48, 560));
 		_dialog.MaxHeight = Math.Max(220, size.Height - keyboardHeight - 48);
 	}

@@ -16,7 +16,9 @@ using Windows.UI;
 namespace CodeBrix.Platform.UI.Runtime.Skia.SoftwareKeyboard;
 
 /// <summary>
-/// The on-screen keyboard's visual: a light-themed strip of pointer-driven keys.
+/// The on-screen keyboard's visual: a strip of pointer-driven keys, styled by the
+/// same theme resources as ContentDialog (see <see cref="DialogThemeResources"/>)
+/// so it matches — and restyles with — this head's dialog chrome.
 /// Keys are plain Borders — deliberately NOT buttons — so tapping one can never
 /// move focus away from the text control being typed into. Design follows the
 /// established mobile conventions (AOSP LatinIME / FlorisBoard; Apache-2.0,
@@ -30,11 +32,34 @@ internal sealed class SoftwareKeyboardView : Border
 	private static readonly string[] Symbols1Rows = ["1234567890", "@#€$%&-_+()", "*\"':;!?"];
 	private static readonly string[] Symbols2Rows = ["~`|•√π÷×¶", "£¥¢^°={}§", "\\©®™%[]"];
 
-	private static readonly Color StripBackground = Color.FromArgb(0xFF, 0xEC, 0xEC, 0xEE);
-	private static readonly Color KeyBackground = Colors.White;
-	private static readonly Color SpecialKeyBackground = Color.FromArgb(0xFF, 0xD4, 0xD6, 0xDA);
-	private static readonly Color PressedKeyBackground = Color.FromArgb(0xFF, 0xB8, 0xD4, 0xF0);
-	private static readonly Color KeyForeground = Color.FromArgb(0xFF, 0x20, 0x20, 0x20);
+	// The fixed spacing chrome: each key's margin (so adjacent keys sit two margins
+	// apart) and the strip's outer padding. ComputeHeight's HalfHeight math relies
+	// on these staying the spacing used by Rebuild/BuildKeyVisual.
+	private const double KeyMargin = 2.5;
+	private const double StripPadding = 3;
+
+	// Fallbacks for the theme resources that drive the keyboard chrome (see
+	// DialogThemeResources): the standard Fluent light-theme values each key
+	// carries, used only when a key cannot be resolved.
+	private static readonly Color StripBackgroundFallback = Color.FromArgb(0xFF, 0xF3, 0xF3, 0xF3);
+	private static readonly Color StripBorderFallback = Color.FromArgb(0x66, 0x75, 0x75, 0x75);
+	private static readonly Color KeyFillFallback = Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF);
+	private static readonly Color KeyForegroundFallback = Color.FromArgb(0xE4, 0x00, 0x00, 0x00);
+	private static readonly Color SpaceLegendFallback = Color.FromArgb(0x9E, 0x00, 0x00, 0x00);
+	private static readonly Color AccentFallback = Color.FromArgb(0xFF, 0x00, 0x78, 0xD4);
+
+	// The key surfaces, resolved (or derived) once per keyboard from the active
+	// theme: normal keys use the same fill as the dialogs' buttons; special keys
+	// are the foreground composited faintly onto the strip so they read slightly
+	// darker in a light theme and slightly lighter in a dark one; a pressed key
+	// flashes with an accent tint.
+	private readonly Brush _stripBrush;
+	private readonly Brush _chromeBorderBrush;
+	private readonly Brush _keyBrush;
+	private readonly Brush _specialKeyBrush;
+	private readonly Brush _pressedKeyBrush;
+	private readonly Brush _keyForegroundBrush;
+	private readonly Brush _spaceLegendBrush;
 
 	private enum KeyKind
 	{
@@ -52,6 +77,7 @@ internal sealed class SoftwareKeyboardView : Border
 		ArrowRight,
 		ArrowUp,
 		ArrowDown,
+		Dismiss,
 	}
 
 	private enum ShiftState
@@ -73,6 +99,7 @@ internal sealed class SoftwareKeyboardView : Border
 
 	private readonly ISoftwareKeyInjector _injector;
 	private readonly IReadOnlyList<KeyboardLayoutDefinition> _layouts;
+	private readonly SoftwareKeyboardOptions _options;
 	private readonly Grid _rows = new();
 	private readonly DispatcherTimer _longPressTimer = new();
 	private readonly DispatcherTimer _repeatTimer = new();
@@ -88,14 +115,30 @@ internal sealed class SoftwareKeyboardView : Border
 	private KeyDef? _pressedDef;
 	private bool _longPressFired;
 
-	internal SoftwareKeyboardView(ISoftwareKeyInjector injector, IReadOnlyList<KeyboardLayoutDefinition> layouts)
+	internal SoftwareKeyboardView(ISoftwareKeyInjector injector, IReadOnlyList<KeyboardLayoutDefinition> layouts,
+		SoftwareKeyboardOptions options)
 	{
 		_injector = injector;
 		_layouts = layouts;
+		_options = options;
 
-		RequestedTheme = ElementTheme.Light;
-		Background = new SolidColorBrush(StripBackground);
-		BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xC0, 0xC0, 0xC0));
+		// Resolved against the active theme when the keyboard is first created
+		// (the controller keeps the one view for the application's lifetime).
+		var strip = DialogThemeResources.ColorOf("ContentDialogBackground", StripBackgroundFallback);
+		var foreground = DialogThemeResources.ColorOf("ContentDialogForeground", KeyForegroundFallback);
+		var keyFace = DialogThemeResources.Composite(
+			DialogThemeResources.ColorOf("ControlFillColorDefaultBrush", KeyFillFallback), 1.0, strip);
+		var accent = DialogThemeResources.ColorOf("SystemAccentColor", AccentFallback);
+		_stripBrush = new SolidColorBrush(strip);
+		_chromeBorderBrush = DialogThemeResources.Brush("ContentDialogBorderBrush", StripBorderFallback);
+		_keyBrush = new SolidColorBrush(keyFace);
+		_specialKeyBrush = new SolidColorBrush(DialogThemeResources.Composite(foreground, 0.15, strip));
+		_pressedKeyBrush = new SolidColorBrush(DialogThemeResources.Composite(accent, 0.30, keyFace));
+		_keyForegroundBrush = DialogThemeResources.Brush("ContentDialogForeground", KeyForegroundFallback);
+		_spaceLegendBrush = DialogThemeResources.Brush("TextFillColorSecondaryBrush", SpaceLegendFallback);
+
+		Background = _stripBrush;
+		BorderBrush = _chromeBorderBrush;
 		BorderThickness = new Thickness(0, 1, 0, 0);
 		Child = _rows;
 
@@ -113,14 +156,37 @@ internal sealed class SoftwareKeyboardView : Border
 	private KeyboardLayoutDefinition ActiveLayout => _layouts[_activeLayoutIndex];
 
 	/// <summary>
+	/// Raised when the user taps the dismiss key. The keys are non-focusable, so
+	/// the text control being typed into still has focus when this fires — the
+	/// controller records it as the user's explicit "keyboard off" intent.
+	/// </summary>
+	internal event Action? DismissRequested;
+
+	/// <summary>
 	/// The keyboard strip height for a given logical root size: a per-orientation
 	/// fraction bounded so keys stay comfortably tappable on the smallest panel
-	/// and the strip never dominates the largest.
+	/// and the strip never dominates the largest. Under
+	/// <see cref="SoftwareKeyHeight.HalfHeight"/> the key faces halve while the
+	/// spacing chrome (key gaps and strip padding) keeps its full-height size.
 	/// </summary>
-	internal static double ComputeHeight(Size rootSize)
-		=> rootSize.Height > rootSize.Width
+	internal double ComputeHeight(Size rootSize)
+	{
+		var fullHeight = rootSize.Height > rootSize.Width
 			? Math.Clamp(rootSize.Height * 0.40, 200, 400)
 			: Math.Clamp(rootSize.Height * 0.42, 190, 340);
+		if (_options.KeyHeight != SoftwareKeyHeight.HalfHeight)
+		{
+			return fullHeight;
+		}
+
+		// The letters page's row count (digits row + the layout's letter rows +
+		// the bottom row) drives the split of the strip into key faces vs. fixed
+		// spacing; the symbols pages have one row fewer and simply get slightly
+		// taller keys within the same strip, exactly as at full height.
+		var rowCount = ActiveLayout.Rows.Length + 2;
+		var spacing = rowCount * KeyMargin * 2 + StripPadding * 2;
+		return spacing + (fullHeight - spacing) / 2;
+	}
 
 	/// <summary>Sizes the strip and (re)builds its keys for the current state.</summary>
 	internal void ApplyMetrics(double width, double height)
@@ -137,7 +203,7 @@ internal sealed class SoftwareKeyboardView : Border
 		CloseAlternates();
 		_rows.Children.Clear();
 		_rows.RowDefinitions.Clear();
-		_rows.Padding = new Thickness(3);
+		_rows.Padding = new Thickness(StripPadding);
 
 		var rows = BuildPageRows();
 		foreach (var _ in rows)
@@ -179,7 +245,8 @@ internal sealed class SoftwareKeyboardView : Border
 		var shifted = _shift != ShiftState.Off;
 		var rows = new List<List<KeyDef>>
 		{
-			DigitsRow.Select(digit => new KeyDef(KeyKind.Character, 1f, digit.ToString(), digit)).ToList(),
+			WithDismissKey(
+				DigitsRow.Select(digit => new KeyDef(KeyKind.Character, 1f, digit.ToString(), digit)).ToList()),
 		};
 
 		for (var rowIndex = 0; rowIndex < layout.Rows.Length; rowIndex++)
@@ -216,6 +283,7 @@ internal sealed class SoftwareKeyboardView : Border
 				.Select(symbol => new KeyDef(KeyKind.Character, 1f, symbol.ToString(), symbol))
 				.ToList())
 			.ToList();
+		rows[0] = WithDismissKey(rows[0]);
 
 		// The third symbols row is flanked by the page toggle and backspace.
 		rows[2].Insert(0, new KeyDef(secondPage ? KeyKind.SymbolsPage : KeyKind.SymbolsPage2, 1.5f,
@@ -224,6 +292,17 @@ internal sealed class SoftwareKeyboardView : Border
 
 		rows.Add(BuildBottomRow(lettersPage: false, withArrows: secondPage));
 		return rows;
+	}
+
+	// The dismiss key is always the top-right key, on every page of every layout,
+	// at the same width as the rest of its row - unless the host opted out.
+	private List<KeyDef> WithDismissKey(List<KeyDef> topRow)
+	{
+		if (_options.ShowDismissKey)
+		{
+			topRow.Add(new KeyDef(KeyKind.Dismiss, 1f));
+		}
+		return topRow;
 	}
 
 	private List<KeyDef> BuildBottomRow(bool lettersPage, bool withArrows = false)
@@ -308,23 +387,31 @@ internal sealed class SoftwareKeyboardView : Border
 			_ => key.Legend ?? "",
 		};
 
-		var text = new TextBlock
-		{
-			Text = legend,
-			Foreground = new SolidColorBrush(key.Kind == KeyKind.Space
-				? Color.FromArgb(0xFF, 0x90, 0x90, 0x90)
-				: KeyForeground),
-			FontSize = key.Kind == KeyKind.Character ? 18 : 13,
-			HorizontalAlignment = HorizontalAlignment.Center,
-			VerticalAlignment = VerticalAlignment.Center,
-		};
+		// The dismiss key's downward triangle is drawn, not text: a shaped glyph
+		// renders identically on every layout regardless of any font's coverage.
+		UIElement face = key.Kind == KeyKind.Dismiss
+			? new Microsoft.UI.Xaml.Shapes.Polygon
+			{
+				Points = [new Point(0, 0), new Point(12, 0), new Point(6, 7)],
+				Fill = _keyForegroundBrush,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Center,
+			}
+			: new TextBlock
+			{
+				Text = legend,
+				Foreground = key.Kind == KeyKind.Space ? _spaceLegendBrush : _keyForegroundBrush,
+				FontSize = key.Kind == KeyKind.Character ? 18 : 13,
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Center,
+			};
 
 		var visual = new Border
 		{
-			Background = new SolidColorBrush(special ? SpecialKeyBackground : KeyBackground),
+			Background = special ? _specialKeyBrush : _keyBrush,
 			CornerRadius = new CornerRadius(5),
-			Margin = new Thickness(2.5),
-			Child = text,
+			Margin = new Thickness(KeyMargin),
+			Child = face,
 			Tag = key,
 		};
 
@@ -347,7 +434,7 @@ internal sealed class SoftwareKeyboardView : Border
 		_pressedKey = visual;
 		_pressedDef = key;
 		_longPressFired = false;
-		visual.Background = new SolidColorBrush(PressedKeyBackground);
+		visual.Background = _pressedKeyBrush;
 
 		if (key.Kind == KeyKind.Character && key.Alternates is not null)
 		{
@@ -392,10 +479,22 @@ internal sealed class SoftwareKeyboardView : Border
 		if (visual is { Tag: KeyDef key })
 		{
 			var special = key.Kind is not (KeyKind.Character or KeyKind.Space);
-			visual.Background = new SolidColorBrush(special ? SpecialKeyBackground : KeyBackground);
+			visual.Background = special ? _specialKeyBrush : _keyBrush;
 		}
 		_pressedKey = null;
 		_pressedDef = null;
+
+		// The capture taken on press MUST be handed back explicitly, exactly as
+		// ButtonBase does: these heads only ever produce TOUCH pointers, and for
+		// touch the managed input manager deliberately does not release captures
+		// on pointer-up - it defers that to the source-level PointerExited of the
+		// documented "Up / Exited / Lost" finger sequence, which a frame-buffer
+		// panel never sends. A leaked capture re-routes the NEXT key's release to
+		// this now-stale key, so that key lights up on press and then never
+		// commits. Released last, and only after the pressed-key state is already
+		// cleared, so the PointerCaptureLost this raises synchronously finds
+		// nothing left to undo.
+		visual?.ReleasePointerCaptures();
 	}
 
 	private void CommitKey(KeyDef key)
@@ -459,6 +558,9 @@ internal sealed class SoftwareKeyboardView : Border
 				_page = Page.Letters;
 				Rebuild();
 				break;
+			case KeyKind.Dismiss:
+				DismissRequested?.Invoke();
+				break;
 		}
 	}
 
@@ -521,9 +623,8 @@ internal sealed class SoftwareKeyboardView : Border
 		};
 		var container = new Border
 		{
-			RequestedTheme = ElementTheme.Light,
-			Background = new SolidColorBrush(Colors.White),
-			BorderBrush = new SolidColorBrush(Color.FromArgb(0xFF, 0xA0, 0xA0, 0xA0)),
+			Background = _stripBrush,
+			BorderBrush = _chromeBorderBrush,
 			BorderThickness = new Thickness(1),
 			CornerRadius = new CornerRadius(6),
 			Padding = new Thickness(4),
@@ -533,14 +634,14 @@ internal sealed class SoftwareKeyboardView : Border
 		{
 			var alternateKey = new Border
 			{
-				Background = new SolidColorBrush(KeyBackground),
+				Background = _keyBrush,
 				CornerRadius = new CornerRadius(4),
 				Padding = new Thickness(10, 6, 10, 6),
 				Child = new TextBlock
 				{
 					Text = alternate.ToString(),
 					FontSize = 18,
-					Foreground = new SolidColorBrush(KeyForeground),
+					Foreground = _keyForegroundBrush,
 				},
 			};
 			var captured = alternate;

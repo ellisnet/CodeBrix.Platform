@@ -14,7 +14,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Sk
 
 internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInputSource, ICodeBrixRelativePointerSource
 {
-#pragma warning disable CS0067 // Some event are not raised on FrameBuffer ... yet!
+#pragma warning disable CS0067 // PointerCaptureLost is not raised by this head (the managed input manager owns capture state).
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerEntered;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerExited;
@@ -75,6 +75,12 @@ internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInput
 	[NotImplemented] public void SetPointerCapture() => LogNotSupported();
 	[NotImplemented] public void ReleasePointerCapture(PointerIdentifier pointer) => LogNotSupported();
 	[NotImplemented] public void ReleasePointerCapture() => LogNotSupported();
+
+	private void RaisePointerEntered(PointerEventArgs args)
+		=> PointerEntered?.Invoke(this, args);
+
+	private void RaisePointerExited(PointerEventArgs args)
+		=> PointerExited?.Invoke(this, args);
 
 	private void RaisePointerMoved(PointerEventArgs args)
 		=> PointerMoved?.Invoke(this, args);

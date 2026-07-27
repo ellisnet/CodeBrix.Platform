@@ -18,7 +18,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Sk
 /// </summary>
 internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInputSource
 {
-#pragma warning disable CS0067 // Only pressed/moved/released are raised by the single-touch model.
+#pragma warning disable CS0067 // The single-touch model raises no wheel, no cancel (the transport has no such message) and no capture-lost.
 	public event TypedEventHandler<object, PointerEventArgs>? PointerCaptureLost;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerEntered;
 	public event TypedEventHandler<object, PointerEventArgs>? PointerExited;
@@ -55,6 +55,12 @@ internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInput
 	[NotImplemented] public void SetPointerCapture() => LogNotSupported();
 	[NotImplemented] public void ReleasePointerCapture(PointerIdentifier pointer) => LogNotSupported();
 	[NotImplemented] public void ReleasePointerCapture() => LogNotSupported();
+
+	private void RaisePointerEntered(PointerEventArgs args)
+		=> PointerEntered?.Invoke(this, args);
+
+	private void RaisePointerExited(PointerEventArgs args)
+		=> PointerExited?.Invoke(this, args);
 
 	private void RaisePointerMoved(PointerEventArgs args)
 		=> PointerMoved?.Invoke(this, args);
