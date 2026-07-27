@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>น้ำเงินอ่อน</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ฟ้าใส</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>เอกสาร</value>
+    <value>ตัวเลือกวันที่</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>ปุ่มแยก</value>
+    <value>วัน</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>หน้าต่าง</value>
+    <value>เดือน</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>บานหน้าต่าง</value>
+    <value>ปี</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>ส่วนหัว</value>
+    <value>ตัวเลือกเวลา</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>รายการส่วนหัว</value>
+    <value>นาที</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>ตาราง</value>
+    <value>ชั่วโมง</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>แถบชื่อเรื่อง</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ตัวคั่น</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>การย่อ/ขยายข้อมูลภาพรวม</value>
+    <value>ช่วงเวลา</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 วินาที</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 วินาที</value>
+    <value>ปิด</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>ตัด</value>

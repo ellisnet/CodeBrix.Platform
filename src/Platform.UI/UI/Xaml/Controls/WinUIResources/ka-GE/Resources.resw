@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>ღია ლურჯი</value>
+    <value>მიღება</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ყინულის ლურჯი</value>
+    <value>გაუქმება</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>დოკუმენტი</value>
+    <value>თარიღია ამრჩევი</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>გაყოფის ღილაკი</value>
+    <value>დღე</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>ფანჯარა</value>
+    <value>თვე</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>სარკმელი</value>
+    <value>წელი</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>ზედა კოლონტიტული</value>
+    <value>დროის ამრჩევი</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>ზედა კოლონტიტულის ელემენტი</value>
+    <value>წუთი</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>ცხრილი</value>
+    <value>საათი</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>სათაურის ზოლი</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>გამყოფი</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>სემანტური მასშტაბირება</value>
+    <value>პერიოდი</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 წამი</value>
+    <value>მიღება</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 წამი</value>
+    <value>დახურვა</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>ამოჭრა</value>

@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>Soilleir-ghorm</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>Gorm na deighe</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>sgrìobhainn</value>
+    <value>roghnaichear cinn-là</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>putan sgoilte</value>
+    <value>Latha</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>uinneag</value>
+    <value>Mìos</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>leòsan</value>
+    <value>Bliadhna</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>bann-cinn</value>
+    <value>roghnaichear ama</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>ball banna-chinn</value>
+    <value>Mionaid</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>clàr</value>
+    <value>Uair a thìde</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>bàr tiotail</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>sgaradair</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>sùm ciallachail</value>
+    <value>Ùine</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 diog</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 diog(an)</value>
+    <value>Dùin</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>Gearr às</value>

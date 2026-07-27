@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>Azzurro</value>
+    <value>Accetta</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>Blu ghiaccio</value>
+    <value>Annulla</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>documento</value>
+    <value>selezione data</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>pulsante di menu combinato</value>
+    <value>Giorno</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>finestra</value>
+    <value>Mese</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>riquadro</value>
+    <value>Anno</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>intestazione</value>
+    <value>selezione ora</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>voce di intestazione</value>
+    <value>Minuto</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>tabella</value>
+    <value>Ora</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>barra del titolo</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>separatore</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>zoom semantico</value>
+    <value>Periodo</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 secondo</value>
+    <value>Accetta</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>secondi: %1</value>
+    <value>Chiudi</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>Taglia</value>

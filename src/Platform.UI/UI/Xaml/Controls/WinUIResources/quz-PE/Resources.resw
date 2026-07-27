@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>Kanchaq anqas</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>Anqas</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>qillqa willakuqkuna</value>
+    <value>punchawta akllay</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>chiqtay ñitina</value>
+    <value>Punchaw</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>qawana tuqu</value>
+    <value>Killa</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>willakuy qata</value>
+    <value>Wata</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>umalliq</value>
+    <value>hora akllay</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>umalliq imakuna</value>
+    <value>Minuto</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>hanpara</value>
+    <value>Hora</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>suti siqi</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>rakiq</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>Ima nisqan asuykaruchay</value>
+    <value>Imay pacha</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 segundo</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 segundo</value>
+    <value>Wichqay</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>Kuchuy</value>

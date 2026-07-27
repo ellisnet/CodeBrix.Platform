@@ -9,13 +9,30 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.SoftwareKeyboard;
 
 /// <summary>
 /// The registry of software-keyboard layouts and the rules for choosing the active
-/// one. Resolution order: the host builder's pinned layout, then the
-/// XKB_DEFAULT_LAYOUT environment variable (an operator's explicit keyboard
-/// setting, consistent with how the hardware keymap resolves), then the locale
-/// environment (LC_ALL / LC_CTYPE / LANG), then US English.
+/// one. Resolution order: the host builder's pinned layout, then the emulated
+/// device's system language when running under the CodeBrix.Develop frame-buffer
+/// emulator, then the XKB_DEFAULT_LAYOUT environment variable (an operator's
+/// explicit keyboard setting, consistent with how the hardware keymap resolves),
+/// then the locale environment (LC_ALL / LC_CTYPE / LANG), then US English.
+/// <para>
+/// The emulator's language outranks the XKB and locale probes because those
+/// describe the DEVELOPER'S machine, which is exactly what an emulated device is
+/// meant to stop looking like — but it yields to the pinned layout, which is the
+/// application author's own deliberate choice.
+/// </para>
 /// </summary>
 internal static class KeyboardLayoutCatalog
 {
+	/// <summary>
+	/// The emulator's launch-contract language variable, and the value of it
+	/// that means "follow the host". Spelled out rather than referenced: this
+	/// file is compiled into the real FrameBuffer head too, which has no
+	/// emulator transport to take the constants from. Keep in step with
+	/// FrameBufferEmulatorProtocol.LanguageVariable in the Emulated head.
+	/// </summary>
+	private const string EmulatorLanguageVariable = "CODEBRIX_FBEMU_LANGUAGE";
+	private const string EmulatorSystemDefaultLanguage = "system-default";
+
 	/// <summary>
 	/// Locale languages that have no layout of their own but are conventionally
 	/// typed on another one (regional and minority languages of Europe).
@@ -103,6 +120,7 @@ internal static class KeyboardLayoutCatalog
 
 	internal static KeyboardLayoutDefinition ResolveActive(string? pinnedLayout)
 		=> Find(pinnedLayout)
+			?? FindFromEmulatorEnvironment()
 			?? FindFromXkbEnvironment()
 			?? FindFromLocaleEnvironment()
 			?? Fallback;
@@ -123,6 +141,21 @@ internal static class KeyboardLayoutCatalog
 			}
 		}
 		return result;
+	}
+
+	// The emulated device's system language, which the IDE puts in the
+	// environment before launching the application. Absent on the real head,
+	// and "system-default" means the user asked to follow the host — both of
+	// which fall through to the probes below.
+	private static KeyboardLayoutDefinition? FindFromEmulatorEnvironment()
+	{
+		var language = Environment.GetEnvironmentVariable(EmulatorLanguageVariable);
+		if (string.IsNullOrWhiteSpace(language)
+			|| string.Equals(language.Trim(), EmulatorSystemDefaultLanguage, StringComparison.OrdinalIgnoreCase))
+		{
+			return null;
+		}
+		return Find(language);
 	}
 
 	private static KeyboardLayoutDefinition? FindFromXkbEnvironment()

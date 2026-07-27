@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>ខៀវ​ខ្ចី</value>
+    <value>ទទួលយក</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ខៀវទឹកកក</value>
+    <value>លុបចោល</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>ឯកសា</value>
+    <value>កម្មវិធីជ្រើសរើស​កាលបរិច្ឆេទ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>ប៊ូតុងបំបែក</value>
+    <value>ថ្ងៃ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>window</value>
+    <value>ខែ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>បន្ទះ</value>
+    <value>ឆ្នាំ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>ក្បាល</value>
+    <value>កម្មវិធីជ្រើសរើសពេលវេលា</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>ធាតុក្បាល</value>
+    <value>នាទី</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>តុ</value>
+    <value>ម៉ោង</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>របារមុខងារ</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>កម្មវិធីបំបែក</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ពង្រីកពង្រួម semantic</value>
+    <value>រយៈពេល</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 វិនាទី</value>
+    <value>ទទួលយក</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 វិនាទី</value>
+    <value>បិទ</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>កាត់</value>

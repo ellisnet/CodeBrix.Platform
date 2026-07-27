@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>இளம் நீலம்</value>
+    <value>ஏற்றுக்கொள்</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ஐஸ் நீலம்</value>
+    <value>ரத்துசெய்</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>ஆவணம்</value>
+    <value>தேதி தேர்வர்</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>பிரிக்கும் பொத்தான்</value>
+    <value>நாள்</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>சாளரம்</value>
+    <value>மாதம்</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>பலகம்</value>
+    <value>ஆண்டு</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>மேற்குறிப்பு</value>
+    <value>நேரத் தேர்வர்</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>மேற்குறிப்பு உருப்படி</value>
+    <value>நிமிடம்</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>அட்டவணை</value>
+    <value>மணிநேரம்</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>தலைப்புப் பட்டி</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>பிரிப்பான்</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>சொற்பொருள் பெரிதாக்கி</value>
+    <value>காலம்</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 வினாடி</value>
+    <value>ஏற்றுக்கொள்</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 நொடிகள்</value>
+    <value>மூடு</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>வெட்டு</value>

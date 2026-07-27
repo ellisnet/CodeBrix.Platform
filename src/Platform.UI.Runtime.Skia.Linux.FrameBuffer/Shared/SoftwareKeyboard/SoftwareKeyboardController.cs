@@ -274,13 +274,39 @@ internal sealed class SoftwareKeyboardController : IInputPaneExtension, ITextBox
 		{
 			_ = rootElement.Dispatcher.RunAsync(
 				Windows.UI.Core.CoreDispatcherPriority.Normal,
-				() =>
-				{
-					if (_focusVersion == version && _focusedTextBox is null)
-					{
-						InputPane.GetForCurrentView().TryHide();
-					}
-				});
+				() => AutoHideIfStillUnfocused(version));
 		}
+	}
+
+	// Hiding re-lays-out the page, so it must not happen while a finger is
+	// still down: the control being tapped would move out from under it
+	// mid-gesture. Focus moves on the PRESS, so without this the layout would
+	// change between a press and its release on every tap that leaves a text
+	// control — which is most of them.
+	private void AutoHideIfStillUnfocused(int version)
+	{
+		if (_focusVersion != version || _focusedTextBox is not null)
+		{
+			return;
+		}
+		if (!ActivePointerTracker.IsPointerDown)
+		{
+			InputPane.GetForCurrentView().TryHide();
+			return;
+		}
+		// Wait for the finger to lift, then re-check: by then the user may have
+		// landed in another text control, which bumps the version and cancels
+		// this hide exactly as the deferral above does.
+		void OnReleased()
+		{
+			ActivePointerTracker.AllPointersReleased -= OnReleased;
+			if (_host.RootElement is { } rootElement)
+			{
+				_ = rootElement.Dispatcher.RunAsync(
+					Windows.UI.Core.CoreDispatcherPriority.Normal,
+					() => AutoHideIfStillUnfocused(version));
+			}
+		}
+		ActivePointerTracker.AllPointersReleased += OnReleased;
 	}
 }

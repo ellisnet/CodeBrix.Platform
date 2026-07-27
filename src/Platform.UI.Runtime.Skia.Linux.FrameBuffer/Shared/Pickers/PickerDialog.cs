@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CodeBrix.Platform.UI.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -220,9 +221,9 @@ internal sealed class PickerDialog
 
 		_title.Text = _mode switch
 		{
-			PickerMode.OpenFile => "Open file",
-			PickerMode.SaveFile => "Save file",
-			_ => "Select folder",
+			PickerMode.OpenFile => PlatformStrings.OpenFileTitle,
+			PickerMode.SaveFile => PlatformStrings.SaveFileTitle,
+			_ => PlatformStrings.SelectFolderTitle,
 		};
 		// ContentDialog's title typography (its template's hard-coded values).
 		_title.FontSize = 20;
@@ -247,7 +248,7 @@ internal sealed class PickerDialog
 		toolbar.Children.Add(_upButton);
 		if (_allowNewFolder)
 		{
-			_newFolderButton.Content = "New folder";
+			_newFolderButton.Content = PlatformStrings.NewFolder;
 			_newFolderButton.Click += (_, _) =>
 			{
 				_newFolderNameBox.Text = "";
@@ -270,7 +271,7 @@ internal sealed class PickerDialog
 		_list.SelectionChanged += OnSelectionChanged;
 		_list.MinHeight = 160;
 		listHost.Children.Add(_list);
-		_emptyHint.Text = "No items";
+		_emptyHint.Text = PlatformStrings.NoItems;
 		_emptyHint.Foreground = _secondaryTextBrush;
 		_emptyHint.HorizontalAlignment = HorizontalAlignment.Center;
 		_emptyHint.VerticalAlignment = VerticalAlignment.Center;
@@ -282,7 +283,7 @@ internal sealed class PickerDialog
 		{
 			_saveNameRow.Orientation = Orientation.Horizontal;
 			_saveNameRow.Spacing = 8;
-			var nameLabel = new TextBlock { Text = "Name:", VerticalAlignment = VerticalAlignment.Center };
+			var nameLabel = new TextBlock { Text = PlatformStrings.NameLabel, VerticalAlignment = VerticalAlignment.Center };
 			_saveNameBox.MinWidth = 220;
 			_saveNameBox.Text = suggestedFileName ?? "";
 			_saveNameBox.TextChanged += (_, _) => UpdateCommitEnabled();
@@ -314,7 +315,7 @@ internal sealed class PickerDialog
 		_commitButton.Click += (_, _) => Commit();
 		var cancelButton = new Button
 		{
-			Content = "Cancel",
+			Content = PlatformStrings.Cancel,
 			HorizontalAlignment = HorizontalAlignment.Stretch,
 		};
 		cancelButton.Click += (_, _) => Complete([]);
@@ -330,8 +331,8 @@ internal sealed class PickerDialog
 		_newFolderRow.Spacing = 8;
 		_newFolderRow.Visibility = Visibility.Collapsed;
 		_newFolderNameBox.MinWidth = 180;
-		_newFolderNameBox.PlaceholderText = "Folder name";
-		var createButton = new Button { Content = "Create" };
+		_newFolderNameBox.PlaceholderText = PlatformStrings.FolderNamePlaceholder;
+		var createButton = new Button { Content = PlatformStrings.Create };
 		createButton.Click += (_, _) =>
 		{
 			if (_navigator.CreateFolder(_newFolderNameBox.Text) is { } created)
@@ -341,7 +342,7 @@ internal sealed class PickerDialog
 				RefreshEntries();
 			}
 		};
-		var dismissButton = new Button { Content = "Cancel" };
+		var dismissButton = new Button { Content = PlatformStrings.Cancel };
 		dismissButton.Click += (_, _) => _newFolderRow.Visibility = Visibility.Collapsed;
 		_newFolderRow.Children.Add(_newFolderNameBox);
 		_newFolderRow.Children.Add(createButton);
@@ -354,7 +355,7 @@ internal sealed class PickerDialog
 		_overwriteRow.Spacing = 8;
 		_overwriteRow.Visibility = Visibility.Collapsed;
 		_overwriteText.VerticalAlignment = VerticalAlignment.Center;
-		var replaceButton = new Button { Content = "Replace" };
+		var replaceButton = new Button { Content = PlatformStrings.Replace };
 		replaceButton.Click += (_, _) =>
 		{
 			if (_pendingOverwritePath is { } path)
@@ -362,7 +363,7 @@ internal sealed class PickerDialog
 				Complete([path]);
 			}
 		};
-		var keepButton = new Button { Content = "Keep editing" };
+		var keepButton = new Button { Content = PlatformStrings.KeepEditing };
 		keepButton.Click += (_, _) =>
 		{
 			_pendingOverwritePath = null;
@@ -505,7 +506,7 @@ internal sealed class PickerDialog
 					if (System.IO.File.Exists(target))
 					{
 						_pendingOverwritePath = target;
-						_overwriteText.Text = $"Replace \"{System.IO.Path.GetFileName(target)}\"?";
+						_overwriteText.Text = PlatformStrings.ReplaceFile(System.IO.Path.GetFileName(target));
 						_overwriteRow.Visibility = Visibility.Visible;
 					}
 					else

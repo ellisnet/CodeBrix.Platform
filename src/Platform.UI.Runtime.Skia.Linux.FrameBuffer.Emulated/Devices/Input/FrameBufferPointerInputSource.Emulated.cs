@@ -76,6 +76,7 @@ internal partial class FrameBufferPointerInputSource
 				properties.IsLeftButtonPressed = true;
 				raisePointerEvent = touchArgs =>
 				{
+					SoftwareKeyboard.ActivePointerTracker.OnPointerDown((uint) pointerId);
 					RaisePointerEntered(touchArgs);
 					RaisePointerPressed(touchArgs);
 				};
@@ -93,6 +94,7 @@ internal partial class FrameBufferPointerInputSource
 				{
 					RaisePointerReleased(touchArgs);
 					RaisePointerExited(touchArgs);
+					SoftwareKeyboard.ActivePointerTracker.OnPointerUp((uint) pointerId);
 				};
 				break;
 

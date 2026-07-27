@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>ਹਲਕਾ ਨੀਲਾ</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ਆਈਸ ਬਲੂ</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>ਦਸਤਾਵੇਜ਼</value>
+    <value>ਮਿਤੀ ਪਿਕਰ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>ਵਿਭਾਜਨ ਬਟਨ</value>
+    <value>ਦਿਨ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>ਵਿੰਡੋ</value>
+    <value>ਮਹੀਨਾ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>ਉਪਖੰਡ</value>
+    <value>ਸਾਲ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>ਸਿਰਲੇਖ</value>
+    <value>ਸਮਾਂ ਪਿਕਰ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>ਸਿਰਲੇਖ ਆਈਟਮ</value>
+    <value>ਮਿੰਟ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>ਤਾਲਿਕਾ</value>
+    <value>ਘੰਟਾ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>ਸਿਰਲੇਖ ਪੱਟੀ</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ਵਿਭਾਜਕ</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ਸੇਮੈਂਟਿਕ ਜ਼ੂਮ</value>
+    <value>ਮਿਆਦ</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 ਸਕਿੰਟ</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 ਸਕਿੰਟ</value>
+    <value>ਬੰਦ ਕਰੋ</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>ਕੱਟੋ</value>

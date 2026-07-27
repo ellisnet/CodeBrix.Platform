@@ -24,6 +24,10 @@ public partial class ListPickerFlyoutPresenterAutomationPeer : FrameworkElementA
 	{
 		//UNO TODO: Private.FindStringResource
 		//return Private.FindStringResource(UIA_AP_LISTPICKERFLYOUT_NAME);
+		//CODEBRIX-DIVERGENCE 2026-07-26: the UIA_AP_LISTPICKERFLYOUT_NAME resource was REMOVED
+		//  from every locale of UI/Xaml/Controls/WinUIResources - it held a value belonging to
+		//  another key (an upstream misalignment) and had no donor to repair it from. Restore a
+		//  correct string there before re-enabling the lookup above, or it will return nothing.
 
 		return base.GetNameCore();
 	}

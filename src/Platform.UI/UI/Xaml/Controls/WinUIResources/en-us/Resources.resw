@@ -117,6 +117,42 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <!--
+    CODEBRIX-DIVERGENCE 2026-07-26 - deliberate change from the inherited resource set.
+    Do NOT revert on an upstream re-sync without re-reading this.
+
+    Fourteen keys held values belonging to OTHER keys - an upstream copy-paste shift
+    present in en-us and inherited, translated, by all 86 sibling locales. The shift was
+    not a uniform offset (the deltas were -29, +61 and +391), so the correct text could
+    not be recovered by shifting values back.
+
+    Twelve were repaired by copying the value of a donor key ALREADY PRESENT AND CORRECTLY
+    TRANSLATED in the same locale file, so no English was invented and no string was machine
+    translated:
+      UIA_AP_DATEPICKER_NAME        <- UIA_AP_DATEPICKER
+      UIA_AP_DATEPICKER_DAYNAME     <- UIA_DATEPICKER_DAY      (trailing space trimmed)
+      UIA_AP_DATEPICKER_MONTHNAME   <- UIA_DATEPICKER_MONTH    (trailing space trimmed)
+      UIA_AP_DATEPICKER_YEARNAME    <- UIA_DATEPICKER_YEAR     (trailing space trimmed)
+      UIA_AP_TIMEPICKER_NAME        <- UIA_AP_TIMEPICKER
+      UIA_AP_TIMEPICKER_HOURNAME    <- UIA_TIMEPICKER_HOUR     (trailing space trimmed)
+      UIA_AP_TIMEPICKER_MINUTENAME  <- UIA_TIMEPICKER_MINUTE   (trailing space trimmed)
+      UIA_AP_TIMEPICKER_PERIODNAME  <- UIA_TIMEPICKER_PERIOD   (trailing space trimmed)
+      UIA_DIALOG_ACCEPT             <- TEXT_VK_ACCEPT
+      UIA_DIALOG_DISMISS            <- TEXT_COMMAND_LABEL_CLOSE
+      TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL <- TEXT_VK_ACCEPT
+      TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL <- TEXT_VK_CANCEL
+
+    UIA_DIALOG_DISMISS is the one approximation: "Close" rather than "Dismiss", accepted
+    deliberately because no donor for "Dismiss" exists. Replace it if authoritative WinUI
+    source text becomes available.
+
+    Two keys had no donor and no code referencing them, and were REMOVED from all 87 files:
+      UIA_AP_LISTPICKERFLYOUT_NAME, UIA_AP_PICKERFLYOUT_NAME
+
+    Six of the repaired keys were live: the TimePicker flyout announced its accept and
+    dismiss buttons as "%1 second"/"%1 seconds" and its hour, minute and period columns as
+    "table", "header item" and "title bar" to screen readers.
+  -->
   <data name="5114" xml:space="preserve">
     <value>White</value>
   </data>
@@ -253,46 +289,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>Light blue</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>Ice blue</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>document</value>
+    <value>date picker</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>split button</value>
+    <value>Day</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>window</value>
+    <value>Month</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>pane</value>
+    <value>Year</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>header</value>
+    <value>time picker</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>header item</value>
+    <value>Minute</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>table</value>
+    <value>Hour</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>title bar</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>separator</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>semantic zoom</value>
+    <value>Period</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 second</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 seconds</value>
+    <value>Close</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>Cut</value>

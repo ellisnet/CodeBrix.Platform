@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>ತಿಳಿನೀಲಿ</value>
+    <value>Accept</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ಐಸ್ ನೀಲಿ</value>
+    <value>Cancel</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>ದಾಖಲೆ</value>
+    <value>ದಿನಾಂಕ ಪಿಕ್ಕರ್</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>ವಿಭಜನೆ ಬಟನ್</value>
+    <value>ದಿನ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>ವಿಂಡೋ</value>
+    <value>ತಿಂಗಳು</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>ಫಲಕ</value>
+    <value>ವರ್ಷ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>ಶಿರೋಲೇಖ</value>
+    <value>ಸಮಯ ಪಿಕ್ಕರ್</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>ಶಿರೋಲೇಖ ಐಟಂ</value>
+    <value>ನಿಮಿಷ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>ಕೋಷ್ಟಕ</value>
+    <value>ಗಂಟೆ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>ಶೀರ್ಷಿಕೆ ಪಟ್ಟಿ</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ಪ್ರತ್ಯೇಕ</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>ಸೆಮಾಂಟಿಕ್ ಜೂಮ್</value>
+    <value>ಅವಧಿ</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 ಸೆಕೆಂಡ್</value>
+    <value>Accept</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 ಸೆಕೆಂಡುಗಳು</value>
+    <value>ಮುಚ್ಚಿ</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>ಕತ್ತರಿಸು</value>

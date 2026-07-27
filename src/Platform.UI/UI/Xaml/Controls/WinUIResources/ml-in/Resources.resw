@@ -253,46 +253,40 @@
     <value></value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_ACCEPTBTNLABEL" xml:space="preserve">
-    <value>ഇളം നീല</value>
+    <value>സ്വീകരിക്കുക</value>
   </data>
   <data name="TEXT_PICKERFLYOUTBASE_CANCELBTNLABEL" xml:space="preserve">
-    <value>ഐസ് ബ്ലൂ</value>
+    <value>റദ്ദാക്കുക</value>
   </data>
   <data name="UIA_AP_DATEPICKER_NAME" xml:space="preserve">
-    <value>ഡോക്യുമെന്റ്</value>
+    <value>തീയതി പിക്കർ</value>
   </data>
   <data name="UIA_AP_DATEPICKER_DAYNAME" xml:space="preserve">
-    <value>വിഭജന ബട്ടൺ</value>
+    <value>ദിവസം</value>
   </data>
   <data name="UIA_AP_DATEPICKER_MONTHNAME" xml:space="preserve">
-    <value>ജാലകം</value>
+    <value>മാസം</value>
   </data>
   <data name="UIA_AP_DATEPICKER_YEARNAME" xml:space="preserve">
-    <value>പാൻ</value>
+    <value>വർഷം</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_NAME" xml:space="preserve">
-    <value>തലക്കെട്ട്</value>
+    <value>സമയ പിക്കർ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_MINUTENAME" xml:space="preserve">
-    <value>തലക്കെട്ട് തരം</value>
+    <value>മിനിറ്റ്</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_HOURNAME" xml:space="preserve">
-    <value>ടേബിൾ</value>
+    <value>മണിക്കൂർ</value>
   </data>
   <data name="UIA_AP_TIMEPICKER_PERIODNAME" xml:space="preserve">
-    <value>ശീർഷക ബാർ</value>
-  </data>
-  <data name="UIA_AP_LISTPICKERFLYOUT_NAME" xml:space="preserve">
-    <value>സെപ്പറേറ്റർ</value>
-  </data>
-  <data name="UIA_AP_PICKERFLYOUT_NAME" xml:space="preserve">
-    <value>സെമാന്റിക് സൂം</value>
+    <value>കാലയളവ്</value>
   </data>
   <data name="UIA_DIALOG_ACCEPT" xml:space="preserve">
-    <value>%1 സെക്കൻഡ്</value>
+    <value>സ്വീകരിക്കുക</value>
   </data>
   <data name="UIA_DIALOG_DISMISS" xml:space="preserve">
-    <value>%1 സെക്കന്റുകള്‍</value>
+    <value>അടയ്ക്കുക</value>
   </data>
   <data name="TEXT_CONTEXT_MENU_CUT" xml:space="preserve">
     <value>മുറിക്കുക</value>

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeBrix.Platform.UI.Localization;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -311,7 +312,7 @@ internal sealed class SoftwareKeyboardView : Border
 		{
 			lettersPage
 				? new KeyDef(KeyKind.SymbolsPage, 1.5f, "?123")
-				: new KeyDef(KeyKind.LettersPage, 1.5f, "ABC"),
+				: new KeyDef(KeyKind.LettersPage, 1.5f, PlatformStrings.KeyAbc),
 		};
 		if (_layouts.Count > 1)
 		{
@@ -319,7 +320,7 @@ internal sealed class SoftwareKeyboardView : Border
 		}
 		if (withArrows)
 		{
-			row.Add(new KeyDef(KeyKind.Tab, 1f, "Tab"));
+			row.Add(new KeyDef(KeyKind.Tab, 1f, PlatformStrings.KeyTab));
 			row.Add(new KeyDef(KeyKind.ArrowLeft, 1f, "←"));
 			row.Add(new KeyDef(KeyKind.ArrowUp, 1f, "↑"));
 			row.Add(new KeyDef(KeyKind.ArrowDown, 1f, "↓"));
@@ -331,7 +332,7 @@ internal sealed class SoftwareKeyboardView : Border
 			row.Add(new KeyDef(KeyKind.Space, 4f));
 			row.Add(new KeyDef(KeyKind.Character, 1f, ".", '.'));
 		}
-		row.Add(new KeyDef(KeyKind.Enter, 1.5f, "Enter"));
+		row.Add(new KeyDef(KeyKind.Enter, 1.5f, PlatformStrings.KeyEnter));
 		return row;
 	}
 
@@ -375,14 +376,15 @@ internal sealed class SoftwareKeyboardView : Border
 		{
 			KeyKind.Shift => _shift switch
 			{
-				ShiftState.Off => "Shift",
-				ShiftState.Once => "Shift ●",
-				_ => "SHIFT",
+				ShiftState.Off => PlatformStrings.KeyShift,
+				// The dot marks "shifted for the next key only".
+				ShiftState.Once => PlatformStrings.KeyShift + " ●",
+				_ => PlatformStrings.KeyShiftUpper,
 			},
 			// Word legends stay within the glyph coverage of every bundled
 			// application font; symbol glyphs for these can come once a dedicated
 			// keyboard font is settled.
-			KeyKind.Backspace => "Bksp",
+			KeyKind.Backspace => PlatformStrings.KeyBackspace,
 			KeyKind.Space => ActiveLayout.DisplayName,
 			_ => key.Legend ?? "",
 		};

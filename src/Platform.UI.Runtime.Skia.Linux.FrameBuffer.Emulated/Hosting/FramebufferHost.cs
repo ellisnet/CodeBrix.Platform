@@ -85,6 +85,14 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			}
 			_connection = connection;
 
+			// Before anything is built: the emulated device's own language, so
+			// the application starts out in it rather than switching later.
+			if (EmulatedSystemLanguage.Apply() is { } language
+				&& this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug($"Emulated device language: {language}");
+			}
+
 			_eventLoop.Schedule(InnerInitialize);
 		}
 
@@ -105,6 +113,10 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			var connection = _connection!;
 
 			_isDispatcherThread = true;
+			// This is the UI thread, and it was already running when the
+			// language was applied — give it the emulated device's culture too,
+			// or it renders the right layout with the wrong words.
+			EmulatedSystemLanguage.ApplyToCurrentThread();
 			// How the application is mounted on the emulated panel, exactly as
 			// on the real head. The frame buffer's dimensions come from the
 			// IDE and never change, so a portrait mount does not resize
@@ -168,6 +180,15 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			{
 				var app = _appBuilder();
 				app.Host = this;
+
+				// Application's constructor calls ApplicationLanguages.ApplyCulture(),
+				// which resets the culture to the FIRST of its language list — and that
+				// list is led by the HOST machine's installed UI culture. Re-assert the
+				// emulated device's language here, after the application exists: doing it
+				// through PrimaryLanguageOverride instead would work, but its setter
+				// persists the value into the application's own LocalSettings, so an
+				// emulator run in German would leave a real run German too.
+				EmulatedSystemLanguage.ApplyToCurrentThread();
 
 				// Force the first render once the app has been setup
 				Dispatch(() => _renderer!.InvalidateRender(), NativeDispatcherPriority.High);

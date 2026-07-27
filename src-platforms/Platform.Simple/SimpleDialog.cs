@@ -187,22 +187,39 @@ public class SimpleDialog : IDisposable
         string secondButton = null;
         SimpleDialogResult secondButtonResult = SimpleDialogResult.None;
 
+#if HAS_CODEBRIX
+        //On CodeBrix.Platform the button words follow the language the application is
+        //  running in — which, under the CodeBrix.Develop frame-buffer emulator, is the
+        //  language the emulated device is set to. The WIN_UI and MAUI editions below
+        //  keep the English words they have always used; localizing those heads is a
+        //  separate piece of work and this branch is the only one they do not compile.
+        var okText = CodeBrix.Platform.UI.Localization.PlatformStrings.Ok;
+        var cancelText = CodeBrix.Platform.UI.Localization.PlatformStrings.Cancel;
+        var yesText = CodeBrix.Platform.UI.Localization.PlatformStrings.Yes;
+        var noText = CodeBrix.Platform.UI.Localization.PlatformStrings.No;
+#else
+        const string okText = "OK";
+        const string cancelText = "Cancel";
+        const string yesText = "Yes";
+        const string noText = "No";
+#endif
+
         switch (this.Buttons)
         {
             case SimpleDialogButtons.OK:
-                firstButton = "OK";
+                firstButton = okText;
                 firstButtonResult = SimpleDialogResult.OK;
                 break;
             case SimpleDialogButtons.OKCancel:
-                firstButton = "OK";
+                firstButton = okText;
                 firstButtonResult = SimpleDialogResult.OK;
-                secondButton = "Cancel";
+                secondButton = cancelText;
                 secondButtonResult = SimpleDialogResult.Cancel;
                 break;
             case SimpleDialogButtons.YesNo:
-                firstButton = "Yes";
+                firstButton = yesText;
                 firstButtonResult = SimpleDialogResult.Yes;
-                secondButton = "No";
+                secondButton = noText;
                 secondButtonResult = SimpleDialogResult.No;
                 break;
             default:

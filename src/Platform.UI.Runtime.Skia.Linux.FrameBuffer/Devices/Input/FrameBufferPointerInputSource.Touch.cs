@@ -83,6 +83,7 @@ unsafe internal partial class FrameBufferPointerInputSource
 					properties.PointerUpdateKind = LeftButtonPressed;
 					raisePointerEvent = touchArgs =>
 					{
+						SoftwareKeyboard.ActivePointerTracker.OnPointerDown(pointerId);
 						RaisePointerEntered(touchArgs);
 						RaisePointerPressed(touchArgs);
 					};
@@ -94,12 +95,22 @@ unsafe internal partial class FrameBufferPointerInputSource
 					{
 						RaisePointerReleased(touchArgs);
 						RaisePointerExited(touchArgs);
+						// After the release, so anything deferred until the finger
+						// lifts (the software keyboard's auto-hide) runs once the
+						// gesture it would have disturbed is complete.
+						SoftwareKeyboard.ActivePointerTracker.OnPointerUp(pointerId);
 					};
 					break;
 
 				case LIBINPUT_EVENT_TOUCH_CANCEL:
 					properties.PointerUpdateKind = LeftButtonReleased;
-					raisePointerEvent = RaisePointerCancelled;
+					raisePointerEvent = touchArgs =>
+					{
+						RaisePointerCancelled(touchArgs);
+						// A cancelled finger never sends TOUCH_UP; without this the
+						// tracker would believe it is still down for ever.
+						SoftwareKeyboard.ActivePointerTracker.OnPointerUp(pointerId);
+					};
 					break;
 			}
 

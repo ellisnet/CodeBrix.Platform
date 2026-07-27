@@ -234,11 +234,30 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
         SimpleDialog.Create(message, title, buttons);
 #endif
 
+#if HAS_CODEBRIX
+    //On CodeBrix.Platform the words this class puts on a dialog follow the language the
+    //  application is running in - which, under the CodeBrix.Develop frame-buffer emulator,
+    //  is the language the emulated device is set to. The WIN_UI / MAUI / WPF editions keep
+    //  the English they have always used; they do not compile this branch. Only the LABELS
+    //  are localized: the message an application passes in is the application's own text.
+    private static string InformationTitle => CodeBrix.Platform.UI.Localization.PlatformStrings.InformationTitle;
+    private static string ErrorTitle => CodeBrix.Platform.UI.Localization.PlatformStrings.ErrorTitle;
+    private static string ErrorOccurredLabel => CodeBrix.Platform.UI.Localization.PlatformStrings.ErrorOccurredLabel;
+    private static string DetailsLabel => CodeBrix.Platform.UI.Localization.PlatformStrings.DetailsLabel;
+    private static string ConfirmTitle => CodeBrix.Platform.UI.Localization.PlatformStrings.ConfirmTitle;
+#else
+    private const string InformationTitle = "Information";
+    private const string ErrorTitle = "ERROR";
+    private const string ErrorOccurredLabel = "An error occurred:";
+    private const string DetailsLabel = "Details:";
+    private const string ConfirmTitle = "Are you sure?";
+#endif
+
     protected virtual async Task ShowInfo(string message)
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            using var dialog = CreateDialog(message, "Information");
+            using var dialog = CreateDialog(message, InformationTitle);
             _ = await dialog.ShowAsync();
         }
     }
@@ -247,7 +266,7 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            message = $"An error occurred:\n   {message.Trim()}";
+            message = $"{ErrorOccurredLabel}\n   {message.Trim()}";
             details = (string.IsNullOrWhiteSpace(details))
                 ? ""
                 : (details.Trim().Length > 200)
@@ -255,8 +274,8 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
                     : details.Trim();
             message += (details == "")
                 ? ""
-                : $"\n\nDetails:\n{details}";
-            using var dialog = CreateDialog(message, "ERROR");
+                : $"\n\n{DetailsLabel}\n{details}";
+            using var dialog = CreateDialog(message, ErrorTitle);
             _ = await dialog.ShowAsync();
         }
     }
@@ -274,11 +293,14 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
 
     protected virtual async Task<bool> ConfirmDialog(
         string message,
-        string title = "Are you sure?",
+        string title = null,
         SimpleDialogButtons confirmButtons = SimpleDialogButtons.YesNo)
     {
+        //The default title cannot be a parameter default any more: it is resolved from the
+        //  running language, which a compile-time constant cannot express. Passing null (or
+        //  blank) therefore means "use the default", exactly as blank already did.
         title = (string.IsNullOrWhiteSpace(title))
-            ? "Are you sure?"
+            ? ConfirmTitle
             : title.Trim();
 
         message = (string.IsNullOrWhiteSpace(message))

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using CodeBrix.Platform.Extensions.Storage.Pickers;
+using CodeBrix.Platform.UI.Localization;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.Pickers;
 
@@ -44,7 +45,7 @@ internal sealed class FrameBufferFileOpenPickerExtension(IFilePicker picker, Fil
 			options.RequiredExtension,
 			picker.FileTypeFilterInternal);
 		var commitText = string.IsNullOrWhiteSpace(picker.CommitButtonTextInternal)
-			? "Open"
+			? PlatformStrings.Open
 			: picker.CommitButtonTextInternal;
 		return PickerDialog.ShowAsync(PickerDialog.PickerMode.OpenFile, navigator,
 			multiple, options.AllowNewFolderCreate, commitText, suggestedFileName: null, token);
@@ -69,7 +70,7 @@ internal sealed class FrameBufferFileSavePickerExtension(FileSavePicker picker, 
 			options.RequiredExtension,
 			picker.FileTypeChoices.Values.SelectMany(extensions => extensions));
 		var commitText = string.IsNullOrWhiteSpace(picker.CommitButtonText)
-			? "Save"
+			? PlatformStrings.Save
 			: picker.CommitButtonText;
 
 		var paths = await PickerDialog.ShowAsync(PickerDialog.PickerMode.SaveFile, navigator,
@@ -116,7 +117,7 @@ internal sealed class FrameBufferFolderPickerExtension(IFilePicker picker, Folde
 			requiredExtension: null,
 			applicationExtensions: null);
 		var commitText = string.IsNullOrWhiteSpace(picker.CommitButtonTextInternal)
-			? "Select folder"
+			? PlatformStrings.SelectFolderTitle
 			: picker.CommitButtonTextInternal;
 
 		var paths = await PickerDialog.ShowAsync(PickerDialog.PickerMode.PickFolder, navigator,
