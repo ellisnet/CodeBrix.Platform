@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Sk
 internal class WpfHostBuilder : IPlatformHostBuilder, IWindowsSkiaHostBuilder
 {
 	private Func<Application>? _wpfApplication;
+	private WpfDispatcherScheduling _dispatcherScheduling = WpfDispatcherScheduling.RenderFirst;
 	private string? _windowsDesktopFrameworkPath;
 
 	public WpfHostBuilder()
@@ -181,8 +182,14 @@ internal class WpfHostBuilder : IPlatformHostBuilder, IWindowsSkiaHostBuilder
 		set => _wpfApplication = value;
 	}
 
+	WpfDispatcherScheduling IWindowsSkiaHostBuilder.DispatcherScheduling
+	{
+		get => _dispatcherScheduling;
+		set => _dispatcherScheduling = value;
+	}
+
 	public CodeBrixPlatformHost Create(Func<Microsoft.UI.Xaml.Application> appBuilder, Type appType)
-		=> new WpfHost(appBuilder, _wpfApplication);
+		=> new WpfHost(appBuilder, _wpfApplication, _dispatcherScheduling);
 
 	private static class NativeMethods
 	{
