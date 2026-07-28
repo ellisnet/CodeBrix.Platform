@@ -5,7 +5,7 @@
 #
 # Version 1.0.205.9999 is deliberately outside the real date-stamped scheme
 # (minute-of-day never reaches 9999): it marks a local development pack, sorts
-# above the 1.0.205.475 family publish, and can never collide with a real
+# above the 1.0.209.480 family publish, and can never collide with a real
 # publish. After the family's next real publish, re-run this script with a new
 # LOCAL_VERSION and bump the pins in the sample csprojs + NuGet.Config together.
 #
