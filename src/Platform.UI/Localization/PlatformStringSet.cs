@@ -119,18 +119,35 @@ internal sealed class PlatformStringSet
 	/// </summary>
 	public required string KeyAbc { get; init; }
 
-	/// <summary>The tab key's legend. Kept short: it is painted on one key.</summary>
+	/// <summary>
+	/// The tab key's legend. Kept short: it is painted on one key. Left as the
+	/// Latin "Tab" in every language whose keyboards are labelled that way —
+	/// see the modifier-key note on <see cref="PlatformStrings"/> before
+	/// translating it.
+	/// </summary>
 	public required string KeyTab { get; init; }
 
 	/// <summary>The enter key's legend.</summary>
 	public required string KeyEnter { get; init; }
 
-	/// <summary>The shift key's legend, shift off.</summary>
+	/// <summary>
+	/// The shift key's legend, shift off. Deliberately still "Shift" in the
+	/// many languages that have no everyday word for this key — see the
+	/// modifier-key note on <see cref="PlatformStrings"/>. A set whose Shift is
+	/// Latin while its Enter and Backspace are not is correct, not unfinished.
+	/// </summary>
 	public required string KeyShift { get; init; }
 
-	/// <summary>The shift key's legend, shift latched — the loud form.</summary>
+	/// <summary>The shift key's legend, shift latched — the loud form of <see cref="KeyShift"/>.</summary>
 	public required string KeyShiftUpper { get; init; }
 
 	/// <summary>The backspace key's legend. Abbreviated on every layout.</summary>
 	public required string KeyBackspace { get; init; }
+
+	/// <summary>
+	/// The file picker's "go to the parent folder" button, beside an upwards
+	/// arrow. Kept to one short word: it shares a toolbar with the new-folder
+	/// button on a narrow device screen.
+	/// </summary>
+	public required string NavigateUp { get; init; }
 }

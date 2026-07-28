@@ -92,10 +92,115 @@ internal static class FontDetailsCache
 		{
 			return LoadTypefaceFromApplicationUriAsync(uri, weight, style, stretch);
 		}
+		else if (FeatureConfiguration.Font.RestrictToEmbeddedFonts)
+		{
+			// Font isolation: a bare family name ("Segoe UI", "Arial") can only ever be
+			// satisfied by the host's installed fonts, so there is nothing to resolve it
+			// against here. The application's own default font stands in — the same thing
+			// a device carrying only the application's fonts would fall back to.
+			return GetEmbeddedDefaultTypefaceTask(weight, stretch, style)
+				?? Task.FromResult<SKTypeface?>(null);
+		}
 		else
 		{
 			// FromFontFamilyName may return null: https://github.com/mono/SkiaSharp/issues/1058
 			return Task.FromResult<SKTypeface?>(SKTypeface.FromFamilyName(name, skWeight, skWidth, skSlant));
+		}
+	}
+
+	/// <summary>
+	/// The first font in <see cref="FeatureConfiguration.Font.FallbackFontFamilies"/> that
+	/// has a glyph for <paramref name="codepoint"/>, or null when none does (or none are
+	/// configured). These are the application's OWN fonts, so they are consulted whether or
+	/// not font isolation is on — an application that declares companion faces is extending
+	/// its own script coverage, not reaching for the host's fonts.
+	/// <para>
+	/// A font still loading is skipped rather than waited on: the caller falls through for
+	/// that one measure pass, and the next one picks it up once the load completes.
+	/// </para>
+	/// </summary>
+	internal static FontDetails? GetEmbeddedFallback(
+		int codepoint,
+		float fontSize,
+		FontWeight weight,
+		FontStretch stretch,
+		FontStyle style)
+	{
+		var families = FeatureConfiguration.Font.FallbackFontFamilies;
+		if (families is null || families.Count == 0)
+		{
+			return null;
+		}
+
+		for (var i = 0; i < families.Count; i++)
+		{
+			var family = families[i];
+			if (string.IsNullOrWhiteSpace(family))
+			{
+				continue;
+			}
+
+			var details = GetFont(family, fontSize, weight, stretch, style).details;
+			if (details.SKFont.ContainsGlyph(codepoint))
+			{
+				return details;
+			}
+		}
+
+		return null;
+	}
+
+	/// <summary>
+	/// The application's own default font for the last-resort path, or null when font
+	/// isolation is off or that font has not finished loading. Every other branch of that
+	/// path asks the HOST for a typeface, so under isolation this is the only acceptable
+	/// answer — and it is available whenever the font's load has already finished, which
+	/// the preload in Application startup makes the ordinary case. A font still loading
+	/// falls through for that one measure pass; the continuation in the caller replaces
+	/// what was measured once the real typeface arrives.
+	/// </summary>
+	private static SKTypeface? GetLoadedEmbeddedDefaultTypeface(
+		FontWeight weight,
+		FontStretch stretch,
+		FontStyle style)
+	{
+		if (!FeatureConfiguration.Font.RestrictToEmbeddedFonts)
+		{
+			return null;
+		}
+		return GetEmbeddedDefaultTypefaceTask(weight, stretch, style) is { IsCompletedSuccessfully: true } task
+			? task.Result
+			: null;
+	}
+
+	/// <summary>
+	/// The load of the application's own default font, taken from (and seeded into) the
+	/// same cache as any other font so one typeface instance is shared by every caller
+	/// that lands on it. Null when the application's default is itself a bare family name
+	/// — the built-in "Segoe UI" — which under font isolation is unresolvable by
+	/// definition, and never recurses for that same reason.
+	/// </summary>
+	private static Task<SKTypeface?>? GetEmbeddedDefaultTypefaceTask(
+		FontWeight weight,
+		FontStretch stretch,
+		FontStyle style)
+	{
+		var name = FeatureConfiguration.Font.DefaultTextFontFamily;
+		if (!Uri.TryCreate(name, UriKind.Absolute, out _))
+		{
+			return null;
+		}
+
+		var key = new FontEntry(name, weight.ToSkiaWeight(), stretch.ToSkiaWidth(), style.ToSkiaSlant());
+		// Monitor is reentrant, so this is safe on the path that reaches it from inside
+		// the cache's own lock (GetFontInternal, called while _getFont holds the gate).
+		lock (_fontCacheGate)
+		{
+			if (!_fontCache.TryGetValue(key, out var task))
+			{
+				_fontCache[key] = task = GetFontInternal(name, weight, stretch, style);
+			}
+			return task;
 		}
 	}
 
@@ -141,7 +246,8 @@ internal static class FontDetailsCache
 				}
 			}
 
-			typeface = SKTypeface.FromFamilyName(FeatureConfiguration.Font.DefaultTextFontFamily, skWeight, skWidth, skSlant)
+			typeface = GetLoadedEmbeddedDefaultTypeface(weight, stretch, style)
+						?? SKTypeface.FromFamilyName(FeatureConfiguration.Font.DefaultTextFontFamily, skWeight, skWidth, skSlant)
 						?? SKTypeface.FromFamilyName(null, skWeight, skWidth, skSlant)
 						?? SKTypeface.FromFamilyName(null);
 		}

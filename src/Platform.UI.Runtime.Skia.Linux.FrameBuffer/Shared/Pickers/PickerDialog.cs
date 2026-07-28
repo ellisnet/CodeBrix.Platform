@@ -239,7 +239,23 @@ internal sealed class PickerDialog
 		layout.Children.Add(_pathText);
 
 		var toolbar = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-		_upButton.Content = "↑ Up";
+		// The arrow and the word need different fonts: the arrow is a Fluent
+		// Private Use Area glyph (a plain "↑" is missing from Open Sans and
+		// Roboto, so it drew as a box on a device with no host fonts), while the
+		// word is ordinary text in the application's own font.
+		var upContent = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+		upContent.Children.Add(new TextBlock
+		{
+			Text = SymbolGlyphs.ArrowUp,
+			FontFamily = SymbolGlyphs.SymbolFontFamily,
+			VerticalAlignment = VerticalAlignment.Center,
+		});
+		upContent.Children.Add(new TextBlock
+		{
+			Text = PlatformStrings.NavigateUp,
+			VerticalAlignment = VerticalAlignment.Center,
+		});
+		_upButton.Content = upContent;
 		_upButton.Click += (_, _) =>
 		{
 			_navigator.NavigateUp();

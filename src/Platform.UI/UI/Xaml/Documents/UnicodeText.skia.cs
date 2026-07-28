@@ -465,6 +465,26 @@ internal readonly partial struct UnicodeText : IParsedText
 		{
 			return symbolsFont;
 		}
+		// The application's own declared fallbacks, in order. These are its fonts, shipped
+		// in its package, so they are consulted whether or not isolation is on — and they
+		// are checked BEFORE the host's fonts so text renders the same on a desktop as on
+		// a device that has nothing else installed.
+		if (FontDetailsCache.GetEmbeddedFallback(codepoint, fontSize, fontWeight, fontStretch, fontStyle) is { } embedded)
+		{
+			return embedded;
+		}
+		// Font isolation: everything below this point looks outside the application — the
+		// device's own font directory on Android, the host's installed fonts everywhere
+		// else — so under isolation there is deliberately nowhere left to look. Returning
+		// null keeps the character in the caller's own font (via "?? inline.FontDetails"),
+		// where it renders as that font's missing-glyph, which is what a device carrying
+		// only the application's fonts would show. The symbols font above is checked first
+		// and stays exempt: the framework depends on it, so it is present on a real device
+		// exactly as it is here.
+		if (FeatureConfiguration.Font.RestrictToEmbeddedFonts)
+		{
+			return null;
+		}
 		if (OperatingSystem.IsAndroid())
 		{
 			foreach (var file in Directory.EnumerateFiles("/system/fonts"))

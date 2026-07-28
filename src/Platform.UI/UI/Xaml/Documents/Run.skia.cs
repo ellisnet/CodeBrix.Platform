@@ -8,6 +8,7 @@ using SkiaSharp;
 using CodeBrix.Platform.Foundation.Logging;
 using Microsoft.UI.Xaml.Documents.TextFormatting;
 using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Dispatching;
 using Buffer = HarfBuzzSharp.Buffer;
 using GlyphInfo = Microsoft.UI.Xaml.Documents.TextFormatting.GlyphInfo;
@@ -118,9 +119,29 @@ namespace Microsoft.UI.Xaml.Documents
 
 				var (codepoint, codepointLength) = GetCodePoint(text, i);
 
-				var currentTypeface = skFont.ContainsGlyph(codepoint)
-					? defaultTypeface
-					: SKFontManager.Default.MatchCharacter(codepoint);
+				SKTypeface? currentTypeface;
+				if (skFont.ContainsGlyph(codepoint))
+				{
+					currentTypeface = defaultTypeface;
+				}
+				else if (FontDetailsCache.GetEmbeddedFallback(
+					codepoint, FontInfo.SKFontSize, FontWeight, FontStretch, FontStyle) is { } embedded)
+				{
+					// The application's own declared fallback fonts, consulted before the
+					// host's and regardless of isolation.
+					currentTypeface = embedded.SKFont.Typeface;
+				}
+				else if (FeatureConfiguration.Font.RestrictToEmbeddedFonts)
+				{
+					// Under font isolation the host's fonts are off-limits, so a glyph the
+					// segment's own font lacks has nowhere else to come from — which is
+					// exactly the "not found" case handled just below.
+					currentTypeface = null;
+				}
+				else
+				{
+					currentTypeface = SKFontManager.Default.MatchCharacter(codepoint);
+				}
 
 				if (currentTypeface is null)
 				{

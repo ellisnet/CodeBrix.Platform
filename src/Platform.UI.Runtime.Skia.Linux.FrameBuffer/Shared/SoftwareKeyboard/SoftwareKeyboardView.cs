@@ -321,10 +321,10 @@ internal sealed class SoftwareKeyboardView : Border
 		if (withArrows)
 		{
 			row.Add(new KeyDef(KeyKind.Tab, 1f, PlatformStrings.KeyTab));
-			row.Add(new KeyDef(KeyKind.ArrowLeft, 1f, "←"));
-			row.Add(new KeyDef(KeyKind.ArrowUp, 1f, "↑"));
-			row.Add(new KeyDef(KeyKind.ArrowDown, 1f, "↓"));
-			row.Add(new KeyDef(KeyKind.ArrowRight, 1f, "→"));
+			row.Add(new KeyDef(KeyKind.ArrowLeft, 1f, SymbolGlyphs.ArrowLeft));
+			row.Add(new KeyDef(KeyKind.ArrowUp, 1f, SymbolGlyphs.ArrowUp));
+			row.Add(new KeyDef(KeyKind.ArrowDown, 1f, SymbolGlyphs.ArrowDown));
+			row.Add(new KeyDef(KeyKind.ArrowRight, 1f, SymbolGlyphs.ArrowRight));
 		}
 		else
 		{
@@ -334,6 +334,27 @@ internal sealed class SoftwareKeyboardView : Border
 		}
 		row.Add(new KeyDef(KeyKind.Enter, 1.5f, PlatformStrings.KeyEnter));
 		return row;
+	}
+
+	// The key's painted legend. An arrow legend is a Fluent Private Use Area
+	// codepoint, so that one gets the symbols font: a plain Unicode arrow is
+	// missing from Open Sans and Roboto and would draw as a box on a device with
+	// no host fonts to fall back on. See SymbolGlyphs.
+	private TextBlock CreateLegend(KeyDef key, string legend)
+	{
+		var text = new TextBlock
+		{
+			Text = legend,
+			Foreground = key.Kind == KeyKind.Space ? _spaceLegendBrush : _keyForegroundBrush,
+			FontSize = key.Kind == KeyKind.Character ? 18 : 13,
+			HorizontalAlignment = HorizontalAlignment.Center,
+			VerticalAlignment = VerticalAlignment.Center,
+		};
+		if (SymbolGlyphs.IsSymbolGlyph(legend))
+		{
+			text.FontFamily = SymbolGlyphs.SymbolFontFamily;
+		}
+		return text;
 	}
 
 	private static char ShiftOf(KeyboardLayoutDefinition layout, int rowIndex, int keyIndex, char baseChar)
@@ -378,7 +399,10 @@ internal sealed class SoftwareKeyboardView : Border
 			{
 				ShiftState.Off => PlatformStrings.KeyShift,
 				// The dot marks "shifted for the next key only".
-				ShiftState.Once => PlatformStrings.KeyShift + " ●",
+				// U+2022 BULLET, not U+25CF BLACK CIRCLE: the latter is absent
+				// from Open Sans, so it drew as a missing-glyph box in any
+				// application using that font.
+				ShiftState.Once => PlatformStrings.KeyShift + " •",
 				_ => PlatformStrings.KeyShiftUpper,
 			},
 			// Word legends stay within the glyph coverage of every bundled
@@ -391,6 +415,8 @@ internal sealed class SoftwareKeyboardView : Border
 
 		// The dismiss key's downward triangle is drawn, not text: a shaped glyph
 		// renders identically on every layout regardless of any font's coverage.
+		// (The arrow keys take the other route — a Fluent symbol glyph — because
+		// four arrowheads as polygons would be four more shapes to keep aligned.)
 		UIElement face = key.Kind == KeyKind.Dismiss
 			? new Microsoft.UI.Xaml.Shapes.Polygon
 			{
@@ -399,14 +425,7 @@ internal sealed class SoftwareKeyboardView : Border
 				HorizontalAlignment = HorizontalAlignment.Center,
 				VerticalAlignment = VerticalAlignment.Center,
 			}
-			: new TextBlock
-			{
-				Text = legend,
-				Foreground = key.Kind == KeyKind.Space ? _spaceLegendBrush : _keyForegroundBrush,
-				FontSize = key.Kind == KeyKind.Character ? 18 : 13,
-				HorizontalAlignment = HorizontalAlignment.Center,
-				VerticalAlignment = VerticalAlignment.Center,
-			};
+			: CreateLegend(key, legend);
 
 		var visual = new Border
 		{

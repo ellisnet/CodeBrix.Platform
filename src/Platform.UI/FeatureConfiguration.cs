@@ -211,6 +211,50 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			public static string DefaultTextFontFamily { get; set; } = "Segoe UI";
 
 			/// <summary>
+			/// Fonts consulted, in order, for a character the requested font has no glyph for —
+			/// the application's own script coverage beyond its primary font. Each entry is an
+			/// "ms-appx:///" URI of a font the application ships, exactly like
+			/// <see cref="DefaultTextFontFamily"/>; a font package that carries companion faces
+			/// (Noto Sans Georgian alongside Roboto, say) names them here.
+			/// </summary>
+			/// <remarks>
+			/// Empty by default. These are tried BEFORE the host machine's installed fonts, so
+			/// text renders the same on a developer desktop as on a device that has nothing but
+			/// the application's own fonts — and they are the only fallback consulted at all when
+			/// <see cref="RestrictToEmbeddedFonts"/> is on, which is what lets an application
+			/// deliberately extend its script coverage without reopening the door to host fonts.
+			/// <para>
+			/// Set it before the first text is measured, alongside
+			/// <see cref="DefaultTextFontFamily"/> in application startup. Weight, stretch and
+			/// style are honored per entry through the usual ".ttf.manifest" lookup, so a
+			/// companion font that ships a manifest resolves bold and italic like any other font.
+			/// </para>
+			/// </remarks>
+			public static IReadOnlyList<string> FallbackFontFamilies { get; set; } = Array.Empty<string>();
+
+			/// <summary>
+			/// Confines font resolution to the fonts the application itself ships — the ones
+			/// reachable through an "ms-appx:///" URI, which on a CodeBrix.Platform application
+			/// means the font package referenced by its shared project plus the framework's own
+			/// <see cref="SymbolsFont"/>. The host machine's installed fonts are not consulted
+			/// at all: a character none of the application's fonts has renders as that font's
+			/// own missing-glyph (.notdef) rather than being satisfied from elsewhere.
+			/// </summary>
+			/// <remarks>
+			/// Off by default, so nothing changes for an application that does not ask for it.
+			/// It exists for the frame-buffer EMULATOR, where the host is a full desktop whose
+			/// fonts a real device would not have — without it the emulator silently renders
+			/// scripts the application cannot actually display, which is a false negative when
+			/// the point of the exercise is finding out what the device will really show.
+			/// <para>
+			/// Set it before the first text is measured — the frame-buffer emulated head sets it
+			/// while reading its launch contract, ahead of anything being built. Resolved fonts
+			/// are cached, so changing it later leaves already-resolved text as it was.
+			/// </para>
+			/// </remarks>
+			public static bool RestrictToEmbeddedFonts { get; set; }
+
+			/// <summary>
 			/// Ignores text scale factor, resulting in a font size as dictated by the control.
 			/// </summary>
 			public static bool IgnoreTextScaleFactor { get; set; }

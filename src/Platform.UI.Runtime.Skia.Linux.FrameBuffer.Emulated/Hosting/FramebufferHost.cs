@@ -93,6 +93,15 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 				this.Log().Debug($"Emulated device language: {language}");
 			}
 
+			// Also before anything is built, and for the same reason: resolved
+			// fonts are cached, so text measured before this is set would keep
+			// the host fonts it was given.
+			if (EmulatedFontIsolation.Apply() && this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug(
+					"Emulated device font isolation: on — only the application's own fonts are used.");
+			}
+
 			_eventLoop.Schedule(InnerInitialize);
 		}
 

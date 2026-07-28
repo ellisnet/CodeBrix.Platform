@@ -18,6 +18,24 @@ namespace CodeBrix.Platform.UI.Localization;
 /// in a language CodeBrix.Platform has no set for, and English words on a
 /// button beat an exception in a file picker.
 /// </para>
+/// <para>
+/// MODIFIER KEY NAMES ARE NOT ALWAYS TRANSLATED, AND THAT IS NOT AN OVERSIGHT.
+/// <see cref="PlatformStringSet.KeyShift"/> and
+/// <see cref="PlatformStringSet.KeyTab"/> keep their Latin spelling in the
+/// languages whose keyboards are actually labelled that way — every Cyrillic
+/// layout (ru, uk, be, bg, sr, mk), Greek, Georgian, Armenian, and most of the
+/// Slavic-Latin group (pl, cs, sk, hu, hr) among others. Those languages never
+/// adopted a native word for "Shift"; a Russian keyboard says Shift. Languages
+/// that DO have the everyday word use it — German "Umschalt", French "Maj",
+/// Spanish "Mayús", Swedish "Skift", Turkish "Üst Krkt", and so on.
+/// </para>
+/// <para>
+/// The same language often DOES translate the keys that have native words:
+/// Russian is Shift and Tab but "Ввод" and "Стереть". So a set that mixes
+/// Latin and native key names is correct, not half-finished. Do NOT "complete"
+/// it by translating Shift into every language — that would put a word on the
+/// key that its users do not use for it.
+/// </para>
 /// </summary>
 public static partial class PlatformStrings
 {
@@ -116,6 +134,9 @@ public static partial class PlatformStrings
 
 	/// <inheritdoc cref="PlatformStringSet.KeyBackspace"/>
 	public static string KeyBackspace => Active.KeyBackspace;
+
+	/// <inheritdoc cref="PlatformStringSet.NavigateUp"/>
+	public static string NavigateUp => Active.NavigateUp;
 
 	/// <summary>
 	/// Asks whether to overwrite <paramref name="fileName"/>. The quoting is
