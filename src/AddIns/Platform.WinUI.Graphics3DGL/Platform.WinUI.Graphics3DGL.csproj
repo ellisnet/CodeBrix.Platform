@@ -25,7 +25,7 @@
 	<Import Project="../../targetframework-override.props" />
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.Platform.OpenGL.MitLicenseForever" Version="1.0.165.1357" />
+		<PackageReference Include="CodeBrix.Platform.OpenGL.MitLicenseForever" Version="1.0.209.135" />
 		<!-- Version is pinned centrally by src/Directory.Build.targets (SkiaSharpVersion, currently
 		     4.150.1); adding it here gives this add-in the GPU-Skia types (GRContext/GRGlInterface/
 		     SKSurface) it needs for OffscreenGLContext.CreateGrContext() and SkiaGLCanvasElement. -->
