@@ -581,7 +581,18 @@ namespace CodeBrix.Platform.Xaml //Was previously: Uno.Xaml
 							atts.Add (r.LocalName, r.Value);
 							continue;
 						}
-						if (updatedNamespace.StartsWith("using:", StringComparison.Ordinal) || updatedNamespace.Contains("#using:")) {
+						// A prefixed attribute (e.g. an attached property such as `flex:FlexPanel.Grow`)
+						// is only meaningful if we can map its prefix back to a CLR namespace. Both
+						// spellings do that: `using:Some.Namespace` and the XAML-2006 form
+						// `clr-namespace:Some.Namespace;assembly=Some.Assembly`. Accepting only the
+						// former silently dropped the attribute for the latter - the attribute never
+						// reached ProcessAttributesToMember, so no member (and, for attached
+						// properties, no Set<Property> call) was ever generated, with no diagnostic.
+						// Visual Studio 2026 does not recognise the `using:` form, so app XAML uses
+						// `clr-namespace:`; both must behave identically here.
+						if (updatedNamespace.StartsWith("using:", StringComparison.Ordinal)
+							|| updatedNamespace.StartsWith("clr-namespace:", StringComparison.Ordinal)
+							|| updatedNamespace.Contains("#using:")) {
 							atts.Add (r.Name, r.Value);
 							continue;
 						}
@@ -623,7 +634,12 @@ namespace CodeBrix.Platform.Xaml //Was previously: Uno.Xaml
 						}
 						else
 						{
-							sti.Members.Add(new Pair(XamlMember.FromUnknown(aname, apns, new XamlType(apns, apname, new List<XamlType>(), sctx)), p.Value));
+							// Unknown attachable member on a resolved type. The member name must be
+							// just the property ("Grow"), not the qualified "FlexPanel.Grow" - the
+							// sibling branch above already does this. A dotted name can never match
+							// the Get<Property>/Set<Property> pair a consumer looks for, so it made
+							// the member permanently unresolvable rather than merely unknown.
+							sti.Members.Add(new Pair(XamlMember.FromUnknown(aname.Substring(propidx + 1), apns, new XamlType(apns, apname, new List<XamlType>(), sctx)), p.Value));
 						}
 					}
 				}
