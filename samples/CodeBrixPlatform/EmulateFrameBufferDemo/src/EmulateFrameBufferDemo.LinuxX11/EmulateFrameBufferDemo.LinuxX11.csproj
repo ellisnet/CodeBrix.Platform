@@ -20,6 +20,6 @@
   <!-- EXACTLY ONE platform head package: the Skia X11 backend for Linux desktops,
        consumed as a package like any real application. -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever" Version="1.0.209.480" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever" Version="1.0.210.112" />
   </ItemGroup>
 </Project>

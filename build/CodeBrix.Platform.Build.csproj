@@ -73,9 +73,9 @@
 		build/nuget/package-dependency-map.json.
 
 		It runs TWICE in a pack run, for two different jobs:
-		  1. before packing, with --emit-properties, to generate the $dep_<Package_Id>$ tokens each
-		     nuspec uses instead of authoring a version literal;
-		  2. after packing, with --package-dir, as a HARD GATE over the produced .nupkg files.
+		  1. before packing, with the emit-properties switch, to generate the $dep_<Package_Id>$ tokens
+		     each nuspec uses instead of authoring a version literal;
+		  2. after packing, with the package-dir switch, as a HARD GATE over the produced .nupkg files.
 
 		Because PackCodeBrix is the only path that produces packages, step 2 cannot be bypassed:
 		no package set can be published without having passed it.
@@ -175,7 +175,7 @@
 		authority. Evaluation only - no restore, no build, no network.
 		-->
 		<Message Importance="high" Text="CodeBrix pack: generating nuspec dependency tokens" />
-		<Exec Command="dotnet run --project &quot;$(_DependencyValidator)&quot; -c Release --nologo -- --map &quot;$(_DependencyMap)&quot; --repo-root &quot;$(_RepoRoot)&quot; --emit-properties &quot;$(_NuspecPropsDir)&quot; --no-fail" />
+		<Exec Command="dotnet run --project &quot;$(_DependencyValidator)&quot; -c Release --nologo -- --map &quot;$(_DependencyMap)&quot; --repo-root &quot;$(_RepoRoot).&quot; --emit-properties &quot;$(_NuspecPropsDir)&quot; --no-fail" />
 
 		<!-- Pack each nuspec through the SDK packer (net10.0-aware). One Exec per
 		     nuspec; the shim turns the -p: values into NuspecFile/NuspecProperties. -->
@@ -201,7 +201,7 @@
 		maintainer's job, done in Visual Studio. The gate never contacts a package feed.
 		-->
 		<Message Importance="high" Text="CodeBrix pack: verifying package dependencies" />
-		<Exec Command="dotnet run --project &quot;$(_DependencyValidator)&quot; -c Release --nologo -- --map &quot;$(_DependencyMap)&quot; --repo-root &quot;$(_RepoRoot)&quot; --package-dir &quot;$(_PackOutputDir)&quot;" />
+		<Exec Command="dotnet run --project &quot;$(_DependencyValidator)&quot; -c Release --nologo -- --map &quot;$(_DependencyMap)&quot; --repo-root &quot;$(_RepoRoot).&quot; --package-dir &quot;$(_PackOutputDir)&quot;" />
 
 	</Target>
 

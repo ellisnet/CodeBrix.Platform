@@ -1254,8 +1254,10 @@ them into NuGet packages under:
 VERSIONING: the driver computes a date-stamped BuildVersion automatically
 (format 1.<years-since-2026>.<dayOfYear>.<minuteOfDay>, all from UTC now) and
 stamps that ONE version on every package in the run. Packing only runs in the
-Release configuration. You can override the version with -p:BuildVersion=1.x.y.z
-to reuse an EXISTING version instead of stamping a fresh one.
+Release configuration. NEVER pass -p:BuildVersion on Windows — every Windows run
+takes a fresh auto-stamped version, and reusing one is never wanted. Pinning a
+version with -p:BuildVersion/-p:PackageVersion belongs ONLY to the macOS rebuild
+below, which must match the version the Windows run already published.
 
 THE EMULATED FRAME-BUFFER HEAD PACKAGE (maintainers only — deliberately NOT in
 the app-facing head-package table above):
@@ -1282,6 +1284,13 @@ Release outputs), then build the driver in Release:
     dotnet build build\CodeBrix.Platform.Build.csproj -c Release
 
 All packages land in  nugets\Release\<auto-version>\  sharing that one version.
+
+THE PACKAGE DEPENDENCY GATE runs inside the driver automatically, twice: before
+packing, to generate each nuspec's dependency version tokens from the packed
+projects' own PackageReferences, and after packing, as a HARD GATE over the
+produced nuspec-driven packages. A mismatch FAILS the pack. Fix it in the
+offending project's .csproj PackageReference — the .csproj is the single version
+authority; never author a version literal into a nuspec.
 
 BUILD FAILS WITH CS2012 (task DLL locked): the solution build may fail with
     error CS2012: Cannot open '...\Platform.XamlMerge.Task\obj\Release\
@@ -1310,17 +1319,17 @@ publishing ONLY the rebuilt macOS package still restores cleanly.
 Do NOT run the full driver on macOS — it would also try to pack the Windows-only
 packages. Instead pack just the macOS csproj (exactly what the driver does for
 that one project) from the repo root, substituting the published version for
-1.0.209.480 below:
+1.0.210.112 below:
 
     dotnet pack src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj \
       -c Release \
-      -p:PackageVersion=1.0.209.480 \
-      --output nugets/Release/1.0.209.480
+      -p:PackageVersion=1.0.210.112 \
+      --output nugets/Release/1.0.210.112
 
 -p:PackageVersion (NOT -p:Version) sets only the NuGet package version while
 still flowing to the ProjectReference dependency versions. This produces:
 
-    nugets/Release/1.0.209.480/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.209.480.nupkg
+    nugets/Release/1.0.210.112/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.1.0.210.112.nupkg
 
 PREREQUISITES on the Mac: full Xcode installed (the native build uses xcodebuild;
 the driver only enables the native step on Apple Silicon) and the native build
