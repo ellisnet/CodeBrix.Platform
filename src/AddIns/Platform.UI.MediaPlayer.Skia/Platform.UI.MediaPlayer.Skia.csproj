@@ -21,7 +21,7 @@
 		     it (and the ".LgplLicenseForever" id) is LGPL-2.1-or-later, NOT Apache-2.0. Without this the
 		     packed nuspec inherits Apache-2.0 and nuget.org mislabels the license. -->
 		<PackageLicenseExpression>LGPL-2.1-or-later</PackageLicenseExpression>
-		<Description>This package provides MediaPlayerElement support for CodeBrix.Platform Skia apps on five heads: Windows (Win32 and Skia-on-WPF) and Linux (X11, Wayland, and FrameBuffer). Video is decoded by LibVLC into memory and composited directly into the Skia scene, so no native child windows (and no XWayland) are involved. Reference it once, in your app's .Core project: every head gets it, the Windows and Linux heads activate it, and it is inert on the macOS head (which has built-in AVFoundation media support). The native libvlc runtime is required at runtime: on Linux install it via the system package manager (sudo apt install libvlc5 vlc-plugin-base); on Windows add the VideoLAN.LibVLC.Windows package to your Windows head project(s). This package (and its CodeBrix.Platform.MediaPlayerCore dependency) is LGPL-2.1-or-later licensed.</Description>
+		<Description>This package provides MediaPlayerElement support for CodeBrix.Platform apps. Video is decoded by LibVLC into memory and composited directly into the Skia scene.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
