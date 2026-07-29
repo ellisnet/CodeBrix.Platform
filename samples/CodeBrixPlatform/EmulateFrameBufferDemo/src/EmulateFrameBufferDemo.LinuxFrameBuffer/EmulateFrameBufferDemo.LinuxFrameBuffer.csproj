@@ -26,6 +26,6 @@
     never modified.
   -->
   <ItemGroup>
-    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever" Version="1.0.210.112" />
+    <PackageReference Include="CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever" Version="1.0.210.770" />
   </ItemGroup>
 </Project>
