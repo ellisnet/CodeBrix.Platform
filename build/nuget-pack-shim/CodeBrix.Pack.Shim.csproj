@@ -35,7 +35,26 @@
 
 		<NuspecFile>$(CbxNuspec)</NuspecFile>
 		<NuspecBasePath>$(CbxNuspecBasePath)</NuspecBasePath>
+	</PropertyGroup>
+
+	<!--
+	Pack-time dependency version tokens.
+
+	CbxNuspecPropsFile points at a GENERATED .props written by
+	src/Platform.PackageDependencyValidator, which evaluates the project(s) this nuspec packs and
+	emits one $dep_<Package_Id>$ token per PackageReference. That is what makes the .csproj the
+	single authority for dependency versions: the nuspec names the token, never a version, so no
+	file can state a version different from the one chosen in Visual Studio.
+
+	SkiaSharp / HarfBuzzSharp are deliberately absent from these tokens — they are under the family
+	hard lock and stay literal in the nuspec, so moving them is always a deliberate edit.
+	-->
+	<Import Project="$(CbxNuspecPropsFile)"
+			Condition="'$(CbxNuspecPropsFile)'!='' and Exists('$(CbxNuspecPropsFile)')" />
+
+	<PropertyGroup>
 		<NuspecProperties>codebrixversion=$(CbxVersion);branch=$(CbxBranch);commitid=$(CbxCommit)</NuspecProperties>
+		<NuspecProperties Condition="'$(CbxExtraNuspecProperties)'!=''">$(NuspecProperties);$(CbxExtraNuspecProperties)</NuspecProperties>
 	</PropertyGroup>
 
 </Project>

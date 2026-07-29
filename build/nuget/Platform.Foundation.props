@@ -1,5 +1,0 @@
-<Project>
-	<ItemGroup>
-		<CodeBrixRuntimeEnabledPackage Include="CodeBrix.Platform.Foundation" PackageBasePath="$(MSBuildThisFileDirectory).." />
-	</ItemGroup>
-</Project>

@@ -17,7 +17,7 @@
          The remaining PackageReferences here are genuinely external packages. -->
 
     <!-- Bundled Open Sans font -->
-    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.209.261" />
 
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package

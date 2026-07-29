@@ -15,7 +15,11 @@
 		<tags>graphics;2d;skia;skiasharp;drawing;CodeBrix</tags>
 		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
 		<dependencies>
-
+			<group targetFramework="net10.0">
+				<!-- Under the family SkiaSharp hard lock; must equal $(SkiaSharpVersion). Enforced by
+				     the package dependency gate (src/Platform.PackageDependencyValidator). -->
+				<dependency id="SkiaSharp" version="4.150.1" />
+			</group>
 		</dependencies>
 	</metadata>
 

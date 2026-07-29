@@ -28,7 +28,7 @@
     <PackageReference Include="SkiaSharp.Skottie" Version="4.150.1" />
 
     <!-- Bundled Open Sans font -->
-    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.181.655" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.209.261" />
 
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
@@ -38,7 +38,7 @@
 
     <!-- SVG rendering support for SvgImageSource on Skia targets. CodeBrix.SkiaSvg is an
          external package and stays; CodeBrix.Platform.Svg is now a ProjectReference. -->
-    <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.180.239" />
+    <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.196.342" />
   </ItemGroup>
 
   <ItemGroup>

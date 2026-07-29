@@ -95,6 +95,7 @@
     <Project Path="src/Platform.ReferenceImplComparer/Platform.ReferenceImplComparer.csproj" />
     <Project Path="src/Platform.UWPSyncGenerator/Platform.UWPSyncGenerator.csproj" />
     <!--I don't think I need this: <Project Path="src/Platform.UWPSyncGenerator.Reference/Platform.UWPSyncGenerator.Reference.csproj" />-->
+    <Project Path="src/Platform.PackageDependencyValidator/Platform.PackageDependencyValidator.csproj" />
     <Project Path="src/Platform.ResourceTrimmingValidator/Platform.ResourceTrimmingValidator.csproj" />
     <Project Path="src/Platform.XamlTrimmingValidator/Platform.XamlTrimmingValidator.csproj" />
     <Project Path="tools/ResourcesExtractor/ResourcesExtractor/ResourcesExtractor.csproj">

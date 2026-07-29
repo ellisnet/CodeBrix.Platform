@@ -33,6 +33,53 @@
 	</Target>
 
 	<!--
+	============================================================================================
+	SkiaSharp / HarfBuzzSharp hard lock (UNOB0002 / UNOB0003)
+	============================================================================================
+	Every part of CodeBrix.Platform is built against one exact SkiaSharp and one exact
+	HarfBuzzSharp version (see platform.winui.common.props). If a consuming application or library
+	resolves a different one, the app runs on a Skia stack CodeBrix.Platform has never been tested
+	against — so this is an ERROR, not a warning.
+
+	The RESOLVED version is inspected (via the NuGetPackageId / NuGetPackageVersion metadata NuGet
+	stamps on resolved package assets), NOT the declared PackageReference. That matters: a
+	mismatched version arriving TRANSITIVELY through some other package is exactly as dangerous as
+	one the app declared itself, and only the resolved view catches it.
+
+	Escape hatch, for CodeBrix.Platform maintainers testing a new SkiaSharp release before the
+	family moves to it:  <CodeBrixAllowSkiaSharpVersionMismatch>true</CodeBrixAllowSkiaSharpVersionMismatch>
+	-->
+	<Target Name="_CodeBrixValidateSkiaSharpLock"
+			AfterTargets="ResolvePackageAssets"
+			Condition="'$(CodeBrixAllowSkiaSharpVersionMismatch)'!='true'">
+
+		<ItemGroup>
+			<_CodeBrixLockCandidate Include="@(ResolvedCompileFileDefinitions)" />
+			<_CodeBrixLockCandidate Include="@(RuntimeCopyLocalItems)" />
+
+			<_CodeBrixResolvedSkiaSharp
+				Include="@(_CodeBrixLockCandidate->'%(NuGetPackageVersion)')"
+				Condition="'%(_CodeBrixLockCandidate.NuGetPackageId)'=='SkiaSharp'" />
+			<_CodeBrixResolvedHarfBuzzSharp
+				Include="@(_CodeBrixLockCandidate->'%(NuGetPackageVersion)')"
+				Condition="'%(_CodeBrixLockCandidate.NuGetPackageId)'=='HarfBuzzSharp'" />
+		</ItemGroup>
+
+		<PropertyGroup>
+			<_CodeBrixFoundSkiaSharpVersion>@(_CodeBrixResolvedSkiaSharp->Distinct())</_CodeBrixFoundSkiaSharpVersion>
+			<_CodeBrixFoundHarfBuzzSharpVersion>@(_CodeBrixResolvedHarfBuzzSharp->Distinct())</_CodeBrixFoundHarfBuzzSharpVersion>
+		</PropertyGroup>
+
+		<Error Code="UNOB0002"
+			   Condition="'$(_CodeBrixFoundSkiaSharpVersion)'!='' and '$(_CodeBrixFoundSkiaSharpVersion)'!='$(CodeBrixRequiredSkiaSharpVersion)'"
+			   Text="This project resolves SkiaSharp $(_CodeBrixFoundSkiaSharpVersion), but CodeBrix.Platform is built and tested against SkiaSharp $(CodeBrixRequiredSkiaSharpVersion) and is hard-locked to it. Every part of CodeBrix.Platform depends on SkiaSharp, so a different version is NOT supported and may fail at runtime in ways a build cannot detect. Change the SkiaSharp version this project resolves (it may be arriving transitively through another package) back to $(CodeBrixRequiredSkiaSharpVersion), and wait for a CodeBrix.Platform release built against the newer SkiaSharp before adopting it. To override deliberately while testing a new SkiaSharp release, set CodeBrixAllowSkiaSharpVersionMismatch=true." />
+
+		<Error Code="UNOB0003"
+			   Condition="'$(_CodeBrixFoundHarfBuzzSharpVersion)'!='' and '$(_CodeBrixFoundHarfBuzzSharpVersion)'!='$(CodeBrixRequiredHarfBuzzSharpVersion)'"
+			   Text="This project resolves HarfBuzzSharp $(_CodeBrixFoundHarfBuzzSharpVersion), but CodeBrix.Platform is built and tested against HarfBuzzSharp $(CodeBrixRequiredHarfBuzzSharpVersion) and is hard-locked to it. HarfBuzzSharp is used for all text shaping, so a different version is NOT supported and may fail at runtime in ways a build cannot detect. Change the HarfBuzzSharp version this project resolves (it may be arriving transitively through another package) back to $(CodeBrixRequiredHarfBuzzSharpVersion). To override deliberately while testing a new SkiaSharp release, set CodeBrixAllowSkiaSharpVersionMismatch=true." />
+	</Target>
+
+	<!--
 	Include a marker for _FindInvalidWinAppSDKCodeBrixPlatformReference to determine if a net7.0-only project is referenced
 	from a WinAppSDK project.
 	-->

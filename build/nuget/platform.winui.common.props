@@ -8,6 +8,35 @@
 				and '$(CodeBrixForceSingleTFM)' == 'true'
 				and Exists($([MSBuild]::GetPathOfFileAbove('codebrix.vscode.props', '$(MSBuildThisFileDirectory)../.vscode/')))" />
 
+	<!--
+	============================================================================================
+	The CodeBrix.Platform SkiaSharp / HarfBuzzSharp HARD LOCK
+	============================================================================================
+	Every part of CodeBrix.Platform is built against these exact versions. A consuming
+	application or library that resolves a DIFFERENT version produces a runtime that CodeBrix.Platform
+	has not been tested against, so the mismatch is reported as a build ERROR (UNOB0002 /
+	UNOB0003) by _CodeBrixValidateSkiaSharpLock in platform.winui.common.targets.
+
+	These values are set unconditionally ON PURPOSE: they are the lock, not a default, and a
+	consumer must not be able to quietly redefine them. The sanctioned way to build against a
+	different version is the documented escape hatch:
+
+		<CodeBrixAllowSkiaSharpVersionMismatch>true</CodeBrixAllowSkiaSharpVersionMismatch>
+
+	which exists so the CodeBrix.Platform maintainers can test a new SkiaSharp release before the
+	family moves to it. Do not set it in shipping applications.
+
+	Bumping the lock: change $(SkiaSharpVersion) / $(HarfBuzzSharpVersion) in
+	src/Directory.Build.targets AND the two literals below. The package dependency gate
+	(src/Platform.PackageDependencyValidator) fails the pack if they disagree, so they cannot
+	drift apart.
+	============================================================================================
+	-->
+	<PropertyGroup>
+		<CodeBrixRequiredSkiaSharpVersion>4.150.1</CodeBrixRequiredSkiaSharpVersion>
+		<CodeBrixRequiredHarfBuzzSharpVersion>14.2.1.1</CodeBrixRequiredHarfBuzzSharpVersion>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<SupportsFontManifest Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))=='ios'">true</SupportsFontManifest>
 		<SupportsFontManifest Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)'))=='tvos'">true</SupportsFontManifest>

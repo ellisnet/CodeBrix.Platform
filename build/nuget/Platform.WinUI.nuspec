@@ -18,14 +18,16 @@
 		<dependencies>
 			<group targetFramework="net10.0">
 				<dependency id="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.181.669" />
-				<!-- Brought in by the folded Microsoft.Extensions.Logging adapter + Extensions.Logging. -->
-				<dependency id="Microsoft.Extensions.Logging" version="10.0.9" />
-				<dependency id="CodeBrix.ServiceLocator.MsplLicenseForever" version="1.0.179.175" />
+				<!-- Brought in by the folded Microsoft.Extensions.Logging adapter + Extensions.Logging.
+				     All versions below come from the packed projects' own PackageReferences at pack
+				     time and are never authored here. -->
+				<dependency id="Microsoft.Extensions.Logging" version="$dep_Microsoft_Extensions_Logging$" />
+				<dependency id="CodeBrix.ServiceLocator.MsplLicenseForever" version="$dep_CodeBrix_ServiceLocator_MsplLicenseForever$" />
 				<!-- Brought in by the folded UI.Toolkit Simple helpers (SimpleServiceResolver, SimpleMessaging).
 				     DependencyInjection.Abstractions also flows transitively via Microsoft.Extensions.Logging;
 				     declared explicitly for clarity/version-pinning. -->
-				<dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="10.0.9" />
-				<dependency id="Microsoft.Extensions.Hosting.Abstractions" version="10.0.9" />
+				<dependency id="Microsoft.Extensions.DependencyInjection.Abstractions" version="$dep_Microsoft_Extensions_DependencyInjection_Abstractions$" />
+				<dependency id="Microsoft.Extensions.Hosting.Abstractions" version="$dep_Microsoft_Extensions_Hosting_Abstractions$" />
 			</group>
 		</dependencies>
 	</metadata>

@@ -16,7 +16,15 @@
 		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
 		<dependencies>
 			<group targetFramework="net10.0">
-				<dependency id="CodeBrix.Platform.OpenGL.MitLicenseForever" version="1.0.165.1357" />
+				<!-- This add-in's assembly binds CodeBrix.Platform.UI and
+				     CodeBrix.Platform.Extensions.Logging, both of which ship in the core package;
+				     stamped with the shared family version at pack time. -->
+				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
+				<!-- Version comes from this add-in's own PackageReference at pack time; never authored here. -->
+				<dependency id="CodeBrix.Platform.OpenGL.MitLicenseForever" version="$dep_CodeBrix_Platform_OpenGL_MitLicenseForever$" />
+				<!-- Under the family SkiaSharp hard lock; must equal $(SkiaSharpVersion). Enforced by
+				     the package dependency gate (src/Platform.PackageDependencyValidator). -->
+				<dependency id="SkiaSharp" version="4.150.1" />
 			</group>
 		</dependencies>
 	</metadata>

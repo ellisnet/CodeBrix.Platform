@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!-- Identity follows the sibling validators (Platform.XamlTrimmingValidator,
+	     Platform.ResourceTrimmingValidator): the csproj file name is short, the
+	     produced assembly carries the full CodeBrix.Platform name. -->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.PackageDependencyValidator</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.PackageDependencyValidator</RootNamespace>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>$(NetCurrent)</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<!-- This tool is never packed; it is a build-time gate only. -->
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.ArgumentParser.MitLicenseForever" Version="1.0.165.286" />
+	</ItemGroup>
+
+</Project>
