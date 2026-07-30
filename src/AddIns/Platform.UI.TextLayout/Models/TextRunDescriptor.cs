@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using SkiaSharp;
 
 namespace CodeBrix.Platform.UI.TextLayout;
 
@@ -81,6 +82,17 @@ public sealed class TextRunDescriptor
 
 	/// <summary>The run's base direction.</summary>
 	public TextDirection Direction { get; }
+
+	/// <summary>
+	/// The colour to paint this run's glyphs with when the layout is drawn, or null to use the
+	/// colour of the paint passed to <see cref="TextLayoutResult.Draw(SkiaSharp.SKCanvas, SkiaSharp.SKPoint, SkiaSharp.SKPaint)"/>.
+	/// </summary>
+	/// <remarks>
+	/// Set with an object initializer: <c>new TextRunDescriptor("if", fontSize: 13f) { Color = new
+	/// SKColor(0x56, 0x9C, 0xD6) }</c>. Colour affects drawing only - never measurement, shaping,
+	/// or hit-testing - so mixing coloured and uncoloured runs is free.
+	/// </remarks>
+	public SKColor? Color { get; init; }
 
 	/// <summary>
 	/// Creates a run using the common bold/italic shorthand instead of the full weight and slant.

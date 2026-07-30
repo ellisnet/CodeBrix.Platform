@@ -1,0 +1,100 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<!-- The editor's rendering layer sits on the shared text engine, which lives in *.skia.cs
+		     files that Platform.CrossTargetting.targets compiles ONLY into the Skia flavour - so
+		     this suite binds the Skia flavour, exactly like the TextLayout add-in's suite. -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<AssemblyName>CodeBrix.Platform.UI.AdvancedTextEdit.Unit.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AdvancedTextEdit.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+
+		<!-- ICU handling copied from the TextLayout add-in's suite (see the long explanation in
+		     src/AddIns/Platform.UI.TextLayout.Tests): on Linux ICU comes from the dynamic linker
+		     search path; on Windows and macOS it ships in a package and its data file has to be
+		     embedded HERE and registered by IcuDataInitializer.cs rather than by the generated
+		     head initializer. -->
+		<CodeBrixTestsNeedIcuData Condition="$([MSBuild]::IsOSPlatform('Windows')) or $([MSBuild]::IsOSPlatform('OSX'))">true</CodeBrixTestsNeedIcuData>
+		<IsCodeBrixHead Condition="'$(CodeBrixTestsNeedIcuData)' == 'true'">true</IsCodeBrixHead>
+		<SkipIcuDataInitializerGenerator Condition="'$(CodeBrixTestsNeedIcuData)' == 'true'">true</SkipIcuDataInitializerGenerator>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
+		<PackageReference Include="xunit.v3" Version="3.2.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+	</ItemGroup>
+
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
+		<!-- Headless Skia and HarfBuzz need their Linux natives brought in explicitly: the head
+		     projects normally supply these, and there is no head here. ICU comes from the system
+		     dynamic linker search path on Linux, so it needs no package. -->
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<!-- The same natives in their Windows flavour, plus ICU. Unlike Linux, Windows has no system
+		     ICU that the engine can dlopen, so it is shipped by the Unicode package: icuuc77.dll as
+		     a runtime asset, and icudt.dat embedded into this assembly (see $(IsCodeBrixHead)). -->
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfBuzzSharpVersion)" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<!-- macOS is in the same position as Windows: no system ICU to find, and the data archive
+		     has to be embedded here. It needs libicudata.dylib as well as libicuuc.dylib, because
+		     macOS does not pull the data library in through icuuc's load commands - the sibling
+		     UnicodeMacOs package supplies both. -->
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.178.348" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<!-- The editor's highlighting model constructs XAML brushes (DependencyObjects), and a
+	     DependencyObject's generated constructor touches the dispatcher. Assembly resolution
+	     hands a host-free test process the .Reference variants of the runtime assemblies,
+	     whose dispatcher stubs throw NotSupportedException("Ref assembly") - so swap in the
+	     .Skia variants, exactly as the from-source sample heads do (see the
+	     _AtedUseSkiaRuntimeAssemblies target in samples/CodeBrixPlatform/AdvancedTextEditDemo).
+	     The TextLayout add-in's suite never needed this because its engine is XAML-free. -->
+	<Target Name="_AteTestsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<_AteSkiaUwp>$(MSBuildThisFileDirectory)..\..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_AteSkiaUwp>
+			<_AteSkiaComp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_AteSkiaComp>
+			<_AteSkiaDisp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_AteSkiaDisp>
+		</PropertyGroup>
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_AteSkiaUwp)\CodeBrix.Platform.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_AteSkiaUwp)\CodeBrix.Platform.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_AteSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_AteSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_AteSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_AteSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_AteSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+		</ItemGroup>
+	</Target>
+
+</Project>

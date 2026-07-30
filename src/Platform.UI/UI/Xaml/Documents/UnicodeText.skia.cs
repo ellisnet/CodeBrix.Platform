@@ -59,6 +59,10 @@ internal readonly partial struct UnicodeText : IParsedText
 		public FontStyle FontStyle { get; }
 		public Brush? Foreground { get; }
 
+		// Set only on the host-free TextRunSpec path (where Foreground can never exist); it lets
+		// DrawToCanvas paint individual runs in their own colour. Null everywhere else.
+		public SKColor? SpecColor { get; }
+
 		public ReadonlyInlineCopy(Inline inline, int startIndex, FlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
 		{
 			CI.Assert(inline is Run or LineBreak);
@@ -83,6 +87,7 @@ internal readonly partial struct UnicodeText : IParsedText
 		{
 			Inline = null;
 			Foreground = null;
+			SpecColor = spec.Color;
 			Text = spec.Text;
 			FlowDirection = forceDefaultFlowDirection ? defaultFlowDirection : spec.FlowDirection;
 			FontDetails = spec.FontDetails;

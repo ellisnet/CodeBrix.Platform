@@ -112,6 +112,37 @@ public sealed class TextLayoutResult : IDisposable
 	}
 
 	/// <summary>
+	/// The geometry of a line by its zero-based index: vertical position, height, baseline, and
+	/// the slice of <see cref="Text"/> it covers.
+	/// </summary>
+	/// <param name="lineIndex">The zero-based line index, from 0 to <see cref="LineCount"/> - 1.</param>
+	/// <returns>The line's metrics.</returns>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="lineIndex"/> is outside the layout's lines.</exception>
+	/// <remarks>
+	/// Combine with <see cref="GetLineAt"/> (which maps a text index to its line) to walk a
+	/// layout line by line - what a renderer drawing per-line decorations needs.
+	/// </remarks>
+	public TextLineMetrics GetLineMetrics(int lineIndex)
+	{
+		if (lineIndex < 0 || lineIndex >= _layout.LineCount)
+		{
+			throw new ArgumentOutOfRangeException(
+				nameof(lineIndex),
+				lineIndex,
+				$"Line index must be between 0 and {_layout.LineCount - 1} inclusive.");
+		}
+
+		var start = _layout.GetLineStartInText(lineIndex);
+		var end = _layout.GetLineEndInText(lineIndex);
+		return new TextLineMetrics(
+			start,
+			end - start,
+			_layout.GetLineTop(lineIndex),
+			_layout.GetLineHeight(lineIndex),
+			_layout.GetLineBaselineOffset(lineIndex));
+	}
+
+	/// <summary>
 	/// The rectangles covering a range of text - what a consumer paints behind selected text.
 	/// </summary>
 	/// <param name="start">The first text index in the range.</param>

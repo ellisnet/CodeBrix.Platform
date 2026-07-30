@@ -18,6 +18,8 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Svg.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TextLayout")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TextLayout.Unit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AdvancedTextEdit")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AdvancedTextEdit.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Maps")]
 [assembly: InternalsVisibleTo("SamplesApp")]

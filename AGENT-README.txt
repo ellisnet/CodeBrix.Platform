@@ -168,6 +168,41 @@ package is versioned to track the SkiaSharp release it vendors).
       Every CodeBrix.Platform app references this. It is self-contained (it folds
       in the Foundation, WinRT, Dispatching, and logging assemblies).
 
+  CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever [optional]
+      A full code/text editor control (AdvancedTextEdit : Control) for every
+      head: rope-backed document with text anchors and grouped undo/redo,
+      XSHD-driven syntax highlighting with 21 built-in definitions (C#, XML,
+      HTML, JavaScript, Python, ...), code folding with pluggable strategies,
+      a code-completion popup, an in-editor search panel (Ctrl+F / F3 /
+      Shift+F3), text snippets, smart indentation, line numbers, word wrap,
+      and rectangular (Alt) selection. Rendering is virtualized and driven by
+      the family's single text engine, so it stays responsive on very large
+      documents and matches TextBlock shaping exactly. Depends on
+      CodeBrix.Platform.TextLayout.ApacheLicenseForever (flows in
+      automatically as a package dependency).
+      Added 2026-07-29. Source: src/AddIns/Platform.UI.AdvancedTextEdit.
+      CONSUMPTION PATTERN: declare the control in XAML, then drive it through
+      Document / Text / SyntaxHighlighting from code-behind:
+
+        xmlns:advtxt="using:CodeBrix.Platform.UI.AdvancedTextEdit"
+        <advtxt:AdvancedTextEdit x:Name="Editor"
+            FontFamily="monospace" FontSize="13"
+            ShowLineNumbers="True" WordWrap="False" />
+
+        // code-behind (namespaces CodeBrix.Platform.UI.AdvancedTextEdit[.Highlighting]):
+        Editor.SyntaxHighlighting =
+            HighlightingManager.Instance.GetDefinitionByExtension(".cs");
+        Editor.Load(pathToFile);   // encoding auto-detected
+        Editor.Save(pathToFile);
+
+      SHARP EDGE: the editor manages its own scrolling and virtualization -
+      do NOT wrap it in a ScrollViewer; give it a bounded height/width.
+      SHARP EDGE: highlighting definitions are looked up by name or file
+      extension via HighlightingManager.Instance; null disables coloring.
+      SHARP EDGE: IME composition (CJK) and drag-drop of selected text are
+      not available in this version.
+      Sample: samples/CodeBrixPlatform/AdvancedTextEditDemo (six heads).
+
   CodeBrix.Platform.FlexPanel.ApacheLicenseForever        [optional]
       A CSS flexbox-style XAML layout panel (FlexPanel : Panel). Children are
       arranged in optionally wrapping rows or columns: Direction (Row default,
@@ -538,6 +573,19 @@ package is versioned to track the SkiaSharp release it vendors).
       at the wrong pitch. Standardize effect files on one rate, or pin the
       output with CodeBrix.Audio's SharedAudioOutput.Configure(rate) at startup.
       (AudioPlayer itself resamples and plays files at any rate.)
+      SHARP EDGE - OGG/VORBIS IS NOT SUPPORTED (verified 2026-07-29): "WAV + MP3"
+      above is the complete list. The bundled codebrix_miniaudio is built without
+      stb_vorbis (miniaudio gates Vorbis behind STB_VORBIS_INCLUDE_STB_VORBIS_H,
+      which native/miniaudio/library.c never defines), so an .ogg fed to
+      AudioPlayer raises MediaFailed, and SoundEffect sniffs RIFF-else-MP3 and
+      throws inside its MP3 path (Play returns false + log). A temp file does
+      not help - the format, not the delivery, is the problem. This bites any
+      app consuming free game-asset packs (kenney.nl audio is 100% .ogg).
+      PROVEN WORKAROUND (KenneyAssetBrowser sample, X11-verified): decode with a
+      managed Vorbis decoder (e.g. the NVorbis nuget), clamp floats to 16-bit
+      PCM, write a 44-byte RIFF/WAVE header + samples into a MemoryStream, and
+      hand that to AudioPlayer.SetSourceStream(...) (or SoundEffect.Play(stream))
+      - no temp file, and AudioPlayer's own resampler handles any source rate.
       Depends only on CodeBrix.Audio.MitLicenseForever (pinned in the csproj) +
       the core framework; ships at the same version as the rest of the family.
       Sample: samples/CodeBrixPlatform/AudioPlayerDemo (six heads; setting
@@ -1054,6 +1102,10 @@ OPTIONAL FEATURE PACKAGES — HOW TO ADD THEM
 ===========================================
 Each optional capability is one (or two) package references in the .Core project.
 
+  Code/text editor control (AdvancedTextEdit):
+      CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever
+      (CodeBrix.Platform.TextLayout.ApacheLicenseForever flows in automatically)
+
   2D SkiaSharp drawing:
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
 
@@ -1376,6 +1428,7 @@ Host builder:     CodeBrixPlatformHostBuilder.Create() (namespace CodeBrix.Platf
 
 Core framework pkg:   CodeBrix.Platform.ApacheLicenseForever            (in .Core)
 Extensions (in .Core):
+    AdvancedTextEdit -> CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever (+ TextLayout, automatic)
     Graphics2DSK ->   CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
     Graphics3DGL ->   CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
     Lottie       ->   CodeBrix.Platform.Lottie.ApacheLicenseForever (+ SkiaSharp.Skottie)

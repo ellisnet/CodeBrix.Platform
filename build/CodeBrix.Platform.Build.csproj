@@ -146,6 +146,15 @@
 		     AlignSelf properties), driven by a managed port of the .NET MAUI FlexLayout engine.
 		     Pure layout - no native dependencies. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+
+		<!-- The AdvancedTextEdit AddIn (CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever)
+		     ships with every family release: a full code/text editor XAML control - rope-backed
+		     document with anchors and grouped undo/redo, XSHD syntax highlighting with built-in
+		     definitions, code folding, completion popup, search panel, snippets, indentation,
+		     line numbers, word wrap, rectangular selection, and virtualized rendering - laid out
+		     by the family's single text engine via the TextLayout AddIn (which packs as a
+		     package dependency). -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

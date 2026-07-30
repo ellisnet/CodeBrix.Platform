@@ -1,0 +1,116 @@
+<Page
+    x:Class="AdvancedTextEditDemo.Views.MainPage"
+    xmlns="clr-namespace:Microsoft.UI.Xaml.Controls;assembly=CodeBrix.Platform.UI"
+    xmlns:d="clr-namespace:Microsoft.UI.Xaml.Data;assembly=CodeBrix.Platform.UI"
+    xmlns:ui="clr-namespace:Microsoft.UI.Xaml;assembly=CodeBrix.Platform.UI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:vm="clr-namespace:AdvancedTextEditDemo.ViewModels;assembly=AdvancedTextEditDemo.Core"
+    xmlns:advtxt="clr-namespace:CodeBrix.Platform.UI.AdvancedTextEdit;assembly=CodeBrix.Platform.UI.AdvancedTextEdit"
+    xmlns:local="using:AdvancedTextEditDemo.Views"
+    FontFamily="{StaticResource RobotoFont}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.DataContext>
+        <vm:MainViewModel />
+    </Page.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar: file and edit actions (text-labeled buttons; the upstream sample used icon buttons) -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Padding="8,8,8,4">
+            <Button Content="Open" Click="OpenFile_Click" />
+            <Button Content="Save" Click="SaveFile_Click" />
+            <Border Width="1" Margin="4,4" Background="Gray" />
+            <Button Content="Cut" Click="Cut_Click" />
+            <Button Content="Copy" Click="Copy_Click" />
+            <Button Content="Paste" Click="Paste_Click" />
+            <Button Content="Delete" Click="Delete_Click" />
+            <Border Width="1" Margin="4,4" Background="Gray" />
+            <Button Content="Undo" Click="Undo_Click" />
+            <Button Content="Redo" Click="Redo_Click" />
+        </StackPanel>
+
+        <!-- Editor toggles + syntax highlighting selection -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Padding="8,0,8,4">
+            <CheckBox x:Name="WordWrapCheck" Content="Word wrap"
+                      Checked="WordWrap_Toggled" Unchecked="WordWrap_Toggled" />
+            <CheckBox x:Name="LineNumbersCheck" Content="Line numbers" IsChecked="True"
+                      Checked="LineNumbers_Toggled" Unchecked="LineNumbers_Toggled" />
+            <CheckBox x:Name="ShowEndOfLineCheck" Content="Show ¶"
+                      Checked="ShowEndOfLine_Toggled" Unchecked="ShowEndOfLine_Toggled" />
+            <TextBlock Text="Highlighting:" VerticalAlignment="Center" />
+            <ComboBox x:Name="HighlightingCombo" Width="190"
+                      SelectionChanged="HighlightingCombo_SelectionChanged" />
+        </StackPanel>
+
+        <!-- The editor plus the property pane. The upstream sample separates them with a
+             GridSplitter; this pane is fixed-width instead (deliberate divergence). -->
+        <Grid Grid.Row="2" Padding="8,0,8,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="260" />
+            </Grid.ColumnDefinitions>
+
+            <advtxt:AdvancedTextEdit
+                x:Name="Editor"
+                Grid.Column="0"
+                FontFamily="monospace"
+                FontSize="13"
+                ShowLineNumbers="True" />
+
+            <!-- Reflection-driven property pane: the demo's stand-in for the WinForms
+                 PropertyGrid the upstream sample hosts. Settable bool properties get a
+                 CheckBox that re-applies the value when toggled. -->
+            <Grid Grid.Column="1" Margin="8,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <ComboBox x:Name="PropertyTargetCombo" HorizontalAlignment="Stretch"
+                          SelectionChanged="PropertyTargetCombo_SelectionChanged">
+                    <ComboBoxItem Content="Editor" />
+                    <ComboBoxItem Content="TextArea" />
+                    <ComboBoxItem Content="Options" />
+                </ComboBox>
+
+                <ScrollViewer Grid.Row="1" Margin="0,6,0,0">
+                    <ItemsControl ItemsSource="{d:Binding PropertyRows}">
+                        <ItemsControl.ItemTemplate>
+                            <ui:DataTemplate>
+                                <Grid Margin="0,1">
+                                    <TextBlock FontSize="11"
+                                               Text="{d:Binding Display}"
+                                               TextTrimming="CharacterEllipsis"
+                                               Visibility="{d:Binding TextVisibility}" />
+                                    <CheckBox MinWidth="0" MinHeight="0" FontSize="11"
+                                              Content="{d:Binding Name}"
+                                              IsChecked="{d:Binding IsChecked, Mode=TwoWay}"
+                                              Visibility="{d:Binding ToggleVisibility}" />
+                                </Grid>
+                            </ui:DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+
+        <!-- Status bar: current file on the left, caret position on the right -->
+        <Grid Grid.Row="3" Padding="8,4,8,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontSize="12" TextTrimming="CharacterEllipsis"
+                       Text="{d:Binding CurrentFileName}" />
+            <TextBlock Grid.Column="1" FontSize="12"
+                       Text="{d:Binding StatusText}" />
+        </Grid>
+    </Grid>
+</Page>

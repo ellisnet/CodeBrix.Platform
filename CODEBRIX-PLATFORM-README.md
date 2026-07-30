@@ -143,6 +143,14 @@ An optional extension package that exposes the framework's text engine as a plai
 
 ---
 
+**CodeBrix.Platform.AdvancedTextEdit**
+NuGet Package ID: `CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing `AdvancedTextEdit` - a full-featured code and text editor control for CodeBrix.Platform XAML. It brings the editing model of a professional code editor to every platform head: an efficient rope-backed document with text anchors and grouped undo/redo; syntax highlighting driven by XSHD definition files, with twenty-one built-in definitions covering C#, XML, HTML, JavaScript, JSON, Python, PowerShell, SQL, and more; code folding with pluggable strategies (XML folding included, brace folding easily added); a code-completion popup with camel-case filtering; an in-editor search panel with regular-expression support; text snippets with linked editable fields; smart indentation; line numbers; word wrap; and rectangular (Alt+drag) selection. Rendering is virtualized line by line and driven by the family's single text engine - the same shaping, bidirectional-text resolution, and font fallback that lays out every `TextBlock` - so the editor stays responsive on very large documents and its measurements always agree with the rest of the framework (the `CodeBrix.Platform.TextLayout.ApacheLicenseForever` package flows in automatically as a dependency). Use it for code editors, log viewers, configuration editing, and anywhere a plain `TextBox` is not enough. The editing model of this package was derived from an established open source WPF editor component; see the THIRD-PARTY-NOTICES.txt file in the package for full provenance and license details.
+
+---
+
 **CodeBrix.Platform.FlexPanel**
 NuGet Package ID: `CodeBrix.Platform.FlexPanel.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

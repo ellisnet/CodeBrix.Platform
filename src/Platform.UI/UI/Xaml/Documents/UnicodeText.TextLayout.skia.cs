@@ -73,6 +73,14 @@ internal readonly partial struct UnicodeText
 	internal float GetLineBaselineOffset(int lineIndex) =>
 		lineIndex >= 0 && lineIndex < _lines.Count ? _lines[lineIndex].baselineOffset : -_defaultFontDetails.SKFontMetrics.Ascent;
 
+	/// <summary>The text index at which the given line starts, or 0 when the line does not exist.</summary>
+	internal int GetLineStartInText(int lineIndex) =>
+		lineIndex >= 0 && lineIndex < _lines.Count ? _lines[lineIndex].startInText : 0;
+
+	/// <summary>The text index at which the given line ends (exclusive), or 0 when the line does not exist.</summary>
+	internal int GetLineEndInText(int lineIndex) =>
+		lineIndex >= 0 && lineIndex < _lines.Count ? _lines[lineIndex].endInText : 0;
+
 	/// <summary>
 	/// The rectangles covering the text in the logical range <paramref name="start"/> ..
 	/// <paramref name="start"/> + <paramref name="length"/>.
@@ -205,33 +213,52 @@ internal readonly partial struct UnicodeText
 	/// </remarks>
 	internal void DrawToCanvas(SKCanvas canvas, SKPoint origin, SKPaint paint)
 	{
-		foreach (var line in _lines)
+		// Runs whose source TextRunSpec carries a colour are painted with a clone of the caller's
+		// paint so every other paint attribute (anti-aliasing, blend mode, ...) is preserved. The
+		// clone is created lazily: a layout with no per-run colours never allocates it.
+		SKPaint? runColorPaint = null;
+		try
 		{
-			var currentLineX = line.xAlignmentOffset;
-			foreach (var run in line.runs)
+			foreach (var line in _lines)
 			{
-				using var textBlobBuilder = new SKTextBlobBuilder();
-				var glyphs = new ushort[run.glyphs.Length];
-				var positions = new SKPoint[run.glyphs.Length];
-				var (textScaleX, textScaleY) = run.fontDetails.TextScale;
-				for (var i = 0; i < run.glyphs.Length; i++)
+				var currentLineX = line.xAlignmentOffset;
+				foreach (var run in line.runs)
 				{
-					var glyph = run.glyphs[i];
-					glyphs[i] = (ushort)glyph.info.Codepoint;
-					positions[i] = new SKPoint(
-						glyph.xPosInRun + glyph.position.GlyphPosition.XOffset * textScaleX,
-						line.y + glyph.position.GlyphPosition.YOffset * textScaleY);
-				}
+					using var textBlobBuilder = new SKTextBlobBuilder();
+					var glyphs = new ushort[run.glyphs.Length];
+					var positions = new SKPoint[run.glyphs.Length];
+					var (textScaleX, textScaleY) = run.fontDetails.TextScale;
+					for (var i = 0; i < run.glyphs.Length; i++)
+					{
+						var glyph = run.glyphs[i];
+						glyphs[i] = (ushort)glyph.info.Codepoint;
+						positions[i] = new SKPoint(
+							glyph.xPosInRun + glyph.position.GlyphPosition.XOffset * textScaleX,
+							line.y + glyph.position.GlyphPosition.YOffset * textScaleY);
+					}
 
-				textBlobBuilder.AddPositionedRun(glyphs, run.fontDetails.SKFont, positions);
-				using var blob = textBlobBuilder.Build();
-				if (blob is not null)
-				{
-					canvas.DrawText(blob, origin.X + currentLineX, origin.Y + line.baselineOffset, paint);
-				}
+					textBlobBuilder.AddPositionedRun(glyphs, run.fontDetails.SKFont, positions);
+					using var blob = textBlobBuilder.Build();
+					if (blob is not null)
+					{
+						var effectivePaint = paint;
+						if (run.inline.SpecColor is { } specColor)
+						{
+							runColorPaint ??= paint.Clone();
+							runColorPaint.Color = specColor;
+							effectivePaint = runColorPaint;
+						}
 
-				currentLineX += run.width;
+						canvas.DrawText(blob, origin.X + currentLineX, origin.Y + line.baselineOffset, effectivePaint);
+					}
+
+					currentLineX += run.width;
+				}
 			}
+		}
+		finally
+		{
+			runColorPaint?.Dispose();
 		}
 	}
 

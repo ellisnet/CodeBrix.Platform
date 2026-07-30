@@ -781,6 +781,29 @@ POSSIBILITY OF SUCH DAMAGE.
     test suite. Ships in the CodeBrix.Platform.FlexPanel.ApacheLicenseForever
     package.
 
+24. AvalonEdit — WPF text editor component  (icsharpcode/AvalonEdit)
+    Project URL:  https://github.com/icsharpcode/AvalonEdit
+    Source:       icsharpcode/AvalonEdit commit ed0bd14 (version 6.3.2)
+    Copyright:    Copyright (c) AvalonEdit Contributors
+                  Copyright (c) 2014 AlphaSierraPapa for the SharpDevelop Team
+                  (per-file headers, 2000-2025)
+    License:      MIT License  (full text in Part D)
+
+    The AdvancedTextEdit AddIn (src/AddIns/Platform.UI.AdvancedTextEdit/) is a
+    port of the AvalonEdit editor component from WPF to this framework: the
+    document model (rope storage, line/anchor/segment trees, undo stack),
+    XSHD syntax-highlighting engine and its built-in highlighting definitions
+    (Highlighting/Resources/*.xshd and ModeV1.xsd/ModeV2.xsd, copied verbatim),
+    folding, code completion, search, snippets, indentation, and editing
+    commands derive from AvalonEdit sources, with the WPF-specific rendering,
+    input and windowing layers re-expressed on this framework's XAML model and
+    the family's Skia text engine. Ported files carry "//was previously:"
+    provenance comments naming their upstream counterparts. Portions of the
+    unit tests under src/AddIns/Platform.UI.AdvancedTextEdit.Tests/ are ported
+    from the AvalonEdit test suite. The definitions in the upstream
+    ThirdParty-Highlightings folder are NOT included. Ships in the
+    CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever package.
+
 ================================================================================
 
 END OF THIRD-PARTY SOFTWARE NOTICES AND INFORMATION

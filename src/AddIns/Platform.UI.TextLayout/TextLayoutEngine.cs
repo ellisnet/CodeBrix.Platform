@@ -157,6 +157,6 @@ public static class TextLayoutEngine
 			_ => layoutFlowDirection,
 		};
 
-		return new TextRunSpec(run.Text, details, runFlowDirection, run.FontSize, weight, stretch, style);
+		return new TextRunSpec(run.Text, details, runFlowDirection, run.FontSize, weight, stretch, style, run.Color);
 	}
 }

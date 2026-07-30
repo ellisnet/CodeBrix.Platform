@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AdvancedTextEdit</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AdvancedTextEdit</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever</PackageId>
+		<Description>A full-featured code and text editor control for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. AdvancedTextEdit is a XAML control with the editing model of a professional code editor: an efficient rope-based document with text anchors and grouped undo/redo, syntax highlighting driven by XSHD definition files with built-in definitions for common languages, code folding, a code-completion popup, an in-editor search panel, snippets, smart indentation, line numbers, word wrap, rectangular selection, and virtualized rendering that stays responsive on very large documents. Text is shaped and measured by the family's single text engine (via the CodeBrix.Platform.TextLayout.ApacheLicenseForever dependency), so what the editor draws always matches what a TextBlock draws - no native dependencies beyond SkiaSharp.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp supplies the geometry and drawing types on the public surface (SKCanvas in
+		     background renderers and the render pass, SKRect/SKPoint in layout geometry). Its version
+		     comes from the PackageReference Update entries in src/Directory.Build.targets, so it can
+		     never disagree with the family-wide pin. -->
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
+		     Platform.UI.TextLayout.Skia as the CodeBrix.Platform.TextLayout.ApacheLicenseForever
+		     dependency, both at the same family version as this build (the whole family ships
+		     together). The editor reaches framework internals (typed-character input, the shared
+		     text engine's line metrics) through InternalsVisibleTo, declared in
+		     src/Platform.UI/AssemblyInfo.cs. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Highlighting\Resources\*.xshd" />
+		<EmbeddedResource Include="Highlighting\Resources\*.xsd" />
+	</ItemGroup>
+</Project>
