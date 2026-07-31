@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the WebView add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.AudioPlayer.ApacheLicenseForever</PackageId>
-		<Description>Audio playback for CodeBrix.Platform Skia apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. Provides the XAML-declarable AudioPlayer element - a bindable WAV/MP3 player with play/pause/stop, seek, volume, looping, and a timecode position that two-way binds to a Slider for scrubbing - plus the SoundEffect class for fire-and-forget sound effects. Audio files load from file paths, ms-appx:/// asset URIs, embedded://Assembly/Resource.Name URIs (embedded resources), or streams. Playback is fully managed via CodeBrix.Audio (with its bundled codebrix_miniaudio native backend) - no other native audio dependency is required.</Description>
+		<Description>Audio playback for CodeBrix.Platform Skia apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. Provides the XAML-declarable AudioPlayer element - a bindable WAV/MP3/Ogg Vorbis/FLAC player with play/pause/stop, seek, volume, looping, and a timecode position that two-way binds to a Slider for scrubbing - plus the SoundEffect class for fire-and-forget sound effects. Audio files load from file paths, ms-appx:/// asset URIs, embedded://Assembly/Resource.Name URIs (embedded resources), or streams. Playback is fully managed via CodeBrix.Audio (with its bundled codebrix_miniaudio native backend) - no other native audio dependency is required.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
@@ -27,7 +27,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- The audio engine: CodeBrix.Audio (WAV/MP3 reading) + CodeBrix.Audio.Engine (device
+		<!-- The audio engine: CodeBrix.Audio (WAV/MP3/Ogg Vorbis/FLAC reading) + CodeBrix.Audio.Engine (device
 		     playback via the bundled codebrix_miniaudio native backend) ship in this one package. -->
 		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.201.77" />
 

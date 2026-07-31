@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using CodeBrix.Audio.Wave;
+using CodeBrix.Audio.Playback;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
 using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
@@ -10,23 +10,35 @@ using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
 
 /// <summary>
-/// Fire-and-forget playback of short WAV and MP3 sound effects. Each call to
+/// Fire-and-forget playback of short sound effects - WAV, MP3, Ogg Vorbis and FLAC. Each call to
 /// <see cref="Play(string, double)"/> plays one voice in the application's single shared audio
 /// output, so many effects can overlap cheaply and can play alongside an
 /// <see cref="AudioPlayer"/>. Sources are the same forms <see cref="AudioPlayer.Source"/>
 /// accepts: a file path, an ms-appx:/// asset URI, or an embedded://Assembly/Resource.Name
 /// embedded-resource URI.
 ///
-/// Effect bytes are cached in memory after the first play (or an explicit
-/// <see cref="Preload"/>), so no disk I/O ever happens on the real-time audio thread. One
-/// sharp edge inherited from the audio engine: the shared output adopts the sample rate of
-/// the first sound played (or a rate pinned with CodeBrix.Audio's SharedAudioOutput.Configure),
-/// and a WAV or MP3 whose sample rate differs is rejected rather than played at the wrong
-/// pitch - standardize your effects on one sample rate, or pin the output rate at startup.
+/// An effect is decoded ONCE, on its first play, and the decoded audio is kept - so a sound
+/// triggered repeatedly costs nothing but mixing, and no file access or decoding ever happens on
+/// the real-time audio thread. <see cref="Preload"/> reads the bytes ahead of time;
+/// <see cref="ClearCache"/> releases everything.
+///
+/// Effects do NOT have to share a sample rate: each is converted to the output's format when it
+/// is decoded, so an asset pack that mixes 22 kHz and 44.1 kHz files just works. (That is a
+/// property of this class; feeding a mismatched source directly to CodeBrix.Audio's WaveOutEvent
+/// still fails, by design.)
+///
+/// Formats beyond the four built in - Opus, say - become playable here as soon as an add-on
+/// codec package is registered with CodeBrix.Audio; this class needs no change and no
+/// dependency on it.
 /// </summary>
 public static class SoundEffect
 {
 	private static readonly ConcurrentDictionary<string, byte[]> _cache = new(StringComparer.Ordinal);
+
+	// Decoded, ready-to-mix audio, keyed by the same source string. Populated on first play rather
+	// than by Preload, because decoding starts the shared output device and Preload historically
+	// did not - an app that preloads and then pins the output format must keep working.
+	private static readonly ConcurrentDictionary<string, SoundEffectClip> _clips = new(StringComparer.Ordinal);
 
 	/// <summary>
 	/// Loads the effect's bytes into the in-memory cache ahead of time, so the first
@@ -34,8 +46,17 @@ public static class SoundEffect
 	/// </summary>
 	public static void Preload(string source) => _cache.GetOrAdd(source, AudioSourceResolver.ReadAllBytes);
 
-	/// <summary>Removes all preloaded/cached effect bytes.</summary>
-	public static void ClearCache() => _cache.Clear();
+	/// <summary>Removes all preloaded/cached effect bytes and releases all decoded audio.</summary>
+	public static void ClearCache()
+	{
+		foreach (var clip in _clips.Values)
+		{
+			try { clip.Dispose(); } catch (Exception) { /* best effort */ }
+		}
+
+		_clips.Clear();
+		_cache.Clear();
+	}
 
 	/// <summary>
 	/// Plays a sound effect (fire and forget): the effect starts immediately as its own voice
@@ -43,15 +64,17 @@ public static class SoundEffect
 	/// failures are logged and reported through the returned value rather than thrown, so a
 	/// missing effect never crashes the app.
 	/// </summary>
-	/// <param name="source">A WAV/MP3 file path, ms-appx:/// URI, or embedded:// URI.</param>
+	/// <param name="source">An audio file path, ms-appx:/// URI, or embedded:// URI.</param>
 	/// <param name="volume">Volume for this play, 0.0 to 1.0 (default 1.0).</param>
 	/// <returns>True when playback started; false when the effect could not be played.</returns>
 	public static bool Play(string source, double volume = 1.0)
 	{
 		try
 		{
-			var bytes = _cache.GetOrAdd(source, AudioSourceResolver.ReadAllBytes);
-			PlayCore(new MemoryStream(bytes, writable: false), volume);
+			var clip = _clips.GetOrAdd(source, static key =>
+				SoundEffectClip.Load(_cache.GetOrAdd(key, AudioSourceResolver.ReadAllBytes)));
+
+			clip.Play((float)Math.Clamp(volume, 0.0, 1.0));
 			return true;
 		}
 		catch (Exception e)
@@ -65,11 +88,14 @@ public static class SoundEffect
 	}
 
 	/// <summary>
-	/// Plays a sound effect from a stream containing a WAV or MP3 file (fire and forget). The
-	/// stream is fully buffered into memory first and can be disposed by the caller as soon as
-	/// this method returns.
+	/// Plays a sound effect from a stream (fire and forget). The stream is read in full before this
+	/// returns and can be disposed by the caller immediately afterwards.
 	/// </summary>
-	/// <param name="stream">A readable stream positioned at the start of a WAV or MP3 file.</param>
+	/// <remarks>
+	/// A stream has no identity to cache under, so this decodes every time. For an effect played
+	/// repeatedly, use <see cref="Play(string, double)"/>, which decodes once and keeps the result.
+	/// </remarks>
+	/// <param name="stream">A readable stream positioned at the start of an audio file.</param>
 	/// <param name="volume">Volume for this play, 0.0 to 1.0 (default 1.0).</param>
 	/// <returns>True when playback started; false when the effect could not be played.</returns>
 	public static bool Play(Stream stream, double volume = 1.0)
@@ -81,10 +107,12 @@ public static class SoundEffect
 
 		try
 		{
-			var buffer = new MemoryStream();
+			using var buffer = new MemoryStream();
 			stream.CopyTo(buffer);
 			buffer.Position = 0;
-			PlayCore(buffer, volume);
+
+			// PlayOnce takes over the decoded audio's lifetime and releases it when the sound ends.
+			SoundEffectClip.PlayOnce(buffer, (float)Math.Clamp(volume, 0.0, 1.0));
 			return true;
 		}
 		catch (Exception e)
@@ -95,41 +123,5 @@ public static class SoundEffect
 			}
 			return false;
 		}
-	}
-
-	private static void PlayCore(MemoryStream stream, double volume)
-	{
-		WaveStream reader = IsWavStream(stream)
-			? new WaveFileReader(stream)
-			: new Mp3FileReader(stream);
-
-		var voice = new WaveOutEvent();
-		try
-		{
-			voice.Volume = (float)Math.Clamp(volume, 0.0, 1.0);
-			voice.Init(reader);
-			voice.PlaybackStopped += (_, _) =>
-			{
-				voice.Dispose();
-				reader.Dispose();
-				stream.Dispose();
-			};
-			voice.Play();
-		}
-		catch (Exception)
-		{
-			voice.Dispose();
-			reader.Dispose();
-			stream.Dispose();
-			throw;
-		}
-	}
-
-	private static bool IsWavStream(MemoryStream stream)
-	{
-		Span<byte> header = stackalloc byte[4];
-		var read = stream.Read(header);
-		stream.Position = 0;
-		return read == 4 && header[0] == (byte)'R' && header[1] == (byte)'I' && header[2] == (byte)'F' && header[3] == (byte)'F';
 	}
 }

@@ -167,7 +167,12 @@ internal class LinuxFileSaverExtension(FileSavePicker picker) : IFileSavePickerE
 				return null;
 			}
 
-			return StorageFile.GetFileFromPath(new Uri(results["uris"].GetArray<string>()[0]).AbsolutePath);
+			// LocalPath, not AbsolutePath. The portal returns a file:// URI, and AbsolutePath hands
+			// back the percent-ENCODED path out of it: a file the user named "My Document.pdf"
+			// would reach the application as "My%20Document.pdf" (and non-ASCII names worse still -
+			// "Ölberg.pdf" as "%C3%96lberg.pdf"), so the application would write its file under that
+			// literal name. LocalPath is the decoded, real file-system path.
+			return StorageFile.GetFileFromPath(new Uri(results["uris"].GetArray<string>()[0]).LocalPath);
 		}
 		catch (Exception e)
 		{

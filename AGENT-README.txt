@@ -559,33 +559,38 @@ package is versioned to track the SkiaSharp release it vendors).
                 Value="{Binding PositionSeconds, ElementName=Player, Mode=TwoWay}" />
       SOUND EFFECTS: SoundEffect.Play(source[, volume]) is fire-and-forget - each
       play is one voice in the app's single shared output device, so effects
-      overlap each other and the AudioPlayer cheaply. Bytes are cached in memory
-      after the first play (or SoundEffect.Preload) so no disk I/O happens on
-      the real-time audio thread; SoundEffect.ClearCache() empties the cache.
+      overlap each other and the AudioPlayer cheaply. An effect is DECODED ONCE,
+      on its first play, and the decoded audio is kept, so a sound triggered
+      repeatedly costs nothing but mixing and no file access or decoding ever
+      happens on the real-time audio thread. SoundEffect.Preload(source) reads
+      the bytes ahead of time; SoundEffect.ClearCache() releases everything.
       Play returns false (and logs) instead of throwing when an effect fails.
+      Play(Stream) has no identity to cache under, so it decodes each call - use
+      the string overload for anything played repeatedly.
       SOURCES (both classes): a filesystem path, an ms-appx:///Assets/... URI,
       an embedded://AssemblyName/Manifest.Resource.Name URI (embedded resources,
       the same scheme the SVG and Lottie add-ons use; "." = the app assembly),
       or a Stream.
-      SHARP EDGE (inherited from the audio engine): the shared output adopts the
-      sample rate of the first sound played, and the SoundEffect path has no
-      resampler - a WAV/MP3 at a different rate is rejected rather than played
-      at the wrong pitch. Standardize effect files on one rate, or pin the
-      output with CodeBrix.Audio's SharedAudioOutput.Configure(rate) at startup.
-      (AudioPlayer itself resamples and plays files at any rate.)
-      SHARP EDGE - OGG/VORBIS IS NOT SUPPORTED (verified 2026-07-29): "WAV + MP3"
-      above is the complete list. The bundled codebrix_miniaudio is built without
-      stb_vorbis (miniaudio gates Vorbis behind STB_VORBIS_INCLUDE_STB_VORBIS_H,
-      which native/miniaudio/library.c never defines), so an .ogg fed to
-      AudioPlayer raises MediaFailed, and SoundEffect sniffs RIFF-else-MP3 and
-      throws inside its MP3 path (Play returns false + log). A temp file does
-      not help - the format, not the delivery, is the problem. This bites any
-      app consuming free game-asset packs (kenney.nl audio is 100% .ogg).
-      PROVEN WORKAROUND (KenneyAssetBrowser sample, X11-verified): decode with a
-      managed Vorbis decoder (e.g. the NVorbis nuget), clamp floats to 16-bit
-      PCM, write a 44-byte RIFF/WAVE header + samples into a MemoryStream, and
-      hand that to AudioPlayer.SetSourceStream(...) (or SoundEffect.Play(stream))
-      - no temp file, and AudioPlayer's own resampler handles any source rate.
+      SAMPLE RATES: effects do NOT have to share one. Each is converted to the
+      output's format when it is decoded, so an asset pack mixing 22 kHz and
+      44.1 kHz files just works, and so does AudioPlayer. (The old restriction
+      came from SoundEffect feeding CodeBrix.Audio's WaveOutEvent directly, which
+      has no resampler and rejects a mismatched source; it now goes through
+      SoundEffectClip, which converts on load. Feeding WaveOutEvent yourself
+      still has that restriction - pin the rate with SharedAudioOutput.Configure
+      if you do.)
+      FORMATS: WAV, MP3, Ogg Vorbis and FLAC, for both AudioPlayer and
+      SoundEffect. Ogg Vorbis matters for anything consuming free game-asset
+      packs (kenney.nl audio is 100% .ogg). NOTE THE VERSION: .ogg and .flac
+      arrived in CodeBrix.Audio 1.0.211.x - against an older package .ogg fails
+      (AudioPlayer raises MediaFailed), and the NVorbis-decode-to-WAV workaround
+      the KenneyAssetBrowser sample used is only needed there.
+      OPUS is not included: it is BSD-3-Clause rather than MIT, so it ships as
+      the separate CodeBrix.Audio.Opus package. An app that needs it depends on
+      that package and registers it at start-up; this add-in needs no change and
+      no dependency on it, because playback resolves codecs through the shared
+      audio output. An .opus file without that package fails with a message
+      saying it is Opus.
       Depends only on CodeBrix.Audio.MitLicenseForever (pinned in the csproj) +
       the core framework; ships at the same version as the rest of the family.
       Sample: samples/CodeBrixPlatform/AudioPlayerDemo (six heads; setting

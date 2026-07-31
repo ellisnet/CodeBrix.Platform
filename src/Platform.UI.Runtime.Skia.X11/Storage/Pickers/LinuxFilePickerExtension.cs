@@ -186,7 +186,11 @@ internal class LinuxFilePickerExtension(IFilePicker picker) : IFileOpenPickerExt
 				return ImmutableList<string>.Empty;
 			}
 
-			return results["uris"].GetArray<string>().Select(s => new Uri(s).AbsolutePath).ToImmutableList();
+			// LocalPath, not AbsolutePath. The portal returns file:// URIs, and AbsolutePath hands
+			// back the percent-ENCODED path out of each: a folder the user picked as "My Models"
+			// would reach the application as "My%20Models", which points at nothing on disk.
+			// LocalPath is the decoded, real file-system path.
+			return results["uris"].GetArray<string>().Select(s => new Uri(s).LocalPath).ToImmutableList();
 		}
 		catch (Exception e)
 		{
