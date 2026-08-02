@@ -3,13 +3,20 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:local="using:AudioPlayerDemo.Views"
       xmlns:audio="using:CodeBrix.Platform.UI.AudioPlayer.Skia"
+      xmlns:conv="using:CodeBrix.Platform.UI.Converters"
       Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
       FontFamily="{StaticResource OpenSansFont}">
 
     <Page.Resources>
         <local:TimecodeConverter x:Key="Timecode" />
+
+        <!-- The platform's own converter, from CodeBrix.Platform.UI.Toolkit - no need for a
+             hand-written one, or for a Visibility property on a view model. -->
+        <conv:BoolToVisibilityConverter x:Key="VisibleWhenTrue" />
     </Page.Resources>
 
+    <!-- Three players' worth of controls is taller than a default window, so the page scrolls. -->
+    <ScrollViewer>
     <StackPanel Margin="20" Spacing="14" MaxWidth="640">
 
         <!-- The player: non-visual, declared like any other element. The song is an embedded
@@ -60,11 +67,16 @@
         </StackPanel>
 
         <!-- Fire-and-forget sound effects: each press is an overlapping voice in the shared
-             output, and they play happily on top of the running song. -->
+             output, and they play happily on top of the running song. The same chime in four
+             formats shows that the decode-once effect path is not WAV-only - and the Opus one
+             works because the app registered that codec at start-up (see App.xaml.cs). -->
         <StackPanel Orientation="Horizontal" Spacing="8">
             <TextBlock Text="Sound effects" VerticalAlignment="Center" />
-            <Button Content="Chime" Click="ChimeButton_Click" />
-            <Button Content="Click" Click="ClickButton_Click" />
+            <Button Content="Click (WAV)" Click="ClickButton_Click" />
+            <Button Content="Chime (WAV)" Click="ChimeButton_Click" />
+            <Button Content="OGG" Click="ChimeOggButton_Click" />
+            <Button Content="FLAC" Click="ChimeFlacButton_Click" />
+            <Button Content="Opus" Click="ChimeOpusButton_Click" />
         </StackPanel>
 
         <TextBlock x:Name="StatusText" Text="Ready" TextWrapping="Wrap" />
@@ -87,6 +99,9 @@
                       SelectionChanged="SecondPlayerSelection_Changed">
                 <ComboBoxItem Content="WAV" />
                 <ComboBoxItem Content="MP3" />
+                <ComboBoxItem Content="OGG/Vorbis" />
+                <ComboBoxItem Content="FLAC" />
+                <ComboBoxItem Content="Opus" />
             </ComboBox>
         </StackPanel>
 
@@ -116,5 +131,72 @@
 
         <TextBlock x:Name="Player2Status" Text="Ready" TextWrapping="Wrap" />
 
+        <!-- ===== Third player: MIDI music rendered through an SFZ instrument ===== -->
+        <TextBlock Text="Play MIDI music through an instrument" FontSize="20" Margin="0,10,0,0" />
+
+        <TextBlock TextWrapping="Wrap"
+                   Text="MidiPlayer synthesizes a MIDI file through a SoundFont (.sf2) or SFZ (.sfz) instrument, with the same transport and the same scrubber binding as the audio players above. Instruments are big - this sampled piano decodes to well over half a gigabyte - so loading runs in the background and the transport comes alive when it finishes." />
+
+        <!-- The instrument and the sequence are set together, in code-behind, when this is
+             pressed: a MidiPlayer starts loading as soon as it has both. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="LoadMidiButton" Content="Load the piano and the music" Click="LoadMidiButton_Click" />
+
+            <!-- Bound straight to the player's IsLoading, so nothing in this page tracks the load
+                 itself. Indeterminate because an instrument load reports no fraction to show - and
+                 it keeps animating throughout, which is the visible proof that the load is running
+                 off the UI thread rather than freezing the window. The fixed-width host keeps the
+                 row from reflowing when the bar comes and goes. -->
+            <Grid Width="180" VerticalAlignment="Center">
+                <ProgressBar Height="4" IsIndeterminate="True"
+                             Visibility="{Binding IsLoading, ElementName=MidiMusic, Converter={StaticResource VisibleWhenTrue}}" />
+            </Grid>
+
+            <TextBlock Text="Voices sounding:" VerticalAlignment="Center" Margin="12,0,0,0" />
+            <TextBlock Text="{Binding ActiveVoiceCount, ElementName=MidiMusic}" VerticalAlignment="Center" Width="40" />
+        </StackPanel>
+
+        <!-- Non-visual, exactly like the players above. Source is the MIDI file; Instrument is
+             what renders it. The .sfz is addressed through ms-appx:/// rather than embedded://,
+             because its 226 sample files have to stay on disk beside it. -->
+        <audio:MidiPlayer x:Name="MidiMusic"
+                          MediaOpened="MidiMusic_MediaOpened"
+                          PlaybackEnded="MidiMusic_PlaybackEnded"
+                          MediaFailed="MidiMusic_MediaFailed" />
+
+        <!-- The same scrubber markup as the audio players - that is the point of matching the
+             transport surface. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding Position, ElementName=MidiMusic, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+            <Slider Width="420" VerticalAlignment="Center"
+                    Maximum="{Binding DurationSeconds, ElementName=MidiMusic}"
+                    Value="{Binding PositionSeconds, ElementName=MidiMusic, Mode=TwoWay}"
+                    StepFrequency="0.1" />
+            <TextBlock Text="{Binding Duration, ElementName=MidiMusic, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button Content="Play" Click="PlayMidiButton_Click" />
+            <Button Content="Pause" Click="PauseMidiButton_Click" />
+            <Button Content="Stop" Click="StopMidiButton_Click" />
+            <ToggleSwitch Header="" OnContent="Looping" OffContent="Loop"
+                          IsOn="{Binding IsLooping, ElementName=MidiMusic, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!-- Tempo without pitch change - something only a sequence can do, so it is bound
+             straight to the player rather than faked. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Tempo" VerticalAlignment="Center" />
+            <Slider Width="200" VerticalAlignment="Center" Minimum="0.25" Maximum="2" StepFrequency="0.05"
+                    Value="{Binding Speed, ElementName=MidiMusic, Mode=TwoWay}" />
+            <TextBlock Text="{Binding Speed, ElementName=MidiMusic}" VerticalAlignment="Center" Width="40" />
+            <TextBlock Text="x  (pitch is unchanged)" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <TextBlock x:Name="MidiStatus" Text="No instrument loaded" TextWrapping="Wrap" />
+
     </StackPanel>
+    </ScrollViewer>
 </Page>

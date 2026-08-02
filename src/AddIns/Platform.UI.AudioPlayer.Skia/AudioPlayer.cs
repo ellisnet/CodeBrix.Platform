@@ -14,11 +14,16 @@ using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
 
 /// <summary>
-/// A non-visual, XAML-declarable audio player for WAV and MP3 files. Declare it on a page (it
-/// renders nothing and takes no space), point <see cref="Source"/> at a file path, an
+/// A non-visual, XAML-declarable audio player for WAV, MP3, Ogg Vorbis and FLAC files. Declare it
+/// on a page (it renders nothing and takes no space), point <see cref="Source"/> at a file path, an
 /// ms-appx:/// asset URI, an embedded://Assembly/Resource.Name embedded resource, or load a
 /// stream with <see cref="SetSourceStream"/>, and control playback with <see cref="Play"/> /
 /// <see cref="Pause"/> / <see cref="Stop"/> / <see cref="Seek"/>.
+///
+/// Formats beyond the four built in - Opus, say - play here as soon as an add-on codec package is
+/// registered with CodeBrix.Audio by the application. This class needs no change and takes no
+/// dependency on one. For MIDI music rendered through a SoundFont or SFZ instrument, see
+/// <see cref="MidiPlayer"/>.
 ///
 /// While playing, <see cref="Position"/> and <see cref="PositionSeconds"/> update on the UI
 /// thread every <see cref="PositionUpdateInterval"/>, so an indicator can one-way bind to them.
@@ -68,7 +73,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 		new PropertyMetadata("", (o, e) => ((AudioPlayer)o).OnSourceChanged((string)e.NewValue)));
 
 	/// <summary>
-	/// The audio source: a WAV or MP3 file path, an ms-appx:/// asset URI, or an
+	/// The audio source: a WAV, MP3, Ogg Vorbis or FLAC file path, an ms-appx:/// asset URI, or an
 	/// embedded://Assembly/Resource.Name embedded-resource URI. Setting it loads the file
 	/// (making <see cref="Duration"/> available immediately) and, when <see cref="AutoPlay"/>
 	/// is true, starts playback. Set an empty string to unload.
@@ -259,9 +264,9 @@ public sealed partial class AudioPlayer : FrameworkElement
 	}
 
 	/// <summary>
-	/// Loads a WAV or MP3 source from a stream (for sources that are neither files nor
-	/// embedded resources). The stream should be seekable; the player takes ownership and
-	/// disposes it when another source is loaded. Clears <see cref="Source"/>.
+	/// Loads a source from a stream, in any format this player reads (for sources that are neither
+	/// files nor embedded resources). The stream should be seekable; the player takes ownership
+	/// and disposes it when another source is loaded. Clears <see cref="Source"/>.
 	/// </summary>
 	public void SetSourceStream(Stream stream)
 	{
@@ -316,7 +321,13 @@ public sealed partial class AudioPlayer : FrameworkElement
 			_isSourceLoaded = false;
 			Duration = TimeSpan.Zero;
 			DurationSeconds = 0.0;
-			ReportFailure($"The audio source '{sourceDescription}' could not be loaded.", e);
+
+			// The engine's own message for an unregistered codec names the CONTAINER ("format
+			// 'ogg'"), which for an .opus file says neither what it is nor what to do; Amend adds
+			// that where it applies and leaves every other failure untouched.
+			ReportFailure(
+				AudioFailureExplanation.Amend($"The audio source '{sourceDescription}' could not be loaded.", sourceDescription),
+				e);
 			return;
 		}
 

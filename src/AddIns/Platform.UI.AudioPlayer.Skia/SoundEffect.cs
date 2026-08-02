@@ -81,7 +81,9 @@ public static class SoundEffect
 		{
 			if (typeof(SoundEffect).Log().IsEnabled(LogLevel.Error))
 			{
-				typeof(SoundEffect).Log().Error($"The sound effect '{source}' could not be played.", e);
+				typeof(SoundEffect).Log().Error(
+					AudioFailureExplanation.Amend($"The sound effect '{source}' could not be played.", source),
+					e);
 			}
 			return false;
 		}

@@ -37,7 +37,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | --- | --- |
 | `CodeBrix.Platform.ApacheLicenseForever` | The core UI framework (required) |
 | `CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever` | Full code/text editor control (`AdvancedTextEdit` element: syntax highlighting, folding, completion, search, snippets, line numbers) |
-| `CodeBrix.Platform.AudioPlayer.ApacheLicenseForever` | Audio playback (`AudioPlayer` element + `SoundEffect`), fully managed on all heads |
+| `CodeBrix.Platform.AudioPlayer.ApacheLicenseForever` | Audio playback (`AudioPlayer` element + `SoundEffect`) and MIDI music through a SoundFont or SFZ instrument (`MidiPlayer` element), fully managed on all heads |
 | `CodeBrix.Platform.FlexPanel.ApacheLicenseForever` | CSS flexbox-style layout panel (`FlexPanel` element with `Grow` / `Shrink` / `Basis` / `Order` / `AlignSelf` attached properties) |
 | `CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever` | 2D SkiaSharp drawing |
 | `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever` | 3D OpenGL drawing (`GLCanvasElement`) |

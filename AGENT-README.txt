@@ -531,7 +531,8 @@ package is versioned to track the SkiaSharp release it vendors).
 --- AUDIO PLAYER ADD-ON PACKAGE (optional; ONE package, live on ALL six heads) ---
 
   CodeBrix.Platform.AudioPlayer.ApacheLicenseForever                 all heads
-      Audio playback (WAV + MP3) with no native setup at all: unlike the WebView
+      Audio playback (WAV, MP3, Ogg Vorbis, FLAC, Opus) and MIDI music with no
+      native setup at all: unlike the WebView
       and MediaPlayer add-ons there is no per-OS engine and nothing to apt
       install - playback is fully managed via the CodeBrix.Audio.MitLicenseForever
       nuget (whose bundled codebrix_miniaudio backend covers win/linux/osx,
@@ -587,15 +588,71 @@ package is versioned to track the SkiaSharp release it vendors).
       the KenneyAssetBrowser sample used is only needed there.
       OPUS is not included: it is BSD-3-Clause rather than MIT, so it ships as
       the separate CodeBrix.Audio.Opus package. An app that needs it depends on
-      that package and registers it at start-up; this add-in needs no change and
-      no dependency on it, because playback resolves codecs through the shared
-      audio output. An .opus file without that package fails with a message
-      saying it is Opus.
+      that package and calls CodeBrixAudioOpus.Register() once at start-up; this
+      add-in needs no change and no dependency on it, because playback resolves
+      codecs through the shared audio output.
+      An .opus file played without that package fails with a message naming Opus
+      and saying what to do - which this add-in supplies (Internal/
+      AudioFailureExplanation.cs), because the ENGINE's own message names the
+      container instead: "No registered and working codec factory found for
+      decoding format 'ogg'". Ogg is a container, so that message is the same for
+      Vorbis, Opus and Ogg FLAC; the add-in sniffs the failed source with
+      OggCodecSniffer and appends the Opus explanation only where it applies.
+      MIDI MUSIC - the MidiPlayer element (added 2026-08-02). Same namespace,
+      same shape: a non-visual [Bindable] FrameworkElement that synthesizes a
+      MIDI file through a SoundFont (.sf2) or an SFZ (.sfz) instrument.
+        <audio:MidiPlayer x:Name="Music"
+            Source="ms-appx:///Assets/theme.mid"
+            Instrument="ms-appx:///Assets/Piano/Piano.sfz" />
+      Its transport surface is AudioPlayer's, member for member - Position/
+      PositionSeconds (two-way, debounced), Duration/DurationSeconds, IsPlaying,
+      Volume, IsLooping, AutoPlay, PositionUpdateInterval, Play/Pause/Stop/Seek,
+      PlaybackEnded, MediaFailed - so THE SAME SCRUBBER MARKUP DRIVES EITHER
+      PLAYER. On top of that sit the things only a sequence can do: Speed (tempo
+      with no pitch change), ActiveVoiceCount (read-only, refreshed with
+      Position), SetChannelVolume/SetChannelPan/SetChannelProgram and
+      SendMidiMessage for mixing a layered arrangement live, and
+      MidiMessageProcessed - the OBSERVE-ONLY message hook, for driving something
+      on screen off the notes. (CodeBrix.Audio's modifying hook, which REPLACES
+      delivery and silences the music if a caller does not re-deliver, is
+      deliberately not exposed here.)
+      LOADING IS ASYNCHRONOUS, and that is the one real difference from
+      AudioPlayer. Instruments are big - a sampled piano is hundreds of MB of
+      decoded audio - so setting Source or Instrument raises IsLoading (bind a
+      status line to it), loads on a thread-pool thread, and raises MediaOpened
+      when the transport is live. Duration is valid from MediaOpened onward, NOT
+      from the property set. Instruments are cached process-wide
+      (SfzInstrumentCache/SoundFontCache), so a second player sharing one pays
+      nothing. Loading synchronously would freeze the window for seconds, which
+      is why AudioPlayer's RunOffSynchronizationContext trick is not used here.
+      InstrumentProblems and UnsupportedInstrumentOpcodes report what the loaded
+      instrument could not do - both empty means fully supported. Show them
+      rather than guessing when an instrument sounds wrong.
+      SOURCE FORMS FOR AN INSTRUMENT: a .sf2 takes every form Source does (path,
+      ms-appx:///, embedded://, and it is cached by path). A .sfz takes ONLY a
+      file path or an ms-appx:/// URI. An .sfz is not one file - it references
+      its samples as separate files beside it (and may #include others), so it
+      needs a real directory to resolve against; an embedded resource has none,
+      and MediaFailed says exactly that.
+      SHIPPING AN INSTRUMENT AS A NUGET PACKAGE: possible today with no new
+      machinery, because library assets already flow through
+      _CodeBrixAddLibraryAssets. Build the package like
+      CodeBrix.Platform.Fonts.OpenSans: a library project with
+      GenerateLibraryLayout=true, the instrument tree as Content with target
+      paths, which packs to lib/<tfm>/<AssemblyName>/... beside an (empty)
+      <AssemblyName>.uprimarker. At head-build time ExpandPackageAssets_v0 globs
+      that whole folder recursively and copies it into the app output with its
+      shape intact, so the .sfz keeps its Samples/ and Data/ neighbours and is
+      addressed as ms-appx:///<AssemblyName>/<name>.sfz. Sample formats follow
+      CodeBrix.Audio - WAV/FLAC/Ogg work as they are; an instrument built on
+      .opus samples additionally needs the app to register the Opus package.
       Depends only on CodeBrix.Audio.MitLicenseForever (pinned in the csproj) +
       the core framework; ships at the same version as the rest of the family.
       Sample: samples/CodeBrixPlatform/AudioPlayerDemo (six heads; setting
-      AUDIOPLAYERDEMO_SELFTEST=1 runs a scripted end-to-end playback/seek/SFX
-      verification and exits PASS/FAIL - the repo's X11 smoke check).
+      AUDIOPLAYERDEMO_SELFTEST=1 runs a scripted end-to-end verification and
+      exits PASS/FAIL - the repo's X11 smoke check - covering all five audio
+      formats, the compressed sound effects, and the MIDI player from background
+      load through tempo and seek: 38 checks).
 
 --- COMPANION PACKAGES used by the reference app (NOT produced by this repo) ---
 

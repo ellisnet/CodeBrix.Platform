@@ -19,6 +19,13 @@
     <!-- Bundled Open Sans font -->
     <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.209.261" />
 
+    <!-- Opus support. This is the APPLICATION's dependency, never the AudioPlayer AddIn's: Opus is
+         BSD-3-Clause rather than MIT, so it ships as its own package, and an app that wants it
+         references it and calls CodeBrixAudioOpus.Register() once at start-up (see App.xaml.cs).
+         The AddIn resolves codecs through the shared audio output, so it plays .opus with no
+         change and no reference of its own. -->
+    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.214.925" />
+
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
          (Platform.WinUI.nuspec), so replacing that package with project references dropped it;
@@ -65,17 +72,39 @@
     <EmbeddedResource Include="..\Shared\Assets\chime.wav" Link="Assets\chime.wav" />
     <EmbeddedResource Include="..\Shared\Assets\click.wav" Link="Assets\click.wav" />
 
+    <!-- The same chime in the three compressed formats, so the sound-effect buttons show that
+         SoundEffect's decode-once path is not WAV-only. Tens of kilobytes each. -->
+    <EmbeddedResource Include="..\Shared\Assets\chime.ogg" Link="Assets\chime.ogg" />
+    <EmbeddedResource Include="..\Shared\Assets\chime.flac" Link="Assets\chime.flac" />
+    <EmbeddedResource Include="..\Shared\Assets\chime.opus" Link="Assets\chime.opus" />
+
     <!-- The song once more as a loose output file, so the demo can also show loading the
          SAME audio through an ms-appx:///Assets/... URI. -->
     <Content Include="..\Shared\Assets\demo_song.mp3" Link="Assets\demo_song.mp3" CopyToOutputDirectory="PreserveNewest" />
 
-    <!-- The four full-length sample songs used by the second player (the song/format drop-downs),
-         referenced in place from the repo-level samples/assets folder. These are large (the WAVs
-         are tens of MB), so they are loose copy-to-output Content addressed via
-         ms-appx:///Assets/... rather than embedded resources, to avoid bloating the assembly. -->
-    <Content Include="..\..\..\assets\sample_song_1.mp3" Link="Assets\sample_song_1.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The two full-length sample songs in each of the five formats, used by the second player
+         (the song/format drop-downs), referenced in place from the repo-level samples/assets
+         folder. These are large (the WAVs are tens of MB), so they are loose copy-to-output
+         Content addressed via ms-appx:///Assets/... rather than embedded resources, to avoid
+         bloating the assembly. -->
     <Content Include="..\..\..\assets\sample_song_1.wav" Link="Assets\sample_song_1.wav" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="..\..\..\assets\sample_song_2.mp3" Link="Assets\sample_song_2.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_1.mp3" Link="Assets\sample_song_1.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_1.ogg" Link="Assets\sample_song_1.ogg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_1.flac" Link="Assets\sample_song_1.flac" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_1.opus" Link="Assets\sample_song_1.opus" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\assets\sample_song_2.wav" Link="Assets\sample_song_2.wav" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.mp3" Link="Assets\sample_song_2.mp3" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.ogg" Link="Assets\sample_song_2.ogg" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.flac" Link="Assets\sample_song_2.flac" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\sample_song_2.opus" Link="Assets\sample_song_2.opus" CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- The MIDI music the third player renders, and the SFZ instrument it renders it through.
+         The instrument is a FOLDER, and it has to stay one: an .sfz file references its samples as
+         separate files beside it (Samples/*.flac here, plus the Data/*.txt files it #includes), so
+         the whole tree is copied to the output with its shape intact and addressed as
+         ms-appx:///Assets/SplendidGrandPiano/... - which is also why an .sfz cannot be an embedded
+         resource. 226 samples, ~74 MB on disk. -->
+    <Content Include="..\..\..\assets\debussy_Ste_Bergamesq_Clair.mid" Link="Assets\debussy_Ste_Bergamesq_Clair.mid" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\SplendidGrandPiano\**\*.*" Link="Assets\SplendidGrandPiano\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

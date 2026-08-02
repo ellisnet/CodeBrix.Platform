@@ -1,3 +1,4 @@
+using CodeBrix.Audio.Opus;
 using CodeBrix.Platform.Simple;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
@@ -18,6 +19,17 @@ public partial class App : Application
     {
         //Set Open Sans as the default font for all text in application
         global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily = "ms-appx:///CodeBrix.Platform.Fonts.OpenSans/Fonts/OpenSans.ttf";
+
+        // Turn on .opus playback. This one call is the whole integration: after it, .opus files
+        // play through the AudioPlayer AddIn's AudioPlayer element and SoundEffect exactly like
+        // the formats CodeBrix.Audio reads natively.
+        //
+        // The dependency belongs to THIS application, not to the AddIn. Opus is BSD-3-Clause and
+        // CodeBrix.Audio holds an MIT-or-better bar, so the codec ships as its own package; the
+        // AddIn resolves codecs through the shared audio output and so needs neither a reference
+        // to it nor a code change. There is deliberately no module initializer doing this call for
+        // us - that would work in a debug build and silently not run in a trimmed publish.
+        CodeBrixAudioOpus.Register();
 
         SimpleServiceResolver.CreateInstance(HostHelper.GetHost(), services =>
         {

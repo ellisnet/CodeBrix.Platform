@@ -121,9 +121,10 @@
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
 
 		<!-- The AudioPlayer AddIn (CodeBrix.Platform.AudioPlayer.ApacheLicenseForever) ships with every
-		     family release: the XAML-declarable AudioPlayer element and the fire-and-forget SoundEffect
-		     class, backed by the CodeBrix.Audio.MitLicenseForever nuget (fully managed WAV/MP3 with a
-		     bundled miniaudio device backend), live on all six heads including macOS. -->
+		     family release: the XAML-declarable AudioPlayer and MidiPlayer elements and the
+		     fire-and-forget SoundEffect class, backed by the CodeBrix.Audio.MitLicenseForever nuget
+		     (fully managed WAV/MP3/Ogg Vorbis/FLAC plus SoundFont and SFZ synthesis, with a bundled
+		     miniaudio device backend), live on all six heads including macOS. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Skia.csproj" />
 
 		<!-- The MediaPlayer AddIn (CodeBrix.Platform.MediaPlayer.LgplLicenseForever) ships with every
