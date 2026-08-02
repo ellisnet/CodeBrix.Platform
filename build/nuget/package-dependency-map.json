@@ -33,7 +33,7 @@
 	// packed project must resolve the SAME version of each. The consumer-side half of this lock
 	// lives in platform.winui.common.targets (UNOB0002 / UNOB0003).
 	//
-	// Currently locked to SkiaSharp 4.150.1 / HarfBuzzSharp 14.2.1.1. SkiaSharp 4.151.x must NOT
+	// Currently locked to SkiaSharp 4.151.0 / HarfBuzzSharp 14.2.1.1. A newer SkiaSharp must NOT
 	// be adopted by any CodeBrix library or application until the CodeBrix.Platform packages have
 	// been tested and updated against it.
 	// --------------------------------------------------------------------

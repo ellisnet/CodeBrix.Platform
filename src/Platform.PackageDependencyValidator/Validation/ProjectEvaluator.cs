@@ -10,7 +10,7 @@ namespace CodeBrix.Platform.PackageDependencyValidator.Validation;
 /// This is deliberately the same view Visual Studio's Solution NuGet package view manages, which
 /// is what makes the .csproj authoritative: versionless references that get their version from the
 /// <c>PackageReference Update</c> block in src/Directory.Build.targets come back fully resolved
-/// (e.g. SkiaSharp -&gt; 4.150.1), so nothing has to be duplicated or guessed here.
+/// (e.g. SkiaSharp -&gt; 4.151.0), so nothing has to be duplicated or guessed here.
 ///
 /// Evaluation only — no restore, no build, no network.
 /// </remarks>

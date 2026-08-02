@@ -51,6 +51,6 @@
     <PackageReference Include="CodeBrix.Platform.ApacheLicenseForever" Version="1.0.210.770" />
     <PackageReference Include="CodeBrix.Platform.WebView.ApacheLicenseForever" Version="1.0.210.770" />
     <PackageReference Include="CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever" Version="1.0.210.770" />
-    <PackageReference Include="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" Version="4.150.1" />
+    <PackageReference Include="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" Version="4.151.0" />
   </ItemGroup>
 </Project>

@@ -191,7 +191,7 @@ internal readonly partial struct UnicodeText
 
 			var translation = SKMatrix.CreateTranslation(origin.X, origin.Y);
 			using var positioned = new SKPath();
-			// The 'in' overload is required: the by-value Transform overloads are obsolete in 4.150.1.
+			// The 'in' overload is required: the by-value Transform overloads are obsolete since 4.150.1.
 			glyphPath.Transform(in translation, positioned);
 			builder.AddPath(positioned, SKPathAddMode.Append);
 		}

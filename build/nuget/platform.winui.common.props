@@ -33,7 +33,7 @@
 	============================================================================================
 	-->
 	<PropertyGroup>
-		<CodeBrixRequiredSkiaSharpVersion>4.150.1</CodeBrixRequiredSkiaSharpVersion>
+		<CodeBrixRequiredSkiaSharpVersion>4.151.0</CodeBrixRequiredSkiaSharpVersion>
 		<CodeBrixRequiredHarfBuzzSharpVersion>14.2.1.1</CodeBrixRequiredHarfBuzzSharpVersion>
 	</PropertyGroup>
 

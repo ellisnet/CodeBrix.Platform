@@ -99,7 +99,7 @@ The core cross-platform UI framework, and the one required package for every Cod
 NuGet Package ID: `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
-Provides the SkiaSharp XAML view types — `SKXamlCanvas` and `SKSwapChainPanel` — for hosting SkiaSharp-drawn content inside CodeBrix.Platform XAML. It is used internally by the Graphics2DSK, Lottie, and Svg extension packages; reference it directly only if your own code uses these view types. Unlike the rest of the family, this package is versioned to track the SkiaSharp release it vendors rather than the shared framework version. The code for this package was derived from a small portion of the open source SkiaSharp library (its XAML view components), version 4.150.1.
+Provides the SkiaSharp XAML view types — `SKXamlCanvas` and `SKSwapChainPanel` — for hosting SkiaSharp-drawn content inside CodeBrix.Platform XAML. It is used internally by the Graphics2DSK, Lottie, and Svg extension packages; reference it directly only if your own code uses these view types. Unlike the rest of the family, this package is versioned to track the SkiaSharp release it vendors rather than the shared framework version. The code for this package was derived from a small portion of the open source SkiaSharp library (its XAML view components), version 4.151.0.
 
 ---
 

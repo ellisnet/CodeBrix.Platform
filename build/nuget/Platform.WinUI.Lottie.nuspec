@@ -23,13 +23,13 @@
 
 			<group targetFramework="net10.0">
 				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
-				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="4.150.1" />
+				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="4.151.0" />
 				<!-- The Lottie assemblies bind CodeBrix.Platform.WinUI.Graphics2DSK, which ships in
 				     its own package; stamped with the shared family version at pack time. -->
 				<dependency id="CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever" version="$codebrixversion$" />
 				<!-- Under the family SkiaSharp hard lock; must equal $(SkiaSharpVersion). Enforced by
 				     the package dependency gate (src/Platform.PackageDependencyValidator). -->
-				<dependency id="SkiaSharp.Skottie" version="4.150.1" />
+				<dependency id="SkiaSharp.Skottie" version="4.151.0" />
 			</group>
 
 		</dependencies>

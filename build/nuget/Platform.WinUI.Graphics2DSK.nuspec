@@ -18,7 +18,7 @@
 			<group targetFramework="net10.0">
 				<!-- Under the family SkiaSharp hard lock; must equal $(SkiaSharpVersion). Enforced by
 				     the package dependency gate (src/Platform.PackageDependencyValidator). -->
-				<dependency id="SkiaSharp" version="4.150.1" />
+				<dependency id="SkiaSharp" version="4.151.0" />
 			</group>
 		</dependencies>
 	</metadata>
