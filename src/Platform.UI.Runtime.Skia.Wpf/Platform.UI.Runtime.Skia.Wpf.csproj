@@ -40,7 +40,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Web.WebView2" Aliases="WpfWebView" PrivateAssets="all" />
-		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.178.348" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.216.148" />
 
 		<!-- SkiaSharp must be referenced directly so that it — and its transitive
 		     SkiaSharp.NativeAssets.Win32 native — flow to consuming apps. The only other

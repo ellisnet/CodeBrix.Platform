@@ -38,6 +38,23 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- ICU, and the reason this add-in can honour "no application host required" on every
+		     platform rather than only on Linux. Linux gets ICU from the dynamic linker search path,
+		     so nothing has to ship; Windows and macOS have no system copy at all, and until these
+		     packages are here a consumer with no head fails on the very first layout call with
+		     "Failed to load libicuuc." An application head already pulls the same packages in
+		     through its runtime package, where the shared version pin makes this a no-op.
+
+		     Referenced unconditionally, not per-OS: a NuGet dependency is chosen at restore time
+		     and has to hold for every platform the consumer builds for. The natives sit under
+		     runtimes/<rid>/native, so a build for one platform never loads the other's. Versions
+		     match Runtime.Skia.Win32 and Runtime.Skia.MacOS, which reference the same packages -
+		     the family resolves one version of each. -->
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.216.148" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.216.148" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
 		     same family version as this build (the whole family ships together). The add-in reaches
 		     the layout engine through InternalsVisibleTo, declared in src/Platform.UI/AssemblyInfo.cs. -->

@@ -40,7 +40,7 @@
 		<PackageReference Include="HarfBuzzSharp" />
 		<PackageReference Include="SkiaSharp" />
     <PackageReference Include="SkiaSharp.HarfBuzz" />
-    <PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.178.348" />
+    <PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.216.148" />
 	</ItemGroup>
 
 	<PropertyGroup>
