@@ -44,6 +44,10 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 		{
 			using var lockDiposable = X11Helper.XLock(_host.RootX11Window.Display);
 			_ = XLib.XStoreName(_host.RootX11Window.Display, _host.RootX11Window.Window, value);
+			// Important! Same as Activate() below: without a flush the XStoreName request sits
+			// in the output buffer until unrelated X traffic flushes it, so a background app's
+			// title visibly updates only when the user next interacts with the window.
+			_ = XLib.XFlush(_host.RootX11Window.Display);
 		}
 	}
 
