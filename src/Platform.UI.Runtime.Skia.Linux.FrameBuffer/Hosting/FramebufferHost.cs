@@ -21,6 +21,11 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 		[ThreadStatic]
 		private static bool _isDispatcherThread = false;
 
+		// Overrides the host builder's UseDRM when set: "0"/"false"/"off" forces
+		// the software /dev/fb0 renderer, "1"/"true"/"on" forces DRM, and unset
+		// (or any other value) leaves the host builder's choice in place.
+		private const string EnvironmentCodeBrixUseDrm = "CODEBRIX_FRAMEBUFFER_USE_DRM";
+
 		private readonly EventLoop _eventLoop;
 		private readonly CoreApplicationExtension? _coreApplicationExtension;
 
@@ -182,11 +187,17 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 
 			var drmInitOptions = new DRMRenderer.DRMInitOptions(_hostBuilder.DRMCardPath, _hostBuilder.DRMConnectorChooser, _hostBuilder.GBMSurfaceColorFormat);
 			var mouseIndicatorOptions = new FrameBufferRenderer.MouseIndicatorOptions(_hostBuilder.ShowMouseCursor, _hostBuilder.MouseCursorRadius, _hostBuilder.MouseCursorColor);
-			if (_hostBuilder.UseDRM ?? false)
+
+			// A launcher can pin the renderer via CODEBRIX_FRAMEBUFFER_USE_DRM,
+			// overriding the host builder's UseDRM. This is what lets an SSH
+			// remote run force software /dev/fb0 rendering, since DRM master is
+			// never available to a process that is not the active console.
+			var useDrm = ResolveUseDrm(_hostBuilder.UseDRM);
+			if (useDrm ?? false)
 			{
 				_renderer = new DRMRenderer(this, drmInitOptions, mouseIndicatorOptions);
 			}
-			else if (_hostBuilder.UseDRM is null)
+			else if (useDrm is null)
 			{
 				try
 				{
@@ -204,6 +215,33 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			}
 
 			WUX.Application.Start(CreateApp);
+		}
+
+		// Applies the CODEBRIX_FRAMEBUFFER_USE_DRM override to the host builder's
+		// UseDRM: an explicit env value wins, otherwise the builder's value stands.
+		private static bool? ResolveUseDrm(bool? fromBuilder)
+		{
+			var value = Environment.GetEnvironmentVariable(EnvironmentCodeBrixUseDrm);
+			if (string.IsNullOrEmpty(value))
+			{
+				return fromBuilder;
+			}
+
+			if (value == "0"
+				|| string.Equals(value, "false", StringComparison.OrdinalIgnoreCase)
+				|| string.Equals(value, "off", StringComparison.OrdinalIgnoreCase))
+			{
+				return false;
+			}
+
+			if (value == "1"
+				|| string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)
+				|| string.Equals(value, "on", StringComparison.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			return fromBuilder;
 		}
 
 		void IXamlRootHost.InvalidateRender() => _renderer?.InvalidateRender();
