@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Digests;
-using Org.BouncyCastle.Crypto.Engines;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Paddings;
-using Org.BouncyCastle.Crypto.Parameters;
+﻿using CodeBrix.Cryptography.Crypto;
+using CodeBrix.Cryptography.Crypto.Digests;
+using CodeBrix.Cryptography.Crypto.Engines;
+using CodeBrix.Cryptography.Crypto.Generators;
+using CodeBrix.Cryptography.Crypto.Paddings;
+using CodeBrix.Cryptography.Crypto.Parameters;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Data;
 using System.IO;

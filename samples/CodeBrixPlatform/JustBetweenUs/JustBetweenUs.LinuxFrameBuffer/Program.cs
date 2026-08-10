@@ -1,4 +1,5 @@
 using CodeBrix.Platform.UI.Hosting;
+using CodeBrix.Platform.UI.Runtime.Skia;
 using System;
 
 // ReSharper disable CheckNamespace
@@ -14,7 +15,15 @@ internal class Program
 
         var host = CodeBrixPlatformHostBuilder.Create()
             .App(() => new App())
-            .UseLinuxFrameBuffer()
+            .UseLinuxFrameBuffer(fb => fb
+                 .EnableSoftwareKeyboard(new SoftwareKeyboardOptions{
+                    ShowDismissKey = true,  //default behavior = true
+                    //ShowDismissKey = false,
+                    //KeyHeight = SoftwareKeyHeight.FullHeight,  //default behavior = FullHeight
+                    KeyHeight = SoftwareKeyHeight.HalfHeight,
+                })           
+            )
+            .UseDirectSkiaCanvasMode()
             .Build();
 
         host.Run();
