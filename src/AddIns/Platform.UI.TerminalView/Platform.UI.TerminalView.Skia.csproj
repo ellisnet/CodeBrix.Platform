@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.TerminalView</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.TerminalView</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.TerminalView.ApacheLicenseForever</PackageId>
+		<Description>A terminal emulator view for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. TerminalView is a XAML control that renders a CodeBrix.Terminal engine (VT100/VT220/xterm-compatible, the CodeBrix fork of XtermSharp) on a Skia surface: feed it bytes or text from any transport (an SSH ShellStream, a PTY, a local process) and it handles ANSI/SGR attributes and 256 colors, scrollback with a scrollbar and mouse wheel, keyboard input encoding (including application-cursor mode, Ctrl chords and Alt-as-meta), live resize with cols/rows reporting for PTY window-change requests, text selection with word/expression double-click, and clipboard copy and paste via context menu or Ctrl+Shift+C/V. Rendering uses the CodeBrix.Platform.TextLayout engine; the default font is the bundled Roboto Mono.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
+		     Platform.UI.TextLayout.Skia as CodeBrix.Platform.TextLayout.ApacheLicenseForever, both at
+		     the same family version as this build (the whole family ships together). TextLayout also
+		     carries the CodeBrix.Platform.Unicode/UnicodeMacOs (ICU) dependencies this control needs
+		     for shaping - they flow transitively; do not remove the TextLayout reference. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp is versionless: the family-wide lock in src/Directory.Build.targets pins it. -->
+		<PackageReference Include="SkiaSharp" />
+
+		<!-- The terminal engine. External to the CodeBrix.Platform family, so this reference is
+		     versioned here (not family-locked); bump deliberately. -->
+		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.223.1140" />
+
+		<!-- The default terminal font (ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf).
+		     Declared here so consumers get it without knowing to reference it themselves (the family's
+		     no-system-font-fallback rule means an undeclared font silently degrades to the app default,
+		     which is proportional). Overridable via TerminalControl.TerminalFontFamily. -->
+		<PackageReference Include="CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever" Version="1.0.216.1150" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

@@ -1,0 +1,50 @@
+<Solution>
+  <Folder Name="/Platform/" />
+  <Folder Name="/Platform/Core/">
+    <Project Path="../../../src/Platform.Foundation.Logging/Platform.Foundation.Logging.csproj" />
+    <Project Path="../../../src/Platform.Foundation/Platform.Foundation.Reference.csproj" />
+    <Project Path="../../../src/Platform.Foundation/Platform.Foundation.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.Composition/Platform.UI.Composition.Reference.csproj" />
+    <Project Path="../../../src/Platform.UI.Composition/Platform.UI.Composition.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.Dispatching/Platform.UI.Dispatching.Reference.csproj" />
+    <Project Path="../../../src/Platform.UI.Dispatching/Platform.UI.Dispatching.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <Project Path="../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+  </Folder>
+  <Folder Name="/Platform/UWP/">
+    <Project Path="../../../src/Platform.UWP/Platform.Reference.csproj" />
+    <Project Path="../../../src/Platform.UWP/Platform.Skia.csproj" />
+  </Folder>
+  <Folder Name="/Platform/UI/">
+    <Project Path="../../../src/Platform.UI/Platform.UI.Reference.csproj" />
+    <Project Path="../../../src/Platform.UI/Platform.UI.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Skia.csproj" />
+  </Folder>
+  <Folder Name="/Platform/Runtime/">
+    <Project Path="../../../src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/Platform/Source Generators/">
+    <Project Path="../../../src/SourceGenerators/System.Xaml/Platform.Xaml.csproj" />
+    <Project Path="../../../src/SourceGenerators/Platform.UI.SourceGenerators/Platform.UI.SourceGenerators.csproj" />
+    <Project Path="../../../src/SourceGenerators/Platform.UI.SourceGenerators.Internal/Platform.UI.SourceGenerators.Internal.csproj" />
+    <Project Path="../../../src/SourceGenerators/Platform.UI.Tasks/Platform.UI.Tasks.csproj" />
+    <Project Path="../../../src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj" />
+  </Folder>
+  <Folder Name="/Platform/AddIns/">
+    <Project Path="../../../src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
+    <Project Path="../../../src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Skia.csproj" />
+  </Folder>
+  <Folder Name="/Platform/Tools/">
+    <Project Path="../../../src/Platform.Analyzers/Platform.Analyzers.csproj" />
+  </Folder>
+  <Project Path="src/TerminalViewDemo.Core/TerminalViewDemo.Core.csproj" />
+  <Project Path="src/TerminalViewDemo.UI/TerminalViewDemo.UI.shproj" Id="05957ddc-1858-46b2-a5e4-2022e2189d2e" />
+  <Project Path="src/TerminalViewDemo.Win32Skia/TerminalViewDemo.Win32Skia.csproj" />
+  <Project Path="src/TerminalViewDemo.WinWpfSkia/TerminalViewDemo.WinWpfSkia.csproj" />
+</Solution>

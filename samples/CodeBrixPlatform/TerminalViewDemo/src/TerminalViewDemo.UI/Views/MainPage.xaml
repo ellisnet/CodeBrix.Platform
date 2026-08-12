@@ -1,0 +1,43 @@
+<Page
+    x:Class="TerminalViewDemo.Views.MainPage"
+    xmlns="clr-namespace:Microsoft.UI.Xaml.Controls;assembly=CodeBrix.Platform.UI"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:term="clr-namespace:CodeBrix.Platform.UI.TerminalView;assembly=CodeBrix.Platform.UI.TerminalView"
+    xmlns:local="using:TerminalViewDemo.Views"
+    FontFamily="{StaticResource RobotoFont}"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Padding="8,8,8,4">
+            <Button Content="Replay showcase" Click="Showcase_Click" />
+            <Button Content="Reset terminal" Click="Reset_Click" />
+            <TextBlock x:Name="HintText" VerticalAlignment="Center" FontSize="12"
+                       Text="Type into the terminal - the demo echoes locally. Select text, then right-click or Ctrl+Shift+C/V for copy and paste." />
+        </StackPanel>
+
+        <!-- The terminal. A bounded star cell is the recommended host: the grid
+             (columns x rows) follows the control size. -->
+        <term:TerminalControl
+            x:Name="Terminal"
+            Grid.Row="1"
+            Margin="8,0,8,0" />
+
+        <!-- Status bar: window title (OSC 0/2) on the left, grid dimensions on the right -->
+        <Grid Grid.Row="2" Padding="8,4,8,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" FontSize="12" TextTrimming="CharacterEllipsis"
+                       x:Name="TitleText" Text="TerminalView demo" />
+            <TextBlock Grid.Column="1" FontSize="12" x:Name="GridText" Text="" />
+        </Grid>
+    </Grid>
+</Page>

@@ -332,6 +332,52 @@ package is versioned to track the SkiaSharp release it vendors).
       NOT in scope for v1: vertical text, ruby, and IME / preedit (an input
       concern, not a layout one).
 
+  CodeBrix.Platform.TerminalView.ApacheLicenseForever     [optional]
+      A terminal emulator control (TerminalControl : Control) for every head,
+      rendering a CodeBrix.Terminal engine (the CodeBrix fork of XtermSharp -
+      VT100/VT220/xterm-compatible) on a Skia surface. Transport-agnostic:
+      feed bytes or text from any source (an SSH ShellStream read loop, a
+      PTY, a local process) and wire the emitted VT-encoded input back. Has
+      ANSI/SGR attributes and 256 colors, scrollback (scrollbar + wheel +
+      Shift+PageUp/PageDown; typing snaps to live output), text selection
+      with word/expression double-click, clipboard copy AND paste (context
+      menu, Ctrl+Shift+C/V; pasted line endings normalized to CR), live grid
+      resize with (cols, rows) reporting for PTY window-change requests, and
+      keyboard encoding via the engine's TerminalKeyEncoder (application-
+      cursor mode, Ctrl chords, Alt-as-meta, layout-composed printables).
+      Default font is the bundled Roboto Mono (a declared dependency);
+      depends on CodeBrix.Platform.TextLayout.ApacheLicenseForever and
+      CodeBrix.Terminal.MitLicenseForever (both flow in automatically).
+      Added 2026-08-11. Source: src/AddIns/Platform.UI.TerminalView.
+      CONSUMPTION PATTERN: declare the control in XAML, then bridge it to the
+      transport from code-behind:
+
+        xmlns:term="using:CodeBrix.Platform.UI.TerminalView"
+        <term:TerminalControl x:Name="Terminal" />
+
+        // code-behind - the whole transport contract is three wires:
+        Terminal.InputEmitted += text => transport.Send(text);
+        Terminal.GridResized  += (cols, rows) =>
+            shellStream.ChangeWindowSize((uint)cols, (uint)rows, 0, 0);
+        // transport read loop (any thread):
+        Terminal.Feed(buffer, bytesRead);
+        Terminal.GrabFocus();
+
+      Properties: TerminalFontFamily/TerminalFontSize, ForegroundColor/
+      BackgroundColor/SelectionColor (SKColors), ConvertEol (default false -
+      set true for hosts emitting bare LF), Scrollback (set before load),
+      Columns/Rows; TitleChanged reports OSC 0/2 titles; Reset() is a full
+      RIS reset between sessions.
+      SHARP EDGE: give the control a bounded size (a Grid star cell) - the
+      grid follows the control size, and an escape-driven resize request
+      from the application is deliberately ignored.
+      SHARP EDGE: mouse-reporting escape protocols (X10/SGR) are NOT
+      forwarded to the hosted application, and there is no IME path.
+      SHARP EDGE: the raw-key fallback is US-QWERTY; layout-composed
+      printables are preferred automatically where available.
+      Sample: samples/CodeBrixPlatform/TerminalViewDemo (six heads; ANSI/SGR
+      showcase plus a local echo loop - no shell or PTY required).
+
   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever     [optional]
       SkiaSharp XAML views (SKXamlCanvas, SKSwapChainPanel). Used internally by
       the Graphics2DSK / Lottie / Svg packages; reference it directly only if you
@@ -1495,6 +1541,7 @@ Extensions (in .Core):
     Graphics3DGL ->   CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
     Lottie       ->   CodeBrix.Platform.Lottie.ApacheLicenseForever (+ SkiaSharp.Skottie)
     Svg          ->   CodeBrix.Platform.Svg.ApacheLicenseForever (+ CodeBrix.SkiaSvg.MitLicenseForever)
+    TerminalView ->   CodeBrix.Platform.TerminalView.ApacheLicenseForever (+ TextLayout + CodeBrix.Terminal, automatic)
     Skia views   ->   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever
 
 Head packages (exactly one per head) and bootstrap call:

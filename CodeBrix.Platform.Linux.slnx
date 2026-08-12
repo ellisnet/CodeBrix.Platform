@@ -96,6 +96,7 @@
     <Project Path="src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.AudioPlayer.Skia/Platform.UI.AudioPlayer.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.FlexPanel/Platform.UI.FlexPanel.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.TerminalView/Platform.UI.TerminalView.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.MediaPlayer.Skia.Win32/Platform.UI.MediaPlayer.Skia.Win32.csproj" />
@@ -151,6 +152,7 @@
     <Project Path="src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.AdvancedTextEdit.Tests/Platform.UI.AdvancedTextEdit.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.FlexPanel.Tests/Platform.UI.FlexPanel.Skia.Unit.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.TerminalView.Tests/Platform.UI.TerminalView.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Unit.Tests.csproj" />
     <!-- CodeBrix.Platform fork: the upstream System.Xaml.Tests.MS (net461) and Uno.Xaml.Tests

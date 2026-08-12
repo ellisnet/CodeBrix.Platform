@@ -156,6 +156,17 @@
 		     by the family's single text engine via the TextLayout AddIn (which packs as a
 		     package dependency). -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Skia.csproj" />
+
+		<!-- The TerminalView AddIn (CodeBrix.Platform.TerminalView.ApacheLicenseForever) ships with
+		     every family release: a terminal emulator XAML control rendering a CodeBrix.Terminal
+		     engine (the CodeBrix fork of XtermSharp) on a Skia surface - transport-agnostic (feed
+		     bytes/text in, VT-encoded input out), with ANSI/256-color attributes, scrollback with
+		     scrollbar/wheel/keys, selection, clipboard copy/paste, grid resize reporting for PTY
+		     window-change requests, and keyboard encoding via the engine's TerminalKeyEncoder.
+		     Text is laid out by the family's single text engine via the TextLayout AddIn (which
+		     packs as a package dependency and carries the ICU Unicode packages); the engine and
+		     default Roboto Mono font come in as versioned package dependencies. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

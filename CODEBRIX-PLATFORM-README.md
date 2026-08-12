@@ -159,6 +159,14 @@ An optional extension package providing `FlexPanel` — a CSS flexbox-style layo
 
 ---
 
+**CodeBrix.Platform.TerminalView**
+NuGet Package ID: `CodeBrix.Platform.TerminalView.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing `TerminalControl` — a terminal emulator view for CodeBrix.Platform XAML on every platform head. It renders a `CodeBrix.Terminal` engine (the CodeBrix fork of XtermSharp: VT100/VT220/xterm-compatible escape sequence parsing, terminal buffer management, and 256-color ANSI/SGR attributes) as a fixed monospace cell grid on a Skia surface, laid out by the family's single text engine (the `CodeBrix.Platform.TextLayout.ApacheLicenseForever` package flows in automatically as a dependency, and `CodeBrix.Terminal.MitLicenseForever` comes in the same way). The control is transport-agnostic — feed it bytes or text from an SSH shell stream, a PTY, or a local process, and wire its VT-encoded keyboard input and grid-resize notifications back to the transport — and it provides scrollback with a scrollbar, mouse-wheel and keyboard paging, text selection with word/expression double-click, built-in clipboard copy and paste (context menu and Ctrl+Shift+C/V), window-title reporting, and a bundled Roboto Mono default font. Use it for SSH clients, embedded consoles, build-output panes, and anywhere an application hosts a live terminal. The control code is original to CodeBrix (first written for the author's Lily.Shell tool and relicensed by the author for this package); the terminal engine behind it is the author's CodeBrix.Terminal fork of the open source XtermSharp library.
+
+---
+
 **CodeBrix.Platform.Runtime.Skia**
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
