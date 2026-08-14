@@ -22,6 +22,8 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AdvancedTextEdit.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TerminalView")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TerminalView.Unit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Maps")]
 [assembly: InternalsVisibleTo("SamplesApp")]

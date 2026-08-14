@@ -20,7 +20,11 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Rendering.Internal;
 //WriteableBitmap shown via an ImageBrush background. It is deliberately internal - consumers who
 //want a general-purpose Skia canvas should use the CodeBrix.Platform.SkiaSharp.Views package -
 //and deliberately smaller: one paint callback, always in device-independent pixels (the canvas is
-//pre-scaled by the display's scale factor, so paint code never sees raw pixels).
+//pre-scaled by the display's scale factor, so paint code never sees raw pixels). Two identical
+//copies live in the TerminalView and PlotterView add-ins
+//(src/AddIns/Platform.UI.TerminalView/Internal/RenderCanvas.cs and
+//src/AddIns/Platform.UI.PlotterView/Internal/RenderCanvas.cs). Keep the three copies in sync
+//when fixing bugs in any of them.
 
 /// <summary>
 /// The editor's drawing surface: a XAML element whose content is painted with an

@@ -11,22 +11,23 @@ using SkiaSharp;
 using Windows.ApplicationModel;
 using Windows.Graphics.Display;
 
-namespace CodeBrix.Platform.UI.TerminalView.Internal;
+namespace CodeBrix.Platform.UI.PlotterView.Internal;
 
-//was previously: an intentionally identical copy of the AdvancedTextEdit add-in's internal
-//RenderCanvas (src/AddIns/Platform.UI.AdvancedTextEdit/Rendering/Internal/RenderCanvas.cs),
-//which re-creates the proven software present path of the family's SKXamlCanvas
+//was previously: an intentionally identical copy of the TerminalView add-in's internal
+//RenderCanvas (src/AddIns/Platform.UI.TerminalView/Internal/RenderCanvas.cs), itself a copy
+//of the AdvancedTextEdit add-in's original
+//(src/AddIns/Platform.UI.AdvancedTextEdit/Rendering/Internal/RenderCanvas.cs), which
+//re-creates the proven software present path of the family's SKXamlCanvas
 //(src/AddIns/CodeBrix.Platform.SkiaSharp.Views, SKXamlCanvas.Skia.cs): draw into a pinned
 //staging buffer through a cached SKSurface, copy into a WriteableBitmap shown via an
 //ImageBrush background. It is deliberately internal - consumers who want a general-purpose
 //Skia canvas should use the CodeBrix.Platform.SkiaSharp.Views package - and deliberately
 //smaller: one paint callback, always in device-independent pixels (the canvas is pre-scaled
-//by the display's scale factor, so paint code never sees raw pixels). A third identical copy
-//lives in the PlotterView add-in (src/AddIns/Platform.UI.PlotterView/Internal/RenderCanvas.cs).
-//Keep the three copies in sync when fixing bugs in any of them.
+//by the display's scale factor, so paint code never sees raw pixels). Keep the three copies
+//in sync when fixing bugs in any of them.
 
 /// <summary>
-/// The terminal's drawing surface: a XAML element whose content is painted with an
+/// The plot's drawing surface: a XAML element whose content is painted with an
 /// <see cref="SKCanvas"/> in device-independent pixels.
 /// </summary>
 internal sealed partial class RenderCanvas : Canvas

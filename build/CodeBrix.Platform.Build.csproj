@@ -167,6 +167,17 @@
 		     packs as a package dependency and carries the ICU Unicode packages); the engine and
 		     default Roboto Mono font come in as versioned package dependencies. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Skia.csproj" />
+
+		<!-- The PlotterView AddIn (CodeBrix.Platform.PlotterView.ApacheLicenseForever) ships with
+		     every family release: a chart XAML control hosting a CodeBrix.Plotter PlotModel (the
+		     CodeBrix port of OxyPlot) on a Skia surface, with the library's full interaction model
+		     wired in - pan/zoom/tracker/zoom-rectangle/reset from mouse, keyboard and touch
+		     (single-finger pan, two-finger pinch). All chart text resolves through the
+		     application's own fonts via the framework's FontDetailsCache (never system fonts);
+		     the plotting engine comes in as a versioned package dependency. Unlike the text
+		     add-ins there is no TextLayout dependency - the engine shapes its own text through
+		     SkiaSharp.HarfBuzz. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

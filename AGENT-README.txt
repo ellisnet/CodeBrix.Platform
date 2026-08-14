@@ -378,6 +378,55 @@ package is versioned to track the SkiaSharp release it vendors).
       Sample: samples/CodeBrixPlatform/TerminalViewDemo (six heads; ANSI/SGR
       showcase plus a local echo loop - no shell or PTY required).
 
+  CodeBrix.Platform.PlotterView.ApacheLicenseForever      [optional]
+      A chart view (PlotterControl : Control) for every head, hosting a
+      CodeBrix.Plotter PlotModel (the CodeBrix port of OxyPlot - 40+ series
+      types, linear/log/date-time/category/polar axes, annotations, legends)
+      on a Skia surface with the library's FULL interaction model wired in:
+      pan (right-drag, arrow keys), zoom (wheel, +/- keys, middle-drag zoom
+      rectangle), data-point tracker (left-click; Ctrl+left for free
+      tracking), reset (double-middle-click, A or Home), and touch
+      (single-finger pan, two-finger pinch zoom). Rebind or unbind any of it
+      through the Controller property (a CodeBrix.Plotter PlotController).
+      Depends on CodeBrix.Plotter.MitLicenseForever (flows in
+      automatically); deliberately NO TextLayout dependency - the plot
+      engine shapes its own text via SkiaSharp.HarfBuzz.
+      FONTS: every piece of chart text renders through the APPLICATION's
+      fonts, never the host system's. A model font family that is an
+      application font URI (ms-appx:///...) loads that font; any bare name -
+      including the model default "Segoe UI" - becomes the control's plot
+      font, which is the app's default font unless PlotFontFamily overrides
+      it. Weight-aware (bold titles resolve like XAML bold text); a font
+      still loading paints with the interim face and swaps on arrival, like
+      TextBlock.
+      Added 2026-08-13. Source: src/AddIns/Platform.UI.PlotterView.
+      CONSUMPTION PATTERN: build a PlotModel, assign it, invalidate on data
+      changes (from any thread):
+
+        xmlns:plot="using:CodeBrix.Platform.UI.PlotterView"
+        <plot:PlotterControl x:Name="Plotter" />
+
+        // code-behind (or bind Model - it is a dependency property):
+        var model = new PlotModel { Title = "Signal" };
+        model.Series.Add(lineSeries);
+        Plotter.Model = model;
+        // after mutating data on any thread:
+        model.InvalidatePlot(true);
+
+      Properties: Model (DP), Controller, PlotFontFamily,
+      TrackerBackground/TrackerForeground/TrackerFontSize,
+      ZoomRectangleFill/ZoomRectangleStroke (PlotterColors).
+      SHARP EDGE: a PlotModel attaches to ONE view at a time - assigning a
+      model already attached elsewhere throws. Detach by setting the other
+      control's Model to null first.
+      SHARP EDGE: mutate a model only while holding its SyncRoot, or from
+      one thread with InvalidatePlot afterwards - the control renders under
+      SyncRoot, which is what makes the mutate-then-invalidate pattern safe.
+      SHARP EDGE: give the control a bounded size (a Grid star cell); it
+      must be clicked (or given focus) before the keyboard bindings work.
+      Sample: samples/CodeBrixPlatform/PlotterViewDemo (six heads; a chart
+      gallery plus a live streaming plot - no hardware required).
+
   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever     [optional]
       SkiaSharp XAML views (SKXamlCanvas, SKSwapChainPanel). Used internally by
       the Graphics2DSK / Lottie / Svg packages; reference it directly only if you
@@ -1542,6 +1591,7 @@ Extensions (in .Core):
     Lottie       ->   CodeBrix.Platform.Lottie.ApacheLicenseForever (+ SkiaSharp.Skottie)
     Svg          ->   CodeBrix.Platform.Svg.ApacheLicenseForever (+ CodeBrix.SkiaSvg.MitLicenseForever)
     TerminalView ->   CodeBrix.Platform.TerminalView.ApacheLicenseForever (+ TextLayout + CodeBrix.Terminal, automatic)
+    PlotterView  ->   CodeBrix.Platform.PlotterView.ApacheLicenseForever (+ CodeBrix.Plotter, automatic)
     Skia views   ->   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever
 
 Head packages (exactly one per head) and bootstrap call:

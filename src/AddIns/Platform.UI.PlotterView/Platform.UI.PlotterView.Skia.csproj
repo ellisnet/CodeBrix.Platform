@@ -1,0 +1,57 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.PlotterView</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.PlotterView</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the TerminalView add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.PlotterView.ApacheLicenseForever</PackageId>
+		<Description>A chart-plotting view for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. PlotterControl is a XAML control that hosts a CodeBrix.Plotter PlotModel (the CodeBrix port of OxyPlot: forty-plus series types, linear/log/date-time/category/polar axes, annotations and legends) on a Skia surface, with the full CodeBrix.Plotter interaction model wired in: pan (right-drag or arrow keys), zoom (mouse wheel, +/- keys, or middle-drag zoom rectangle), a data-point tracker on left-click, reset on double-middle-click or the A/Home keys, and single-finger pan with two-finger pinch zoom on touch heads. All chart text renders through the application's own font (the CodeBrix.Platform default font, overridable per control) - never a system font. Set the Model property, call PlotModel.InvalidatePlot after changing data from any thread, and the control does the rest.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency at the
+		     same family version as this build (the whole family ships together). Unlike the
+		     TerminalView add-in there is no TextLayout reference: CodeBrix.Plotter shapes and
+		     measures its own text through SkiaSharp.HarfBuzz, which flows in transitively with the
+		     Plotter package below. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp is versionless: the family-wide lock in src/Directory.Build.targets pins it. -->
+		<PackageReference Include="SkiaSharp" />
+
+		<!-- The plotting engine (the CodeBrix port of OxyPlot). External to the CodeBrix.Platform
+		     family, so this reference is versioned here (not family-locked); bump deliberately.
+		     This version is the first that carries SkiaRenderContext.TypefaceResolver, which the
+		     control uses to route ALL chart text through the application's own fonts (the family's
+		     no-system-font-fallback rule) - do not downgrade past it. -->
+		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.226.286" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

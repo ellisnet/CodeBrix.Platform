@@ -167,6 +167,14 @@ An optional extension package providing `TerminalControl` — a terminal emulato
 
 ---
 
+**CodeBrix.Platform.PlotterView**
+NuGet Package ID: `CodeBrix.Platform.PlotterView.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing `PlotterControl` — a chart-plotting view for CodeBrix.Platform XAML on every platform head. It hosts a `CodeBrix.Plotter` `PlotModel` (the CodeBrix port of the open source OxyPlot library: forty-plus series types including line, scatter, area, bar, pie, heat-map, contour, histogram, candlestick and box-plot, with linear, logarithmic, date-time, category and polar axes, annotations, and legends; the `CodeBrix.Plotter.MitLicenseForever` package flows in automatically as a dependency) on a Skia surface, with the library's full interaction model wired in: pan with right-drag or the arrow keys, zoom with the mouse wheel, the +/- keys, or a middle-drag zoom rectangle, a data-point tracker on left-click, reset with a double middle-click or the A/Home keys, and on touch heads single-finger panning and two-finger pinch zoom — all rebindable through the control's `Controller` property. Every piece of chart text — titles, axis labels, legends, the tracker — renders through the application's own fonts (the app's default font, or another application font named per control or per model element), never a host system font, so a chart looks identical on a desktop and on a bare frame-buffer device. Set the `Model` property (it is a dependency property, so it binds), and after changing data from any thread call `PlotModel.InvalidatePlot` — the control marshals, updates, and repaints. Use it for dashboards, oscilloscope-style live streaming charts, data-analysis views, and anywhere an application draws a chart. The control code is original to CodeBrix; the plotting engine behind it is the author's CodeBrix.Plotter port of the open source OxyPlot library.
+
+---
+
 **CodeBrix.Platform.Runtime.Skia**
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
