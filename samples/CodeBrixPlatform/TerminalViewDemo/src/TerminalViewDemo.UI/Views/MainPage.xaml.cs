@@ -2,6 +2,7 @@ using System;
 using System.Text;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SkiaSharp;
 
 namespace TerminalViewDemo.Views;
 
@@ -22,6 +23,9 @@ public sealed partial class MainPage : Page
         Terminal.GridResized += (cols, rows) =>
             GridText.Text = $"{cols} x {rows}";
 
+        //Start on the control's default scheme (fires SchemeCombo_SelectionChanged)
+        SchemeCombo.SelectedIndex = 0;
+
         Loaded += (_, _) =>
         {
             PlayShowcase();
@@ -39,6 +43,30 @@ public sealed partial class MainPage : Page
     {
         Terminal.Reset();
         Prompt();
+        Terminal.GrabFocus();
+    }
+
+    private void SchemeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        //A color scheme on TerminalControl is just its three color properties; each
+        //setter repaints, so the whole grid (scrollback included) restyles instantly.
+        //Only default-attributed cells follow ForegroundColor/BackgroundColor - text
+        //that names an ANSI/256 palette color keeps its palette value on either ground.
+        if (SchemeCombo.SelectedIndex == 1)
+        {
+            //Light scheme: black-on-white, with a selection tint that reads on white
+            Terminal.BackgroundColor = new SKColor(0xff, 0xff, 0xff);
+            Terminal.ForegroundColor = new SKColor(0x00, 0x00, 0x00);
+            Terminal.SelectionColor = new SKColor(0x33, 0x66, 0xcc, 0x59);
+        }
+        else
+        {
+            //Default scheme: the control's own defaults (white on the engine's black)
+            Terminal.BackgroundColor = new SKColor(0x00, 0x00, 0x00);
+            Terminal.ForegroundColor = new SKColor(0xff, 0xff, 0xff);
+            Terminal.SelectionColor = new SKColor(0x4d, 0x8b, 0xd8, 0x66);
+        }
+
         Terminal.GrabFocus();
     }
 

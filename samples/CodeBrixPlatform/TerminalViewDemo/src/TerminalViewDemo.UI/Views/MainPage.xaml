@@ -16,6 +16,11 @@
 
         <!-- Toolbar -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Padding="8,8,8,4">
+            <ComboBox x:Name="SchemeCombo" VerticalAlignment="Center"
+                      SelectionChanged="SchemeCombo_SelectionChanged">
+                <ComboBoxItem Content="Default scheme" />
+                <ComboBoxItem Content="Light scheme" />
+            </ComboBox>
             <Button Content="Replay showcase" Click="Showcase_Click" />
             <Button Content="Reset terminal" Click="Reset_Click" />
             <TextBlock x:Name="HintText" VerticalAlignment="Center" FontSize="12"
