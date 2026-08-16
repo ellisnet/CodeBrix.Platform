@@ -17,7 +17,8 @@ internal class Program
         var host = CodeBrixPlatformHostBuilder.Create()
             .App(() => new App())
             .UseLinuxFrameBuffer(fb => fb
-                .Orientation(DisplayOrientations.Landscape, isPreferredOrientation: true)
+                //.Orientation(DisplayOrientations.Landscape, isPreferredOrientation: true)
+                .Orientation(DisplayOrientations.Portrait, isPreferredOrientation: true)
                 .AutoRotationEnabled(true)
                 .UseOrientationSensor()  //inert under CodeBrix.Develop launches (they pin
                                          //  CODEBRIX_FRAMEBUFFER_ORIENTATION_SOURCE=develop);
@@ -31,6 +32,9 @@ internal class Program
                     KeyHeight = SoftwareKeyHeight.PortraitFullLandscapeHalf,
                 })
                 .EnableSimpleTextClipboard()
+                .ScaleUserInterface(UserInterfaceScale.Percent100) //default = Percent100 - i.e. normal resolution
+                //.ScaleUserInterface(UserInterfaceScale.Percent150)
+                //.ScaleUserInterface(UserInterfaceScale.Percent200)
             )
             .UseDirectSkiaCanvasMode()
             .Build();

@@ -62,6 +62,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 		{
 			_appBuilder = appBuilder;
 			_hostBuilder = builder;
+			// The emulated screen is laid out exactly as the device's will be,
+			// so the application's ScaleUserInterface applies here unchanged.
+			DisplayScale = builder.DisplayScale;
 
 			_eventLoop = new EventLoop();
 			_coreApplicationExtension = new CoreApplicationExtension(_terminationGate);

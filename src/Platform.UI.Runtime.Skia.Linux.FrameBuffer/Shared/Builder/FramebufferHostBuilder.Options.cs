@@ -119,6 +119,26 @@ public partial class FramebufferHostBuilder
 		return this;
 	}
 
+	/// <summary>
+	/// Draws the application's user-interface elements larger than their nominal
+	/// size, for a panel whose pixel density would otherwise render everything
+	/// too small to use — a small tablet with a high-resolution screen. The
+	/// layout is measured and arranged in logical units (the panel's pixels
+	/// divided by the scale) while the drawing surface keeps all of the panel's
+	/// real pixels, so nothing is upscaled: text and vector content are
+	/// rasterized at the panel's full resolution. Without this call the
+	/// application draws at <see cref="UserInterfaceScale.Percent100"/>, one
+	/// logical unit to one panel pixel. Honored under the emulator too, which
+	/// lays the emulated screen out exactly as the device will.
+	/// </summary>
+	/// <param name="scale">How much larger to draw; see
+	/// <see cref="UserInterfaceScale"/> for choosing one for a given panel.</param>
+	public FramebufferHostBuilder ScaleUserInterface(UserInterfaceScale scale)
+	{
+		DisplayScale = (int)scale / 100f;
+		return this;
+	}
+
 	internal bool FileOpenPickerEnabled { get; private set; }
 
 	internal FilePickerOptions FileOpenPickerOptions { get; private set; } = new();
@@ -140,4 +160,9 @@ public partial class FramebufferHostBuilder
 	internal bool AllowMultipleInstances { get; private set; }
 
 	internal bool OrientationSensorEnabled { get; private set; }
+
+	// null until ScaleUserInterface is called, so the host's own DisplayScale
+	// (and the CODEBRIX_DISPLAY_SCALE_OVERRIDE environment variable behind it)
+	// keep working untouched for an application that never states a scale.
+	internal float? DisplayScale { get; private set; }
 }

@@ -53,6 +53,9 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 		{
 			_appBuilder = appBuilder;
 			_hostBuilder = builder;
+			// Null unless the application called ScaleUserInterface, so this
+			// leaves DisplayScale alone for everyone who did not.
+			DisplayScale = builder.DisplayScale;
 
 			_eventLoop = new EventLoop();
 			_coreApplicationExtension = new CoreApplicationExtension(_terminationGate);
