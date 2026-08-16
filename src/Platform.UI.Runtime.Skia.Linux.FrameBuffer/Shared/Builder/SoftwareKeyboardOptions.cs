@@ -41,10 +41,32 @@ public class SoftwareKeyboardOptions
 	public bool ShowDismissKey { get; set; } = true;
 
 	/// <summary>
-	/// The rendered height of the keys: <see cref="SoftwareKeyHeight.FullHeight"/>
-	/// (the default), or <see cref="SoftwareKeyHeight.HalfHeight"/> to render every
-	/// key at half its standard height — the spaces between keys keep their
-	/// standard size, so the strip shrinks to a little over half its full height.
+	/// Whether the keyboard shows a lock key — an open/closed padlock — as the
+	/// far-left key of the number row on every page and layout. Off by default.
+	/// The lock starts open (unlocked) and the keyboard behaves exactly as
+	/// without it. Tapping the lock while the keyboard is visible LOCKS it: the
+	/// keyboard then stays on screen at all times — the dismiss key, focus
+	/// leaving text entry and the application's own InputPane.TryHide() are all
+	/// refused — until the user taps the lock again (or the application exits).
+	/// On unlocking, the normal rules re-apply immediately: with no text-entry
+	/// control focused the keyboard hides right away, otherwise it stays for
+	/// the control being typed into and hides by the usual rules thereafter.
+	/// The one exception: a portrait &lt;-&gt; landscape orientation change
+	/// forcibly unlocks and hides the keyboard (and unfocuses the text control)
+	/// before rotating — a keyboard strip cannot survive the aspect swap — and
+	/// the user re-summons it by tapping back into a text control.
 	/// </summary>
-	public SoftwareKeyHeight KeyHeight { get; set; } = SoftwareKeyHeight.FullHeight;
+	public bool AllowLockOn { get; set; }
+
+	/// <summary>
+	/// The rendered height of the keys, PER ORIENTATION:
+	/// <see cref="SoftwareKeyHeight.PortraitFullLandscapeFull"/> (the default)
+	/// for standard keys everywhere, through
+	/// <see cref="SoftwareKeyHeight.PortraitFullLandscapeHalf"/> and its
+	/// siblings to mix standard and half-height keys by orientation — the
+	/// spaces between keys keep their standard size, so a "half" strip shrinks
+	/// to a little over half its full height. Rotating the device re-fits the
+	/// keyboard to the new orientation's setting.
+	/// </summary>
+	public SoftwareKeyHeight KeyHeight { get; set; } = SoftwareKeyHeight.PortraitFullLandscapeFull;
 }

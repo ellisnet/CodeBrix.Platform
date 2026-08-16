@@ -38,6 +38,10 @@
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="HarfBuzzSharp" />
     <PackageReference Include="SkiaSharp.HarfBuzz" />
+		<!-- Orientation instructions ride the D-Bus system bus: sensor rotations from
+		     iio-sensor-proxy (UseOrientationSensor) and CodeBrix.Develop's testing
+		     signal. Same version the X11 and Wayland heads reference. -->
+		<PackageReference Include="CodeBrix.Platform.LinuxDBus.MitLicenseForever" Version="1.0.165.1241" />
 	</ItemGroup>
 
 	<ItemGroup>

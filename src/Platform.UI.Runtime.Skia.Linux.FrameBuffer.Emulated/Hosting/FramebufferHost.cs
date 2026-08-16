@@ -149,10 +149,11 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			// surfaceless platform (llvmpipe software rendering on GPU-less systems).
 			ApiExtensibility.Register<Microsoft.UI.Xaml.XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), _ => new FrameBufferNativeOpenGLWrapper());
 
-			// The in-application pickers and the software keyboard exist ONLY when the
-			// host builder opted in, exactly as on the real FrameBuffer head; otherwise
-			// no registration happens and the pickers keep throwing
-			// NotSupportedException exactly as before.
+			// The in-application pickers, the software keyboard and the simple text
+			// clipboard exist ONLY when the host builder opted in, exactly as on the
+			// real FrameBuffer head; otherwise no registration happens and the
+			// pickers keep throwing NotSupportedException (and the clipboard stays
+			// unimplemented) exactly as before.
 			if (_hostBuilder.FileOpenPickerEnabled)
 			{
 				var fileOpenOptions = _hostBuilder.FileOpenPickerOptions;
@@ -180,6 +181,13 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 					this, keyboardSource, _hostBuilder.SoftwareKeyboardOptions);
 				ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IInputPaneExtension), o => keyboardController);
 				ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Xaml.Controls.Extensions.ITextBoxNotificationsProviderSingleton), o => keyboardController);
+				ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Xaml.Controls.Extensions.ITextInputFocusNotificationsSingleton), o => keyboardController);
+			}
+			if (_hostBuilder.SimpleTextClipboardEnabled)
+			{
+				ApiExtensibility.Register(
+					typeof(CodeBrix.Platform.ApplicationModel.DataTransfer.IClipboardExtension),
+					_ => CodeBrix.Platform.UI.Runtime.Skia.SimpleTextClipboardExtension.Instance);
 			}
 
 			void Dispatch(System.Action d, NativeDispatcherPriority p)

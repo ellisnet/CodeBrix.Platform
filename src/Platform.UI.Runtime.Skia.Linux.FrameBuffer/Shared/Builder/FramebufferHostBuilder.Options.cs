@@ -70,6 +70,55 @@ public partial class FramebufferHostBuilder
 		return this;
 	}
 
+	/// <summary>
+	/// Enables a simple Last-In-Only-Out, TEXT-ONLY clipboard that exists in the
+	/// application process alone: copy and paste work within the application, but
+	/// nothing reaches a system clipboard and nothing crosses applications.
+	/// Copying content without a text representation logs an error and keeps the
+	/// previous clipboard text. Without this call, the head has no clipboard at
+	/// all and clipboard use logs "Clipboard is not implemented on this platform."
+	/// </summary>
+	public FramebufferHostBuilder EnableSimpleTextClipboard()
+	{
+		SimpleTextClipboardEnabled = true;
+		return this;
+	}
+
+	/// <summary>
+	/// Follows the device's orientation SENSOR: on a device running
+	/// iio-sensor-proxy (Debian: <c>apt install iio-sensor-proxy</c>) with an
+	/// accelerometer the kernel supports, physically turning the device rotates
+	/// the application — gated, like every rotation source, by
+	/// <see cref="AutoRotationEnabled(bool)"/>. Without this call no sensor is
+	/// ever consulted. The launcher can override the source with the
+	/// CODEBRIX_FRAMEBUFFER_ORIENTATION_SOURCE environment variable:
+	/// "develop" (what CodeBrix.Develop sets) listens for orientation
+	/// instructions from the IDE INSTEAD of the sensor, "sensor" forces the
+	/// sensor, "none" disables both, unset honors this declaration. Under the
+	/// emulator this is a no-op — the Emulator View drives rotation itself.
+	/// </summary>
+	public FramebufferHostBuilder UseOrientationSensor()
+	{
+		OrientationSensorEnabled = true;
+		return this;
+	}
+
+	/// <summary>
+	/// Allows more than one instance of this application to run at the same time.
+	/// By DEFAULT a second instance of the same application refuses to start with
+	/// an informative error: both instances would share the one framebuffer (the
+	/// screen "flashes" as each blits its own frames) and each would receive every
+	/// touch event, which is virtually always an accident rather than an intent.
+	/// Call this only when concurrent instances are genuinely wanted. Under the
+	/// emulator this is a no-op — CodeBrix.Develop hosts a single emulated view,
+	/// so there is no second instance to guard against.
+	/// </summary>
+	public FramebufferHostBuilder AllowMultipleApplicationInstances()
+	{
+		AllowMultipleInstances = true;
+		return this;
+	}
+
 	internal bool FileOpenPickerEnabled { get; private set; }
 
 	internal FilePickerOptions FileOpenPickerOptions { get; private set; } = new();
@@ -85,4 +134,10 @@ public partial class FramebufferHostBuilder
 	internal bool SoftwareKeyboardEnabled { get; private set; }
 
 	internal SoftwareKeyboardOptions SoftwareKeyboardOptions { get; private set; } = new();
+
+	internal bool SimpleTextClipboardEnabled { get; private set; }
+
+	internal bool AllowMultipleInstances { get; private set; }
+
+	internal bool OrientationSensorEnabled { get; private set; }
 }

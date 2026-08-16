@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using System.Threading;
 using CodeBrix.Platform.Extensions.ApplicationModel.Core;
 using CodeBrix.Platform.Foundation.Extensibility;
@@ -34,6 +36,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 		private Thread? _consoleInterceptionThread;
 		private ManualResetEvent _terminationGate = new(false);
 		private readonly FramebufferHostBuilder _hostBuilder;
+		private FileStream? _instanceLock;
 
 		/// <summary>
 		/// Creates a host for a CodeBrix Skia FrameBuffer application.
@@ -63,9 +66,57 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 
 		protected override void Initialize()
 		{
+			AcquireSingleInstanceLock();
+
 			StartConsoleInterception();
 
 			_eventLoop.Schedule(InnerInitialize);
+		}
+
+		// Two instances of the same FrameBuffer application would share the one
+		// framebuffer — both blitting their frames, so the screen "flashes"
+		// between them — and each would receive every touch, because evdev fans
+		// events out to all readers. That is virtually always an accident, so a
+		// second instance refuses to start unless the application opted in with
+		// AllowMultipleApplicationInstances(). The guard is an advisory file
+		// lock keyed on the entry assembly name: the OS releases it however the
+		// process dies, so a crash can never leave a stale lock behind. A lock
+		// file that cannot be created at all (odd permissions, read-only /tmp)
+		// only logs a warning — an environmental quirk must not stop a
+		// legitimate application from starting.
+		private void AcquireSingleInstanceLock()
+		{
+			if (_hostBuilder.AllowMultipleInstances)
+			{
+				return;
+			}
+
+			var appName = Assembly.GetEntryAssembly()?.GetName().Name ?? "application";
+			foreach (var invalid in Path.GetInvalidFileNameChars())
+			{
+				appName = appName.Replace(invalid, '_');
+			}
+			var lockPath = Path.Combine(Path.GetTempPath(), $"codebrix-framebuffer-{appName}.lock");
+			try
+			{
+				_instanceLock = new FileStream(lockPath,
+					FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+			}
+			catch (IOException)
+			{
+				throw new InvalidOperationException(
+					$"Another instance of {appName} is already running on this device " +
+					$"(lock file: {lockPath}). A second instance would share the screen and the " +
+					"touch input with the first, so it refuses to start. Stop the running instance " +
+					"first — or opt in with AllowMultipleApplicationInstances() on the " +
+					"UseLinuxFrameBuffer host builder if concurrent instances are really wanted.");
+			}
+			catch (Exception e)
+			{
+				this.Log().LogWarning(
+					$"Could not create the single-instance lock file '{lockPath}' ({e.Message}); " +
+					"continuing without duplicate-instance protection.");
+			}
 		}
 
 		protected override Task RunLoop()
@@ -136,9 +187,11 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 			// rendering — requires Mesa's software GL to be installed on GPU-less systems).
 			ApiExtensibility.Register<Microsoft.UI.Xaml.XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), _ => new FrameBufferNativeOpenGLWrapper());
 
-			// The in-application pickers and the software keyboard exist ONLY when the
-			// host builder opted in; otherwise no registration happens and the pickers
-			// keep throwing NotSupportedException exactly as before.
+			// The in-application pickers, the software keyboard and the simple text
+			// clipboard exist ONLY when the host builder opted in; otherwise no
+			// registration happens and the pickers keep throwing
+			// NotSupportedException (and the clipboard stays unimplemented)
+			// exactly as before.
 			if (_hostBuilder.FileOpenPickerEnabled)
 			{
 				var fileOpenOptions = _hostBuilder.FileOpenPickerOptions;
@@ -166,6 +219,13 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 					this, keyboardSource, _hostBuilder.SoftwareKeyboardOptions);
 				ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IInputPaneExtension), o => keyboardController);
 				ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Xaml.Controls.Extensions.ITextBoxNotificationsProviderSingleton), o => keyboardController);
+				ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Xaml.Controls.Extensions.ITextInputFocusNotificationsSingleton), o => keyboardController);
+			}
+			if (_hostBuilder.SimpleTextClipboardEnabled)
+			{
+				ApiExtensibility.Register(
+					typeof(CodeBrix.Platform.ApplicationModel.DataTransfer.IClipboardExtension),
+					_ => CodeBrix.Platform.UI.Runtime.Skia.SimpleTextClipboardExtension.Instance);
 			}
 
 			void Dispatch(System.Action d, NativeDispatcherPriority p)
@@ -214,6 +274,18 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 				_renderer = new SoftwareRenderer(this, mouseIndicatorOptions);
 			}
 
+			// Runtime orientation instructions (the sensor via iio-sensor-proxy,
+			// or CodeBrix.Develop's testing signal — see DeviceOrientationSource)
+			// are applied on the event loop exactly as the Emulated head applies
+			// its transport-driven rotations.
+			DeviceOrientationSource.Start(_hostBuilder, orientation => _eventLoop.Schedule(() =>
+			{
+				if (FrameBufferWindowWrapper.Instance.SetDeviceOrientation(orientation))
+				{
+					_renderer?.InvalidateRender();
+				}
+			}));
+
 			WUX.Application.Start(CreateApp);
 		}
 
@@ -250,6 +322,8 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 
 		public void Dispose()
 		{
+			_instanceLock?.Dispose();
+			_instanceLock = null;
 		}
 	}
 }

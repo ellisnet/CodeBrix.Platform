@@ -1423,7 +1423,19 @@ namespace Microsoft.UI.Xaml.Controls
 		{
 			_ = Dispatcher.RunAsync(CoreDispatcherPriority.High, async () =>
 			{
+				// GetContent returns null when the platform has no clipboard
+				// implementation at all (an empty-but-real clipboard returns a
+				// view whose GetTextAsync throws InvalidOperationException,
+				// handled below) — a paste then simply has nothing to paste.
 				var content = Clipboard.GetContent();
+				if (content == null)
+				{
+					if (this.Log().IsEnabled(LogLevel.Warning))
+					{
+						this.Log().LogWarning("Nothing in the clipboard to paste.");
+					}
+					return;
+				}
 				string clipboardText;
 				try
 				{

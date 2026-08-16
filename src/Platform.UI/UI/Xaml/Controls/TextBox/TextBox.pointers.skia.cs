@@ -5,6 +5,7 @@ using Windows.System;
 using Microsoft.UI.Xaml.Input;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.UI.Helpers.WinUI;
+using CodeBrix.Platform.UI.Xaml.Controls.Extensions;
 
 #if HAS_CODEBRIX_WINUI
 using Microsoft.UI.Input;
@@ -336,6 +337,11 @@ public partial class TextBox
 			{
 				_contextMenu = new MenuFlyout();
 				_contextMenu.Opened += (_, _) => UpdateDisplaySelection();
+				// The menu borrowing focus is not the user leaving the control:
+				// the software keyboard must not hide on open / re-show on Paste.
+				_contextMenu.DoesNotAffectSoftwareKeyboard = true;
+				_contextMenuKeyboardGuard = new SoftwareKeyboardFlyoutGuard(this, _contextMenu,
+					() => _textBoxNotificationsSingleton?.OnUnfocused(this));
 
 				_flyoutItems.Add(ContextMenuItem.Cut, new MenuFlyoutItem { Text = ResourceAccessor.GetLocalizedStringResource("TEXT_CONTEXT_MENU_CUT"), Command = new StandardUICommand(StandardUICommandKind.Cut) { Command = new TextBoxCommand(CutSelectionToClipboard) } });
 				_flyoutItems.Add(ContextMenuItem.Copy, new MenuFlyoutItem { Text = ResourceAccessor.GetLocalizedStringResource("TEXT_CONTEXT_MENU_COPY"), Command = new StandardUICommand(StandardUICommandKind.Copy) { Command = new TextBoxCommand(CopySelectionToClipboard) } });

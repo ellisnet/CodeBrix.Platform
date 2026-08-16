@@ -18,6 +18,7 @@ using CodeBrix.Platform.UI.AdvancedTextEdit.Document;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Indentation;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Rendering;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Utils;
+using CodeBrix.Platform.UI.Xaml.Controls.Extensions;
 
 namespace CodeBrix.Platform.UI.AdvancedTextEdit.Editing;
 
@@ -868,6 +869,14 @@ public partial class TextArea : Control, ITextEditorComponent, IWeakEventListene
 	{
 		base.OnGotFocus(e);
 		caret.Show();
+		//An editable text area summons the software keyboard on heads that have
+		//one. A fully read-only editor (IsReadOnly sets the ReadOnlySectionDocument
+		//provider) is not text ENTRY and never summons it; a partially read-only
+		//document still does.
+		if (ReadOnlySectionProvider is not ReadOnlySectionDocument && IsEnabled)
+		{
+			SoftwareKeyboardFocus.NotifyFocused(this);
+		}
 	}
 
 	/// <inheritdoc/>
@@ -875,6 +884,7 @@ public partial class TextArea : Control, ITextEditorComponent, IWeakEventListene
 	{
 		base.OnLostFocus(e);
 		caret.Hide();
+		SoftwareKeyboardFocus.NotifyUnfocused(this);
 	}
 	#endregion
 

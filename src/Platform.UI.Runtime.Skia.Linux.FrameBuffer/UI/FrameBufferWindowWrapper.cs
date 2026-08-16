@@ -33,6 +33,17 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 	/// </summary>
 	internal event Action? DeviceOrientationChanged;
 
+	/// <summary>
+	/// Raised BEFORE a portrait &lt;-&gt; landscape turn the application honors is
+	/// applied, while the old bounds are still in place. The software keyboard
+	/// subscribes to get out of the way: a keyboard strip — locked or not —
+	/// cannot survive the aspect swap (its occlusion inset and popup metrics
+	/// would re-derive against a mid-change size and corrupt the screen), so it
+	/// unlocks, hides and releases the focused text control first. 180° turns
+	/// keep the panel's proportions and are not announced.
+	/// </summary>
+	internal event Action? AspectSwappingOrientationChange;
+
 	private FrameBufferWindowWrapper(DisplayOrientations orientation, bool isPreferredOrientation,
 		DisplayOrientations? autoRotationOrientations, bool autoRotationDisabled)
 	{
@@ -89,6 +100,10 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 		if (rotation == Orientation)
 		{
 			return false;
+		}
+		if (IsPortraitOrientation(CurrentOrientation) != IsPortraitOrientation(deviceOrientation))
+		{
+			AspectSwappingOrientationChange?.Invoke();
 		}
 		Orientation = rotation;
 		SetSize(_panelSize);
@@ -192,6 +207,9 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 		3 => DisplayOrientations.PortraitFlipped,
 		_ => DisplayOrientations.Landscape,
 	};
+
+	private static bool IsPortraitOrientation(DisplayOrientations orientation)
+		=> orientation is DisplayOrientations.Portrait or DisplayOrientations.PortraitFlipped;
 
 	internal void OnNativeVisibilityChanged(bool visible) => IsVisible = visible;
 

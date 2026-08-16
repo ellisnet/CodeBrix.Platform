@@ -71,6 +71,9 @@ public partial class TextBox
 
 	private MenuFlyout _contextMenu;
 	private readonly Dictionary<ContextMenuItem, MenuFlyoutItem> _flyoutItems = new();
+	// Keeps the software keyboard unmoved across the focus round-trip into the
+	// built-in context menu (which is marked DoesNotAffectSoftwareKeyboard).
+	private SoftwareKeyboardFlyoutGuard _contextMenuKeyboardGuard;
 
 	internal bool IsBackwardSelection => _selection.selectionEndsAtTheStart;
 
@@ -300,16 +303,24 @@ public partial class TextBox
 
 		if (_isSkiaTextBox)
 		{
+			// The guard suppresses the keyboard notifications (never the caret or
+			// selection handling) across the focus round-trip into the built-in
+			// context menu, so opening it and clicking Paste cannot hide and
+			// re-show the software keyboard. If the menu instead closes with
+			// focus elsewhere, the guard delivers the withheld unfocus itself.
 			if (focusState != FocusState.Unfocused)
 			{
 				CaretMode = CaretDisplayMode.ThumblessCaretShowing;
-				_textBoxNotificationsSingleton?.OnFocused(this);
+				if (_contextMenuKeyboardGuard?.ShouldSuppressFocus() != true)
+				{
+					_textBoxNotificationsSingleton?.OnFocused(this);
+				}
 			}
 			else
 			{
 				TrySetCurrentlyTyping(false);
 				CaretMode = CaretDisplayMode.ThumblessCaretHidden;
-				if (!initial)
+				if (!initial && _contextMenuKeyboardGuard?.ShouldSuppressUnfocus() != true)
 				{
 					_textBoxNotificationsSingleton?.OnUnfocused(this);
 				}

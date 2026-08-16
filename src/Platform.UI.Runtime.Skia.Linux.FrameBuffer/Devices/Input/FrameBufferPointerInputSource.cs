@@ -52,8 +52,28 @@ internal partial class FrameBufferPointerInputSource : ICodeBrixCorePointerInput
 		}
 	}
 
+	// A launcher can declare the device's touch digitizer as mounted rotated
+	// 180 degrees relative to the display (the WinBook TW700 ships this way)
+	// via CODEBRIX_FRAMEBUFFER_TOUCH_ROTATION=180: touch positions are then
+	// flipped to land where the finger actually is. Touch only — an attached
+	// mouse is not part of the rotated digitizer. 180 is the only supported
+	// rotation, since it is the only one that composes with every display
+	// orientation without an axis swap.
+	private const string EnvironmentCodeBrixTouchRotation = "CODEBRIX_FRAMEBUFFER_TOUCH_ROTATION";
+	private readonly bool _touchRotated180;
+
 	private FrameBufferPointerInputSource()
 	{
+		var rotation = Environment.GetEnvironmentVariable(EnvironmentCodeBrixTouchRotation);
+		if (rotation == "180")
+		{
+			_touchRotated180 = true;
+		}
+		else if (!string.IsNullOrEmpty(rotation) && rotation != "0")
+		{
+			this.Log().LogWarning(
+				$"Ignoring {EnvironmentCodeBrixTouchRotation}={rotation}: only 180 (or 0/unset) is supported.");
+		}
 	}
 
 	internal static FrameBufferPointerInputSource Instance { get; } = new FrameBufferPointerInputSource();

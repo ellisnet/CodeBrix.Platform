@@ -45,6 +45,26 @@ unsafe internal partial class FrameBufferPointerInputSource
 				|| rawEventType == LIBINPUT_EVENT_TOUCH_MOTION)
 			{
 				var (x, y) = GetOrientationAdjustedAbsolutionPosition(rawTouchEvent, libinput_event_touch_get_x_transformed, libinput_event_touch_get_y_transformed);
+				if (_touchRotated180)
+				{
+					// The digitizer is mounted upside-down relative to the panel:
+					// mirror both axes in the window's coordinate space. A 180
+					// flip commutes with every orientation mapping above, so it
+					// composes correctly however the app is rotated.
+					x = FrameBufferWindowWrapper.Instance.Bounds.Width - x;
+					y = FrameBufferWindowWrapper.Instance.Bounds.Height - y;
+				}
+				// libinput's transformed coordinates span the CLOSED range
+				// [0, dimension], and every "dimension - value" arm above (the
+				// flipped orientation mappings and the 180 digitizer flip) turns
+				// an exact-edge touch into exactly the dimension — ONE PAST the
+				// last pixel, where a press hits nothing and pulls focus off the
+				// control being typed into. Most reachable at the bottom edge of
+				// a half-height keyboard's space bar. A finger at the bezel
+				// belongs ON the edge pixel, so the final position is clamped
+				// just inside the bounds.
+				x = Math.Clamp(x, 0, Math.Max(0, FrameBufferWindowWrapper.Instance.Bounds.Width - 0.5));
+				y = Math.Clamp(y, 0, Math.Max(0, FrameBufferWindowWrapper.Instance.Bounds.Height - 0.5));
 				currentPosition = new Point(x, y);
 				_activePointers[pointerId] = currentPosition;
 			}

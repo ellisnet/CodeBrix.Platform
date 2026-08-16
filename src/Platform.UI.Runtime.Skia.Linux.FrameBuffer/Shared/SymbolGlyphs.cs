@@ -40,6 +40,12 @@ internal static class SymbolGlyphs
 	/// <summary>Rightwards arrow.</summary>
 	internal const string ArrowRight = "";
 
+	/// <summary>Closed padlock (the keyboard's lock key while locked).</summary>
+	internal const string LockLocked = "";
+
+	/// <summary>Open padlock (the keyboard's lock key while unlocked).</summary>
+	internal const string LockUnlocked = "";
+
 	/// <summary>
 	/// The Fluent symbols font these glyphs live in, read fresh each time so an
 	/// application that replaces
@@ -53,5 +59,6 @@ internal static class SymbolGlyphs
 	/// and therefore has to be painted in <see cref="SymbolFontFamily"/>.
 	/// </summary>
 	internal static bool IsSymbolGlyph(string legend) =>
-		legend is ArrowUp or ArrowDown or ArrowLeft or ArrowRight;
+		legend is ArrowUp or ArrowDown or ArrowLeft or ArrowRight
+			or LockLocked or LockUnlocked;
 }

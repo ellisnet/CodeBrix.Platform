@@ -79,6 +79,7 @@ internal sealed class SoftwareKeyboardView : Border
 		ArrowUp,
 		ArrowDown,
 		Dismiss,
+		Lock,
 	}
 
 	private enum ShiftState
@@ -109,6 +110,7 @@ internal sealed class SoftwareKeyboardView : Border
 	private int _activeLayoutIndex;
 	private Page _page = Page.Letters;
 	private ShiftState _shift = ShiftState.Off;
+	private bool _locked;
 	private DateTimeOffset _lastShiftTap = DateTimeOffset.MinValue;
 	private double _keyboardWidth;
 	private double _keyboardHeight;
@@ -164,18 +166,50 @@ internal sealed class SoftwareKeyboardView : Border
 	internal event Action? DismissRequested;
 
 	/// <summary>
+	/// Raised when the user taps the lock key (shown only when the host set
+	/// <see cref="SoftwareKeyboardOptions.AllowLockOn"/>). The lock POLICY —
+	/// what a locked keyboard refuses to do — lives in the controller; the view
+	/// only reports the tap and renders the state it is told via
+	/// <see cref="SetLocked"/>.
+	/// </summary>
+	internal event Action? LockToggleRequested;
+
+	/// <summary>Renders the lock key open or closed for the controller's state.</summary>
+	internal void SetLocked(bool locked)
+	{
+		if (_locked == locked)
+		{
+			return;
+		}
+		_locked = locked;
+		Rebuild();
+	}
+
+	/// <summary>
 	/// The keyboard strip height for a given logical root size: a per-orientation
 	/// fraction bounded so keys stay comfortably tappable on the smallest panel
-	/// and the strip never dominates the largest. Under
-	/// <see cref="SoftwareKeyHeight.HalfHeight"/> the key faces halve while the
-	/// spacing chrome (key gaps and strip padding) keeps its full-height size.
+	/// and the strip never dominates the largest. When the options ask for
+	/// half-height keys IN THE CURRENT ORIENTATION (each
+	/// <see cref="SoftwareKeyHeight"/> member decides portrait and landscape
+	/// independently) the key faces halve while the spacing chrome (key gaps
+	/// and strip padding) keeps its full-height size. The orientation is the
+	/// root size's own aspect, so a device rotation — which re-applies the
+	/// metrics — re-resolves the choice with no extra wiring.
 	/// </summary>
 	internal double ComputeHeight(Size rootSize)
 	{
-		var fullHeight = rootSize.Height > rootSize.Width
+		var portrait = rootSize.Height > rootSize.Width;
+		var fullHeight = portrait
 			? Math.Clamp(rootSize.Height * 0.40, 200, 400)
 			: Math.Clamp(rootSize.Height * 0.42, 190, 340);
-		if (_options.KeyHeight != SoftwareKeyHeight.HalfHeight)
+		var halfInThisOrientation = _options.KeyHeight switch
+		{
+			SoftwareKeyHeight.PortraitHalfLandscapeHalf => true,
+			SoftwareKeyHeight.PortraitFullLandscapeHalf => !portrait,
+			SoftwareKeyHeight.PortraitHalfLandscapeFull => portrait,
+			_ => false,
+		};
+		if (!halfInThisOrientation)
 		{
 			return fullHeight;
 		}
@@ -246,7 +280,7 @@ internal sealed class SoftwareKeyboardView : Border
 		var shifted = _shift != ShiftState.Off;
 		var rows = new List<List<KeyDef>>
 		{
-			WithDismissKey(
+			WithEdgeKeys(
 				DigitsRow.Select(digit => new KeyDef(KeyKind.Character, 1f, digit.ToString(), digit)).ToList()),
 		};
 
@@ -284,7 +318,7 @@ internal sealed class SoftwareKeyboardView : Border
 				.Select(symbol => new KeyDef(KeyKind.Character, 1f, symbol.ToString(), symbol))
 				.ToList())
 			.ToList();
-		rows[0] = WithDismissKey(rows[0]);
+		rows[0] = WithEdgeKeys(rows[0]);
 
 		// The third symbols row is flanked by the page toggle and backspace.
 		rows[2].Insert(0, new KeyDef(secondPage ? KeyKind.SymbolsPage : KeyKind.SymbolsPage2, 1.5f,
@@ -295,10 +329,17 @@ internal sealed class SoftwareKeyboardView : Border
 		return rows;
 	}
 
-	// The dismiss key is always the top-right key, on every page of every layout,
-	// at the same width as the rest of its row - unless the host opted out.
-	private List<KeyDef> WithDismissKey(List<KeyDef> topRow)
+	// The edge keys frame the top row on every page of every layout, each at the
+	// same width as the rest of its row: the lock key at the far LEFT (only when
+	// the host allowed lock-on) and the dismiss key at the far RIGHT (unless the
+	// host opted out).
+	private List<KeyDef> WithEdgeKeys(List<KeyDef> topRow)
 	{
+		if (_options.AllowLockOn)
+		{
+			topRow.Insert(0, new KeyDef(KeyKind.Lock, 1f,
+				_locked ? SymbolGlyphs.LockLocked : SymbolGlyphs.LockUnlocked));
+		}
 		if (_options.ShowDismissKey)
 		{
 			topRow.Add(new KeyDef(KeyKind.Dismiss, 1f));
@@ -349,6 +390,15 @@ internal sealed class SoftwareKeyboardView : Border
 			FontSize = key.Kind == KeyKind.Character ? 18 : 13,
 			HorizontalAlignment = HorizontalAlignment.Center,
 			VerticalAlignment = VerticalAlignment.Center,
+			// The legend is decoration, never a target: a hit-testable legend
+			// becomes the press's original source, and the input pipeline then
+			// treats the tap differently from one on the key face — on the
+			// space key, whose language label is large enough to actually hit,
+			// tapping the TEXT unfocused the control being typed into (and so
+			// dismissed the keyboard) while tapping beside it typed a space.
+			// Every tap must land on the key's Border, which owns the
+			// capture-and-commit handling.
+			IsHitTestVisible = false,
 		};
 		if (SymbolGlyphs.IsSymbolGlyph(legend))
 		{
@@ -424,6 +474,8 @@ internal sealed class SoftwareKeyboardView : Border
 				Fill = _keyForegroundBrush,
 				HorizontalAlignment = HorizontalAlignment.Center,
 				VerticalAlignment = VerticalAlignment.Center,
+				// Decoration, never a target — see CreateLegend.
+				IsHitTestVisible = false,
 			}
 			: CreateLegend(key, legend);
 
@@ -581,6 +633,9 @@ internal sealed class SoftwareKeyboardView : Border
 				break;
 			case KeyKind.Dismiss:
 				DismissRequested?.Invoke();
+				break;
+			case KeyKind.Lock:
+				LockToggleRequested?.Invoke();
 				break;
 		}
 	}

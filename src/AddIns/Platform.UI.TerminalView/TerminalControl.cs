@@ -7,6 +7,7 @@ using CodeBrix.Platform.UI.TerminalView.Input;
 using CodeBrix.Platform.UI.TerminalView.Internal;
 using CodeBrix.Platform.UI.TerminalView.Rendering;
 using CodeBrix.Platform.UI.TextLayout;
+using CodeBrix.Platform.UI.Xaml.Controls.Extensions;
 using CodeBrix.Terminal.Engine;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -72,6 +73,7 @@ public sealed partial class TerminalControl : Control
     private readonly ScrollBar _verticalScrollBar;
     private readonly MenuFlyout _contextMenu;
     private readonly MenuFlyoutItem _copyMenuItem;
+    private readonly SoftwareKeyboardFlyoutGuard _keyboardGuard;
     private readonly DispatcherTimer _blinkTimer;
     private readonly DispatcherTimer _dragScrollTimer;
 
@@ -148,6 +150,14 @@ public sealed partial class TerminalControl : Control
         _contextMenu = new MenuFlyout();
         _contextMenu.Items.Add(_copyMenuItem);
         _contextMenu.Items.Add(pasteMenuItem);
+        //The Copy/Paste menu borrowing focus is not the user leaving the
+        //terminal: the software keyboard must not hide on open / re-show on
+        //Paste. The guard suppresses the keyboard notifications across that
+        //round-trip and delivers the withheld unfocus itself if the menu
+        //closes with focus somewhere else.
+        _contextMenu.DoesNotAffectSoftwareKeyboard = true;
+        _keyboardGuard = new SoftwareKeyboardFlyoutGuard(this, _contextMenu,
+            () => SoftwareKeyboardFocus.NotifyUnfocused(this));
 
         Template = new ControlTemplate(CreateTemplateRoot);
 
@@ -626,6 +636,14 @@ public sealed partial class TerminalControl : Control
         _focused = true;
         _blinkOn = true;
         _canvas.Invalidate();
+        //A focused terminal is typed into, so it summons the software keyboard
+        //on heads that have one. Consume the guard's hold even when disabled,
+        //so a suppressed round-trip can never leave it armed.
+        var returningFromContextMenu = _keyboardGuard.ShouldSuppressFocus();
+        if (!returningFromContextMenu && IsEnabled)
+        {
+            SoftwareKeyboardFocus.NotifyFocused(this);
+        }
     }
 
     /// <inheritdoc/>
@@ -634,6 +652,10 @@ public sealed partial class TerminalControl : Control
         base.OnLostFocus(e);
         _focused = false;
         _canvas.Invalidate();
+        if (!_keyboardGuard.ShouldSuppressUnfocus())
+        {
+            SoftwareKeyboardFocus.NotifyUnfocused(this);
+        }
     }
 
     /// <inheritdoc/>

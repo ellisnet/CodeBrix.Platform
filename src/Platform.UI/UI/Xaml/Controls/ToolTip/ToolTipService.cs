@@ -236,6 +236,16 @@ public partial class ToolTipService
 
 	private static void OnGotFocus(object sender, RoutedEventArgs e)
 	{
+		// Only KEYBOARD focus (tabbing to the element) opens a tooltip.
+		// Pointer-driven and programmatic focus must not: a context menu takes
+		// the focus programmatically as it opens, and without this gate that
+		// alone would pop a tooltip over a touch-opened menu the user cannot
+		// hover.
+		if (sender is Control { FocusState: not FocusState.Keyboard })
+		{
+			return;
+		}
+
 		if (sender is FrameworkElement owner && GetActualToolTipObject(owner) is { } toolTip)
 		{
 			if (toolTip.IsOpen) return;
@@ -247,6 +257,16 @@ public partial class ToolTipService
 
 	private static void OnPointerEntered(object sender, PointerRoutedEventArgs e)
 	{
+		// Hover does not exist for a finger: a touch "enter" is the finger
+		// landing on the element (a tap, or a press-and-hold already in
+		// progress), and a tooltip opening under it — over a touch-opened
+		// context menu, say — explains options the user has no way to hover.
+		// Touch never opens tooltips.
+		if (e.Pointer.PointerDeviceType == global::Microsoft.UI.Input.PointerDeviceType.Touch)
+		{
+			return;
+		}
+
 		// Multiple elements can all receive the same PointerEntered at once (from inner-most to outer-most).
 		// In this case, the inner-most one is the only one that should be shown,
 		// so we are dropping any subsequent events from this frame-id.
