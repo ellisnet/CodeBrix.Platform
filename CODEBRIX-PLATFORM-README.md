@@ -175,6 +175,14 @@ An optional extension package providing `PlotterControl` — a chart-plotting vi
 
 ---
 
+**CodeBrix.Platform.AppSettings**
+NuGet Package ID: `CodeBrix.Platform.AppSettings.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional extension package providing a persistent application-settings system — the one extension package in the family that is not a UI control, and deliberately so: it ships no settings screen, leaving an application free to build its own or to have none at all and simply save in the background. Everything an application wants to remember between runs is stored as JSON in a single portable `settings.sqlite` database (the `CodeBrix.Sqlite.ApacheLicenseForever` package flows in automatically as a dependency), reached through the static `AppSettingsService` facade over an `AppSettingsStore`: `Get`, `Set`, `HasValue`, change notification both per key and across the store, and typed `AppSettingProperty<T>` handles that read and write one setting as an ordinary property and can migrate a value from a previous key name. Initialization asks for nothing but the application name — `AppSettingsService.Initialize("MyApp")` — and the database is placed in the right per-user configuration location for the platform, grouped under a `CodeBrix` folder; an explicit folder can be supplied instead. The store manages its own file lifecycle so an application does not have to: a timestamped automatic backup with retention pruning on every start, quarantine of a corrupt database and restore from the newest good backup, silent creation on first run, export to a self-contained single file, and import of a settings file that is validated when selected and adopted on the next start. Values are text — a `byte[]` does round-trip, since it serializes to a base64 string, but binary belongs elsewhere. Use it for window geometry, recently-used lists, chosen folders, tool and view state, feature toggles, and anything else an application should still know next time it starts. The code for this package is original to CodeBrix, and descends from the settings store written for the CodeBrix sample applications; its typed-property and service shape was adapted from the open source MonoDevelop IDE.
+
+---
+
 **CodeBrix.Platform.Runtime.Skia**
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

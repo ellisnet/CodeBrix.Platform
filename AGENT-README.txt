@@ -203,6 +203,54 @@ package is versioned to track the SkiaSharp release it vendors).
       not available in this version.
       Sample: samples/CodeBrixPlatform/AdvancedTextEditDemo (six heads).
 
+  CodeBrix.Platform.AppSettings.ApacheLicenseForever      [optional]
+      An application settings system - the ONLY AddIn that is not a UI
+      control. It stores every configurable value as JSON in one portable
+      settings.sqlite, and provides NO settings screen: the application
+      builds its own, or has none and just saves in the background.
+      Reached through the static AppSettingsService facade over an
+      AppSettingsStore: Get/Set/HasValue, per-key and global change
+      notification, and typed AppSettingProperty<T> handles (with old-key
+      migration). The store owns its file lifecycle - a timestamped
+      auto-backup plus retention pruning on every start, quarantine of a
+      corrupt database and restore from the newest good backup, silent
+      first-run creation, ExportToFile, and StageIncomingFile (validated,
+      adopted on the NEXT start). Depends on
+      CodeBrix.Sqlite.ApacheLicenseForever and
+      Microsoft.Extensions.Logging.Abstractions (both flow in automatically).
+      Added 2026-08-16. Source: src/AddIns/Platform.AppSettings.
+      CONSUMPTION PATTERN: initialize once at startup with nothing but the
+      application name, then read and write anywhere:
+
+        using CodeBrix.Platform.AppSettings;
+
+        // once, before any UI renders (App constructor or Program.Main):
+        AppSettingsService.Initialize("MyApp");
+        // -> {per-user config}/CodeBrix/MyApp/settings/settings.sqlite
+
+        AppSettingsService.Set("MyApp.Window.Width", 1280);
+        var width = AppSettingsService.Get("MyApp.Window.Width", 1024);
+        if (AppSettingsService.HasValue("MyApp.AssetsFolder")) { ... }
+
+      Initialize(appName, directoryPath) places the store somewhere else;
+      Shutdown() closes it and permits a later Initialize (test hosts).
+      STORES TEXT ONLY: values are JSON. A byte[] does round-trip, because
+      System.Text.Json renders one as a base64 string, but it is stored as
+      text and pays the base64 cost - encode deliberately, and keep large
+      binary out of settings.
+      SHARP EDGE: a second Initialize throws; call Shutdown first.
+      SHARP EDGE: AutoBackupRetention is clamped to 0..10 and takes effect
+      on the NEXT start - the backup/prune pass runs during construction,
+      so lowering it does not delete existing backups on the spot.
+      SHARP EDGE: AppSettingLoggingService writes to the console by DEFAULT
+      (set ConsoleOutput = false to stop it) as well as forwarding to the
+      framework's ambient logger. It logs under the category
+      "CodeBrix.Platform.AppSettings", so the usual
+      AddFilter("CodeBrix.Platform", Warning) line hides its informational
+      lines unless a more specific filter is added.
+      SHARP EDGE: ExportToFile REFUSES a destination inside the settings
+      folder, which holds only the live store and its own backups.
+
   CodeBrix.Platform.FlexPanel.ApacheLicenseForever        [optional]
       A CSS flexbox-style XAML layout panel (FlexPanel : Panel). Children are
       arranged in optionally wrapping rows or columns: Direction (Row default,
@@ -1586,6 +1634,7 @@ Host builder:     CodeBrixPlatformHostBuilder.Create() (namespace CodeBrix.Platf
 Core framework pkg:   CodeBrix.Platform.ApacheLicenseForever            (in .Core)
 Extensions (in .Core):
     AdvancedTextEdit -> CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever (+ TextLayout, automatic)
+    AppSettings  ->   CodeBrix.Platform.AppSettings.ApacheLicenseForever (+ CodeBrix.Sqlite, automatic)
     Graphics2DSK ->   CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
     Graphics3DGL ->   CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever
     Lottie       ->   CodeBrix.Platform.Lottie.ApacheLicenseForever (+ SkiaSharp.Skottie)

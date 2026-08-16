@@ -436,6 +436,33 @@ The components in this part are present as source code in this repository
     obligation attaches; it is recorded to document design provenance
     completely.
 
+--------------------------------------------------------------------------------
+ MIT License  (full text in Part D) — continued
+--------------------------------------------------------------------------------
+
+23. MonoDevelop — property service and configuration property
+    Project URL:  https://github.com/mono/monodevelop
+    Copyright:    Copyright (C) 2007 Novell, Inc (http://www.novell.com)
+                  Copyright (c) 2018 Microsoft Inc.
+                  (authored by Lluis Sanchez Gual)
+    License:      MIT License
+
+    Two files of the AppSettings add-in are derived from MonoDevelop.Core:
+    src/AddIns/Platform.AppSettings/AppSettingsService.cs (from
+    PropertyService.cs) and src/AddIns/Platform.AppSettings/
+    AppSettingProperty.cs (from ConfigurationProperty.cs). Both carry the
+    upstream copyright and the MIT grant in their file headers, and both
+    namespace lines carry a "//was previously:" provenance comment.
+
+    The derivation is not verbatim. AppSettingProperty keeps the upstream
+    shape — an abstract typed handle, a backing implementation, and a static
+    factory with old-key migration — modernized for .NET 10 and renamed away
+    from "ConfigurationProperty" to avoid colliding with
+    System.Configuration.ConfigurationProperty. AppSettingsService keeps only
+    the facade's shape; its implementation is original, storing values in a
+    SQLite database rather than MonoDevelop's MonoDevelopProperties.xml file.
+    The remaining files of the add-in are original to CodeBrix.
+
 ================================================================================
  PART C — BUNDLED ASSET FILES
 ================================================================================

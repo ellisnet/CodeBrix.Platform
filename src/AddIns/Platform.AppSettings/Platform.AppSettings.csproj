@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.AppSettings</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.AppSettings</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the AudioPlayer add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.AppSettings.ApacheLicenseForever</PackageId>
+		<Description>A persistent application-settings system for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. Unlike the other add-ins this one has no UI - it is the storage layer an application's own settings screen (or an application with no settings screen at all) writes through. Every configurable value lives as JSON in a single portable settings.sqlite database under the user's per-user configuration folder, reached through the static AppSettingsService facade: Get, Set, HasValue, per-key and global change notification, and typed AppSettingProperty handles with old-key migration. The store manages its own file lifecycle - a timestamped automatic backup with retention pruning on every start, quarantine of a corrupt database and restore from the newest good backup, silent first-run creation, plus export to a self-contained file and validated import staged for adoption on the next start. Initialize with nothing but the application name and the location is chosen for you.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- The SQLite engine behind settings.sqlite. External to the CodeBrix.Platform family, so
+		     this reference is versioned here (not family-locked); bump deliberately. -->
+		<PackageReference Include="CodeBrix.Sqlite.ApacheLicenseForever" Version="1.0.213.50" />
+
+		<!-- ILogger/ILoggerFactory, which AppSettingLoggingService forwards through. Referenced
+		     PUBLICLY on purpose: the Extensions.Logging project reference below is PrivateAssets="all"
+		     (its assembly ships inside the main framework package), so nothing would carry
+		     Microsoft.Extensions.Logging.Abstractions to a consumer otherwise - and the very first
+		     line this add-in logs would fail to JIT with a FileNotFoundException. Version matches the
+		     10.0.10 the family pins for the other Microsoft.Extensions.Logging.* packages. -->
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
+		     same family version as this build (the whole family ships together). This add-in draws
+		     nothing and references no XAML type - the dependency exists so the consumer has the
+		     assembly that carries LogExtensionPoint, which AppSettingLoggingService forwards to.
+		     Every consumer is a CodeBrix.Platform application and already has that package.
+		     Extensions.Logging is PrivateAssets="all" because it has no standalone nuget - its
+		     assembly ships inside the main framework package. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

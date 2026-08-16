@@ -178,6 +178,17 @@
 		     add-ins there is no TextLayout dependency - the engine shapes its own text through
 		     SkiaSharp.HarfBuzz. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Skia.csproj" />
+
+		<!-- The AppSettings AddIn (CodeBrix.Platform.AppSettings.ApacheLicenseForever) ships with
+		     every family release, and is the first AddIn that is not a UI control: an application
+		     settings system storing JSON values in a single portable settings.sqlite, with a
+		     startup auto-backup and retention pruning, quarantine-and-restore of a corrupt file,
+		     and validated export/import. The SQLite engine comes in as a versioned package
+		     dependency. It references the framework only so a consumer has the assembly carrying
+		     LogExtensionPoint (every consumer is a CodeBrix.Platform application already), plus
+		     Microsoft.Extensions.Logging.Abstractions, which must flow PUBLICLY - the private
+		     Extensions.Logging project reference does not carry it to consumers. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.AppSettings\Platform.AppSettings.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

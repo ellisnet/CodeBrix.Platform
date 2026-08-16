@@ -37,13 +37,16 @@ A CodeBrix.Platform solution has three kinds of projects:
 | --- | --- |
 | `CodeBrix.Platform.ApacheLicenseForever` | The core UI framework (required) |
 | `CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever` | Full code/text editor control (`AdvancedTextEdit` element: syntax highlighting, folding, completion, search, snippets, line numbers) |
+| `CodeBrix.Platform.AppSettings.ApacheLicenseForever` | Application settings persisted as JSON in a portable `settings.sqlite` (`AppSettingsService` / `AppSettingProperty`), with automatic backups, corrupt-file recovery, and export/import — storage only, no settings UI |
 | `CodeBrix.Platform.AudioPlayer.ApacheLicenseForever` | Audio playback (`AudioPlayer` element + `SoundEffect`) and MIDI music through a SoundFont or SFZ instrument (`MidiPlayer` element), fully managed on all heads |
 | `CodeBrix.Platform.FlexPanel.ApacheLicenseForever` | CSS flexbox-style layout panel (`FlexPanel` element with `Grow` / `Shrink` / `Basis` / `Order` / `AlignSelf` attached properties) |
 | `CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever` | 2D SkiaSharp drawing |
 | `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever` | 3D OpenGL drawing (`GLCanvasElement`) |
 | `CodeBrix.Platform.Lottie.ApacheLicenseForever` | Lottie / Skottie animations |
+| `CodeBrix.Platform.PlotterView.ApacheLicenseForever` | Chart plotting view (`PlotterControl` element hosting a CodeBrix.Plotter `PlotModel`: 40+ series types, linear / logarithmic / date-time / category / polar axes, annotations, legends) with pan, zoom, data-point tracker and reset from mouse, keyboard and touch |
 | `CodeBrix.Platform.Svg.ApacheLicenseForever` | SVG (`SvgImageSource`) support |
 | `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` | SkiaSharp XAML views |
+| `CodeBrix.Platform.TerminalView.ApacheLicenseForever` | Terminal emulator view (`TerminalControl` element rendering a CodeBrix.Terminal engine: VT100 / VT220 / xterm escape sequences, 256-color ANSI attributes, scrollback, selection, clipboard copy and paste) — transport-agnostic, for SSH clients, embedded consoles and build-output panes |
 | `CodeBrix.Platform.TextLayout.ApacheLicenseForever` | Shaped, bidirectional text layout without XAML — measurement, caret and hit-test geometry, selection rectangles, glyph outlines, drawing to any `SKCanvas` |
 | `CodeBrix.Platform.WebView.ApacheLicenseForever` | WebView on every head (adds Linux support via the system WPE WebKit engine) |
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
