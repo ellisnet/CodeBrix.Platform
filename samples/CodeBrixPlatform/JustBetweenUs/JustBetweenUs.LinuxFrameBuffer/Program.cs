@@ -32,9 +32,9 @@ internal class Program
                     KeyHeight = SoftwareKeyHeight.PortraitFullLandscapeHalf,
                 })
                 .EnableSimpleTextClipboard()
-                .ScaleUserInterface(UserInterfaceScale.Percent100) //default = Percent100 - i.e. normal resolution
-                //.ScaleUserInterface(UserInterfaceScale.Percent150)
-                //.ScaleUserInterface(UserInterfaceScale.Percent200)
+                //.ScaleUserInterface(UserInterfaceScale.Percent100) //default = Percent100 - i.e. normal resolution
+                .ScaleUserInterface(UserInterfaceScale.Percent150) // great for TMAX high resolution tablet
+                //.ScaleUserInterface(UserInterfaceScale.Percent200) // not really recommended for any screen
             )
             .UseDirectSkiaCanvasMode()
             .Build();
