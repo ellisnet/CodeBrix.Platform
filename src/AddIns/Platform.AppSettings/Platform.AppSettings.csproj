@@ -37,8 +37,8 @@
 		     (its assembly ships inside the main framework package), so nothing would carry
 		     Microsoft.Extensions.Logging.Abstractions to a consumer otherwise - and the very first
 		     line this add-in logs would fail to JIT with a FileNotFoundException. Version matches the
-		     10.0.10 the family pins for the other Microsoft.Extensions.Logging.* packages. -->
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+		     10.0.11 the family pins for the other Microsoft.Extensions.Logging.* packages. -->
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
 	</ItemGroup>
 
 	<ItemGroup>
