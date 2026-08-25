@@ -32,7 +32,7 @@
 	<files>
 		<file src="..\..\icon-codebrix-128.png" target="/" />
 		<file src="..\..\README.md" target="/" />
-		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
 		<!-- The real (Skia) implementation ships directly in lib; no reference/codebrix-platform-runtime split. -->

@@ -32,7 +32,7 @@
 	<files>
 		<file src="..\..\icon-codebrix-128.png" target="/" />
 		<file src="..\..\README.md" target="/" />
-		<file src="..\..\AGENT-README.txt" target="/" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
 		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.dll" target="lib\net10.0" />
