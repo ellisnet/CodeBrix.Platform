@@ -190,12 +190,7 @@
 			// Nothing to allow: every dependency this nuspec declares is now backed either by a
 			// PackageReference or by a ProjectReference resolved through projectPackages above.
 			"allowedExtraDependencies": [],
-			// Referenced by Platform.UI.Lottie.Reference.csproj but not bound by any shipped
-			// assembly, so it is not a real dependency of the package. Flagged in the audit as a
-			// csproj cleanup candidate, deliberately not actioned here.
-			"allowedMissingDependencies": [
-				"Newtonsoft.Json"
-			]
+			"allowedMissingDependencies": []
 		},
 		{
 			"packageId": "CodeBrix.Platform.Svg.ApacheLicenseForever",

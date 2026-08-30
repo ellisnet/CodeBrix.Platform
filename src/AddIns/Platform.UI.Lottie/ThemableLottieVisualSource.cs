@@ -69,9 +69,8 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 		{
 			_sourceCacheKey = sourceCacheKey;
 
-			// Note: we're using Newtonsoft JSON.NET here
-			// because System.Text.Json does not support changing the
-			// parsed document - it's read only.
+			// The theming below mutates the parsed document in place, which requires the
+			// mutable System.Json mini-DOM vendored in this project.
 
 			// LOAD & PARSE JSON
 			LoadAndParseDocument(sourceJson);

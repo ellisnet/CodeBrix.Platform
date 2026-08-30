@@ -37,9 +37,5 @@
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Tests.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="Newtonsoft.Json" />
-	</ItemGroup>
-
 	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
 </Project>

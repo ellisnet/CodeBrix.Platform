@@ -109,7 +109,6 @@
 		<PackageReference Update="GtkSharp" Version="3.24.24.95" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
-		<PackageReference Update="Newtonsoft.Json" Version="13.0.4" />
 		<PackageReference Update="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvmVersion)" />
 		<PackageReference Update="Microsoft.Web.WebView2" Version="1.0.4129.50" />
 	</ItemGroup>
