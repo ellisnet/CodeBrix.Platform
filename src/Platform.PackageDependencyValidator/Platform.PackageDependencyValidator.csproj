@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.ArgumentParser.MitLicenseForever" Version="1.0.165.286" />
+		<PackageReference Include="CodeBrix.ArgumentParser.MitLicenseForever" Version="1.0.242.924" />
 	</ItemGroup>
 
 </Project>
