@@ -20,7 +20,7 @@
     <NoWarn>$(NoWarn);MSB3277</NoWarn>
   </PropertyGroup>
 
-  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <!-- Tell MSBuild to treat .xaml files as CodeBrix.Platform XAML pages -->
   <ItemGroup>
     <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
     <None Remove="**\*.xaml" />

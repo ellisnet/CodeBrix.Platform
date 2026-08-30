@@ -1,0 +1,103 @@
+<Page x:Class="VideoPlayerDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:local="using:VideoPlayerDemo.Views"
+      xmlns:video="using:CodeBrix.Platform.UI.VideoPlayer.Skia"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+    <Page.Resources>
+        <local:TimecodeConverter x:Key="Timecode" />
+    </Page.Resources>
+
+    <Grid Margin="12" RowSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- The player: a VISUAL element, unlike the AudioPlayer one, so it gets the whole of
+             row 0 and letterboxes whatever it is given inside that. -->
+        <video:VideoPlayer x:Name="Player" Grid.Row="0"
+                           Stretch="Uniform"
+                           MediaOpened="Player_MediaOpened"
+                           PlaybackEnded="Player_PlaybackEnded"
+                           MediaFailed="Player_MediaFailed"
+                           RenderPathChanged="Player_RenderPathChanged" />
+
+        <!-- Which clip, and how it is read. RenderPath and SourceMode are both read when a source
+             is opened, so they are applied by the Open button rather than live. -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Clip" VerticalAlignment="Center" />
+            <ComboBox x:Name="ClipSelector" Width="260" SelectedIndex="0">
+                <ComboBoxItem Content="landscape 720p - WebM (Opus)" />
+                <ComboBoxItem Content="portrait 720p - WebM (Opus)" />
+                <ComboBoxItem Content="landscape 720p - .cbv Mode 1 (Opus)" />
+                <ComboBoxItem Content="portrait 720p - .cbv Mode 1 (Opus)" />
+                <ComboBoxItem Content="landscape 720p - .cbv Mode 2 (Vorbis)" />
+                <ComboBoxItem Content="portrait 720p - .cbv Mode 2 (Vorbis)" />
+                <ComboBoxItem Content="landscape 720p - .cbv Mode 2 (Vorbis) with chapters" />
+                <ComboBoxItem Content="(the path box below)" />
+            </ComboBox>
+            <TextBox x:Name="PathBox" Width="320" PlaceholderText="or any file path / http(s) address" />
+            <Button Content="Open" Click="OpenButton_Click" />
+        </StackPanel>
+
+        <!-- Timecode indicator + scrubber. This is the AudioPlayerDemo markup, unchanged: the
+             Slider follows playback through the two-way binding and dragging it seeks the video
+             (debounced seek-on-release). One markup, either kind of player. -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="{Binding Position, ElementName=Player, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+            <Slider x:Name="Scrubber" Width="420" VerticalAlignment="Center"
+                    Maximum="{Binding DurationSeconds, ElementName=Player}"
+                    Value="{Binding PositionSeconds, ElementName=Player, Mode=TwoWay}"
+                    StepFrequency="0.1" />
+            <TextBlock Text="{Binding Duration, ElementName=Player, Converter={StaticResource Timecode}}"
+                       Width="52" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Transport -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8">
+            <Button Content="Play" Click="PlayButton_Click" />
+            <Button Content="Pause" Click="PauseButton_Click" />
+            <Button Content="Stop" Click="StopButton_Click" />
+            <ToggleSwitch Header="" OnContent="Looping" OffContent="Loop"
+                          IsOn="{Binding IsLooping, ElementName=Player, Mode=TwoWay}" />
+            <TextBlock Text="Volume" VerticalAlignment="Center" Margin="12,0,0,0" />
+            <Slider Width="140" VerticalAlignment="Center" Minimum="0" Maximum="1" StepFrequency="0.01"
+                    Value="{Binding Volume, ElementName=Player, Mode=TwoWay}" />
+        </StackPanel>
+
+        <!-- Render path, the preloaded-loop option, and what is ACTUALLY running. GpuAuto is
+             permission rather than a promise, which is why the readout is worth having. -->
+        <StackPanel Grid.Row="4" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Render path" VerticalAlignment="Center" />
+            <ComboBox x:Name="RenderPathSelector" Width="150" SelectedIndex="0">
+                <ComboBoxItem Content="GpuAuto" />
+                <ComboBoxItem Content="GpuNoFallback" />
+                <ComboBoxItem Content="Cpu" />
+            </ComboBox>
+            <CheckBox x:Name="PreloadedLoopCheck" Content="Preloaded loop" VerticalAlignment="Center" />
+            <!-- Bound rather than set from the RenderPathChanged handler, so the readout is right
+                 from the first layout pass and stays right even when nothing changed: GpuAuto is
+                 permission, not a promise, and this is what says which promise was kept. -->
+            <TextBlock Text="running:" VerticalAlignment="Center" Margin="12,0,0,0" />
+            <TextBlock Text="{Binding ActiveRenderPath, ElementName=Player}" VerticalAlignment="Center" />
+            <TextBlock Text="effects:" VerticalAlignment="Center" Margin="8,0,0,0" />
+            <TextBlock Text="{Binding EffectsActive, ElementName=Player}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <!-- Chapters, when the file has any, and the status line. -->
+        <StackPanel Grid.Row="5" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Chapter" VerticalAlignment="Center" />
+            <ComboBox x:Name="ChapterSelector" Width="220"
+                      SelectionChanged="ChapterSelector_SelectionChanged" />
+            <TextBlock x:Name="StatusText" Text="Ready" TextWrapping="Wrap" VerticalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Page>

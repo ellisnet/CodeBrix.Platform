@@ -1,0 +1,62 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.VideoPlayer.Skia</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.VideoPlayer.Skia</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the AudioPlayer add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.VideoPlayer.ApacheLicenseForever</PackageId>
+		<Description>Video playback for CodeBrix.Platform Skia apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. Provides the XAML-declarable VideoPlayer element - a bindable AV1 player for WebM/Matroska files and CodeBrix .cbv files, with play/pause/stop, seek, volume, looping, a timecode position that two-way binds to a Slider for scrubbing, Stretch letterboxing, captions and chapters as data, and a colour-grading effect chain, with an overlay seam (IVideoLayer and the Composing event) for drawing inside the picture. The picture is composed with the CodeBrix.Platform family's own SkiaSharp, so an application carries one SkiaSharp and no second copy: this package depends on the drawing-free CodeBrix.VideoPlayback engine only. It renders on the GPU wherever the running head can supply a Skia GPU context (through the Graphics3DGL add-in) and falls back to the fully managed processor path everywhere else - both paths are first class and either can be demanded outright. Video files load from file paths, http(s):// addresses, ms-appx:/// asset URIs, embedded://Assembly/Resource.Name URIs (embedded resources), or streams. AV1 decoding arrives with the separate CodeBrix.VideoPlayback.Dav1d package and Opus audio with CodeBrix.Audio.Opus, both registered by the application; this package neither depends on nor needs either of them.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- The playback engine: CodeBrix.VideoPlayback (WebM/Matroska and .cbv reading, demuxing,
+		     A/V sync, transport, captions and chapters, plus the drawing-free rendering vocabulary -
+		     render paths, the letterbox arithmetic, the composed effect chain and the colour shader
+		     source). The CORE ONLY, deliberately: its Skia companion package pins its own SkiaSharp,
+		     while this family pins one SkiaSharp for everything it ships ($(SkiaSharpVersion) in
+		     src/Directory.Build.targets), and an assembly compiled against one SkiaSharp and run
+		     against another fails the moment SkiaSharp changes a signature it uses. So the small
+		     amount of Skia-bound code that package holds - the presenter and the colour-shader
+		     renderer - lives here instead, in Internal/, compiled against the family's pin.
+		     NEVER add CodeBrix.VideoPlayback.Skia back, and never add Dav1d, Opus or .Authoring -
+		     the first two are the application's own choice to register and the third is an
+		     authoring-time tool. -->
+		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.242.1044" />
+
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
+		     Platform.WinUI.Graphics3DGL as CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever, both at
+		     the same family version as this build (the whole family ships together). Graphics3DGL is
+		     what supplies SkiaGpuContext - the backend-neutral off-screen GPU context this element takes
+		     wherever a head can provide one - so a consumer needs no GPU wiring of its own; do not
+		     remove that reference. Extensions.Logging is PrivateAssets="all" because it has no
+		     standalone nuget - its assembly ships inside the main framework package. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

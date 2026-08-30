@@ -1,0 +1,32 @@
+<Project>
+  <!--
+    The Linux FrameBuffer runtime for the from-source samples in this folder - imported by every
+    <Demo>.LinuxFrameBuffer head in place of a direct ProjectReference, so all of them pick their
+    runtime the same way and there is ONE place to change it.
+
+    By default the head references the REAL frame-buffer runtime (Platform.UI.Runtime.Skia.Linux.FrameBuffer,
+    which packs as CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever): it draws into /dev/fb0
+    and reads /dev/input, so it must never be launched on a desktop session - it takes over the console
+    invisibly.
+
+    Building with -p:CodeBrixFrameBufferEmulated=true swaps in the EMULATED runtime instead
+    (Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated, the CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated
+    package): the same head with only its device layer replaced - it draws into a shared-memory surface and talks
+    over a Unix socket to whatever hosts it (the CodeBrix.Develop frame-buffer emulator window, or a scripted
+    harness), which shows the frames and feeds touches back. Both runtimes expose the identical
+    UseLinuxFrameBuffer() builder, so Program.cs never changes. This is the from-source equivalent of the
+    silent build-time package swap CodeBrix.Develop performs for package-consuming applications; the property
+    is off by default, so a plain build is exactly what it always was.
+
+      dotnet build <Demo>.LinuxFrameBuffer.csproj -c Release                                   (real runtime)
+      dotnet build <Demo>.LinuxFrameBuffer.csproj -c Release -p:CodeBrixFrameBufferEmulated=true (emulated)
+
+    Paths are relative to THIS file (samples/CodeBrixPlatform/), so the import works from any sample folder.
+  -->
+  <ItemGroup Condition="'$(CodeBrixFrameBufferEmulated)' != 'true'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CodeBrixFrameBufferEmulated)' == 'true'">
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.csproj" />
+  </ItemGroup>
+</Project>

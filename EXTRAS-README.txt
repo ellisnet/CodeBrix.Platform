@@ -66,6 +66,22 @@ Wayland head needs a running compositor, the FrameBuffer head needs a real
 framebuffer device (or the CodeBrix.Develop emulator), the WPF and Win32 heads
 need Windows, and the macOS head needs macOS.
 
+FrameBuffer heads and the emulated runtime. Every from-source <Demo>.LinuxFrameBuffer
+head takes its runtime from ONE shared file, samples/CodeBrixPlatform/FrameBufferRuntime.targets,
+instead of a ProjectReference of its own. A plain build references the real
+frame-buffer runtime (never launch that on a desktop: it draws into /dev/fb0 and
+takes over the console invisibly). Building with
+
+    dotnet build <Demo>.LinuxFrameBuffer.csproj -c Release -p:CodeBrixFrameBufferEmulated=true
+
+swaps in the EMULATED runtime - the same head with its device layer replaced by a
+shared-memory surface and a socket that the CodeBrix.Develop emulator window (or a
+scripted harness) hosts - so the head can be run and captured on a desktop. Same
+UseLinuxFrameBuffer() builder, so Program.cs is identical either way; the property
+is off by default. This is the from-source counterpart of the silent package swap
+CodeBrix.Develop performs for package-consuming applications such as
+EmulateFrameBufferDemo.
+
 ================================================================================
 
 SAMPLE APPLICATIONS (samples/CodeBrixPlatform/)
@@ -201,6 +217,39 @@ Media assets come from samples/assets (see SHARED SAMPLE ASSETS below).
 Run:
     dotnet run --project samples/CodeBrixPlatform/AudioPlayerDemo/AudioPlayerDemo.LinuxX11
 
+VideoPlayerDemo
+---------------
+    samples/CodeBrixPlatform/VideoPlayerDemo    six heads
+    Add-in: CodeBrix.Platform.VideoPlayer
+
+One page: the VideoPlayer element filling the window, a drop-down of the seven
+sample clips (landscape and portrait, in WebM, CodeBrix Mode1 and CodeBrix
+Mode2 form, plus a chaptered Mode2 clip) plus a free-text path box, transport (Play/Pause/Stop, Loop,
+Volume) with a Slider bound to PositionSeconds - the AudioPlayerDemo scrubber
+markup, unchanged, proving one markup drives either element - a render-path
+drop-down (GpuAuto / GpuNoFallback / Cpu, applied before opening), a
+"preloaded loop" option, an ActiveRenderPath / EffectsActive readout and a
+chapter list.
+
+The DEMO (never the add-in) references CodeBrix.VideoPlayback.Dav1d and
+CodeBrix.Audio.Opus and calls both Register()s at start-up.
+
+Smoke mode: CODEBRIX_VIDEOPLAYER_SMOKE=<asset name or path> makes the app open
+that clip, play for about three seconds, capture the presented frame to a PNG
+under CODEBRIX_VIDEOPLAYER_SMOKE_OUT, print one "VPD-SMOKE: <fact>" line per
+fact and exit 0 or 1. CODEBRIX_VIDEOPLAYER_SMOKE_RENDERPATH picks the path and
+CODEBRIX_VIDEOPLAYER_SMOKE_LUT adds a .cube grade before the clip is opened -
+the scripted X11 smoke verification. CODEBRIX_VIDEOPLAYER_SMOKE_PAUSEDLUT adds a
+.cube grade AFTER the three seconds, with playback PAUSED, and captures the
+picture either side of it: on the graphics path the picture must change with no
+seek (the element recomposes the frame it is holding), and on the processor path
+with AllowEffectsOnCpu left false it must not change at all.
+
+Media assets come from samples/assets/video (see SHARED SAMPLE ASSETS below).
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/VideoPlayerDemo/VideoPlayerDemo.LinuxX11
+
 FlexPanelDemo
 -------------
     samples/CodeBrixPlatform/FlexPanelDemo    six heads
@@ -308,13 +357,18 @@ demonstrates - and exercises - CodeBrix.Platform.WinUI, .WinUI.Skia,
 SHARED SAMPLE ASSETS (samples/assets/)
 ======================================
 Media used by the samples, referenced in place (linked into the consuming
-project's output as Assets\..., not copied into each demo folder). Currently
-only AudioPlayerDemo consumes them.
+project's output as Assets\..., not copied into each demo folder). Consumed by
+AudioPlayerDemo (the audio) and VideoPlayerDemo (video/).
 
     sample_song_1.{wav,mp3,ogg,opus,flac}   the same short song in five
     sample_song_2.{wav,mp3,ogg,opus,flac}   formats, for the format selector
     debussy_Ste_Bergamesq_Clair.mid         the MIDI file the MIDI pane plays
     SplendidGrandPiano/                     the SFZ instrument it plays through
+    video/                                  six short AV1 clips (landscape and
+                                            portrait, in WebM, CodeBrix Mode1
+                                            and CodeBrix Mode2 form) plus a
+                                            README.txt recording their
+                                            provenance
 
 SplendidGrandPiano is a public-domain Akai Steinway sample set (4 velocity
 layers, converted to FLAC and mapped to SFZ with ARIA extensions); see its own

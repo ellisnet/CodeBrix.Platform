@@ -127,6 +127,24 @@
 		     miniaudio device backend), live on all six heads including macOS. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Skia.csproj" />
 
+		<!-- The VideoPlayer AddIn (CodeBrix.Platform.VideoPlayer.ApacheLicenseForever) ships with every
+		     family release: the XAML-declarable VideoPlayer element, backed by the
+		     CodeBrix.VideoPlayback.MitLicenseForever nuget (managed WebM/Matroska and .cbv reading,
+		     demultiplexing, A/V sync, and the drawing-free rendering vocabulary), live on all six
+		     heads including macOS. The composing presenter and its colour shader are the add-in's
+		     OWN code (Internal/VideoPresenter.cs), compiled against the family's SkiaSharp pin: the
+		     engine's companion CodeBrix.VideoPlayback.Skia package pins its own SkiaSharp, and this
+		     family ships one SkiaSharp for everything, so that package must never become a
+		     dependency here. It ALSO ProjectReferences the
+		     Graphics3DGL AddIn - the first add-in to add-in reference in this repository - which is
+		     what gives it the off-screen GPU Skia context (SkiaGpuContext) with no wiring in the
+		     consuming application; that reference packs as a dependency on
+		     CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever at the family version, which is why
+		     Graphics3DGL's PackageId had to become its PUBLISHED id (see its csproj). AV1 decoding
+		     (Dav1d, BSD-2) and Opus (BSD-3) are deliberately NOT dependencies - the application
+		     references and registers those itself. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Skia.csproj" />
+
 		<!-- The MediaPlayer AddIn (CodeBrix.Platform.MediaPlayer.LgplLicenseForever) ships with every
 		     family release: one windowing-agnostic vmem package for the Win32, WPF, X11, Wayland, and
 		     FrameBuffer heads (macOS uses its built-in AVFoundation support). (The legacy

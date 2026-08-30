@@ -1,8 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-	<!-- Identity pinned to legacy names; rename step changed only the .csproj filename. -->
+	<!-- Assembly identity pinned to the legacy name; the rename step changed only the .csproj
+	     filename. PackageId is NOT the assembly name: this project never packs itself
+	     (IsPackable=false below - its package is built from build/nuget/Platform.WinUI.Graphics3DGL.nuspec),
+	     so the only thing PackageId governs is how another project in this repository that takes a
+	     ProjectReference to it resolves its package dependency. That has to be the PUBLISHED id,
+	     the one the nuspec and build/nuget/package-dependency-map.json both name - otherwise a
+	     referencing package (the VideoPlayer add-in, which needs SkiaGpuContext) would ship a
+	     dependency on an id that has never been published. -->
 	<PropertyGroup>
 		<AssemblyName>CodeBrix.Platform.WinUI.Graphics3DGL</AssemblyName>
-		<PackageId>CodeBrix.Platform.WinUI.Graphics3DGL</PackageId>
+		<PackageId>CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever</PackageId>
 	</PropertyGroup>
 
     <PropertyGroup>

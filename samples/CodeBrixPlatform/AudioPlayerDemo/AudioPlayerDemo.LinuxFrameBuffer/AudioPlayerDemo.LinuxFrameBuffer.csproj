@@ -18,7 +18,7 @@
     <NoWarn>$(NoWarn);MSB3277</NoWarn>
   </PropertyGroup>
 
-  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <!-- Tell MSBuild to treat .xaml files as CodeBrix.Platform XAML pages -->
   <ItemGroup>
     <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
     <None Remove="**\*.xaml" />
@@ -32,14 +32,14 @@
 
   <!--
     Platform-specific runtime: Skia FrameBuffer backend for Linux (embedded/kiosk, no X11),
-    formerly the CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever NuGet (the
-    Platform.UI.Runtime.Skia.Linux.FrameBuffer project packs that id). Builds managed-only here on
+    formerly the CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever NuGet. The
+    ProjectReference lives in the shared samples/CodeBrixPlatform/FrameBufferRuntime.targets so every
+    from-source sample picks it the same way; build with -p:CodeBrixFrameBufferEmulated=true to swap in
+    the EMULATED runtime and run this head on a desktop (see that file). Builds managed-only on
     Windows; runs on Linux where the SkiaSharp.NativeAssets.Linux native libs apply. All other
     platform references come transitively via AudioPlayerDemo.Core.
   -->
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
-  </ItemGroup>
+  <Import Project="..\..\FrameBufferRuntime.targets" />
 
 
   <!--

@@ -48,6 +48,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` | SkiaSharp XAML views |
 | `CodeBrix.Platform.TerminalView.ApacheLicenseForever` | Terminal emulator view (`TerminalControl` element rendering a CodeBrix.Terminal engine: VT100 / VT220 / xterm escape sequences, 256-color ANSI attributes, scrollback, selection, clipboard copy and paste) — transport-agnostic, for SSH clients, embedded consoles and build-output panes |
 | `CodeBrix.Platform.TextLayout.ApacheLicenseForever` | Shaped, bidirectional text layout without XAML — measurement, caret and hit-test geometry, selection rectangles, glyph outlines, drawing to any `SKCanvas` |
+| `CodeBrix.Platform.VideoPlayer.ApacheLicenseForever` | Video playback (`VideoPlayer` element: AV1 in WebM, Matroska and CodeBrix `.cbv` files, with the AudioPlayer transport surface, `Stretch` letterboxing, a colour-grading effect chain, drawable layers, and captions and chapters as data) — composed on the GPU wherever a head can supply a context, on the processor everywhere else, with the framework's own SkiaSharp and no second copy; AV1 and Opus decoding arrive as separate packages the application registers |
 | `CodeBrix.Platform.WebView.ApacheLicenseForever` | WebView on every head (adds Linux support via the system WPE WebKit engine) |
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
 | `CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever` | Windows (WPF) host |

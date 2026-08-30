@@ -169,6 +169,11 @@ API, usage and pitfalls.
   CodeBrix.Platform.PlotterView.ApacheLicenseForever       Apache-2.0
       Chart view hosting a CodeBrix.Plotter PlotModel with full interaction.
       see src/AddIns/Platform.UI.PlotterView/AGENT-README.txt
+  CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       Apache-2.0
+      VideoPlayer - AV1 video from WebM/Matroska and .cbv files, on all heads,
+      on the GPU where the head can give one. AV1 and Opus decoding arrive as
+      separate packages the application registers.
+      see src/AddIns/Platform.UI.VideoPlayer.Skia/AGENT-README.txt
   CodeBrix.Platform.TerminalView.ApacheLicenseForever      Apache-2.0
       Terminal emulator control (VT100/xterm) on a Skia surface.
       see src/AddIns/Platform.UI.TerminalView/AGENT-README.txt
@@ -2069,6 +2074,7 @@ the reference lines):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/MediaPlayerDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlotterViewDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/TerminalViewDemo
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/VideoPlayerDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebViewDemo
         one demo per add-in (six heads each); their AGENT-READMEs describe them
 
@@ -2116,6 +2122,7 @@ ADD-INS (all in .Core; each has its own AGENT-README):
     CodeBrix.Platform.PlotterView.ApacheLicenseForever       src/AddIns/Platform.UI.PlotterView/
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView/
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout/
+    CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia/  (+ CodeBrix.VideoPlayback)
     CodeBrix.Platform.WebView.ApacheLicenseForever           src/AddIns/Platform.UI.WebView.Skia/
 
 TOOLKITS FOR MICROSOFT'S OWN FRAMEWORKS (not for CodeBrix.Platform apps):

@@ -1,0 +1,92 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- Match the namespace used by the app code -->
+    <RootNamespace>VideoPlayerDemo</RootNamespace>
+
+    <!-- CodeBrix.Platform needs this define for its internal conditional compilation -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;RESOLVE_SERVICES;SIMPLE_ENUM;SIMPLE_MESSAGING</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
+
+    <!-- CodeBrix.Platform packages are now ProjectReferences (see ItemGroups below).
+         The remaining PackageReferences here are genuinely external packages. -->
+
+    <!-- Bundled Open Sans font -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.209.261" />
+
+    <!-- The two decoder packages. These are the APPLICATION's dependencies, never the VideoPlayer
+         AddIn's: AV1 decoding is BSD-2-Clause and Opus is BSD-3-Clause, while the AddIn is
+         Apache-2.0, so each ships as its own package and an app that wants them references them
+         and calls their Register() once at start-up (see App.xaml.cs). The AddIn resolves codecs
+         through the playback session's registries, so it plays them with no change and no
+         reference of its own.
+
+         Dav1d is needed for EVERY clip this demo plays - every one carries AV1. Opus is needed
+         only for the WebM and CodeBrix-Mode1 clips, whose soundtrack is Opus; the Mode2 clips
+         carry Vorbis, which needs nothing. -->
+    <PackageReference Include="CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever" Version="1.0.242.1054" />
+    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.241.1040" />
+
+    <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
+         declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
+         (Platform.WinUI.nuspec), so replacing that package with project references dropped it;
+         re-added here. Version matches the platform's pin in src/Directory.Build.targets. -->
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.181.669" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform core, formerly the CodeBrix.Platform.ApacheLicenseForever NuGet.
+    Referenced from source instead of the package. Only the three top-level UI projects
+    are listed; their .Skia/.Reference dependencies (Foundation, WinRT/UWP, Composition,
+    Xaml, FluentTheme v1/v2) flow in transitively. Variants mirror the repo's own
+    from-source Skia build (src/Platform.UI/Platform.UI.Skia.csproj).
+    NOTE: the XAML source-generator + build-task wiring does NOT flow across a
+    ProjectReference; it must be added to the XAML-compiling head projects
+    (the Linux heads), not here.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+
+    <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
+         in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
+         CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
+         Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
+         Referenced here in Core so all heads inherit them. -->
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+
+    <!-- The VideoPlayer AddIn, normally consumed as the
+         CodeBrix.Platform.VideoPlayer.ApacheLicenseForever NuGet; referenced from source here.
+         Referenced ONCE in Core: every head inherits it transitively, and it is live on all six
+         heads (the containers, the demultiplexer and the clock are fully managed, and the picture
+         is composed with SkiaSharp - no system media package is required). The AddIn brings the
+         Graphics3DGL AddIn with it, which is what gives the element its off-screen GPU Skia
+         context; this project needs no GPU reference and no GPU code of its own. -->
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Skia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The seven sample clips, referenced in place from the repo-level samples/assets/video folder
+         (see its README.txt for provenance: two phone recordings placed in the Public Domain by
+         Jeremy Ellis on 2026-08-29, encoded by the CodeBrix.VideoPlayback authoring corpus
+         generator). They are loose copy-to-output Content addressed via ms-appx:///Assets/video/...
+         rather than embedded resources - the same treatment AudioPlayerDemo gives its songs. -->
+    <Content Include="..\..\..\assets\video\landscape_720p_webm.webm" Link="Assets\video\landscape_720p_webm.webm" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\video\portrait_720p_webm.webm" Link="Assets\video\portrait_720p_webm.webm" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\video\landscape_720p_mode1.cbv" Link="Assets\video\landscape_720p_mode1.cbv" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\video\portrait_720p_mode1.cbv" Link="Assets\video\portrait_720p_mode1.cbv" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\video\landscape_720p_mode2.cbv" Link="Assets\video\landscape_720p_mode2.cbv" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="..\..\..\assets\video\portrait_720p_mode2.cbv" Link="Assets\video\portrait_720p_mode2.cbv" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The seventh clip is the Mode 2 landscape encode again, authored with the published
+         CodeBrix.VideoPlayback.Authoring package from a three-chapter ffmetadata file (kept beside it
+         as landscape_720p_mode2_chapters.ffmeta), so the chapter drop-down has something to show. -->
+    <Content Include="..\..\..\assets\video\landscape_720p_mode2_chapters.cbv" Link="Assets\video\landscape_720p_mode2_chapters.cbv" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

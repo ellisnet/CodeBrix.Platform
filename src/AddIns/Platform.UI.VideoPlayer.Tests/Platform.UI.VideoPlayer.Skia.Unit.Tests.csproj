@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<!-- The add-in binds the Skia flavour of Platform.UI (like the PlotterView and TerminalView
+		     suites), so this suite does too. No window is ever created: the element's own rules are
+		     pure logic, and the presenter tests compose on off-screen surfaces - on Skia's raster
+		     backend, and on a real graphics device obtained head-lessly through Mesa's surfaceless
+		     EGL platform (HeadlessGraphicsContext), which skips itself where there is none. -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<AssemblyName>CodeBrix.Platform.UI.VideoPlayer.Unit.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.VideoPlayer.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+	</ItemGroup>
+
+	<!-- The presenter tests really compose pixels, so Skia's own native binary has to be here: a head
+	     project normally supplies it and there is no head in a test run. Only Skia - nothing in this
+	     suite lays out text, so HarfBuzz and ICU are not needed. -->
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+
+		<!-- The add-in references this with PrivateAssets="all" - the assembly has no nuget of its own
+		     and ships inside the main framework package, so it is there in any real application but
+		     does NOT flow across the project reference into a test run. The presenter logs through it
+		     (the once-per-process processor-effects warning, and the debug line that says why the
+		     graphics path was not taken), so a test that takes either road needs it here. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- A tiny embedded resource, so the source resolver's embedded:// form can be exercised
+		     against a real manifest resource rather than a mock. -->
+		<EmbeddedResource Include="Assets\resolver_probe.txt" />
+	</ItemGroup>
+
+</Project>

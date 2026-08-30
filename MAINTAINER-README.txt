@@ -38,6 +38,7 @@ Package ids and the AGENT-README that covers each:
     CodeBrix.Platform.PlotterView.ApacheLicenseForever       src/AddIns/Platform.UI.PlotterView
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout
+    CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia
     CodeBrix.Platform.WebView.ApacheLicenseForever           src/AddIns/Platform.UI.WebView.Skia
 
   Toolkits for Microsoft's own frameworks (src-platforms/):
@@ -215,8 +216,27 @@ Packing only runs in the Release configuration. Two kinds of package:
     The nuspec names a dependency-version TOKEN, never a literal version.
   - CSPROJ-DRIVEN (`dotnet pack <csproj> -p:PackageVersion=$(BuildVersion)`):
     Platform.UI.Runtime.Skia and the seven heads (including the Emulated head),
-    and the add-ins WebView, AudioPlayer, MediaPlayer, TextLayout, FlexPanel,
-    AdvancedTextEdit, TerminalView, PlotterView, AppSettings.
+    and the add-ins WebView, AudioPlayer, VideoPlayer, MediaPlayer, TextLayout,
+    FlexPanel, AdvancedTextEdit, TerminalView, PlotterView, AppSettings.
+    VideoPlayer is the only add-in that ProjectReferences another add-in
+    (Graphics3DGL, for its off-screen GPU Skia context); that is why
+    Platform.WinUI.Graphics3DGL.csproj carries its PUBLISHED PackageId
+    (CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever) rather than its legacy
+    assembly name - the SDK packer reads a referenced project's PackageId to
+    build the dependency, and the legacy id is never published.
+    VideoPlayer must NEVER depend on CodeBrix.VideoPlayback.Skia. That package is
+    the playback engine's presenter for hosts outside this family and it pins its
+    own SkiaSharp; this family publishes as one unit and pins one SkiaSharp
+    ($(SkiaSharpVersion) in src/Directory.Build.targets), and an assembly compiled
+    against one SkiaSharp and run against another fails as soon as SkiaSharp
+    changes a signature it uses. The Skia-bound part - the composing presenter and
+    the colour-shader binding - is therefore the add-in's OWN code, ported into
+    src/AddIns/Platform.UI.VideoPlayer.Skia/Internal/ (VideoPresenter.cs,
+    YuvSurfaceRenderer.cs, VideoRectangles.cs) and built against the family's pin.
+    Everything that needs no canvas - the render paths, the letterbox arithmetic,
+    the effect chain, the shader SOURCE, the composition context - stays in the
+    engine and is consumed from it, never re-declared. The same rule applies to
+    any future add-in that draws frames from a library with its own Skia package.
     The PackageId in each csproj is conditional on CODEBRIX_UWP_BUILD; the
     buildTransitive props/targets are packed renamed to <PackageId>.props/.targets.
 

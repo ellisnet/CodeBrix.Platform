@@ -1,0 +1,1 @@
+A probe file, so the embedded:// source form has something real to resolve.

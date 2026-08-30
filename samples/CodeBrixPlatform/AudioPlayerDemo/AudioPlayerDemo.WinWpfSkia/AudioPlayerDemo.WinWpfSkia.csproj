@@ -2,8 +2,8 @@
   <PropertyGroup>
     <!-- WPF host: the Skia.Wpf runtime package flows a Microsoft.WindowsDesktop.App.WPF
          FrameworkReference, so the SDK requires a Windows target platform (NETSDK1136).
-         We do NOT set <UseWPF> — that would make WPF's build targets treat our Uno .xaml
-         <Page> items as WPF XAML. WPF is loaded at runtime by the Uno host. -->
+         We do NOT set <UseWPF> — that would make WPF's build targets treat our CodeBrix.Platform .xaml
+         <Page> items as WPF XAML. WPF is loaded at runtime by the CodeBrix.Platform host. -->
     <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>Exe</OutputType>
 
@@ -25,7 +25,7 @@
     <NoWarn>$(NoWarn);MSB3277</NoWarn>
   </PropertyGroup>
 
-  <!-- Tell MSBuild to treat .xaml files as Uno XAML pages -->
+  <!-- Tell MSBuild to treat .xaml files as CodeBrix.Platform XAML pages -->
   <ItemGroup>
     <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
     <None Remove="**\*.xaml" />
@@ -41,7 +41,7 @@
     Platform-specific runtime: Skia-on-WPF backend, formerly the
     CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever NuGet. The runtime project carries a
     Microsoft.WindowsDesktop.App.WPF FrameworkReference that flows here (hence the net10.0-windows
-    TFM); the Uno WPF host loads the WindowsDesktop framework at runtime. All other platform
+    TFM); the CodeBrix.Platform WPF host loads the WindowsDesktop framework at runtime. All other platform
     references come transitively via AudioPlayerDemo.Core.
   -->
   <ItemGroup>

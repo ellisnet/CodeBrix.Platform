@@ -83,6 +83,11 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           Pango-class text shaping and layout (HarfBuzz, bidi, font fallback) with no
           XAML and no application host required.
 
+  src/AddIns/Platform.UI.VideoPlayer.Skia/AGENT-README.txt
+      CodeBrix.Platform.VideoPlayer.ApacheLicenseForever
+          Video playback (AV1 in WebM, Matroska and CodeBrix .cbv files) with a
+          colour-grading effect chain, on the GPU where a head can give one.
+
   src/AddIns/Platform.UI.WebView.Skia/AGENT-README.txt
       CodeBrix.Platform.WebView.ApacheLicenseForever
           Makes the XAML WebView2 control work on the Skia desktop heads, downloads
