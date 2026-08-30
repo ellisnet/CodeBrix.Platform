@@ -106,7 +106,6 @@
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetPrevious)' " Update="Microsoft.Win32.SystemEvents" Version="9.0.0" />
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.0-rc.2.25502.107" />
 
-		<PackageReference Update="GtkSharp" Version="3.24.24.95" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
 		<PackageReference Update="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvmVersion)" />

@@ -116,8 +116,7 @@
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wayland\Platform.UI.Runtime.Skia.Wayland.csproj" />
 
 		<!-- The WebView AddIn (CodeBrix.Platform.WebView.ApacheLicenseForever) ships with every
-		     family release. (The legacy Platform.UI.WebView.Skia.X11 AddIn is deliberately NOT
-		     listed - it is unsupported, slated for deletion, and must never be published.) -->
+		     family release. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
 
 		<!-- The AudioPlayer AddIn (CodeBrix.Platform.AudioPlayer.ApacheLicenseForever) ships with every

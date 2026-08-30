@@ -140,7 +140,6 @@
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.MediaPlayer.Skia.X11.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.MediaPlayer.Skia.Win32.csproj</_AdjustedOutputProjects>
 		
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.WebView.Skia.X11.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.WebView.Skia.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.RemoteControl.Tests.csproj</_AdjustedOutputProjects>

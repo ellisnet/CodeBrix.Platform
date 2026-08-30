@@ -55,8 +55,7 @@ Package ids and the AGENT-README that covers each:
     embedding; X11/Win32 only, incompatible with Wayland and FrameBuffer).
     They remain for reference, are not packed by the driver, and must NEVER be
     published.
-    src/AddIns/Platform.UI.WebView.Skia.X11 (CodeBrix.Platform.WinUI.WebView.Skia.X11)
-    and src/AddIns/Platform.UI.MSAL / Platform.UI.Maps - not in the pack list.
+    src/AddIns/Platform.UI.MSAL / Platform.UI.Maps - not in the pack list.
 
 Every package id carries a license suffix that permanently binds the id to its
 license: Apache-2.0 for all but CodeBrix.Platform.SkiaSharp.Views (MIT) and

@@ -80,11 +80,6 @@
 
 		<PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4 " Condition="'$(CODEBRIX_UWP_BUILD)'=='true'" />
 
-		<PackageReference Include="PolySharp" Version="1.16.0">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-
 		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />
 
 		<FrameworkReference Update="Microsoft.Windows.SDK.NET.Ref" RuntimeFrameworkVersion="10.0.19041.21" Condition="'$(CODEBRIX_UWP_BUILD)'!='true'" />

@@ -125,7 +125,6 @@
     <Project Path="src/AddIns/Platform.AppSettings/Platform.AppSettings.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj" />
-    <Project Path="src/AddIns/Platform.UI.WebView.Skia.X11/Platform.UI.WebView.Skia.X11.csproj" />
     <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
     <!-- CodeBrix.Platform macOS solution: Uno.WinUI.Graphics2DSK.Windows excluded —
          WinAppSDK PRI generation needs Microsoft.Build.Packaging.Pri.Tasks.dll /

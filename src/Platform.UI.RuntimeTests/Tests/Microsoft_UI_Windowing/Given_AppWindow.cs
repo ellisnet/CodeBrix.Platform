@@ -1,6 +1,5 @@
 ﻿#if HAS_CODEBRIX_WINUI || WINDOWS
 using System;
-using System.Reflection;
 using System.Threading.Tasks;
 using Combinatorial.MSTest;
 using SilverAssertions;
@@ -190,25 +189,10 @@ public class Given_AppWindow
 			!OperatingSystem.IsWindows() &&
 			!OperatingSystem.IsMacOS() ||
 			TestServices.WindowHelper.IsXamlIsland ||
-			IsGtk() ||
 			RuntimeTestsPlatformHelper.CurrentPlatform == RuntimeTestPlatforms.SkiaFrameBuffer)
 		{
 			Assert.Inconclusive("This test only supported on Windows, macOS and Linux apps currently.");
 		}
-	}
-
-	private bool IsGtk()
-	{
-		var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-		foreach (Assembly a in assemblies)
-		{
-			if (a.GetName().Name == "GtkSharp")
-			{
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
 #endif
