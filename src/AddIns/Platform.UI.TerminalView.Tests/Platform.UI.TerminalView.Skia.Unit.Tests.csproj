@@ -36,7 +36,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
 	</ItemGroup>
 
 	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
@@ -53,7 +53,7 @@
 		     a runtime asset, and icudt.dat embedded into this assembly (see $(IsCodeBrixHead)). -->
 		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfBuzzSharpVersion)" />
-		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.216.148" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.242.1407" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
@@ -63,7 +63,7 @@
 		     UnicodeMacOs package supplies both. -->
 		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
-		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.216.148" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.242.1407" />
 	</ItemGroup>
 
 	<ItemGroup>

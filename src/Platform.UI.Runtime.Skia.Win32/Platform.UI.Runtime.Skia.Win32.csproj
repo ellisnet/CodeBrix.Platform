@@ -54,7 +54,7 @@
 		<PackageReference Include="SkiaSharp" />
 		<PackageReference Include="HarfBuzzSharp" />
     <PackageReference Include="SkiaSharp.HarfBuzz" />
-		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.216.148" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.242.1407" />
 	</ItemGroup>
 
 	<ItemGroup>

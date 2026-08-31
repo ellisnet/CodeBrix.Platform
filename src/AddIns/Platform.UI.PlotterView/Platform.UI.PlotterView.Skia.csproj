@@ -45,7 +45,7 @@
 		     This version is the first that carries SkiaRenderContext.TypefaceResolver, which the
 		     control uses to route ALL chart text through the application's own fonts (the family's
 		     no-system-font-fallback rule) - do not downgrade past it. -->
-		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.226.286" />
+		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.242.1416" />
 	</ItemGroup>
 
 	<ItemGroup>

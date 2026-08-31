@@ -43,13 +43,13 @@
 
 		<!-- The terminal engine. External to the CodeBrix.Platform family, so this reference is
 		     versioned here (not family-locked); bump deliberately. -->
-		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.224.1197" />
+		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.242.1438" />
 
 		<!-- The default terminal font (ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf).
 		     Declared here so consumers get it without knowing to reference it themselves (the family's
 		     no-system-font-fallback rule means an undeclared font silently degrades to the app default,
 		     which is proportional). Overridable via TerminalControl.TerminalFontFamily. -->
-		<PackageReference Include="CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever" Version="1.0.216.1150" />
+		<PackageReference Include="CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever" Version="1.0.238.534" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -45,7 +45,7 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Features" Version="5.9.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.Features" Version="5.9.0" />
 		<PackageReference Include="Microsoft.CodeAnalysis.CSharp.SourceGenerators.Testing" Version="1.1.4" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
 		<PackageReference Include="NuGet.Packaging" />
 		<Reference Include="$(NuGetPackageRoot)\communitytoolkit.mvvm\$(CommunityToolkitMvvmVersion)\analyzers\dotnet\roslyn4.3\cs\CommunityToolkit.Mvvm.SourceGenerators.dll" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />

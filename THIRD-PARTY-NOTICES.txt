@@ -693,7 +693,7 @@ compiled bits; in each case the applicable license permits binary
 redistribution provided the copyright notice and disclaimer are reproduced,
 which is done below.
 
-21. Microsoft Edge WebView2 SDK  (Microsoft.Web.WebView2, version 1.0.4129.50)
+21. Microsoft Edge WebView2 SDK  (Microsoft.Web.WebView2, version 1.0.4191.47)
     Bundled into: the CodeBrix.Platform.WebView.ApacheLicenseForever package,
     under buildTransitive/webview2/. On the Windows (Win32) and Skia-on-WPF
     heads these files are copied to the application output to back the XAML

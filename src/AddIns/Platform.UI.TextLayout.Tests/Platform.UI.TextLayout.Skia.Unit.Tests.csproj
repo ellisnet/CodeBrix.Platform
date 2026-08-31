@@ -37,7 +37,7 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
 	</ItemGroup>
 
 	<!-- Skia and HarfBuzz still need their natives named per-OS: those come from the head packages

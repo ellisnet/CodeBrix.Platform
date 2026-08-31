@@ -15,10 +15,9 @@
 //
 // ******************************************************************
 
+using CodeBrix.ServiceLocation;
 using Microsoft.Extensions.Logging;
 using System;
-
-using SvcLocator = CodeBrix.ServiceLocator;
 
 namespace CodeBrix.Platform.Extensions // was previously: Uno.Extensions
 {
@@ -58,11 +57,11 @@ namespace CodeBrix.Platform.Extensions // was previously: Uno.Extensions
 
 		private static ILoggerFactory GetFactory()
 		{
-			if (SvcLocator.ServiceLocator.IsLocationProviderSet)
+			if (ServiceLocator.IsLocationProviderSet)
 			{
 				try
 				{
-					var service = SvcLocator.ServiceLocator.Current.GetService(typeof(ILoggerFactory));
+					var service = ServiceLocator.Current.GetService(typeof(ILoggerFactory));
 
 					if (service is ILoggerFactory factory)
 					{

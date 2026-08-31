@@ -38,7 +38,7 @@
 
     <!-- SVG rendering support for SvgImageSource on Skia targets. CodeBrix.SkiaSvg is an
          external package and stays; CodeBrix.Platform.Svg is now a ProjectReference. -->
-    <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.214.1201" />
+    <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.238.140" />
   </ItemGroup>
 
   <ItemGroup>

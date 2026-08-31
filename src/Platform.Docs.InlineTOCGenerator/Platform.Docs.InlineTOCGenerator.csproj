@@ -17,7 +17,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.YamlParse.MitLicenseForever" Version="1.0.179.189" />
+		<PackageReference Include="CodeBrix.YamlParse.MitLicenseForever" Version="1.0.242.1115" />
 	</ItemGroup>
 
 </Project>

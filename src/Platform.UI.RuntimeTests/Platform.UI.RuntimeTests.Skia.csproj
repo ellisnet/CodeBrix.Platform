@@ -28,7 +28,7 @@
 	-->
 
 	<ItemGroup>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.164.180" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
 		<PackageReference Include="MSTest.TestFramework" />
 		<PackageReference Include="MSTest.Analyzers" />
 		<PackageReference Include="Combinatorial.MSTest" />
