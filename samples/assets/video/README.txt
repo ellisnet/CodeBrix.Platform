@@ -24,6 +24,15 @@ settings (libsvtav1 preset 4, crf 24, 30 fps, keyframe every 60 frames,
 libvorbis 96 kbit/s 48 kHz stereo) and the three-chapter ffmetadata file that
 sits beside it, landscape_720p_mode2_chapters.ffmeta.
 
+WHICH GENERATION OF THE CORPUS. The six copies are byte-for-byte the corpus
+files of its 2026-08-29 generation. That corpus was re-encoded on 2026-09-02,
+when the authoring command line gained `-map_chapters -1` (a no-op for these
+chapter-less recordings: the finished files are structurally identical either
+way, and differ only in the Matroska muxer's random track UID and muxing date).
+The copies here were deliberately left as they were, so they no longer match
+the current corpus byte for byte, while the manifest's encoder settings still
+describe them exactly.
+
 THE FILES
 =========
   landscape_720p_webm.webm   AV1 video + Opus audio, WebM container. The

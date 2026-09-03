@@ -8,7 +8,8 @@ namespace CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
 /// <remarks>
 /// <para>
 /// Two failures need this, and one of them is the most likely failure this AddIn will ever
-/// produce. Every video this family plays carries AV1 video, and AV1 decoding is BSD-2-Clause
+/// produce. Every video this family authors carries AV1 video (the one exception a player can meet
+/// is an uncompressed test track, which the playback core decodes itself), and AV1 decoding is BSD-2-Clause
 /// rather than Apache-2.0, so it ships as a separate package that the APPLICATION references and
 /// registers: until it does, every single file fails. Ogg Opus audio is the same story a size
 /// smaller (BSD-3-Clause, a separate package, a separate registration call).

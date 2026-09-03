@@ -32,7 +32,8 @@ public partial class App : Application
         // module initializer doing these calls for us - that would work in a debug build and
         // silently not run in a trimmed publish.
         //
-        // Dav1d is not optional in practice: every clip carries AV1, so nothing plays without it.
+        // Dav1d is not optional in practice: every clip this demo ships carries AV1, so nothing here plays
+        // without it. (Only an uncompressed V_UNCOMPRESSED track would, through the decoder built into the core.)
         // Opus is needed only for the WebM and CodeBrix-Mode1 clips; the Mode2 clips carry Vorbis.
         CodeBrixVideoPlaybackDav1d.Register();
         CodeBrixAudioOpus.Register();

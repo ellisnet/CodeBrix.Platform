@@ -45,8 +45,10 @@ namespace CodeBrix.Platform.UI.VideoPlayer.Skia;
 /// AV1 decoding is BSD-2-Clause rather than Apache-2.0, so it is NOT part of this package: an
 /// application references CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever and calls
 /// CodeBrixVideoPlaybackDav1d.Register() once at start-up, and Ogg Opus soundtracks likewise need
-/// CodeBrix.Audio.Opus.BsdLicenseForever and CodeBrixAudioOpus.Register(). Until then every file
-/// fails with a <see cref="MediaFailed"/> message that names the package and the call.
+/// CodeBrix.Audio.Opus.BsdLicenseForever and CodeBrixAudioOpus.Register(). Until then every AV1 file
+/// fails with a <see cref="MediaFailed"/> message that names the package and the call; only an
+/// uncompressed (V_UNCOMPRESSED) track plays with nothing registered, because that decoder is built
+/// into the playback core.
 ///
 /// The picture is composed on the graphics device wherever the running head can supply a context
 /// and on the processor everywhere else; <see cref="RenderPath"/> says which is wanted and

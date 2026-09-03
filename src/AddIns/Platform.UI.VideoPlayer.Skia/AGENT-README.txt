@@ -38,9 +38,12 @@ TWO PACKAGES THE APPLICATION SUPPLIES (this add-in does not, and must not)
       CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever   CodeBrixVideoPlaybackDav1d.Register()
       CodeBrix.Audio.Opus.BsdLicenseForever            CodeBrixAudioOpus.Register()
 
-  The first is needed for EVERY file this family plays — nothing decodes without
-  it. The second is needed only for a soundtrack encoded as Opus (Vorbis needs
-  nothing). Both calls go in the application's start-up, once, before a source is
+  The first is needed for every AV1 file — which is every file this family
+  AUTHORS; no coded video decodes without it. The one thing that plays with
+  neither package is an uncompressed (V_UNCOMPRESSED) track, whose decoder is
+  built into the playback core: a test-clip and tooling format, enormous on
+  disk, never something to ship. The second is needed only for a soundtrack
+  encoded as Opus (Vorbis needs nothing). Both calls go in the application's start-up, once, before a source is
   opened; there is deliberately no module initializer doing it for you, because
   that works in a debug build and silently does not run in a trimmed publish.
   Until the calls are made, MediaFailed carries a message naming the package and
@@ -262,10 +265,13 @@ VideoPlayer — teardown
 
 FORMATS AND CONTAINERS
 ======================
-  Video      AV1 only ("av01"), 8/10/12-bit, 4:2:0 / 4:2:2 / 4:4:4, through the
-             separately-registered Dav1d package. There is no H.264/HEVC and no
-             MP4: that is the point of this family — nothing royalty-bearing and
-             nothing LGPL/GPL in a shipped application.
+  Video      AV1 ("av01"), 8/10/12-bit, 4:2:0 / 4:2:2 / 4:4:4, through the
+             separately-registered Dav1d package; and uncompressed video
+             (V_UNCOMPRESSED), which the playback core decodes itself with no
+             package at all — a test and tooling format, enormous on disk.
+             There is no H.264/HEVC and no MP4: that is the point of this
+             family — nothing royalty-bearing and nothing LGPL/GPL in a shipped
+             application.
   Sound      Ogg Vorbis (built in) and Opus (register CodeBrix.Audio.Opus).
   Containers WebM and Matroska (.webm, .mkv), and CodeBrix ".cbv" video in both
              its flavours: the WebM-profile one (which any browser also opens)
@@ -308,7 +314,7 @@ App.xaml.cs, once at start-up:
 
     public App()
     {
-        CodeBrixVideoPlaybackDav1d.Register();   // AV1 - needed for every file
+        CodeBrixVideoPlaybackDav1d.Register();   // AV1 - needed for every coded file
         CodeBrixAudioOpus.Register();            // only for Opus soundtracks
         InitializeComponent();
     }
@@ -431,10 +437,12 @@ PERFORMANCE TIPS
 
 COMMON PITFALLS TO AVOID
 ========================
-  - Forgetting CodeBrixVideoPlaybackDav1d.Register(). NOTHING plays without it,
-    and it is the single most likely reason a first attempt shows a black
-    rectangle. Handle MediaFailed while developing: its message names the package
-    and the call.
+  - Forgetting CodeBrixVideoPlaybackDav1d.Register(). No AV1 file plays without
+    it — and every file this family authors is AV1 — so it is the single most
+    likely reason a first attempt shows a black rectangle. An uncompressed test
+    clip DOES play without it, which is exactly how a missing registration can
+    hide until the first real file. Handle MediaFailed while developing: its
+    message names the package and the call.
   - Setting RenderPath after Source. It throws, on purpose — the path is chosen
     once, before anything is opened. Set it first.
   - Setting SourceMode after Source. It does not throw; it simply has no effect
@@ -470,7 +478,8 @@ WHAT THIS PACKAGE DOES NOT DO
     several elements.
   - No streaming protocol beyond plain HTTP(S) progressive/range.
   - It does not decode AV1 or Opus itself; those arrive as the two packages the
-    application registers.
+    application registers. Uncompressed video is the one codec the playback core
+    decodes on its own.
 
 WORKING EXAMPLES ON GITHUB
 ==========================
