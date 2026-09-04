@@ -364,9 +364,12 @@ AudioPlayerDemo (the audio) and VideoPlayerDemo (video/).
     sample_song_2.{wav,mp3,ogg,opus,flac}   formats, for the format selector
     debussy_Ste_Bergamesq_Clair.mid         the MIDI file the MIDI pane plays
     SplendidGrandPiano/                     the SFZ instrument it plays through
-    video/                                  six short AV1 clips (landscape and
-                                            portrait, in WebM, CodeBrix Mode1
-                                            and CodeBrix Mode2 form) plus a
+    video/                                  seven short AV1 clips (landscape
+                                            and portrait, in WebM, CodeBrix
+                                            Mode1 and CodeBrix Mode2 form, one
+                                            of them a chaptered Mode2 clip with
+                                            its landscape_720p_mode2_chapters.
+                                            ffmeta chapter sidecar) plus a
                                             README.txt recording their
                                             provenance
 

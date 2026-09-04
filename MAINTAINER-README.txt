@@ -53,8 +53,11 @@ Package ids and the AGENT-README that covers each:
     CodeBrix.Platform.WinUI.MediaPlayer.Skia.{X11,Win32}.LgplLicenseForever) -
     the superseded native-child-window media add-ons (set_xwindow / set_hwnd
     embedding; X11/Win32 only, incompatible with Wayland and FrameBuffer).
-    They remain for reference, are not packed by the driver, and must NEVER be
-    published.
+    They remain for reference. Both csprojs are packable and self-pack on a
+    Release build (GeneratePackageOnBuild), so .nupkg files for those two ids do
+    appear in a local Release output - but they are deliberately excluded from
+    the central pack driver's _CsprojPackage list, never reach nuget.org, and
+    must NEVER be published.
     src/AddIns/Platform.UI.MSAL / Platform.UI.Maps - not in the pack list.
 
 Every package id carries a license suffix that permanently binds the id to its
@@ -230,8 +233,11 @@ Packing only runs in the Release configuration. Two kinds of package:
     against one SkiaSharp and run against another fails as soon as SkiaSharp
     changes a signature it uses. The Skia-bound part - the composing presenter and
     the colour-shader binding - is therefore the add-in's OWN code, ported into
-    src/AddIns/Platform.UI.VideoPlayer.Skia/Internal/ (VideoPresenter.cs,
-    YuvSurfaceRenderer.cs, VideoRectangles.cs) and built against the family's pin.
+    src/AddIns/Platform.UI.VideoPlayer.Skia/ and built against the family's pin.
+    Five files carry the "Ported from CodeBrix.VideoPlayback.Skia" header: the
+    public drawing seams IVideoLayer.cs and VideoComposingEventArgs.cs at the
+    project root, and Internal/VideoPresenter.cs, Internal/YuvSurfaceRenderer.cs
+    and Internal/VideoRectangles.cs.
     Everything that needs no canvas - the render paths, the letterbox arithmetic,
     the effect chain, the shader SOURCE, the composition context - stays in the
     engine and is consumed from it, never re-declared. The same rule applies to
@@ -438,6 +444,11 @@ Other vendored / derived components:
     vendors the SkiaSharp views for the framework.
   - The add-ins vendor their own upstreams (MAUI FlexLayout, AvalonEdit, ...);
     each add-in's AGENT-README states its provenance.
+  - The VideoPlayer add-in's five Skia-bound files (IVideoLayer.cs,
+    VideoComposingEventArgs.cs and the three under Internal/) carry a "Ported
+    from CodeBrix.VideoPlayback.Skia" header. That is the same author's own MIT
+    package, so it is recorded here and in the add-in's AGENT-README rather than
+    as a numbered THIRD-PARTY-NOTICES item.
   - Complete attribution and license texts: THIRD-PARTY-NOTICES.txt (numbered
     items; the add-in docs cite item numbers).
 

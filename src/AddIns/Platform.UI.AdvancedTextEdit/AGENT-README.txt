@@ -27,8 +27,8 @@ CodeBrix.Platform.TextLayout.ApacheLicenseForever package), so it stays
 responsive on very large documents and matches TextBlock shaping exactly.
 Target: .NET 10 or later.
 
-PROVENANCE: a port of the AvalonEdit editor component (icsharpcode/AvalonEdit
-6.3.2, MIT) from WPF to this framework. The upstream namespaces
+PROVENANCE: a port of the AvalonEdit editor component (icsharpcode/AvalonEdit,
+MIT) from WPF to this framework. The upstream namespaces
 ICSharpCode.AvalonEdit[.Document|.Editing|.Rendering|.Highlighting|...] map
 1:1 onto CodeBrix.Platform.UI.AdvancedTextEdit[.Document|.Editing|...]; three
 types were renamed: TextEditor -> AdvancedTextEdit, TextEditorOptions ->

@@ -8,26 +8,38 @@ OVERVIEW
 Video playback for CodeBrix.Platform applications, delivered as one
 XAML-declarable element. Plays AV1 video from WebM and Matroska containers and
 from CodeBrix ".cbv" video files, with Ogg Vorbis or Opus sound. Target: .NET 10
-or later. Three public types, all in one namespace:
+or later. Five public types, all in one namespace:
 
   VideoPlayer     A [Bindable] Panel that shows the picture: a file player with
-                  Play/Pause/Stop/Seek, volume, looping, a position that two-way
-                  binds to a Slider for scrubbing, Stretch letterboxing, an
-                  effect chain, drawable layers, and captions and chapters as
+                  Play/Pause/Stop/Seek, volume, muting, looping, a position that
+                  two-way binds to a Slider for scrubbing, Stretch letterboxing,
+                  an effect chain, drawable layers, and captions and chapters as
                   data.
+  IVideoLayer     The drawing seam for a reusable layer drawn over the picture
+                  (see "VideoPlayer — effects and composition").
+  VideoComposingEventArgs
+                  The payload of the Composing event - the one-off drawing seam,
+                  documented in the same section.
   VideoPlayerFailedEventArgs
                   The payload of the MediaFailed event.
   VideoPlayerRenderPathChangedEventArgs
                   The payload of the RenderPathChanged event.
 
-The transport surface is the AudioPlayer add-in's element, member for member, so
-ONE scrubber markup drives either kind of player.
+The transport surface is a superset of the AudioPlayer add-in's element - the
+same members, plus IsMuted - so ONE scrubber markup drives either kind of
+player.
 
 There is no per-OS engine and nothing to apt install: the container readers, the
 demultiplexer, the clock and the sound are fully managed, and the picture is
 composed with SkiaSharp. The add-in is live on all six heads — Windows
 Win32-Skia, Windows WPF-Skia, Linux X11, Linux Wayland, Linux FrameBuffer and
 macOS.
+
+PROVENANCE: the Skia-bound part of this add-in - the composing presenter, the
+colour-shader binding and the two public drawing seams - was ported from the
+CodeBrix.VideoPlayback.Skia package (MIT, same author) and compiled against this
+family's single SkiaSharp pin, which is why an application that uses this add-in
+never carries a second SkiaSharp.
 
 TWO PACKAGES THE APPLICATION SUPPLIES (this add-in does not, and must not)
 -------------------------------------------------------------------------
@@ -150,8 +162,8 @@ VideoPlayer — the source
 
   bool AutoPlay                    default false
 
-VideoPlayer — the transport (identical to the AudioPlayer element)
-------------------------------------------------------------------
+VideoPlayer — the transport (the AudioPlayer element's members, plus IsMuted)
+-----------------------------------------------------------------------------
   TimeSpan Position         (two-way)   TimeSpan Duration          (read-only)
   double   PositionSeconds  (two-way)   double   DurationSeconds   (read-only)
   bool     IsPlaying        (read-only) double   Volume            0.0 .. 1.0

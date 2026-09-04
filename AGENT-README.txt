@@ -169,17 +169,17 @@ API, usage and pitfalls.
   CodeBrix.Platform.PlotterView.ApacheLicenseForever       Apache-2.0
       Chart view hosting a CodeBrix.Plotter PlotModel with full interaction.
       see src/AddIns/Platform.UI.PlotterView/AGENT-README.txt
-  CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       Apache-2.0
-      VideoPlayer - AV1 video from WebM/Matroska and .cbv files, on all heads,
-      on the GPU where the head can give one. AV1 and Opus decoding arrive as
-      separate packages the application registers.
-      see src/AddIns/Platform.UI.VideoPlayer.Skia/AGENT-README.txt
   CodeBrix.Platform.TerminalView.ApacheLicenseForever      Apache-2.0
       Terminal emulator control (VT100/xterm) on a Skia surface.
       see src/AddIns/Platform.UI.TerminalView/AGENT-README.txt
   CodeBrix.Platform.TextLayout.ApacheLicenseForever        Apache-2.0
       Text shaping/bidi/caret/hit-test/outline API with no XAML required.
       see src/AddIns/Platform.UI.TextLayout/AGENT-README.txt
+  CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       Apache-2.0
+      VideoPlayer - AV1 video from WebM/Matroska and .cbv files, on all heads,
+      on the GPU where the head can give one. AV1 and Opus decoding arrive as
+      separate packages the application registers.
+      see src/AddIns/Platform.UI.VideoPlayer.Skia/AGENT-README.txt
   CodeBrix.Platform.WebView.ApacheLicenseForever           Apache-2.0
       Makes the WebView2 control work on every head (WPE WebKit on Linux).
       see src/AddIns/Platform.UI.WebView.Skia/AGENT-README.txt

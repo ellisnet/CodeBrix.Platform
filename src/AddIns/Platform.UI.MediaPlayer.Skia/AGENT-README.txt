@@ -97,8 +97,13 @@ add-on instead (see its AGENT-README under src/AddIns/Platform.UI.AudioPlayer
 .Skia in the repository).
 
 Legacy projects: the repository also contains two superseded native-child-window
-add-ins (X11 and Win32 only, incompatible with Wayland and FrameBuffer). They
-are never published and are not consumable packages; ignore them.
+add-ins (X11 and Win32 only, incompatible with Wayland and FrameBuffer), whose
+package ids are CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32.LgplLicenseForever
+and CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever. Both projects
+are packable and self-pack on a Release build - and both pack THIS file as their
+AGENT-README - but they are excluded from the central pack driver, so neither id
+is published to nuget.org and neither is available to install. Use the
+CodeBrix.Platform.MediaPlayer.LgplLicenseForever package documented here.
 
 KEY NAMESPACES / USINGS
 =======================
@@ -224,7 +229,7 @@ Windows.Media.Core.MediaSource and playlists
     public MediaPlaybackItem(MediaSource source)        // wraps one MediaSource
     public MediaSource Source { get; }
 
-    public class MediaPlaybackList : IMediaPlaybackSource
+    public partial class MediaPlaybackList : IMediaPlaybackList, IMediaPlaybackSource
     public IObservableVector<MediaPlaybackItem> Items { get; }
 
 MediaSource.CreateFromStream(...), CreateFromStreamReference(...) and

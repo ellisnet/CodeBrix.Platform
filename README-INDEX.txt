@@ -20,9 +20,9 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
       CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever,
       CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever
           The cross-platform WinUI-XAML framework rendered with Skia, its base Skia
-          runtime, and the seven platform heads (Win32, WPF, X11, Wayland, Linux
-          frame buffer, the emulated frame buffer and macOS). START HERE for any
-          CodeBrix.Platform application.
+          runtime, and the six shipping platform heads (Win32, WPF, X11, Wayland,
+          Linux frame buffer and macOS) plus the IDE-only emulated frame buffer
+          head. START HERE for any CodeBrix.Platform application.
 
   src/AddIns/Platform.WinUI.Graphics2DSK/AGENT-README.txt
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
@@ -47,9 +47,15 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           namespace, for CodeBrix.Platform applications.
 
   src/AddIns/Platform.UI.MediaPlayer.Skia/AGENT-README.txt
-      CodeBrix.Platform.MediaPlayer.LgplLicenseForever
+      CodeBrix.Platform.MediaPlayer.LgplLicenseForever,
+      CodeBrix.Platform.WinUI.MediaPlayer.Skia.Win32.LgplLicenseForever,
+      CodeBrix.Platform.WinUI.MediaPlayer.Skia.X11.LgplLicenseForever
           Makes the XAML MediaPlayerElement (audio and video playback) work on the
-          Skia heads, via LibVLC.
+          Skia heads, via LibVLC. The same file is packed as the AGENT-README of the
+          two superseded native-child-window projects that carry the other two ids
+          above; those projects are packable and self-pack on a Release build, but
+          they are excluded from the central pack driver and are never published -
+          use the CodeBrix.Platform.MediaPlayer.LgplLicenseForever package instead.
 
   src/AddIns/Platform.UI.AdvancedTextEdit/AGENT-README.txt
       CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever
@@ -130,5 +136,13 @@ GENERAL
       Human-facing overview for the WPF toolkit package.
   src-platforms/Platform.Mobile/README.md
       Human-facing overview for the .NET MAUI toolkit package.
+  THIRD-PARTY-NOTICES.txt
+      What came from where, and under which licences. Packed into every package
+      produced from this repository's root.
+  src-platforms/Platform.WinUI/THIRD-PARTY-NOTICES.txt
+  src-platforms/Platform.WPF/THIRD-PARTY-NOTICES.txt
+  src-platforms/Platform.Mobile/THIRD-PARTY-NOTICES.txt
+      The same record for each native-framework toolkit family, packed into that
+      family's packages.
   README-INDEX.txt
       This file.

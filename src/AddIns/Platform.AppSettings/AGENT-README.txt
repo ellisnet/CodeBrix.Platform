@@ -11,7 +11,7 @@ as JSON text in one portable SQLite file, settings.sqlite, and provides NO
 settings screen: the application builds its own, or has none and just saves in
 the background. Target: .NET 10 or later.
 
-Six public types, all in the CodeBrix.Platform.AppSettings namespace:
+Seven public types, all in the CodeBrix.Platform.AppSettings namespace:
 
   AppSettingsService          the static facade you normally use: Initialize
                               once, then Get/Set/HasValue anywhere, per-key
