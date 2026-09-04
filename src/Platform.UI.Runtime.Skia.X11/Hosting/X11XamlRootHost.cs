@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
@@ -175,6 +176,44 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		{
 			_applicationView.Title = Windows.ApplicationModel.Package.Current.DisplayName;
 		}
+	}
+
+	/// <summary>
+	/// Publishes which process a window belongs to, so the desktop and window-scripting tools can
+	/// match a window to a running application instead of to a title.
+	/// </summary>
+	/// <param name="x11Window">The top-level window to describe.</param>
+	/// <remarks>
+	/// _NET_WM_PID is what a desktop's "force quit" and what window tools (xdotool's --pid search)
+	/// read. The specification only allows it to be trusted next to WM_CLIENT_MACHINE, which names
+	/// the host the process runs on, so the two are always set together.
+	/// </remarks>
+	private static void SetProcessIdentity(X11Window x11Window)
+	{
+		var display = x11Window.Display;
+		using var lockDisposable = X11Helper.XLock(display);
+
+		_ = XLib.XChangeProperty(
+			display,
+			x11Window.Window,
+			X11Helper.GetAtom(display, X11Helper._NET_WM_PID),
+			X11Helper.GetAtom(display, X11Helper.XA_CARDINAL),
+			32,
+			PropertyMode.Replace,
+			new[] { (IntPtr)Environment.ProcessId },
+			1);
+
+		// WM_CLIENT_MACHINE is a latin-1 host name, not a Unicode one.
+		var hostName = Encoding.Latin1.GetBytes(Environment.MachineName);
+		_ = XLib.XChangeProperty(
+			display,
+			x11Window.Window,
+			X11Helper.GetAtom(display, X11Helper.WM_CLIENT_MACHINE),
+			X11Helper.GetAtom(display, X11Helper.XA_STRING),
+			8,
+			PropertyMode.Replace,
+			hostName,
+			hostName.Length);
 	}
 
 	private void SetWindowIcon()
@@ -458,6 +497,8 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		// Tell the WM to send a WM_DELETE_WINDOW message before closing
 		IntPtr deleteWindow = X11Helper.GetAtom(display, X11Helper.WM_DELETE_WINDOW);
 		_ = XLib.XSetWMProtocols(RootX11Window.Display, RootX11Window.Window, new[] { deleteWindow }, 1);
+
+		SetProcessIdentity(RootX11Window);
 
 		lock (_x11WindowToXamlRootHostMutex)
 		{

@@ -16,8 +16,8 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// <see cref="RasterIcon"/> BOUND to itself.
 /// </para>
 /// <para>
-/// In XAML the terse form is the <see cref="RasterIconExtension">{cb:RasterIcon}</see> markup
-/// extension.
+/// In XAML the terse form is the <see cref="RasterIconSourceExtension">{cb:RasterIconSource}</see>
+/// markup extension.
 /// </para>
 /// </remarks>
 public partial class RasterIconSource : ToolIconSource

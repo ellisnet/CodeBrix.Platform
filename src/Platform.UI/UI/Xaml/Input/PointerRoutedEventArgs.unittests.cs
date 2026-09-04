@@ -32,6 +32,17 @@ namespace Microsoft.UI.Xaml.Input
 			FrameId = _pseudoFrameId;
 		}
 
+		/// <summary>
+		/// Initializes a new instance carrying a modifier mask, the way the backends that build these
+		/// arguments from a system pointer event do.
+		/// </summary>
+		/// <param name="point">The pointer's position.</param>
+		/// <param name="keyModifiers">The modifier keys the system reports as held.</param>
+		internal PointerRoutedEventArgs(Point point, global::Windows.System.VirtualKeyModifiers keyModifiers) : this(point)
+		{
+			KeyModifiers = keyModifiers;
+		}
+
 		public PointerPoint GetCurrentPoint(UIElement relativeTo)
 		{
 			var device = global::Windows.Devices.Input.PointerDevice.For(PointerDeviceType.Mouse);

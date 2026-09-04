@@ -157,13 +157,14 @@
            writes its icon files at start-up rather than shipping them; a real application
            writes ms-appx:///Icons/save.svg in the XAML and stops there. -->
       <CommandBar x:Name="IconBar" DefaultLabelPosition="Right" ClosedDisplayMode="Compact">
-        <!-- The IconElement twin. Its icon is assigned from the code-behind rather than written
-             as <cb:SvgIcon /> here, because the add-in declares BOTH an SvgIcon element and an
-             SvgIcon markup extension, and the XAML generator resolves the "Extension" name first
-             for either syntax - so the element form yields an SvgIconSource and the assignment
-             fails. Measured, and recorded in the wave's STATUS; the add-in's own guidance already
-             points an AppBarButton at SvgIconSource, which is the next button along. -->
-        <AppBarButton x:Name="SvgIconButton" Label="SvgIcon" />
+        <!-- The IconElement twin, written in plain element form - exactly what a consumer of the
+             add-in writes. The element name belongs to the ELEMENT: the markup extensions are
+             called {cb:SvgIconSource} and {cb:RasterIconSource}, so nothing captures this name. -->
+        <AppBarButton x:Name="SvgIconButton" Label="SvgIcon">
+          <AppBarButton.Icon>
+            <cb:SvgIcon x:Name="SvgIconArt" Size="20" Tint="#FF2266DD" />
+          </AppBarButton.Icon>
+        </AppBarButton>
         <AppBarButton x:Name="SvgIconSourceButton" Label="SvgIconSource">
           <AppBarButton.Icon>
             <IconSourceElement x:Name="SvgIconSourceHost">

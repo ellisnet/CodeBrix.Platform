@@ -10,7 +10,6 @@ using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
 using CodeBrix.Platform.UI.CommandBar;
 using Windows.System;
 
@@ -51,12 +50,9 @@ public sealed partial class WinUiCommandBarPage : Page
 
 		//The add-in's icons take their artwork here because this demo writes its icon files at
 		//start-up rather than shipping them as content; an application writes the URI in the XAML.
-		SvgIconButton.Icon = new SvgIcon
-		{
-			Markup = TintableSvgMarkup,
-			Size = 20,
-			Tint = new SolidColorBrush(Color.FromArgb(0xFF, 0x22, 0x66, 0xDD)),
-		};
+		//Both icons are DECLARED in the XAML - the element on the button, the source in the
+		//IconSourceElement - and only the artwork is filled in from here.
+		SvgIconArt.Markup = TintableSvgMarkup;
 		SvgIconSourceArt.Markup = TintableSvgMarkup;
 
 		//A XamlUICommand carrying an accelerator, bound to an ordinary Button and to an
@@ -342,15 +338,20 @@ public sealed partial class WinUiCommandBarPage : Page
 
 		// ---- Icons that the core does not know about (D6 and P4) -------------------------------
 
-		// P19. D6: the add-in's SvgIcon as an AppBarButton.Icon. This is the ONE prefixed element on
-		//      the page, and it works because the application references the CommandBar add-in; the
-		//      core package has no SVG dependency of its own.
+		// P19. D6: the add-in's SvgIcon as an AppBarButton.Icon, written <cb:SvgIcon /> in the XAML.
+		//      This is the ONE prefixed element on the page, and it works because the application
+		//      references the CommandBar add-in; the core package has no SVG dependency of its own.
+		//      The Icon has to BE the element the XAML declared: the element form resolving to the
+		//      markup extension instead - which is what the SvgIconSourceExtension rename fixed -
+		//      would put an SvgIconSource here and fail the assignment.
 		var svgIcon = SvgIconButton.Icon as CodeBrix.Platform.UI.CommandBar.SvgIcon;
 		check("winui-appbarbutton-with-the-addins-svgicon-paints",
-			svgIcon != null && svgIcon.ActualWidth > 0 && svgIcon.ActualHeight > 0
+			svgIcon != null && ReferenceEquals(svgIcon, SvgIconArt)
+			&& svgIcon.ActualWidth > 0 && svgIcon.ActualHeight > 0
 			&& SvgIconButton.ActualWidth > 0,
 			$"button={SvgIconButton.ActualWidth:0.#}x{SvgIconButton.ActualHeight:0.#} "
 			+ $"icon={svgIcon?.GetType().Name} {svgIcon?.ActualWidth:0.#}x{svgIcon?.ActualHeight:0.#} "
+			+ $"fromXaml={ReferenceEquals(SvgIconButton.Icon, SvgIconArt)} "
 			+ $"tinted={svgIcon?.Tint != null}");
 
 		// P20. P4: a third-party IconSource through the framework's IconSourceElement wrapper. The

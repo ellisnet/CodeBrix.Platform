@@ -1381,6 +1381,33 @@ extra package is needed.
         <toolkit:ElevatedView Elevation="12" ShadowColor="#66000000" Background="White">
             <TextBlock Text="Card" Margin="16" />
         </toolkit:ElevatedView>
+    public sealed partial class TriPaneView : Control
+        UIElement SidePane, UpperPane, LowerPane;   SidePanePlacement {Left, Right}
+        double SidePanePercent/StackPercent (width pair), UpperPanePercent/LowerPanePercent (height pair)
+            star weights, so only the ratio inside a pair matters; 0 means that pane is minimized
+        double SidePaneMinLength/StackMinLength/UpperPaneMinLength/LowerPaneMinLength   // pixel floors
+        bool CanUserDragSideDivider, CanUserDragStackDivider, IsDragToMinimizeEnabled
+        double DividerThickness;  Brush DividerBrush/DividerPointerOverBrush/DividerPressedBrush
+        RestoreGripMode {Auto, Always, Never}   // Auto: a grip only on a pane the USER dragged shut
+        bool IsSidePaneMinimized/IsUpperPaneMinimized/IsLowerPaneMinimized   (two-way friendly)
+        void MinimizeSidePane/UpperPane/LowerPane(), RestoreSidePane/UpperPane/LowerPane(), RestoreAll()
+        <Side|Upper|Lower>PaneVerticalScrollBarVisibility, <Side|Upper|Lower>PaneHorizontalScrollMode
+            {Disabled, Enabled, AutoOnPortrait}   // AutoOnPortrait: on while taller than wide
+        event EventHandler<TriPaneViewDividerDragCompletedEventArgs> DividerDragCompleted
+        // a side pane and a stack of two, with two draggable dividers:
+        <toolkit:TriPaneView SidePanePercent="25" StackPercent="75"
+                             UpperPaneVerticalScrollBarVisibility="Disabled">
+            <toolkit:TriPaneView.SidePane><ListView ItemsSource="{x:Bind Items}" /></toolkit:TriPaneView.SidePane>
+            <toolkit:TriPaneView.UpperPane>
+                <Grid RowDefinitions="Auto,*"><TextBox Grid.Row="1" /></Grid>
+            </toolkit:TriPaneView.UpperPane>
+            <toolkit:TriPaneView.LowerPane><TextBlock Text="Output" /></toolkit:TriPaneView.LowerPane>
+        </toolkit:TriPaneView>
+        Every pane is a ScrollViewer, so its content is measured UNBOUNDED along any axis that
+        scrolls: star rows fill the pane only where that pane's VerticalScrollBarVisibility is
+        Disabled, as the upper pane above. Dividers are pointer-driven; no keyboard resize.
+        A minimized pane is given zero width/height, NEVER detached - the same element instance,
+        with its text, scroll position and selection, is what comes back on restore.
     public partial class StorageFileHelper
         public static Task<bool> ExistsInPackage(string fileName)   // "Assets/x.png"
 
@@ -2065,6 +2092,14 @@ COMMON PITFALLS TO AVOID
     message names the member; find an implemented alternative (NOT-IMPLEMENTED.md
     on GitHub explains the policy).
 
+20. DO NOT expect a modifier key the desktop reserved for itself to reach your
+    application: Cinnamon takes Alt for its window drag and its window menu, so
+    bind Shift and Control for a modifier-aware click. The key state
+    (InputKeyboardSource.GetKeyStateForCurrentThread, CoreWindow.GetKeyState)
+    follows the modifier mask carried by every routed key and pointer event and
+    is cleared when the window loses focus, so a press or a release the desktop
+    swallowed cannot leave a modifier reading "held".
+
 ================================================================================
 
 WHAT THIS PACKAGE DOES NOT DO
@@ -2149,6 +2184,9 @@ the reference lines):
         file/folder pickers on every head (six heads)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/ParityDemo
         X11 vs native-Wayland behavior side by side (two Linux heads)
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/TriPaneViewDemo
+        the Toolkit's TriPaneView driven from a control strip: proportions, minimum
+        lengths, minimize and restore, the grip modes and per-pane scrolling (six heads)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/AdvancedTextEditDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/AudioPlayerDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/FlexPanelDemo
@@ -2239,6 +2277,7 @@ Fonts:            FeatureConfiguration.Font.DefaultTextFontFamily = "ms-appx:///
                   CodeBrix.Platform.UI.Xaml.Media.FontFamilyHelper.PreloadAsync(...)
 Logging:          LogExtensionPoint.AmbientLoggerFactory = factory; LoggingAdapter.Initialize();
 Toolkit:          ElevatedView, *ToVisibilityConverter (Invert), StorageFileHelper, DiagnosticsOverlay, FromJsonExtension
+                  TriPaneView (side pane + upper/lower stack, draggable dividers, minimize/restore)
 UI thread:        DispatcherQueue.TryEnqueue(...)  (Microsoft.UI.Dispatching)
 Dialog:           new ContentDialog { XamlRoot = XamlRoot, ... }.ShowAsync()
 

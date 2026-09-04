@@ -91,6 +91,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever` | Full code/text editor control (`AdvancedTextEdit` element: syntax highlighting, folding, completion, search, snippets, line numbers) |
 | `CodeBrix.Platform.AppSettings.ApacheLicenseForever` | Application settings persisted as JSON in a portable `settings.sqlite` (`AppSettingsService` / `AppSettingProperty`), with automatic backups, corrupt-file recovery, and export/import — storage only, no settings UI |
 | `CodeBrix.Platform.AudioPlayer.ApacheLicenseForever` | Audio playback (`AudioPlayer` element + `SoundEffect`) and MIDI music through a SoundFont or SFZ instrument (`MidiPlayer` element), fully managed on all heads |
+| `CodeBrix.Platform.CommandBar.ApacheLicenseForever` | Desktop tool bars (`ToolBarTray` / `ToolBar` / `ToolButton` family with groups, separators, spacers and chevron overflow) bound to `ICommand`, with SVG and raster icons |
 | `CodeBrix.Platform.FlexPanel.ApacheLicenseForever` | CSS flexbox-style layout panel (`FlexPanel` element with `Grow` / `Shrink` / `Basis` / `Order` / `AlignSelf` attached properties) |
 | `CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever` | 2D SkiaSharp drawing |
 | `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever` | 3D OpenGL drawing (`GLCanvasElement`) |

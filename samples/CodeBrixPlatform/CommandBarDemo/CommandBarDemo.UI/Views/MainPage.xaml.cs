@@ -615,11 +615,12 @@ public sealed partial class MainPage : Page
 			var window = "none";
 
 			//Another head running the same demo may be on this display at the same time, and every
-			//one of them is titled "CommandBar Demo". Each candidate window is therefore tried in
-			//turn, newest first, and the one whose key press MOVES THIS PAGE'S FOCUS is by
-			//definition the right one - so the check can never pass on somebody else's window, and
-			//never fails just because theirs was found first. The winner is remembered: every later
-			//step that resizes or captures a window uses THAT id and no other.
+			//one of them is titled "CommandBar Demo", so the candidates are this PROCESS ID's own
+			//windows rather than that title. Each is tried in turn, newest first, and the one whose
+			//key press MOVES THIS PAGE'S FOCUS is by definition the right one - so the check can
+			//never pass on somebody else's window, and never fails just because theirs was found
+			//first. The winner is remembered: every later step that resizes or captures a window
+			//uses THAT id and no other.
 			foreach (var candidate in ListDemoWindows())
 			{
 				for (var attempt = 0; attempt < 2 && !ReferenceEquals(after, GroupOneSecond); attempt++)
@@ -640,9 +641,12 @@ public sealed partial class MainPage : Page
 				}
 			}
 
+			//"window=none" here means no window was found for this process id at all, which is the
+			//head failing to publish _NET_WM_PID rather than the bar failing to move focus.
 			Check("layout-keyboard-moves-along-the-bar",
 				sent && ReferenceEquals(before, GroupOneFirst) && ReferenceEquals(after, GroupOneSecond),
-				$"sent={sent} window={window} before={before?.Name ?? "null"} after={after?.Name ?? "null"}");
+				$"sent={sent} window={window} pid={Environment.ProcessId} "
+				+ $"before={before?.Name ?? "null"} after={after?.Name ?? "null"}");
 
 			// 31. The flyout itself. "Present" is not "paints": the bar leans on Flyout and Popup,
 			//     so the items that moved into the overflow are shown to have no arranged size
@@ -965,25 +969,48 @@ public sealed partial class MainPage : Page
 		// 49. A modifier-aware click: a modifier really held down while the button is activated,
 		//     read AT THE CLICK rather than remembered from the last key event. This is the
 		//     Shift-click a score editor uses for "engrave with options".
-		//Alt is measured first and not asserted on, and the reason is the DESKTOP rather than the
-		//platform: this window manager uses Alt as its own window-drag modifier
-		//(org.cinnamon.desktop.wm.preferences mouse-button-modifier = '<Alt>'), so it grabs the Alt
-		//key press and the application never sees it. The modifier MASK on the keys that follow
-		//still carries Alt, which is what the next check proves through an access key. It goes
-		//first so the sequence ends with a plain, modifier-free activation.
-		var altClick = await ClickWithModifierAsync("alt");
+		//What is ASSERTED is Shift and Control: the two a score editor really binds, and the two no
+		//window manager takes for itself over a client area. Alt is measured LAST and only reported,
+		//because what happens to it is decided by the DESKTOP rather than by the platform - this one
+		//uses Alt as its window-drag modifier, so it takes the Alt press and the application never
+		//sees the activation at all. The check that follows proves that what the desktop swallowed
+		//cannot leak into the next click.
 		var shiftClick = await ClickWithModifierAsync("shift");
 		var controlClick = await ClickWithModifierAsync("ctrl");
 		var plainClick = await ClickWithModifierAsync(null);
+		var altClick = await ClickWithModifierAsync("alt");
+		var dragModifier = RunShell(
+			"gsettings get org.cinnamon.desktop.wm.preferences mouse-button-modifier").Trim();
 
 		check("fresco-modifier-aware-click-reports-the-modifiers-held",
 			shiftClick.HasFlag(VirtualKeyModifiers.Shift)
 			&& controlClick.HasFlag(VirtualKeyModifiers.Control)
 			&& plainClick == VirtualKeyModifiers.None,
 			$"shift-click={shiftClick} control-click={controlClick} plain-click={plainClick}; "
-			+ $"alt-click={altClick} (this window manager grabs the Alt key itself)");
+			+ $"alt-click={altClick} (informational: this desktop's window-drag modifier is "
+			+ $"{(dragModifier.Length == 0 ? "unreported" : dragModifier)}, so it takes the Alt "
+			+ "press for itself and no Alt activation ever reaches the application)");
 
-		// 50. The X11 head's own modifier translation, which the modifier-aware click rests on:
+		// 50. A modifier the desktop swallowed must not stick. Alt+Space is this desktop's window
+		//     menu: the application sees the Alt press and never the Alt release, so a modifier
+		//     state fed only by key down and key up would report Alt held on every later click until
+		//     the window was deactivated. The state has to follow the modifier MASK that the next
+		//     event carries, so a plain activation straight afterwards reports no modifiers at all.
+		RunShell($"xdotool windowactivate --sync {_ownWindow}; xdotool keydown alt; sleep 0.3; "
+			+ "xdotool key space; sleep 0.5; xdotool keyup alt");
+		await Task.Delay(800);
+
+		//Dismiss whatever the desktop opened over the demo, and give the window back to the page.
+		RunShell($"xdotool key --clearmodifiers Escape; xdotool windowactivate --sync {_ownWindow}");
+		await Task.Delay(500);
+		var afterSwallowedRelease = await ClickWithModifierAsync(null);
+
+		check("fresco-swallowed-modifier-release-does-not-stick",
+			afterSwallowedRelease == VirtualKeyModifiers.None,
+			"after alt+space - which this desktop keeps for its window menu, so the Alt release "
+			+ $"never arrives - a plain activation read {afterSwallowedRelease}");
+
+		// 51. The X11 head's own modifier translation, which the modifier-aware click rests on:
 		//     Alt (X11's Mod1) has to arrive as VirtualKeyModifiers.Menu. It used to arrive as
 		//     Shift, and an access key - which is Alt plus a letter, and is resolved from the
 		//     modifiers the head reports rather than from the key-state table - could therefore
@@ -1002,7 +1029,7 @@ public sealed partial class MainPage : Page
 			$"AccessKey='{PrintToolButton.AccessKey}' invocations={_accessKeyInvocations} "
 			+ $"lastKey={_lastKey}; Alt must arrive as VirtualKeyModifiers.Menu for this to resolve");
 
-		// 51. A REAL window shrink, through the window manager, makes the chevron appear on the
+		// 52. A REAL window shrink, through the window manager, makes the chevron appear on the
 		//     reference bar - the whole point of the overflow.
 		var sizeBefore = XamlRoot?.Size ?? default;
 		RunShell($"xdotool windowsize --sync {_ownWindow} 420 900");
@@ -1017,7 +1044,7 @@ public sealed partial class MainPage : Page
 			+ $"hasOverflow={MainToolBar.HasOverflowItems} "
 			+ $"chevron={(chevron == null ? "absent" : $"{chevron.ActualWidth:0.#}x{chevron.ActualHeight:0.#}")}");
 
-		// 52. What is BEHIND the chevron still belongs to the bar: the seam wave 3 closed. An
+		// 53. What is BEHIND the chevron still belongs to the bar: the seam wave 3 closed. An
 		//     overflowed button keeps the bar's label mode and still follows its command.
 		VerboseCheck.IsChecked = true;
 		UpdateLayout();
@@ -1039,7 +1066,7 @@ public sealed partial class MainPage : Page
 			+ $"printFound={commandFollower != null} enabled={enabledInOverflow} "
 			+ $"afterCanExecuteFalse={disabledInOverflow}");
 
-		// 53. The chevron's flyout paints the moved items on the head.
+		// 54. The chevron's flyout paints the moved items on the head.
 		var flyoutOpened = MainToolBar.ShowOverflow();
 		await Task.Delay(900);
 		var paintedInFlyout = overflowed.Count > 0 && overflowed[0].ActualWidth > 0;
@@ -1052,7 +1079,7 @@ public sealed partial class MainPage : Page
 		await Task.Delay(400);
 		VerboseCheck.IsChecked = false;
 
-		// 54. The window really painted. A capture of THIS window - not the root, which on this
+		// 55. The window really painted. A capture of THIS window - not the root, which on this
 		//     compositing window manager comes back without window contents - is searched for the
 		//     colour the reference tray sits on, and the count is compared with the area the tray
 		//     was arranged at.
@@ -1140,12 +1167,22 @@ public sealed partial class MainPage : Page
 	private static double OffsetIn(UIElement bar, UIElement element)
 		=> element.TransformToVisual(bar).TransformPoint(new Point(0, 0)).X;
 
+	/// <summary>
+	/// Lists the visible windows this process owns, newest first.
+	/// </summary>
+	/// <returns>The window ids to try, in the order to try them.</returns>
+	/// <remarks>
+	/// The candidates are the windows the desktop attributes to this PROCESS ID, never the windows
+	/// carrying this demo's title: another head running the same demo is titled the same, and a
+	/// title is not an identity. Which of them is this page's own is then settled by the focus probe
+	/// in the keyboard check - the window whose key press moves THIS page's focus.
+	/// </remarks>
 	private static IEnumerable<string> ListDemoWindows()
 	{
-		var output = RunShell("xdotool search --onlyvisible --name '^CommandBar Demo$'");
+		var output = RunShell($"xdotool search --onlyvisible --pid {Environment.ProcessId}");
 
-		//Window ids ascend with creation order, so the newest - this process's own, in the
-		//usual case - is tried first.
+		//Window ids ascend with creation order, so the newest - the one the page is in, when a head
+		//opened more than one - is tried first.
 		return output
 			.Split('\n', StringSplitOptions.RemoveEmptyEntries)
 			.Select(line => line.Trim())

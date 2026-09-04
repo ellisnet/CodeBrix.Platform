@@ -613,11 +613,7 @@ WORKING EXAMPLES ON GITHUB
     CoreWebView2.Source and DocumentTitle, and DownloadStarting wired into a
     status line with BytesReceivedChanged / StateChanged):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebViewDemo
-    The shared page is WebViewDemo.UI/Views/MainPage.xaml(.cs). Setting the
-    environment variable WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL=<url> makes the
-    demo navigate there and exit PASS/FAIL when the download finishes - a
-    ready-made scripted check for downloads on a new machine (pair it with a
-    local server that sends Content-Disposition: attachment).
+    The shared page is WebViewDemo.UI/Views/MainPage.xaml(.cs).
   - The core WebView2 contract sources (control + CoreWebView2 facade):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI/UI/Xaml/Controls/WebView
   - The add-in source (internal seams; Linux WPE engine binding):

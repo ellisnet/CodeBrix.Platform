@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+
+    <!-- Runtime identity. Formerly set by the Skia.MacOS runtime package's buildTransitive props. -->
+    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+    <IsCodeBrixHead Condition="'$(OutputType)'=='Exe' OR '$(OutputType)'=='WinExe'">true</IsCodeBrixHead>
+
+    <!-- CodeBrix.Platform feature defines. The NuGet supplied these via its buildTransitive
+         targets (platform.winui.common.targets + the Skia.MacOS runtime targets); this head is
+         outside the src tree so it does not inherit them from Directory.Build, hence they are set
+         explicitly here. The Skia.MacOS runtime defines HAS_CODEBRIX_SKIA_MACOS / __CODEBRIX_SKIA_MACOS__. -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__;HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING;CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE;CODEBRIX_HAS_NO_IDEPENDENCYOBJECT;CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_SKIA_MACOS;__DESKTOP__;__CODEBRIX_SKIA__;__CODEBRIX_SKIA_MACOS__</DefineConstants>
+
+    <!-- MSB3277: benign reference-version conflicts that can flow in transitively via the Skia
+         runtimes (same rationale as the platform's own runtime csprojs, which NoWarn it). -->
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+  </PropertyGroup>
+
+  <!-- Tell MSBuild to treat .xaml files as CodeBrix.Platform XAML pages -->
+  <ItemGroup>
+    <Page Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml" />
+    <None Remove="**\*.xaml" />
+  </ItemGroup>
+
+  <!-- Shared UI files (linked from TriPaneViewDemo.UI) -->
+  <Import Project="..\TriPaneViewDemo.UI\TriPaneViewDemo.UI.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\TriPaneViewDemo.Core\TriPaneViewDemo.Core.csproj" />
+  </ItemGroup>
+
+  <!--
+    Platform-specific runtime: Skia macOS backend, formerly the
+    CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever NuGet. The macOS runtime references
+    the Linux.FrameBuffer runtime (it builds on its frame-buffer functionality), so that flows in
+    transitively. The native macOS dylib is built only on Apple Silicon; on Windows/Intel the
+    managed build still succeeds (the head just can't run without the native libs). All other
+    platform references come transitively via TriPaneViewDemo.Core.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Runtime.Skia.MacOS\Platform.UI.Runtime.Skia.MacOS.csproj" />
+  </ItemGroup>
+
+  <!--
+    XAML source-generator + build-task pipeline. The NuGet flowed this into heads via its
+    buildTransitive targets; it does NOT flow across a ProjectReference, so a head that compiles
+    .xaml must wire it up directly. Mirrors the repo's own from-source build
+    (src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj).
+  -->
+  <PropertyGroup>
+    <CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DocsGeneration)'==''">
+    <ProjectReference Include="..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+      <UndefineProperties>TargetFramework</UndefineProperties>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+  <Import Project="..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+  <!--
+    Shared macOS-head build logic (from-source runtime-replace assembly swap + native dylib copy
+    and de-quarantine). Lives in one file so all *.MacOS sample heads stay in sync; see that file
+    for the full rationale. Imported only by *.MacOS heads and self-gated to them, so it never
+    affects the other platform heads.
+  -->
+  <Import Project="..\..\CodeBrix.MacOSHead.targets" />
+
+</Project>

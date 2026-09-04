@@ -69,6 +69,8 @@ internal static partial class X11Helper
 	public const string _NET_WM_ACTION_MAXIMIZE_HORZ = "_NET_WM_ACTION_MAXIMIZE_HORZ";
 	public const string _NET_WM_ACTION_MAXIMIZE_VERT = "_NET_WM_ACTION_MAXIMIZE_VERT";
 	public const string _NET_WM_ICON = "_NET_WM_ICON";
+	public const string _NET_WM_PID = "_NET_WM_PID";
+	public const string WM_CLIENT_MACHINE = "WM_CLIENT_MACHINE";
 	public const string _MOTIF_WM_HINTS = "_MOTIF_WM_HINTS";
 	public const string TIMESTAMP = "TIMESTAMP";
 	public const string MULTIPLE = "MULTIPLE";
@@ -78,6 +80,7 @@ internal static partial class X11Helper
 	public const string XA_INTEGER = "INTEGER";
 	public const string XA_ATOM = "ATOM";
 	public const string XA_CARDINAL = "CARDINAL";
+	public const string XA_STRING = "STRING";
 	public const string ATOM_PAIR = "ATOM_PAIR";
 	public const string INCR = "INCR";
 	public const string XdndAware = "XdndAware";

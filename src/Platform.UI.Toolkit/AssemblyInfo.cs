@@ -10,3 +10,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("SamplesApp.macOS")]
 [assembly: InternalsVisibleTo("SamplesApp.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.App.Mcp.Client")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit.Tests")]

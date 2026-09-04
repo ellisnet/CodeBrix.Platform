@@ -58,21 +58,29 @@ Qt's three drop-down popup modes).
 The ICON story is shared, and it is the one thing that crosses between them.
 ToolIconSource derives from the framework's IconSource, and SvgIcon / RasterIcon
 are IconElements, so the same artwork works on a ToolButton and on an
-AppBarButton - directly as the Icon, or through the framework's
-IconSourceElement wrapper:
+AppBarButton - the element straight into the Icon, or the source through the
+framework's IconSourceElement wrapper:
 
     <AppBarButton Label="Open">
         <AppBarButton.Icon>
+            <cb:SvgIcon UriSource="ms-appx:///Icons/open.svg" Size="20" />
+        </AppBarButton.Icon>
+    </AppBarButton>
+
+    <AppBarButton Label="Save">
+        <AppBarButton.Icon>
             <IconSourceElement>
-                <cb:SvgIconSource Source="ms-appx:///Icons/open.svg" Size="20" />
+                <cb:SvgIconSource Source="ms-appx:///Icons/save.svg" Size="20" />
             </IconSourceElement>
         </AppBarButton.Icon>
     </AppBarButton>
 
-Use SvgIconSource / RasterIconSource for an AppBarButton (an icon as a VALUE);
-the SvgIcon / RasterIcon elements are for a template or anywhere an IconElement
-is wanted on its own. One thing does not flow automatically: the core framework
-package NEVER depends on the SVG renderer, so an SVG icon on a WinUI
+Reach for SvgIconSource / RasterIconSource wherever an icon is wanted as a
+VALUE - ToolButton.Icon, a XamlUICommand's IconSource, a shared resource - and
+for the SvgIcon / RasterIcon ELEMENTS wherever the framework wants an element:
+an AppBarButton's or MenuFlyoutItem's Icon, or a template. One thing does not
+flow automatically: the core framework package NEVER depends on the SVG
+renderer, so an SVG icon on a WinUI
 AppBarButton works only in an application that references the SVG add-in
 (CodeBrix.Platform.Svg.ApacheLicenseForever) or this package, which brings it.
 Font, symbol, path and PNG icons on a WinUI AppBarButton need neither.
@@ -328,9 +336,11 @@ ICONS
         EffectiveIconSize and UpdateIcon().
 
     Markup extensions, for terse XAML:
-        {cb:SvgIcon Source=..., Dark=..., Markup=..., Tint=..., TintMode=...,
-                    Size=...}
-        {cb:RasterIcon Source=..., Dark=..., Tint=..., Size=...}
+        {cb:SvgIconSource Source=..., Dark=..., Markup=..., Tint=...,
+                          TintMode=..., Size=...}
+        {cb:RasterIconSource Source=..., Dark=..., Tint=..., Size=...}
+        They are named after what they RETURN - a source - which is also what
+        leaves <cb:SvgIcon /> and <cb:RasterIcon /> free to be the elements.
         A relative path is read as ms-appx:///; an absolute URI is taken as
         written. Use the full object syntax when you need to BIND a value.
 
@@ -449,8 +459,9 @@ COMPLETE EXAMPLES
           <cb:ToolBarGroup>
             <cb:ToolDropDownButton Text="Engrave" PopupMode="MenuButton"
                                    Command="{Binding EngraveCommand}"
-                                   Icon="{cb:SvgIcon Source=Icons/engrave.svg,
-                                                     Dark=Icons/engrave.dark.svg}">
+                                   Icon="{cb:SvgIconSource
+                                          Source=Icons/engrave.svg,
+                                          Dark=Icons/engrave.dark.svg}">
               <cb:ToolDropDownButton.Flyout>
                 <MenuFlyout>
                   <MenuFlyoutItem Text="Preview"
@@ -464,8 +475,9 @@ COMPLETE EXAMPLES
             </cb:ToolDropDownButton>
             <cb:ToolButton Text="Print" Shortcut="Ctrl+P"
                            Command="{Binding PrintCommand}"
-                           Icon="{cb:SvgIcon Source=Icons/print.svg,
-                                             Dark=Icons/print.dark.svg}" />
+                           Icon="{cb:SvgIconSource
+                                  Source=Icons/print.svg,
+                                  Dark=Icons/print.dark.svg}" />
           </cb:ToolBarGroup>
 
           <cb:ToolBarSeparator />
@@ -480,8 +492,9 @@ COMPLETE EXAMPLES
 
           <cb:ToolToggleButton Text="Magnifier"
                                IsChecked="{Binding Magnifier, Mode=TwoWay}"
-                               Icon="{cb:RasterIcon Source=Icons/magnifier.png,
-                                                    Tint={ThemeResource TextFillColorPrimaryBrush}}" />
+                               Icon="{cb:RasterIconSource
+                                      Source=Icons/magnifier.png,
+                                      Tint={ThemeResource TextFillColorPrimaryBrush}}" />
         </cb:ToolBar>
 
         <cb:ToolBar Title="Music">
@@ -541,25 +554,28 @@ the bar is in the tree.
     <!-- A light/dark pair. The dark artwork replaces the light one whenever the
          element's ActualTheme is dark, and swaps back live on a theme change. -->
     <cb:ToolButton Text="New"
-                   Icon="{cb:SvgIcon Source=Icons/new.svg, Dark=Icons/new.dark.svg}" />
+                   Icon="{cb:SvgIconSource Source=Icons/new.svg,
+                                           Dark=Icons/new.dark.svg}" />
 
     <!-- One file, any colour: artwork drawn in currentColor takes the tint. -->
     <cb:ToolButton Text="Next page"
-                   Icon="{cb:SvgIcon Source=Icons/chevron.svg,
-                                     Tint={ThemeResource AccentFillColorDefaultBrush}}" />
+                   Icon="{cb:SvgIconSource Source=Icons/chevron.svg,
+                                           Tint={ThemeResource AccentFillColorDefaultBrush}}" />
 
     <!-- A PNG tinted through its ALPHA: the opaque pixels are painted with the
          tint, exactly as BitmapIcon.ShowAsMonochrome does. -->
     <cb:ToolButton Text="Magnifier"
-                   Icon="{cb:RasterIcon Source=Icons/magnifier.png, Tint=#FF3A6EA5}" />
+                   Icon="{cb:RasterIconSource Source=Icons/magnifier.png,
+                                              Tint=#FF3A6EA5}" />
 
     <!-- A JPEG, drawn as it was written. A JPEG has no alpha, so a tint would
          paint the whole rectangle - leave it unset. -->
-    <cb:ToolButton Text="Score" Icon="{cb:RasterIcon Source=Icons/score.jpg}" />
+    <cb:ToolButton Text="Score"
+                   Icon="{cb:RasterIconSource Source=Icons/score.jpg}" />
 
     <!-- Artwork embedded in a class library rather than shipped beside the app. -->
     <cb:ToolButton Text="Open"
-                   Icon="{cb:SvgIcon Source=cb-res://MyCompany.Icons/open.svg}" />
+                   Icon="{cb:SvgIconSource Source=cb-res://MyCompany.Icons/open.svg}" />
 
     <!-- The same icons as ELEMENTS, where the framework wants an IconElement. -->
     <MenuFlyoutItem Text="Publish">
@@ -676,13 +692,25 @@ COMMON PITFALLS TO AVOID
     DockPanel - if you want Fill="True" to push something to the far end. This
     is the same rule a star-sized column follows in an auto-sized container.
 
- 8. AN ICON SOURCE IS A VALUE; AN ICON ELEMENT IS A THING.
+ 8. AN ICON SOURCE IS A VALUE; AN ICON ELEMENT IS A THING - AND THE NAME TELLS
+    YOU WHICH ONE YOU JUST WROTE.
     SvgIconSource / RasterIconSource are what you hand to a property that wants
-    an icon - ToolButton.Icon, AppBarButton.Icon (through the framework's
-    IconSourceElement), a XamlUICommand's IconSource. SvgIcon / RasterIcon are
-    IconElements: use them in a template, or anywhere the framework wants an
-    element rather than a source. The two carry the same properties, and a
-    source builds the matching element when it is asked for one.
+    an icon as a value - ToolButton.Icon, a XamlUICommand's IconSource, a
+    shared ResourceDictionary entry - and to AppBarButton.Icon through the
+    framework's IconSourceElement. SvgIcon / RasterIcon are IconElements: put
+    one straight into an AppBarButton's or a MenuFlyoutItem's Icon, or use one
+    in a template. The two carry the same properties, and a source builds the
+    matching element when it is asked for one.
+    THE ELEMENT FORM IS THE ELEMENT; THE MARKUP FORM IS THE SOURCE:
+
+        <cb:SvgIcon UriSource="ms-appx:///Icons/open.svg" />  -> an SvgIcon
+        Icon="{cb:SvgIconSource Source=Icons/open.svg}"       -> an SvgIconSource
+
+    That is why the markup extensions are named after the SOURCES rather than
+    after the elements. A prefixed XAML name is looked up with an "Extension"
+    suffix FIRST, in either syntax, so an extension named after an element
+    would answer for the element form too and hand an IconElement property a
+    source - which does not fit, and fails where it is assigned.
 
  9. SET Size ON AN ICON ELEMENT, NOT Width AND Height.
     Size (or the inherited ToolBarProperties.IconSize) is what the icon is
@@ -763,7 +791,7 @@ abstract class ToolIconSource : IconSource
     GlyphIconSource    Glyph, FontFamily, Size
     SvgIcon/RasterIcon UriSource, DarkUriSource, (Markup,) Tint, (TintMode,)
                        Size, ResolvedUriSource, EffectiveIconSize, UpdateIcon()
-    {cb:SvgIcon ...}   {cb:RasterIcon ...}     markup extensions
+    {cb:SvgIconSource ...}      {cb:RasterIconSource ...}   markup extensions
     IconTintMode       CurrentColorOnly | ReplaceBlackAndWhite | None
     IconResourceScheme cb-res://Assembly/resource.svg
     IconRasterCache    Count, Clear()

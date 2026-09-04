@@ -80,6 +80,83 @@ internal static partial class KeyboardStateTracker
 		SetStateOnNonSideKeys(key);
 	}
 
+	/// <summary>
+	/// Reconciles the tracked modifier keys against the modifier mask carried by an input event.
+	/// </summary>
+	/// <param name="modifiers">The modifier mask the event carries.</param>
+	/// <param name="eventKey">
+	/// The key the event is about, when it is a key event, so that key is left to
+	/// <see cref="OnKeyDown"/>/<see cref="OnKeyUp"/>; <see cref="VirtualKey.None"/> otherwise.
+	/// </param>
+	/// <remarks>
+	/// Key down and key up alone cannot keep the modifier keys honest: a window manager that keeps a
+	/// modifier combination for itself (an Alt drag, or a window menu on Alt+Space) swallows the
+	/// release, and the modifier would then read "held" for every later click until the window was
+	/// deactivated. Every routed key and pointer event carries the modifier mask the system had at
+	/// the time, so that mask is the authority on the modifier keys - and only on them: a key the
+	/// mask cannot speak for keeps whatever state its own key events gave it.
+	/// </remarks>
+	internal static void ReconcileModifiers(VirtualKeyModifiers modifiers, VirtualKey eventKey = VirtualKey.None)
+	{
+		ReconcileModifier(modifiers, VirtualKeyModifiers.Shift, VirtualKey.Shift, VirtualKey.LeftShift, VirtualKey.RightShift, eventKey);
+		ReconcileModifier(modifiers, VirtualKeyModifiers.Control, VirtualKey.Control, VirtualKey.LeftControl, VirtualKey.RightControl, eventKey);
+		ReconcileModifier(modifiers, VirtualKeyModifiers.Menu, VirtualKey.Menu, VirtualKey.LeftMenu, VirtualKey.RightMenu, eventKey);
+
+		// There is no side-agnostic Windows key in VirtualKey, so a Windows modifier the mask reports
+		// as held cannot be attributed to a side; a Windows modifier it reports as NOT held still
+		// clears both sides, which is the direction that leaves a key stuck.
+		ReconcileModifier(modifiers, VirtualKeyModifiers.Windows, VirtualKey.None, VirtualKey.LeftWindows, VirtualKey.RightWindows, eventKey);
+	}
+
+	private static void ReconcileModifier(
+		VirtualKeyModifiers modifiers,
+		VirtualKeyModifiers flag,
+		VirtualKey combined,
+		VirtualKey left,
+		VirtualKey right,
+		VirtualKey eventKey)
+	{
+		if (eventKey != VirtualKey.None && (eventKey == combined || eventKey == left || eventKey == right))
+		{
+			// The event is this modifier's own. A mask is sampled before the key that raised the
+			// event is applied on some backends and after it on others, so it may not agree with the
+			// event yet; the key's own down/up is what counts.
+			return;
+		}
+
+		var held = (modifiers & flag) == flag;
+		var tracked = IsDown(combined) || IsDown(left) || IsDown(right);
+		if (held == tracked)
+		{
+			return;
+		}
+
+		if (held)
+		{
+			// A press that never arrived. The mask does not say which side it was.
+			if (combined != VirtualKey.None)
+			{
+				OnKeyDown(combined);
+			}
+
+			return;
+		}
+
+		// A release that never arrived. Both sides go up before the side-agnostic key, so the
+		// side-agnostic key ends up released whichever side was down.
+		OnKeyUp(left);
+		OnKeyUp(right);
+		if (combined != VirtualKey.None)
+		{
+			OnKeyUp(combined);
+		}
+	}
+
+	private static bool IsDown(VirtualKey key)
+		=> key != VirtualKey.None
+			&& _keyStates.TryGetValue(key, out var state)
+			&& state.HasFlag(CoreVirtualKeyStates.Down);
+
 	private static void SetStateOnNonSideKeys(VirtualKey key)
 	{
 		if (key == VirtualKey.LeftShift || key == VirtualKey.RightShift)

@@ -250,6 +250,33 @@ Media assets come from samples/assets/video (see SHARED SAMPLE ASSETS below).
 Run:
     dotnet run --project samples/CodeBrixPlatform/VideoPlayerDemo/VideoPlayerDemo.LinuxX11
 
+CommandBarDemo
+--------------
+    samples/CodeBrixPlatform/CommandBarDemo    six heads
+    Add-in: CodeBrix.Platform.CommandBar
+
+A score editor's two tool bars, in the shape a desktop application puts across
+the top of its window: a main bar of file and engrave commands, and a music bar
+of view controls, both in one ToolBarTray. It exercises the whole vocabulary -
+ToolBarGroup runs with automatic separators, ToolBarSeparator, a filling
+ToolBarSpacer, ToolButton, ToolToggleButton, ToolDropDownButton with a
+MenuButton split arrow behind a MenuFlyout, and ordinary ComboBoxes sitting in
+the bar as items - with chevron overflow when a bar does not fit. Commands are
+bound both ways they can be: XamlUICommands that carry their own label, icon,
+description and shortcut, and plain ICommands whose CanExecute drives IsEnabled.
+Icons are SVG (themed and tinted) and raster (PNG, JPEG), and two check boxes
+change the bar-level "show button text" and "show tooltips" settings while the
+window is open.
+
+Self-test: COMMANDBARDEMO_SELFTEST=1 makes the app run its scripted checks once
+loaded, print PASS/FAIL lines and exit with the failure count;
+COMMANDBARDEMO_RESULTS=<path> writes the same lines to a file. It drives the
+bars with xdotool and window captures, so run it on the X11 head with DISPLAY
+set.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/CommandBarDemo/CommandBarDemo.LinuxX11
+
 FlexPanelDemo
 -------------
     samples/CodeBrixPlatform/FlexPanelDemo    six heads
@@ -311,6 +338,32 @@ and paste.
 
 Run:
     dotnet run --project samples/CodeBrixPlatform/TerminalViewDemo/src/TerminalViewDemo.LinuxX11
+
+TriPaneViewDemo
+---------------
+    samples/CodeBrixPlatform/TriPaneViewDemo    six heads
+    No add-in: TriPaneView is a Toolkit type, folded into the core package
+
+Three resizable panes - a full-height side pane, and an upper and a lower pane
+stacked beside it - separated by two draggable dividers. A control strip over
+the control drives everything from outside: the side-pane placement, the four
+percent weights and two minimum lengths as two-way bound number boxes, the two
+"can drag" toggles, drag-to-minimize, the restore-grip mode, per-pane
+Minimize/Restore buttons and Restore all, and a horizontal-scroll mode per pane.
+The panes themselves are the proof: a long list that scrolls vertically, a
+star-row Grid holding a TextBox with vertical scrolling disabled so the content
+fills the pane and survives a minimize with its text intact, and a FlexPanel of
+tiles beside a deliberately wide strip that starts scrolling sideways when the
+window turns portrait.
+
+Self-test: TRIPANEVIEWDEMO_SELFTEST=1 makes the app run its scripted checks once
+loaded, print PASS/FAIL lines and exit with the failure count;
+TRIPANEVIEWDEMO_RESULTS=<path> writes the same lines to a file. It drags the
+dividers with injected pointer input and reshapes the window with xdotool, so
+run it on the X11 head with DISPLAY set.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/TriPaneViewDemo/TriPaneViewDemo.LinuxX11
 
 WebViewDemo
 -----------

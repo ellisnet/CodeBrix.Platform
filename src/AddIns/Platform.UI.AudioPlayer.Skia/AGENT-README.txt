@@ -612,9 +612,7 @@ WORKING EXAMPLES ON GITHUB
       declares two AudioPlayer elements and a MidiPlayer, drives all five audio
       formats (WAV, MP3, Ogg Vorbis, FLAC, and Opus through the registered
       CodeBrix.Audio.Opus.BsdLicenseForever package), compressed sound effects,
-      and the MIDI player from background load through tempo and seek. Setting
-      the environment variable AUDIOPLAYERDEMO_SELFTEST=1 before launching runs
-      a scripted end-to-end verification of all of that and exits PASS/FAIL.
+      and the MIDI player from background load through tempo and seek.
       Start with AudioPlayerDemo.UI/Views/MainPage.xaml and its code-behind.
   https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/AddIns/Platform.UI.AudioPlayer.Skia
       The add-in's own source (AudioPlayer.cs, MidiPlayer.cs, SoundEffect.cs),

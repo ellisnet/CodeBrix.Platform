@@ -623,6 +623,10 @@ namespace Microsoft.UI.Xaml
 			{
 				TrackKeyState(routedEvent, args);
 			}
+			else if (routedEvent.IsPointerEvent)
+			{
+				TrackPointerModifierState(args);
+			}
 
 			// [3] Any local handlers?
 			var isHandled = IsHandled(args);
@@ -718,6 +722,10 @@ namespace Microsoft.UI.Xaml
 			{
 				TrackKeyState(routedEvent, args);
 			}
+			else if (routedEvent.IsPointerEvent)
+			{
+				TrackPointerModifierState(args);
+			}
 
 			// On WinUI, if one of the event handlers reparents this element, the tunneling still goes through the
 			// original path.
@@ -745,6 +753,13 @@ namespace Microsoft.UI.Xaml
 		{
 			if (args is KeyRoutedEventArgs keyArgs)
 			{
+				// The modifier mask this event carries is what the system really had: a modifier
+				// press or release the application never received (a window manager that keeps Alt
+				// for a window drag, or Alt+Space for its window menu, swallows both) is corrected
+				// here rather than left stuck until the window is deactivated. The key this event is
+				// about is excluded - its own state is applied just below.
+				KeyboardStateTracker.ReconcileModifiers(keyArgs.KeyboardModifiers, keyArgs.OriginalKey);
+
 				if (routedEvent == KeyDownEvent
 #if __SKIA__
 					|| routedEvent == PreviewKeyDownEvent
@@ -762,6 +777,27 @@ namespace Microsoft.UI.Xaml
 					KeyboardStateTracker.OnKeyUp(keyArgs.OriginalKey);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Follows the modifier keys through a pointer event, which carries the same modifier mask a
+		/// key event does and is very often the first event after a modifier combination the window
+		/// manager kept for itself.
+		/// </summary>
+		/// <param name="args">The pointer event's arguments.</param>
+		/// <remarks>
+		/// Only the backends that build <see cref="PointerRoutedEventArgs"/> from a system pointer
+		/// event fill in <see cref="PointerRoutedEventArgs.KeyModifiers"/>; where it is always None
+		/// it would say every modifier is up, so the reconciliation is compiled in only for those.
+		/// </remarks>
+		private static void TrackPointerModifierState(RoutedEventArgs args)
+		{
+#if CODEBRIX_HAS_MANAGED_POINTERS || IS_UNIT_TESTS
+			if (args is PointerRoutedEventArgs pointerArgs)
+			{
+				KeyboardStateTracker.ReconcileModifiers(pointerArgs.KeyModifiers);
+			}
+#endif
 		}
 
 		// This method is a workaround for https://github.com/mono/mono/issues/12981

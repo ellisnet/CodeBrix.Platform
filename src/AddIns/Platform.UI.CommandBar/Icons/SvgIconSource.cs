@@ -17,8 +17,8 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// - a new tint, a new size - reaches all of them.
 /// </para>
 /// <para>
-/// In XAML the terse form is the <see cref="SvgIconExtension">{cb:SvgIcon}</see> markup extension;
-/// this full form is the one to use when a property has to be bound.
+/// In XAML the terse form is the <see cref="SvgIconSourceExtension">{cb:SvgIconSource}</see>
+/// markup extension; this full form is the one to use when a property has to be bound.
 /// </para>
 /// </remarks>
 public partial class SvgIconSource : ToolIconSource

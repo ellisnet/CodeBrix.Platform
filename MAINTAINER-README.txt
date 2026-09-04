@@ -202,20 +202,45 @@ upstream, run-devserver-cli-tests.ps1) drive the runtime tests with
 UITEST_RUNTIME_TEST_GROUP / CODEBRIX_TESTS_FAILED_LIST / TEST_RESULTS_FILE
 environment variables and expect BUILD_SOURCESDIRECTORY to be set.
 
-Several add-in demos double as scripted smoke tests on the X11 head (an
-environment variable makes the app run a self-test and exit PASS/FAIL); each
-add-in's AGENT-README and EXTRAS-README.txt name the variable. CommandBarDemo's
-is COMMANDBARDEMO_SELFTEST=1, with COMMANDBARDEMO_RESULTS=<path> writing the
-PASS/FAIL lines to a file as well; it drives the tool bars through xdotool and
-window captures, so run it on the X11 head with DISPLAY set:
+Several demos double as scripted smoke tests: an environment variable makes
+the app run a self-test once loaded, print PASS/FAIL lines and exit with the
+failure count. EXTRAS-README.txt names each variable in the demo's entry (the
+package AGENT-READMEs do not; this is maintainer material). The full set:
+
+    AudioPlayerDemo   AUDIOPLAYERDEMO_SELFTEST=1
+                      X11 head; "APD-SELFTEST: PASS|FAIL <step>" lines
+    CommandBarDemo    COMMANDBARDEMO_SELFTEST=1  (+ COMMANDBARDEMO_RESULTS=<path>)
+                      X11 head with DISPLAY set; xdotool and window captures
+    ParityDemo        exactly one of PARITYDEMO_SELFTEST / PARITYDEMO_CLIPTEST /
+                      PARITYDEMO_CHROMETEST / PARITYDEMO_TOUCHTEST = 1
+                      (+ PARITYDEMO_RESULTS=<path>); X11 or Wayland head; "PARITY|" lines
+    TriPaneViewDemo   TRIPANEVIEWDEMO_SELFTEST=1  (+ TRIPANEVIEWDEMO_RESULTS=<path>)
+                      X11 head with DISPLAY set; injected pointer input and xdotool
+    WebViewDemo       WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL=<url>
+                      navigates there, logs "WVD-SELFTEST:" lines, exits when the
+                      download completes (pair it with a local server that sends
+                      Content-Disposition: attachment)
+
+CommandBarDemo drives the tool bars through xdotool and window captures, so
+run it on the X11 head with DISPLAY set:
 
     cd samples/CodeBrixPlatform/CommandBarDemo/CommandBarDemo.LinuxX11
     DISPLAY=:0 COMMANDBARDEMO_SELFTEST=1 \
         dotnet bin/Release/net10.0/CommandBarDemo.LinuxX11.dll
 
-Every window it opens is titled "CommandBar Demo", so the self-test elects its
-OWN window by probing which one its key presses reach, never by title; a second
-demo left running on the same display does not disturb it.
+Every window it opens is titled "CommandBar Demo", so the self-test never goes
+by title: it takes the windows the desktop attributes to its own process id and
+elects its OWN one by probing which of them its key presses reach; a second demo
+left running on the same display does not disturb it.
+
+TriPaneViewDemo works the same way: TRIPANEVIEWDEMO_SELFTEST=1, with
+TRIPANEVIEWDEMO_RESULTS=<path> for the file, drags the dividers with injected
+pointer input and reshapes the window with xdotool, so it too needs the X11 head
+with DISPLAY set:
+
+    cd samples/CodeBrixPlatform/TriPaneViewDemo/TriPaneViewDemo.LinuxX11
+    DISPLAY=:0 TRIPANEVIEWDEMO_SELFTEST=1 \
+        dotnet bin/Release/net10.0/TriPaneViewDemo.LinuxX11.dll
 
 PACKAGING AND PUBLISHING
 ========================

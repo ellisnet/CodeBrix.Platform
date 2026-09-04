@@ -71,6 +71,11 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           Audio playback (WAV, MP3, Ogg Vorbis, FLAC, Opus), sound effects and MIDI
           synthesis through SoundFont/SFZ instruments.
 
+  src/AddIns/Platform.UI.CommandBar/AGENT-README.txt
+      CodeBrix.Platform.CommandBar.ApacheLicenseForever
+          Desktop tool bars: trays, bars, groups, separators, spacers and command-bound
+          buttons with SVG and raster icons.
+
   src/AddIns/Platform.UI.FlexPanel/AGENT-README.txt
       CodeBrix.Platform.FlexPanel.ApacheLicenseForever
           A CSS flexbox-style XAML layout panel.

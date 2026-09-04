@@ -1,0 +1,254 @@
+<Page x:Class="TriPaneViewDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:flex="using:CodeBrix.Platform.UI.FlexPanel"
+      xmlns:toolkit="using:CodeBrix.Platform.UI.Toolkit"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+  <Grid Padding="8" RowSpacing="8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!--
+      The control strip. It wraps, so it stays usable when the window is narrow, and it never eats
+      the pane area: a maximum height plus its own vertical scroll bar keep the TriPaneView below it
+      in charge of the rest of the page.
+    -->
+    <ScrollViewer Grid.Row="0"
+                  MaxHeight="152"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollMode="Disabled"
+                  HorizontalScrollBarVisibility="Disabled">
+      <flex:FlexPanel Direction="Row" Wrap="Wrap" AlignItems="Start">
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Placement" FontSize="12" />
+          <CheckBox x:Name="PlacementRightCheck"
+                    Content="Side pane on the right"
+                    Checked="OnPlacementChanged"
+                    Unchecked="OnPlacementChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Side %" FontSize="12" />
+          <NumberBox x:Name="SidePercentBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="100"
+                     SmallChange="5"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding SidePanePercent, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Stack %" FontSize="12" />
+          <NumberBox x:Name="StackPercentBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="100"
+                     SmallChange="5"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding StackPercent, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Upper %" FontSize="12" />
+          <NumberBox x:Name="UpperPercentBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="100"
+                     SmallChange="5"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding UpperPanePercent, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Lower %" FontSize="12" />
+          <NumberBox x:Name="LowerPercentBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="100"
+                     SmallChange="5"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding LowerPanePercent, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Side min px" FontSize="12" />
+          <NumberBox x:Name="SideMinLengthBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="600"
+                     SmallChange="25"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding SidePaneMinLength, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Upper min px" FontSize="12" />
+          <NumberBox x:Name="UpperMinLengthBox"
+                     Width="118"
+                     Minimum="0"
+                     Maximum="600"
+                     SmallChange="25"
+                     SpinButtonPlacementMode="Compact"
+                     ValidationMode="InvalidInputOverwritten"
+                     Value="{Binding UpperPaneMinLength, ElementName=Panes, Mode=TwoWay}" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Dividers" FontSize="12" />
+          <CheckBox x:Name="DragSideCheck"
+                    Content="Drag the side divider"
+                    IsChecked="True"
+                    Checked="OnDividerOptionChanged"
+                    Unchecked="OnDividerOptionChanged" />
+          <CheckBox x:Name="DragStackCheck"
+                    Content="Drag the stack divider"
+                    IsChecked="True"
+                    Checked="OnDividerOptionChanged"
+                    Unchecked="OnDividerOptionChanged" />
+          <CheckBox x:Name="DragToMinimizeCheck"
+                    Content="Drag to minimize"
+                    Checked="OnDividerOptionChanged"
+                    Unchecked="OnDividerOptionChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Restore grip" FontSize="12" />
+          <ComboBox x:Name="GripModeCombo" Width="140" SelectionChanged="OnGripModeChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Side pane" FontSize="12" />
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Button x:Name="MinimizeSideButton" Content="Minimize" Click="OnMinimizeSide" />
+            <Button x:Name="RestoreSideButton" Content="Restore" Click="OnRestoreSide" />
+          </StackPanel>
+          <ComboBox x:Name="SideScrollCombo" Width="150" SelectionChanged="OnScrollModeChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Upper pane" FontSize="12" />
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Button x:Name="MinimizeUpperButton" Content="Minimize" Click="OnMinimizeUpper" />
+            <Button x:Name="RestoreUpperButton" Content="Restore" Click="OnRestoreUpper" />
+          </StackPanel>
+          <ComboBox x:Name="UpperScrollCombo" Width="150" SelectionChanged="OnScrollModeChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Lower pane" FontSize="12" />
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Button x:Name="MinimizeLowerButton" Content="Minimize" Click="OnMinimizeLower" />
+            <Button x:Name="RestoreLowerButton" Content="Restore" Click="OnRestoreLower" />
+          </StackPanel>
+          <ComboBox x:Name="LowerScrollCombo" Width="150" SelectionChanged="OnScrollModeChanged" />
+        </StackPanel>
+
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Everything" FontSize="12" />
+          <Button x:Name="RestoreAllButton" Content="Restore all" Click="OnRestoreAll" />
+        </StackPanel>
+
+      </flex:FlexPanel>
+    </ScrollViewer>
+
+    <!--
+      The control itself, filling the rest of the page. The lower pane is the one set to
+      AutoOnPortrait, so a tall narrow window turns its horizontal scrolling on and a wide one turns
+      it off again; the upper pane has vertical scrolling switched off so its grid fills the pane
+      instead of being measured unbounded.
+    -->
+    <toolkit:TriPaneView x:Name="Panes"
+                         Grid.Row="1"
+                         DividerThickness="6"
+                         UpperPaneVerticalScrollBarVisibility="Disabled"
+                         LowerPaneHorizontalScrollMode="AutoOnPortrait">
+
+      <toolkit:TriPaneView.SidePane>
+        <Border Background="#1F3949AB" Padding="8">
+          <StackPanel x:Name="SideList" Spacing="3" />
+        </Border>
+      </toolkit:TriPaneView.SidePane>
+
+      <toolkit:TriPaneView.UpperPane>
+        <Grid x:Name="UpperGrid" Background="#1F00695C" Padding="10" RowSpacing="8">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="1*" />
+          </Grid.RowDefinitions>
+
+          <TextBlock Grid.Row="0"
+                     Text="Upper pane - vertical scrolling is off, so this grid fills the pane and its star rows share the height."
+                     TextWrapping="Wrap"
+                     FontWeight="SemiBold" />
+
+          <TextBox x:Name="SurvivalTextBox"
+                   Grid.Row="1"
+                   AcceptsReturn="True"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Stretch"
+                   VerticalContentAlignment="Top"
+                   PlaceholderText="Type here, minimize this pane, restore it - the text and the caret are still here." />
+
+          <Border Grid.Row="2" Background="#33004D40" CornerRadius="4" Padding="8">
+            <TextBlock Text="A minimized pane is collapsed, never detached: this row keeps the very same elements while the pane is shut."
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center" />
+          </Border>
+        </Grid>
+      </toolkit:TriPaneView.UpperPane>
+
+      <toolkit:TriPaneView.LowerPane>
+        <StackPanel x:Name="LowerContent" Background="#1F6A1B9A" Padding="10" Spacing="10">
+          <TextBlock Text="Lower pane - a FlexPanel of tiles, plus one element far wider than the pane."
+                     TextWrapping="Wrap"
+                     FontWeight="SemiBold" />
+
+          <flex:FlexPanel Direction="Row" Wrap="Wrap" JustifyContent="Start">
+            <Border Width="120" Height="58" Margin="4" Background="#E57373" CornerRadius="4">
+              <TextBlock Text="Tile 1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border Width="120" Height="58" Margin="4" Background="#FFB74D" CornerRadius="4">
+              <TextBlock Text="Tile 2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border Width="120" Height="58" Margin="4" Background="#FFF176" CornerRadius="4">
+              <TextBlock Text="Tile 3" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border Width="120" Height="58" Margin="4" Background="#81C784" CornerRadius="4">
+              <TextBlock Text="Tile 4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border Width="120" Height="58" Margin="4" Background="#64B5F6" CornerRadius="4">
+              <TextBlock Text="Tile 5" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <Border Width="120" Height="58" Margin="4" Background="#BA68C8" CornerRadius="4">
+              <TextBlock Text="Tile 6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+          </flex:FlexPanel>
+
+          <Border x:Name="WideStrip"
+                  Width="1400"
+                  Height="46"
+                  HorizontalAlignment="Left"
+                  Background="#4D6A1B9A"
+                  CornerRadius="4"
+                  Padding="8">
+            <TextBlock Text="A 1400 pixel strip. Set this pane's horizontal scroll mode to Enabled - or make the window portrait, which AutoOnPortrait does for you - and it scrolls."
+                       VerticalAlignment="Center" />
+          </Border>
+        </StackPanel>
+      </toolkit:TriPaneView.LowerPane>
+
+    </toolkit:TriPaneView>
+  </Grid>
+</Page>

@@ -5,7 +5,8 @@ using Microsoft.UI.Xaml.Media;
 namespace CodeBrix.Platform.UI.CommandBar;
 
 /// <summary>
-/// The terse XAML form of an SVG icon: <c>Icon="{cb:SvgIcon Source=ms-appx:///Assets/open.svg}"</c>.
+/// The terse XAML form of an SVG icon source:
+/// <c>Icon="{cb:SvgIconSource Source=ms-appx:///Assets/open.svg}"</c>.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -15,12 +16,16 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// since a markup extension is evaluated once, when the XAML is parsed.
 /// </para>
 /// <para>
+/// The name is the source's, not the element's, on purpose: this extension returns a SOURCE, and
+/// <c>&lt;cb:SvgIcon /&gt;</c> is left free to mean the <see cref="SvgIcon"/> element it names.
+/// </para>
+/// <para>
 /// A relative <see cref="Source"/> is read as <c>ms-appx:///</c>, so
-/// <c>{cb:SvgIcon Source=Assets/open.svg}</c> says the same thing as the absolute form.
+/// <c>{cb:SvgIconSource Source=Assets/open.svg}</c> says the same thing as the absolute form.
 /// </para>
 /// </remarks>
 [MarkupExtensionReturnType(ReturnType = typeof(SvgIconSource))]
-public sealed class SvgIconExtension : MarkupExtension
+public sealed class SvgIconSourceExtension : MarkupExtension
 {
 	/// <summary>The artwork's URI, absolute or relative to the application package.</summary>
 	public string? Source { get; set; }

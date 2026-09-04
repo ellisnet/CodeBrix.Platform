@@ -2,6 +2,32 @@
 					xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 					xmlns:toolkit="using:CodeBrix.Platform.UI.Toolkit">
 
+	<ResourceDictionary.ThemeDictionaries>
+
+		<!-- "Default" is the DARK dictionary; that is the framework's convention, not a typo. -->
+		<ResourceDictionary x:Key="Default">
+			<StaticResource x:Key="TriPaneViewDividerBrush" ResourceKey="SystemControlForegroundBaseLowBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPointerOverBrush" ResourceKey="SystemControlForegroundBaseMediumBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPressedBrush" ResourceKey="SystemControlForegroundBaseMediumHighBrush" />
+			<StaticResource x:Key="TriPaneViewRestoreGripForegroundBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+		</ResourceDictionary>
+
+		<ResourceDictionary x:Key="Light">
+			<StaticResource x:Key="TriPaneViewDividerBrush" ResourceKey="SystemControlForegroundBaseLowBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPointerOverBrush" ResourceKey="SystemControlForegroundBaseMediumBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPressedBrush" ResourceKey="SystemControlForegroundBaseMediumHighBrush" />
+			<StaticResource x:Key="TriPaneViewRestoreGripForegroundBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+		</ResourceDictionary>
+
+		<ResourceDictionary x:Key="HighContrast">
+			<StaticResource x:Key="TriPaneViewDividerBrush" ResourceKey="SystemControlForegroundBaseLowBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPointerOverBrush" ResourceKey="SystemControlForegroundBaseMediumBrush" />
+			<StaticResource x:Key="TriPaneViewDividerPressedBrush" ResourceKey="SystemControlForegroundBaseMediumHighBrush" />
+			<StaticResource x:Key="TriPaneViewRestoreGripForegroundBrush" ResourceKey="SystemControlForegroundBaseHighBrush" />
+		</ResourceDictionary>
+
+	</ResourceDictionary.ThemeDictionaries>
+
 	<Style TargetType="toolkit:ElevatedView">
 		<Setter Property="IsTabStop" Value="False" />
 		<Setter Property="Template">
@@ -9,13 +35,211 @@
 				<ControlTemplate TargetType="toolkit:ElevatedView">
 					<Grid>
 						<Canvas x:Name="PART_ShadowHost" />
-						
+
 						<Border x:Name="PART_Border"
 								Background="{TemplateBinding Background}"
 								BorderBrush="{TemplateBinding BorderBrush}"
 								BorderThickness="{TemplateBinding BorderThickness}"
 								CornerRadius="{TemplateBinding CornerRadius}"
 								Child="{TemplateBinding ElevatedContent}" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!--
+	The TriPaneViewDivider template. Three stacked borders give the rest / pointer-over / pressed
+	appearance without a state ever needing to name a brush, and four chevrons - one per direction -
+	give the restore grip. The chevron points into the pane that is minimized, so the divider picks
+	the state that matches its own orientation and the side the minimized pane is on.
+	-->
+	<Style TargetType="toolkit:TriPaneViewDivider">
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="Foreground" Value="{ThemeResource TriPaneViewRestoreGripForegroundBrush}" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="toolkit:TriPaneViewDivider">
+					<Grid x:Name="DividerRoot" Background="Transparent">
+						<VisualStateManager.VisualStateGroups>
+							<VisualStateGroup x:Name="CommonStates">
+								<VisualState x:Name="Normal" />
+
+								<VisualState x:Name="PointerOver">
+									<VisualState.Setters>
+										<Setter Target="PointerOverLayer.Opacity" Value="1" />
+									</VisualState.Setters>
+								</VisualState>
+
+								<VisualState x:Name="Pressed">
+									<VisualState.Setters>
+										<Setter Target="PressedLayer.Opacity" Value="1" />
+									</VisualState.Setters>
+								</VisualState>
+
+								<VisualState x:Name="Disabled">
+									<VisualState.Setters>
+										<Setter Target="RestLayer.Opacity" Value="0.4" />
+									</VisualState.Setters>
+								</VisualState>
+							</VisualStateGroup>
+
+							<VisualStateGroup x:Name="GripStates">
+								<VisualState x:Name="NoGrip" />
+
+								<VisualState x:Name="GripLeft">
+									<VisualState.Setters>
+										<Setter Target="GripLeftPath.Visibility" Value="Visible" />
+									</VisualState.Setters>
+								</VisualState>
+
+								<VisualState x:Name="GripRight">
+									<VisualState.Setters>
+										<Setter Target="GripRightPath.Visibility" Value="Visible" />
+									</VisualState.Setters>
+								</VisualState>
+
+								<VisualState x:Name="GripUp">
+									<VisualState.Setters>
+										<Setter Target="GripUpPath.Visibility" Value="Visible" />
+									</VisualState.Setters>
+								</VisualState>
+
+								<VisualState x:Name="GripDown">
+									<VisualState.Setters>
+										<Setter Target="GripDownPath.Visibility" Value="Visible" />
+									</VisualState.Setters>
+								</VisualState>
+							</VisualStateGroup>
+						</VisualStateManager.VisualStateGroups>
+
+						<Border x:Name="RestLayer" Background="{TemplateBinding Background}" />
+						<Border x:Name="PointerOverLayer" Background="{TemplateBinding PointerOverBrush}" Opacity="0" />
+						<Border x:Name="PressedLayer" Background="{TemplateBinding PressedBrush}" Opacity="0" />
+
+						<Path x:Name="GripLeftPath"
+							  Data="M 4.5,0 L 0,5 L 4.5,10"
+							  Stroke="{TemplateBinding Foreground}"
+							  StrokeThickness="1.5"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"
+							  Visibility="Collapsed" />
+
+						<Path x:Name="GripRightPath"
+							  Data="M 0,0 L 4.5,5 L 0,10"
+							  Stroke="{TemplateBinding Foreground}"
+							  StrokeThickness="1.5"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"
+							  Visibility="Collapsed" />
+
+						<Path x:Name="GripUpPath"
+							  Data="M 0,4.5 L 5,0 L 10,4.5"
+							  Stroke="{TemplateBinding Foreground}"
+							  StrokeThickness="1.5"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"
+							  Visibility="Collapsed" />
+
+						<Path x:Name="GripDownPath"
+							  Data="M 0,0 L 5,4.5 L 10,0"
+							  Stroke="{TemplateBinding Foreground}"
+							  StrokeThickness="1.5"
+							  HorizontalAlignment="Center"
+							  VerticalAlignment="Center"
+							  Visibility="Collapsed" />
+					</Grid>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
+
+	<!--
+	The TriPaneView template. Every column width, row height and divider visibility is owned by the
+	control's code-behind, which recomputes them from the four percent weights on every state change;
+	the values below are only the starting point the template is parsed with.
+
+	PART_SideColumn and PART_StackColumn are the leading and trailing columns of the root grid. The
+	side pane and the stack swap between them when SidePanePlacement is Right, exactly as the
+	framework's TwoPaneView swaps its panes between PART_ColumnLeft and PART_ColumnRight, so under
+	that placement the column named PART_SideColumn is the one holding the stack.
+	-->
+	<Style TargetType="toolkit:TriPaneView">
+		<Setter Property="IsTabStop" Value="False" />
+		<Setter Property="HorizontalAlignment" Value="Stretch" />
+		<Setter Property="VerticalAlignment" Value="Stretch" />
+		<Setter Property="DividerBrush" Value="{ThemeResource TriPaneViewDividerBrush}" />
+		<Setter Property="DividerPointerOverBrush" Value="{ThemeResource TriPaneViewDividerPointerOverBrush}" />
+		<Setter Property="DividerPressedBrush" Value="{ThemeResource TriPaneViewDividerPressedBrush}" />
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="toolkit:TriPaneView">
+					<Grid x:Name="RootGrid" Background="{TemplateBinding Background}">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition x:Name="PART_SideColumn" Width="33.3*" />
+							<ColumnDefinition x:Name="PART_SideDividerColumn" Width="6" />
+							<ColumnDefinition x:Name="PART_StackColumn" Width="66.7*" />
+						</Grid.ColumnDefinitions>
+
+						<ScrollViewer x:Name="PART_SidePaneScrollViewer"
+									  Grid.Column="0"
+									  HorizontalContentAlignment="Stretch"
+									  VerticalContentAlignment="Stretch"
+									  VerticalScrollBarVisibility="Auto"
+									  HorizontalScrollMode="Disabled"
+									  HorizontalScrollBarVisibility="Disabled">
+							<ContentPresenter Content="{TemplateBinding SidePane}"
+											  HorizontalContentAlignment="Stretch"
+											  VerticalContentAlignment="Stretch" />
+						</ScrollViewer>
+
+						<toolkit:TriPaneViewDivider x:Name="PART_SideDivider"
+													Grid.Column="1"
+													Orientation="Vertical"
+													Background="{TemplateBinding DividerBrush}"
+													PointerOverBrush="{TemplateBinding DividerPointerOverBrush}"
+													PressedBrush="{TemplateBinding DividerPressedBrush}" />
+
+						<Grid x:Name="PART_StackGrid" Grid.Column="2">
+							<Grid.RowDefinitions>
+								<RowDefinition x:Name="PART_UpperRow" Height="50*" />
+								<RowDefinition x:Name="PART_StackDividerRow" Height="6" />
+								<RowDefinition x:Name="PART_LowerRow" Height="50*" />
+							</Grid.RowDefinitions>
+
+							<ScrollViewer x:Name="PART_UpperPaneScrollViewer"
+										  Grid.Row="0"
+										  HorizontalContentAlignment="Stretch"
+										  VerticalContentAlignment="Stretch"
+										  VerticalScrollBarVisibility="Auto"
+										  HorizontalScrollMode="Disabled"
+										  HorizontalScrollBarVisibility="Disabled">
+								<ContentPresenter Content="{TemplateBinding UpperPane}"
+												  HorizontalContentAlignment="Stretch"
+												  VerticalContentAlignment="Stretch" />
+							</ScrollViewer>
+
+							<toolkit:TriPaneViewDivider x:Name="PART_StackDivider"
+														Grid.Row="1"
+														Orientation="Horizontal"
+														Background="{TemplateBinding DividerBrush}"
+														PointerOverBrush="{TemplateBinding DividerPointerOverBrush}"
+														PressedBrush="{TemplateBinding DividerPressedBrush}" />
+
+							<ScrollViewer x:Name="PART_LowerPaneScrollViewer"
+										  Grid.Row="2"
+										  HorizontalContentAlignment="Stretch"
+										  VerticalContentAlignment="Stretch"
+										  VerticalScrollBarVisibility="Auto"
+										  HorizontalScrollMode="Disabled"
+										  HorizontalScrollBarVisibility="Disabled">
+								<ContentPresenter Content="{TemplateBinding LowerPane}"
+												  HorizontalContentAlignment="Stretch"
+												  VerticalContentAlignment="Stretch" />
+							</ScrollViewer>
+						</Grid>
 					</Grid>
 				</ControlTemplate>
 			</Setter.Value>
