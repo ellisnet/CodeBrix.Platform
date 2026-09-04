@@ -1,0 +1,101 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<!-- The add-in ships in the Skia flavour and binds the Skia flavour of the framework.
+		     Binding that same flavour here is what lets this suite exercise the code that actually
+		     ships, rather than the .Reference API shells (whose bodies throw). -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<AssemblyName>CodeBrix.Platform.UI.CommandBar.Unit.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.CommandBar.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
+	</ItemGroup>
+
+	<!-- The icon half of this add-in rasterises for real - an SVG or a PNG decoded and drawn at
+	     IconSize times the display scale - so Skia's native binary has to be present, named per-OS:
+	     an application gets it from its head package, and there is no head in a test run. The Linux
+	     and macOS packages take their version from src/Directory.Build.targets
+	     ($(SkiaSharpVersion)); Win32 has no Update entry there, so it names the property directly. -->
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+	</ItemGroup>
+
+	<!-- The icon fixtures - an SVG using currentColor, one with hard-coded black strokes, a PNG
+	     with alpha, a JPEG and a BMP. They are EMBEDDED so the add-in's cb-res:// resource scheme
+	     has something real to resolve, and also COPIED so the same files can be reached through a
+	     file: URI, which is how the scale-qualifier and decoder tests read them. (This is the one
+	     addition the ICONS stream makes to this csproj; adding a .cs test file needs no edit.) -->
+	<ItemGroup>
+		<EmbeddedResource Include="Fixtures\**\*" />
+		<None Update="Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.CommandBar\Platform.UI.CommandBar.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- These three are what the target below swaps in, and nothing else in this project's
+		     reference graph builds them: the compile-time reference to CodeBrix.Platform resolves to
+		     the .Reference flavour, so without these a STALE .Skia build would be copied beside the
+		     tests and the suite would silently measure yesterday's framework. ReferenceOutputAssembly
+		     is false because they are needed at run time only - the compile still binds .Reference,
+		     exactly as it did before. -->
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<!-- Every control here is a XAML type: constructing one runs the dependency-object machinery,
+	     which touches the dispatcher. Assembly resolution hands a host-free test process the
+	     .Reference variants of the runtime assemblies, whose dispatcher stubs throw
+	     NotSupportedException("Ref assembly") - so swap in the .Skia variants, exactly as the
+	     from-source sample heads and the SkiaSharp.Views suite do. DispatcherInitializer.cs then
+	     installs the host-free dispatcher overrides those assemblies expect a head to install. -->
+	<Target Name="_CommandBarTestsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<_CbSkiaUwp>$(MSBuildThisFileDirectory)..\..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbSkiaUwp>
+			<_CbSkiaComp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbSkiaComp>
+			<_CbSkiaDisp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbSkiaDisp>
+		</PropertyGroup>
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+		</ItemGroup>
+	</Target>
+
+</Project>

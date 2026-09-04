@@ -3,74 +3,23 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Input
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class AccessKeyManager
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
 		internal AccessKeyManager()
 		{
 		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static bool AreKeyTipsEnabled
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool AccessKeyManager.AreKeyTipsEnabled is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Input.AccessKeyManager", "bool AccessKeyManager.AreKeyTipsEnabled");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static bool IsDisplayModeEnabled
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool AccessKeyManager.IsDisplayModeEnabled is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static void EnterDisplayMode(global::Microsoft.UI.Xaml.XamlRoot XamlRoot)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Input.AccessKeyManager", "void AccessKeyManager.EnterDisplayMode(XamlRoot XamlRoot)");
-		}
-#endif
+		// Skipping already declared property AccessKeyManager.AreKeyTipsEnabled
+		// Skipping already declared property AccessKeyManager.IsDisplayModeEnabled
+		// Skipping already declared method Microsoft.UI.Xaml.Input.AccessKeyManager.EnterDisplayMode(Microsoft.UI.Xaml.XamlRoot)
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.IsDisplayModeEnabled.get
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.AreKeyTipsEnabled.get
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.AreKeyTipsEnabled.set
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.IsDisplayModeEnabledChanged.add
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.IsDisplayModeEnabledChanged.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static void ExitDisplayMode()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Input.AccessKeyManager", "void AccessKeyManager.ExitDisplayMode()");
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public static event global::Windows.Foundation.TypedEventHandler<object, object> IsDisplayModeEnabledChanged
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Input.AccessKeyManager", "event TypedEventHandler<object, object> AccessKeyManager.IsDisplayModeEnabledChanged");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Input.AccessKeyManager", "event TypedEventHandler<object, object> AccessKeyManager.IsDisplayModeEnabledChanged");
-			}
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Input.AccessKeyManager.ExitDisplayMode()
+		// Skipping already declared event Microsoft.UI.Xaml.Input.AccessKeyManager.IsDisplayModeEnabledChanged
 	}
 }

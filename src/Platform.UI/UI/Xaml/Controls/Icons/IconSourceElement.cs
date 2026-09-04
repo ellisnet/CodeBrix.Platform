@@ -85,6 +85,15 @@ public partial class IconSourceElement : IconElement
 
 			SetIconBinding(_iconElement, nameof(pathIconSource.Data), PathIcon.DataProperty);
 		}
+		else
+		{
+			// Any other icon source - the framework's own ImageIconSource and AnimatedIconSource
+			// included, and every source an application or an add-in supplies - builds its own
+			// element. The four cases above bind their properties so a later change to the source
+			// still reaches the element; a source outside them has no such property list to bind,
+			// so it is asked for an element and the element is used as it comes.
+			_iconElement = IconSource.CreateIconElement();
+		}
 
 		if (_iconElement is not null)
 		{

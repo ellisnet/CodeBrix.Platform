@@ -206,6 +206,16 @@
 		     Microsoft.Extensions.Logging.Abstractions, which must flow PUBLICLY - the private
 		     Extensions.Logging project reference does not carry it to consumers. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.AppSettings\Platform.AppSettings.csproj" />
+
+		<!-- The CommandBar AddIn (CodeBrix.Platform.CommandBar.ApacheLicenseForever) ships with every
+		     family release: the tool bar family - ToolBarTray, ToolBar, ToolBarGroup, ToolBarSeparator,
+		     ToolBarSpacer, ToolButton, ToolToggleButton, ToolDropDownButton - as XAML controls bound to
+		     view-model commands, with grouping, separators, spacers, inline controls, overflow into a
+		     chevron flyout, and bar-level icon size / label mode / label position / tooltips as
+		     inherited attached properties. Its icons are SVG (themed, tintable, rasterised at the
+		     display scale) and raster, so the Svg AddIn is a HARD dependency and packs as a package
+		     dependency (which is why Platform.UI.Svg.Skia.csproj carries its PUBLISHED PackageId). -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.CommandBar\Platform.UI.CommandBar.Skia.csproj" />
 	</ItemGroup>
 
 	<Target Name="PackCodeBrix"

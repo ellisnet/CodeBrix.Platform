@@ -388,12 +388,9 @@ internal partial class X11XamlRootHost
 		}
 		if ((state & XModifierMask.Mod1Mask) != 0)
 		{
-			// TODO: Modifier keys can be mapped to different keys. What to do?
-			modifiers |= VirtualKeyModifiers.Shift;
-		}
-		if ((state & XModifierMask.ControlMask) != 0)
-		{
-			modifiers |= VirtualKeyModifiers.Control;
+			// Mod1 is Alt on every mainstream keymap; the family convention (and what WinUI code
+			// expects for access keys and menu mnemonics) is VirtualKeyModifiers.Menu.
+			modifiers |= VirtualKeyModifiers.Menu;
 		}
 		if ((state & XModifierMask.ControlMask) != 0)
 		{

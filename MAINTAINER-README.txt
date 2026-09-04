@@ -34,6 +34,7 @@ Package ids and the AGENT-README that covers each:
     CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever  src/AddIns/Platform.UI.AdvancedTextEdit
     CodeBrix.Platform.AppSettings.ApacheLicenseForever       src/AddIns/Platform.AppSettings
     CodeBrix.Platform.AudioPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.AudioPlayer.Skia
+    CodeBrix.Platform.CommandBar.ApacheLicenseForever        src/AddIns/Platform.UI.CommandBar
     CodeBrix.Platform.FlexPanel.ApacheLicenseForever         src/AddIns/Platform.UI.FlexPanel
     CodeBrix.Platform.PlotterView.ApacheLicenseForever       src/AddIns/Platform.UI.PlotterView
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView
@@ -183,10 +184,11 @@ Microsoft.Testing.Platform per global.json):
     src/SourceGenerators/XamlGenerationTests/
   Add-ins:
     src/AddIns/Platform.AppSettings.Tests, Platform.UI.AdvancedTextEdit.Tests,
-    Platform.UI.FlexPanel.Tests, Platform.UI.PlotterView.Tests,
-    Platform.UI.TerminalView.Tests, Platform.UI.TextLayout.Tests,
-    Platform.UI.VideoPlayer.Tests, CodeBrix.Platform.SkiaSharp.Views.Tests (all
-    *.Unit.Tests.csproj), src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
+    Platform.UI.CommandBar.Tests, Platform.UI.FlexPanel.Tests,
+    Platform.UI.PlotterView.Tests, Platform.UI.TerminalView.Tests,
+    Platform.UI.TextLayout.Tests, Platform.UI.VideoPlayer.Tests,
+    CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Unit.Tests.csproj),
+    src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
 
     CodeBrix.Platform.SkiaSharp.Views.Tests is the guard for a SkiaSharp version
     bump: it pins the managed/native agreement, the add-in version's tie to
@@ -202,7 +204,18 @@ environment variables and expect BUILD_SOURCESDIRECTORY to be set.
 
 Several add-in demos double as scripted smoke tests on the X11 head (an
 environment variable makes the app run a self-test and exit PASS/FAIL); each
-add-in's AGENT-README and EXTRAS-README.txt name the variable.
+add-in's AGENT-README and EXTRAS-README.txt name the variable. CommandBarDemo's
+is COMMANDBARDEMO_SELFTEST=1, with COMMANDBARDEMO_RESULTS=<path> writing the
+PASS/FAIL lines to a file as well; it drives the tool bars through xdotool and
+window captures, so run it on the X11 head with DISPLAY set:
+
+    cd samples/CodeBrixPlatform/CommandBarDemo/CommandBarDemo.LinuxX11
+    DISPLAY=:0 COMMANDBARDEMO_SELFTEST=1 \
+        dotnet bin/Release/net10.0/CommandBarDemo.LinuxX11.dll
+
+Every window it opens is titled "CommandBar Demo", so the self-test elects its
+OWN window by probing which one its key presses reach, never by title; a second
+demo left running on the same display does not disturb it.
 
 PACKAGING AND PUBLISHING
 ========================
@@ -226,7 +239,13 @@ Packing only runs in the Release configuration. Two kinds of package:
   - CSPROJ-DRIVEN (`dotnet pack <csproj> -p:PackageVersion=$(BuildVersion)`):
     Platform.UI.Runtime.Skia and the seven heads (including the Emulated head),
     and the add-ins WebView, AudioPlayer, VideoPlayer, MediaPlayer, TextLayout,
-    FlexPanel, AdvancedTextEdit, TerminalView, PlotterView, AppSettings.
+    FlexPanel, AdvancedTextEdit, TerminalView, PlotterView, AppSettings,
+    CommandBar.
+    CommandBar is the second add-in that ProjectReferences another add-in (Svg,
+    for the SVG icon route, which is a HARD dependency - there is no version of
+    it without SVG icons); that is why Platform.UI.Svg.Skia.csproj carries its
+    PUBLISHED PackageId (CodeBrix.Platform.Svg.ApacheLicenseForever) for the
+    same reason Graphics3DGL does.
     VideoPlayer is the only add-in that ProjectReferences another add-in
     (Graphics3DGL, for its off-screen GPU Skia context); that is why
     Platform.WinUI.Graphics3DGL.csproj carries its PUBLISHED PackageId

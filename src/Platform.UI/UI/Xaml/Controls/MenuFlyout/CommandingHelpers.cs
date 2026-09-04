@@ -65,13 +65,7 @@ namespace Microsoft.UI.Xaml.Controls
 					// will propagate to the accelerators that are used by the framework.
 					for (int i = 0; i < keyboardAcceleratorCount; i++)
 					{
-						KeyboardAccelerator keyboardAccelerator = valueAsKeyboardAccelerators[i];
-						KeyboardAccelerator keyboardAcceleratorCopy = new KeyboardAccelerator();
-
-						keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.IsEnabledProperty, new Binding { Path = "IsEnabled", Source = keyboardAccelerator });
-						keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.KeyProperty, new Binding { Path = "Key", Source = keyboardAccelerator });
-						keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.ModifiersProperty, new Binding { Path = "Modifiers", Source = keyboardAccelerator });
-						keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.ScopeOwnerProperty, new Binding { Path = "ScopeOwner", Source = keyboardAccelerator });
+						returnValueAsKeyboardAcceleratorCollection.Add(CreateBoundCopy(valueAsKeyboardAccelerators[i]));
 					}
 
 					return returnValueAsKeyboardAcceleratorCollection;
@@ -150,6 +144,26 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 
+		/// <summary>
+		/// Copies one keyboard accelerator, binding the copy to the original's properties.
+		/// </summary>
+		/// <remarks>
+		/// A keyboard accelerator cannot have two parents, so the framework's own accelerator is a
+		/// copy of the application's; the bindings are what make a later change to the original
+		/// reach the copy.
+		/// </remarks>
+		private static KeyboardAccelerator CreateBoundCopy(KeyboardAccelerator keyboardAccelerator)
+		{
+			KeyboardAccelerator keyboardAcceleratorCopy = new KeyboardAccelerator();
+
+			keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.IsEnabledProperty, new Binding { Path = "IsEnabled", Source = keyboardAccelerator });
+			keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.KeyProperty, new Binding { Path = "Key", Source = keyboardAccelerator });
+			keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.ModifiersProperty, new Binding { Path = "Modifiers", Source = keyboardAccelerator });
+			keyboardAcceleratorCopy.SetBinding(KeyboardAccelerator.ScopeOwnerProperty, new Binding { Path = "ScopeOwner", Source = keyboardAccelerator });
+
+			return keyboardAcceleratorCopy;
+		}
+
 		internal static void BindToKeyboardAcceleratorsIfUnset(
 			 XamlUICommand uiCommand,
 			 UIElement target)
@@ -164,6 +178,25 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				var converter = new KeyboardAcceleratorCopyConverter();
 				target.SetBinding(UIElement.KeyboardAcceleratorsProperty, new Binding { Path = "KeyboardAccelerators", Source = uiCommand, Converter = converter });
+
+				// A binding cannot always reach this property. UIElement.KeyboardAccelerators has a
+				// private setter and an internal dependency property, so where the binding engine
+				// resolves a target property through generated bindable metadata rather than
+				// through reflection it finds no setter for it and drops the value silently
+				// (BindingPropertyHelper.InternalGetValueSetter). Where that happened the target
+				// still has nothing, and the copies are put on it directly - made the same way, by
+				// the same code, so the command's accelerators reach the element either way.
+				// Clearing the binding when the command changes clears these with it, since they
+				// live in the collection the property's cleared value replaces.
+				if (target.KeyboardAccelerators.Count == 0)
+				{
+					var commandKeyboardAccelerators = uiCommand.KeyboardAccelerators;
+
+					for (int i = 0; i < commandKeyboardAccelerators.Count; i++)
+					{
+						target.KeyboardAccelerators.Add(CreateBoundCopy(commandKeyboardAccelerators[i]));
+					}
+				}
 			}
 		}
 

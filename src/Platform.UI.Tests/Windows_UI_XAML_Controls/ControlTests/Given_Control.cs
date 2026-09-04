@@ -73,6 +73,48 @@ namespace CodeBrix.Platform.UI.Tests.ControlTests //Was previously: Uno.UI.Tests
 			}
 		}
 
+		[TestMethod]
+		public void When_GetTemplateChild_Name_Only_In_Content()
+		{
+			//Arrange
+			var namedInContent = new Border { Name = "Part" };
+			var content = new Grid();
+			content.Children.Add(namedInContent);
+
+			var sut = new ContentControl { Content = content };
+
+			//Act
+			var found = sut.GetTemplateChild("Part");
+
+			//Assert
+			Assert.IsNull(found, "GetTemplateChild must only look inside the control template, never in the content.");
+		}
+
+		[TestMethod]
+		public void When_GetTemplateChild_Name_In_Template()
+		{
+			//Arrange
+			var templatePart = default(Border);
+			var sut = new ContentControl
+			{
+				Template = new ControlTemplate(() =>
+				{
+					var root = new Grid();
+					templatePart = new Border { Name = "Part" };
+					root.Children.Add(templatePart);
+					return root;
+				}),
+			};
+
+			//Act
+			sut.ApplyTemplate();
+			var found = sut.GetTemplateChild("Part");
+
+			//Assert
+			Assert.IsNotNull(templatePart);
+			Assert.AreSame(templatePart, found);
+		}
+
 		public partial class MyControl : Control
 		{
 		}

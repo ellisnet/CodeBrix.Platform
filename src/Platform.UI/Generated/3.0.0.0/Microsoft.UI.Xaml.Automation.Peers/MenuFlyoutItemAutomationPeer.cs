@@ -3,26 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Automation.Peers
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MenuFlyoutItemAutomationPeer : global::Microsoft.UI.Xaml.Automation.Peers.FrameworkElementAutomationPeer, global::Microsoft.UI.Xaml.Automation.Provider.IInvokeProvider
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public MenuFlyoutItemAutomationPeer(global::Microsoft.UI.Xaml.Controls.MenuFlyoutItem owner) : base(owner)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer", "MenuFlyoutItemAutomationPeer.MenuFlyoutItemAutomationPeer(MenuFlyoutItem owner)");
-		}
-#endif
-		// Forced skipping of method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.MenuFlyoutItemAutomationPeer(Microsoft.UI.Xaml.Controls.MenuFlyoutItem)
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public void Invoke()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer", "void MenuFlyoutItemAutomationPeer.Invoke()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.MenuFlyoutItemAutomationPeer(Microsoft.UI.Xaml.Controls.MenuFlyoutItem)
+		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.Invoke()
 		// Processing: Microsoft.UI.Xaml.Automation.Provider.IInvokeProvider
 	}
 }

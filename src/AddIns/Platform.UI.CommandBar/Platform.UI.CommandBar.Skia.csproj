@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.CommandBar</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.CommandBar</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the FlexPanel add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.CommandBar.ApacheLicenseForever</PackageId>
+		<Description>A tool bar / command bar / button bar family of XAML controls for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. ToolBarTray hosts several ToolBars in a wrapping row; a ToolBar takes any UIElement as an item - ToolButton, ToolToggleButton, ToolDropDownButton, ToolBarGroup, ToolBarSeparator, ToolBarSpacer, or an ordinary control such as a ComboBox - and lays them out with grouping, separators, spacers and overflow into a chevron flyout. Buttons bind to ICommand (IsEnabled follows CanExecute) or to a XamlUICommand/StandardUICommand action object, show icon only, text only, or both, and carry auto-composed tooltips with shortcut text. Icons come from SVG (themed, tintable, re-rasterised at the display scale) or from PNG and the other raster formats the platform decoder reads.</Description>
+
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
+		     same family version as this build (the whole family ships together). -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+
+		<!-- The Svg add-in is a HARD dependency: there is no version of this add-in without SVG
+		     icons. It is nuspec-driven, so its csproj carries its PUBLISHED PackageId
+		     (CodeBrix.Platform.Svg.ApacheLicenseForever) for the SDK packer to read here - the same
+		     arrangement Platform.WinUI.Graphics3DGL.csproj carries for the VideoPlayer add-in.
+		     It brings CodeBrix.SkiaSvg (MIT) and the SkiaSharp.Views add-in transitively. -->
+		<ProjectReference Include="..\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />
+	</ItemGroup>
+
+	<!-- Default styles. Themes/Generic.xaml is picked up as a <Page> automatically
+	     (src/Directory.Build.props sets EnableAutomaticXamlPageInclusion), and this import is what
+	     runs the XAML source generator over it so the dictionary is compiled into the assembly and
+	     found by DefaultStyleKey. Same arrangement as src/Platform.UI.Toolkit, the in-repo
+	     precedent for a library that ships its own control styles. -->
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+</Project>

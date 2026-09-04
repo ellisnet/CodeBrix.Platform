@@ -1314,7 +1314,13 @@ implemented on the Skia heads and how the framework expects it to be used.
     InitializeComponent(); afterwards the setter throws NotSupportedException.
     Per-element: FrameworkElement.RequestedTheme (ElementTheme.Default / Light
     / Dark) can be changed at run time on any element (set it on the Window's
-    root element to switch the whole app). In XAML, {ThemeResource Key} and
+    root element to switch the whole app). RequestedTheme does NOT inherit down
+    the visual tree: an element's ActualTheme is its OWN RequestedTheme, or the
+    application's theme when that is Default, so setting RequestedTheme halfway
+    down a page changes that element alone and nothing under it. Set it on the
+    element the XamlRoot holds - that syncs the application theme, and every
+    element that has not asked for a theme of its own follows.
+    In XAML, {ThemeResource Key} and
     {StaticResource Key} resolve against merged ResourceDictionary entries;
     put app-wide dictionaries in App.xaml:
 
@@ -1548,6 +1554,72 @@ Microsoft.UI.Xaml.Controls surface are written exactly as in WinUI
 documentation. A member that is present but not backed by an implementation
 throws a "not implemented" exception naming it - see WHAT THIS PACKAGE DOES
 NOT DO.
+
+ACCESS KEYS (Alt+letter) work on the Skia heads. Put an AccessKey on any
+element and Alt plus that letter invokes it: the element's AccessKeyInvoked
+event is raised, and when nothing handles that event the element is invoked
+through its automation peer, so a Button is clicked and a MenuFlyoutItem runs
+its Click/Command with no code behind.
+
+    <MenuBar>
+        <MenuBarItem Title="File" AccessKey="F">
+            <MenuFlyoutItem Text="Exit" AccessKey="X" Click="OnExit" />
+        </MenuBarItem>
+        <MenuBarItem Title="Edit" AccessKey="E" />
+    </MenuBar>
+
+Alt+F opens the File menu; while it is open a bare "X" invokes Exit; Escape
+closes the menu. Tapping Alt on its own enters access-key display mode and
+raises AccessKeyDisplayRequested on the elements of the active scope (key tips
+- the floating letter badges - are not drawn yet, so nothing appears on screen
+unless your own handler draws it); Escape or an unmatched letter leaves display
+mode and raises AccessKeyDisplayDismissed. IsAccessKeyScope and
+AccessKeyScopeOwner are honoured, and an open popup's content is the active
+scope, which is what makes an open menu's items answer their letters.
+AccessKeyManager.IsDisplayModeEnabled / EnterDisplayMode(XamlRoot) /
+ExitDisplayMode() / IsDisplayModeEnabledChanged are available;
+AccessKeyManager.AreKeyTipsEnabled has no visual effect for the same reason.
+
+To open a menu from your own code, call MenuBarItem.Invoke() - it toggles the
+item's flyout with the menu bar's own placement and arrow-key wiring.
+
+COMMAND BARS work on the Skia heads, written exactly as in WinUI: CommandBar
+with PrimaryCommands and SecondaryCommands, AppBarButton, AppBarToggleButton,
+AppBarSeparator and AppBarElementContainer, DefaultLabelPosition
+(Bottom / Right / Collapsed), ClosedDisplayMode (Compact / Minimal / Hidden),
+IsOpen, IsSticky, IsDynamicOverflowEnabled, a Flyout on an AppBarButton, and a
+KeyboardAccelerator whose text a command in the overflow shows for itself.
+Pasted WinUI CommandBar XAML needs no prefix changes, because the default XAML
+namespace of a page is already Microsoft.UI.Xaml.Controls:
+
+    <CommandBar DefaultLabelPosition="Right">
+        <AppBarButton Icon="Save" Label="Save">
+            <AppBarButton.KeyboardAccelerators>
+                <KeyboardAccelerator Key="S" Modifiers="Control" />
+            </AppBarButton.KeyboardAccelerators>
+        </AppBarButton>
+        <AppBarToggleButton Icon="Highlight" Label="Highlight" />
+        <AppBarSeparator />
+        <AppBarElementContainer>
+            <ComboBox MinWidth="110" VerticalAlignment="Center" />
+        </AppBarElementContainer>
+        <CommandBar.SecondaryCommands>
+            <AppBarButton Icon="Setting" Label="Settings" />
+        </CommandBar.SecondaryCommands>
+    </CommandBar>
+
+An open bar OVERLAYS the content below it rather than reflowing the page: the
+bar keeps its closed display mode's height and reveals the label row by moving
+its own clip, which is WinUI's own behaviour.
+
+ICONS ON AN AppBarButton: SymbolIcon, FontIcon, PathIcon, BitmapIcon (a PNG or
+any other format the image decoder reads) and IconSourceElement over any
+IconSource all work with the core package alone. SVG does NOT: the core package
+deliberately has no dependency on an SVG library, so an SVG icon on an
+AppBarButton requires the application to reference the Svg add-in
+(CodeBrix.Platform.Svg.ApacheLicenseForever), or the CommandBar add-in
+(CodeBrix.Platform.CommandBar.ApacheLicenseForever), which brings it and adds
+icon types that drop straight into AppBarButton.Icon.
 
 ================================================================================
 
@@ -2011,7 +2083,10 @@ WHAT THIS PACKAGE DOES NOT DO
     https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md
   - Not implemented on any Skia head: IME (composed CJK / dead-key) text input;
     initiating drag-and-drop (accepting drops works on X11/Windows/macOS, and on
-    Wayland subject to the compositor).
+    Wayland subject to the compositor); access-key KEY TIPS (access keys
+    themselves work - see ACCESS KEYS under WRITING XAML AND VIEWS - but the
+    floating letter badges are not drawn, and multi-character access keys typed
+    as a sequence are not matched).
   - Not implemented on the Wayland head (deferred): touch input, native-view
     hosting in a ContentPresenter (the content is ignored with a one-time
     warning; the WebView and MediaPlayer add-ins are windowing-agnostic and

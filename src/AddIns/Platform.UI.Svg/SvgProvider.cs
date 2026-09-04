@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.SqlTypes;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CodeBrix.Platform.UI.Xaml.Media.Imaging.Svg;
 using Windows.Foundation;
@@ -16,6 +17,7 @@ using System.Diagnostics.CodeAnalysis;
 #if !__NETSTD_REFERENCE__
 using CodeBrix.SkiaSvg.ShimSkiaSharp;
 using CodeBrix.SkiaSvg;
+using CodeBrix.SkiaSvg.Model;
 using CodeBrix.Platform.UI.Xaml.Media;
 using SkiaSharp;
 using SKCanvas = SkiaSharp.SKCanvas;
@@ -28,6 +30,84 @@ namespace CodeBrix.Platform.UI.Svg; //Was previously: Uno.UI.Svg
 
 public partial class SvgProvider : ISvgProvider
 {
+	//Keyed weakly by the source, because the CSS belongs to the SvgImageSource rather than to a
+	//provider: it has to be readable at PARSE time, which happens on a background thread inside the
+	//provider the framework created for that source, and it has to survive the provider being
+	//recreated when the source is reloaded.
+	private static readonly ConditionalWeakTable<SvgImageSource, string> _cssBySource = new();
+
+	//The provider that most recently took ownership of a source, so the rasterised size can be
+	//asked for from the source alone - which is all an application, or a demo's self-test, has.
+	private static readonly ConditionalWeakTable<SvgImageSource, SvgProvider> _providersBySource = new();
+
+	/// <summary>
+	/// Sets the CSS applied to the SVG document behind <paramref name="source"/> the next time that
+	/// source is parsed.
+	/// </summary>
+	/// <param name="source">The image source the CSS belongs to.</param>
+	/// <param name="css">
+	/// A CSS snippet, for example <c>svg { color: #2266DD; }</c>, or null to remove one that was set
+	/// before. The rules are applied to the document as an author stylesheet, so a file that paints
+	/// with <c>currentColor</c> can be themed without the file being rewritten.
+	/// </param>
+	/// <remarks>
+	/// Set this BEFORE the source starts loading - before its <c>UriSource</c> is assigned, or before
+	/// <c>SetSourceAsync</c> is called. Changing it afterwards has no effect until the source is
+	/// parsed again, because parsing is what applies it.
+	/// </remarks>
+	/// <exception cref="ArgumentNullException"><paramref name="source"/> is null.</exception>
+	public static void SetCss(SvgImageSource source, string? css)
+	{
+		if (source is null)
+		{
+			throw new ArgumentNullException(nameof(source));
+		}
+
+		if (string.IsNullOrWhiteSpace(css))
+		{
+			_cssBySource.Remove(source);
+		}
+		else
+		{
+			_cssBySource.AddOrUpdate(source, css);
+		}
+	}
+
+	/// <summary>Reads the CSS <see cref="SetCss"/> put on <paramref name="source"/>.</summary>
+	/// <param name="source">The image source to read.</param>
+	/// <returns>The CSS snippet, or null when none was set.</returns>
+	/// <exception cref="ArgumentNullException"><paramref name="source"/> is null.</exception>
+	public static string? GetCss(SvgImageSource source)
+	{
+		if (source is null)
+		{
+			throw new ArgumentNullException(nameof(source));
+		}
+
+		return _cssBySource.TryGetValue(source, out var css) ? css : null;
+	}
+
+	/// <summary>
+	/// The size, in PHYSICAL pixels, of the bitmap the SVG route rasterised for
+	/// <paramref name="source"/>.
+	/// </summary>
+	/// <param name="source">The image source to ask about.</param>
+	/// <returns>
+	/// The bitmap's size, or an empty size when the source is drawn from its vector picture instead
+	/// - which is the case unless it sets both <c>RasterizePixelWidth</c> and
+	/// <c>RasterizePixelHeight</c>.
+	/// </returns>
+	/// <exception cref="ArgumentNullException"><paramref name="source"/> is null.</exception>
+	public static Size GetRasterizedPixelSize(SvgImageSource source)
+	{
+		if (source is null)
+		{
+			throw new ArgumentNullException(nameof(source));
+		}
+
+		return _providersBySource.TryGetValue(source, out var provider) ? provider.RasterizedPixelSize : default;
+	}
+
 #if !__NETSTD_REFERENCE__
 	private readonly SvgImageSource _owner;
 	private readonly CompositeDisposable _disposables = new();
@@ -48,6 +128,7 @@ public partial class SvgProvider : ISvgProvider
 		}
 
 		_owner = svgImageSource;
+		_providersBySource.AddOrUpdate(svgImageSource, this);
 
 		_disposables.Add(_owner.RegisterDisposablePropertyChangedCallback(SvgImageSource.RasterizePixelHeightProperty, SourcePropertyChanged));
 		_disposables.Add(_owner.RegisterDisposablePropertyChangedCallback(SvgImageSource.RasterizePixelWidthProperty, SourcePropertyChanged));
@@ -84,6 +165,27 @@ public partial class SvgProvider : ISvgProvider
 			}
 
 			return default;
+#endif
+		}
+	}
+
+	/// <summary>
+	/// The size, in PHYSICAL pixels, of the bitmap this provider rasterised for its source.
+	/// </summary>
+	/// <remarks>
+	/// Empty unless the source sets both <c>RasterizePixelWidth</c> and <c>RasterizePixelHeight</c>;
+	/// those are logical pixels, and the rasterised bitmap is that size multiplied by the display's
+	/// scale, so an icon asked for at 24 logical pixels on a 125% display is 30 pixels across.
+	/// Without them the source is drawn from its vector picture instead and there is no bitmap.
+	/// </remarks>
+	public Size RasterizedPixelSize
+	{
+		get
+		{
+#if __NETSTD_REFERENCE__
+			throw new PlatformNotSupportedException();
+#else
+			return _skBitmap is { } bitmap ? new Size(bitmap.Width, bitmap.Height) : default;
 #endif
 		}
 	}
@@ -158,14 +260,20 @@ public partial class SvgProvider : ISvgProvider
 	}
 
 #if !__NETSTD_REFERENCE__
-	private Task<SKSvg?> LoadSvgAsync(byte[] svgBytes) =>
-		Task.Run(() =>
+	private Task<SKSvg?> LoadSvgAsync(byte[] svgBytes)
+	{
+		//Read on the calling thread: the parse itself runs on the thread pool, and the CSS belongs
+		//to the source rather than to that thread.
+		var css = GetCss(_owner);
+		var parameters = css is null ? (SvgParameters?)null : new SvgParameters(null!, css);
+
+		return Task.Run(() =>
 		{
 			var skSvg = new SKSvg();
 			try
 			{
 				using var memoryStream = new MemoryStream(svgBytes);
-				skSvg.Load(memoryStream);
+				skSvg.Load(memoryStream, parameters);
 			}
 			catch (Exception ex)
 			{
@@ -179,12 +287,13 @@ public partial class SvgProvider : ISvgProvider
 
 			return skSvg;
 		});
+	}
 
 	private bool UpdateBitmap()
 	{
 		var scale = DisplayInformation.GetForCurrentView().LogicalDpi / DisplayInformation.BaseDpi;
-		var desiredPhysicalWidth = (int)(scale * _owner.RasterizePixelHeight);
-		var desiredPhysicalHeight = (int)(scale * _owner.RasterizePixelWidth);
+		var desiredPhysicalWidth = (int)(scale * _owner.RasterizePixelWidth);
+		var desiredPhysicalHeight = (int)(scale * _owner.RasterizePixelHeight);
 		var changed = false;
 		if (!double.IsNaN(_owner.RasterizePixelHeight) &&
 			!double.IsNaN(_owner.RasterizePixelWidth) &&

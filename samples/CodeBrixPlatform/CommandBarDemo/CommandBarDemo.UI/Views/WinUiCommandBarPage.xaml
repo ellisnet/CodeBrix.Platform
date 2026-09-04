@@ -1,0 +1,206 @@
+<Page x:Class="CommandBarDemo.Views.WinUiCommandBarPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:cb="using:CodeBrix.Platform.UI.CommandBar"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+  <!-- ==============================================================================
+       WinUI CommandBar parity page.
+
+       Everything between the "PASTED WINUI SAMPLE" markers below is written the way a
+       WinUI page writes it: the default XAML namespace of a CodeBrix.Platform page is
+       already Microsoft.UI.Xaml.Controls, so a CommandBar, an AppBarButton, an
+       AppBarToggleButton, an AppBarSeparator and an AppBarElementContainer are spelled
+       with no prefix at all. Nothing in this file was renamed, re-prefixed or adapted
+       from the shape a WinUI Gallery page uses.
+
+       The ONE prefixed element on the page is the `cb:` one at the bottom: the CommandBar
+       add-in's own SVG icon on an AppBarButton. The core platform package never depends on
+       the Svg add-in or on a Skia SVG library, so a CommandBar in a plain application shows
+       font, path, symbol and bitmap icons on its own; an SVG icon on an AppBarButton works
+       because THIS application references the CommandBar add-in (which brings the Svg
+       add-in with it). That is the whole of the difference, and it is why this page has a
+       `cb:` prefix declared while the pasted sample above needs none.
+       ============================================================================== -->
+
+  <ScrollViewer>
+    <StackPanel Padding="16" Spacing="14">
+
+      <TextBlock x:Name="Title" Text="Pasted WinUI CommandBar" FontSize="24" FontWeight="Bold" />
+      <TextBlock Text="Written exactly as a WinUI page writes it - no prefix changes."
+                 FontSize="12" Opacity="0.7" />
+
+      <!-- ===================== PASTED WINUI SAMPLE - BEGIN ====================== -->
+
+      <!-- The transport bar every WinUI CommandBar sample opens with: primary commands
+           written as the bar's own content, secondary commands in the overflow, and a
+           Content block on the left for the "now playing" text. Labels sit under the
+           icons, and the bar moves commands into the overflow by itself as it narrows. -->
+      <Border x:Name="MediaHost" Background="#FF00C8FF" Padding="2">
+        <CommandBar x:Name="MediaBar"
+                    DefaultLabelPosition="Bottom"
+                    ClosedDisplayMode="Compact"
+                    IsDynamicOverflowEnabled="True"
+                    IsOpen="False">
+          <AppBarToggleButton x:Name="ShuffleToggle" Icon="Shuffle" Label="Shuffle" />
+          <AppBarToggleButton x:Name="RepeatToggle" Icon="RepeatAll" Label="Repeat" />
+          <AppBarSeparator x:Name="MediaSeparator" />
+          <AppBarButton x:Name="BackButton" Icon="Back" Label="Back" />
+          <AppBarButton x:Name="StopButton" Icon="Stop" Label="Stop" />
+          <AppBarButton x:Name="ForwardButton" Icon="Forward" Label="Forward" />
+
+          <CommandBar.SecondaryCommands>
+            <AppBarButton x:Name="LikeButton" Icon="Like" Label="Like" />
+            <AppBarButton x:Name="DislikeButton" Icon="Dislike" Label="Dislike" />
+            <AppBarSeparator />
+            <AppBarButton x:Name="ShareButton" Icon="Share" Label="Share">
+              <AppBarButton.KeyboardAccelerators>
+                <KeyboardAccelerator x:Name="ShareAccelerator" Key="H" Modifiers="Control" />
+              </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+          </CommandBar.SecondaryCommands>
+
+          <CommandBar.Content>
+            <TextBlock x:Name="NowPlaying" Text="Now playing..." Margin="12,14" />
+          </CommandBar.Content>
+        </CommandBar>
+      </Border>
+
+      <!-- The editing bar: labels to the RIGHT of the icons, the three built-in icon
+           kinds a WinUI sample reaches for (a Symbol, a FontIcon glyph and a BitmapIcon
+           over a PNG), a keyboard accelerator whose text the bar shows for itself, a
+           Flyout hanging off an AppBarButton, and an AppBarElementContainer holding an
+           ordinary ComboBox. IsSticky keeps the overflow open once it is opened. -->
+      <CommandBar x:Name="EditBar"
+                  DefaultLabelPosition="Right"
+                  ClosedDisplayMode="Compact"
+                  IsSticky="True"
+                  IsOpen="False">
+        <AppBarButton x:Name="SaveButton" Icon="Save" Label="Save">
+          <AppBarButton.KeyboardAccelerators>
+            <KeyboardAccelerator x:Name="SaveAccelerator" Key="S" Modifiers="Control" />
+          </AppBarButton.KeyboardAccelerators>
+        </AppBarButton>
+        <AppBarButton x:Name="FontIconButton" Label="Font icon">
+          <AppBarButton.Icon>
+            <FontIcon x:Name="FontIconArt" Glyph="&#xE734;" />
+          </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="BitmapIconButton" Label="Bitmap icon">
+          <AppBarButton.Icon>
+            <BitmapIcon x:Name="BitmapIconArt"
+                        UriSource="ms-appx:///Assets/appbar-diamond.png"
+                        ShowAsMonochrome="False" />
+          </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="AddButton" Icon="Add" Label="Add">
+          <AppBarButton.Flyout>
+            <MenuFlyout x:Name="AddFlyout">
+              <MenuFlyoutItem x:Name="AddSectionItem" Text="Section" />
+              <MenuFlyoutItem x:Name="AddPageItem" Text="Page" />
+            </MenuFlyout>
+          </AppBarButton.Flyout>
+        </AppBarButton>
+        <AppBarSeparator x:Name="EditSeparator" />
+        <AppBarElementContainer x:Name="ZoomContainer">
+          <ComboBox x:Name="ZoomCombo" MinWidth="110" VerticalAlignment="Center" SelectedIndex="1">
+            <ComboBoxItem Content="100%" />
+            <ComboBoxItem Content="150%" />
+            <ComboBoxItem Content="200%" />
+          </ComboBox>
+        </AppBarElementContainer>
+
+        <CommandBar.SecondaryCommands>
+          <AppBarButton x:Name="SettingsButton" Icon="Setting" Label="Settings" />
+          <AppBarToggleButton x:Name="PreviewToggle" Icon="View" Label="Preview" />
+        </CommandBar.SecondaryCommands>
+      </CommandBar>
+
+      <!-- The compact bar: no labels at all, and closed down to the overflow button only
+           until it is opened. -->
+      <CommandBar x:Name="MinimalBar"
+                  DefaultLabelPosition="Collapsed"
+                  ClosedDisplayMode="Minimal"
+                  IsDynamicOverflowEnabled="False">
+        <AppBarButton x:Name="CutButton" Icon="Cut" Label="Cut" />
+        <AppBarButton x:Name="CopyButton" Icon="Copy" Label="Copy" />
+        <AppBarButton x:Name="PasteButton" Icon="Paste" Label="Paste" />
+        <CommandBar.SecondaryCommands>
+          <AppBarButton x:Name="SelectAllButton" Icon="SelectAll" Label="Select all" />
+        </CommandBar.SecondaryCommands>
+      </CommandBar>
+
+      <!-- A bar whose width the self-test drives, so the dynamic overflow can be measured
+           rather than guessed at: as the host narrows, trailing primary commands move into
+           the overflow and come back when the room returns. -->
+      <Border x:Name="DynamicHost" HorizontalAlignment="Left">
+        <CommandBar x:Name="DynamicBar"
+                    DefaultLabelPosition="Right"
+                    ClosedDisplayMode="Compact"
+                    IsDynamicOverflowEnabled="True">
+          <AppBarButton x:Name="DynamicOne" Icon="Home" Label="Home" />
+          <AppBarButton x:Name="DynamicTwo" Icon="Document" Label="Document" />
+          <AppBarButton x:Name="DynamicThree" Icon="Folder" Label="Folder" />
+          <AppBarButton x:Name="DynamicFour" Icon="Calendar" Label="Calendar" />
+          <AppBarButton x:Name="DynamicFive" Icon="Contact" Label="Contact" />
+        </CommandBar>
+      </Border>
+
+      <!-- ====================== PASTED WINUI SAMPLE - END ======================= -->
+
+      <!-- The icon bar. Three of these four buttons carry an icon the CORE does not know
+           about: the add-in's SvgIcon (an IconElement of its own), the add-in's
+           SvgIconSource and RasterIconSource through the framework's IconSourceElement
+           wrapper, and - as the control case - the framework's OWN ImageIconSource through
+           the same wrapper. The artwork is filled in from the code-behind because this demo
+           writes its icon files at start-up rather than shipping them; a real application
+           writes ms-appx:///Icons/save.svg in the XAML and stops there. -->
+      <CommandBar x:Name="IconBar" DefaultLabelPosition="Right" ClosedDisplayMode="Compact">
+        <!-- The IconElement twin. Its icon is assigned from the code-behind rather than written
+             as <cb:SvgIcon /> here, because the add-in declares BOTH an SvgIcon element and an
+             SvgIcon markup extension, and the XAML generator resolves the "Extension" name first
+             for either syntax - so the element form yields an SvgIconSource and the assignment
+             fails. Measured, and recorded in the wave's STATUS; the add-in's own guidance already
+             points an AppBarButton at SvgIconSource, which is the next button along. -->
+        <AppBarButton x:Name="SvgIconButton" Label="SvgIcon" />
+        <AppBarButton x:Name="SvgIconSourceButton" Label="SvgIconSource">
+          <AppBarButton.Icon>
+            <IconSourceElement x:Name="SvgIconSourceHost">
+              <cb:SvgIconSource x:Name="SvgIconSourceArt" Size="20" Tint="#FFDD2266" />
+            </IconSourceElement>
+          </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="RasterIconSourceButton" Label="RasterIconSource">
+          <AppBarButton.Icon>
+            <IconSourceElement x:Name="RasterIconSourceHost">
+              <cb:RasterIconSource x:Name="RasterIconSourceArt" Size="20"
+                                   Source="ms-appx:///Assets/appbar-diamond.png" />
+            </IconSourceElement>
+          </AppBarButton.Icon>
+        </AppBarButton>
+        <AppBarButton x:Name="ImageIconSourceButton" Label="ImageIconSource">
+          <AppBarButton.Icon>
+            <IconSourceElement x:Name="ImageIconSourceHost">
+              <ImageIconSource x:Name="ImageIconSourceArt"
+                               ImageSource="ms-appx:///Assets/appbar-diamond.png" />
+            </IconSourceElement>
+          </AppBarButton.Icon>
+        </AppBarButton>
+      </CommandBar>
+
+      <!-- A XamlUICommand carrying a keyboard accelerator, bound to an ordinary Button and
+           to an AppBarButton. The command's accelerator has to reach the button it is bound
+           to; nothing else on the page proves that path. -->
+      <StackPanel x:Name="CommandRow" Orientation="Horizontal" Spacing="8">
+        <Button x:Name="CommandedButton" />
+        <AppBarButton x:Name="CommandedAppBarButton" />
+        <TextBlock x:Name="CommandLog" VerticalAlignment="Center" Opacity="0.8" />
+      </StackPanel>
+
+      <ScrollViewer Height="160">
+        <TextBlock x:Name="LogText" FontFamily="monospace" FontSize="11" TextWrapping="Wrap" />
+      </ScrollViewer>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

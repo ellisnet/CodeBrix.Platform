@@ -59,6 +59,12 @@ partial class InputManager
 				_inputManager.LastInputDeviceType = InputDeviceType.Keyboard;
 			}
 
+			if (AccessKeyManager.TryProcessKey(_inputManager.ContentRoot.XamlRoot, args.VirtualKey, args.KeyboardModifiers, down))
+			{
+				args.Handled = true;
+				return;
+			}
+
 			var originalSource1 = FocusManager.GetFocusedElement(_inputManager.ContentRoot.XamlRoot) as UIElement ?? _inputManager.ContentRoot.VisualTree.RootElement;
 
 			var routedArgs = new KeyRoutedEventArgs(originalSource1, args.VirtualKey, args.KeyboardModifiers, args.KeyStatus, args.UnicodeKey)

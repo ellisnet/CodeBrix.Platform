@@ -1476,24 +1476,44 @@ namespace Microsoft.UI.Xaml
 		}
 
 		/// <summary>
-		/// This event is not yet implemented in CodeBrix Platform.
+		/// Occurs when a user completes an access key sequence that targets this element.
 		/// </summary>
 		/// <remarks>
-		/// The code was moved here to override the LogLevel.
+		/// Raised by <see cref="AccessKeyManager"/> when the element's <see cref="AccessKey"/>
+		/// matches the letter or digit typed while the Menu (Alt) modifier is held, or while
+		/// access-key display mode is active.
 		/// </remarks>
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Xaml.UIElement, global::Microsoft.UI.Xaml.Input.AccessKeyInvokedEventArgs> AccessKeyInvoked
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.UIElement", "event TypedEventHandler<UIElement, AccessKeyInvokedEventArgs> UIElement.AccessKeyInvoked", LogLevel.Debug);
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.UIElement", "event TypedEventHandler<UIElement, AccessKeyInvokedEventArgs> UIElement.AccessKeyInvoked", LogLevel.Debug);
-			}
-		}
+		public event TypedEventHandler<UIElement, AccessKeyInvokedEventArgs> AccessKeyInvoked;
+
+		/// <summary>
+		/// Occurs when the user requests that access keys be displayed.
+		/// </summary>
+		public event TypedEventHandler<UIElement, AccessKeyDisplayRequestedEventArgs> AccessKeyDisplayRequested;
+
+		/// <summary>
+		/// Occurs when access keys should no longer be displayed.
+		/// </summary>
+		public event TypedEventHandler<UIElement, AccessKeyDisplayDismissedEventArgs> AccessKeyDisplayDismissed;
+
+		/// <summary>
+		/// Raises <see cref="AccessKeyInvoked"/> on this element.
+		/// </summary>
+		/// <param name="args">The event data carrying the handled flag back to the caller.</param>
+		internal void RaiseAccessKeyInvoked(AccessKeyInvokedEventArgs args)
+			=> AccessKeyInvoked?.Invoke(this, args);
+
+		/// <summary>
+		/// Raises <see cref="AccessKeyDisplayRequested"/> on this element.
+		/// </summary>
+		/// <param name="args">The event data carrying the keys pressed so far.</param>
+		internal void RaiseAccessKeyDisplayRequested(AccessKeyDisplayRequestedEventArgs args)
+			=> AccessKeyDisplayRequested?.Invoke(this, args);
+
+		/// <summary>
+		/// Raises <see cref="AccessKeyDisplayDismissed"/> on this element.
+		/// </summary>
+		/// <param name="args">The event data.</param>
+		internal void RaiseAccessKeyDisplayDismissed(AccessKeyDisplayDismissedEventArgs args)
+			=> AccessKeyDisplayDismissed?.Invoke(this, args);
 	}
 }

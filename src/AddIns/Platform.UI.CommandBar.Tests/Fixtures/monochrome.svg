@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Drawn the way an exported icon usually is: black stated outright, with no hook for a
+       theme. Only IconTintMode.ReplaceBlackAndWhite recolours this. -->
+  <rect x="0" y="0" width="24" height="24" fill="#000000" stroke="#000000" />
+</svg>

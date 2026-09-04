@@ -11,6 +11,16 @@
 		<AssemblyName>CodeBrix.Platform.UI.Svg</AssemblyName>
 		<RootNamespace>CodeBrix.Platform.UI.Svg</RootNamespace>
 
+		<!-- PackageId is NOT the assembly name: this project never packs itself (its package is
+		     built from build/nuget/Platform.WinUI.Svg.nuspec by build/CodeBrix.Platform.Build.csproj),
+		     so the only thing PackageId governs is how another project in this repository that takes
+		     a ProjectReference to it resolves its package dependency. That has to be the PUBLISHED
+		     id, the one the nuspec and build/nuget/package-dependency-map.json both name - otherwise
+		     a referencing package (the CommandBar add-in, whose SVG icons make the Svg add-in a hard
+		     dependency) would ship a dependency on an id that has never been published. Same
+		     arrangement as Platform.WinUI.Graphics3DGL.csproj, for the VideoPlayer add-in. -->
+		<PackageId>CodeBrix.Platform.Svg.ApacheLicenseForever</PackageId>
+
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
 		<Nullable>enable</Nullable>

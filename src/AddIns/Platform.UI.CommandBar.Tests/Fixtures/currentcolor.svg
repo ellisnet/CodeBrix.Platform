@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Themed the way a modern icon set is: nothing states a colour, so every shape takes
+       whatever "color" resolves to. This is what IconTintMode.CurrentColorOnly recolours. -->
+  <rect x="0" y="0" width="24" height="24" fill="currentColor" />
+</svg>

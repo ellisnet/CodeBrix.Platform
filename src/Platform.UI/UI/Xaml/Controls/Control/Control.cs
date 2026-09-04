@@ -537,10 +537,14 @@ namespace Microsoft.UI.Xaml.Controls
 		/// </summary>
 		/// <param name="childName">The name of the template part.</param>
 		/// <returns>The first template part of the specified name; otherwise, null.</returns>
+		/// <remarks>
+		/// The search is restricted to the applied control template. Elements that are named in the
+		/// control's Content (or anywhere else outside the templated root) are never returned, and
+		/// null is returned when no template has been applied yet.
+		/// </remarks>
 		public DependencyObject GetTemplateChild(string childName)
 		{
-			return FindNameInScope(TemplatedRoot as IFrameworkElement, childName) as DependencyObject
-				?? FindName(childName) as DependencyObject;
+			return FindNameInTemplate(childName) as DependencyObject;
 		}
 
 		/// <summary>
@@ -551,7 +555,26 @@ namespace Microsoft.UI.Xaml.Controls
 		/// <returns>The first template part of the specified name; otherwise, null.</returns>
 		internal T GetTemplateChild<T>(string childName) where T : class, DependencyObject
 		{
-			return FindNameInScope(TemplatedRoot as IFrameworkElement, childName) as T ?? FindName(childName) as T;
+			return FindNameInTemplate(childName) as T;
+		}
+
+		/// <summary>
+		/// Searches the applied control template - and only the applied control template - for the
+		/// element with the given name.
+		/// </summary>
+		/// <remarks>
+		/// The name scope of the templated root answers for templates that carry one. The walk from
+		/// the templated root is the fallback for the cases the name scope cannot answer, notably a
+		/// deferred (ElementStub) part and a template that was built in code, and it keeps the search
+		/// inside the template. Searching from the control itself would let a name that only exists
+		/// in the control's Content be mistaken for a template part.
+		/// </remarks>
+		private object FindNameInTemplate(string childName)
+		{
+			var templatedRoot = TemplatedRoot as IFrameworkElement;
+
+			return FindNameInScope(templatedRoot, childName)
+				?? templatedRoot?.FindName(childName);
 		}
 
 		private static object FindNameInScope(IFrameworkElement root, string name)

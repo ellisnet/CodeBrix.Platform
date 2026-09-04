@@ -99,6 +99,7 @@
     <Project Path="src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.AudioPlayer.Skia/Platform.UI.AudioPlayer.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.VideoPlayer.Skia/Platform.UI.VideoPlayer.Skia.csproj" />
+    <Project Path="src/AddIns/Platform.UI.CommandBar/Platform.UI.CommandBar.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.FlexPanel/Platform.UI.FlexPanel.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.TerminalView/Platform.UI.TerminalView.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.PlotterView/Platform.UI.PlotterView.Skia.csproj" />
@@ -156,6 +157,7 @@
     <Project Path="src/Platform.UI.Toolkit/Platform.UI.Toolkit.Tests.csproj" />
     <Project Path="src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.AdvancedTextEdit.Tests/Platform.UI.AdvancedTextEdit.Skia.Unit.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.CommandBar.Tests/Platform.UI.CommandBar.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.FlexPanel.Tests/Platform.UI.FlexPanel.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TerminalView.Tests/Platform.UI.TerminalView.Skia.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.PlotterView.Tests/Platform.UI.PlotterView.Skia.Unit.Tests.csproj" />

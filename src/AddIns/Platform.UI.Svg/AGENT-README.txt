@@ -147,8 +147,31 @@ Image (core) with an SvgImageSource on the Skia heads
 
 SvgProvider (this package; CodeBrix.Platform.UI.Svg) : ISvgProvider
 -------------------------------------------------------------------
-Framework-facing. Listed so an agent recognises it; application code does not
-construct or call it.
+Mostly framework-facing - application code does not construct one - but three
+STATIC members are meant for you, and are the supported way to theme an SVG and
+to check what was actually rasterized:
+
+    public static void SetCss(SvgImageSource source, string css);
+    public static string GetCss(SvgImageSource source);
+        A stylesheet handed to the SVG parser for that source. This is how a
+        themed icon is made: an artwork drawn with fill="currentColor" takes
+        whatever `* { color: #RRGGBB; }` says, so one file serves every theme
+        and accent without being rewritten. SET IT BEFORE THE SOURCE STARTS
+        LOADING - parsing is what applies it; changing it afterwards has no
+        effect until the source is parsed again. Null removes it, which is
+        byte-for-byte the behaviour of a source that never had one.
+        Use the UNIVERSAL selector: a type selector on the root element
+        (`svg { color: ... }`) does not reach the shapes inside it in the
+        renderer this package uses.
+
+    public static Size GetRasterizedPixelSize(SvgImageSource source);
+        The size, in DEVICE pixels, of the bitmap the source last rasterized -
+        the complement of SourceSize, which is the SVG's own size. Use it to
+        confirm that an icon asked for at 24 logical pixels really came out at
+        30 device pixels on a 1.25-scale display, rather than at 24 and
+        stretched. Also available per instance as `RasterizedPixelSize`.
+
+The rest is framework-facing; listed so an agent recognises it.
 
     public SvgProvider(object owner);          // owner must be a SvgImageSource,
                                                // else InvalidOperationException

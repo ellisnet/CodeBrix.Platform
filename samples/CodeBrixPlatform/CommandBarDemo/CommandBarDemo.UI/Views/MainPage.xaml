@@ -1,0 +1,253 @@
+<Page x:Class="CommandBarDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:cb="using:CodeBrix.Platform.UI.CommandBar"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+  <Grid RowSpacing="10" Padding="16">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" Text="CommandBar Demo" FontSize="24" FontWeight="Bold" />
+
+    <!-- ============================================================================
+         THE REFERENCE DEMO: a score editor's two tool bars, in the spirit of the ones
+         a music-notation editor puts across the top of its window - a main bar of file
+         and engrave commands, and a music bar of view controls. Everything on it is
+         bound to the view model: XamlUICommands for New/Open/Save, which carry their own
+         label, icon, description and shortcut, and plain ICommands for the rest.
+         The tray sits in a Border with a known background so a window capture can find
+         where it painted without knowing where the window landed.
+         ============================================================================ -->
+    <Border x:Name="FrescoHost" Grid.Row="1" Background="#FF00C8FF" Padding="6" CornerRadius="4">
+      <cb:ToolBarTray x:Name="FrescoTray"
+                      cb:ToolBarProperties.IconSize="24"
+                      cb:ToolBarProperties.LabelMode="IconOnly">
+
+        <cb:ToolBar x:Name="MainToolBar" Title="Main" OverflowMode="Chevron">
+          <!-- A group: two file commands that belong together. The bar puts a separator
+               between adjacent groups by itself. -->
+          <cb:ToolBarGroup x:Name="FileGroup">
+            <cb:ToolButton x:Name="NewToolButton" />
+            <!-- Open, with the recent-files menu behind its arrow: the main half runs the
+                 command, the arrow half opens the menu. -->
+            <cb:ToolDropDownButton x:Name="OpenToolButton" PopupMode="MenuButton">
+              <cb:ToolDropDownButton.Flyout>
+                <MenuFlyout x:Name="RecentFilesFlyout" />
+              </cb:ToolDropDownButton.Flyout>
+            </cb:ToolDropDownButton>
+            <!-- Save, split the same way: click saves, the arrow offers Save As. -->
+            <cb:ToolDropDownButton x:Name="SaveToolButton" PopupMode="MenuButton">
+              <cb:ToolDropDownButton.Flyout>
+                <MenuFlyout>
+                  <MenuFlyoutItem x:Name="SaveAsItem" Text="Save as..." />
+                </MenuFlyout>
+              </cb:ToolDropDownButton.Flyout>
+            </cb:ToolDropDownButton>
+          </cb:ToolBarGroup>
+
+          <cb:ToolBarGroup x:Name="EngraveGroup">
+            <!-- Engrave, with its modes behind the arrow. -->
+            <cb:ToolDropDownButton x:Name="EngraveToolButton" Text="Engrave" PopupMode="MenuButton">
+              <cb:ToolDropDownButton.Flyout>
+                <MenuFlyout x:Name="EngraveModesFlyout" />
+              </cb:ToolDropDownButton.Flyout>
+            </cb:ToolDropDownButton>
+            <cb:ToolButton x:Name="PrintToolButton" Text="Print" Shortcut="Ctrl+P" />
+          </cb:ToolBarGroup>
+
+          <cb:ToolBarSeparator />
+
+          <!-- Any control at all can sit in a bar: this is the score chooser. -->
+          <ComboBox x:Name="ScoreChooser" MinWidth="150" VerticalAlignment="Center" />
+
+          <!-- Everything after a filling spacer is pushed to the far end of the bar. -->
+          <cb:ToolBarSpacer x:Name="MainSpacer" Fill="True" />
+
+          <!-- The magnifier: a checkable button whose icon is a PNG, tinted through its
+               alpha channel the way the platform tints any bitmap icon. -->
+          <cb:ToolToggleButton x:Name="MagnifierToolButton" Text="Magnifier" />
+        </cb:ToolBar>
+
+        <cb:ToolBar x:Name="MusicToolBar" Title="Music" OverflowMode="Chevron">
+          <!-- The zoom box is editable: a typed value is as good as a chosen one. -->
+          <ComboBox x:Name="ZoomBox" IsEditable="True" MinWidth="90" VerticalAlignment="Center" />
+          <cb:ToolBarSeparator />
+          <!-- The pager. Its two chevrons are one SVG drawn in currentColor, tinted here
+               rather than shipped twice. -->
+          <cb:ToolBarGroup x:Name="PagerGroup">
+            <cb:ToolButton x:Name="PreviousPageButton" Text="Previous page" />
+            <TextBlock x:Name="PageLabel" VerticalAlignment="Center" Margin="6,0" />
+            <cb:ToolButton x:Name="NextPageButton" Text="Next page" />
+          </cb:ToolBarGroup>
+          <cb:ToolBarSeparator />
+          <!-- The JPEG icon: opaque, as a JPEG always is, and drawn as it was written. -->
+          <cb:ToolButton x:Name="ScoreThumbnailButton" Text="Score" />
+        </cb:ToolBar>
+      </cb:ToolBarTray>
+    </Border>
+
+    <!-- The three switches the demo drives: they are ordinary controls, outside the bars,
+         changing bar-level settings while the window is open. -->
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12">
+      <CheckBox x:Name="VerboseCheck" Content="Show button text" />
+      <CheckBox x:Name="ToolTipsCheck" Content="Show tooltips" IsChecked="True" />
+      <TextBlock x:Name="ActionText" VerticalAlignment="Center" Opacity="0.8" />
+    </StackPanel>
+
+    <!-- ============================================================================
+         Below this line are the per-stream proof rows from waves 1 and 2. They are kept
+         so every self-test step written by the scaffold and the three streams still runs
+         against exactly the element it was written for.
+         ============================================================================ -->
+    <TextBlock Grid.Row="3" Text="Wave 1 and 2 proof rows" FontSize="12" Opacity="0.7" />
+
+    <cb:ToolBarTray x:Name="Tray" Grid.Row="4"
+                    cb:ToolBarProperties.IconSize="24"
+                    cb:ToolBarProperties.LabelMode="IconAndText">
+      <cb:ToolBar x:Name="MainBar">
+        <cb:ToolButton x:Name="NewButton" Content="New" />
+        <cb:ToolBarSeparator />
+        <cb:ToolToggleButton x:Name="MagnifierToggle" Content="Magnifier" />
+        <cb:ToolBarSpacer x:Name="Spacer" Width="24" />
+        <cb:ToolDropDownButton x:Name="EngraveButton" Content="Engrave" />
+      </cb:ToolBar>
+    </cb:ToolBarTray>
+
+    <!-- Ordinary parenting, so the templated controls measure, arrange and paint without the
+         bar's own layout being involved. The inherited attached property set here is read by the
+         button below it. -->
+    <StackPanel x:Name="StyleProof" Grid.Row="5" Orientation="Horizontal"
+                cb:ToolBarProperties.IconSize="32"
+                cb:ToolBarProperties.LabelMode="IconAndText"
+                cb:ToolBarProperties.LabelPosition="Bottom"
+                cb:ToolBarProperties.ShowToolTips="False">
+      <cb:ToolButton x:Name="HostedButton" Content="Hosted button" />
+      <cb:ToolBarSeparator x:Name="HostedSeparator" />
+      <cb:ToolToggleButton x:Name="HostedToggle" Content="Hosted toggle" />
+    </StackPanel>
+
+    <!-- ===== BUTTONS stream: the three button types, with icons, labels, a checked state and a
+         flyout, on a parent that lays out. ===== -->
+    <StackPanel x:Name="ButtonsRow" Grid.Row="6" Orientation="Horizontal" Spacing="8"
+                cb:ToolBarProperties.IconSize="24"
+                cb:ToolBarProperties.LabelMode="IconAndText">
+      <cb:ToolButton x:Name="SaveButton" Text="Save" Shortcut="Ctrl+S" />
+      <cb:ToolButton x:Name="IconOnlyButton" Text="Print"
+                     cb:ToolBarProperties.LabelMode="IconOnly" />
+      <cb:ToolToggleButton x:Name="MagnifierButton" Text="Magnifier" />
+      <cb:ToolDropDownButton x:Name="MenuDropDown" Text="Open" PopupMode="MenuButton">
+        <cb:ToolDropDownButton.Flyout>
+          <MenuFlyout>
+            <MenuFlyoutItem x:Name="RecentItem" Text="Recent score" />
+            <MenuFlyoutItem Text="Another score" />
+          </MenuFlyout>
+        </cb:ToolDropDownButton.Flyout>
+      </cb:ToolDropDownButton>
+      <cb:ToolDropDownButton x:Name="InstantDropDown" Text="Modes" PopupMode="Instant">
+        <cb:ToolDropDownButton.Flyout>
+          <MenuFlyout>
+            <MenuFlyoutItem Text="Publish" />
+            <MenuFlyoutItem Text="Draft" />
+          </MenuFlyout>
+        </cb:ToolDropDownButton.Flyout>
+      </cb:ToolDropDownButton>
+      <cb:ToolDropDownButton x:Name="DelayedDropDown" Text="Engrave" PopupMode="Delayed">
+        <cb:ToolDropDownButton.Flyout>
+          <MenuFlyout>
+            <MenuFlyoutItem Text="Custom engrave" />
+          </MenuFlyout>
+        </cb:ToolDropDownButton.Flyout>
+      </cb:ToolDropDownButton>
+      <cb:ToolButton x:Name="NoToolTipButton" Text="Quiet" ShowToolTip="False" />
+    </StackPanel>
+
+    <!-- ===== BUTTONS stream: the core primitives this stream considered building on. They are
+         here to be MEASURED on the head, not to be used: the self-test reports whether each one
+         arranges to a real size. ===== -->
+    <StackPanel x:Name="CorePrimitivesRow" Grid.Row="7" Orientation="Horizontal" Spacing="8">
+      <DropDownButton x:Name="CoreDropDownButton" Content="Core DropDownButton">
+        <DropDownButton.Flyout>
+          <MenuFlyout>
+            <MenuFlyoutItem Text="One" />
+          </MenuFlyout>
+        </DropDownButton.Flyout>
+      </DropDownButton>
+      <ToggleSplitButton x:Name="CoreToggleSplitButton" Content="Core ToggleSplitButton">
+        <ToggleSplitButton.Flyout>
+          <MenuFlyout>
+            <MenuFlyoutItem Text="One" />
+          </MenuFlyout>
+        </ToggleSplitButton.Flyout>
+      </ToggleSplitButton>
+    </StackPanel>
+
+    <!-- ===== ICONS stream, self-test stage. A known, unique background colour so a window
+         capture can find the icons without knowing where the window landed. ===== -->
+    <Border x:Name="IconStage" Grid.Row="8" Background="#FFFF00FF" Padding="8"
+            HorizontalAlignment="Left" VerticalAlignment="Top">
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <cb:SvgIcon x:Name="SvgIconProof" Size="24" Tint="#FF2266DD" />
+        <cb:RasterIcon x:Name="RasterIconProof" Size="24" />
+      </StackPanel>
+    </Border>
+
+    <!-- ===== LAYOUT stream. A tray of two real bars, whose host width the self-test sets
+         directly, which is deterministic and does not need a window manager. ===== -->
+    <Border x:Name="LayoutHost" Grid.Row="9">
+      <cb:ToolBarTray x:Name="LayoutTray">
+        <cb:ToolBar x:Name="LayoutBar" Title="Layout" OverflowMode="Chevron">
+          <cb:ToolBarGroup x:Name="GroupOne">
+            <cb:ToolButton x:Name="GroupOneFirst" Content="New" />
+            <cb:ToolButton x:Name="GroupOneSecond" Content="Open" />
+          </cb:ToolBarGroup>
+          <cb:ToolBarGroup x:Name="GroupTwo">
+            <cb:ToolButton x:Name="GroupTwoFirst" Content="Cut" />
+            <cb:ToolButton x:Name="GroupTwoSecond" Content="Copy" />
+          </cb:ToolBarGroup>
+          <cb:ToolBarSeparator x:Name="LayoutSeparator" />
+          <cb:ToolButton x:Name="EngraveButtonTwo" Content="Engrave" />
+          <cb:ToolToggleButton x:Name="TailToggle" Content="Tail" />
+        </cb:ToolBar>
+        <cb:ToolBar x:Name="MusicBar" Title="Music">
+          <cb:ToolButton x:Name="MusicFirst" Content="Note" />
+          <cb:ToolButton x:Name="MusicSecond" Content="Rest" />
+        </cb:ToolBar>
+      </cb:ToolBarTray>
+    </Border>
+
+    <!-- A bar that fills its cell, so a filling spacer has room to hand out: it pushes the
+         trailing toggle to the far end of the bar. -->
+    <cb:ToolBar x:Name="StretchBar" Grid.Row="10" Title="Stretch" OverflowMode="None">
+      <cb:ToolButton x:Name="StretchFirst" Content="Left" />
+      <cb:ToolBarSpacer x:Name="FillSpacer" Fill="True" />
+      <cb:ToolToggleButton x:Name="StretchTail" Content="Right" />
+    </cb:ToolBar>
+
+    <!-- A vertical bar, so the turned axis is on screen and not only in the unit suite. -->
+    <cb:ToolBar x:Name="VerticalBar" Grid.Row="11" Orientation="Vertical"
+                OverflowMode="None" HorizontalAlignment="Left">
+      <cb:ToolButton x:Name="VerticalFirst" Content="One" />
+      <cb:ToolBarSeparator x:Name="VerticalSeparator" />
+      <cb:ToolButton x:Name="VerticalSecond" Content="Two" />
+    </cb:ToolBar>
+
+    <ScrollViewer Grid.Row="12">
+      <TextBlock x:Name="LogText" FontFamily="monospace" FontSize="11" TextWrapping="Wrap" />
+    </ScrollViewer>
+  </Grid>
+</Page>
