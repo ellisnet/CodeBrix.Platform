@@ -72,6 +72,19 @@
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<!-- These three are what the target below swaps in, and nothing else in this project's
+		     reference graph builds them: the compile-time reference to CodeBrix.Platform resolves to
+		     the .Reference flavour, so without these a STALE .Skia build would be copied beside the
+		     tests (or none at all on a fresh clone) and the suite would silently measure yesterday's
+		     framework. ReferenceOutputAssembly is false because they are needed at run time only -
+		     the compile still binds .Reference, exactly as it did before. Same wiring as the
+		     SkiaSharp.Views suite. -->
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
 	<!-- The editor's highlighting model constructs XAML brushes (DependencyObjects), and a
 	     DependencyObject's generated constructor touches the dispatcher. Assembly resolution
 	     hands a host-free test process the .Reference variants of the runtime assemblies,

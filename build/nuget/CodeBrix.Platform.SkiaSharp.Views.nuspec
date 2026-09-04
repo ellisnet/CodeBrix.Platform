@@ -7,7 +7,6 @@
 		vendors, NOT the CodeBrix.Platform family version. It is hard-coded here (not
 		set by CI) and bumped only together with $(SkiaSharpVersion). The fourth
 		version segment is reserved for glue-only fixes between SkiaSharp bumps.
-		See src/AddIns/CodeBrix.Platform.SkiaSharp.Views/PORTING-NOTES.md.
 		-->
 		<version>4.151.0</version>
 		<title>CodeBrix.Platform.SkiaSharp.Views</title>

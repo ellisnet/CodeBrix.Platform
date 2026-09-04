@@ -1217,6 +1217,12 @@ implemented on the Skia heads and how the framework expects it to be used.
     SetPresenter(AppWindowPresenterKind), SetIcon(string iconPath),
     static GetFromWindowId(WindowId), events Changed / Closing.
 
+    AppWindow.Size is the window in screen coordinates - it includes whatever
+    non-client frame the windowing system draws around it - and Resize takes a
+    size of that same kind, so Resize(AppWindow.Size) is a no-op. ClientSize is
+    the client area only, and Window.Bounds is that same client area in
+    effective pixels, which is what the page is laid out into.
+
     OverlappedPresenter: IsAlwaysOnTop, IsMaximizable, IsMinimizable, IsModal,
     IsResizable, HasBorder, HasTitleBar, PreferredMinimumWidth/Height,
     PreferredMaximumWidth/Height, State, Maximize(), Minimize(), Restore(),

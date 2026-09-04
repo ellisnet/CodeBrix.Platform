@@ -30,6 +30,11 @@ using System.Runtime.InteropServices;
 // Cast/ApplyActionOnRawBufferPtr) for the opt-in UseDirectSkiaCanvasMode() one-copy present path.
 [assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views")]
 
+// The SkiaSharp.Views add-in's unit-test suite reads back the pixels the control just presented
+// (the same internal Buffer accessor as above) and registers a fake IDisplayInformationExtension so
+// a host-free test can measure the control at a display scale other than 1.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views.Unit.Tests")]
+
 [assembly: InternalsVisibleTo("SamplesApp")]
 [assembly: InternalsVisibleTo("SamplesApp.Droid")]
 [assembly: InternalsVisibleTo("SamplesApp.macOS")]

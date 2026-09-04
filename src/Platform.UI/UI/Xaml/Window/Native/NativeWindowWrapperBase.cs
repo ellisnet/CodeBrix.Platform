@@ -194,6 +194,47 @@ internal abstract class NativeWindowWrapperBase : INativeWindowWrapper
 
 	public SizeInt32 ClientSize { get; private set; }
 
+	/// <summary>
+	/// True once <see cref="Size"/> (which includes whatever non-client frame the windowing system
+	/// draws) is known to be larger than <see cref="ClientSize"/> in either dimension - that is, once
+	/// the frame extents are knowable. It is false while the two are equal, which is the case for an
+	/// undecorated window and for a window the window manager has not framed yet.
+	/// </summary>
+	internal static bool HasNonClientFrame(SizeInt32 framedSize, SizeInt32 clientSize)
+		=> framedSize.Width > clientSize.Width || framedSize.Height > clientSize.Height;
+
+	/// <summary>
+	/// Converts a size expressed the way <see cref="Size"/> and <see cref="Resize"/> express it - in
+	/// screen coordinates, including the non-client frame - into the size the window's own client area
+	/// has to be given to produce it, using the frame extents implied by
+	/// <paramref name="framedSize"/> and <paramref name="clientSize"/>. Each dimension is clamped to at
+	/// least one pixel. When no frame is known the requested size is returned unchanged.
+	/// </summary>
+	/// <param name="requestedFramedSize">The framed size the caller asked for.</param>
+	/// <param name="framedSize">The window's current framed size, i.e. <see cref="Size"/>.</param>
+	/// <param name="clientSize">The window's current client size, i.e. <see cref="ClientSize"/>.</param>
+	/// <returns>The size to give the client area.</returns>
+	internal static SizeInt32 ToClientSize(SizeInt32 requestedFramedSize, SizeInt32 framedSize, SizeInt32 clientSize)
+	{
+		var frameWidth = Math.Max(0, framedSize.Width - clientSize.Width);
+		var frameHeight = Math.Max(0, framedSize.Height - clientSize.Height);
+
+		return new SizeInt32
+		{
+			Width = Math.Max(1, requestedFramedSize.Width - frameWidth),
+			Height = Math.Max(1, requestedFramedSize.Height - frameHeight),
+		};
+	}
+
+	/// <summary>
+	/// <see cref="ToClientSize(SizeInt32, SizeInt32, SizeInt32)"/> against the wrapper's current
+	/// <see cref="Size"/> and <see cref="ClientSize"/>.
+	/// </summary>
+	/// <param name="requestedFramedSize">The framed size the caller asked for.</param>
+	/// <returns>The size to give the client area.</returns>
+	internal SizeInt32 ToClientSize(SizeInt32 requestedFramedSize)
+		=> ToClientSize(requestedFramedSize, Size, ClientSize);
+
 	protected void SetSizes(SizeInt32 size, SizeInt32 clientSize)
 	{
 		var anySizeChanged = false;

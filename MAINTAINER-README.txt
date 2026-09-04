@@ -184,8 +184,15 @@ Microsoft.Testing.Platform per global.json):
   Add-ins:
     src/AddIns/Platform.AppSettings.Tests, Platform.UI.AdvancedTextEdit.Tests,
     Platform.UI.FlexPanel.Tests, Platform.UI.PlotterView.Tests,
-    Platform.UI.TerminalView.Tests, Platform.UI.TextLayout.Tests (all
+    Platform.UI.TerminalView.Tests, Platform.UI.TextLayout.Tests,
+    Platform.UI.VideoPlayer.Tests, CodeBrix.Platform.SkiaSharp.Views.Tests (all
     *.Unit.Tests.csproj), src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
+
+    CodeBrix.Platform.SkiaSharp.Views.Tests is the guard for a SkiaSharp version
+    bump: it pins the managed/native agreement, the add-in version's tie to
+    $(SkiaSharpVersion), and the SKXamlCanvas paint-and-present path down to the
+    presented pixels. Run it after changing $(SkiaSharpVersion) in
+    src/Directory.Build.targets, before launching any head.
 
 CI scripts under build/test-scripts (linux-skia-runtime-tests.sh,
 macos-skia-runtime-tests.sh, android/ios UI-test scripts inherited from

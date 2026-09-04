@@ -459,6 +459,26 @@ WHAT THIS PACKAGE DOES NOT DO
   - It does not bundle Lottie or SVG rendering — those are the separate
     Lottie and Svg add-ins, which depend on this package.
 
+HOW THIS PACKAGE IS VERIFIED
+===========================
+  src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests is this add-in's unit-test
+  suite, registered in the Tests folder of all three solutions. It runs with no
+  application head: it constructs an SKXamlCanvas, lays it out, invalidates it,
+  and reads the presented pixels back out of the WriteableBitmap the control
+  paints through, so the whole paint-and-present path is measured, not just the
+  API shape. It also pins the managed/native SkiaSharp agreement, the tie
+  between this add-in's version and the SkiaSharp it vendors, the conversions in
+  UWPExtensions, SKSwapChainPanel's unsupported behaviour, the control at a
+  scaled display, and the opt-in direct present path.
+
+  Run it after any change to the vendored sources or to the SkiaSharp pin:
+
+      dotnet test src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests/CodeBrix.Platform.SkiaSharp.Views.Skia.Unit.Tests.csproj -c Release
+
+  What it cannot cover without a head: Loaded/Unloaded (never raised outside a
+  visual tree), a live DPI change from the system, and the on-screen present of
+  the ImageBrush through the compositor. Those stay a head-level check.
+
 WORKING EXAMPLES ON GITHUB
 ==========================
   https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/EmulateFrameBufferDemo

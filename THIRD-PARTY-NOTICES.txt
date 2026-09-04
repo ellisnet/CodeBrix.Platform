@@ -158,7 +158,6 @@ The components in this part are present as source code in this repository
     SKPaintGLSurfaceEventArgs, Extensions, UWPExtensions, and their
     .Skia/.Reference flavors), copied byte-for-byte from the SkiaSharp views
     source. Only this thin view-glue layer is present in this repository.
-    (See PORTING-NOTES.md in that folder.)
 
 7.  Mono / Novell — System.Xaml
     Project URL:  https://github.com/mono/mono

@@ -18,7 +18,7 @@
 		<!--
 		Upstream (SkiaSharp.Views.Platform.WinUI.csproj, plain-TFM build) defines HAS_CODEBRIX;WINUI
 		and gets HAS_CODEBRIX_WINUI/CODEBRIX_REFERENCE_API from the CodeBrix.Platform package props.
-		CODEBRIX_REFERENCE_API selects the *.Reference.cs API shells. See PORTING-NOTES.md.
+		CODEBRIX_REFERENCE_API selects the *.Reference.cs API shells.
 		-->
 		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;WINUI;CODEBRIX_REFERENCE_API</DefineConstants>
 

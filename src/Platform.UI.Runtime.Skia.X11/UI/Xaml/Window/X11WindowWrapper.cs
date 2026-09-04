@@ -21,6 +21,9 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 	private readonly X11XamlRootHost _host;
 	private readonly XamlRoot _xamlRoot;
 
+	// Set by Resize() and consumed once by the configure callback - see ApplyPendingFramedSize.
+	private SizeInt32? _pendingFramedSize;
+
 	internal X11WindowWrapper(Window window, XamlRoot xamlRoot) : base(window, xamlRoot)
 	{
 		_xamlRoot = xamlRoot;
@@ -151,23 +154,34 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 		XLib.XSync(display, false);
 	}
 
+	/// <summary>
+	/// Resizes the window to <paramref name="size"/>, which is the FRAMED size - the size
+	/// <see cref="NativeWindowWrapperBase.Size"/> reports, including whatever decorations the window
+	/// manager draws around the window. <c>Resize(Size)</c> is therefore a no-op round trip, matching
+	/// the Win32 head (where <c>Size</c> is the window rect and <c>Resize</c> sets the window rect).
+	/// <see cref="NativeWindowWrapperBase.ClientSize"/> and <c>Window.Bounds</c> keep answering the
+	/// client area, which is what the page is laid out into.
+	/// </summary>
+	/// <remarks>
+	/// The request always goes to the application's OWN window, never to the window manager's frame:
+	/// a reparenting window manager owns the frame and ignores configure requests aimed at it (a
+	/// direct XResizeWindow of the frame is silently dropped by Muffin/Mutter, for instance), while a
+	/// configure request on the client window is redirected to the window manager, which resizes its
+	/// frame to fit. The frame extents are the difference between the two sizes last read by
+	/// <see cref="UpdatePositionAndSize"/>; before the window manager has framed the window they are
+	/// not knowable, so the request is remembered and corrected once, from the configure callback,
+	/// as soon as the frame exists.
+	/// </remarks>
 	public override void Resize(SizeInt32 size)
 	{
 		var display = _host.RootX11Window.Display;
 		var window = _host.RootX11Window.Window;
 		using var lockDiposable = X11Helper.XLock(display);
 
-		// If the window manager adds decorations, usually that is implemented by wrapping
-		// the window in another slightly bigger window that includes the decorations. In that case,
-		// XGetWindowAttributes will give us x and y offsets relative to this slightly bigger window,
-		// not relative to the root window.
-		_ = XLib.XQueryTree(display, window, out var root, out var parent, out var children, out _);
-		_ = XLib.XQueryTree(display, parent, out _, out var parentParent, out var children2, out _);
-		_ = XLib.XFree(children);
-		_ = XLib.XFree(children2);
+		_pendingFramedSize = size;
 
-		var windowToResize = parentParent == root ? parent : window;
-		_ = XLib.XResizeWindow(display, windowToResize, size.Width, size.Height);
+		var clientSize = ToClientSize(size);
+		_ = XLib.XResizeWindow(display, window, clientSize.Width, clientSize.Height);
 		XLib.XSync(display, false);
 	}
 
@@ -191,12 +205,15 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 		_ = XLib.XGetWindowAttributes(display, windowToRead, ref windowAttrs);
 		_ = XLib.XTranslateCoordinates(display, windowToRead, root, 0, 0, out var rootx, out var rooty, out _);
 
-		Position = new PointInt32 { X = rootx, Y = rooty };
-		var fullSize = new SizeInt32 { Width = windowAttrs.width, Height = windowAttrs.height };
-		SetSizes(fullSize, fullSize);
-
 		XWindowAttributes windowAttrs2 = default;
 		_ = XLib.XGetWindowAttributes(display, window, ref windowAttrs2);
+
+		Position = new PointInt32 { X = rootx, Y = rooty };
+		// Size is the framed size (windowToRead is the window manager's frame once it has reparented
+		// us) and ClientSize is the application's own window - the two differ by the decorations.
+		var fullSize = new SizeInt32 { Width = windowAttrs.width, Height = windowAttrs.height };
+		var clientSize = new SizeInt32 { Width = windowAttrs2.width, Height = windowAttrs2.height };
+		SetSizes(fullSize, clientSize);
 
 		var scale = _xamlRoot.RasterizationScale;
 		var newWindowSize = new Size(windowAttrs2.width / scale, windowAttrs2.height / scale);
@@ -205,6 +222,48 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 
 		// copy the root window dimensions to the top window
 		_ = XLib.XResizeWindow(display, _host.TopX11Window.Window, windowAttrs2.width, windowAttrs2.height);
+
+		ApplyPendingFramedSize(display, window, fullSize, clientSize);
+
+		// Every configure - a size increase and a size decrease alike - has to end in a repaint at the
+		// new size. The layout pass that SetBoundsAndVisibleBounds triggers normally asks for one, but
+		// only when something in the tree actually re-arranges; asking here as well makes the renderer
+		// resize its surface and redraw the last frame unconditionally, so a window that gets smaller
+		// can never be left painted at the previous size until the next input event arrives.
+		((IXamlRootHost)_host).InvalidateRender();
+	}
+
+	/// <summary>
+	/// Re-applies the size given to <see cref="Resize"/> once, if that call happened before the window
+	/// manager had framed the window and so had to assume no decorations. Exactly one correction is
+	/// made per <see cref="Resize"/> call, so a window manager that refuses the size cannot start a
+	/// resize loop.
+	/// </summary>
+	private void ApplyPendingFramedSize(IntPtr display, IntPtr window, SizeInt32 fullSize, SizeInt32 clientSize)
+	{
+		if (_pendingFramedSize is not { } pending)
+		{
+			return;
+		}
+
+		if (!HasNonClientFrame(fullSize, clientSize))
+		{
+			// Either the window manager has not framed the window yet - keep the request until it
+			// has - or there are no decorations at all, in which case Resize already applied the
+			// framed size and the correction below would be a no-op anyway.
+			return;
+		}
+
+		_pendingFramedSize = null;
+
+		if (fullSize.Width == pending.Width && fullSize.Height == pending.Height)
+		{
+			return;
+		}
+
+		var correctedClientSize = ToClientSize(pending, fullSize, clientSize);
+		_ = XLib.XResizeWindow(display, window, correctedClientSize.Width, correctedClientSize.Height);
+		XLib.XSync(display, false);
 	}
 
 	internal void SetFullScreenMode(bool on)

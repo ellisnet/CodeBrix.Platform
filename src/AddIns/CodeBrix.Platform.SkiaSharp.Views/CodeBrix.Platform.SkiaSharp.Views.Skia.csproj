@@ -25,13 +25,13 @@
 		Upstream (SkiaSharp.Views.Platform.WinUI.Skia.csproj) defines HAS_CODEBRIX_SKIA;WINUI and
 		gets HAS_CODEBRIX/HAS_CODEBRIX_WINUI/CODEBRIX_REFERENCE_API from the CodeBrix.Platform package props.
 		CODEBRIX_REFERENCE_API is intentionally NOT defined here: this flavor compiles against
-		the real CodeBrix.Platform UI Skia binaries, not reference shells. See PORTING-NOTES.md.
+		the real CodeBrix.Platform UI Skia binaries, not reference shells.
 		-->
 		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;HAS_CODEBRIX_SKIA;WINUI</DefineConstants>
 
 		<!--
 		The version of this library is deliberately tied to the SkiaSharp version it
-		vendors (see PORTING-NOTES.md), NOT the CodeBrix.Platform family version.
+		vendors, NOT the CodeBrix.Platform family version.
 		Family-wide version-bump tooling must skip this project. Bump only together
 		with $(SkiaSharpVersion) in src/Directory.Build.targets, after re-diffing the
 		vendored sources against the matching SkiaSharp tag. The fourth version

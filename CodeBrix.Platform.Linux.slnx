@@ -163,6 +163,7 @@
     <Project Path="src/AddIns/Platform.AppSettings.Tests/Platform.AppSettings.Unit.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Unit.Tests.csproj" />
+    <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests/CodeBrix.Platform.SkiaSharp.Views.Skia.Unit.Tests.csproj" />
     <!-- CodeBrix.Platform fork: the upstream System.Xaml.Tests.MS (net461) and Uno.Xaml.Tests
          (net462) conformance-test projects were removed entirely — CodeBrix.Platform does not
          support .NET Framework 4.x. They compared Uno.Xaml against Microsoft's reference
