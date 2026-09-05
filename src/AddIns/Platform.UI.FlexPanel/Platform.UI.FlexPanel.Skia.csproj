@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.FlexPanel.ApacheLicenseForever</PackageId>
-		<Description>A CSS flexbox-style layout panel for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. FlexPanel is a XAML Panel that arranges its children in optionally wrapping rows or columns with the familiar flexbox model: Direction (row/column, both reversible), JustifyContent (including SpaceBetween/SpaceAround/SpaceEvenly), AlignItems/AlignContent, wrapping with WrapReverse, and the per-child attached properties FlexPanel.Grow, FlexPanel.Shrink, FlexPanel.Basis (absolute or percentage), FlexPanel.Order, and FlexPanel.AlignSelf. The layout engine is a managed port of the Microsoft .NET MAUI FlexLayout engine (MIT) - no native dependencies.</Description>
+		<Description>A flexible layout panel that arranges its children in wrapping rows or columns, using the same model as CSS flexbox on the web. Supports the familiar flex properties - direction, justify-content, align-items, grow, shrink, and order - so if you know flexbox, you already know this panel. Pure managed layout code, with no native dependencies.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever</PackageId>
-		<Description>A full-featured code and text editor control for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. AdvancedTextEdit is a XAML control with the editing model of a professional code editor: an efficient rope-based document with text anchors and grouped undo/redo, syntax highlighting driven by XSHD definition files with built-in definitions for common languages, code folding, a code-completion popup, an in-editor search panel, snippets, smart indentation, line numbers, word wrap, rectangular selection, and virtualized rendering that stays responsive on very large documents. Text is shaped and measured by the family's single text engine (via the CodeBrix.Platform.TextLayout.ApacheLicenseForever dependency), so what the editor draws always matches what a TextBlock draws - no native dependencies beyond SkiaSharp.</Description>
+		<Description>A full-featured code and text editor control for your app, with the kind of editing experience you'd expect from a professional IDE. It includes syntax highlighting, code folding, a completion popup, search, line numbers, and undo/redo, and stays responsive even on very large documents. Text is rendered with the same shaping and layout engine used throughout the toolkit, so it always matches the rest of your UI.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

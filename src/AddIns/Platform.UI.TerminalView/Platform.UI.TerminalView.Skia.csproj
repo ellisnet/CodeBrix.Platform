@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.TerminalView.ApacheLicenseForever</PackageId>
-		<Description>A terminal emulator view for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. TerminalView is a XAML control that renders a CodeBrix.Terminal engine (VT100/VT220/xterm-compatible, the CodeBrix fork of XtermSharp) on a Skia surface: feed it bytes or text from any transport (an SSH ShellStream, a PTY, a local process) and it handles ANSI/SGR attributes and 256 colors, scrollback with a scrollbar and mouse wheel, keyboard input encoding (including application-cursor mode, Ctrl chords and Alt-as-meta), live resize with cols/rows reporting for PTY window-change requests, text selection with word/expression double-click, and clipboard copy and paste via context menu or Ctrl+Shift+C/V. Rendering uses the CodeBrix.Platform.TextLayout engine; the default font is the bundled Roboto Mono.</Description>
+		<Description>A terminal emulator control for your app, compatible with VT100, VT220, and xterm escape sequences. Feed it bytes from any source - an SSH session, a local process, a serial port - and it handles colors, scrollback, keyboard input, resizing, text selection, and clipboard copy/paste for you. Rendering uses the same text engine as the rest of the toolkit, with a bundled monospace font by default.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

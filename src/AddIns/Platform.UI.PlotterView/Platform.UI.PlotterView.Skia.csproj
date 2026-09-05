@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the TerminalView add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.PlotterView.ApacheLicenseForever</PackageId>
-		<Description>A chart-plotting view for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. PlotterControl is a XAML control that hosts a CodeBrix.Plotter PlotModel (the CodeBrix port of OxyPlot: forty-plus series types, linear/log/date-time/category/polar axes, annotations and legends) on a Skia surface, with the full CodeBrix.Plotter interaction model wired in: pan (right-drag or arrow keys), zoom (mouse wheel, +/- keys, or middle-drag zoom rectangle), a data-point tracker on left-click, reset on double-middle-click or the A/Home keys, and single-finger pan with two-finger pinch zoom on touch heads. All chart text renders through the application's own font (the CodeBrix.Platform default font, overridable per control) - never a system font. Set the Model property, call PlotModel.InvalidatePlot after changing data from any thread, and the control does the rest.</Description>
+		<Description>Adds an interactive chart control for plotting data in your app, with panning, zooming, and a click-to-inspect data tracker built in. Works with mouse, keyboard, and touch input alike. Supports line, bar, scatter, and dozens of other chart types, plus linear, logarithmic, date-time, and category axes.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

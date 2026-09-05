@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the AudioPlayer add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.TextLayout.ApacheLicenseForever</PackageId>
-		<Description>Pango-class text layout for CodeBrix.Platform apps, with no XAML and no application host required. Shapes text with HarfBuzz, resolves bidirectional runs per UAX #9, itemises across fallback fonts, and reports the geometry an editor or renderer needs: measured size, caret rectangles, cluster-correct hit-testing, per-line metrics, selection rectangles, and per-glyph or combined outline paths for filled and stroked text. Draws into any SKCanvas - an offscreen surface, a document layer, a bitmap. This is a facade over the very same engine that lays out every TextBlock in the framework, so there is exactly one text implementation in the family.</Description>
+		<Description>Advanced text layout and measurement for building your own text-heavy control, with no XAML or application host required. Shapes and measures text using the same HarfBuzz-based engine used throughout the toolkit, including support for right-to-left and mixed-direction text. Draws directly onto a drawing surface, so you can use it for anything from a custom editor to exporting text into a document.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>

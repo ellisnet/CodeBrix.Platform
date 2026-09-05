@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the FlexPanel add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.CommandBar.ApacheLicenseForever</PackageId>
-		<Description>A tool bar / command bar / button bar family of XAML controls for CodeBrix.Platform apps on every head: Windows (Win32 and Skia-on-WPF), Linux (X11, Wayland, FrameBuffer), and macOS. ToolBarTray hosts several ToolBars in a wrapping row; a ToolBar takes any UIElement as an item - ToolButton, ToolToggleButton, ToolDropDownButton, ToolBarGroup, ToolBarSeparator, ToolBarSpacer, or an ordinary control such as a ComboBox - and lays them out with grouping, separators, spacers and overflow into a chevron flyout. Buttons bind to ICommand (IsEnabled follows CanExecute) or to a XamlUICommand/StandardUICommand action object, show icon only, text only, or both, and carry auto-composed tooltips with shortcut text. Icons come from SVG (themed, tintable, re-rasterised at the display scale) or from PNG and the other raster formats the platform decoder reads.</Description>
+		<Description>A family of tool bar and command bar controls - buttons, toggle buttons, drop-down buttons, and separators - that bind to your view-model's commands. Handles layout, grouping, and overflow into a menu automatically when there isn't enough room. Icons can be SVG (tinted and sharp at any screen size) or ordinary image files, and buttons can show an icon, text, or both.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
