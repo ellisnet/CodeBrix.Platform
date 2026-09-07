@@ -69,7 +69,7 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
   src/AddIns/Platform.UI.AudioPlayer.Skia/AGENT-README.txt
       CodeBrix.Platform.AudioPlayer.ApacheLicenseForever
           Audio playback (WAV, MP3, Ogg Vorbis, FLAC, Opus), sound effects and MIDI
-          synthesis through SoundFont/SFZ instruments.
+          synthesis through SoundFont, SFZ or Decent Sampler instruments.
 
   src/AddIns/Platform.UI.CommandBar/AGENT-README.txt
       CodeBrix.Platform.CommandBar.ApacheLicenseForever

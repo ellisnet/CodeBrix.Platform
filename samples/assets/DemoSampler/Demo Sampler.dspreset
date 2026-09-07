@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Demo Sampler - a tiny sampled instrument written by hand for the AudioPlayerDemo, so that the
+    demo can show a MidiPlayer rendering through a Decent Sampler instrument without any third-party
+    library entering this repository. Both recordings in Samples/ are copies of the demo's own
+    sound effects (Shared/Assets/chime.wav and click.wav).
+
+    Two groups, one instrument-level effect, one tag and two knobs:
+
+      Chime   the chime across the whole keyboard, pitched from its own recorded note. The
+              recording is a pure 880 Hz tone, which is MIDI note 81 - and a Decent Sampler preset
+              writes note names in the convention where midi = (octave + 2) * 12 + pitch class, so
+              MIDI 81 is written "A4" here rather than "A5".
+      Click   the click on four keys at the bottom of the keyboard, as a small percussion range.
+              Its root note is written as a bare MIDI number, which means the same thing in every
+              convention.
+
+      Level   a labeled knob bound to the instrument's AMP_VOLUME.
+      Reverb  a labeled knob bound to the wet level of the instrument-level reverb.
+
+    The knobs are what MidiPlayer.InstrumentControls exposes and what
+    MidiPlayer.InstrumentControlChanged reports, so the demo's slider drives the first of them.
+-->
+<DecentSampler minVersion="1.0.0">
+
+    <ui width="480" height="180" bgColor="FF1E1E1E">
+        <tab name="main">
+            <labeled-knob x="60" y="30" width="90" height="110" label="Level"
+                          parameterName="LEVEL" valueType="float"
+                          minValue="0" maxValue="1" value="1" textColor="FFEEEEEE" textSize="14">
+                <binding type="amp" level="instrument" parameter="AMP_VOLUME"
+                         translation="linear" translationOutputMin="0" translationOutputMax="1" />
+            </labeled-knob>
+
+            <labeled-knob x="220" y="30" width="90" height="110" label="Reverb"
+                          parameterName="REVERB" valueType="float"
+                          minValue="0" maxValue="1" value="0.25" textColor="FFEEEEEE" textSize="14">
+                <binding type="effect" level="instrument" position="0" parameter="FX_REVERB_WET_LEVEL"
+                         translation="linear" translationOutputMin="0" translationOutputMax="1" />
+            </labeled-knob>
+        </tab>
+    </ui>
+
+    <groups attack="0.002" decay="2.0" sustain="0.2" release="0.4" ampEnvEnabled="true">
+        <group name="Chime" tags="chime" volume="-3dB">
+            <sample path="Samples/chime.wav" rootNote="A4" loNote="21" hiNote="108"
+                    loVel="1" hiVel="127" />
+        </group>
+
+        <group name="Click" decay="0.2" sustain="0" release="0.05">
+            <sample path="Samples/click.wav" rootNote="36" loNote="36" hiNote="39"
+                    loVel="1" hiVel="127" />
+        </group>
+    </groups>
+
+    <effects>
+        <effect type="reverb" roomSize="0.5" damping="0.4" wetLevel="0.25" />
+    </effects>
+
+    <tags>
+        <tag name="chime" enabled="true" volume="1.0" />
+    </tags>
+
+</DecentSampler>

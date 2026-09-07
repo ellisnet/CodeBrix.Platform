@@ -203,10 +203,19 @@ AudioPlayerDemo
 
 Three panes: a song player (two sample songs, one of five formats - WAV, MP3,
 OGG/Vorbis, FLAC, Opus - and a source selector for ms-appx:/// versus
-embedded://), sound effects (Click, Chime), and a MIDI pane that synthesizes a
-MIDI file through an SFZ instrument. Transport (Play/Pause/Stop, Loop, Jump to
-1:00, Volume, Tempo) is bound to Position/Duration/Speed/ActiveVoiceCount on
-the player elements.
+embedded://), sound effects (Click, Chime), and a MIDI pane that synthesizes one
+MIDI file through either of two instruments: a sampled SFZ (.sfz) piano or a
+hand-written Decent Sampler (.dspreset) preset built from copies of the demo's
+own chime and click. Transport (Play/Pause/Stop, Loop, Jump to 1:00, Volume,
+Tempo) is bound to Position/Duration/Speed/ActiveVoiceCount on the player
+elements; the MIDI pane adds a slider driving the preset's first knob through
+InstrumentControls and InstrumentControlChanged, an MPE drop-down two-way bound
+to MpeMode, a beat readout, and a status line showing InstrumentKind,
+InstrumentMemorySummary and the count of SourceProblems the MIDI file needed
+forgiving.
+
+The DEMO (never the add-in) references CodeBrix.Audio.Opus and
+CodeBrix.Audio.ModestSynth and calls both Register()s at start-up.
 
 Self-test: AUDIOPLAYERDEMO_SELFTEST=1 makes the app exercise the whole player
 once loaded, print "APD-SELFTEST: PASS|FAIL <step>" lines and exit with the
@@ -417,6 +426,10 @@ AudioPlayerDemo (the audio) and VideoPlayerDemo (video/).
     sample_song_2.{wav,mp3,ogg,opus,flac}   formats, for the format selector
     debussy_Ste_Bergamesq_Clair.mid         the MIDI file the MIDI pane plays
     SplendidGrandPiano/                     the SFZ instrument it plays through
+    DemoSampler/                            the Decent Sampler instrument it
+                                            plays through instead, when the
+                                            MIDI pane's instrument drop-down
+                                            names it
     video/                                  seven short AV1 clips (landscape
                                             and portrait, in WebM, CodeBrix
                                             Mode1 and CodeBrix Mode2 form, one
@@ -432,6 +445,17 @@ README.md in that folder. It is large - it decodes to well over half a
 gigabyte at load time, which is why the demo loads it in the background. An
 .sfz instrument must be a real file on disk (it is loaded by path, not as an
 embedded resource), so it is copied to the output rather than embedded.
+
+DemoSampler is ours: a "Demo Sampler.dspreset" written by hand for this
+repository over Samples/chime.wav and Samples/click.wav, which are copies of
+AudioPlayerDemo's own two sound effects. No sample library from anywhere else
+is in this repository, and none ever will be. The preset is deliberately small
+but not trivial - two groups, an instrument-level reverb, two labeled knobs
+bound to the instrument's amplitude and the reverb's wet level, and one tag -
+so that the demo has real controls to drive and a real memory summary to show.
+Its own file header explains every element in it. Like an .sfz it is a FOLDER
+instrument (a .dspreset references its samples as separate files beside it), so
+it too is copied to the output rather than embedded.
 
 ================================================================================
 

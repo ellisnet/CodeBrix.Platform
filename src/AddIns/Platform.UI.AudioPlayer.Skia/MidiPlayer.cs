@@ -9,6 +9,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using CodeBrix.Audio.Playback;
 using CodeBrix.Audio.Synth;
+using CodeBrix.Audio.Synth.DecentSampler;
+using CodeBrix.Audio.Synth.Mpe;
 using CodeBrix.Audio.Synth.Sfz;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
@@ -17,11 +19,12 @@ using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
 
 /// <summary>
-/// A non-visual, XAML-declarable player for MIDI music, rendered through a SoundFont (.sf2) or an
-/// SFZ (.sfz) instrument. It is the synthesized counterpart of <see cref="AudioPlayer"/> and carries
-/// the same transport: point <see cref="Source"/> at a MIDI file and <see cref="Instrument"/> at the
-/// instrument to render it with, then control playback with <see cref="Play"/> / <see cref="Pause"/> /
-/// <see cref="Stop"/> / <see cref="Seek"/>.
+/// A non-visual, XAML-declarable player for MIDI music, rendered through a SoundFont (.sf2), an
+/// SFZ (.sfz) or a Decent Sampler (.dspreset, .dslibrary, .dsbundle) instrument. It is the
+/// synthesized counterpart of <see cref="AudioPlayer"/> and carries the same transport: point
+/// <see cref="Source"/> at a MIDI file and <see cref="Instrument"/> at the instrument to render it
+/// with, then control playback with <see cref="Play"/> / <see cref="Pause"/> / <see cref="Stop"/> /
+/// <see cref="Seek"/>.
 ///
 /// The bindable properties match <see cref="AudioPlayer"/> exactly - <see cref="Position"/> /
 /// <see cref="PositionSeconds"/> follow playback and seek when written (debounced for
@@ -42,14 +45,19 @@ namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
 /// </para>
 /// <para>
 /// Instruments are cached across every <see cref="MidiPlayer"/> in the application, so two players
-/// sharing an instrument pay for it once.
+/// sharing an instrument pay for it once. A Decent Sampler instrument is shared through the audio
+/// engine's own process-wide cache, so a player and an application that pre-loaded the same path
+/// through CodeBrix.Audio share one copy as well. That sharing has a consequence worth knowing:
+/// a Decent Sampler instrument keeps its knob values on the instrument, so two players naming the
+/// same preset also share one set of <see cref="InstrumentControls"/> values.
 /// </para>
 /// <para>
 /// SOURCE FORMS: <see cref="Source"/> and a <c>.sf2</c> <see cref="Instrument"/> accept everything
 /// <see cref="AudioPlayer.Source"/> does - a file path, an ms-appx:/// asset URI or an
-/// embedded://Assembly/Resource.Name URI. A <c>.sfz</c> instrument accepts only the forms that name
-/// a real file on disk (a path or an ms-appx:/// URI), because an SFZ instrument is not one file:
-/// it references its samples as separate files beside it.
+/// embedded://Assembly/Resource.Name URI. An <c>.sfz</c> or Decent Sampler instrument accepts only
+/// the forms that name something real on disk (a path or an ms-appx:/// URI): an SFZ instrument and
+/// a <c>.dspreset</c> reference their samples as separate files beside them, and a <c>.dslibrary</c>
+/// or <c>.dsbundle</c>, though it is one file, is read in place from the archive on disk.
 /// </para>
 /// </remarks>
 [Bindable]
@@ -64,16 +72,27 @@ public sealed partial class MidiPlayer : FrameworkElement
 	// after the value has been stable for this long, landing one seek per gesture.
 	private static readonly TimeSpan SeekDebounceInterval = TimeSpan.FromMilliseconds(200);
 
-	private const string SfzNeedsFileMessage =
-		"An SFZ instrument must be given as a file path or an ms-appx:/// URI. An .sfz file is not " +
-		"self-contained - it references its sample files as separate files beside it - so it cannot " +
-		"be loaded from an embedded resource or a stream. A .sf2 SoundFont can.";
+	// The advice the audio engine writes into an instrument's problems when a preset asks for a
+	// sound only the CodeBrix.Audio.ModestSynth add-on can make. This package does not reference
+	// that add-on - the application does, exactly as it does for the Opus codec - so all this
+	// element can do is pass the engine's own line on, once, as a warning.
+	private const string AddOnMarker = "ModestSynth";
 
 	private readonly MidiMusicPlayer _player = new();
 	private readonly SemaphoreSlim _loadGate = new(1, 1);
 
+	// A control can be moved by a modulator or a MIDI binding on the real-time AUDIO thread, many
+	// times per rendered block, so changes are collected here and raised once per control per
+	// dispatcher pass instead of once per movement.
+	private readonly object _controlChangeGate = new();
+	private readonly Dictionary<DecentSamplerControl, DecentSamplerControlChangedEventArgs> _pendingControlChanges = new();
+
 	private DispatcherQueueTimer? _positionTimer;
 	private DispatcherQueueTimer? _seekDebounceTimer;
+	private DispatcherQueue? _uiQueue;  // captured on the UI thread; the audio thread marshals onto it
+	private DecentSamplerInstrument? _decentSamplerInstrument;
+	private bool _controlsSubscribed;
+	private bool _controlFlushQueued;
 	private bool _updatingFromPlayback; // set while playback progress writes the position DPs
 	private bool _syncingPositionPair;  // set while Position and PositionSeconds mirror each other
 	private TimeSpan _pendingSeek;
@@ -81,9 +100,19 @@ public sealed partial class MidiPlayer : FrameworkElement
 	private bool _loadQueued;
 	private int _loadGeneration;
 
+	/// <summary>Creates a player with nothing loaded.</summary>
 	public MidiPlayer()
 	{
-		Unloaded += (_, _) => Pause();
+		Unloaded += (_, _) =>
+		{
+			Pause();
+
+			// A Decent Sampler instrument outlives this element - it belongs to the audio engine's
+			// process-wide cache - so an element leaving the tree lets go of its controls rather
+			// than keeping itself, and its page, alive through their Changed handlers.
+			DetachInstrumentControls();
+		};
+		Loaded += (_, _) => AttachInstrumentControls();
 	}
 
 	/// <summary>
@@ -100,9 +129,29 @@ public sealed partial class MidiPlayer : FrameworkElement
 
 	/// <summary>
 	/// Raised (on the UI thread) when a source or instrument fails to load or play - a missing
-	/// file, an unreadable MIDI file, or an SFZ instrument given in a form that cannot name one.
+	/// file, an unreadable MIDI file, or an instrument format that must name a file on disk given in
+	/// a form that cannot.
 	/// </summary>
 	public event EventHandler<AudioPlayerFailedEventArgs>? MediaFailed;
+
+	/// <summary>
+	/// Raised (on the UI thread) when a control of the loaded Decent Sampler instrument changes -
+	/// because something set its value, or because a modulator or a MIDI binding inside the preset
+	/// moved it while the music played.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Bindings can move a control on the real-time audio thread many times per rendered block, so
+	/// changes are coalesced: each control that moved is reported once per dispatcher pass, carrying
+	/// the last change seen for it. Read the current value from the control the event args carry.
+	/// </para>
+	/// <para>
+	/// Never raised for a SoundFont or SFZ instrument, which have no control model. An element built
+	/// outside a UI thread's dispatcher has nothing to marshal onto and raises this on the thread
+	/// the change arrived on.
+	/// </para>
+	/// </remarks>
+	public event EventHandler<DecentSamplerControlChangedEventArgs>? InstrumentControlChanged;
 
 	#region | Dependency properties |
 
@@ -129,18 +178,80 @@ public sealed partial class MidiPlayer : FrameworkElement
 		new PropertyMetadata("", (o, e) => ((MidiPlayer)o).QueueLoad()));
 
 	/// <summary>
-	/// The instrument the sequence is rendered through: a <c>.sf2</c> SoundFont or a <c>.sfz</c>
-	/// instrument. The extension decides which synthesizer runs.
+	/// The instrument the sequence is rendered through: a <c>.sf2</c> SoundFont, a <c>.sfz</c>
+	/// instrument, or a Decent Sampler instrument as a <c>.dspreset</c>, a <c>.dslibrary</c>, a
+	/// <c>.dsbundle</c> or a folder holding a <c>.dspreset</c>. What it names decides which
+	/// synthesizer runs, and <see cref="InstrumentKind"/> reports which one did.
 	/// </summary>
 	/// <remarks>
-	/// A <c>.sf2</c> accepts every form <see cref="Source"/> does. A <c>.sfz</c> accepts a file
-	/// path or an ms-appx:/// URI only - see the note on the class - and any other form fails with
-	/// <see cref="MediaFailed"/> saying so.
+	/// A <c>.sf2</c> accepts every form <see cref="Source"/> does. The other two formats accept a
+	/// file path or an ms-appx:/// URI only - see the note on the class - and any other form fails
+	/// with <see cref="MediaFailed"/> saying which format needs one and why. A folder is read as a
+	/// Decent Sampler instrument when it holds a <c>.dspreset</c>, which is the shape a
+	/// <c>.dsbundle</c> has on macOS and the shape an unpacked library has everywhere.
 	/// </remarks>
 	public string Instrument
 	{
 		get => (string)GetValue(InstrumentProperty);
 		set => SetValue(InstrumentProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="InstrumentPreset"/> dependency property.</summary>
+	public static readonly DependencyProperty InstrumentPresetProperty = DependencyProperty.Register(
+		nameof(InstrumentPreset), typeof(string), typeof(MidiPlayer),
+		new PropertyMetadata("", (o, e) => ((MidiPlayer)o).QueueLoad()));
+
+	/// <summary>
+	/// Which preset to play from a Decent Sampler container that holds several - a
+	/// <c>.dslibrary</c> with a preset menu, for instance. Empty, the default, takes the container's
+	/// first preset. Changing it queues a load, exactly as changing <see cref="Instrument"/> does.
+	/// </summary>
+	/// <remarks>
+	/// Ignored by SoundFont and SFZ instruments, which hold one instrument each. The name is part of
+	/// what the shared instrument cache keys on, so two presets of one library are two cached
+	/// instruments sharing the library's sample data.
+	/// </remarks>
+	public string InstrumentPreset
+	{
+		get => (string)GetValue(InstrumentPresetProperty);
+		set => SetValue(InstrumentPresetProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="InstrumentKind"/> dependency property.</summary>
+	public static readonly DependencyProperty InstrumentKindProperty = DependencyProperty.Register(
+		nameof(InstrumentKind), typeof(MidiInstrumentKind), typeof(MidiPlayer),
+		new PropertyMetadata(MidiInstrumentKind.None));
+
+	/// <summary>
+	/// Which instrument format the loaded <see cref="Instrument"/> turned out to be (read-only), or
+	/// <see cref="MidiInstrumentKind.None"/> while nothing is loaded. Valid from
+	/// <see cref="MediaOpened"/>.
+	/// </summary>
+	public MidiInstrumentKind InstrumentKind
+	{
+		get => (MidiInstrumentKind)GetValue(InstrumentKindProperty);
+		private set => SetValue(InstrumentKindProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="DropAuxiliaryOutputs"/> dependency property.</summary>
+	public static readonly DependencyProperty DropAuxiliaryOutputsProperty = DependencyProperty.Register(
+		nameof(DropAuxiliaryOutputs), typeof(bool), typeof(MidiPlayer),
+		new PropertyMetadata(false, (o, e) => ((MidiPlayer)o)._player.DropAuxiliaryOutputs = (bool)e.NewValue));
+
+	/// <summary>
+	/// Whether an instrument's auxiliary stereo outputs are thrown away instead of being folded into
+	/// the mix. False by default, so nothing an instrument makes goes unheard.
+	/// </summary>
+	/// <remarks>
+	/// A Decent Sampler preset can route a group, a zone or a bus to one of sixteen auxiliary
+	/// outputs. This player has one stereo pair, so it adds them into the mix; set this when a
+	/// preset uses them for something a listener should not hear - a cue feed, or a layer meant for
+	/// an external processor. Formats without auxiliary outputs are unaffected.
+	/// </remarks>
+	public bool DropAuxiliaryOutputs
+	{
+		get => (bool)GetValue(DropAuxiliaryOutputsProperty);
+		set => SetValue(DropAuxiliaryOutputsProperty, value);
 	}
 
 	/// <summary>Identifies the <see cref="AutoPlay"/> dependency property.</summary>
@@ -300,6 +411,41 @@ public sealed partial class MidiPlayer : FrameworkElement
 		private set => SetValue(ActiveVoiceCountProperty, value);
 	}
 
+	/// <summary>Identifies the <see cref="BeatsPerMinute"/> dependency property.</summary>
+	public static readonly DependencyProperty BeatsPerMinuteProperty = DependencyProperty.Register(
+		nameof(BeatsPerMinute), typeof(double), typeof(MidiPlayer),
+		new PropertyMetadata(TempoSource.DefaultBeatsPerMinute));
+
+	/// <summary>
+	/// The tempo of the sequence at the current position, in beats per minute (read-only), refreshed
+	/// with <see cref="Position"/> while playing. A sequence with tempo changes reports the tempo in
+	/// force now rather than the one it started at; 120 while nothing is loaded.
+	/// </summary>
+	/// <remarks>
+	/// This is the music's own tempo and takes no notice of <see cref="Speed"/>, which changes how
+	/// fast the transport travels through it.
+	/// </remarks>
+	public double BeatsPerMinute
+	{
+		get => (double)GetValue(BeatsPerMinuteProperty);
+		private set => SetValue(BeatsPerMinuteProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="BeatPosition"/> dependency property.</summary>
+	public static readonly DependencyProperty BeatPositionProperty = DependencyProperty.Register(
+		nameof(BeatPosition), typeof(double), typeof(MidiPlayer), new PropertyMetadata(0.0));
+
+	/// <summary>
+	/// How far into the sequence the transport has travelled, in beats (read-only), refreshed with
+	/// <see cref="Position"/> while playing - the musical counterpart of
+	/// <see cref="PositionSeconds"/>, for a beat indicator or for lining something up with the bar.
+	/// </summary>
+	public double BeatPosition
+	{
+		get => (double)GetValue(BeatPositionProperty);
+		private set => SetValue(BeatPositionProperty, value);
+	}
+
 	/// <summary>Identifies the <see cref="PositionUpdateInterval"/> dependency property.</summary>
 	public static readonly DependencyProperty PositionUpdateIntervalProperty = DependencyProperty.Register(
 		nameof(PositionUpdateInterval), typeof(TimeSpan), typeof(MidiPlayer),
@@ -317,6 +463,129 @@ public sealed partial class MidiPlayer : FrameworkElement
 
 	#endregion
 
+	#region | MIDI Polyphonic Expression |
+
+	/// <summary>Identifies the <see cref="MpeMode"/> dependency property.</summary>
+	public static readonly DependencyProperty MpeModeProperty = DependencyProperty.Register(
+		nameof(MpeMode), typeof(CodeBrix.Audio.Synth.Mpe.MpeMode), typeof(MidiPlayer),
+		new PropertyMetadata(CodeBrix.Audio.Synth.Mpe.MpeMode.Off,
+			(o, e) => ((MidiPlayer)o)._player.MpeMode = (CodeBrix.Audio.Synth.Mpe.MpeMode)e.NewValue));
+
+	/// <summary>
+	/// How the player reads the MIDI Polyphonic Expression zones of the music it plays. Off by
+	/// default. Settable before a load and changeable while one plays; it survives a load.
+	/// </summary>
+	/// <remarks>
+	/// A performance recorded from an expressive controller spreads each note onto its own MIDI
+	/// channel so that it can bend, brighten and swell alone. Exporters usually leave out the
+	/// message that says so, which is what <c>Auto</c> is for. All three instrument formats read
+	/// such a performance the same way, so the same recording plays alike through any of them.
+	/// </remarks>
+	public CodeBrix.Audio.Synth.Mpe.MpeMode MpeMode
+	{
+		get => (CodeBrix.Audio.Synth.Mpe.MpeMode)GetValue(MpeModeProperty);
+		set => SetValue(MpeModeProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="MpeMemberBendRange"/> dependency property.</summary>
+	public static readonly DependencyProperty MpeMemberBendRangeProperty = DependencyProperty.Register(
+		nameof(MpeMemberBendRange), typeof(double), typeof(MidiPlayer),
+		new PropertyMetadata(48.0, (o, e) => ((MidiPlayer)o)._player.MpeMemberBendRange = (double)e.NewValue));
+
+	/// <summary>
+	/// How far a member channel's pitch bend reaches when the music never says, in semitones.
+	/// Forty-eight by default, the value expressive controllers ship with.
+	/// </summary>
+	/// <remarks>A bend-range message in the music overrides this, per channel and per zone.</remarks>
+	public double MpeMemberBendRange
+	{
+		get => (double)GetValue(MpeMemberBendRangeProperty);
+		set => SetValue(MpeMemberBendRangeProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="MpeLowerZoneMemberCount"/> dependency property.</summary>
+	public static readonly DependencyProperty MpeLowerZoneMemberCountProperty = DependencyProperty.Register(
+		nameof(MpeLowerZoneMemberCount), typeof(int), typeof(MidiPlayer),
+		new PropertyMetadata(0, (o, e) => ((MidiPlayer)o)._player.MpeLowerZoneMemberCount = (int)e.NewValue));
+
+	/// <summary>
+	/// How many member channels the lower zone holds when <see cref="MpeMode"/> names it. Zero, the
+	/// default, means fifteen when only the lower zone is on and seven when both zones are.
+	/// </summary>
+	/// <remarks>Use this to pin a file the automatic detection reads differently from how it was played.</remarks>
+	public int MpeLowerZoneMemberCount
+	{
+		get => (int)GetValue(MpeLowerZoneMemberCountProperty);
+		set => SetValue(MpeLowerZoneMemberCountProperty, value);
+	}
+
+	/// <summary>Identifies the <see cref="MpeUpperZoneMemberCount"/> dependency property.</summary>
+	public static readonly DependencyProperty MpeUpperZoneMemberCountProperty = DependencyProperty.Register(
+		nameof(MpeUpperZoneMemberCount), typeof(int), typeof(MidiPlayer),
+		new PropertyMetadata(0, (o, e) => ((MidiPlayer)o)._player.MpeUpperZoneMemberCount = (int)e.NewValue));
+
+	/// <summary>The upper zone's equivalent of <see cref="MpeLowerZoneMemberCount"/>.</summary>
+	public int MpeUpperZoneMemberCount
+	{
+		get => (int)GetValue(MpeUpperZoneMemberCountProperty);
+		set => SetValue(MpeUpperZoneMemberCountProperty, value);
+	}
+
+	/// <summary>
+	/// The lower MPE zone as the loaded instrument currently reads it (read-only) - master channel
+	/// 1, its members, and the bend ranges in force. An inactive zone is reported while nothing is
+	/// loaded.
+	/// </summary>
+	public MpeZoneInfo MpeLowerZone => _player.MpeLowerZone;
+
+	/// <summary>
+	/// The upper MPE zone as the loaded instrument currently reads it (read-only), with master
+	/// channel 16.
+	/// </summary>
+	public MpeZoneInfo MpeUpperZone => _player.MpeUpperZone;
+
+	/// <summary>
+	/// The note-off ("lift") velocity of the last note-off for a key on a channel, 0 to 127, or -1
+	/// when nothing is loaded or the loaded instrument format does not capture it.
+	/// </summary>
+	/// <param name="channel">The MIDI channel, 0-15.</param>
+	/// <param name="key">The MIDI note number, 0-127.</param>
+	/// <returns>The release velocity, 0 when that key has not been released, or -1 when unavailable.</returns>
+	/// <remarks>
+	/// An expressive controller sends how quickly a finger left the key, and a MIDI file records it.
+	/// No instrument format here defines what it should DO, so it changes nothing about how a
+	/// preset sounds; it is here so an application can react to it. To watch lifts as they happen
+	/// rather than ask afterwards, use <see cref="MidiMessageProcessed"/>: a note-off carries the
+	/// lift as its second data byte.
+	/// </remarks>
+	/// <exception cref="ArgumentOutOfRangeException"><paramref name="channel"/> is outside 0-15.</exception>
+	public int GetReleaseVelocity(int channel, int key) => _player.GetReleaseVelocity(channel, key);
+
+	#endregion
+
+	#region | How an instrument is loaded |
+
+	/// <summary>
+	/// How to load a Decent Sampler instrument - its memory budget, the size above which a sample is
+	/// streamed from disk rather than decoded, whether samples are decoded at all, and where the
+	/// decode cache lives. Null, the default, takes the engine's defaults.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// Read at the next load, so set it before <see cref="Instrument"/> or change it and set the
+	/// instrument again. This is a plain property rather than a bindable one: it is configuration
+	/// for the load, not something a page binds to.
+	/// </para>
+	/// <para>
+	/// A preset name inside it is overridden by <see cref="InstrumentPreset"/> whenever that is set.
+	/// The element loads from a copy, so changing the object afterwards affects only later loads.
+	/// Ignored by SoundFont and SFZ instruments.
+	/// </para>
+	/// </remarks>
+	public DecentSamplerLoadOptions? InstrumentLoadOptions { get; set; }
+
+	#endregion
+
 	#region | What the loaded instrument reported |
 
 	/// <summary>
@@ -331,9 +600,97 @@ public sealed partial class MidiPlayer : FrameworkElement
 
 	/// <summary>
 	/// Opcodes the loaded SFZ instrument uses that the synthesizer does not implement. Empty for a
-	/// SoundFont, and empty for an SFZ instrument that is fully supported.
+	/// SoundFont, empty for a Decent Sampler instrument (which reports
+	/// <see cref="UnsupportedInstrumentFeatures"/> instead), and empty for an SFZ instrument that is
+	/// fully supported.
 	/// </summary>
 	public IReadOnlyCollection<string> UnsupportedInstrumentOpcodes { get; private set; } = Array.Empty<string>();
+
+	/// <summary>
+	/// Features the loaded Decent Sampler instrument uses that the synthesizer cannot honour. Empty
+	/// for the other two formats, and empty for a preset that is fully supported.
+	/// </summary>
+	/// <remarks>
+	/// The preset still loads and plays what it can. Some entries name the
+	/// CodeBrix.Audio.ModestSynth add-on package: an application that references it and calls its
+	/// <c>Register()</c> once at start-up, before loading, gets those sounds too. This package does
+	/// not reference that add-on, exactly as it does not reference the Opus codec.
+	/// </remarks>
+	public IReadOnlyCollection<string> UnsupportedInstrumentFeatures { get; private set; } = Array.Empty<string>();
+
+	/// <summary>
+	/// How the loaded Decent Sampler instrument decided to hold its samples - what was decoded into
+	/// memory, what is streamed from disk, and against which budget. Empty for the other two
+	/// formats and until <see cref="MediaOpened"/> has been raised.
+	/// </summary>
+	/// <remarks>
+	/// A line for a diagnostics panel or a log, in the engine's own words. What it says is steered
+	/// by <see cref="InstrumentLoadOptions"/>.
+	/// </remarks>
+	public string InstrumentMemorySummary { get; private set; } = "";
+
+	/// <summary>
+	/// Anything the loaded MIDI file itself needed forgiving - a Standard MIDI File that breaks a
+	/// rule is read leniently rather than refused, and says so here. Empty for a file that is
+	/// exactly to specification, which is the normal case.
+	/// </summary>
+	/// <remarks>
+	/// The sequence plays either way; this is where to look when a file from an unusual exporter
+	/// sounds wrong. Valid from <see cref="MediaOpened"/>.
+	/// </remarks>
+	public IReadOnlyList<string> SourceProblems { get; private set; } = Array.Empty<string>();
+
+	#endregion
+
+	#region | The Decent Sampler control model |
+
+	/// <summary>
+	/// The knobs, sliders, menus and labels of the loaded Decent Sampler instrument as live
+	/// parameters. Empty for the other two formats and until <see cref="MediaOpened"/> has been
+	/// raised.
+	/// </summary>
+	/// <remarks>
+	/// <para>
+	/// These are the instrument's own control objects: setting one's value fires the bindings behind
+	/// it immediately, exactly as turning that knob in a player would, and
+	/// <see cref="InstrumentControlChanged"/> reports every movement - including the ones the
+	/// preset's own modulators and MIDI bindings make.
+	/// </para>
+	/// <para>
+	/// The values belong to the instrument rather than to this element, and instruments are shared:
+	/// two players naming the same preset move one another's knobs.
+	/// </para>
+	/// </remarks>
+	public IReadOnlyList<DecentSamplerControl> InstrumentControls { get; private set; } = Array.Empty<DecentSamplerControl>();
+
+	/// <summary>
+	/// The live state of every tag the loaded Decent Sampler preset names - whether it is enabled,
+	/// and the volume, pan and polyphony that go with it. Empty for the other two formats.
+	/// </summary>
+	public IReadOnlyList<DecentSamplerTagState> InstrumentTagStates { get; private set; } = Array.Empty<DecentSamplerTagState>();
+
+	/// <summary>
+	/// Finds one of <see cref="InstrumentControls"/> by name, case-insensitively.
+	/// </summary>
+	/// <param name="name">The control's parameter name or label.</param>
+	/// <returns>The first control of that name, or null when there is none (or nothing is loaded).</returns>
+	public DecentSamplerControl? GetInstrumentControl(string name)
+	{
+		if (name is null)
+		{
+			return null;
+		}
+
+		foreach (var control in InstrumentControls)
+		{
+			if (string.Equals(control.Name, name, StringComparison.OrdinalIgnoreCase))
+			{
+				return control;
+			}
+		}
+
+		return null;
+	}
 
 	#endregion
 
@@ -503,6 +860,11 @@ public sealed partial class MidiPlayer : FrameworkElement
 		var source = Source;
 		var instrument = Instrument;
 
+		// Read on the UI thread, where the dependency properties live, and carried into the
+		// background load rather than read from it.
+		var presetName = InstrumentPreset;
+		var loadOptions = InstrumentLoadOptions;
+
 		StopPositionTimer();
 		IsPlaying = false;
 		_isSourceLoaded = false;
@@ -528,7 +890,7 @@ public sealed partial class MidiPlayer : FrameworkElement
 				return;
 			}
 
-			result = await Task.Run(() => LoadOffThread(source, instrument));
+			result = await Task.Run(() => LoadOffThread(source, instrument, presetName, loadOptions));
 		}
 		finally
 		{
@@ -546,9 +908,18 @@ public sealed partial class MidiPlayer : FrameworkElement
 		{
 			Duration = TimeSpan.Zero;
 			DurationSeconds = 0.0;
-			InstrumentProblems = Array.Empty<string>();
-			UnsupportedInstrumentOpcodes = Array.Empty<string>();
-			ReportFailure($"The MIDI source '{source}' could not be loaded with the instrument '{instrument}'.", result.Error);
+			ClearInstrumentReporting();
+
+			// An instrument format that must name a file on disk explains itself when it was handed
+			// something else; that explanation is the useful half of the message, so it is carried
+			// in the message rather than left in the exception for the reader to go and find.
+			var message = $"The MIDI source '{source}' could not be loaded with the instrument '{instrument}'.";
+			if (result.Error is NotSupportedException explained)
+			{
+				message = $"{message} {explained.Message}";
+			}
+
+			ReportFailure(message, result.Error);
 			return;
 		}
 
@@ -558,11 +929,23 @@ public sealed partial class MidiPlayer : FrameworkElement
 		_player.PlaybackEnded -= OnPlayerPlaybackEnded;
 		_player.PlaybackEnded += OnPlayerPlaybackEnded;
 
+		// The engine keeps these across loads; re-applying them costs nothing and means a player
+		// configured before it had anything loaded behaves the same as one configured after.
+		ApplyMpeSettings();
+		_player.DropAuxiliaryOutputs = DropAuxiliaryOutputs;
+
 		Duration = result.Duration;
 		DurationSeconds = result.Duration.TotalSeconds;
+		InstrumentKind = result.Kind;
 		InstrumentProblems = result.Problems;
 		UnsupportedInstrumentOpcodes = result.UnsupportedOpcodes;
+		UnsupportedInstrumentFeatures = result.UnsupportedFeatures;
+		InstrumentMemorySummary = result.MemorySummary;
+		SourceProblems = result.SourceProblems;
+		SetInstrument(result.Instrument);
 		RefreshPositionFromPlayback();
+
+		WarnWhenAnAddOnIsMissing(instrument, result);
 
 		MediaOpened?.Invoke(this, EventArgs.Empty);
 
@@ -573,30 +956,59 @@ public sealed partial class MidiPlayer : FrameworkElement
 	}
 
 	// Runs on a thread-pool thread: reading an instrument is seconds of work and hundreds of
-	// megabytes of decoding, which must never happen on the UI thread.
-	private LoadResult LoadOffThread(string source, string instrument)
+	// megabytes of decoding, which must never happen on the UI thread. Every call into an
+	// instrument - including the shared Decent Sampler cache, whose Get is thread-safe - stays here.
+	private LoadResult LoadOffThread(
+		string source, string instrument, string presetName, DecentSamplerLoadOptions? loadOptions)
 	{
 		try
 		{
 			var sequence = OpenSequence(source);
+			var kind = ClassifyInstrument(instrument, out var instrumentPath);
 
-			if (IsSfz(instrument))
+			switch (kind)
 			{
-				var instrumentPath = AudioSourceResolver.ResolveFilePathOrNull(instrument)
-					?? throw new NotSupportedException(SfzNeedsFileMessage);
+				case MidiInstrumentKind.Sfz:
+				{
+					var path = instrumentPath ?? throw new NotSupportedException(NeedsFileMessage(kind, instrument));
+					var sfz = _sfzInstruments.Get(path);
+					_player.Load(sfz, sequence);
+					return new LoadResult(
+						_player.Duration, kind, sfz.Problems, sfz.UnsupportedOpcodes,
+						Array.Empty<string>(), "", sequence.Problems, null, null);
+				}
 
-				var sfz = _sfzInstruments.Get(instrumentPath);
-				_player.Load(sfz, sequence);
-				return new LoadResult(_player.Duration, sfz.Problems, sfz.UnsupportedOpcodes, null);
+				case MidiInstrumentKind.DecentSampler:
+				{
+					var path = instrumentPath ?? throw new NotSupportedException(NeedsFileMessage(kind, instrument));
+
+					// The engine's own process-wide cache, rather than a third private one here: it
+					// is what the audio package's path-based loading uses, so an application that
+					// pre-loaded a library and a player naming the same path pay for it once, and
+					// two presets of one library share that library's decoded samples.
+					var decentSampler = MidiMusicPlayer.SharedDecentSamplerCache.Get(
+						path, BuildLoadOptions(loadOptions, presetName));
+
+					_player.Load(decentSampler, sequence);
+					return new LoadResult(
+						_player.Duration, kind, decentSampler.Problems, Array.Empty<string>(),
+						decentSampler.UnsupportedFeatures, decentSampler.MemoryPolicySummary,
+						sequence.Problems, decentSampler, null);
+				}
+
+				default:
+				{
+					var soundFont = OpenSoundFont(instrument);
+					_player.Load(soundFont, sequence);
+					return new LoadResult(
+						_player.Duration, MidiInstrumentKind.SoundFont, Array.Empty<string>(),
+						Array.Empty<string>(), Array.Empty<string>(), "", sequence.Problems, null, null);
+				}
 			}
-
-			var soundFont = OpenSoundFont(instrument);
-			_player.Load(soundFont, sequence);
-			return new LoadResult(_player.Duration, Array.Empty<string>(), Array.Empty<string>(), null);
 		}
 		catch (Exception e)
 		{
-			return new LoadResult(TimeSpan.Zero, Array.Empty<string>(), Array.Empty<string>(), e);
+			return LoadResult.Failed(e);
 		}
 	}
 
@@ -630,9 +1042,90 @@ public sealed partial class MidiPlayer : FrameworkElement
 		}
 	}
 
-	// The instrument's extension decides the synthesizer, matching CodeBrix.Audio's own rule.
-	private static bool IsSfz(string instrument)
-		=> Path.GetExtension(instrument).Equals(".sfz", StringComparison.OrdinalIgnoreCase);
+	// What the instrument names decides the synthesizer, matching CodeBrix.Audio's own rule: the
+	// extension first, then a folder that holds a preset. The extension is read from the source as
+	// written, so an instrument that only exists as a stream is still recognised as the format it
+	// names - which is what lets the failure below say which format needs a file, and why.
+	private static MidiInstrumentKind ClassifyInstrument(string instrument, out string? resolvedPath)
+	{
+		// Null for the forms that name no file - an embedded resource. Resolved without opening
+		// anything, because a format that must be a file on disk has already failed by then.
+		resolvedPath = AudioSourceResolver.ResolveLocalPathOrNull(instrument);
+
+		var extension = Path.GetExtension(instrument);
+
+		if (extension.Equals(".sfz", StringComparison.OrdinalIgnoreCase))
+		{
+			return MidiInstrumentKind.Sfz;
+		}
+
+		if (extension.Equals(".dspreset", StringComparison.OrdinalIgnoreCase)
+			|| extension.Equals(".dslibrary", StringComparison.OrdinalIgnoreCase)
+			|| extension.Equals(".dsbundle", StringComparison.OrdinalIgnoreCase))
+		{
+			return MidiInstrumentKind.DecentSampler;
+		}
+
+		// A folder is a Decent Sampler instrument when it holds a preset; that is the shape a
+		// .dsbundle has on macOS, and the shape an unpacked library has everywhere.
+		if (resolvedPath is not null && HoldsDecentSamplerPreset(resolvedPath))
+		{
+			return MidiInstrumentKind.DecentSampler;
+		}
+
+		return MidiInstrumentKind.SoundFont;
+	}
+
+	private static bool HoldsDecentSamplerPreset(string path)
+	{
+		if (!Directory.Exists(path))
+		{
+			return false;
+		}
+
+		using var presets = Directory
+			.EnumerateFiles(path, "*.dspreset", SearchOption.AllDirectories)
+			.GetEnumerator();
+
+		return presets.MoveNext();
+	}
+
+	// Says which format was asked for and why it cannot come from anything but a file on disk.
+	private static string NeedsFileMessage(MidiInstrumentKind kind, string instrument)
+	{
+		var extension = Path.GetExtension(instrument);
+		var named = extension.Length == 0 ? "" : $" ({extension})";
+
+		var reason = kind == MidiInstrumentKind.Sfz
+			? "an .sfz file references its sample files as separate files beside it"
+			: "a .dspreset references its samples as separate files beside it, and a .dslibrary or " +
+			  ".dsbundle, though it is one file, is read in place from the archive on disk";
+
+		var format = kind == MidiInstrumentKind.Sfz ? "An SFZ" : "A Decent Sampler";
+
+		return $"{format} instrument{named} must be given as a file path or an ms-appx:/// URI, " +
+			$"because {reason} - so it cannot be loaded from an embedded resource or a stream. " +
+			"A .sf2 SoundFont can.";
+	}
+
+	// The element's own copy of the load options, so that a caller holding the object cannot change
+	// a load already under way, and so that InstrumentPreset can name the preset without editing
+	// what the caller handed over. Null means the engine's defaults.
+	private static DecentSamplerLoadOptions? BuildLoadOptions(DecentSamplerLoadOptions? options, string presetName)
+	{
+		if (options is null && string.IsNullOrEmpty(presetName))
+		{
+			return null;
+		}
+
+		var forThisLoad = options?.Clone() ?? new DecentSamplerLoadOptions();
+		if (!string.IsNullOrEmpty(presetName))
+		{
+			forThisLoad.PresetName = presetName;
+		}
+
+		return forThisLoad;
+	}
 
 	private void UnloadSource()
 	{
@@ -644,9 +1137,56 @@ public sealed partial class MidiPlayer : FrameworkElement
 		Duration = TimeSpan.Zero;
 		DurationSeconds = 0.0;
 		ActiveVoiceCount = 0;
+		ClearInstrumentReporting();
+		RefreshPositionFromPlayback();
+	}
+
+	// Everything an earlier load reported, back to the nothing-is-loaded state.
+	private void ClearInstrumentReporting()
+	{
+		InstrumentKind = MidiInstrumentKind.None;
 		InstrumentProblems = Array.Empty<string>();
 		UnsupportedInstrumentOpcodes = Array.Empty<string>();
-		RefreshPositionFromPlayback();
+		UnsupportedInstrumentFeatures = Array.Empty<string>();
+		InstrumentMemorySummary = "";
+		SourceProblems = Array.Empty<string>();
+		SetInstrument(null);
+	}
+
+	private void ApplyMpeSettings()
+	{
+		_player.MpeMode = MpeMode;
+		_player.MpeMemberBendRange = MpeMemberBendRange;
+		_player.MpeLowerZoneMemberCount = MpeLowerZoneMemberCount;
+		_player.MpeUpperZoneMemberCount = MpeUpperZoneMemberCount;
+	}
+
+	// One warning, carrying the engine's own advice, when the preset that just loaded asks for a
+	// sound only an application-side add-on package can make. The load succeeded, because the
+	// engine plays everything else in the preset.
+	private void WarnWhenAnAddOnIsMissing(string instrument, LoadResult result)
+	{
+		var advice = FirstLineNamingTheAddOn(result.Problems) ?? FirstLineNamingTheAddOn(result.UnsupportedFeatures);
+		if (advice is null || !this.Log().IsEnabled(LogLevel.Warning))
+		{
+			return;
+		}
+
+		this.Log().Warn(
+			$"The instrument '{instrument}' loaded, but part of it cannot sound as written: {advice}");
+	}
+
+	private static string? FirstLineNamingTheAddOn(IEnumerable<string> lines)
+	{
+		foreach (var line in lines)
+		{
+			if (line is not null && line.Contains(AddOnMarker, StringComparison.Ordinal))
+			{
+				return line;
+			}
+		}
+
+		return null;
 	}
 
 	private void OnPlayerPlaybackEnded(object? sender, EventArgs e)
@@ -673,9 +1213,130 @@ public sealed partial class MidiPlayer : FrameworkElement
 
 	private readonly record struct LoadResult(
 		TimeSpan Duration,
+		MidiInstrumentKind Kind,
 		IReadOnlyList<string> Problems,
 		IReadOnlyCollection<string> UnsupportedOpcodes,
-		Exception? Error);
+		IReadOnlyCollection<string> UnsupportedFeatures,
+		string MemorySummary,
+		IReadOnlyList<string> SourceProblems,
+		DecentSamplerInstrument? Instrument,
+		Exception? Error)
+	{
+		public static LoadResult Failed(Exception error) => new(
+			TimeSpan.Zero, MidiInstrumentKind.None, Array.Empty<string>(), Array.Empty<string>(),
+			Array.Empty<string>(), "", Array.Empty<string>(), null, error);
+	}
+
+	#endregion
+
+	#region | Watching the loaded instrument's controls |
+
+	// The instrument itself is never disposed here: it belongs to the engine's process-wide cache
+	// and may be sounding in another player. All this element owns is its subscriptions.
+	private void SetInstrument(DecentSamplerInstrument? instrument)
+	{
+		DetachInstrumentControls();
+
+		_decentSamplerInstrument = instrument;
+		InstrumentControls = instrument?.Controls ?? Array.Empty<DecentSamplerControl>();
+		InstrumentTagStates = instrument?.TagStates ?? Array.Empty<DecentSamplerTagState>();
+
+		AttachInstrumentControls();
+	}
+
+	private void AttachInstrumentControls()
+	{
+		if (_controlsSubscribed || _decentSamplerInstrument is null)
+		{
+			return;
+		}
+
+		// Captured here, on the UI thread, because the audio thread cannot go looking for it.
+		_uiQueue = DispatcherQueue;
+
+		foreach (var control in InstrumentControls)
+		{
+			control.Changed += OnInstrumentControlChanged;
+		}
+
+		_controlsSubscribed = true;
+	}
+
+	private void DetachInstrumentControls()
+	{
+		if (!_controlsSubscribed)
+		{
+			return;
+		}
+
+		foreach (var control in InstrumentControls)
+		{
+			control.Changed -= OnInstrumentControlChanged;
+		}
+
+		_controlsSubscribed = false;
+
+		lock (_controlChangeGate)
+		{
+			_pendingControlChanges.Clear();
+		}
+	}
+
+	// Arrives on whichever thread moved the control - the audio thread for a modulator or a MIDI
+	// binding, the caller's thread for a SetValue.
+	private void OnInstrumentControlChanged(object? sender, DecentSamplerControlChangedEventArgs e)
+	{
+		bool flushNeeded;
+		lock (_controlChangeGate)
+		{
+			// One entry per control, carrying the last change seen for it: a modulator can move the
+			// same knob on every rendered block, and the UI only ever needs where it ended up.
+			_pendingControlChanges[e.Control] = e;
+			flushNeeded = !_controlFlushQueued;
+			_controlFlushQueued = true;
+		}
+
+		if (!flushNeeded)
+		{
+			return;
+		}
+
+		var queue = _uiQueue;
+		if (queue is null || !queue.TryEnqueue(FlushControlChanges))
+		{
+			// Nothing to marshal onto (an element built outside the UI thread's dispatcher): raise
+			// it here rather than losing it, the same choice the load path makes.
+			FlushControlChanges();
+		}
+	}
+
+	private void FlushControlChanges()
+	{
+		DecentSamplerControlChangedEventArgs[] changes;
+		lock (_controlChangeGate)
+		{
+			_controlFlushQueued = false;
+			if (_pendingControlChanges.Count == 0)
+			{
+				return;
+			}
+
+			changes = new DecentSamplerControlChangedEventArgs[_pendingControlChanges.Count];
+			_pendingControlChanges.Values.CopyTo(changes, 0);
+			_pendingControlChanges.Clear();
+		}
+
+		var handler = InstrumentControlChanged;
+		if (handler is null)
+		{
+			return;
+		}
+
+		foreach (var change in changes)
+		{
+			handler(this, change);
+		}
+	}
 
 	#endregion
 
@@ -772,6 +1433,11 @@ public sealed partial class MidiPlayer : FrameworkElement
 		Position = _isSourceLoaded ? _player.Position : TimeSpan.Zero;
 		_updatingFromPlayback = false;
 		ActiveVoiceCount = _isSourceLoaded ? _player.ActiveVoiceCount : 0;
+
+		// The musical clock costs two lock-free reads, so it follows the same timer as the timecode.
+		var tempo = _player.TempoSource;
+		BeatsPerMinute = _isSourceLoaded ? tempo.BeatsPerMinute : TempoSource.DefaultBeatsPerMinute;
+		BeatPosition = _isSourceLoaded ? tempo.BeatPosition : 0.0;
 	}
 
 	private TimeSpan ClampToDuration(TimeSpan position)
@@ -785,4 +1451,25 @@ public sealed partial class MidiPlayer : FrameworkElement
 	}
 
 	#endregion
+}
+
+/// <summary>
+/// Which instrument format a <see cref="MidiPlayer"/> is rendering its sequence through.
+/// </summary>
+public enum MidiInstrumentKind
+{
+	/// <summary>Nothing is loaded.</summary>
+	None,
+
+	/// <summary>A SoundFont (<c>.sf2</c>).</summary>
+	SoundFont,
+
+	/// <summary>An SFZ instrument (<c>.sfz</c>).</summary>
+	Sfz,
+
+	/// <summary>
+	/// A Decent Sampler instrument: a <c>.dspreset</c>, a <c>.dslibrary</c>, a <c>.dsbundle</c>, or a
+	/// folder holding a preset.
+	/// </summary>
+	DecentSampler,
 }

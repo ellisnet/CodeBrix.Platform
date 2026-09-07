@@ -16,7 +16,7 @@
 		     package content via the ItemGroup below, matching the WebView add-in's configuration. -->
 		<PackageIcon>icon-codebrix-128.png</PackageIcon>
 		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.AudioPlayer.ApacheLicenseForever</PackageId>
-		<Description>Adds music, MIDI, and sound-effect playback to your app, with play, pause, seek, volume, and looping controls built in. Trigger a quick sound effect or play a full song with just a few lines of code. Plays common audio formats like WAV, MP3, Ogg Vorbis, and FLAC, and MIDI music through SoundFont or SFZ instrument files.</Description>
+		<Description>Adds music, MIDI, and sound-effect playback to your app, with play, pause, seek, volume, and looping controls built in. Trigger a quick sound effect or play a full song with just a few lines of code. Plays common audio formats like WAV, MP3, Ogg Vorbis, and FLAC, and MIDI music through SoundFont, SFZ, or Decent Sampler instrument files.</Description>
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
@@ -27,9 +27,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<!-- The audio engine: CodeBrix.Audio (WAV/MP3/Ogg Vorbis/FLAC reading) + CodeBrix.Audio.Engine (device
-		     playback via the bundled codebrix_miniaudio native backend) ship in this one package. -->
-		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.241.985" />
+		<!-- The audio engine: CodeBrix.Audio (WAV/MP3/Ogg Vorbis/FLAC reading, and the SoundFont, SFZ and
+		     Decent Sampler synthesizers behind MidiPlayer) + CodeBrix.Audio.Engine (device playback via the
+		     bundled codebrix_miniaudio native backend) ship in this one package. -->
+		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.250.60" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
 		     same family version as this build (the whole family ships together). Extensions.Logging is

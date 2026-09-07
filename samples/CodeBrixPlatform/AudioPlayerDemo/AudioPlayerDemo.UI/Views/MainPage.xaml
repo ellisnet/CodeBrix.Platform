@@ -10,6 +10,10 @@
     <Page.Resources>
         <local:TimecodeConverter x:Key="Timecode" />
 
+        <!-- Lets the MPE drop-down two-way bind straight to MidiPlayer.MpeMode: a ComboBox picks by
+             index, and the property is an enumeration. -->
+        <local:MpeModeIndexConverter x:Key="MpeModeIndex" />
+
         <!-- The platform's own converter, from CodeBrix.Platform.UI.Toolkit - no need for a
              hand-written one, or for a Visibility property on a view model. -->
         <conv:BoolToVisibilityConverter x:Key="VisibleWhenTrue" />
@@ -135,12 +139,24 @@
         <TextBlock Text="Play MIDI music through an instrument" FontSize="20" Margin="0,10,0,0" />
 
         <TextBlock TextWrapping="Wrap"
-                   Text="MidiPlayer synthesizes a MIDI file through a SoundFont (.sf2) or SFZ (.sfz) instrument, with the same transport and the same scrubber binding as the audio players above. Instruments are big - this sampled piano decodes to well over half a gigabyte - so loading runs in the background and the transport comes alive when it finishes." />
+                   Text="MidiPlayer synthesizes a MIDI file through a SoundFont (.sf2), an SFZ (.sfz) or a Decent Sampler (.dspreset, .dslibrary, .dsbundle, or a folder holding a preset) instrument, with the same transport and the same scrubber binding as the audio players above. Instruments are big - the sampled piano below decodes to well over half a gigabyte - so loading runs in the background and the transport comes alive when it finishes." />
+
+        <!-- The same music, through either instrument. The Source never changes; only Instrument
+             does, which is the whole point: what the file extension names decides the synthesizer,
+             and MidiPlayer.InstrumentKind reports which one ran. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Instrument" VerticalAlignment="Center" />
+            <ComboBox x:Name="InstrumentSelector" Width="260" SelectedIndex="0"
+                      SelectionChanged="InstrumentSelection_Changed">
+                <ComboBoxItem Content="Splendid Grand Piano (.sfz)" />
+                <ComboBoxItem Content="Demo Sampler (.dspreset)" />
+            </ComboBox>
+        </StackPanel>
 
         <!-- The instrument and the sequence are set together, in code-behind, when this is
              pressed: a MidiPlayer starts loading as soon as it has both. -->
         <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button x:Name="LoadMidiButton" Content="Load the piano and the music" Click="LoadMidiButton_Click" />
+            <Button x:Name="LoadMidiButton" Content="Load the instrument and the music" Click="LoadMidiButton_Click" />
 
             <!-- Bound straight to the player's IsLoading, so nothing in this page tracks the load
                  itself. Indeterminate because an instrument load reports no fraction to show - and
@@ -157,10 +173,11 @@
         </StackPanel>
 
         <!-- Non-visual, exactly like the players above. Source is the MIDI file; Instrument is
-             what renders it. The .sfz is addressed through ms-appx:/// rather than embedded://,
-             because its 226 sample files have to stay on disk beside it. -->
+             what renders it. Both instruments are addressed through ms-appx:/// rather than
+             embedded://, because their sample files have to stay on disk beside them. -->
         <audio:MidiPlayer x:Name="MidiMusic"
                           MediaOpened="MidiMusic_MediaOpened"
+                          InstrumentControlChanged="MidiMusic_InstrumentControlChanged"
                           PlaybackEnded="MidiMusic_PlaybackEnded"
                           MediaFailed="MidiMusic_MediaFailed" />
 
@@ -195,7 +212,44 @@
             <TextBlock Text="x  (pitch is unchanged)" VerticalAlignment="Center" />
         </StackPanel>
 
+        <!-- A Decent Sampler preset carries its own knobs, and MidiPlayer exposes them as live
+             parameters. This slider drives the FIRST of them through the element's control list,
+             and InstrumentControlChanged writes the slider back - including when the preset's own
+             modulators or MIDI bindings move the knob while the music plays. The SFZ piano and a
+             SoundFont have no control model, so it stays disabled for them. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock x:Name="ControlName" Text="Instrument control" VerticalAlignment="Center" Width="150" />
+            <Slider x:Name="ControlSlider" Width="200" VerticalAlignment="Center" IsEnabled="False"
+                    Minimum="0" Maximum="1" StepFrequency="0.01"
+                    ValueChanged="ControlSlider_ValueChanged" />
+            <TextBlock x:Name="ControlValue" Text="-" VerticalAlignment="Center" Width="60" />
+        </StackPanel>
+
+        <!-- MIDI Polyphonic Expression: how the player reads a performance that puts every note on
+             its own channel so it can bend and swell alone. The setting survives a load and reaches
+             whichever instrument is loaded. The Debussy file is ordinary MIDI, so this changes
+             nothing you can hear here - it is the property path that is worth showing. -->
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="MPE" VerticalAlignment="Center" />
+            <ComboBox x:Name="MpeModeSelector" Width="180"
+                      SelectedIndex="{Binding MpeMode, ElementName=MidiMusic, Mode=TwoWay, Converter={StaticResource MpeModeIndex}}">
+                <ComboBoxItem Content="Off" />
+                <ComboBoxItem Content="Lower zone" />
+                <ComboBoxItem Content="Upper zone" />
+                <ComboBoxItem Content="Both zones" />
+                <ComboBoxItem Content="Auto" />
+            </ComboBox>
+            <TextBlock Text="Beat" VerticalAlignment="Center" Margin="12,0,0,0" />
+            <TextBlock Text="{Binding BeatPosition, ElementName=MidiMusic}" VerticalAlignment="Center" Width="70" />
+            <TextBlock Text="{Binding BeatsPerMinute, ElementName=MidiMusic}" VerticalAlignment="Center" Width="60" />
+            <TextBlock Text="BPM" VerticalAlignment="Center" />
+        </StackPanel>
+
         <TextBlock x:Name="MidiStatus" Text="No instrument loaded" TextWrapping="Wrap" />
+
+        <!-- What the loaded instrument turned out to be, how it decided to hold its samples, and
+             anything the MIDI file itself needed forgiving. All three are valid from MediaOpened. -->
+        <TextBlock x:Name="InstrumentStatus" Text="" TextWrapping="Wrap" />
 
     </StackPanel>
     </ScrollViewer>

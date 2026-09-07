@@ -24,36 +24,50 @@ internal static class AudioSourceResolver
 			throw new ArgumentException("The audio source is empty.", nameof(source));
 		}
 
+		if (Uri.TryCreate(source, UriKind.Absolute, out var uri)
+			&& uri.Scheme.Equals("embedded", StringComparison.OrdinalIgnoreCase))
+		{
+			return (null, OpenEmbeddedResource(uri));
+		}
+
+		// Everything else names a place on disk - an ms-appx:/// asset, a file:// URI, or, when it is
+		// no recognized URI at all, a filesystem path.
+		return (ResolveLocalPathOrNull(source), null);
+	}
+
+	/// <summary>
+	/// Resolves <paramref name="source"/> to the local file-system path it names, or returns null
+	/// when the source names something that only exists as a stream (an embedded resource).
+	/// </summary>
+	/// <remarks>
+	/// For sources that must be real files or folders on disk because other files sit beside them -
+	/// an SFZ instrument and its sample folder, a Decent Sampler preset and its samples, a
+	/// Decent Sampler archive that is read in place - rather than sources that merely prefer to be.
+	/// Nothing is opened: what is wanted is the NAME, and a source that has none has already failed.
+	/// The path is returned whether or not anything exists there, so that the failure to open it is
+	/// reported by whatever tried, in its own words.
+	/// </remarks>
+	public static string? ResolveLocalPathOrNull(string source)
+	{
+		if (string.IsNullOrWhiteSpace(source))
+		{
+			throw new ArgumentException("The audio source is empty.", nameof(source));
+		}
+
 		if (Uri.TryCreate(source, UriKind.Absolute, out var uri))
 		{
 			switch (uri.Scheme.ToLowerInvariant())
 			{
 				case "embedded":
-					return (null, OpenEmbeddedResource(uri));
+					return null;
 				case "ms-appx":
-					return (Path.Join(Package.Current.InstalledPath, AssetRelativePath(source)), null);
+					return Path.Join(Package.Current.InstalledPath, AssetRelativePath(source));
 				case "file":
-					return (uri.LocalPath, null);
+					return uri.LocalPath;
 			}
 		}
 
-		// Not a recognized URI: treat it as a filesystem path.
-		return (source, null);
-	}
-
-	/// <summary>
-	/// Resolves <paramref name="source"/> to a local file path, or returns null when the source
-	/// names something that only exists as a stream (an embedded resource).
-	/// </summary>
-	/// <remarks>
-	/// For sources that must be real files on disk because other files sit beside them - an SFZ
-	/// instrument and its sample folder - rather than sources that merely prefer to be.
-	/// </remarks>
-	public static string? ResolveFilePathOrNull(string source)
-	{
-		var (filePath, stream) = Resolve(source);
-		stream?.Dispose();
-		return filePath;
+		return source;
 	}
 
 	/// <summary>

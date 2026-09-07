@@ -4,6 +4,9 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using CodeBrix.Audio.Synth.DecentSampler;
+using CodeBrix.Audio.Synth.Mpe;
 using CodeBrix.Platform.UI.AudioPlayer.Skia;
 
 namespace AudioPlayerDemo.Views;
@@ -27,7 +30,29 @@ public sealed partial class MainPage : Page
     private const string MidiSource = "ms-appx:///Assets/debussy_Ste_Bergamesq_Clair.mid";
     private const string InstrumentSource = "ms-appx:///Assets/SplendidGrandPiano/Splendid Grand Piano.sfz";
 
+    // The demo's own Decent Sampler instrument: a hand-written preset over copies of the chime and
+    // click above (samples/assets/DemoSampler). A .dspreset is a folder instrument exactly as an
+    // .sfz is - its samples sit beside it in Samples/ - so it is addressed through ms-appx:///
+    // rather than embedded://, and the whole tree is copied to the output (see the .Core csproj).
+    private const string DemoSamplerSource = "ms-appx:///Assets/DemoSampler/Demo Sampler.dspreset";
+
+    // The same preset named as an embedded resource. Nothing packs it that way, and nothing could:
+    // it is here only so the demo (and the self-test) can show what happens when a format that must
+    // be a real file on disk is given a form that names no file - MediaFailed, with a message that
+    // says which format and why. The name is never opened, so the resource's absence is not the
+    // reason it fails.
+    private const string DemoSamplerEmbeddedSource =
+        "embedded://AudioPlayerDemo.Core/AudioPlayerDemo.Assets.DemoSampler.dspreset";
+
     private readonly Stopwatch _instrumentLoadTimer = new();
+
+    // The knob the control slider drives - the first of the loaded instrument's controls, or null
+    // when what is loaded has no control model (a SoundFont or an SFZ instrument).
+    private DecentSamplerControl _boundControl;
+
+    // Set while the slider is being written FROM the instrument, so writing it back is not read as
+    // a user's drag and sent round again.
+    private bool _updatingControlSlider;
 
     public MainPage()
     {
@@ -100,6 +125,7 @@ public sealed partial class MainPage : Page
             await CheckEveryFormat();
             await CheckCompressedSoundEffects();
             await CheckMidiMusic();
+            await CheckDecentSamplerInstrument();
 
             Console.WriteLine($"APD-SELFTEST: RESULT {(_selfTestFailures == 0 ? "PASS" : $"FAIL ({_selfTestFailures})")}");
             Environment.Exit(_selfTestFailures == 0 ? 0 : 1);
@@ -226,6 +252,225 @@ public sealed partial class MainPage : Page
             $"IsPlaying={MidiMusic.IsPlaying} PositionSeconds={MidiMusic.PositionSeconds:F2}");
     }
 
+    /// <summary>
+    /// The Decent Sampler half of the MIDI player: the demo's own hand-written preset loads in the
+    /// background like any other instrument, reports itself as a Decent Sampler instrument, is
+    /// fully supported, exposes its knobs as live parameters that round-trip and report their own
+    /// movement on the UI thread, plays, and refuses a form that names no file on disk. The MPE
+    /// settings and the musical clock are checked here too, because they need something loaded.
+    /// </summary>
+    /// <remarks>
+    /// Runs after CheckMidiMusic, so the player already holds the SFZ piano when it starts: the
+    /// first thing it does is supersede that load, which is also the shape a real page's instrument
+    /// chooser has.
+    /// </remarks>
+    private async Task CheckDecentSamplerInstrument()
+    {
+        var opened = false;
+        var failure = "";
+        void OnOpened(object s, EventArgs e) => opened = true;
+        void OnFailed(object s, AudioPlayerFailedEventArgs e) => failure = e.Message;
+
+        MidiMusic.Stop();
+        MidiMusic.MediaOpened += OnOpened;
+        MidiMusic.MediaFailed += OnFailed;
+
+        var loadTimer = Stopwatch.StartNew();
+        MidiMusic.Instrument = DemoSamplerSource;
+        MidiMusic.Source = MidiSource;
+
+        Check("ds-loads-in-background", MidiMusic.IsLoading,
+            $"IsLoading={MidiMusic.IsLoading} immediately after the set");
+
+        while (!opened && failure.Length == 0 && loadTimer.Elapsed < TimeSpan.FromSeconds(60))
+        {
+            await Task.Delay(100);
+        }
+        loadTimer.Stop();
+
+        if (!opened)
+        {
+            Check("ds-kind", false, failure.Length == 0
+                ? $"nothing opened after {loadTimer.Elapsed.TotalSeconds:F1} s"
+                : $"MediaFailed: {failure}");
+            MidiMusic.MediaOpened -= OnOpened;
+            MidiMusic.MediaFailed -= OnFailed;
+            return;
+        }
+
+        Check("ds-kind", MidiMusic.InstrumentKind == MidiInstrumentKind.DecentSampler,
+            $"InstrumentKind={MidiMusic.InstrumentKind} after {loadTimer.Elapsed.TotalSeconds:F1} s, " +
+            $"memory=\"{MidiMusic.InstrumentMemorySummary}\"");
+
+        Check("ds-supported",
+            MidiMusic.InstrumentProblems.Count == 0 && MidiMusic.UnsupportedInstrumentFeatures.Count == 0,
+            $"problems={MidiMusic.InstrumentProblems.Count} " +
+            $"unsupported={MidiMusic.UnsupportedInstrumentFeatures.Count} " +
+            $"{DescribeFirst(MidiMusic.InstrumentProblems)}{DescribeFirst(MidiMusic.UnsupportedInstrumentFeatures)}");
+
+        Check("source-problems-empty", MidiMusic.SourceProblems.Count == 0,
+            $"SourceProblems={MidiMusic.SourceProblems.Count}{DescribeFirst(MidiMusic.SourceProblems)}");
+
+        await CheckInstrumentControls();
+
+        // Voices are WATCHED rather than sampled once. The demo's instrument is built from two very
+        // short recordings, so a note lasts as long as its sample does - about a second and a half
+        // at the pitches this piece opens with - and the music has rests in it. Asking at one
+        // arbitrary instant would be asking whether a note happens to be sounding right then.
+        MidiMusic.Play();
+        var voicesSeen = 0;
+        var voiceWatch = Stopwatch.StartNew();
+        while (voiceWatch.Elapsed < TimeSpan.FromSeconds(10))
+        {
+            voicesSeen = Math.Max(voicesSeen, MidiMusic.ActiveVoiceCount);
+            if (voicesSeen > 0 && MidiMusic.PositionSeconds > 2.0)
+            {
+                break;
+            }
+
+            await Task.Delay(50);
+        }
+
+        Check("ds-plays", MidiMusic.IsPlaying && voicesSeen > 0,
+            $"IsPlaying={MidiMusic.IsPlaying} voices peaked at {voicesSeen} " +
+            $"PositionSeconds={MidiMusic.PositionSeconds:F2}");
+
+        // The musical clock: beats rather than seconds, refreshed on the same timer as Position.
+        var beatsBefore = MidiMusic.BeatPosition;
+        await Task.Delay(1500);
+        Check("beat-position-advances", MidiMusic.BeatPosition > beatsBefore,
+            $"BeatPosition {beatsBefore:F2} -> {MidiMusic.BeatPosition:F2} at {MidiMusic.BeatsPerMinute:F1} BPM");
+
+        MidiMusic.Stop();
+        await Task.Delay(300);
+
+        CheckMpeRoundTrip();
+
+        MidiMusic.MediaOpened -= OnOpened;
+        MidiMusic.MediaFailed -= OnFailed;
+
+        await CheckEmbeddedInstrumentFails();
+    }
+
+    /// <summary>
+    /// The preset's knobs, as MidiPlayer exposes them: a live control list, a value that round-trips
+    /// through the instrument's own parameter model, and the change reported back on the UI thread.
+    /// </summary>
+    private async Task CheckInstrumentControls()
+    {
+        var control = MidiMusic.InstrumentControls.Count > 0 ? MidiMusic.InstrumentControls[0] : null;
+        var byName = control is null ? null : MidiMusic.GetInstrumentControl(control.Name);
+
+        var changedOnUiThread = false;
+        var observed = 0;
+        void OnChanged(object s, DecentSamplerControlChangedEventArgs e)
+        {
+            observed++;
+            changedOnUiThread = DispatcherQueue is not null && DispatcherQueue.HasThreadAccess;
+        }
+
+        MidiMusic.InstrumentControlChanged += OnChanged;
+
+        if (control is not null)
+        {
+            // A quarter of the way along the knob's own travel, and away from where it sits now.
+            var started = control.Value;
+            var range = control.MaxValue - control.MinValue;
+            var target = Math.Abs(started - (control.MinValue + range * 0.25)) > range * 0.05
+                ? control.MinValue + range * 0.25
+                : control.MinValue + range * 0.75;
+            control.SetValue(target);
+
+            // The event is coalesced onto the dispatcher, so give it a pass to arrive on.
+            await Task.Delay(300);
+
+            Check("ds-controls",
+                MidiMusic.InstrumentControls.Count > 0
+                && ReferenceEquals(byName, control)
+                && Math.Abs(control.Value - target) < 1e-6
+                && observed > 0
+                && changedOnUiThread,
+                $"controls={MidiMusic.InstrumentControls.Count} tags={MidiMusic.InstrumentTagStates.Count} " +
+                $"\"{control.Name}\" set to {target:F2}, reads {control.Value:F2}, " +
+                $"{observed} change(s) raised, onUiThread={changedOnUiThread}");
+
+            // Put the knob back. The first control of this preset is its level, and the checks that
+            // follow listen for what the instrument sounds - a test must not leave it turned down.
+            control.SetValue(started);
+            await Task.Delay(200);
+        }
+        else
+        {
+            Check("ds-controls", false, "the loaded instrument reported no controls");
+        }
+
+        MidiMusic.InstrumentControlChanged -= OnChanged;
+    }
+
+    /// <summary>
+    /// MPE is a property path rather than a sound here - the Debussy file is ordinary MIDI - so what
+    /// is checked is that the setting reaches the player, survives being read back, and that the
+    /// zone information is readable while an instrument is loaded.
+    /// </summary>
+    private void CheckMpeRoundTrip()
+    {
+        MidiMusic.MpeMode = MpeMode.Auto;
+        var readBack = MidiMusic.MpeMode;
+        var lower = MidiMusic.MpeLowerZone;
+        var upper = MidiMusic.MpeUpperZone;
+
+        Check("mpe-mode-roundtrip", readBack == MpeMode.Auto,
+            $"MpeMode={readBack} lowerZone(active={lower.IsActive} master={lower.MasterChannel} " +
+            $"members={lower.MemberCount}) upperZone(active={upper.IsActive} master={upper.MasterChannel}) " +
+            $"bendRange={MidiMusic.MpeMemberBendRange:F0}");
+
+        MidiMusic.MpeMode = MpeMode.Off;
+    }
+
+    /// <summary>
+    /// A Decent Sampler instrument names files that have to be on disk beside it, so a form that
+    /// names no file cannot work - and the failure has to SAY so rather than reporting a missing
+    /// resource, because the fix is to ship the instrument as content rather than to add a resource.
+    /// </summary>
+    private async Task CheckEmbeddedInstrumentFails()
+    {
+        var failure = "";
+        var opened = false;
+        void OnOpened(object s, EventArgs e) => opened = true;
+        void OnFailed(object s, AudioPlayerFailedEventArgs e) => failure = e.Message;
+
+        MidiMusic.MediaOpened += OnOpened;
+        MidiMusic.MediaFailed += OnFailed;
+
+        MidiMusic.Instrument = DemoSamplerEmbeddedSource;
+        MidiMusic.Source = MidiSource;
+
+        var timer = Stopwatch.StartNew();
+        while (!opened && failure.Length == 0 && timer.Elapsed < TimeSpan.FromSeconds(30))
+        {
+            await Task.Delay(100);
+        }
+
+        Check("ds-embedded-fails",
+            !opened && failure.Contains("Decent Sampler", StringComparison.Ordinal)
+                    && failure.Contains(".dspreset", StringComparison.Ordinal),
+            failure.Length == 0 ? $"opened={opened}, no MediaFailed in {timer.Elapsed.TotalSeconds:F1} s" : failure);
+
+        MidiMusic.MediaOpened -= OnOpened;
+        MidiMusic.MediaFailed -= OnFailed;
+    }
+
+    /// <summary>The first line of a report list, for a check's detail text; empty when there is none.</summary>
+    private static string DescribeFirst(System.Collections.Generic.IEnumerable<string> lines)
+    {
+        foreach (var line in lines)
+        {
+            return $" first=\"{line}\"";
+        }
+
+        return "";
+    }
+
     private void PlayButton_Click(object sender, RoutedEventArgs e)
     {
         Player.Play();
@@ -350,7 +595,32 @@ public sealed partial class MainPage : Page
 
     private void Player2_MediaFailed(object sender, AudioPlayerFailedEventArgs e) => Player2Status.Text = $"Media failed: {e.Message}";
 
-    // ===== Third player: MIDI music through an SFZ instrument =====
+    // ===== Third player: MIDI music through an SFZ or Decent Sampler instrument =====
+
+    /// <summary>
+    /// The instrument the MIDI pane renders through, as the drop-down currently reads. The music
+    /// never changes - only what synthesizes it, which is what the extension in this string decides.
+    /// </summary>
+    private string SelectedInstrument
+        => InstrumentSelector is not null && InstrumentSelector.SelectedIndex == 1
+            ? DemoSamplerSource
+            : InstrumentSource;
+
+    /// <summary>
+    /// Changing the instrument does not load anything by itself: the two instruments are very
+    /// different sizes, and starting a three-second load from a drop-down would be a surprise.
+    /// Pressing the load button afterwards is what picks the new one up.
+    /// </summary>
+    private void InstrumentSelection_Changed(object sender, SelectionChangedEventArgs e)
+    {
+        // Fires from SelectionChanged during XAML load, before every element on the page exists.
+        if (MidiStatus is null)
+        {
+            return;
+        }
+
+        MidiStatus.Text = "Press \"Load the instrument and the music\" to load the chosen instrument";
+    }
 
     /// <summary>
     /// Sets the instrument and the sequence together, which is what starts the load. The UI stays
@@ -360,10 +630,12 @@ public sealed partial class MainPage : Page
     private void LoadMidiButton_Click(object sender, RoutedEventArgs e)
     {
         LoadMidiButton.IsEnabled = false;
-        MidiStatus.Text = "Loading the instrument - 226 samples, decoded once and then shared...";
+        MidiStatus.Text = InstrumentSelector.SelectedIndex == 1
+            ? "Loading the demo sampler - two samples, decoded once and then shared..."
+            : "Loading the piano - 226 samples, decoded once and then shared...";
         _instrumentLoadTimer.Restart();
 
-        MidiMusic.Instrument = InstrumentSource;
+        MidiMusic.Instrument = SelectedInstrument;
         MidiMusic.Source = MidiSource;
     }
 
@@ -373,12 +645,99 @@ public sealed partial class MainPage : Page
         LoadMidiButton.IsEnabled = true;
 
         // Worth showing rather than hiding: an instrument loads even when parts of it could not be
-        // built, and an SFZ library may use opcodes the synthesizer does not implement. Both being
-        // zero is what "this instrument is fully supported" looks like.
+        // built, an SFZ library may use opcodes the synthesizer does not implement, and a Decent
+        // Sampler preset may ask for a feature only the ModestSynth add-on package supplies. All
+        // three being zero is what "this instrument is fully supported" looks like.
         MidiStatus.Text =
             $"Loaded in {_instrumentLoadTimer.Elapsed.TotalSeconds:F1} s - {MidiMusic.Duration:mm\\:ss} of music, " +
             $"{MidiMusic.InstrumentProblems.Count} instrument problem(s), " +
-            $"{MidiMusic.UnsupportedInstrumentOpcodes.Count} unsupported opcode(s). Press Play.";
+            $"{MidiMusic.UnsupportedInstrumentOpcodes.Count} unsupported opcode(s), " +
+            $"{MidiMusic.UnsupportedInstrumentFeatures.Count} unsupported feature(s). Press Play.";
+
+        ShowInstrumentDetail();
+        BindFirstInstrumentControl();
+    }
+
+    /// <summary>
+    /// What the loaded instrument turned out to be, how it decided to hold its samples, and
+    /// anything the MIDI file itself needed forgiving. A Standard MIDI File that breaks a rule is
+    /// read leniently rather than refused, and SourceProblems is where that is visible.
+    /// </summary>
+    private void ShowInstrumentDetail()
+    {
+        var memory = string.IsNullOrEmpty(MidiMusic.InstrumentMemorySummary)
+            ? "the format reports no memory policy"
+            : MidiMusic.InstrumentMemorySummary;
+
+        InstrumentStatus.Text =
+            $"InstrumentKind: {MidiMusic.InstrumentKind} - {memory} - " +
+            $"{MidiMusic.SourceProblems.Count} MIDI file problem(s)";
+    }
+
+    /// <summary>
+    /// Points the control slider at the first of the loaded instrument's controls. A Decent Sampler
+    /// preset carries its knobs on the instrument itself, so this is the instrument's own live
+    /// parameter rather than a copy of it - and because instruments are shared, two players naming
+    /// one preset move the same knob.
+    /// </summary>
+    private void BindFirstInstrumentControl()
+    {
+        _boundControl = MidiMusic.InstrumentControls.Count > 0 ? MidiMusic.InstrumentControls[0] : null;
+
+        if (_boundControl is null)
+        {
+            ControlName.Text = "Instrument control";
+            ControlValue.Text = "-";
+            ControlSlider.IsEnabled = false;
+            return;
+        }
+
+        ControlName.Text = string.IsNullOrEmpty(_boundControl.Label) ? _boundControl.Name : _boundControl.Label;
+        ControlSlider.Minimum = _boundControl.MinValue;
+        ControlSlider.Maximum = _boundControl.MaxValue;
+        ControlSlider.StepFrequency = Math.Max((_boundControl.MaxValue - _boundControl.MinValue) / 100.0, 0.001);
+        ControlSlider.IsEnabled = true;
+        WriteControlValueToSlider(_boundControl.Value);
+    }
+
+    /// <summary>
+    /// A drag on the control slider. Setting a control's value fires the bindings behind it at
+    /// once - exactly as turning that knob in a player would - so this one line is the whole
+    /// integration.
+    /// </summary>
+    private void ControlSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+    {
+        if (_updatingControlSlider || _boundControl is null)
+        {
+            return;
+        }
+
+        _boundControl.SetValue(e.NewValue);
+        ControlValue.Text = $"{e.NewValue:F2}";
+    }
+
+    /// <summary>
+    /// The other direction: the instrument's own modulators and MIDI bindings move its knobs while
+    /// the music plays, and MidiPlayer reports every movement on the UI thread (coalesced to one
+    /// raise per control per dispatcher pass, because a modulator can move one knob on every
+    /// rendered block).
+    /// </summary>
+    private void MidiMusic_InstrumentControlChanged(object sender, DecentSamplerControlChangedEventArgs e)
+    {
+        if (!ReferenceEquals(e.Control, _boundControl))
+        {
+            return;
+        }
+
+        WriteControlValueToSlider(e.Control.Value);
+    }
+
+    private void WriteControlValueToSlider(double value)
+    {
+        _updatingControlSlider = true;
+        ControlSlider.Value = value;
+        _updatingControlSlider = false;
+        ControlValue.Text = $"{value:F2}";
     }
 
     private void PlayMidiButton_Click(object sender, RoutedEventArgs e)
@@ -408,6 +767,11 @@ public sealed partial class MainPage : Page
         _instrumentLoadTimer.Stop();
         LoadMidiButton.IsEnabled = true;
         MidiStatus.Text = $"Media failed: {e.Message}";
+
+        // A failed load unloads whatever was reported before it, so the detail line and the knob go
+        // back to their nothing-is-loaded state too.
+        InstrumentStatus.Text = "";
+        BindFirstInstrumentControl();
     }
 }
 
@@ -421,4 +785,22 @@ public sealed class TimecodeConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, string language)
         => throw new NotSupportedException();
+}
+
+/// <summary>
+/// Two-way binds a ComboBox's SelectedIndex to MidiPlayer.MpeMode, which is an enumeration whose
+/// members are in the drop-down's own order (Off, LowerZone, UpperZone, Both, Auto).
+/// </summary>
+public sealed class MpeModeIndexConverter : IValueConverter
+{
+    /// <summary>Turns the player's MpeMode into the index of the matching drop-down item.</summary>
+    public object Convert(object value, Type targetType, object parameter, string language)
+        => value is MpeMode mode ? (int)mode : 0;
+
+    /// <summary>
+    /// Turns the selected index back into an MpeMode. A ComboBox reports -1 while nothing is
+    /// selected, which is read as Off rather than as an invalid enumeration value.
+    /// </summary>
+    public object ConvertBack(object value, Type targetType, object parameter, string language)
+        => value is int index && Enum.IsDefined(typeof(MpeMode), index) ? (MpeMode)index : MpeMode.Off;
 }

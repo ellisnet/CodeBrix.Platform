@@ -1,3 +1,4 @@
+using CodeBrix.Audio.ModestSynth;
 using CodeBrix.Audio.Opus;
 using CodeBrix.Platform.Simple;
 using Microsoft.Extensions.Logging;
@@ -30,6 +31,18 @@ public partial class App : Application
         // to it nor a code change. There is deliberately no module initializer doing this call for
         // us - that would work in a debug build and silently not run in a trimmed publish.
         CodeBrixAudioOpus.Register();
+
+        // Turn on the oscillators and creative effects a Decent Sampler preset may ask for. Like
+        // the Opus call above, the dependency belongs to THIS application rather than to the AddIn,
+        // and for the same reason: the audio engine's add-ons ship as their own packages so that
+        // nothing is forced on an app that does not want it.
+        //
+        // REGISTER BEFORE LOADING. The engine looks these factories up when an instrument is BUILT,
+        // so a registration made after an instrument has loaded does not reach it - the oscillator
+        // group is simply silent and the effect bypassed, with a line in the instrument's Problems
+        // saying so. The demo's own instrument uses neither, so this call changes nothing here; it
+        // is the shape an application that plays a preset needing them has to follow.
+        ModestSynth.Register();
 
         SimpleServiceResolver.CreateInstance(HostHelper.GetHost(), services =>
         {

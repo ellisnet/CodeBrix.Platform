@@ -24,7 +24,15 @@
          references it and calls CodeBrixAudioOpus.Register() once at start-up (see App.xaml.cs).
          The AddIn resolves codecs through the shared audio output, so it plays .opus with no
          change and no reference of its own. -->
-    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.214.925" />
+    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.250.73" />
+
+    <!-- Oscillators and the creative effects a Decent Sampler preset may ask for. This is the
+         APPLICATION's dependency too, for exactly the reason Opus is: the AddIn holds an
+         MIT-or-better bar for what it depends on and the audio engine's add-ons ship as their own
+         packages, so an app that wants them references one and calls ModestSynth.Register() once at
+         start-up, BEFORE any instrument is loaded (see App.xaml.cs). The demo's own instrument uses
+         neither, so the call is here to show the shape rather than because this demo needs it. -->
+    <PackageReference Include="CodeBrix.Audio.ModestSynth.MitLicenseForever" Version="1.0.250.60" />
 
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
@@ -106,5 +114,13 @@
          resource. 226 samples, ~74 MB on disk. -->
     <Content Include="..\..\..\assets\debussy_Ste_Bergamesq_Clair.mid" Link="Assets\debussy_Ste_Bergamesq_Clair.mid" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="..\..\..\assets\SplendidGrandPiano\**\*.*" Link="Assets\SplendidGrandPiano\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+
+    <!-- The hand-written Decent Sampler instrument the MIDI pane's second choice renders through.
+         It is a FOLDER for the same reason the SFZ instrument is: a .dspreset references its
+         samples as separate files beside it, so the whole tree is copied to the output with its
+         shape intact and addressed as ms-appx:///Assets/DemoSampler/Demo Sampler.dspreset - which
+         is also why a .dspreset cannot be an embedded resource. Two samples, ~130 KB on disk,
+         both copies of this demo's own sound effects. -->
+    <Content Include="..\..\..\assets\DemoSampler\**\*.*" Link="Assets\DemoSampler\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -122,8 +122,11 @@
 		<!-- The AudioPlayer AddIn (CodeBrix.Platform.AudioPlayer.ApacheLicenseForever) ships with every
 		     family release: the XAML-declarable AudioPlayer and MidiPlayer elements and the
 		     fire-and-forget SoundEffect class, backed by the CodeBrix.Audio.MitLicenseForever nuget
-		     (fully managed WAV/MP3/Ogg Vorbis/FLAC plus SoundFont and SFZ synthesis, with a bundled
-		     miniaudio device backend), live on all six heads including macOS. -->
+		     (fully managed WAV/MP3/Ogg Vorbis/FLAC plus SoundFont, SFZ and Decent Sampler
+		     synthesis, with a bundled miniaudio device backend), live on all six heads including
+		     macOS. The Opus codec and the ModestSynth oscillator/effect add-on stay OUT of the
+		     dependency graph: both are packages the consuming application references and
+		     registers. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Skia.csproj" />
 
 		<!-- The VideoPlayer AddIn (CodeBrix.Platform.VideoPlayer.ApacheLicenseForever) ships with every
