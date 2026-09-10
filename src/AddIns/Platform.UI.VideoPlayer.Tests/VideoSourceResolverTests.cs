@@ -97,17 +97,20 @@ public class VideoSourceResolverTests
     {
         //Arrange
         //"(assembly)" stands for the ASSEMBLY name, which is not always the root namespace the
-        //  resource names were built from - as in this very suite, whose assembly is
-        //  ...VideoPlayer.Unit.Tests while its resources are named ...VideoPlayer.Tests.*. The
-        //  substitution is what is under test, so the failure message is the evidence.
+        //  resource names were built from. This suite used to be an example of the two
+        //  differing - its assembly was ...VideoPlayer.Unit.Tests while its resources were named
+        //  ...VideoPlayer.Tests.* - but the .Unit rename made them coincide, so the resource the
+        //  probe used to miss is now found. The probe therefore names a resource that cannot
+        //  exist: the substitution is what is under test, and the failure message - which
+        //  carries the name the resolver actually looked for - is the evidence.
         var assemblyName = typeof(VideoSourceResolverTests).Assembly.GetName().Name;
 
         //Act
         var act = () => VideoSourceResolver.Resolve(
-            $"embedded://{assemblyName}/(assembly).Assets.resolver_probe.txt");
+            $"embedded://{assemblyName}/(assembly).Assets.no_such_resource.txt");
 
         //Assert
-        act.Should().Throw<FileNotFoundException>().WithMessage($"*{assemblyName}.Assets.resolver_probe.txt*");
+        act.Should().Throw<FileNotFoundException>().WithMessage($"*{assemblyName}.Assets.no_such_resource.txt*");
     }
 
     [Fact]

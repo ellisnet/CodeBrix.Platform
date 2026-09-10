@@ -24,7 +24,7 @@ using static Private.Infrastructure.TestServices.WindowHelper;
 using static Windows.Foundation.Rect;
 using EffectiveViewportChangedEventArgs = Microsoft.UI.Xaml.EffectiveViewportChangedEventArgs;
 using CodeBrix.Platform.UI.Extensions;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 using SilverAssertions.Execution;
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml

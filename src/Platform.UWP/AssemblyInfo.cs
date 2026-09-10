@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Lottie")]
@@ -33,7 +32,7 @@ using System.Runtime.InteropServices;
 // The SkiaSharp.Views add-in's unit-test suite reads back the pixels the control just presented
 // (the same internal Buffer accessor as above) and registers a fake IDisplayInformationExtension so
 // a host-free test can measure the control at a display scale other than 1.
-[assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views.Unit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views.Tests")]
 
 [assembly: InternalsVisibleTo("SamplesApp")]
 [assembly: InternalsVisibleTo("SamplesApp.Droid")]

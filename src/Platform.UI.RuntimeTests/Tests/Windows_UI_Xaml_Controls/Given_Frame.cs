@@ -7,7 +7,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using Microsoft.UI.Xaml.Media.Animation;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls

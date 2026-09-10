@@ -473,7 +473,7 @@ HOW THIS PACKAGE IS VERIFIED
 
   Run it after any change to the vendored sources or to the SkiaSharp pin:
 
-      dotnet test src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests/CodeBrix.Platform.SkiaSharp.Views.Skia.Unit.Tests.csproj -c Release
+      dotnet test src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests/CodeBrix.Platform.SkiaSharp.Views.Skia.Tests.csproj -c Release
 
   What it cannot cover without a head: Loaded/Unloaded (never raised outside a
   visual tree), a live DPI change from the system, and the on-screen present of

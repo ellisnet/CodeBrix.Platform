@@ -9,7 +9,6 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation.Runtime.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit")]

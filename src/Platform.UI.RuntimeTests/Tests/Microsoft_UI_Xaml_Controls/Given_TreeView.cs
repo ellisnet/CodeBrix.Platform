@@ -34,7 +34,7 @@ using TreeView = Microsoft.UI.Xaml.Controls.TreeView;
 using TreeViewNode = Microsoft.UI.Xaml.Controls.TreeViewNode;
 using TreeViewItem = Microsoft.UI.Xaml.Controls.TreeViewItem;
 using TreeViewList = Microsoft.UI.Xaml.Controls.TreeViewList;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 #if HAS_CODEBRIX
 using Windows.Foundation.Metadata;

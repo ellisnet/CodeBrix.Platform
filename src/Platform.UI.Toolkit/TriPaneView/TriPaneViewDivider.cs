@@ -7,6 +7,11 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Windows.Foundation;
+#if HAS_CODEBRIX
+using PaneMetadata = Microsoft.UI.Xaml.FrameworkPropertyMetadata;
+#else
+using PaneMetadata = Microsoft.UI.Xaml.PropertyMetadata;
+#endif
 
 namespace CodeBrix.Platform.UI.Toolkit;
 
@@ -121,7 +126,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(Orientation),
 			typeof(Orientation),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(Orientation.Vertical, OnOrientationChanged));
+			new PaneMetadata(Orientation.Vertical, OnOrientationChanged));
 
 	/// <summary>
 	/// Gets a value indicating whether the divider is currently acting as the restore grip of a
@@ -139,7 +144,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(IsRestoreGrip),
 			typeof(bool),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(false, OnVisualStatePropertyChanged));
+			new PaneMetadata(false, OnVisualStatePropertyChanged));
 
 	/// <summary>
 	/// Gets a value indicating which way the restore-grip chevron points: <see langword="true"/>
@@ -159,7 +164,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(IsGripTowardStart),
 			typeof(bool),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(false, OnVisualStatePropertyChanged));
+			new PaneMetadata(false, OnVisualStatePropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the brush the divider paints itself with while the pointer is over it. The
@@ -180,7 +185,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(PointerOverBrush),
 			typeof(Brush),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets the brush the divider paints itself with while it is being dragged. The owning
@@ -200,7 +205,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(PressedBrush),
 			typeof(Brush),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets a value indicating whether the divider is currently being dragged. It is set by the
@@ -216,7 +221,7 @@ public sealed partial class TriPaneViewDivider : Control
 			nameof(IsDragging),
 			typeof(bool),
 			typeof(TriPaneViewDivider),
-			new FrameworkPropertyMetadata(false, OnVisualStatePropertyChanged));
+			new PaneMetadata(false, OnVisualStatePropertyChanged));
 
 	/// <summary>
 	/// Cancels a drag in progress, raising <see cref="DragCompleted"/> with its
@@ -292,7 +297,7 @@ public sealed partial class TriPaneViewDivider : Control
 		_capturedPointer = e.Pointer;
 
 		_transformToOrigin = transformToOrigin;
-		_origin = _previousPosition = transformToOrigin.TransformPoint(pointerPoint.RawPosition);
+		_origin = _previousPosition = transformToOrigin.TransformPoint(GetDragPosition(pointerPoint));
 		SetValue(IsDraggingProperty, true);
 
 		try
@@ -316,7 +321,7 @@ public sealed partial class TriPaneViewDivider : Control
 			return;
 		}
 
-		var position = _transformToOrigin.TransformPoint(e.GetCurrentPoint(null).RawPosition);
+		var position = _transformToOrigin.TransformPoint(GetDragPosition(e.GetCurrentPoint(null)));
 
 		if (position.X != _previousPosition.X || position.Y != _previousPosition.Y)
 		{
@@ -440,6 +445,21 @@ public sealed partial class TriPaneViewDivider : Control
 					? InputSystemCursorShape.SizeWestEast
 					: InputSystemCursorShape.SizeNorthSouth)
 			: null;
+
+	/// <summary>
+	/// The drag position of <paramref name="point"/>, in the coordinate space of the window root.
+	/// </summary>
+	/// <remarks>
+	/// CodeBrix.Platform exposes the un-smoothed <c>RawPosition</c> that UWP had; the native WinUI
+	/// <see cref="PointerPoint"/> only exposes <c>Position</c>. Both are expressed in the same
+	/// window-root space that the divider's inverse transform expects.
+	/// </remarks>
+	private static Point GetDragPosition(PointerPoint point)
+#if HAS_CODEBRIX
+		=> point.RawPosition;
+#else
+		=> point.Position;
+#endif
 
 	private void UpdateVisualStates(bool useTransitions)
 	{

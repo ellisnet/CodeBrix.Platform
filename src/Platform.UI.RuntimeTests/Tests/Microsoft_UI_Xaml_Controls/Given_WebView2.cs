@@ -8,7 +8,7 @@ using Private.Infrastructure;
 using Microsoft.UI.Xaml.Controls;
 using System.Runtime.CompilerServices;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 
 #if !HAS_CODEBRIX_WINUI && !WINAPPSDK

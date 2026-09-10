@@ -13,7 +13,7 @@ using Private.Infrastructure;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primitives.PopupPages;
 using static Private.Infrastructure.TestServices.WindowHelper;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primitives //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primitives
 {

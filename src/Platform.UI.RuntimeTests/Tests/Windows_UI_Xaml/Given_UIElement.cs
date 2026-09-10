@@ -34,7 +34,7 @@ using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Hosting;
 using CodeBrix.Platform.UI.Toolkit.Extensions;
 using KeyEventArgs = Windows.UI.Core.KeyEventArgs;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using CodeBrix.Platform.UI.Toolkit.DevTools.Input;
 
 using SilverAssertions.Execution;

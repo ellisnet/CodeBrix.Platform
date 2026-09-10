@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests.Windows")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Unit.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition")]
 

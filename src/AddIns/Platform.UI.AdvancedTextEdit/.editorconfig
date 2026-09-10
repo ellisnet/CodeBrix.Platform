@@ -1,0 +1,19 @@
+# Ported from icsharpcode/AvalonEdit 6.3.2 (commit ed0bd14) - see THIRD-PARTY-NOTICES.txt.
+# The repo turns on AnalysisModePerformance/Globalization=AllEnabledByDefault
+# (src/Directory.Build.props), which fires a large number of micro-optimization and
+# culture suggestions against this vendored code. They are silenced HERE, for this
+# port only, so that future merges from upstream AvalonEdit stay clean; every one of
+# these rules remains enabled for first-party CodeBrix code.
+
+[*.cs]
+dotnet_diagnostic.CA1305.severity = none
+dotnet_diagnostic.CA1805.severity = none
+dotnet_diagnostic.CA1825.severity = none
+dotnet_diagnostic.CA1827.severity = none
+dotnet_diagnostic.CA1830.severity = none
+dotnet_diagnostic.CA1834.severity = none
+dotnet_diagnostic.CA1845.severity = none
+dotnet_diagnostic.CA1846.severity = none
+dotnet_diagnostic.CA1860.severity = none
+dotnet_diagnostic.CA1861.severity = none
+dotnet_diagnostic.CA1865.severity = none

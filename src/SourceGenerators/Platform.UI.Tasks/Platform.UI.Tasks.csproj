@@ -28,7 +28,7 @@
 		<PackageReference Include="Microsoft.Build.Framework" Version="18.9.6" ExcludeAssets="runtime" />
 		<PackageReference Include="Microsoft.Build.Tasks.Core" Version="18.9.6" ExcludeAssets="runtime" />
 		<PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.9.6" ExcludeAssets="runtime" />
-		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.242.973" />
+		<PackageReference Include="CodeBrix.AssemblyTools.MitLicenseForever" Version="1.0.252.4" />
 
     <!--
     We shouldn't need a package reference to System.Security.Cryptography.Xml - but the package is 
@@ -38,7 +38,7 @@
     have a severe vulnerability. Hopefully in the future, the other packages will not try to pull
     in a vulnerable version - and we get rid of this "manual" package reference.
     -->
-		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.11" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>

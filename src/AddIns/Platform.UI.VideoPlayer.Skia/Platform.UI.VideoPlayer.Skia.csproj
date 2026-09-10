@@ -39,7 +39,7 @@
 		     NEVER add CodeBrix.VideoPlayback.Skia back, and never add Dav1d, Opus or .Authoring -
 		     the first two are the application's own choice to register and the third is an
 		     authoring-time tool. -->
-		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.242.1044" />
+		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.252.1212" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
 		     Platform.WinUI.Graphics3DGL as CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever, both at

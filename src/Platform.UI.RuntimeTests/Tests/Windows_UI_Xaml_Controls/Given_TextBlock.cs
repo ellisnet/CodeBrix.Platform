@@ -21,7 +21,7 @@ using SamplesApp.UITests;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.UI.Extensions;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using CodeBrix.Platform.UI.Helpers;
 using Microsoft.UI.Xaml.Markup;
 using CodeBrix.Platform.UI.Toolkit.DevTools.Input;

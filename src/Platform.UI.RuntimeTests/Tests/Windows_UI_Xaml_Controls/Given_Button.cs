@@ -17,7 +17,7 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Color = Windows.UI.Color;
 using Microsoft.UI.Xaml.Data;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using CodeBrix.Platform.UI.Toolkit.DevTools.Input;
 
 

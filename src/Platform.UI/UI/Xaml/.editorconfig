@@ -1,4 +1,5 @@
-# Overrides our root .editorconfig to match https://github.com/microsoft/microsoft-ui-xaml/blob/438e5ebd870f8e090b35140c456ea03f570da42c/.editorconfig
+# Folder-local settings, matching https://github.com/microsoft/microsoft-ui-xaml/blob/438e5ebd870f8e090b35140c456ea03f570da42c/.editorconfig
+# (This repo has no root .editorconfig, so nothing is being overridden - these stand on their own.)
 
 [**.{xaml,xml}]
 indent_style = space

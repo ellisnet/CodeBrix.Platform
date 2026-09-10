@@ -15,20 +15,20 @@
 		     that actually ships, rather than the .Reference API shells (whose bodies throw). -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 
-		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views.Unit.Tests</AssemblyName>
+		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views.Tests</AssemblyName>
 		<RootNamespace>CodeBrix.Platform.SkiaSharp.Views.Tests</RootNamespace>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
 		<PackageReference Include="xunit.v3" Version="4.0.0" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
 	</ItemGroup>
 
 	<!-- This suite really rasterises - it creates raster surfaces, paints them and reads the bytes

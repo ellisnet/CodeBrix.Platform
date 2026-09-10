@@ -28,7 +28,7 @@ using MenuBar = Microsoft.UI.Xaml.Controls.MenuBar;
 using MenuBarItem = Microsoft.UI.Xaml.Controls.MenuBarItem;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Automation.Provider;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls
 {

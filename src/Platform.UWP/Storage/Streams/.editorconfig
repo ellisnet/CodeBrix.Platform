@@ -1,0 +1,17 @@
+# CA1844 ("override the memory-based ReadAsync/WriteAsync as well as the array-based ones")
+# does not apply to the Stream shims in this folder - RentedStream, StreamOverInputStream,
+# StreamOverOutputStream and StreamOverRandomAccessStream.
+#
+# The rule's premise is that a memory-based override can reach the underlying sink without
+# going through a byte[]. These shims sit on the WinRT-shaped surface (IInputStream /
+# IOutputStream / IRandomAccessStream, and IRentableStream), which is array- and
+# IBuffer-based all the way down, so the array overload is where the work has to happen
+# either way. Stream's own base implementation of ReadAsync(Memory<byte>, ...) already does
+# the best thing available here - MemoryMarshal.TryGetArray and then the array overload with
+# no copy, renting from ArrayPool only for the rare non-array-backed Memory<byte> - so an
+# override could match it but never beat it, and would only add code to maintain.
+#
+# Revisit if these shims ever gain a genuinely span-based sink.
+
+[*.cs]
+dotnet_diagnostic.CA1844.severity = none

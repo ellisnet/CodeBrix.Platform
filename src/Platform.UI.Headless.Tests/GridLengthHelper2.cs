@@ -1,0 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+using Microsoft.UI.Xaml;
+
+//Copied verbatim from src/Platform.UI.RuntimeTests/Helpers/GridLengthHelper2.cs (a test
+//helper, not framework code); only the namespace changed.
+namespace CodeBrix.Platform.UI.Headless.Tests
+{
+	class GridLengthHelper2
+	{
+		public static GridLength Auto =>
+			GridLength.Auto;
+
+		internal static GridLength FromValueAndType(double value, GridUnitType pixel) =>
+			new GridLength(value, pixel);
+
+		internal static bool GetIsStar(GridLength sizeHint) =>
+			sizeHint.IsStar;
+
+		internal static bool GetIsAbsolute(GridLength sizeHint) =>
+			sizeHint.IsAbsolute;
+
+		internal static bool GetIsAuto(GridLength sizeHint) =>
+			sizeHint.IsAuto;
+	}
+}

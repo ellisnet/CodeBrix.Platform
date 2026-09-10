@@ -21,7 +21,7 @@ using static Private.Infrastructure.TestServices;
 using Windows.UI.Input.Preview.Injection;
 using Microsoft.UI.Xaml.Automation.Peers;
 using MUXControlsTestApp.Utilities;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using Microsoft.UI.Windowing;
 using Private.Infrastructure;
 using CodeBrix.Platform.UI.Extensions;

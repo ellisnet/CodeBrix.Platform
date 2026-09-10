@@ -77,7 +77,6 @@
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="CodeBrix.Platform.UI.SourceGenerators.Tests" />
-		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Unit.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>

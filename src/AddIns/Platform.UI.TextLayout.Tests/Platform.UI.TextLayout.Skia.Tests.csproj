@@ -16,7 +16,7 @@
 		     suite possible. -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 
-		<AssemblyName>CodeBrix.Platform.UI.TextLayout.Unit.Tests</AssemblyName>
+		<AssemblyName>CodeBrix.Platform.UI.TextLayout.Tests</AssemblyName>
 		<RootNamespace>CodeBrix.Platform.UI.TextLayout.Tests</RootNamespace>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
@@ -31,13 +31,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
 		<PackageReference Include="xunit.v3" Version="4.0.0" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
 	</ItemGroup>
 
 	<!-- Skia and HarfBuzz still need their natives named per-OS: those come from the head packages

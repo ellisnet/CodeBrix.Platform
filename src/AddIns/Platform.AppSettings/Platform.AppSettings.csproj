@@ -30,15 +30,15 @@
 	<ItemGroup>
 		<!-- The SQLite engine behind settings.sqlite. External to the CodeBrix.Platform family, so
 		     this reference is versioned here (not family-locked); bump deliberately. -->
-		<PackageReference Include="CodeBrix.Sqlite.ApacheLicenseForever" Version="1.0.238.153" />
+		<PackageReference Include="CodeBrix.Sqlite.ApacheLicenseForever" Version="1.0.250.22" />
 
 		<!-- ILogger/ILoggerFactory, which AppSettingLoggingService forwards through. Referenced
 		     PUBLICLY on purpose: the Extensions.Logging project reference below is PrivateAssets="all"
 		     (its assembly ships inside the main framework package), so nothing would carry
 		     Microsoft.Extensions.Logging.Abstractions to a consumer otherwise - and the very first
 		     line this add-in logs would fail to JIT with a FileNotFoundException. Version matches the
-		     10.0.11 the family pins for the other Microsoft.Extensions.Logging.* packages. -->
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+		     10.0.12 the family pins for the other Microsoft.Extensions.Logging.* packages. -->
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -31,7 +31,7 @@ using System.Collections.Generic;
 using CodeBrix.Platform.Extensions;
 using Windows.UI.ViewManagement;
 using Private.Infrastructure;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 
 #if WINAPPSDK

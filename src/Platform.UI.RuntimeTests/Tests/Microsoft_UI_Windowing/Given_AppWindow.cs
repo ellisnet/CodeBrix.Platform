@@ -1,7 +1,7 @@
 ﻿#if HAS_CODEBRIX_WINUI || WINDOWS
 using System;
 using System.Threading.Tasks;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using SilverAssertions;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;

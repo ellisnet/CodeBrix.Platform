@@ -19,7 +19,7 @@ using DependencyObjectExtensions = CodeBrix.Platform.UI.Extensions.DependencyObj
 using static Private.Infrastructure.TestServices.WindowHelper;
 using Microsoft.UI.Xaml.Shapes;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 
 using SilverAssertions.Execution;

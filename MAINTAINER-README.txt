@@ -167,7 +167,7 @@ Microsoft.Testing.Platform per global.json):
 
   Framework:
     src/Platform.UI/Platform.UI.Tests.csproj
-    src/Platform.UI.Tests/Platform.UI.Unit.Tests.csproj (+ Tests.ViewLibrary,
+    src/Platform.UI.Tests/Platform.UI.Automated.Tests.csproj (+ Tests.ViewLibrary,
         Tests.ViewLibraryProps helper projects)
     src/Platform.UWP/Platform.Tests.csproj
     src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj
@@ -178,7 +178,7 @@ Microsoft.Testing.Platform per global.json):
     src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj
     src/Platform.UI.FluentTheme{,.v1,.v2}/*.Tests.csproj
     src/Platform.UI.Toolkit/Platform.UI.Toolkit.Tests.csproj and
-    src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Unit.Tests.csproj
+    src/Platform.UI.Toolkit.Tests/Platform.UI.Toolkit.Automated.Tests.csproj
     src/Platform.Analyzers.Tests/Platform.Analyzers.Tests.csproj
     src/SourceGenerators/Platform.UI.SourceGenerators.Tests/
     src/SourceGenerators/XamlGenerationTests/
@@ -187,7 +187,7 @@ Microsoft.Testing.Platform per global.json):
     Platform.UI.CommandBar.Tests, Platform.UI.FlexPanel.Tests,
     Platform.UI.PlotterView.Tests, Platform.UI.TerminalView.Tests,
     Platform.UI.TextLayout.Tests, Platform.UI.VideoPlayer.Tests,
-    CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Unit.Tests.csproj),
+    CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Tests.csproj),
     src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
 
     CodeBrix.Platform.SkiaSharp.Views.Tests is the guard for a SkiaSharp version

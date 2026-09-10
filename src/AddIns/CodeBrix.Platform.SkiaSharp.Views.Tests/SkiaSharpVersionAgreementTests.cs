@@ -32,7 +32,7 @@ public class SkiaSharpVersionAgreementTests
 
 		//Assert
 		//A partial bump surfaces as SkiaSharp's own message - measured by swapping a 4.150.1
-		//libSkiaSharp under a 4.151.0 managed assembly: "The version of the native libSkiaSharp
+		//libSkiaSharp under a 4.152.0 managed assembly: "The version of the native libSkiaSharp
 		//library (150.0) is incompatible with this version of SkiaSharp. Supported versions of the
 		//native libSkiaSharp library are in the range [151.0, 152.0)." It arrives wrapped in a
 		//TypeInitializationException, because reading the native version is the first thing that

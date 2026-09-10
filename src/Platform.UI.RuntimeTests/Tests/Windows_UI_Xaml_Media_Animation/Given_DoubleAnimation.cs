@@ -14,7 +14,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Shapes;
 using static Private.Infrastructure.TestServices;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animation //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animation
 {

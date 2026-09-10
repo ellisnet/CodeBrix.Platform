@@ -23,7 +23,7 @@ using Windows.UI.Input.Preview.Injection;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.UI.RuntimeTests.Tests.Platform_UI_Xaml_Core;
 using System.Numerics;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using CodeBrix.Platform.UI.Toolkit.DevTools.Input;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was previously: Uno.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls

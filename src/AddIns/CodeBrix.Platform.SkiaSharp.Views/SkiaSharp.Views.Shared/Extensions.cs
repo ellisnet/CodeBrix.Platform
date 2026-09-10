@@ -2,8 +2,8 @@
 
 namespace SkiaSharp.Views
 {
-	// NOTE (CodeBrix, SkiaSharp 4.151.0): the probe below no longer works, upstream included.
-	// As of SkiaSharp 4.151.0 SKPMColor.PreMultiply is implemented entirely in managed code and
+	// NOTE (CodeBrix, SkiaSharp 4.152.0): the probe below no longer works, upstream included.
+	// As of SkiaSharp 4.152.0 SKPMColor.PreMultiply is implemented entirely in managed code and
 	// no longer P/Invokes into libSkiaSharp, so it can never throw DllNotFoundException and
 	// IsValidEnvironment always returns true — even in a designer with no native library loaded.
 	// Nothing in CodeBrix.Platform calls IsValidEnvironment, so this is currently harmless, but do

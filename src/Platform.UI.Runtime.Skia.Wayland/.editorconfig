@@ -1,0 +1,8 @@
+# Wayland_Interop/ is vendored third-party code (MIT, Copyright (c) 2014 Steven Kirk),
+# and the sibling Wayland_Bindings/ is generated - MAINTAINER-README.txt says to
+# regenerate it rather than edit it by hand. Silence the design rules that fire on
+# those interop value types and attributes; they stay enabled everywhere else.
+
+[Wayland_Interop/**.cs]
+dotnet_diagnostic.CA1813.severity = none
+dotnet_diagnostic.CA1815.severity = none

@@ -28,10 +28,9 @@
 	-->
 
 	<ItemGroup>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
 		<PackageReference Include="MSTest.TestFramework" />
 		<PackageReference Include="MSTest.Analyzers" />
-		<PackageReference Include="Combinatorial.MSTest" />
 	</ItemGroup>
 
 	<!-- CodeBrix.Platform fork: SamplesApp.UITests Compile includes removed (SamplesApp folder dropped). -->

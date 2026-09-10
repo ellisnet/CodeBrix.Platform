@@ -5,6 +5,11 @@ using CodeBrix.Platform.UI.Toolkit.Internal;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+#if HAS_CODEBRIX
+using PaneMetadata = Microsoft.UI.Xaml.FrameworkPropertyMetadata;
+#else
+using PaneMetadata = Microsoft.UI.Xaml.PropertyMetadata;
+#endif
 
 namespace CodeBrix.Platform.UI.Toolkit;
 
@@ -31,7 +36,7 @@ public sealed partial class TriPaneView
 			nameof(SidePane),
 			typeof(UIElement),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets the content of the upper pane of the stack. The default is
@@ -55,7 +60,7 @@ public sealed partial class TriPaneView
 			nameof(UpperPane),
 			typeof(UIElement),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets the content of the lower pane of the stack. The default is
@@ -79,7 +84,7 @@ public sealed partial class TriPaneView
 			nameof(LowerPane),
 			typeof(UIElement),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets which edge the side pane occupies. The default is
@@ -106,7 +111,7 @@ public sealed partial class TriPaneView
 			nameof(SidePanePlacement),
 			typeof(TriPaneViewSidePanePlacement),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewSidePanePlacement.Left, OnPlacementPropertyChanged));
+			new PaneMetadata(TriPaneViewSidePanePlacement.Left, OnPlacementPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the width weight of the side pane, on a nominal 0-to-100 scale. It is paired
@@ -134,7 +139,7 @@ public sealed partial class TriPaneView
 			nameof(SidePanePercent),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewLayoutMath.DefaultSidePanePercent, OnWeightPropertyChanged));
+			new PaneMetadata(TriPaneViewLayoutMath.DefaultSidePanePercent, OnWeightPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the width weight of the stack - the column holding the upper and lower panes -
@@ -159,7 +164,7 @@ public sealed partial class TriPaneView
 			nameof(StackPercent),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewLayoutMath.DefaultStackPercent, OnWeightPropertyChanged));
+			new PaneMetadata(TriPaneViewLayoutMath.DefaultStackPercent, OnWeightPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the height weight of the upper pane, on a nominal 0-to-100 scale. It is paired
@@ -182,7 +187,7 @@ public sealed partial class TriPaneView
 			nameof(UpperPanePercent),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewLayoutMath.DefaultUpperPanePercent, OnWeightPropertyChanged));
+			new PaneMetadata(TriPaneViewLayoutMath.DefaultUpperPanePercent, OnWeightPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the height weight of the lower pane, on a nominal 0-to-100 scale. It is paired
@@ -205,7 +210,7 @@ public sealed partial class TriPaneView
 			nameof(LowerPanePercent),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewLayoutMath.DefaultLowerPanePercent, OnWeightPropertyChanged));
+			new PaneMetadata(TriPaneViewLayoutMath.DefaultLowerPanePercent, OnWeightPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the smallest width, in pixels, the side pane may be given while it is open. The
@@ -229,7 +234,7 @@ public sealed partial class TriPaneView
 			nameof(SidePaneMinLength),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(0d, OnLayoutPropertyChanged));
+			new PaneMetadata(0d, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the smallest width, in pixels, the stack may be given while it is open. The
@@ -253,7 +258,7 @@ public sealed partial class TriPaneView
 			nameof(StackMinLength),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(0d, OnLayoutPropertyChanged));
+			new PaneMetadata(0d, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the smallest height, in pixels, the upper pane may be given while it is open.
@@ -277,7 +282,7 @@ public sealed partial class TriPaneView
 			nameof(UpperPaneMinLength),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(0d, OnLayoutPropertyChanged));
+			new PaneMetadata(0d, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the smallest height, in pixels, the lower pane may be given while it is open.
@@ -301,7 +306,7 @@ public sealed partial class TriPaneView
 			nameof(LowerPaneMinLength),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(0d, OnLayoutPropertyChanged));
+			new PaneMetadata(0d, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the user may drag the side divider. The default is
@@ -326,7 +331,7 @@ public sealed partial class TriPaneView
 			nameof(CanUserDragSideDivider),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(true, OnLayoutPropertyChanged));
+			new PaneMetadata(true, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the user may drag the stack divider. The default is
@@ -351,7 +356,7 @@ public sealed partial class TriPaneView
 			nameof(CanUserDragStackDivider),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(true, OnLayoutPropertyChanged));
+			new PaneMetadata(true, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the thickness, in pixels, of each divider: the width of the side divider and the
@@ -374,7 +379,7 @@ public sealed partial class TriPaneView
 			nameof(DividerThickness),
 			typeof(double),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(DefaultDividerThickness, OnLayoutPropertyChanged));
+			new PaneMetadata(DefaultDividerThickness, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the brush the dividers paint themselves with at rest. The default style binds it
@@ -394,7 +399,7 @@ public sealed partial class TriPaneView
 			nameof(DividerBrush),
 			typeof(Brush),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets the brush the dividers paint themselves with while the pointer is over them. The
@@ -414,7 +419,7 @@ public sealed partial class TriPaneView
 			nameof(DividerPointerOverBrush),
 			typeof(Brush),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets the brush the dividers paint themselves with while they are being dragged. The
@@ -434,7 +439,7 @@ public sealed partial class TriPaneView
 			nameof(DividerPressedBrush),
 			typeof(Brush),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(null));
+			new PaneMetadata(null));
 
 	/// <summary>
 	/// Gets or sets a value indicating what a drag does when it asks a pane for less than its
@@ -466,7 +471,7 @@ public sealed partial class TriPaneView
 			nameof(IsDragToMinimizeEnabled),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(false));
+			new PaneMetadata(false));
 
 	/// <summary>
 	/// Gets or sets when a minimized pane keeps a visible restore grip. The default is
@@ -486,7 +491,7 @@ public sealed partial class TriPaneView
 			nameof(RestoreGripMode),
 			typeof(TriPaneViewRestoreGripMode),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewRestoreGripMode.Auto, OnLayoutPropertyChanged));
+			new PaneMetadata(TriPaneViewRestoreGripMode.Auto, OnLayoutPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the side pane is minimized. Setting it to
@@ -513,7 +518,7 @@ public sealed partial class TriPaneView
 			nameof(IsSidePaneMinimized),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(false, OnIsSidePaneMinimizedChanged));
+			new PaneMetadata(false, OnIsSidePaneMinimizedChanged));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the upper pane is minimized. Setting it to
@@ -541,7 +546,7 @@ public sealed partial class TriPaneView
 			nameof(IsUpperPaneMinimized),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(false, OnIsUpperPaneMinimizedChanged));
+			new PaneMetadata(false, OnIsUpperPaneMinimizedChanged));
 
 	/// <summary>
 	/// Gets or sets a value indicating whether the lower pane is minimized. Setting it to
@@ -569,7 +574,7 @@ public sealed partial class TriPaneView
 			nameof(IsLowerPaneMinimized),
 			typeof(bool),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(false, OnIsLowerPaneMinimizedChanged));
+			new PaneMetadata(false, OnIsLowerPaneMinimizedChanged));
 
 	/// <summary>
 	/// Gets or sets the vertical scroll bar visibility of the side pane. The default is
@@ -593,7 +598,7 @@ public sealed partial class TriPaneView
 			nameof(SidePaneVerticalScrollBarVisibility),
 			typeof(ScrollBarVisibility),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
+			new PaneMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the vertical scroll bar visibility of the upper pane. The default is
@@ -617,7 +622,7 @@ public sealed partial class TriPaneView
 			nameof(UpperPaneVerticalScrollBarVisibility),
 			typeof(ScrollBarVisibility),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
+			new PaneMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets the vertical scroll bar visibility of the lower pane. The default is
@@ -641,7 +646,7 @@ public sealed partial class TriPaneView
 			nameof(LowerPaneVerticalScrollBarVisibility),
 			typeof(ScrollBarVisibility),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
+			new PaneMetadata(ScrollBarVisibility.Auto, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets how the side pane scrolls horizontally. The default is
@@ -661,7 +666,7 @@ public sealed partial class TriPaneView
 			nameof(SidePaneHorizontalScrollMode),
 			typeof(TriPaneViewHorizontalScrollMode),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
+			new PaneMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets how the upper pane scrolls horizontally. The default is
@@ -681,7 +686,7 @@ public sealed partial class TriPaneView
 			nameof(UpperPaneHorizontalScrollMode),
 			typeof(TriPaneViewHorizontalScrollMode),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
+			new PaneMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Gets or sets how the lower pane scrolls horizontally. The default is
@@ -701,7 +706,7 @@ public sealed partial class TriPaneView
 			nameof(LowerPaneHorizontalScrollMode),
 			typeof(TriPaneViewHorizontalScrollMode),
 			typeof(TriPaneView),
-			new FrameworkPropertyMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
+			new PaneMetadata(TriPaneViewHorizontalScrollMode.Disabled, OnScrollPropertyChanged));
 
 	/// <summary>
 	/// Occurs when the user finishes interacting with either divider. The pane weights have already

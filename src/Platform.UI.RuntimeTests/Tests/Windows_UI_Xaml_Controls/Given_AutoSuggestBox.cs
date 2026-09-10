@@ -20,7 +20,7 @@ using static Microsoft.UI.Xaml.Controls.AutoSuggestionBoxTextChangeReason;
 using SamplesApp.UITests;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
 using Windows.Foundation;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 #if false
 using UIKit;

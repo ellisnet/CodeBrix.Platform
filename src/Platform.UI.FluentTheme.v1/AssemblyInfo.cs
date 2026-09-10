@@ -7,7 +7,6 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Unit.Tests")]
 
 [assembly: AssemblyMetadata("IsTrimmable", "True")]
 

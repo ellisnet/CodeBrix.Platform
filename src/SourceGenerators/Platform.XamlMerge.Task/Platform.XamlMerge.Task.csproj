@@ -19,6 +19,16 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsTool>true</IsTool>
+
+		<!--
+		The _copyTasksBuildTime target below refreshes a shadow copy of this task assembly, and
+		carries ContinueOnError="true" precisely because an MSBuild node that has already loaded
+		the previous shadow copy still holds a lock on it. That is expected and harmless - the
+		stale copy is functionally identical - but ContinueOnError leaves the copy failure behind
+		as MSB3021/MSB3026/MSB3027 warnings on every build. Report the expected condition as a
+		message instead, so a real warning here is not lost in the noise.
+		-->
+		<MSBuildWarningsAsMessages>MSB3021;MSB3026;MSB3027</MSBuildWarningsAsMessages>
 		<AssemblyName>CodeBrix.Platform.XamlMerge.Task.v0</AssemblyName>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
@@ -37,7 +47,7 @@
     have a severe vulnerability. Hopefully in the future, the other packages will not try to pull
     in a vulnerable version - and we get rid of this "manual" package reference.
     -->
-		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.11" />
+		<PackageReference Include="System.Security.Cryptography.Xml" Version="10.0.12" />
 	</ItemGroup>
 
 	<Target Name="_copyTasksBuildTime" AfterTargets="Build">

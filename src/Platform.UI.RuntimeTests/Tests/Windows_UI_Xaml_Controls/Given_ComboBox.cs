@@ -25,7 +25,7 @@ using Windows.UI.Input.Preview.Injection;
 using static Private.Infrastructure.TestServices;
 using ComboBoxHelper = Microsoft.UI.Xaml.Tests.Common.ComboBoxHelper;
 using CodeBrix.Platform.UI.Extensions;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 using CodeBrix.Platform.UI.Toolkit.DevTools.Input;
 
 #if false

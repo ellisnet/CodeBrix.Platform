@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Unit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Tests")]

@@ -72,10 +72,10 @@
 	</Target>
 
 	<PropertyGroup>
-		<MSTestVersion>4.3.3</MSTestVersion>
+		<MSTestVersion>4.4.0</MSTestVersion>
 		<MicrosoftTestingPlatformVersion>2.2.3</MicrosoftTestingPlatformVersion>
-		<SkiaSharpVersion>4.151.0</SkiaSharpVersion>
-		<HarfBuzzSharpVersion>14.2.1.1</HarfBuzzSharpVersion>
+		<SkiaSharpVersion>4.152.0</SkiaSharpVersion>
+		<HarfBuzzSharpVersion>14.2.1.200</HarfBuzzSharpVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -84,7 +84,6 @@
 		<PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
 		<PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
 		<PackageReference Update="MSTest.Analyzers" Version="$(MSTestVersion)" />
-		<PackageReference Update="Combinatorial.MSTest" Version="2.0.0" />
 
 		<PackageReference Update="NUnit" Version="4.6.0" />
 		<PackageReference Update="NUnit3TestAdapter" Version="6.2.0" />
@@ -106,8 +105,8 @@
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetPrevious)' " Update="Microsoft.Win32.SystemEvents" Version="9.0.0" />
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.0-rc.2.25502.107" />
 
-		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.11" />
-		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
+		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
+		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
 		<PackageReference Update="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvmVersion)" />
 		<PackageReference Update="Microsoft.Web.WebView2" Version="1.0.4191.47" />
 	</ItemGroup>

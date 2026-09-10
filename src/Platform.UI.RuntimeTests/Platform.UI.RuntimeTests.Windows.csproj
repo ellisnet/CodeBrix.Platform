@@ -6,7 +6,14 @@
 		<RootNamespace>CodeBrix.Platform.UI.RuntimeTests</RootNamespace>
 
 		<DefineConstants>$(DefineConstants);IS_RUNTIME_UI_TESTS</DefineConstants>
-		<NoWarn>$(NoWarn);CS1998</NoWarn>
+		<!--
+		WMC1506 (a OneWay binding whose source raises no change notification) fires on
+		Tests/Windows_UI_Xaml/Controls/When_xLoad_Order.xaml, where that is the point of the
+		fixture: the x:Load sources are plain auto-properties and the test drives them by
+		calling Bindings.Update() by hand, so it can control x:Load ordering. Giving them change
+		notification would change what the test exercises.
+		-->
+		<NoWarn>$(NoWarn);CS1998;WMC1506</NoWarn>
 		<UseWinUI>true</UseWinUI>
 		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
 
@@ -33,10 +40,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.237.1200" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
 		<PackageReference Include="MSTest.TestFramework" />
 		<PackageReference Include="MSTest.Analyzers" />
-		<PackageReference Include="Combinatorial.MSTest" />
 		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Windows.csproj" />
 	</ItemGroup>
 

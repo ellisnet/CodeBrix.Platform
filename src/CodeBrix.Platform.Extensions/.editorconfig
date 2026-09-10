@@ -1,0 +1,6 @@
+# CA1848 wants LoggerMessage delegates, which need a compile-time message template.
+# LogExtensions.Conditional.cs builds its message from a runtime Func<string>, so the
+# rule cannot apply there; it stays enabled for ordinary call sites elsewhere.
+
+[*.cs]
+dotnet_diagnostic.CA1848.severity = none

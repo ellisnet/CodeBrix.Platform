@@ -4,7 +4,7 @@ using Private.Infrastructure;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
 using Microsoft.UI.Xaml.Controls;
 using CodeBrix.Platform.Extensions.Disposables;
-using Combinatorial.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting.Combinatorial;
 
 namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Microsoft_UI_Xaml_Controls.ProgressRingTests; //Was previously: Uno.UI.RuntimeTests.MUX.Microsoft_UI_Xaml_Controls.ProgressRingTests
 
