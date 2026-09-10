@@ -9,6 +9,13 @@
 		<CodeBrixForceHotReloadCodeGen>true</CodeBrixForceHotReloadCodeGen>
 		<AssemblyName>CodeBrix.Platform.UI.Tests</AssemblyName>
 		<RootNamespace>CodeBrix.Platform.UI.Tests</RootNamespace>
+
+		<!-- MSTest 4.4.0+ copies its 13 culture satellite DLLs as Content items. This project imports
+		     Platform.UI.Tasks.targets, whose library-asset layout re-roots every copy-to-output Content
+		     item under $(AssemblyName)/ - and on Linux that folder name collides with the extensionless
+		     apphost file of this test Exe (MSB3021/MSB3027). Skip the satellite copy; MSTest's own
+		     diagnostic messages then stay in English, which is all the test run needs. -->
+		<EnableMSTestV2CopyResources>false</EnableMSTestV2CopyResources>
 	</PropertyGroup>
 
 	<Import Project="../targetframework-override.props" />
