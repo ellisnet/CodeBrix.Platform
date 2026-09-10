@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>$(NetUnitTests)</TargetFramework>
@@ -20,7 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.9.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
 		<PackageReference Include="xunit.v3" Version="4.0.0" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -46,7 +46,7 @@
 		     $(IsCodeBrixHead) bootstrap is needed for that. -->
 		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfBuzzSharpVersion)" />
-		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.242.1407" />
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.249.1295" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
@@ -55,7 +55,7 @@
 		     pull the data library in through icuuc's load commands. -->
 		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
-		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.242.1407" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.249.1295" />
 	</ItemGroup>
 
 	<ItemGroup>
