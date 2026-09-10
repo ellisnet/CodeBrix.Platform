@@ -196,6 +196,252 @@ Microsoft.Testing.Platform per global.json):
     presented pixels. Run it after changing $(SkiaSharpVersion) in
     src/Directory.Build.targets, before launching any head.
 
+UI REQUIREMENTS (UIReqs): a second kind of test project, and the only one in
+this repository that looks at rendered pixels. Requirements are written as
+Gherkin feature files; Reqnroll generates one xunit v3 test per scenario at
+build time and the Microsoft Testing Platform runs them - nobody hand-writes a
+[Fact]. A scenario builds a piece of user interface in C#, drives it with
+touch and key input, and then states what must be true: geometry and state
+come from the visual tree, appearance comes from the frame the renderer
+actually published. Every scenario runs in BOTH panel orientations. One
+process is one orientation, so the same source tree is built twice - as the
+Landscape project and as its Portrait twin:
+
+    src/UIReqs/Platform.UI.Core/Platform.UI.Core.UIReqs.csproj
+        the Landscape run (1920 x 1080 panel), and the project that later
+        add-in UIReqs projects reference for the hosting and the canvas
+        vocabulary
+    src/UIReqs/Platform.UI.Core.Portrait/Platform.UI.Core.UIReqs.Portrait.csproj
+        the Portrait run (1080 x 1920 panel)
+
+Frames come from the in-process test target of the Emulated frame-buffer head
+(see THE EMULATED HEAD'S TEST-TARGET MODE below), so a run needs no display,
+no desktop session and no window - but that head is Linux-only, and so is the
+suite. Both projects sit in the "UI Requirements" solution folder of
+CodeBrix.Platform.Linux.slnx, so one solution-wide run covers both
+orientations:
+
+    dotnet test --solution CodeBrix.Platform.Linux.slnx -c Release
+    dotnet test --project src/UIReqs/Platform.UI.Core/Platform.UI.Core.UIReqs.csproj -c Release
+    dotnet test --project src/UIReqs/Platform.UI.Core.Portrait/Platform.UI.Core.UIReqs.Portrait.csproj -c Release
+
+One coverage group at a time - the generated class namespace is
+<RootNamespace>.Features.<Group>, so one filter matches in both assemblies:
+
+    dotnet test --project src/UIReqs/Platform.UI.Core/Platform.UI.Core.UIReqs.csproj \
+        -c Release -- --filter-class "*Features.Text*"
+
+Everything after the bare -- goes to the runner. Each assembly is also
+self-executing, which is the quickest way to cross-check a count or to see an
+option rejected by name:
+
+    dotnet src/UIReqs/Platform.UI.Core/bin/Release/net10.0/CodeBrix.Platform.UI.Core.UIReqs.dll
+
+A failing scenario saves the frame it was looking at to
+<test project>/TestResults/UIReqs/<feature>/<scenario>.png and attaches it to
+the test result. That path is per project, so the two orientations never
+collide, and it is already gitignored. The failure message carries the canvas
+report with it: the region and its size, the frame's sequence and render
+generation, the panel background, the top five colours with percentages, the
+ink bounds and the ink share, and the path of that PNG.
+
+Every frame a PASSING scenario looked at can be kept too, for review by eye.
+Set CODEBRIX_UIREQS_FRAME_SAVE to a folder and the run saves every frame it
+evaluates under <folder>/<Orientation>/<Domain>/<feature file>/ - the
+orientation keeps the two concurrent assemblies apart, the domain is the
+Features sub-folder, and a copy of the .feature source is put in each feature
+folder so the requirement and its pictures sit together. A PNG is named
+Scenario<N>_<slugged scenario title>_<capture number>[_<capture name>].png,
+where N is the scenario's position in that feature file; a re-run replaces the
+frames of the scenarios it runs rather than piling more beside them. The
+folder is created if it is missing, and if it cannot be created or written to
+the run says so in one line and carries on without saving. With the variable
+unset nothing is read, created or written, and the run behaves exactly as it
+does without the feature.
+
+COVERAGE. 266 scenarios per orientation at the time of writing: 265 pass and
+one is skipped, the skip being the Harness group's orientation-tagged scenario
+that belongs to the other panel (@landscape-only and @portrait-only are the
+only way a scenario is excluded from one of the two runs). By coverage group,
+again at the time of writing:
+
+    Harness     10  harness smoke: the panel size, a Border fill, TextBlock
+                    ink, a Button tap, the between-scenario reset, and the
+                    orientation tags (the one skip per run is in the Harness
+                    group)
+    Layout      56  layout and visuals: Grid, StackPanel, Canvas, Border, the
+                    shapes, solid and gradient brushes, Opacity and
+                    Visibility, RenderTransform, Clip,
+                    margin/padding/alignment
+    Text        28  text: TextBlock appearance and wrapping, TextBox focus,
+                    typing, MaxLength and read-only, PasswordBox masking
+    Buttons     36  buttons and toggles: Button, Command and CanExecute,
+                    ToggleButton, CheckBox, RadioButton, ToggleSwitch,
+                    HyperlinkButton, RepeatButton, SplitButton, DropDownButton
+    Range       21  range and progress: Slider, ProgressBar, ProgressRing,
+                    RatingControl, ScrollBar
+    Items       35  items and selection: ListView, GridView, ComboBox,
+                    ItemsControl, ItemsRepeater, FlipView, TreeView, Pivot,
+                    TabView, SelectorBar
+    Popups      22  popups and dialogs: Flyout, MenuFlyout, Popup,
+                    ContentDialog, TeachingTip, InfoBar
+    Navigation  32  navigation and containers: Frame, NavigationView,
+                    SplitView, Expander, ScrollViewer, TwoPaneView
+    ThemeFocus  26  theme, focus, keyboard, animation and images: the dark
+                    theme, focus visuals and Tab, Enter/Space/Escape,
+                    Storyboard, VisualState, and Image under each Stretch mode
+
+ADDING A COVERAGE GROUP. Feature files go in Features/<Group>/, one file per
+control. Step definitions go in Steps/<Group>Steps.cs, one [Binding] class per
+file - read the sentences the existing step classes already define first,
+because a near-duplicate makes both definitions match and the scenario fails as
+ambiguous. Any new assertion primitive goes in a partial
+Canvas/CanvasAssert.<Group>.cs, never inline in a step. Element kinds,
+settable properties and colour names are taught to the shared tables through
+the public ElementFactory.RegisterKind / RegisterProperty and
+Colors.RegisterName, called from the group's own [BeforeTestRun] hook - never
+by editing those files. One name means one thing to the whole assembly:
+registering a name another group has taken, with a different implementation
+behind it, throws rather than quietly winning, so anything that is not
+universal gets a control-specific name ("RatingValue", not "Value").
+Registering the identical delegate again is allowed, so a registration hook may
+safely run twice. The Portrait twin needs no edit at all.
+
+MAINTENANCE FACTS, none of them obvious from the source:
+
+  - The Portrait project is a twin, not a copy: it links every .cs and every
+    .feature of the Landscape project and carries only its own
+    PanelOrientation.cs, which is the one file it excludes from the link. It
+    does need a PHYSICAL reqnroll.json of its own, though - the generator only
+    reads a reqnroll.json that Exists() in the project directory, so a linked
+    one is honoured at run time and invisible at generation time. Keep the two
+    files identical.
+  - ReqnrollUseIntermediateOutputPathForCodeBehind is mandatory in BOTH
+    projects. Without it Reqnroll writes <Feature>.feature.cs beside the
+    .feature file, which means the twin writes its generated code into the
+    Landscape project's source folder: every scenario then exists twice, and
+    the next build warns about stale code-behind and spoils the 0-warning gate.
+  - Neither project name contains "Test", so src/Directory.Build.props does not
+    turn the analyzers down for them: NetAnalyzers runs at AllEnabledByDefault
+    for performance and globalization, under warnings-as-errors. Fix at source;
+    no NoWarn, no #pragma.
+  - The font packages' .ttf files AND their .ttf.manifest files are copied
+    beside the test Exe by the _UIReqsCopyFontAssets target. A head does this
+    through the XAML asset machinery, which these projects deliberately do not
+    import. The manifest is how the text engine resolves a FontWeight to the
+    right face; without it every weight renders as the one face the URI names.
+    Both steps of that target are hard errors, because a missing font renders
+    as nothing and only a pixel assertion would notice.
+  - The module initializer that loads the native text library is generated for
+    heads only, so Hosting/TextEngineBootstrap.cs calls the framework's
+    internal EnsureEngineInitialized by reflection from the virtual
+    application's constructor - the same thing the two host-free add-in test
+    projects do. Without it the first TextBlock measure throws
+    ArgumentNullException on the 'handle' parameter.
+  - --report-trx needs the Microsoft.Testing.Extensions.TrxReport package (the
+    test SDK brings only its abstractions), and ANY runner option the platform
+    does not recognise is reported as "Zero tests ran" with exit code 5 rather
+    than as a bad argument. Try a new option by running the assembly directly
+    first, where it is named in the error.
+  - The between-scenario reset closes every popup a scenario left open before
+    it clears the content: a Flyout, a MenuFlyout, a ContentDialog and a bare
+    Popup are hosted BESIDE the application's root, so emptying the root does
+    not take them off the panel, and a light-dismiss layer left over the panel
+    would swallow the next scenario's first tap. A group that opens popups
+    needs no cleanup of its own; a Harness scenario fences that.
+
+DELIBERATELY OUT OF SCOPE: hover of every kind - the panel is touch-only, so
+there is no pointer-over state to reach and ToolTip cannot be tested at all;
+golden-image comparison, which is brittle and machine-dependent; and OCR - text
+CONTENT is asserted on the tree, and only its appearance on pixels.
+
+FRAMEWORK GAPS THE SUITE FOUND AND DID NOT PAPER OVER. Each was measured and
+then left alone, because closing it is a framework feature rather than a small
+fix; no scenario asserts the behaviour a gap describes, in either direction, so
+none of these gaps is frozen into a requirement:
+
+  - RichTextBlock draws nothing on the Skia runtime. The control is a bare
+    FrameworkElement carrying a Blocks collection, marked not implemented, with
+    no measure, no arrange and no rendering.
+  - TextBlock.TextTrimming is never read by the Skia text formatter: text is
+    clipped at the block's edge and no ellipsis is drawn, whatever the property
+    says.
+  - A swipe that carries a FlipView past about half a page turns TWO pages
+    rather than one. A short swipe does turn exactly one page, and a scenario
+    asserts that; but the mandatory-snap arithmetic adds one whole snap
+    interval to the LIVE, mid-pan offset and then rounds that sum to the
+    nearest snap point (ScrollViewer.AdjustOffsetsForSnapPoints, and
+    AdjustOffsetWithMandatorySnapPoints under it), so a finger that has already
+    taken the content more than half way lands two pages on and FlipView
+    selects the item it came to rest over. It is a known issue: the runtime
+    test When_TouchMoveMoreThanHalfItem_Then_FlipOneItem is ignored on Skia for
+    exactly this. No scenario asserts the two-page behaviour.
+  - A selected GridView tile is not filled with the accent colour a ListView
+    row gets: the fallback tile template draws a selection border and a check
+    instead of the fill its theme dictionary names.
+  - The Image element lays itself out around its picture rather than around the
+    box it was given, under Uniform, UniformToFill and None - so an Image's
+    device rectangle is not the box the scenario asked for, and the Image
+    scenarios are written about the picture instead.
+  - A Button's painted fill is not the brush its Background property reports on
+    this build: the same low-alpha fill is painted in both themes, so no
+    scenario names a Button's fill colour.
+
+THE EMULATED HEAD'S TEST-TARGET MODE is what those scenarios run on:
+src/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated has a second front door
+beside UseLinuxFrameBuffer(). It is purely ADDITIVE - the CodeBrix.Develop
+emulator path (FrameBufferHost, EmulatorConnection, the CODEBRIX_FBEMU_*
+contract, the shared memory, the socket, the _exit-on-disconnect semantics) is
+untouched, and the two front doors share the renderer through one internal
+transport interface.
+
+    var session = LinuxTestTarget.Setup(TestDisplayOrientation.Landscape);
+    await session.LaunchAsync(() => new MyVirtualApp(), timeout);
+
+Setup configures and runs nothing; the application's builder chain then names
+the mode with UseLinuxTestTarget(session), and LaunchAsync starts the host on a
+thread of its own and returns once the first frame has been published.
+TestTargetSession is the whole handle:
+
+  - RequestFrameAsync(timeout) is the frame call to reach for. It renders TWO
+    passes on purpose. The compositor DRAWS the picture it recorded last and
+    RECORDS the current tree on the UI thread, and it only queues that
+    recording when a frame is asked for - so a single pass publishes the panel
+    as it was BEFORE whatever was just applied. The first pass makes the
+    compositor record the tree as it is now, a lowest-priority dispatcher drain
+    lets the UI thread run that recording, and the second pass draws it.
+  - WaitForFrameAsync(afterSequence, timeout) makes the weaker promise: a frame
+    ARRIVED after that sequence number, not that it shows anything particular.
+  - CaptureLatestFrame() returns the last published frame with no waiting.
+  - TouchPress / TouchMove / TouchRelease / Tap and KeyDown / KeyUp / TypeText
+    go through the very methods the emulator's socket input thread calls, so a
+    scenario's finger and a person's finger take the same path.
+  - RunOnUIThreadAsync(...) is the only way to touch the tree.
+  - ShutdownAsync(timeout) calls Application.Current.Exit() on the UI thread,
+    which opens the termination gate, ends the run loop and lets the host
+    thread finish. Nothing in this mode can end the process: there is no _exit
+    anywhere in it.
+
+TestFrame is a deliberately small immutable BGRA snapshot - Width, Height,
+Sequence, RenderGeneration, GetPixel, ToBitmap, SavePng. The assertion
+vocabulary belongs to the consumer, not to a shipped head.
+
+The fixed facts of the mode: ONE virtual application per process, because the
+window wrapper, the pointer source and the dispatcher overrides are all
+process-wide (LinuxTestTarget.Setup throws on a second call); the panel is
+1920 x 1080 Landscape or 1080 x 1920 Portrait, chosen once for the life of the
+process and never rotated, with the application laid out upright either way;
+the display scale is fixed at 1.0 so a logical pixel is a device pixel, and
+CODEBRIX_DISPLAY_SCALE_OVERRIDE is deliberately NOT consulted, so nothing
+outside the process can skew a run; and the host thread is a background thread,
+so a host that somehow gets stuck can never be the reason a test runner refuses
+to exit.
+
+Applications are not the audience for any of this. The mode exists for the
+in-repo UIReqs projects and for the add-in UIReqs projects that will follow,
+and it is public only because those projects are separate assemblies. It is
+absent from the package documentation on purpose; keep it that way.
+
 CI scripts under build/test-scripts (linux-skia-runtime-tests.sh,
 macos-skia-runtime-tests.sh, android/ios UI-test scripts inherited from
 upstream, run-devserver-cli-tests.ps1) drive the runtime tests with

@@ -28,14 +28,15 @@ namespace CodeBrix.Platform.UI.Runtime.Skia; //Was previously: Uno.UI.Runtime.Sk
 internal class EmulatedRenderer
 {
 	private readonly IXamlRootHost _host;
-	private readonly EmulatorConnection _connection;
+	private readonly IEmulatorTransport _connection;
 	private readonly AutoResetEvent _renderInvalidationEvent = new(false);
 	private readonly SKImageInfo _frameInfo;
 	private SKSurface? _surface;
 	private long _sequence;
+	private long _invalidationGeneration;
 	private int _renderCount;
 
-	public EmulatedRenderer(IXamlRootHost host, EmulatorConnection connection)
+	public EmulatedRenderer(IXamlRootHost host, IEmulatorTransport connection)
 	{
 		_host = host;
 		_connection = connection;
@@ -51,8 +52,12 @@ internal class EmulatedRenderer
 				try
 				{
 					_renderInvalidationEvent.WaitOne();
+					// Read the generation BEFORE drawing: anything applied before the
+					// invalidation that produced this number is necessarily in the frame
+					// this pass is about to draw.
+					var generation = Volatile.Read(ref _invalidationGeneration);
 					Render();
-					Publish();
+					Publish(generation);
 				}
 				catch (Exception ex)
 				{
@@ -66,7 +71,20 @@ internal class EmulatedRenderer
 		}.Start();
 	}
 
-	public void InvalidateRender() => _renderInvalidationEvent.Set();
+	public void InvalidateRender() => InvalidateRenderAndGetGeneration();
+
+	/// <summary>
+	/// Asks for a new frame and returns the invalidation generation this request
+	/// moved the renderer to. A published frame whose render generation is that
+	/// number or larger was rendered entirely after this call returned, so every
+	/// change made before the call is in it.
+	/// </summary>
+	internal long InvalidateRenderAndGetGeneration()
+	{
+		var generation = Interlocked.Increment(ref _invalidationGeneration);
+		_renderInvalidationEvent.Set();
+		return generation;
+	}
 
 	private void Render()
 	{
@@ -132,7 +150,7 @@ internal class EmulatedRenderer
 		_surface?.Flush();
 	}
 
-	private void Publish()
+	private void Publish(long renderGeneration)
 	{
 		if (_surface is null)
 		{
@@ -140,7 +158,7 @@ internal class EmulatedRenderer
 		}
 		var next = _sequence + 1;
 		_surface.ReadPixels(_frameInfo, _connection.GetSlotPointer(next), _connection.Stride, 0, 0);
-		_connection.PublishFrame(next);
+		_connection.PublishFrame(next, renderGeneration);
 		_sequence = next;
 	}
 }

@@ -22,7 +22,7 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.Transport
 /// also guarantees a kill -9 of the IDE never leaves an orphaned app behind.
 /// </para>
 /// </summary>
-internal sealed class EmulatorConnection
+internal sealed class EmulatorConnection : IEmulatorTransport
 {
 	private readonly MemoryMappedFile _sharedMemory;
 	private readonly MemoryMappedViewAccessor _accessor;
@@ -164,6 +164,13 @@ internal sealed class EmulatorConnection
 		SendMessage(FrameBufferEmulatorProtocol.FrameReadyMessage,
 			(uint) sequence, (uint) ((ulong) sequence >> 32), (uint) (sequence % 2));
 	}
+
+	/// <summary>
+	/// Publishes frame <paramref name="sequence"/>. The render generation is a
+	/// consumer-side idea with no place in the emulator's wire protocol, so it is
+	/// ignored here and the IDE sees exactly the message it always has.
+	/// </summary>
+	public void PublishFrame(long sequence, long renderGeneration) => PublishFrame(sequence);
 
 	/// <summary>
 	/// Starts the input thread: blocks on the socket, dispatches touch

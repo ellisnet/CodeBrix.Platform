@@ -179,4 +179,12 @@
          if you're iterating on the XAML generator. -->
     <Project Path="src/Platform.Analyzers.Tests/Platform.Analyzers.Tests.csproj" />
   </Folder>
+  <!-- The Cucumber-style UI requirement scenarios. Every scenario runs in BOTH orientations, and
+       one process is one orientation, so the source tree has two entry projects: the Landscape
+       run and its Portrait twin, which links the same sources and the same feature files and
+       differs only in the assembly attribute that names its panel. Linux only. -->
+  <Folder Name="/UI Requirements/">
+    <Project Path="src/UIReqs/Platform.UI.Core/Platform.UI.Core.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.Core.Portrait/Platform.UI.Core.UIReqs.Portrait.csproj" />
+  </Folder>
 </Solution>

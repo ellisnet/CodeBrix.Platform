@@ -23,14 +23,19 @@ namespace CodeBrix.Platform.UI.Runtime.Skia //Was previously: Uno.UI.Runtime.Ski
 
 		private readonly DisplayInformation _owner;
 
-		public DisplayInformationExtension(object owner, float? scaleOverride)
+		public DisplayInformationExtension(object owner, float? scaleOverride,
+			bool honorEnvironmentOverride = true)
 		{
 			_owner = (DisplayInformation)owner;
-			if (float.TryParse(
-				Environment.GetEnvironmentVariable(EnvironmentCodeBrixDisplayScaleOverride),
-				NumberStyles.Any,
-				CultureInfo.InvariantCulture,
-				out var environmentScaleOverride))
+			// The environment override is a person's setting for a device being
+			// emulated; a caller that needs an exact scale (the test target does)
+			// turns it off so nothing outside the process can skew the run.
+			if (honorEnvironmentOverride
+				&& float.TryParse(
+					Environment.GetEnvironmentVariable(EnvironmentCodeBrixDisplayScaleOverride),
+					NumberStyles.Any,
+					CultureInfo.InvariantCulture,
+					out var environmentScaleOverride))
 			{
 				scaleOverride = environmentScaleOverride;
 			}
