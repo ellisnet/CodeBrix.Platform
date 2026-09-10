@@ -29,6 +29,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls; //
 public class Given_TabView
 {
 #if HAS_CODEBRIX
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 #if !HAS_INPUT_INJECTOR
 	[Ignore("InputInjector is not supported on this platform.")]
@@ -70,6 +71,7 @@ public class Given_TabView
 	}
 #endif
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS)]
 	public async Task When_Leading_Item_Removed()
@@ -96,6 +98,7 @@ public class Given_TabView
 		Assert.AreEqual(setup.SelectedItem, presenter.DataContext, "TabView content was changed.");
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_Tab_Removed()
 	{
@@ -123,6 +126,7 @@ public class Given_TabView
 		Assert.AreEqual("Tab 2", ((TabViewItem)SUT.TabItems[0]).Header);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_SelectedItem_Changed()
 	{
@@ -146,6 +150,7 @@ public class Given_TabView
 		Assert.AreEqual(1, SUT.SelectedIndex);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_DataBinding()
 	{
@@ -164,6 +169,7 @@ public class Given_TabView
 	}
 
 #if !WINAPPSDK // GetTemplateChild is protected in UWP while public in Uno.
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_Items_Should_ShowHeader()
 	{
@@ -202,6 +208,7 @@ public class Given_TabView
 	}
 #endif
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_SelectedItem_Changed_Binding()
 	{
@@ -220,6 +227,7 @@ public class Given_TabView
 		Assert.AreEqual(1, SUT.SelectedIndex);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 	[TestMethod]
 	public async Task When_AddingTab_While_Binding()
 	{

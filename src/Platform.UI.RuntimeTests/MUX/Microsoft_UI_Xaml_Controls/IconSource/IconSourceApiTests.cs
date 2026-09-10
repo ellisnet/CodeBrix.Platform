@@ -40,6 +40,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[TestClass]
 	public class IconSourceApiTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task ImageIconSourceTest()
 		{
@@ -81,6 +82,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task AnimatedIconSourceTest()
 		{
@@ -130,6 +132,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 		}
 
 		// Uno Doc: tests from here onwards are only present in the WinUI2 source
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task SymbolIconSourceTest()
 		{
@@ -169,6 +172,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task FontIconSourceTest()
 		{
@@ -239,6 +243,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task BitmapIconSourceTest()
 		{
@@ -289,6 +294,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 		[TestMethod]
 		public async Task PathIconSourceTest()
 		{

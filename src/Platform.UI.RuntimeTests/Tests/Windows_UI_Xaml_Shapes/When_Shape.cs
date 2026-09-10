@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 	[RunsOnUIThread]
 	public class When_Shape
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		public async Task When_Shape_Stretch_None()
 		{
@@ -52,6 +53,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 
 
 #if __SKIA__ // This needs the netstd layouter + non-legacy shapes layout
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		public async Task When_Shape_Stretch_UniformToFill()
 		{
@@ -89,6 +91,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 #if !__SKIA__
 		[Ignore("Only skia accurately hittests shapes")]

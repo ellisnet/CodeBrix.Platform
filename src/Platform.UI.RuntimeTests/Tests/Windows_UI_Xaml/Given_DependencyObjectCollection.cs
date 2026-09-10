@@ -10,6 +10,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 [TestClass]
 public class Given_DependencyObjectCollection
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyObjectCollection.cs
 	[TestMethod]
 	public void When_Add_Multiple_And_Invoke()
 	{
@@ -30,12 +31,14 @@ public class Given_DependencyObjectCollection
 		Assert.IsTrue(list.SequenceEqual(["One", "Two"]));
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyObjectCollection.cs
 	[TestMethod]
 	public void When_Indexer_Get_IndexOutOfRange()
 	{
 		Assert.IsNull(new DependencyObjectCollection()[int.MaxValue]);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyObjectCollection.cs
 	[TestMethod]
 	public void When_Indexer_Get_NegativeIndex()
 	{

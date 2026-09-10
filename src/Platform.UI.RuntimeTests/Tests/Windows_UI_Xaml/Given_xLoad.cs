@@ -22,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[RunsOnUIThread]
 	public class Given_xLoad
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_xLoad_Literal()
@@ -36,6 +37,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsNotNull(loadBorderTrue);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_xLoad_Order()
@@ -76,6 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsInstanceOfType(sut.root.Children[2], typeof(Border));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_xLoad_xBind()
@@ -107,6 +110,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsFalse(((ElementStub)parent.Child).Load);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_xLoad_Visibility_While_Materializing()
@@ -124,6 +128,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(1, When_xLoad_Visibility_While_Materializing_Content.Instances);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_xLoad_xBind_xLoad_Initial()
@@ -144,6 +149,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(42, SUT.tb01.Tag);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_xLoad_xBind_xLoad_While_Loading()
@@ -164,6 +170,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(42, SUT.tb01.Tag);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/16250")]
@@ -187,6 +194,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #if false
 		[Ignore("https://github.com/unoplatform/uno/issues/7305")]
 #endif
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		public async Task When_Binding_xLoad_Nested()
 		{
@@ -297,6 +305,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #if false
 		[Ignore("https://github.com/unoplatform/uno/issues/7305")]
 #endif
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		public async Task When_Binding_xLoad_Nested_With_ElementStub_LoadCount()
 		{
@@ -477,6 +486,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_xLoad.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/xLoad/Given_xLoadSetters.cs
 		[TestMethod]
 		public async Task When_xLoad_Visibility_Set()
 		{

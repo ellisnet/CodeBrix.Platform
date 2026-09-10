@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml.Media;
 [TestClass]
 public class Given_GradientBrush
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Brushes.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media/Given_LinearGradientBrush.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_GradientStop_Color_Changes()
@@ -54,6 +55,7 @@ public class Given_GradientBrush
 #endif
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Brushes.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media/Given_LinearGradientBrush.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[RequiresScaling(1f)]
@@ -105,6 +107,7 @@ public class Given_GradientBrush
 		await ImageAssert.AreSimilarAsync(actualBitmap, expectedBitmap);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Brushes.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media/Given_LinearGradientBrush.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[RequiresScaling(1f)]
@@ -156,6 +159,7 @@ public class Given_GradientBrush
 		await ImageAssert.AreSimilarAsync(actualBitmap, expectedBitmap);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Brushes.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media/Given_LinearGradientBrush.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[RequiresScaling(1f)]
@@ -207,6 +211,7 @@ public class Given_GradientBrush
 		await ImageAssert.AreSimilarAsync(actualBitmap, expectedBitmap);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Brushes.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media/Given_LinearGradientBrush.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[RequiresScaling(1f)]

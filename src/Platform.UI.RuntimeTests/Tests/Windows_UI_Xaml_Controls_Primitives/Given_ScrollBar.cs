@@ -12,6 +12,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 	[RunsOnUIThread]
 	public class Given_ScrollBar
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ScrollBar.feature
 		[TestMethod]
 		public void When_Value_Changed()
 		{

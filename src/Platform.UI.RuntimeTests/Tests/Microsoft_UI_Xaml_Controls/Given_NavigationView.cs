@@ -28,6 +28,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 	[RunsOnUIThread]
 	public partial class Given_NavigationView
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_SelectedItem_Set_Before_Load_And_Theme_Changed()
@@ -79,6 +80,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public async Task When_IsBackButtonVisible_Toggled()
 		{
@@ -177,6 +179,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			Assert.IsTrue(partiallyCollapsedHeight > fullyCollapsedHeight, $"Collapsing 'B' should reduce item 'B' height: {partiallyCollapsedHeight} -> {fullyCollapsedHeight}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno-private/issues/1091")]
 		public async Task When_Theme_Changes_NVItem_Foreground()

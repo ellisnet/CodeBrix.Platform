@@ -15,6 +15,7 @@ namespace Microsoft.UI.Xaml.Tests.Generic;
 [RequiresFullWindow]
 public class RangeBaseTests
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature, src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	public async Task DoesFireRangeValueChangedEvent()
 	{
@@ -42,6 +43,7 @@ public class RangeBaseTests
 		await WindowHelper.WaitFor(() => valueChangedEvent);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature, src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	public async Task IsRangeValueKeptBetweenMaxAndMin()
 	{
@@ -154,6 +156,7 @@ public class RangeBaseTests
 		valueChangedEvent = false;
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature, src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	public async Task MinMaxValueSetThroughMarkupWork()
 	{

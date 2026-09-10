@@ -27,6 +27,7 @@ public class SelectorBarTests : MUXApiTestBase
 	private const double c_defaultUISelectorBarParentWidth = 400.0;
 	private const double c_defaultUISelectorBarParentHeight = 200.0;
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/SelectorBar.feature
 	[TestMethod]
 	public void VerifyDefaultSelectorBarItemPropertyValues()
 	{
@@ -41,6 +42,7 @@ public class SelectorBarTests : MUXApiTestBase
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/SelectorBar.feature
 	[TestMethod]
 	public void VerifyDefaultSelectorBarPropertyValues()
 	{
@@ -53,6 +55,7 @@ public class SelectorBarTests : MUXApiTestBase
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/SelectorBar.feature
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 	public async Task VerifySelectorBarItems()

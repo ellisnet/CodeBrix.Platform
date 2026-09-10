@@ -12,6 +12,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.ApiTests;
 [TestClass]
 public class Given_SplitButton
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 	[TestMethod]
 	[RunsOnUIThread]
 	[Description("Verifies that the TextBlock representing the Chevron glyph uses the correct font")]

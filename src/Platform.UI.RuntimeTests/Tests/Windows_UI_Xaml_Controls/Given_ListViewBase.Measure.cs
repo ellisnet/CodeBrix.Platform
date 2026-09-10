@@ -35,6 +35,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 			;
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -71,6 +72,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(minWidth, SUT.ActualWidth);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -112,6 +114,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(minWidth, SUT.ActualWidth);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 #if false
 		[Ignore("ListView only supports HorizontalAlignment.Stretch - https://github.com/unoplatform/uno/issues/1133")]
@@ -135,6 +138,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(132, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Item_Changes_Measure_Count()
@@ -176,6 +180,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(initialLocalArrangeCount + 1, counterGrid.LocalArrangeCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Available_Breadth_Changes()
@@ -408,6 +413,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(HeightOfTwoItems - MaxPossibleScroll, rectScrollFinal.Y, 1);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ItemsSource_INCC_StartEmpty_AddOne()
@@ -430,6 +436,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitFor(() => Math.Abs(SUT.ActualHeight - 29) <= Epsilon, message: $"ListView failed to grow from adding item: (ActualHeight: {SUT.ActualHeight})");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ItemsSource_INCC_StartTwo_RemoveOne()

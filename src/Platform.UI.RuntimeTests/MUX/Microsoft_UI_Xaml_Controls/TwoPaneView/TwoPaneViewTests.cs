@@ -37,6 +37,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 		private const double c_defaultMinWideModeWidth = 641.0;
 		private const double c_defaultMinTallModeHeight = 641.0;
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/TwoPaneView.feature
 		[TestMethod]
 		[Description("Verifies the TwoPaneView default properties.")]
 		public async Task VerifyDefaultsAndBasicSetting()

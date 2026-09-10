@@ -7,6 +7,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [TestClass]
 public class Given_DataTemplateSelector
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 	[TestMethod]
 	public void When_Base_Container_Is_Null()
 	{
@@ -17,6 +18,7 @@ public class Given_DataTemplateSelector
 		act.Should().Throw<ArgumentException>();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 	[TestMethod]
 	public void When_Custom_Container_Is_Null()
 	{

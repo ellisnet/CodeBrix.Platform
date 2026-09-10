@@ -16,6 +16,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Platform_UI_Xaml_Controls; //W
 [RunsOnUIThread]
 public class Given_SystemFocusVisual
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 	[RequiresFullWindow]
 	public async Task When_Focused_Element_Scrolled()
@@ -82,6 +83,7 @@ public class Given_SystemFocusVisual
 		Assert.AreEqual(initialPoint.Y - 100, scrolledPoint.Y, 0.5);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 #if false
 	[Ignore("RenderTargetBitmap is not implemented")]
@@ -133,6 +135,7 @@ public class Given_SystemFocusVisual
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 	[RequiresFullWindow]
 #if false
@@ -178,6 +181,7 @@ public class Given_SystemFocusVisual
 		Assert.AreEqual(focusPoint.Y, buttonPoint.Y);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 	[RequiresFullWindow]
 	public async Task When_Keyboard_Focus()
@@ -188,6 +192,7 @@ public class Given_SystemFocusVisual
 		button.Focus(FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 	[RequiresFullWindow]
 	public async Task When_Focused_Element_In_Scaled_Viewbox()
@@ -244,6 +249,7 @@ public class Given_SystemFocusVisual
 		Assert.AreEqual(buttonPoint.Y, focusPoint.Y, 1.0, $"Focus visual Y position {focusPoint.Y} should match button Y position {buttonPoint.Y}");
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 	[TestMethod]
 	[RequiresFullWindow]
 	public async Task When_Focused_Element_With_Multiple_Parent_Transforms()

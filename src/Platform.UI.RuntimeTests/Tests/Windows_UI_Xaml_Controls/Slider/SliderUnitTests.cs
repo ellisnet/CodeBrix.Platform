@@ -13,6 +13,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls;
 [RunsOnUIThread]
 public class SliderUnitTests
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 	[TestMethod]
 	public void ValidateKeyDownWithNavigationOrGamepad()
 	{
@@ -51,6 +52,7 @@ public class SliderUnitTests
 		VERIFY_ARE_EQUAL(sObject.Value, sObject.Minimum);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 	[TestMethod]
 	public void ValidateKeyDown()
 	{
@@ -78,6 +80,7 @@ public class SliderUnitTests
 		VERIFY_ARE_EQUAL(sObject.Value, sObject.Minimum);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 	[TestMethod]
 	public void ValidateKeyDownReversedWithNavigationOrGamepad()
 	{

@@ -6,6 +6,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 	[TestClass]
 	public class Given_AutomationPeer
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetHeadingLevel()
@@ -15,6 +16,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(AutomationHeadingLevel.None, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsDialog()
@@ -24,6 +26,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetPattern()
@@ -33,6 +36,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetAcceleratorKey()
@@ -42,6 +46,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetAccessKey()
@@ -51,6 +56,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetAutomationControlType()
@@ -60,6 +66,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(AutomationControlType.Custom, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetAutomationId()
@@ -69,6 +76,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetBoundingRectangle()
@@ -78,6 +86,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(default, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetChildren()
@@ -87,6 +96,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetClassName()
@@ -96,6 +106,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetClickablePoint()
@@ -105,6 +116,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(default, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetHelpText()
@@ -114,6 +126,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetItemStatus()
@@ -123,6 +136,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetItemType()
@@ -132,6 +146,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLabeledBy()
@@ -141,6 +156,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLocalizedControlType()
@@ -150,6 +166,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual("custom", result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetName()
@@ -159,6 +176,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetOrientation()
@@ -168,6 +186,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(AutomationOrientation.None, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_HasKeyboardFocus()
@@ -177,6 +196,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsContentElement()
@@ -186,6 +206,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsControlElement()
@@ -195,6 +216,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsEnabled()
@@ -204,6 +226,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsTrue(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsKeyboardFocusable()
@@ -213,6 +236,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsOffscreen()
@@ -222,6 +246,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsPassword()
@@ -231,6 +256,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsRequiredForForm()
@@ -240,6 +266,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_SetFocus()
@@ -249,6 +276,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			automationPeer.SetFocus();
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetPeerFromPoint()
@@ -260,6 +288,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(automationPeer, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLiveSetting()
@@ -269,6 +298,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(AutomationLiveSetting.Off, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_Navigate()
@@ -278,6 +308,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetElementFromPoint()
@@ -287,6 +318,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(automationPeer, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetFocusedElement()
@@ -296,6 +328,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(automationPeer, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_ShowContextMenu()
@@ -305,6 +338,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			automationPeer.ShowContextMenu();
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetControlledPeers()
@@ -314,6 +348,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetAnnotations()
@@ -323,6 +358,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsNull(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetPositionInSet()
@@ -332,6 +368,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(-1, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetSizeOfSet()
@@ -341,6 +378,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(-1, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLevel()
@@ -350,6 +388,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(-1, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLandmarkType()
@@ -359,6 +398,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(AutomationLandmarkType.None, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetLocalizedLandmarkType()
@@ -368,6 +408,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.AreEqual(string.Empty, result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsPeripheral()
@@ -377,6 +418,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsFalse(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_IsDataValidForForm()
@@ -386,6 +428,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Automation //W
 			Assert.IsTrue(result);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/AutomationPeerTests.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_AutomationPeer_Default_GetFullDescription()

@@ -47,6 +47,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #elif !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[DataRow((ushort)400, FontStyle.Italic, FontStretch.Condensed, "ms-appx:///Assets/Fonts/OpenSans/OpenSans_Condensed-MediumItalic.ttf")]
 		[DataRow((ushort)400, FontStyle.Normal, FontStretch.SemiCondensed, "ms-appx:///Assets/Fonts/OpenSans/OpenSans_SemiCondensed-Regular.ttf")]
@@ -156,6 +157,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreSimilarAsync(screenshot1, screenshot2, imperceptibilityThreshold: 0.15);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		// Different platforms will resolve SKFontManager.Default.MatchCharacter to different fonts
 		[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.SkiaWin32)]
@@ -195,6 +197,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task Check_TextDecorations_Binding()
 		{
@@ -209,6 +212,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(TextDecorations.None, SUT.textBlock6.TextDecorations);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_NewLine_After_Tab()
 		{
@@ -237,6 +241,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(screenshot, new Rectangle(0, 0, screenshot.Width, screenshot.Height), Microsoft.UI.Colors.Red, tolerance: 15);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public void Check_ActualWidth_After_Measure()
 		{
@@ -253,6 +258,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public void Check_ActualWidth_After_Measure_Collapsed()
 		{
@@ -266,6 +272,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public void Check_Text_When_Having_Inline_Text_In_Span()
 		{
@@ -279,6 +286,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(" my text go?", ((Run)inlines[2]).Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public void When_Null_FontFamily()
 		{
@@ -287,6 +295,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.Measure(new Size(1000, 1000));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task Check_Single_Character_Run_With_Wrapping_Constrained()
 		{
@@ -316,6 +325,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreNotEqual(0, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Multiline_Wrapping_LongWord_Then_Space_Then_Word()
@@ -340,6 +350,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(height, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Multiline_Wrapping_LeadingSpaces()
@@ -369,6 +380,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(height, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if false
 		[Ignore("Fails")]
@@ -398,6 +410,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(height, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -434,6 +447,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT1.ActualHeight.Should().BeGreaterThan(SUT0.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -485,6 +499,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT3.ActualHeight.Should().BeGreaterThan(SUT2.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -507,6 +522,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.ActualHeight.Should().BeGreaterThan(height * 1.5);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -544,6 +560,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT1.ActualHeight.Should().BeGreaterThan(SUT0.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -600,6 +617,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT3.ActualHeight.Should().BeGreaterThan(SUT2.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public void When_Inlines_XamlRoot()
 		{
@@ -615,6 +633,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Inlines_Transitively_Change()
 		{
@@ -655,6 +674,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
 		[DataRow("ms-appx:///Assets/Fonts/CascadiaCode-Regular.ttf")]
@@ -721,6 +741,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreNotEqual(originalSize, SUT.DesiredSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
@@ -740,6 +761,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorInRectangle(bitmap, new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), Colors.Red.WithOpacity(.5));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_TextWrapping_Changed()
@@ -765,6 +787,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreNotEqual(height1, height2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
@@ -790,6 +813,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(tb1.ActualHeight, tb2.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Empty_TextBlock_Measure()
@@ -811,6 +835,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.DesiredSize.Height > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/kahua-private/issues/289")]
 #if false
@@ -850,6 +875,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if true // Line height is not supported on iOS
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Empty_TextBlock_LineHeight_Override()
 		{
@@ -871,6 +897,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Empty_TextBlocks_Stacked()
 		{
@@ -912,6 +939,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno.hotdesign/issues/4327")]
 		public async Task When_Bound_To_TextBox_Text()
@@ -945,6 +973,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_TextTrimming()
@@ -973,6 +1002,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(states.Count == 1 && states[0] == true, $"IsTextTrimmedChanged should only proc once for IsTextTrimmed=true. states: {(string.Join(", ", states) is string { Length: > 0 } tmp ? tmp : "(-empty-)")}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_TextTrimmingNone()
@@ -1001,6 +1031,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, states.Count, $"IsTextTrimmedChanged should not proc at all. states: {(string.Join(", ", states) is string { Length: > 0 } tmp ? tmp : "(-empty-)")}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Padding()
 		{
@@ -1020,6 +1051,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(screenshot, new Rectangle(0, 0, 50, 50), Colors.Red);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Text_Contains_Tabs_Does_Not_Throw()
 		{
@@ -1052,6 +1084,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_RENDER_TARGET_BITMAP
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21322")]
 		public async Task When_Text_Set_By_Style_Setter()
@@ -1088,6 +1121,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_RenderTransform_Rearrange()
 		{
@@ -1113,6 +1147,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if HAS_CODEBRIX // GetMouse is not available on WinUI
 		#region IsTextSelectionEnabled
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1161,6 +1196,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1190,6 +1226,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", sut.SelectedText);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1218,6 +1255,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", sut.SelectedText);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1268,6 +1306,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1319,6 +1358,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1378,6 +1418,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[Ignore("Requires authorization to access to the clipboard on WASM.")]
 #endif
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_IsTextSelectionEnabled_SurrogatePair_Copy()
@@ -1422,6 +1463,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		// Clipboard is currently not available on skia-WASM
 		// Flaky on Skia.iOS uno-private#795
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm | RuntimeTestPlatforms.SkiaIOS)]
 		public async Task When_IsTextSelectionEnabled_CRLF()
@@ -1492,6 +1534,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(" ", await Clipboard.GetContent()!.GetTextAsync());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1530,6 +1573,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[Ignore("Cannot take screenshot on this platform.")]
 #endif
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_IsTextSelectionEnabled_Keyboard_SelectAll_Copy()
@@ -1581,6 +1625,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text, await Clipboard.GetContent()!.GetTextAsync());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1631,6 +1676,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[Ignore("The context menu is only implemented on skia.")]
 #endif
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_IsTextSelectionEnabled_ContextMenu_Copy()
@@ -1672,6 +1718,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("world", await Clipboard.GetContent()!.GetTextAsync());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1706,6 +1753,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", sut.SelectedText);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -1753,6 +1801,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		public async Task When_Focus_Changes_Selection_Is_Not_Shown()
 		{
@@ -1784,6 +1833,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBlock.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBlockTests/Given_TextBlock.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21264")]
 		[DataRow("L")]

@@ -40,6 +40,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 	[TestClass]
 	public class FlowLayoutCollectionChangeTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void ValidateInserts()
 		{
@@ -71,6 +72,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void ValidateSentinelsDuringInserts()
 		{
@@ -501,6 +503,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 #if false
 		[Ignore("UNO: Test does not pass yet with Uno https://github.com/unoplatform/uno/issues/4529")]
@@ -528,6 +531,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 		}
 
 #if CODEBRIX_REFERENCE_API // https://github.com/unoplatform/uno/issues/4529
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 #if false
 		[Ignore("UNO: Test does not pass yet with Uno https://github.com/unoplatform/uno/issues/4529")]

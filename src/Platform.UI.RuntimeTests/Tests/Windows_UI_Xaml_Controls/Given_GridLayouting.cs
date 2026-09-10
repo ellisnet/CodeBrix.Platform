@@ -50,6 +50,7 @@ public partial class Given_GridLayouting
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Empty_And_MeasuredEmpty()
 	{
@@ -65,6 +66,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().BeEmpty();
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Empty_And_Measured_Non_Empty()
 	{
@@ -80,6 +82,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().BeEmpty();
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -105,6 +108,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -140,6 +144,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -188,6 +193,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -225,6 +231,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -268,6 +275,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -324,6 +332,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -377,6 +386,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -433,6 +443,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -488,6 +499,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -542,6 +554,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -597,6 +610,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -669,6 +683,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(4);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -758,6 +773,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(4);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -819,6 +835,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -886,6 +903,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -927,6 +945,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1012,6 +1031,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(2);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1052,6 +1072,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1121,6 +1142,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(3);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1166,6 +1188,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1210,6 +1233,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1245,6 +1269,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS for child.SizePassedToArrangeOverride https://github.com/unoplatform/uno/issues/9080")]
@@ -1295,6 +1320,7 @@ public partial class Given_GridLayouting
 #endif
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1344,6 +1370,7 @@ public partial class Given_GridLayouting
 #endif
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public async Task When_Grid_Column_Min_MaxWidth_Changes()
 	{
@@ -1384,6 +1411,7 @@ public partial class Given_GridLayouting
 		//SUT.InvalidateMeasureCallCount.Should().Be(4);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1421,6 +1449,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1486,6 +1515,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(4);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1571,6 +1601,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(6);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS.")]
@@ -1607,6 +1638,7 @@ public partial class Given_GridLayouting
 		LayoutInformation.GetLayoutSlot(SUT).Should().Be(new Rect(0, 0, 100, 1000));
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Column_Out_Of_Range()
 	{
@@ -1633,6 +1665,7 @@ public partial class Given_GridLayouting
 		SUT.Arrange(new Rect(0, 0, 10, 10));
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_RowSpan_Out_Of_Range()
 	{
@@ -1659,6 +1692,7 @@ public partial class Given_GridLayouting
 		SUT.Arrange(new Rect(0, 0, 100, 1000));
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_ColumnSpan_Out_Of_Range()
 	{
@@ -1685,6 +1719,7 @@ public partial class Given_GridLayouting
 		SUT.Arrange(new Rect(0, 0, 1000, 100));
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Clear_ColumnDefinitions()
 	{
@@ -1697,6 +1732,7 @@ public partial class Given_GridLayouting
 		SUT.ColumnDefinitions.Should().HaveCount(0);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public async Task When_Clear_RowDefinitions()
 	{
@@ -1711,6 +1747,7 @@ public partial class Given_GridLayouting
 		SUT.RowDefinitions.Should().HaveCount(0);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Zero_Star_Size()
 	{
@@ -1737,6 +1774,7 @@ public partial class Given_GridLayouting
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_RowSpan_Reuse()
 	{
@@ -1778,6 +1816,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(new Size(20, 20), knob.DesiredSize);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_5()
 	{
@@ -1821,6 +1860,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_1234()
 	{
@@ -1868,6 +1908,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_1234_Size8()
 	{
@@ -1922,6 +1963,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_Center_And_Center()
 	{
@@ -1978,6 +2020,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_Center_And_Bottom()
 	{
@@ -2038,6 +2081,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_Margin_Center_And_Top()
 	{
@@ -2091,6 +2135,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(1);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Fixed_Size_Child_With_Margin_Right_And_Stretch()
 	{
@@ -2148,6 +2193,7 @@ public partial class Given_GridLayouting
 	}
 #endif
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Auto_Columns_and_one_star_and_two_children()
 	{
@@ -2177,6 +2223,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(2, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Two_Auto_Columns_two_children()
 	{
@@ -2206,6 +2253,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(2, SUT.Children.Count());
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Auto_and_one_abs_and_one_star_and_three_children()
 	{
@@ -2245,6 +2293,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(3);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	[RequiresScaling(1f)]
 	public void When_Nine_grid_and_one_auto_cell_and_three_children()
@@ -2296,6 +2345,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(3);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Quad_two_auto_and_four_children()
 	{
@@ -2342,6 +2392,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(4, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	[RequiresScaling(1f)]
 	public void When_Nine_grid_and_one_auto_cell_and_four_children()
@@ -2402,6 +2453,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(4);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Three_Rows_One_Auto_Two_Fixed_And_Row_Span_Full()
 	{
@@ -2442,6 +2494,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(3);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_Three_Colums_One_Auto_Two_Fixed_And_Column_Span_Full()
 	{
@@ -2482,6 +2535,7 @@ public partial class Given_GridLayouting
 		SUT.Children.Should().HaveCount(3);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalTopAlignment_and_Fixed_Height()
 	{
@@ -2509,6 +2563,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalBottomAlignment_and_Fixed_Height()
 	{
@@ -2537,6 +2592,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalCenterAlignment_and_Fixed_Height()
 	{
@@ -2566,6 +2622,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_HorizontalLeftAlignment_and_Fixed_Width()
 	{
@@ -2594,6 +2651,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_HorizontalRightAlignment_and_Fixed_Width()
 	{
@@ -2623,6 +2681,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_HorizontalCenterAlignment_and_Fixed_Width()
 	{
@@ -2653,6 +2712,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalTopAlignment_and_Variable_Height()
 	{
@@ -2680,6 +2740,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalCenterAlignment_and_Variable_Height()
 	{
@@ -2708,6 +2769,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_HorizontalStretchAlignment_and_MaxWidth()
 	{
@@ -2735,6 +2797,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalStretchAlignment_and_MaxHeight()
 	{
@@ -2764,6 +2827,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_With_VerticalCenterAlignment_HorizontalCenterAlignment_and_Variable_Height_and_Variable_Width()
 	{
@@ -2793,6 +2857,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_Centered_And_Auto_row_And_Fixed_Column()
 	{
@@ -2831,6 +2896,7 @@ public partial class Given_GridLayouting
 		Assert.AreEqual(1, SUT.Children.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	[RequiresScaling(1f)]
 	public void When_One_Child_Centered_And_Auto_row_And_Star_Column()
@@ -2996,6 +3062,7 @@ public partial class Given_GridLayouting
 		LayoutInformation.GetLayoutSlot(c1).Should().Be(expectedClippedFrameRect);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid_And_Min_Max.cs
 	[TestMethod]
 	public void When_One_Child_and_Measure_Bigger_than_arrange()
 	{

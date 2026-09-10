@@ -43,6 +43,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	public partial class Given_FrameworkElement
 	{
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Two_Grids_With_Translate_And_Ellipse()
@@ -94,6 +95,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(22, 2, 76, 96), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Border_And_Clip_With_Translate_And_Ellipse()
@@ -141,6 +143,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(22, 2, 76, 96), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Grid_And_Border_With_Translate_And_Ellipse()
@@ -189,6 +192,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(22, 2, 96, 96), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Two_Borders_With_Translate_And_Ellipse()
@@ -233,6 +237,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(22, 2, 96, 96), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Border_With_Translate_And_Ellipse()
@@ -266,6 +271,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(21, 1, 97, 97), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Clip_Grid_With_Translate_And_Ellipse()
@@ -317,6 +323,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			});
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow("Auto", "Auto", double.NaN, double.NaN)]
@@ -430,6 +437,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Alignment_Changes_During_Measure()
@@ -495,6 +503,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreEqualAsync(actualBitmap, expectedBitmap);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public Task When_Measure_And_Invalidate() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -513,6 +522,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			});
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false // #9282 for macOS
@@ -541,6 +551,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -565,6 +576,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if !WINAPPSDK
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -616,6 +628,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public Task MeasureWithNan() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -638,6 +651,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public Task MeasureOverrideWithNan() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -651,6 +665,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 				Assert.AreEqual(new Size(0, 0), SUT.DesiredSize);
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 #if false
 		[Ignore] // Failing on WASM - https://github.com/unoplatform/uno/issues/2314
@@ -702,6 +717,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -746,6 +762,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(0, 0, 100, 15), ls3);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void Check_ActualWidth_After_Measure()
@@ -789,6 +806,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		// Center: Both sizes & max values, sizes < max
 		[DataRow("Center", "Center", 100d, 50d, 10d, 5d, null, null, "46;17;108;66|50;25;100;50|58;38;84;24")]
 		// Center: Both sizes & max values, sizes > max
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[DataRow("Center", "Center", 25d, 5d, 100d, 50d, null, null, "46;17;108;66|50;25;100;50|58;38;84;24")]
 		[TestMethod]
 		[RunsOnUIThread]
@@ -904,6 +922,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_AreDimensionsConstrained_And_Margin()
@@ -928,6 +947,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(setHeight, Math.Round(innerView.ActualHeight));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Negative_Margin_NonZero_Size()
@@ -943,6 +963,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(104d, Math.Round(SUT.DesiredSize.Height));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Negative_Margin_Zero_Size()
@@ -958,6 +979,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0d, Math.Round(SUT.DesiredSize.Height));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Add_Element_Then_Load_Raised()
@@ -980,6 +1002,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, loadedCount, "loaded");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Add_Native_Child_To_ElementCollection()
@@ -991,6 +1014,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, panel.Children.Count);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Set_Name()
@@ -1001,6 +1025,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Test", dpName);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Set_NameProperty()
@@ -1011,6 +1036,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Test", name);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Add_Element_Then_Unload_Raised()
@@ -1033,6 +1059,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_BaseUri()
@@ -1073,6 +1100,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		// Those tests only validate the current behavior which should be reviewed by https://github.com/unoplatform/uno/issues/2895
 		// (cf. notes in the tests)
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Add_Element_While_Parent_Loading_Then_Load_Raised()
@@ -1103,6 +1131,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, loadedCount, "loaded");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Add_Element_While_Parent_Loaded_Then_Load_Raised()
@@ -1136,6 +1165,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, loadedCount, "loaded");
 		}
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !CODEBRIX_HAS_ENHANCED_LIFECYCLE
@@ -1185,6 +1215,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if CODEBRIX_HAS_ENHANCED_LIFECYCLE || !HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task TestEventOrder()
@@ -1220,6 +1251,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20914")]

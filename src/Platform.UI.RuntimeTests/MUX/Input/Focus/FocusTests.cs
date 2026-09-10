@@ -281,6 +281,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we get the first focusable element")]
 		[TestProperty("Hosting:Mode", "UAP")] // Task 19276384
@@ -325,6 +326,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we get the last focusable element")]
 		[TestProperty("Hosting:Mode", "UAP")] // Task 19276384
@@ -369,6 +371,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		public async Task VerifyCyclingWhenTabFocusNavigationSet()
 		{
@@ -471,6 +474,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await Task.Delay(50);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Hosting:Mode", "UAP")]   // Bug 24196441: Focus engagement bugs in lifted islands
 		public async Task VerifyCyclingWithTabIndexWhenTabFocusNavigationSet()
@@ -549,6 +553,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		[TestProperty("Hosting:Mode", "UAP")]   // Bug 24196441: Focus engagement bugs in lifted islands
@@ -622,6 +627,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		public async Task VerifyTabNavigationAndTabFocusNavigationIdentical()
 		{
@@ -657,6 +663,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		public async Task VerifyClearValueWorksWithTabFocusNavigation()
 		{
@@ -703,6 +710,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we get the first/last focusable correctly when tab indexes specified")]
 		public async Task VerifyFindAndLastFocusableElementWithTabIndex()
@@ -743,6 +751,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we get the first/last focusable correctly when adding elements to the tree")]
 		[TestProperty("Hosting:Mode", "UAP")] // Task 19276384
@@ -1021,6 +1030,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryMoveAsync can be awaited")]
 		public async Task VerifyTryMoveFocusAsync()
@@ -1029,6 +1039,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.Button, false, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryMoveAsync can be awaited, StackPanel variant")]
 		public async Task VerifyTryMoveFocusAsyncForStackPanel()
@@ -1037,6 +1048,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.StackPanel, false, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryMoveAsync can be awaited, TextBlock variant")]
 		public async Task VerifyTryMoveFocusAsyncForTextBlock()
@@ -1053,6 +1065,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 		//	await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.RichTextBlock, false, expectedString);
 		//}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false")]
 		public async Task VerifyTryMoveFocusAsyncUnsuccessful()
@@ -1061,6 +1074,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.Button, true, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false, StackPanel variant")]
 		public async Task VerifyTryMoveFocusAsyncUnsuccessfulForStackPanel()
@@ -1069,6 +1083,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.StackPanel, true, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false, TextBlock variant")]
 		public async Task VerifyTryMoveFocusAsyncUnsuccessfulForTextBlock()
@@ -1085,6 +1100,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 		//	await FocusAsyncValidation(FocusAsyncMethod.TryMoveFocusAsync, FocusElementType.RichTextBlock, true, expectedString);
 		//}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryAsync can be awaited")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1094,6 +1110,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryFocusAsync, FocusElementType.Button, false, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryAsync can be awaited, StackPanel variant")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1103,6 +1120,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryFocusAsync, FocusElementType.StackPanel, false, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryAsync can be awaited, TextBlock variant")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1121,6 +1139,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 		//	await FocusAsyncValidation(FocusAsyncMethod.TryFocusAsync, FocusElementType.RichTextBlock, false, expectedString);
 		//}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1130,6 +1149,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryFocusAsync, FocusElementType.Button, true, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false, StackPanel variant")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1139,6 +1159,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await FocusAsyncValidation(FocusAsyncMethod.TryFocusAsync, FocusElementType.StackPanel, true, expectedString);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we successfully await the operation, but the Succeeded value is false, TextBlock variant")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1268,6 +1289,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that TryAsync fails when trying to focus a non-focusable element")]
 		[TestProperty("Hosting:Mode", "UAP")] // fails in WPF mode due to final release queue is not empty cleanup issue
@@ -1372,6 +1394,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verifies execution of code in KeyDown handler if TryFocusAsync can be completed synchronously")]
 		public async Task ElementMovesToCorrectElementWhenFocusedElementCollapsed()
@@ -1413,6 +1436,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verifies that moving focus back (using Shift+Tab) into ContentControl (with disabled tab stop) brings focus to the correct element contained inside it. ")]
 		public async Task FocusMovesToNextCorrectElementWhenFocusCandidateElementCollapsed()
@@ -1457,6 +1481,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we can [can't] focus focusable [non-focusable] stackpanel UIElement")]
 		public async Task VerifyFocusBehaviorWithFocusDisabledUIElement()
@@ -1506,6 +1531,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify that we can[can't] focus focusable[non-focusable] stackpanel with Tab/ Shift+Tab")]
 		[TestProperty("Hosting:Mode", "UAP")]   // Bug 24196441: Focus engagement bugs in lifted islands
@@ -1565,6 +1591,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Input.Focus //Was previously: Un
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[TestProperty("Description", "Verify focus event order on UIElement")]
 		public async Task VerifyFocusEventOrderOnUIElement()

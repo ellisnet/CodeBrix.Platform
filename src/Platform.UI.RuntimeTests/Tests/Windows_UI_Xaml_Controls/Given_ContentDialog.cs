@@ -34,6 +34,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	public class Given_ContentDialog
 	{
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -94,6 +95,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		public async Task When_Not_FullSizeDesired()
 		{
@@ -123,6 +125,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaAndroid)] // Very flaky on Skia Android #9080
 		public async Task When_FullSizeDesired()
@@ -156,6 +159,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaIslands | RuntimeTestPlatforms.Native)]
 		public async Task When_Uncapped_FullSizeDesired()
@@ -203,6 +207,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		public async Task When_DefaultButton_Not_Set()
 		{
@@ -235,6 +240,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		public async Task When_DefaultButton_Set()
 		{
@@ -267,6 +273,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Initial_Focus_With_Focusable_Content()
@@ -298,6 +305,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Initial_Focus_With_DefaultButton_Not_Set()
@@ -329,6 +337,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Initial_Focus_With_DefaultButton_Set()
@@ -360,6 +369,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		public async Task When_CloseDeferred()
 		{
@@ -518,6 +528,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[DataRow(ContentDialogButton.Primary)]
 		[DataRow(ContentDialogButton.Secondary)]
@@ -581,6 +592,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, closingCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[DataRow(ContentDialogButton.Primary)]
 		[DataRow(ContentDialogButton.Secondary)]
@@ -682,6 +694,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		public async Task When_Popup_Closed()
 		{
@@ -733,6 +746,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/ContentDialog.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ContentDialogTests/Given_ContentDialog.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20842")]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaX11)]

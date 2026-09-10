@@ -13,6 +13,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[TestClass]
 	public class Given_RadioButton
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_GroupName_Default_Property_Value()
@@ -21,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			radioButton.GroupName.Should().Be("");
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_GroupName_Default_Dependency_Property_Value()
@@ -30,6 +32,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			value.Should().BeNull();
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_GroupName_Set_Null()
@@ -39,6 +42,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			act.Should().Throw<ArgumentNullException>();
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Custom()
@@ -93,6 +97,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(radioButtonA2.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Custom_Two_Containers()
@@ -142,6 +147,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(radioButtonA1.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Empty()
@@ -198,6 +204,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(radioButtonEmpty2.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Empty_Two_Containers()
@@ -247,6 +254,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(radioButtonEmpty1.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Default()
@@ -300,6 +308,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(radioButtonNull2.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GroupName_Default_Two_Containers()
@@ -353,6 +362,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(radioButtonNull2.IsChecked);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		public async Task When_AutomationPeer_Toggle()
 		{
@@ -380,6 +390,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature
 		[TestMethod]
 		public async Task When_AutomationPeer_Toggle_With_Command()
 		{

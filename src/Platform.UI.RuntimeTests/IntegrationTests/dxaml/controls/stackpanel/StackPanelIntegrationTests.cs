@@ -21,6 +21,7 @@ public class StackPanelIntegrationTests
 {
 	private const int s_itemCount = 3;
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task CanStackItemsHorizontally()
 	{
@@ -37,6 +38,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyItemPositions(stackPanel, expectedPositions);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task CanStackItemsVertically()
 	{
@@ -53,6 +55,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyItemPositions(stackPanel, expectedPositions);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task CanStackVariableSizedItemsHorizontally()
 	{
@@ -80,6 +83,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyItemPositions(stackPanel, expectedPositions);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task CanStackVariableSizedItemsVertically()
 	{
@@ -107,6 +111,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyItemPositions(stackPanel, expectedPositions);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	[RequiresScaling(1.0f)]
 	public async Task CanChangeOrientation()
@@ -183,6 +188,7 @@ public class StackPanelIntegrationTests
 		TestServices.Utilities.VerifyMockDCompOutput(MockDComp.SurfaceComparison.NoComparison, "Vertical");
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifyDesiredSize_AutoLayout()
 	{
@@ -206,6 +212,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyPanelDesiredSize(stackPanel, 350.0f, 100.0f);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifyDesiredSize_MinWidthHeight()
 	{
@@ -240,6 +247,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyPanelDesiredSize(stackPanel, 350.0f, 150.0f);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifyDesiredSize_MaxWidthHeight()
 	{
@@ -274,6 +282,7 @@ public class StackPanelIntegrationTests
 		await PanelsHelper.VerifyPanelDesiredSize(stackPanel, 175.0f, 50.0f);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task ValidateSpacing()
 	{
@@ -349,6 +358,7 @@ public class StackPanelIntegrationTests
 		TestServices.Utilities.VerifyMockDCompOutput(MockDComp.SurfaceComparison.NoComparison, "4");
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifyBorderChrome()
 	{
@@ -429,6 +439,7 @@ public class StackPanelIntegrationTests
 		return rectangle;
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifySnapPoints()
 	{
@@ -620,6 +631,7 @@ public class StackPanelIntegrationTests
 	//	await TestServices.WindowHelper.WaitForIdle();
 	//}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 	[TestMethod]
 	public async Task VerifyContentClipping()
 	{

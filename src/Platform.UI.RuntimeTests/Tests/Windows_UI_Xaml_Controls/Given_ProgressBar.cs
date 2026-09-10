@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 public class Given_ProgressBar
 {
 #if __SKIA__
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_ProgressBar_Automation_Listener_Attached()

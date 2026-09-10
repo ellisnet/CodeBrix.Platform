@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 	[RunsOnUIThread]
 	public class Given_Path
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/6846")]
 		public void Should_not_throw_if_Path_Data_is_set_to_null()
@@ -28,6 +29,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 			SUT.Data = null;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		public void Should_Not_Include_Control_Points_Bounds()
 		{
@@ -43,6 +45,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18694")]
 #if !__SKIA__
@@ -114,6 +117,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes //Was p
 			ImageAssert.HasColorAt(screenShot, new Point(50, 250), Microsoft.UI.Colors.Red);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18694")]
 #if !__SKIA__

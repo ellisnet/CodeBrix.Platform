@@ -152,6 +152,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX_WINUI || WINAPPSDK
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public async Task When_NavigationViewItem_MenuSource_VectorChanged()
 		{
@@ -189,6 +190,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_NavigationView_MenuItems_Clear()

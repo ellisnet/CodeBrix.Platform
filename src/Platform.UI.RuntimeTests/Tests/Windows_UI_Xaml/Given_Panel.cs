@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 [TestClass]
 public class Given_Panel
 {
+	//TEST PARTLY REPLACED - by src/Platform.UI.Tests/CustomPanelTests/Given_CustomPanel.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Overriding_Measure_Arrange()

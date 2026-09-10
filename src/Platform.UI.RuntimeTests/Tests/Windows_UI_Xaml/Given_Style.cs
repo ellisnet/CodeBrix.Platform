@@ -24,6 +24,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[TestClass]
 	public class Given_Style
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Implicit_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_StyleFailsToApply()
@@ -48,6 +49,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			_ = new ContentControl() { Style = style };
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Implicit_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/15460")]
@@ -87,6 +89,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(HorizontalAlignment.Left, cc.HorizontalContentAlignment);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Implicit_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Style_Flows_To_Popup()

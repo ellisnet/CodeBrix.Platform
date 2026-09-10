@@ -24,6 +24,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RequiresFullWindow]
 public partial class Given_ContentPresenter
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_Padding_Set_In_SizeChanged()
 	{
@@ -56,6 +57,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual(200, ((UIElement)VisualTreeHelper.GetChild(SUT, 0)).ActualOffset.Y);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Alignment_Set_Default_Alignment_Not_Overriden()
 	{
@@ -70,6 +72,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual(HorizontalAlignment.Stretch, border.HorizontalAlignment);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Binding_And_DataContext_Same_As_Content()
 	{
@@ -89,6 +92,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual(1, dataContextChangedCount);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_Empty()
 	{
@@ -103,6 +107,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("43", GetTextBlockText(sut, "emptyTest"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_Priority()
 	{
@@ -122,6 +127,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("46", GetTextBlockText(sut, "priorityTest"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_SameValue()
 	{
@@ -132,6 +138,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("42", GetTextBlockText(sut, "sameValueTest"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_Inheritance()
 	{
@@ -154,6 +161,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("48", GetTextBlockText(sut, "inheritanceTest"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_Inside_ContentControl_Template()
 	{
@@ -193,6 +201,7 @@ public partial class Given_ContentPresenter
 
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_SameValue_Changing()
 	{
@@ -203,6 +212,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("DataContext", GetTextBlockText(sut, "sameValueChangingTest"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public void When_Content_Presenter_Null_Content_Changed()
 	{
@@ -213,6 +223,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual("42", GetTextBlockText(sut, "nullContentChanged"));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_ContentPresenter_ContentBindingNonPath()
 	{
@@ -311,6 +322,7 @@ public partial class Given_ContentPresenter
 		TreeAssert.VerifyTree(expectedTree, setup.Content, describe: Describe);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_ContentPresenter_ContentBindingPath()
 	{
@@ -412,6 +424,7 @@ public partial class Given_ContentPresenter
 		return configurations.Select(c => new object[] { c });
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	[DynamicData(nameof(GetAlignments))]
 	public async Task When_Content_Aligned_Position_And_Size(AlignmentTestConfiguration configuration)
@@ -444,6 +457,7 @@ public partial class Given_ContentPresenter
 		Assert.AreEqual(configuration.ExpectedSize, new Size(border.ActualWidth, border.ActualHeight));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_Content_Unset_Release()
 	{
@@ -469,6 +483,7 @@ public partial class Given_ContentPresenter
 	}
 
 #if __SKIA__
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 	[TestMethod]
 	public async Task When_Native_Host_Infinite_Measure_Bounds()
 	{

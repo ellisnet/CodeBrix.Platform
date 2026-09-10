@@ -46,6 +46,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 	{
 		const int expectedLastRealizedIndex = 8;
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidatePhaseInvokeAndOrdering()
 		{
@@ -125,6 +126,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateXBindWithoutPhasing()
 		{

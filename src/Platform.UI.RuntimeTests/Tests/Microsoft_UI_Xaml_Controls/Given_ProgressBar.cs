@@ -17,6 +17,7 @@ using ProgressBar = Microsoft.UI.Xaml.Controls.ProgressBar;
 [RunsOnUIThread]
 public class Given_ProgressBar
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	public async Task ProgressBarLayoutUpdate()
 	{
@@ -53,6 +54,7 @@ public class Given_ProgressBar
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressBar.feature
 	[TestMethod]
 	public async Task When_CustomTemplate()
 	{

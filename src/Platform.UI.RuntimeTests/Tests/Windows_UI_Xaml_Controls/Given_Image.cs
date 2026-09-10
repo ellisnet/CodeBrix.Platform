@@ -30,6 +30,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[TestClass]
 	public class Given_Image
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresScaling(1f)]
@@ -90,6 +91,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if false
 		[Ignore("Currently fails on iOS")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Fixed_Height_And_Stretch_Uniform()
@@ -189,6 +191,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void TargetNullValue_Is_Correctly_Applied()
@@ -202,6 +205,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("ms-appx:///Assets/StoreLogo.png", targetNullValueSource.UriSource.ToString());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Transitive_Asset_Loaded()
@@ -218,6 +222,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(img.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Transitive_Asset_With_Link_Loaded()
@@ -243,6 +248,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(img.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Explicit_BitmapImage_Relative_NonRooted()
@@ -256,6 +262,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.explicitRelativeNonRooted.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Relative_NonRooted()
@@ -269,6 +276,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.relativeNonRooted.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Relative_Rooted()
@@ -283,6 +291,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_AbsoluteLocal()
@@ -296,6 +305,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.absoluteLocal.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_AbsoluteMain()
@@ -310,6 +320,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Image_Is_Loaded_From_URL()
@@ -326,6 +337,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(img.ActualHeight > 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Image_Source_Nullify()
@@ -451,6 +463,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_BitmapImage_Should_Have_Correct_Event_Sequence()
@@ -487,6 +500,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Image_ImageOpened", logs[1]);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Loaded_From_AppData_LocalFolder()
@@ -500,6 +514,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForLoaded(image);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow("ms-appx:///Assets/couch.svg")]
@@ -518,6 +533,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForLoaded(image);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_SVGImageSource_Uri_Is_Null()
@@ -533,6 +549,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForLoaded(image);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_SVGImageSource_Uri_Is_Set_Null()
@@ -549,6 +566,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForLoaded(image);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ImageFailed()
@@ -617,6 +635,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Exif_Rotated_MsAppx()
@@ -629,6 +648,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await When_Exif_Rotated_Common(new Uri("ms-appx:///Assets/testimage_exif_rotated.jpg"));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Exif_Rotated_MsAppx_Unequal_Dimensions()
@@ -655,6 +675,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Exif_Rotated_MsAppData()
@@ -687,6 +708,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20727")]
@@ -730,6 +752,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAt(screenShot, screenShot.Width / 2, screenShot.Height / 2, Color.FromArgb(0xFF, 0x80, 0xBF, 0x80));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Image.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ImageTests/Given_ImageSizeHelper.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Exif_Rotated_From_Stream()

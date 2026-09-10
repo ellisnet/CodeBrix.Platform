@@ -34,6 +34,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[TestClass]
 	public class Given_Grid
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[DataRow(20, 20, 70, 60, 0, 0, 90, 20, 110, 0, 30, 20, 160, 0, 90, 20, 0, 40, 90, 260, 110, 40, 30, 120, 160, 40, 90, 120, 110, 180, 140, 120)]
 		[DataRow(20, 80, 70, 180, 0, 0, 90, 20, 110, 0, 30, 20, 160, 0, 90, 20, 0, 100, 90, 200, 110, 100, 30, 60, 160, 100, 90, 60, 110, 240, 140, 60)]
@@ -182,6 +183,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -225,6 +227,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ColumnDefinition_Width_Changed()
@@ -262,6 +265,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(210, colDef1.ActualWidth);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Definitions_Cleared_And_Empty()
@@ -282,6 +286,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			NumberAssert.Greater(tb.ActualHeight, 0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Padding_Set_In_SizeChanged()
@@ -330,6 +335,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(200, ((UIElement)VisualTreeHelper.GetChild(SUT, 0)).ActualOffset.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -383,6 +389,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, secondPosition.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -438,6 +445,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await Task.Delay(1000);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -478,6 +486,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await Task.Delay(1000);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -518,6 +527,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await Task.Delay(1000);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Child_Added_Measure_And_Visible_Arrange()
@@ -544,6 +554,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresScaling(1f)]
@@ -609,6 +620,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(new Point(84, 6), new Size(29, 29)), redBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresScaling(1f)]

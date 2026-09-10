@@ -13,6 +13,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Platform_Helpers; //Was previo
 [RunsOnUIThread]
 public partial class Given_DependencyPropertyHelper
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDefaultValue()
 	{
@@ -26,6 +27,7 @@ public partial class Given_DependencyPropertyHelper
 		defaultValue.Should().Be("TestValue");
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDependencyPropertyByName_OwnerType()
 	{
@@ -41,6 +43,7 @@ public partial class Given_DependencyPropertyHelper
 		property2.Should().Be(TestClass.TestProperty);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDependencyPropertyByName_Property()
 	{
@@ -56,6 +59,7 @@ public partial class Given_DependencyPropertyHelper
 		property2.Should().Be(TestClass.TestProperty);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDependencyPropertyByName_InvalidProperty()
 	{
@@ -69,6 +73,7 @@ public partial class Given_DependencyPropertyHelper
 		property.Should().BeNull();
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDependencyPropertyByName_InvalidPropertyCasing()
 	{
@@ -82,6 +87,7 @@ public partial class Given_DependencyPropertyHelper
 		property.Should().BeNull();
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDependencyPropertiesForType()
 	{
@@ -92,6 +98,7 @@ public partial class Given_DependencyPropertyHelper
 		properties.Should().Contain(TestClass.TestProperty);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_TryGetDependencyPropertiesForType()
 	{
@@ -103,6 +110,7 @@ public partial class Given_DependencyPropertyHelper
 		properties.Should().Contain(TestClass.TestProperty);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_TryGetDependencyPropertiesForType_Invalid()
 	{
@@ -114,6 +122,7 @@ public partial class Given_DependencyPropertyHelper
 		properties.Should().BeNull();
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetPropertyType()
 	{
@@ -127,6 +136,7 @@ public partial class Given_DependencyPropertyHelper
 		propertyType.Should().Be(typeof(string));
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetPropertyDetails()
 	{
@@ -147,6 +157,7 @@ public partial class Given_DependencyPropertyHelper
 		defaultValue.Should().Be("TestValue");
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetPropertyDetails_DataContext()
 	{
@@ -167,6 +178,7 @@ public partial class Given_DependencyPropertyHelper
 		defaultValue.Should().BeNull();
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetPropertyDetails_Attached()
 	{
@@ -187,6 +199,7 @@ public partial class Given_DependencyPropertyHelper
 		defaultValue.Should().Be(0);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetProperties()
 	{
@@ -195,6 +208,7 @@ public partial class Given_DependencyPropertyHelper
 		properties.Should().Contain(DerivedTestClass.TestProperty);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDefaultValue_Derived()
 	{
@@ -208,6 +222,7 @@ public partial class Given_DependencyPropertyHelper
 		defaultValue.Should().Be("TestValue");
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDefaultUnsetValue_FromStyle()
 	{
@@ -223,6 +238,7 @@ public partial class Given_DependencyPropertyHelper
 		precedence.Should().Be(DependencyPropertyValuePrecedences.ExplicitStyle);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/DependencyPropertyHelperTests.cs
 	[TestMethod]
 	public void When_GetDefaultUnsetValue()
 	{

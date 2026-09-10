@@ -103,6 +103,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public partial class Given_ListViewBase // test cases
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void ValidSelectionChange()
@@ -115,6 +116,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(5, list.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void InvalidSelectionChangeValidPrevious()
@@ -127,6 +129,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(3, list.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task ContainerIndicesAreUpdated()
@@ -161,6 +164,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -234,6 +238,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task ContainerParentIsKept_OnRemoveAndAdd()
@@ -269,6 +274,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void InvalidChanges_ShouldNotBeReflectedOnSelectedItem()
@@ -291,6 +297,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(3, list.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ContainerSet_Then_ContentShouldBeSet()
@@ -322,6 +329,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("item 0", tb?.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_IsItsOwnItemContainer_FromSource()
@@ -350,6 +358,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("item 1", si.Content);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Item_Parents_Include_ListView()
@@ -386,6 +395,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Item_GetParentInternal_Include_ListView()
@@ -422,6 +432,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_NoItemTemplate()
@@ -452,6 +463,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_IsItsOwnItemContainer_FromSource_With_DataTemplate()
@@ -492,6 +504,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_TemplateRoot_IsOwnContainer()
@@ -527,6 +540,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("item 1", (content.Child as TextBlock)?.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task SingleItemSelected()
@@ -568,6 +582,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list.SelectedItem, child1);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task MultipleItemsSelected()
@@ -610,6 +625,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list.SelectedItems[1], child3);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task NoItemSelectedMultiple()
 		{
@@ -648,6 +664,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, list.SelectedItems.Count);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task NoItemSelectedSingle()
@@ -687,6 +704,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(-1, list.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -839,6 +857,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -911,6 +930,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Multiple_Selection_Keyboard()
@@ -972,6 +992,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -1053,6 +1074,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Extended_Selection_Keyboard()
@@ -1131,6 +1153,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Extended_Selection_SelectedIndex_Changed_Keyboard()
@@ -1183,6 +1206,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -1240,6 +1264,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if WINAPPSDK
@@ -1286,6 +1311,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, SUT.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if NETFX_CORE
@@ -1332,6 +1358,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(handled);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_IsItsOwnItemContainer_Recycling()
 		{
@@ -1370,6 +1397,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(newTwo, GetAllPanelChildren(SUT).Last());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Outer_ElementName_Binding()
@@ -1401,6 +1429,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_CollectionViewSource_In_Xaml()
@@ -1424,6 +1453,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitFor(() => (lvi = page.SubjectListView.ContainerFromItem("One") as ListViewItem) != null);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 #if RUNTIME_NATIVE_AOT
 		[Ignore("TODO: figure out why this fails, how to fix")]
@@ -1459,6 +1489,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(-1, SUT.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public void When_Selection_SelectedValue_Path_Not_Set()
 		{
@@ -1533,6 +1564,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1578,6 +1610,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			materialized.Should().BeLessThan(5);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1623,6 +1656,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1685,6 +1719,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1755,6 +1790,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			LayoutInformation.GetLayoutSlot(secondContainer).Y.Should().BeApproximately(50, 0.6);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -2008,6 +2044,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(si, new Rectangle(100, 110, si.Width - 100, si.Height - 110), Colors.FromARGB("#FFE6E6E6"), tolerance); // hovered
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__CROSSRUNTIME__
@@ -2059,6 +2096,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Arrow_keys_ListView_Only_Scrolled_As_Needed()
@@ -2090,6 +2128,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			sv.VerticalOffset.Should().BeApproximately(lvi.ActualHeight * 3 - 120, 2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -2151,6 +2190,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			dataContextChanged.Should().BeLessThan(15, $"dataContextChanged {dataContextChanged}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -2209,6 +2249,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -2309,6 +2350,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Their_Own_Container()
@@ -2337,6 +2379,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Own_Container_ContainerFromItem_Owner()
@@ -2357,6 +2400,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list, ItemsControl.ItemsControlFromItemContainer(container));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Own_Container_ContainerFromIndex_Owner()
@@ -2377,6 +2421,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list, ItemsControl.ItemsControlFromItemContainer(container));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Own_Container_Direct_Owner()
@@ -2396,6 +2441,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list, ItemsControl.ItemsControlFromItemContainer(item));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Not_Own_Container_ContainerFromItem_Owner()
@@ -2415,6 +2461,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(list, ItemsControl.ItemsControlFromItemContainer(container));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Not_Own_Container_ContainerFromIndex_Owner()
@@ -2435,6 +2482,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Their_Own_Container_In_OnItemsChanged_Removal()
@@ -2490,6 +2538,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items.Remove(removedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Their_Own_Container_In_OnItemsChanged_Addition()
@@ -2549,6 +2598,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items.Insert(1, addedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Their_Own_Container_In_OnItemsChanged_Change()
@@ -2608,6 +2658,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items[1] = newItem;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Their_Own_Container_In_OnItemsChanged_Reset()
@@ -2660,6 +2711,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			list.ItemsSource = newItems;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Not_Their_Own_Container()
@@ -2689,6 +2741,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, list.ItemFromContainer(container2));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Not_Their_Own_Container_In_OnItemsChanged_Removal()
@@ -2745,6 +2798,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items.Remove(removedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Not_Their_Own_Container_In_OnItemsChanged_Addition()
@@ -2808,6 +2862,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items.Insert(1, 42);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Not_Their_Own_Container_In_OnItemsChanged_Change()
@@ -2871,6 +2926,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			items[1] = 42;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Not_Their_Own_Container_In_OnItemsChanged_Reset()
@@ -2920,6 +2976,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			list.ItemsSource = newItems;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_ItemTemplateSelector_Set()
 		{
@@ -2958,6 +3015,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Selectable C", text3.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_ItemTemplateSelector_Set_And_Uwp()
 		{
@@ -2965,6 +3023,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await When_ItemTemplateSelector_Set();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Removed_From_Tree_And_Selection_TwoWay_Bound()
 		{
@@ -2989,6 +3048,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Rice", dc.MySelection);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_ItemsSource_Move()
 		{
@@ -3037,6 +3097,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNull(list.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Selection_Events()
 		{
@@ -3073,6 +3134,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			list.SelectedIndex = 1;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_DisplayMemberPath_Property_Changed()
 		{
@@ -3102,6 +3164,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForResultEqual("BBB", () => tb.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Item_Removed_And_Relayout_NV286()
 		{
@@ -3164,6 +3227,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_FE_Item_Removed()
 		{
@@ -3178,6 +3242,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNull(item.Parent, "The item is still attached to a parent after being removed from ListView.");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Item_Removed_Selection_Stays()
 		{
@@ -3279,6 +3344,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(greenCount1 + 1, greenCount2); // Green template should be reused once for final item
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_ItemTemplate_Selector_And_Clear_Then_Released()
 		{
@@ -3342,6 +3408,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 #if false
 		[Ignore] // https://github.com/unoplatform/uno/issues/7323
@@ -3405,6 +3472,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(listBounds.Y, itemBounds.Y, 2); // Top of first item should align with top of list
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 #if false
 		[Ignore("Fails on WASM")]
@@ -3466,6 +3534,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(listBounds.Y, itemBounds.Y); // Top of first item should align with top of list
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_TemplateSelector_And_List_Reloaded()
 		{
@@ -3528,6 +3597,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_TemplateSelector_And_List_Reloaded_Uwp()
 		{
@@ -3535,6 +3605,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await When_TemplateSelector_And_List_Reloaded();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_List_Given_More_Space()
 		{
@@ -3566,6 +3637,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForNonNull(() => list.ContainerFromIndex(8));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Pool_Aware_View_In_Item_Template()
 		{
@@ -3636,6 +3708,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Binding_and_Item_Removed()
 		{
@@ -3677,6 +3750,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		[RunsOnUIThread]
@@ -3714,6 +3788,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(item2, focused);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		[RunsOnUIThread]
@@ -3751,6 +3826,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(item1, focused);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		[RunsOnUIThread]
@@ -3778,6 +3854,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Incremental_Load_Default()
@@ -3831,6 +3908,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Incremental_Load_ShouldStop()
@@ -3929,6 +4007,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_SelectionMode_Is_Multiple()
 		{
@@ -3954,6 +4033,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task Valid_MultipleSelectionMode_ValidSelectionStates()
 		{
@@ -3991,6 +4071,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[DataRow(nameof(ListView), "add")]
 		[DataRow(nameof(ListView), "remove")]
@@ -4043,6 +4124,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 #if false
 		[Ignore("The behaviour of virtualizing panels is only accurate for managed virtualizing panels.")]
@@ -4075,6 +4157,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.FindVisualChildByType<ItemsStackPanel>().Children.Count);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_ItemsSource_INCC_Reset()
 		{
@@ -4110,15 +4193,19 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Have_Duplicates_ListView() => await When_Items_Have_Duplicates_Common(new ListView());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Have_Duplicates_GridView() => await When_Items_Have_Duplicates_Common(new GridView());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Have_Duplicates_ComboBox() => await When_Items_Have_Duplicates_Common(new ComboBox());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Have_Duplicates_FlipView() => await When_Items_Have_Duplicates_Common(new FlipView());
 
@@ -4182,15 +4269,19 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("String 1", (string)added3.Single());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Are_Equal_But_Different_References_ListView() => await When_Items_Are_Equal_But_Different_References_Common(new ListView());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Are_Equal_But_Different_References_GridView() => await When_Items_Are_Equal_But_Different_References_Common(new GridView());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Are_Equal_But_Different_References_ComboBox() => await When_Items_Are_Equal_But_Different_References_Common(new ComboBox());
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_Items_Are_Equal_But_Different_References_FlipView() => await When_Items_Are_Equal_But_Different_References_Common(new FlipView());
 
@@ -4233,6 +4324,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreSame(obj1, added2.Single());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Header_DataContext()
@@ -4277,6 +4369,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(header2.DataContext.ToString(), header2.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[RunsOnUIThread]
 		[TestMethod]
 		public async Task When_Footer_DataContext()
@@ -4321,6 +4414,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(header2.DataContext.ToString(), header2.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow("GridView")]
@@ -4350,6 +4444,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -4412,6 +4507,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_GridView_Header_Orientation()
@@ -4530,10 +4626,12 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public Task When_SelectionChanged_Item_Is_BroughtIntoView_ListView() => When_SelectionChanged_Item_Is_BroughtIntoView<ListView>();
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public Task When_SelectionChanged_Item_Is_BroughtIntoView_TabView() => When_SelectionChanged_Item_Is_BroughtIntoView<TabView>();
@@ -4580,6 +4678,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -4651,6 +4750,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -4709,6 +4809,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("2", textBlocks[2].Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR || !HAS_RENDER_TARGET_BITMAP
@@ -4769,6 +4870,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -4835,6 +4937,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -4886,6 +4989,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ScrollIntoView_FreshlyAddedDefaultItem() // checks against #17695
@@ -4928,6 +5032,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/kahua-private/issues/257")]
@@ -4956,6 +5061,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(300, sv.VerticalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -5011,6 +5117,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(sv.ScrollableHeight, sv.VerticalOffset, "ListView is not scrolled to the end.");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ListView.feature, src/UIReqs/Platform.UI.Core/Features/Items/GridView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase.cs
 		[TestMethod]
 		public async Task When_SelectionChanged_DuringRefresh()
 		{

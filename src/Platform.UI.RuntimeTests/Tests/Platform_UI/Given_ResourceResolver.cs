@@ -14,6 +14,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Platform_UI; //Was previously:
 [TestClass]
 public class Given_ResourceResolver
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_StaticResource.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public void When_Resolving_String_Resources_Should_Produce_Target_Type()
@@ -26,6 +27,7 @@ public class Given_ResourceResolver
 		Assert.AreEqual(expected, SUT.ReferenceStringDurationFromProperty.Duration);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_StaticResource.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Resolving_FrameworkElement_Local_ThemeResource()
@@ -52,6 +54,7 @@ public class Given_ResourceResolver
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_StaticResource.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Resolving_TextBlockInlines_Local_ThemeResource()
@@ -71,6 +74,7 @@ public class Given_ResourceResolver
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_StaticResource.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Resolving_Parent_Local_Resources_With_NativeViews()

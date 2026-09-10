@@ -13,6 +13,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RunsOnUIThread]
 public class Given_PasswordBox
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/PasswordBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PasswordBoxTests/Given_PasswordBox.cs
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
 	public async Task When_PasswordChar_Visual_Comparison()
@@ -78,6 +79,7 @@ public class Given_PasswordBox
 		await ImageAssert.AreNotEqualAsync(passwordBoxScreenshot, passwordBoxBScreenshot);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/PasswordBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PasswordBoxTests/Given_PasswordBox.cs
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
 	public async Task When_PasswordChar_Special_Characters()
@@ -124,6 +126,7 @@ public class Given_PasswordBox
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/PasswordBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PasswordBoxTests/Given_PasswordBox.cs
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
 	public void When_PasswordChar_Set()
@@ -143,6 +146,7 @@ public class Given_PasswordBox
 		Assert.AreEqual("*", passwordBox.PasswordChar);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/PasswordBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PasswordBoxTests/Given_PasswordBox.cs
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
 	public void When_PasswordChar_Set_To_Invalid()

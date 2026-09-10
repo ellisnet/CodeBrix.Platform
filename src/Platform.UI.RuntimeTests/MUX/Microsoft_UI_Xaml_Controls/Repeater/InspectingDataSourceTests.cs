@@ -38,6 +38,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 	[RequiresFullWindow]
 	public class InspectingDataSourceTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void CanCreateFromIBindableIterable()
 		{
@@ -49,6 +50,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void CanCreateFromInccIBindableVector()
 		{
@@ -77,6 +79,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void CanCreateFromIObservableVector()
 		{
@@ -106,6 +109,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void VerifyUniqueIdMappingInterface()
 		{
@@ -120,6 +124,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void VerifyIndexOfBehavior()
 		{
@@ -162,6 +167,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 
 		// Calling Reset multiple times before layout runs causes a crash
 		// in unique ids. We end up thinking we have multiple elements with the same id.
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task VerifyCallingResetMultipleTimesOnUniqueIdItemsSource()
 		{
@@ -220,6 +226,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			await ValidateSwitchingItemsSourceRefreshesElements(isVirtualLayout: true);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void VerifyReadOnlyListCompatibility()
 		{
@@ -245,6 +252,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void VerifyNotifyCollectionChangeWithReadonlyListBehavior()
 		{

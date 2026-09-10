@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RequiresFullWindow]
 public class Given_Frame
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task When_Page_Ctor_Navigates()
 	{
@@ -51,6 +52,7 @@ public class Given_Frame
 		Assert.IsInstanceOfType(frame.Content, typeof(FrameNavigateFirstPage));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 #if !CODEBRIX_HAS_ENHANCED_LIFECYCLE
 	[Ignore("This test fails on Uno Platform targets. See https://github.com/unoplatform/uno/issues/14300")]
@@ -58,6 +60,7 @@ public class Given_Frame
 	public Task When_Page_Loaded_Navigates_Without_Yield() =>
 		When_Page_Loaded_Navigates_Inner(false);
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public Task When_Page_Loaded_Navigates_With_Yield() =>
 		When_Page_Loaded_Navigates_Inner(true);
@@ -132,6 +135,7 @@ public class Given_Frame
 		Assert.IsInstanceOfType(frame.Content, typeof(FrameNavigateSecondPage));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_Navigating_Cancels()
 	{
@@ -157,6 +161,7 @@ public class Given_Frame
 		Assert.IsInstanceOfType(SUT.Content, typeof(DisallowNavigatingFromPage));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_IsNavigationStackEnabled_False()
 	{
@@ -172,6 +177,7 @@ public class Given_Frame
 		Assert.IsFalse(SUT.CanGoBack);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_IsNavigationStackEnabled_False_After_Start()
 	{
@@ -215,6 +221,7 @@ public class Given_Frame
 		Assert.AreEqual(1, SUT.ForwardStack.Count);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_IsNavigationStackEnabled_Can_Enable()
 	{
@@ -281,6 +288,7 @@ public class Given_Frame
 	}
 #endif
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_Tracking_SourcePageType()
 	{
@@ -381,6 +389,7 @@ public class Given_Frame
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_SourcePageType_Set()
 	{
@@ -389,6 +398,7 @@ public class Given_Frame
 		Assert.IsInstanceOfType(SUT.Content, typeof(MyPage));
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_SourcePageType_Set_Null()
 	{
@@ -398,6 +408,7 @@ public class Given_Frame
 			() => SUT.SourcePageType = null);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_Content_Changes_Page()
 	{
@@ -415,6 +426,7 @@ public class Given_Frame
 
 	internal static NavigateOrderTracker _navigateOrderTracker = null;
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public void When_NavigatingBetweenPages()
 	{
@@ -442,6 +454,7 @@ public class Given_Frame
 		Assert.IsTrue(_navigateOrderTracker.FrameNavigated);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task When_Exception_In_Page_Ctor()
 	{
@@ -470,6 +483,7 @@ public class Given_Frame
 #endif
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task When_Exception_In_OnNavigatedTo()
 	{
@@ -494,6 +508,7 @@ public class Given_Frame
 		Assert.IsTrue(navigationFailed);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task When_BackStack_Then_Go_Back()
 	{

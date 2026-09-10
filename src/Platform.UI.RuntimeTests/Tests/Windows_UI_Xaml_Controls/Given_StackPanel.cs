@@ -41,6 +41,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -120,6 +121,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.LastArrangeOverrideReturn.Height);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Padding_Set_In_SizeChanged()
@@ -156,6 +158,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(200, ((UIElement)VisualTreeHelper.GetChild(SUT, 0)).ActualOffset.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/3543")]
@@ -197,16 +200,19 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
 		public Task When_MaxWidth_IsApplied() => MaxSizingTest(new Size(300, double.PositiveInfinity));
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
 		public Task When_MaxHeight_Is_Applied() => MaxSizingTest(new Size(double.PositiveInfinity, 200));
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -271,6 +277,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if RUNTIME_NATIVE_AOT
@@ -327,6 +334,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if RUNTIME_NATIVE_AOT
@@ -383,6 +391,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_No_Children_SnapPoints()
@@ -407,6 +416,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.GetIrregularSnapPoints(Orientation.Vertical, SnapPointsAlignment.Center).ToList().Should().BeEmpty();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -444,6 +454,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ValidateSpacingPositions(orientation, stackPanel, itemSpacing, itemSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -482,6 +493,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ValidateSpacingPositions(orientation, stackPanel, itemSpacing, itemSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -519,6 +531,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ValidateSpacingPositions(orientation, stackPanel, itemSpacing, itemSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -556,6 +569,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ValidateSpacingPositions(orientation, stackPanel, itemSpacing, itemSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -593,6 +607,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ValidateSpacingPositions(orientation, stackPanel, itemSpacing, itemSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/StackPanel.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/StackPanelTest/Given_StackPanel.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]

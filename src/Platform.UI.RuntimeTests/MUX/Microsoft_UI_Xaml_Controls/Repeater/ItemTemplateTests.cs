@@ -47,6 +47,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 	[RequiresFullWindow]
 	public class ItemTemplateTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateRecycling()
 		{
@@ -115,6 +116,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 		}
 
 		// Validate data context propagation and template selection
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateBindingAndTemplateSelection()
 		{
@@ -175,6 +177,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateCustomRecyclingElementFactory()
 		{
@@ -222,6 +225,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateRecyclingElementFactoryWithSingleTemplate()
 		{
@@ -272,6 +276,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateDataTemplateAsItemTemplate()
 		{
@@ -315,6 +320,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateDataTemplateSelectorAsItemTemplate()
 		{
@@ -380,6 +386,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateNoSizeWhenEmptyDataTemplate()
 		{
@@ -406,6 +413,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateCorrectSizeWhenEmptyDataTemplateInSelector()
 		{
@@ -462,6 +470,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateReyclingElementFactoryWithNoTemplate()
 		{
@@ -490,6 +499,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 		}
 
 		// Validate ability to create and use a view generator from scratch
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateCustomElementFactory()
 		{
@@ -524,6 +534,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateTemplateSwitchingRefreshesElementsVirtualizingLayout()
 		{
@@ -533,6 +544,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateTemplateSwitchingRefreshesElementsNonVirtualizingLayout()
 		{
@@ -583,6 +595,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task ValidateNullItemTemplateAndContainerInItems()
 		{
@@ -616,6 +629,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task VerifySelectTemplateLayoutFallback()
 		{

@@ -31,6 +31,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 	[RunsOnUIThread]
 	public partial class SplitButtonTests
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -70,6 +71,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			Verify.AreEqual("1", flyoutClosedCountTextBlock.Text);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -123,6 +125,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			Verify.AreEqual("4", executeCountTextBlock.Text);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -178,6 +181,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			await WindowHelper.WaitForIdle();
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 		public async Task AccessibilityTest()
 		{
@@ -220,6 +224,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			Verify.AreEqual(ExpandCollapseState.Collapsed, ((IExpandCollapseProvider)splitButton.GetAutomationPeer()).ExpandCollapseState);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 #if !__SKIA__
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -270,6 +275,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			Verify.AreEqual("2", flyoutOpenedCountTextBlock.Text);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -324,6 +330,7 @@ namespace Windows.UI.Xaml.Tests.MUXControls.InteractionTests
 			Verify.AreEqual("Unchecked", toggleStateOnClickTextBlock.Text);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 		public async Task ToggleAccessibilityTest()
 		{

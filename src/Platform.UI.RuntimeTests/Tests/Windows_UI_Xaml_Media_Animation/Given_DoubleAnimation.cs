@@ -22,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 	[RunsOnUIThread]
 	public class Given_DoubleAnimation
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public void When_SeekAlignedToLastTick()
 		{
@@ -46,6 +47,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 			sb.SeekAlignedToLastTick(TimeSpan.FromMilliseconds(50));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 #if false
 		[Ignore("In this scenario, droid doesnt ReportEachFrame(), so we won't be able to read the animated values to evaluate this test.")]
@@ -120,6 +122,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 			storyboard.Stop();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.Skia)]
 		public async Task When_RepeatForever_ShouldLoop() // Flaky - #9080
@@ -200,6 +203,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 			await TestHelper.RetryAssert(Do, 10);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_StartingFrom_AnimatedValue() // value from completed(filling) animation
 		{
@@ -243,6 +247,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 			Assert.IsTrue(y > 0, $"Expecting Translate.Y to be still positive: {y}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_StartingFrom_AnimatingValue() // value from mid animation
 		{
@@ -297,6 +302,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		[CombinatorialData]
 		public async Task When_OverridingFillingValue_WithLocalValue(bool skipToFill)

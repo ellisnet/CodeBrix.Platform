@@ -69,6 +69,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		const int BorderThicknessAdjustment = 2; // Deduct BorderThickness on PopupBorder
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[DataRow(0)]
 		[DataRow(1)]
@@ -93,6 +94,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_IsEditable_False()
 		{
@@ -104,6 +106,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(Visibility.Collapsed, GetEditableText(SUT).Visibility);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_IsEditable_True()
 		{
@@ -115,6 +118,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(Visibility.Visible, GetEditableText(SUT).Visibility);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_IsEditable_False_Changes_To_True()
 		{
@@ -138,6 +142,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		private TextBox GetEditableText(ComboBox comboBox) => comboBox.FindFirstChild<TextBox>(c => c.Name == "EditableText");
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_ComboBox_MinWidth()
 		{
@@ -175,6 +180,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_ComboBox_Constrained_By_Parent()
 		{
@@ -216,6 +222,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -253,6 +260,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task Check_Creation_Count_Few_Items()
 		{
@@ -298,6 +306,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 #if false
 		[Ignore("ComboBox is currently not virtualized on iOS and Android - #556")] // https://github.com/unoplatform/uno/issues/556
@@ -412,6 +421,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task Check_Dropdown_Measure_Count()
 		{
@@ -455,6 +465,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_CB_Fluent_And_Theme_Changed()
 		{
@@ -484,6 +495,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(lightThemeForeground, (placeholderTextBlock.Foreground as SolidColorBrush)?.Color);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_SelectedItem_Set_Before_ItemsSource()
 		{
@@ -502,6 +514,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(5, SUT.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_SelectedItem_Set_Then_SelectedIndex_Then_ItemsSource()
 		{
@@ -527,6 +540,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(5, SUT.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Tabbed()
 		{
@@ -562,6 +576,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(btn, FocusManager.GetFocusedElement(SUT.XamlRoot));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Popup_Open_Tabbed()
 		{
@@ -604,6 +619,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(btn, FocusManager.GetFocusedElement(SUT.XamlRoot));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Is_Out_Of_Range_And_Later_Becomes_Valid()
 		{
@@ -618,6 +634,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, comboBox.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Set_With_No_Items_Repeated()
 		{
@@ -639,6 +656,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, comboBox.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Set_Out_Of_Range_When_Items_Exist()
 		{
@@ -647,6 +665,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.ThrowsExactly<ArgumentException>(() => comboBox.SelectedIndex = 2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Set_Negative_Out_Of_Range_When_Items_Exist()
 		{
@@ -655,6 +674,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.ThrowsExactly<ArgumentException>(() => comboBox.SelectedIndex = -2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Set_Negative_Out_Of_Range_When_Items_Do_Not_Exist()
 		{
@@ -665,6 +685,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(-1, comboBox.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public void When_Index_Is_Explicitly_Set_To_Negative_After_Out_Of_Range_Value()
 		{
@@ -680,6 +701,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(-1, comboBox.SelectedIndex); // Will no longer become 2
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Collection_Reset()
 		{
@@ -721,6 +743,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_ComboBoxItem_DataContext_Cleared()
 		{
@@ -757,6 +780,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			comboBox.IsDropDownOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Binding_Change()
 		{
@@ -810,6 +834,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Full_Collection_Reset()
 		{
@@ -876,6 +901,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_Recycling_Explicit_Items()
 		{
@@ -942,6 +968,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_SelectedItem_TwoWay_Binding()
 		{
@@ -979,6 +1006,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_SelectedItem_Active_VisualState()
@@ -1114,6 +1142,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_SelectedItem_TwoWay_Binding_Clear()
 		{
@@ -1140,6 +1169,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, dc.ItemSetCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[CombinatorialData]
 		public async Task When_ComboBox_IsTextSearchEnabled_DropDown_Closed(bool isTextSearchEnabled)
@@ -1170,6 +1200,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(expectedSelectedItem, comboBox.SelectedItem);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[CombinatorialData]
 		public async Task When_ComboBox_IsTextSearchEnabled_DropDown_Opened(bool isTextSearchEnabled)
@@ -1215,6 +1246,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(!isTextSearchEnabled, comboBox.IsDropDownOpen);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		[RunsOnUIThread]
@@ -1271,6 +1303,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Items_Are_Enum_Values()
@@ -1297,6 +1330,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ComboPopup_Rearrange_ScrollShouldNotReset()
@@ -1331,6 +1365,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if __SKIA__ // Requires input injection
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		[RunsOnUIThread]
@@ -1370,6 +1405,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		public async Task When_ComboBox_Popup_Dismissed()
 		{
@@ -1412,10 +1448,12 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(dropDownClosedFired, "DropDownClosed event was not fired");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS | RuntimeTestPlatforms.NativeAndroid)] // https://github.com/unoplatform/uno-private/issues/1297
 		public Task When_ComboBox_ScrollIntoView_SelectedItem() => When_ComboBox_ScrollIntoView_Selection(viaIndex: false);
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS | RuntimeTestPlatforms.NativeAndroid)] // https://github.com/unoplatform/uno-private/issues/1297
 		public Task When_ComboBox_ScrollIntoView_SelectedIndex() => When_ComboBox_ScrollIntoView_Selection(viaIndex: true);

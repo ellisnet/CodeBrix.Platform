@@ -12,6 +12,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 [RunsOnUIThread]
 public class Given_xBind
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/xBindTests/Given_xBind_Binding.cs
 	[TestMethod]
 #if false
 	[Ignore("Fails on iOS")]
@@ -34,6 +35,7 @@ public class Given_xBind
 		Assert.AreEqual("ItemOther", SUT.tb.Text);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/xBindTests/Given_xBind_Binding.cs
 	[TestMethod]
 	public async Task When_xBind_With_Cast_Default_Namespace()
 	{

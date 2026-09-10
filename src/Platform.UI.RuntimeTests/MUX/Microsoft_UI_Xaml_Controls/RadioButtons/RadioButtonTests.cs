@@ -25,6 +25,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Microsoft_UI_Xaml_Controls //Was
 	[TestClass]
 	public class RadioButtonsTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RadioButtonsTests/Given_RadioButtons.cs
 		[TestMethod]
 		public async Task VerifyCustomItemTemplate()
 		{
@@ -81,6 +82,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Microsoft_UI_Xaml_Controls //Was
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/RadioButton.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RadioButtonsTests/Given_RadioButtons.cs
 		[TestMethod]
 		public async Task VerifyIsEnabledChangeUpdatesVisualState()
 		{

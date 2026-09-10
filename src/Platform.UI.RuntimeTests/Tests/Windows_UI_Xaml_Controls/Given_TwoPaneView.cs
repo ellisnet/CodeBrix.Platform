@@ -31,6 +31,7 @@ public partial class Given_TwoPaneView
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/TwoPaneView.feature
 	[TestMethod]
 	public async Task When_ApplyTemplate_Should_Not_Throw()
 	{

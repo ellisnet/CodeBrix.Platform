@@ -38,6 +38,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	{
 		private string GetAllIsOpens() => string.Join(" ", VisualTreeHelper.GetOpenPopupsForXamlRoot(TestServices.WindowHelper.XamlRoot).Select(p => p.IsOpen));
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Default_ShowMode()
@@ -46,6 +47,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(FlyoutShowMode.Standard, flyout.ShowMode);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Unloaded_Before_Shown()
@@ -68,6 +70,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_LoadedAndUnloaded_Check_Binding()
@@ -128,6 +131,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Attached_To_Border_Check_Placement()
 		{
@@ -170,6 +174,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Attached_To_TextBlock_Check_Placement()
 		{
@@ -207,6 +212,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[DataRow(FlyoutPlacementMode.Top, HorizontalPosition.Center, VerticalPosition.BeyondTop)]
 		[DataRow(FlyoutPlacementMode.Bottom, HorizontalPosition.Center, VerticalPosition.BeyondBottom)]
@@ -261,6 +267,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[DataRow(FlyoutPlacementMode.Top, HorizontalPosition.Center, VerticalPosition.BeyondTop)]
 		[DataRow(FlyoutPlacementMode.Bottom, HorizontalPosition.Center, VerticalPosition.BeyondBottom)]
@@ -319,6 +326,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 		// "Popup successfully fits left-aligned on Android - possibly because the status bar offset changes the layouting?"
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeAndroid | RuntimeTestPlatforms.SkiaAndroid | RuntimeTestPlatforms.SkiaIOS)]
 		public async Task When_Too_Large_For_Any_Fallback()
@@ -398,6 +406,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[DataRow(FlyoutPlacementMode.Top, HorizontalPosition.Center, VerticalPosition.BeyondTop)]
 		[DataRow(FlyoutPlacementMode.Bottom, HorizontalPosition.Center, VerticalPosition.BeyondBottom)]
@@ -457,6 +466,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX // For macOS, see https://github.com/unoplatform/uno/issues/626 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Test_Flyout_Binding()
@@ -483,6 +493,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("My Data Context", (stackPanel.Children[0] as TextBlock).Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Test_Flyout_Binding_In_MenuFlyoutItem()
@@ -512,6 +523,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Test_Flyout_Binding_With_SetAttachedFlyout()
@@ -566,6 +578,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.Hide();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Flyout_Content_Takes_Focus()
@@ -603,6 +616,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			TestServices.WindowHelper.WindowContent = null;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Flyout_Has_Focusable_Child()
@@ -634,6 +648,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			TestServices.WindowHelper.WindowContent = null;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PlacementTarget_Binding()
@@ -667,6 +682,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Hide_Always_Closing()
@@ -679,6 +695,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(closingCalled);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Opening_Canceled()
@@ -715,6 +732,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Opening_And_Closing_Canceled()
@@ -758,6 +776,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Opening_And_Closing_Nested_Flyouts()
@@ -915,6 +934,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Opening_And_Closing_Nested_Flyouts_Not_Open()
@@ -1420,6 +1440,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		//		}
 		//#endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Opening_XamlRootIsSet()
 		{
@@ -1448,6 +1469,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Button_ContextFlyout_XamlRoot()
 		{
@@ -1461,6 +1483,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(host.XamlRoot, flyout.XamlRoot);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_SplitButton_Flyout_XamlRoot()
 		{
@@ -1474,6 +1497,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(host.XamlRoot, flyout.XamlRoot);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Button_Flyout_XamlRoot()
 		{
@@ -1487,6 +1511,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(host.XamlRoot, flyout.XamlRoot);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_Flyout_Popup_XamlRoot()
 		{
@@ -1515,6 +1540,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		public async Task When_AttachedFlyout_Popup_XamlRoot()
 		{
@@ -1547,6 +1573,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -1625,11 +1652,13 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public Task When_Unbound_FullFlyout_Any() =>
 			When_Unbound_FullFlyout_Impl(skiaFullScreen: false);
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.SkiaMobile)]
 		[RunsOnUIThread]
@@ -1707,6 +1736,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Flyout.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/FlyoutTests/Given_Flyout.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Open_In_GotFocus()

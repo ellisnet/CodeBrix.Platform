@@ -78,6 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Limited_By_Available_Size_Before_Margin_Application()
@@ -104,6 +105,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Size(200, 200), SUT.DesiredSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Limited_By_Available_Size_After_Margin_Application()
@@ -127,6 +129,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Size(200, 200), SUT.DesiredSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_SetChildTemplateUsingVisualState()
@@ -170,6 +173,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			</Button>
 			""";
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Refresh_Setter_BindingOnInvocation()
@@ -202,6 +206,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Style_Changed_During_Loading()
@@ -231,6 +236,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 
 #if WINAPPSDK || CODEBRIX_HAS_ENHANCED_LIFECYCLE
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Template_Changes_Should_Not_Be_Materialized_Immediately()
@@ -269,6 +275,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(1, control.ApplyTemplateCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Measure_Should_Materialize_Template()
@@ -302,6 +309,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Refresh_Setter_BindingOnInvocation_ElementName()
@@ -333,6 +341,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(43, testTransform.TranslateY);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__CROSSRUNTIME__
@@ -370,6 +379,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(0, ((UIElement)VisualTreeHelper.GetChild(SUT, 0)).ActualOffset.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_CCButton_ApplyTemplate_WithChild()
@@ -396,6 +406,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 
 			Assert.IsNotNull(SUT.FindFirstDescendant<Border>("ControlTemplateRoot"), "Failed to find the expected template root (Border#ControlTemplateRoot)");
 		}
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_CCButton_ApplyTemplate_WithNoChild()
@@ -416,6 +427,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsNotNull(SUT.FindFirstDescendant<Border>("ControlTemplateRoot"), "Failed to find the expected template root (Border#ControlTemplateRoot)");
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_CCExpander_ApplyTemplate_WithChild()
@@ -437,6 +449,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 
 			Assert.IsNotNull(SUT.FindFirstDescendant<Border>("ControlTemplateRoot"), "Failed to find the expected template root (Border#ControlTemplateRoot)");
 		}
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_CCExpander_ApplyTemplate_WithNoChild()
@@ -466,6 +479,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		/// We only execute this test on Skia, as native targets also have some built-in controls that are not
 		/// in fact WinUI-based, so it is expected they don't have the DefaultStyleResourceUri set.
 		/// </remarks>
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21469")]
@@ -561,6 +575,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21469")]
@@ -602,6 +617,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsNotNull(VisualTreeUtils.FindVisualChildByName(tabView, "TabContainerGrid"));
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/Given_Style.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21469")]

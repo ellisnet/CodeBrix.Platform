@@ -15,6 +15,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public class Given_AppBarButton
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/CommandBarTests/Given_AppBarButton.cs
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeAndroid)] // https://github.com/unoplatform/uno/issues/9080
 		[TestMethod]
 		public async Task Check_DataContext_Propagation()
@@ -40,6 +41,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/CommandBarTests/Given_AppBarButton.cs
 		[TestMethod]
 		public async Task Check_Binding_No_DataContext()
 		{

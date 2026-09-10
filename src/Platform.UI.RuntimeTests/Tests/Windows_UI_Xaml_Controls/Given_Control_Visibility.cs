@@ -20,6 +20,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RunsOnUIThread]
 public class Given_Control_Visibility
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Appearance.feature
 	[TestMethod]
 	[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaUIKit)] // Times out in Skia UIKit CI https://github.com/unoplatform/uno-private/issues/806
 	[GitHubWorkItem("https://github.com/unoplatform/uno/issues/16369")]

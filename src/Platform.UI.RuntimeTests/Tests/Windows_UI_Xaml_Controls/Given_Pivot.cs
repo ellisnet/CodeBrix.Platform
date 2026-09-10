@@ -29,6 +29,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			_testsResources = new TestsResources();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/Pivot.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PivotTests/Given_Pivot.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_Binding()
@@ -86,6 +87,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if !WINAPPSDK // GetTemplateChild is protected in UWP while public in Uno.
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/Pivot.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PivotTests/Given_Pivot.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_Changing_Header_Affects_UI()
@@ -107,6 +109,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/Pivot.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PivotTests/Given_Pivot.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_Changing_SelectedItem_Affects_SelectedIndex()
@@ -130,6 +133,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.SelectedItem.Should().Be(pivotItem2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/Pivot.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/PivotTests/Given_Pivot.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Pivot_Single_ItemContent_Visible()

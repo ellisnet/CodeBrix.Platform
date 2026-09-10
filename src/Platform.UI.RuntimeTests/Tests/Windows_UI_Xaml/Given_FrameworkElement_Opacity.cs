@@ -29,6 +29,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	public class Given_FrameworkElement_Opacity
 	{
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Appearance.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Opacity()
@@ -65,6 +66,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAtChild(si, SUT.ImageOpacity0_5, width / 2, height / 2, "#FFFEF3C2");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Appearance.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm | RuntimeTestPlatforms.SkiaMacOS | RuntimeTestPlatforms.SkiaIOS)]
 		public async Task When_Opacity_Inner()

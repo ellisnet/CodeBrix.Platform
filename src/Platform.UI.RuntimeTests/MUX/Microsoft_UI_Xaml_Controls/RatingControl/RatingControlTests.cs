@@ -35,6 +35,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[TestClass]
 	public class RatingControlTests : MUXApiTestBase
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/RatingControl.feature
 		[TestMethod]
 		public async Task VerifyDefaultsAndBasicSetting()
 		{
@@ -90,6 +91,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 
 		// Setting the value on a collapsed control can cause it to try and
 		// interact with a non-existent AutomationPeer, causing a crash.
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/RatingControl.feature
 		[TestMethod]
 		public void VerifyDontCrashWhenCollapsedAndValueSet()
 		{
@@ -102,6 +104,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 		}
 
 		// Test just verifies the API contraaaact
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/RatingControl.feature
 		[TestMethod]
 		public void VerifyValuesCoercion()
 		{
@@ -135,6 +138,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/RatingControl.feature
 		[TestMethod]
 		[TestProperty("IsolationLevel", "Method")] // This test alters the application resources, so it's isolated from other tests.
 		public async Task VerifySizeIsChangeableFromResource()

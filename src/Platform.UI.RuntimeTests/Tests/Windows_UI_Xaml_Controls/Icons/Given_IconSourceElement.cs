@@ -11,6 +11,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Icons
 [RunsOnUIThread]
 public class Given_IconSourceElement
 {
+	//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/IconTests/Given_IconSourceElement.cs
 	[TestMethod]
 	public async Task When_Switch_Sources()
 	{

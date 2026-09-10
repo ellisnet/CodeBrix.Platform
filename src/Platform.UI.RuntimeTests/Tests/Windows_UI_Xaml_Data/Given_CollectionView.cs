@@ -15,6 +15,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Data; //Was pr
 [RunsOnUIThread]
 public class Given_CollectionView
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/CollectionViewTests/Given_CollectionView.cs
 	[TestMethod]
 	public void When_Grouped_With_ItemsPath()
 	{
@@ -44,6 +45,7 @@ public class Given_CollectionView
 		Assert.AreEqual(typeof(GroupItemDto), type);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/CollectionViewTests/Given_CollectionView.cs
 	[TestMethod]
 	public void When_Grouped_Get_Count()
 	{

@@ -16,6 +16,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests;
 
 public partial class NavigationViewTests : MUXApiTestBase
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 	[TestMethod]
 #if !HAS_INPUT_INJECTOR || !HAS_CODEBRIX_WINUI
 	[Ignore("InputInjector is not supported on this platform.")]

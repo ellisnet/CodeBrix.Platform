@@ -33,6 +33,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RunsOnUIThread]
 public class Given_TreeView
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 	[TestMethod]
 	public async Task When_Open_Close_Twice()
 	{
@@ -78,6 +79,7 @@ public class Given_TreeView
 		Assert.AreEqual("Child 2", child2NodeAfter.Content);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 	[TestMethod]
 	public async Task When_Open_Close_Twice_Grid()
 	{
@@ -128,6 +130,7 @@ public class Given_TreeView
 	}
 
 #if __SKIA__
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 	[TestMethod]
 	public async Task When_Delete_Node_With_MenuFlyout()
 	{
@@ -164,6 +167,7 @@ public class Given_TreeView
 #if false
 	[Ignore("Test is not operational on Android, items are not returned properly https://github.com/unoplatform/uno/issues/9080")]
 #endif
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 	[TestMethod]
 	public async Task When_Open_Close_Root_Twice_Keep_State()
 	{

@@ -10,6 +10,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 
 partial class Given_UIElement
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyProperty.DataContext.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]
@@ -35,6 +36,7 @@ partial class Given_UIElement
 		Assert.AreEqual(DC, nested2.DataContext, "3. when reattached, DC (nested2) should be inherited again");
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyProperty.DataContext.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[PlatformCondition(ConditionMode.Include, RuntimeTestPlatforms.Skia)]

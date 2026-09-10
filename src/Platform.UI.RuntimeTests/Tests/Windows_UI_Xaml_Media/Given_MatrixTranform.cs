@@ -15,6 +15,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 	[TestClass]
 	public class Given_MatrixTranform
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Identity_And_TransformPoint() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -24,6 +25,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				Assert.AreEqual(new Point(0, 0), SUT.TransformPoint(new Point(0, 0)));
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Identity_And_TransformBounds() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -33,6 +35,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				Assert.AreEqual(new Rect(0, 0, 0, 0), SUT.TransformBounds(new Rect(0, 0, 0, 0)));
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Translate_And_TransformPoint() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -45,6 +48,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				Assert.AreEqual(new Point(10, 20), SUT.TransformPoint(new Point(0, 0)));
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Translate_And_TransformBounds() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -60,6 +64,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				);
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Rotate_And_TransformPoint() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -72,6 +77,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				Assert.AreEqual(new Point(-1, 1), SUT.TransformPoint(new Point(1, 1)));
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_Rotate_And_TransformBounds() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -87,6 +93,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				);
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_RotateQuarter_And_TransformPoint() =>
 			RunOnUIThread.ExecuteAsync(() =>
@@ -102,6 +109,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				Assert.AreEqual(expected.Y, res.Y, 1e-10, $"{expected} != {res}");
 			});
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		public Task When_RotateQuarter_And_TransformBounds() =>
 			RunOnUIThread.ExecuteAsync(() =>

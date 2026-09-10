@@ -16,6 +16,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 [RunsOnUIThread]
 public class Given_xUid
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XUidTests/Given_xUid.cs
 	[TestMethod]
 	public void When_xUid()
 	{
@@ -28,6 +29,7 @@ public class Given_xUid
 		Assert.AreEqual("en-US Value for SomePrefix/When_xUid_With_Prefix", SUT.defaultResolverWithPrefix.Text);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XUidTests/Given_xUid.cs
 	[TestMethod]
 	public void When_xUid_On_Root()
 	{

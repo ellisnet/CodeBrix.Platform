@@ -41,6 +41,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		// most macOS keyboard shortcuts uses Command (mapped as Window) and not Control (Ctrl)
 		private readonly VirtualKeyModifiers _platformCtrlKey = RuntimeInformation.IsOSPlatform(OSPlatform.OSX) ? VirtualKeyModifiers.Windows : VirtualKeyModifiers.Control;
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Basic_Input()
 		{
@@ -68,6 +69,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Basic_Input_Event_Sequence()
 		{
@@ -117,6 +119,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
                 """.Replace("\r\n", "\n"), eventLog);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Public_KeyDown_Subscription_Changes_Text()
 		{
@@ -138,6 +141,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("tRamez", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Basic_Input_With_ArrowKeys()
 		{
@@ -181,6 +185,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Basic_Input_With_Home_End()
 		{
@@ -223,6 +228,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Home_Empty_TextBox()
 		{
@@ -242,6 +248,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Selection_With_Keyboard_NoMod_And_Shift()
 		{
@@ -305,6 +312,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Keyboard_Selection_Backwards_ScrollViewer_Offset()
 		{
@@ -349,6 +357,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, ((ScrollViewer)SUT.ContentElement).HorizontalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_End_ScrollViewer_Vertical_Offset()
 		{
@@ -381,6 +390,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			((ScrollViewer)SUT.ContentElement).VerticalOffset.Should().BeApproximately(((ScrollViewer)SUT.ContentElement).ScrollableHeight, 1.0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_A()
 		{
@@ -417,6 +427,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Shift()
 		{
@@ -444,6 +455,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello world", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_Home_End()
 		{
@@ -478,6 +490,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_Delete()
 		{
@@ -516,6 +529,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_Backspace()
 		{
@@ -554,6 +568,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Enter_But_Not_Multiline()
 		{
@@ -586,6 +601,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(size, SUT.ActualSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Selection_With_Keyboard_NoMod_Ctrl_And_Shift()
 		{
@@ -638,6 +654,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Text_Bigger_Than_TextBox()
 		{
@@ -680,6 +697,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, sv.HorizontalOffset, "HorizontalOffset should be 0 after Home key press");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_KeyDown_Bubbles_Out()
 		{
@@ -785,6 +803,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(8, keyDownCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Selection_Initial_Then_Text_Changed()
 		{
@@ -819,6 +838,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_ReadOnly()
 		{
@@ -868,6 +888,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, keyDownCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Long_Text_Unfocused()
 		{
@@ -911,6 +932,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			LayoutInformation.GetLayoutSlot(SUT).Right.Should().BeLessThan(LayoutInformation.GetLayoutSlot(sv).Right + 10);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Scrolling_Updates_With_Movement()
 		{
@@ -968,6 +990,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			sv.HorizontalOffset.Should().BeGreaterThan(0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Scrolling_Updates_After_Backspace()
@@ -1016,6 +1039,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Scrolling_Updates_After_Pasting_Long_Text()
@@ -1066,6 +1090,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			((ScrollViewer)SUT.ContentElement).HorizontalOffset.Should().BeApproximately(((ScrollViewer)SUT.ContentElement).ScrollableWidth, 5.0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Tap()
 		{
@@ -1109,6 +1134,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Tap_After_Ending_Spaces()
 		{
@@ -1144,6 +1170,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Shift_Tap()
 		{
@@ -1183,6 +1210,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(selectionEnd, SUT.SelectionStart + SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_RightClick_No_Selection()
 		{
@@ -1226,6 +1254,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaUIKit)] // Fails in Skia UIKit CI - https://github.com/unoplatform/uno-private/issues/808
 		public async Task When_Pointer_RightClick_Selection()
@@ -1275,6 +1304,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Hold_Drag()
 		{
@@ -1322,6 +1352,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(9, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Hold_Drag_OutOfBounds()
 		{
@@ -1370,6 +1401,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(10, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_LongText_Pointer_Hold_Drag_OutOfBounds()
 		{
@@ -1426,6 +1458,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length - 10, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Chunk_DoubleTapped()
 		{
@@ -1470,6 +1503,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(4, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Chunk_DoubleTapHeld()
 		{
@@ -1523,6 +1557,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length - 1, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Chunk_TripleTapped()
 		{
@@ -1569,6 +1604,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length - 1, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Typing_While_Pointer_Held()
 		{
@@ -1630,6 +1666,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(9, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[DataRow(VirtualKey.Left, VirtualKeyModifiers.None)]
 		[DataRow(VirtualKey.Right, VirtualKeyModifiers.None)]
@@ -1698,6 +1735,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(9, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Cut_While_Pointer_Held()
 		{
@@ -1834,6 +1872,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(13, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Escape_While_Pointer_Held()
 		{
@@ -1901,6 +1940,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_NonAscii_Characters()
 		{
@@ -1926,6 +1966,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(text, SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[CombinatorialData]
 		public async Task When_Copy_Paste(bool useInsert)
@@ -2032,6 +2073,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Cut_Paste()
 		{
@@ -2096,6 +2138,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Paste_History_Remains_Intact()
@@ -2152,6 +2195,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		// Clipboard is currently not available on skia-WASM
 		// Newline handling is different on Skia.UIKit targets due to native input sync #788
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Paste_The_Same_Text()
@@ -2190,6 +2234,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Simple()
 		{
@@ -2216,6 +2261,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.ActualHeight.Should().BeGreaterThan(height * 1.2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_LineFeed()
 		{
@@ -2237,6 +2283,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("lorem\ripsum\rdolor", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Return_Selected()
 		{
@@ -2269,6 +2316,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("o\rw", SUT.SelectedText);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Up_WithWithout_Shift()
 		{
@@ -2303,6 +2351,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, keyDownCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Multiline_NewLine_UpDown()
@@ -2349,6 +2398,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_UpDown_Caret_Position_Preserved()
 		{
@@ -2402,6 +2452,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Multiline_Wrapping_UpDown()
@@ -2451,6 +2502,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_NewLine_LeftRight()
 		{
@@ -2480,6 +2532,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Wrapping_LeftRight()
 		{
@@ -2509,6 +2562,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Keyboard_Chunking()
 		{
@@ -2607,6 +2661,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(31, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Text_Ends_In_Return()
 		{
@@ -2630,6 +2685,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.ActualHeight.Should().BeGreaterThan(height * 1.2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Wrapping_Text_Ends_In_Too_Many_Spaces()
 		{
@@ -2656,6 +2712,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(height, SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Text_Changed_Events()
 		{
@@ -2692,6 +2749,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(expected.Replace("\r\n", "\n"), output);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_SelectionChanging()
 		{
@@ -2731,6 +2789,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18371")]
 		public async Task When_BeforeTextChanging_Resets_Selection_Direction()
@@ -2776,6 +2835,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length - 2, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaUIKit)] // Fails in Skia UIKit CI - https://github.com/unoplatform/uno-private/issues/808
 		public async Task When_Multiline_Pointer_Tap()
@@ -2831,6 +2891,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Pointer_DoubleTap()
 		{
@@ -2908,6 +2969,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(14, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Wrapping_Pointer_DoubleTap()
 		{
@@ -2944,6 +3006,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_SurrogatePair_Copy()
@@ -2985,6 +3048,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Hello ", await Clipboard.GetContent()!.GetTextAsync());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Pointer_TripleTap()
 		{
@@ -3036,6 +3100,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(14, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Multiline_Pointer_TripleTap_With_Wrapping()
 		{
@@ -3094,6 +3159,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Text_Cleared_No_Paint()
 		{
@@ -3130,6 +3196,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(cleared, new Rectangle(System.Drawing.Point.Empty, cleared.Size), SUT.SelectionHighlightColor.Color);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[DataRow(false, null, true)]
 		[DataRow(true, null, false)]
@@ -3178,6 +3245,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Single_Letter_Selected()
 		{
@@ -3196,6 +3264,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorInRectangle(screenshot, new Rectangle(System.Drawing.Point.Empty, screenshot.Size), SUT.SelectionHighlightColor.Color);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Undo_Redo_Basic()
 		{
@@ -3235,6 +3304,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Undo_Redo_Keyboard_Basic()
 		{
@@ -3274,6 +3344,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Typing_with_Backspace_Undo_Redo()
 		{
@@ -3317,6 +3388,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Typing_Over_Selection_Undo_Redo()
 		{
@@ -3364,6 +3436,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Undo_Redo_ContextMenu_Basic()
 		{
@@ -3432,6 +3505,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Right_Tap_Selection_Persists()
 		{
@@ -3491,6 +3565,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(selection, (SUT.SelectionStart, SUT.SelectionLength));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Text_Changed_History_Cleared()
 		{
@@ -3534,6 +3609,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Changed", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_ClearUndoRedoHistory()
 		{
@@ -3577,6 +3653,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Typing_Nothing()
 		{
@@ -3625,6 +3702,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[DataRow(VirtualKey.Y)] // redo
 		[DataRow(VirtualKey.C)] // copy
@@ -3666,6 +3744,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[DataRow(VirtualKey.X)] // cut
 		[DataRow(VirtualKey.V)] // paste
@@ -3733,6 +3812,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_CanRedo_CanUndo()
 		{
@@ -3802,6 +3882,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(SUT.CanUndo);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Clicked_Typing_Ends()
 		{
@@ -3871,6 +3952,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hellohello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Pressed_Undo()
 		{
@@ -3929,6 +4011,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Pointer_Pressed_Redo()
 		{
@@ -3991,6 +4074,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Unfocused_Typing_Ends()
 		{
@@ -4062,6 +4146,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hellohello", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Caret_Moves_Typing_Ends()
 		{
@@ -4116,6 +4201,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("hellllo", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Repeated_Delete_Undo_Redo()
 		{
@@ -4170,6 +4256,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("o", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Ctrl_Delete_Undo_Redo()
 		{
@@ -4204,6 +4291,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("world", SUT.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Paste_Does_Not_Change_Text()
 		{
@@ -4249,6 +4337,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Variable_Width_Tab()
 		{
@@ -4278,6 +4367,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Tab_Forces_NewLine_When_Not_Enough_Width()
 		{
@@ -4313,6 +4403,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreNotEqual(sp.Children[0].ActualSize.Y, sp.Children[1].ActualSize.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_FeatureConfiguration_Changes()
 		{
@@ -4341,6 +4432,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, SUT.TextBoxView.DisplayBlock.Opacity);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_Caret_Color_DarkMode()
 		{
@@ -4392,6 +4484,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(i < 20);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_PasswordBox_TextRevealed()
 		{
@@ -4442,6 +4535,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("test", SUT.TextBoxView.DisplayBlock.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno.chefs/issues/1472")]
 		public async Task When_PasswordBox_Focus_Changes()
@@ -4491,6 +4585,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreEqualAsync(screenshotRefocused, screenshotFilled);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno-private/issues/753")]
 		public async Task When_TextBox_Touch_Tapped_At_End()
@@ -4514,6 +4609,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(SUT.Text.Length, SUT.SelectionStart);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		public async Task When_First_Second_Tap_Caret_Thumb_Shows()
 		{
@@ -4541,6 +4637,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(TextBox.CaretDisplayMode.CaretWithThumbsOnlyEndShowing, SUT.CaretMode);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno-private/issues/753")]
 		public async Task When_Touch_Focused_Then_Scrolled_Away()
@@ -4604,6 +4701,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.GetAbsoluteBoundsRect().Bottom.Should().BeApproximately(sv.GetAbsoluteBoundsRect().Bottom, 5);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno-private/issues/1199")]
 		public async Task When_TextBox_TextChange_Not_Trigger_Selection_Change_To_Start()
@@ -4640,6 +4738,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(selectionChangedToStart, "SelectionChanged event should not be triggered when TextBox text is changed.");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/19327")]
 		public async Task When_Setting_Short_Text_And_Previous_Selection_Is_OutOfBounds()
@@ -4674,6 +4773,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.RaiseEvent(UIElement.KeyUpEvent, new KeyRoutedEventArgs(SUT, VirtualKey.Escape, VirtualKeyModifiers.None));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)] // needs paste permission
 		public async Task When_MaxLine_Paste()
@@ -4715,6 +4815,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20857")]
@@ -4763,6 +4864,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreEqualAsync(screenshot1, screenshot2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/21961")]

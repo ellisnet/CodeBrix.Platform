@@ -25,6 +25,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[RunsOnUIThread]
 	public class Given_FrameworkElement_ThemeResources
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_Detached_From_Window_While_Theme_Changed()
 		{
@@ -45,6 +46,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_Styled_And_Not_Loaded_While_Theme_Changed()
 		{
@@ -59,6 +61,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_ComboBox_Theme_Changed()
 		{
@@ -75,6 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_ComboBox_Theme_Changed_After_First_Open()
 		{

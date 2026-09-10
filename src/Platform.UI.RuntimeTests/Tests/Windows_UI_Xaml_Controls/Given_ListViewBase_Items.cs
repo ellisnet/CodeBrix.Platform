@@ -26,6 +26,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[TestClass]
 	public partial class Given_ListViewBase_Items
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_Items_Added_Count_Updated()
 		{
@@ -34,6 +35,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_Items_Added_ItemsSource_Stays_Null()
 		{
@@ -42,6 +44,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNull(listView.ItemsSource);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Used_Items_NotNull()
 		{
@@ -50,6 +53,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNotNull(listView.Items);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Unset_Items_NotNull()
 		{
@@ -60,6 +64,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNotNull(listView.Items);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Set_To_Empty_Items_Cleared()
 		{
@@ -69,6 +74,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Unset_Items_Not_Cleared()
 		{
@@ -79,6 +85,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Unset_When_Already_Null_Items_Not_Cleared()
 		{
@@ -88,6 +95,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Set_Items_Not_Modifiable()
 		{
@@ -107,6 +115,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(thrown);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Unset_Items_Modifiable()
 		{
@@ -130,6 +139,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_List_Modified_VectorChange_Not_Triggered()
 		{
@@ -149,6 +159,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(notified);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Resets_ItemsCollection_Reference_Does_Not_Change()
 		{
@@ -164,6 +175,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreSame(oldItems, listView.Items);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_ObservableCollection_Modified_VectorChange_Triggered()
 		{
@@ -181,6 +193,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(notified);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Set_Items_Sync()
 		{
@@ -214,6 +227,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Changes_Items_VectorChanged_Triggered()
 		{
@@ -238,6 +252,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(3, triggerCount);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Enumerable_Changes_Items_Do_Not_Sync()
 		{
@@ -256,6 +271,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_ReadOnly_Items_ReadOnly_Does_Not_Change()
 		{
@@ -265,6 +281,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(listView.Items.IsReadOnly);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_ICollection_Items_Do_Not_Sync()
 		{
@@ -278,6 +295,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, listView.Items.Count);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Is_CollectionViewSource_Ungrouped_Observable()
 		{
@@ -309,6 +327,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Grouped_Simple()
 		{
@@ -328,6 +347,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			CollectionAssert.AreEqual(sourceFlattened, listView.Items.ToArray());
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Grouped_Observables_Inner_Groups_Modified()
 		{
@@ -364,6 +384,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_Grouped_Observables_Outer_Modified()
 		{
@@ -403,6 +424,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ListViewBaseTests/Given_ListViewBase_Items.cs
 		[TestMethod]
 		public void When_ItemsSource_ObservableCollection_Selection()
 		{

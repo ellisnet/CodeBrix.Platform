@@ -49,6 +49,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public partial class Given_TextBox
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[DataRow(UpdateSourceTrigger.Default, false)]
 		[DataRow(UpdateSourceTrigger.PropertyChanged, false)]
@@ -118,6 +119,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Hello2", tb.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 #if !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
@@ -153,6 +155,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreEqualAsync(opacityZero, borderThicknessZero);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 #if !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
@@ -200,6 +203,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Template_Recycled()
 		{
@@ -228,6 +232,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_TB_Fluent_And_Theme_Changed()
 		{
@@ -255,6 +260,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(lightThemeForeground, (placeholderTextContentPresenter.Foreground as SolidColorBrush)?.Color);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_BeforeTextChanging()
 		{
@@ -274,6 +280,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			textBox.Text = "Something";
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Calling_Select_With_Negative_Values()
 		{
@@ -285,6 +292,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.ThrowsExactly<ArgumentException>(() => textBox.Select(-1, 0));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Calling_Select_With_In_Range_Values()
 		{
@@ -309,6 +317,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(7, textBox.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Calling_Select_With_Out_Of_Range_Length()
 		{
@@ -333,6 +342,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(9, textBox.SelectionLength);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Calling_Select_With_Out_Of_Range_Start()
 		{
@@ -360,6 +370,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if false
 		[Ignore("Disabled as not working properly. See https://github.com/unoplatform/uno/issues/8016")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_SelectionStart_Set()
 		{
@@ -398,6 +409,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if false
 		[Ignore("Disabled as not working properly. See https://github.com/unoplatform/uno/issues/8016")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Focus_Changes_SelectionStart_Preserved()
 		{
@@ -436,6 +448,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(3, textBox.SelectionStart);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_IsEnabled_Set()
 		{
@@ -546,6 +559,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_SelectedText_StartZero()
 		{
@@ -569,6 +583,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_SelectedText_EndOfText()
 		{
@@ -588,6 +603,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("ABCDEFGHIJKLMNOPQRSTUVWXYZ1234", textBox.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_SelectedText_MiddleOfText()
 		{
@@ -608,6 +624,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("AB1234YZ", textBox.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_SelectedText_AllTextToEmpty()
 		{
@@ -631,6 +648,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Text_Set_On_Initial_Load()
 		{
@@ -649,6 +667,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Changes_In_TextChanged()
 		{
@@ -807,6 +826,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_ReadOnly_Update_Text()
 		{
@@ -825,6 +845,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Something", textBox.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_ReadOnly_Toggled_Repeatedly()
 		{
@@ -928,6 +949,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 		// Clipboard is currently not available on skia-WASM
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm)]
 		public async Task When_Paste()
@@ -960,6 +982,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, pasteCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1009,6 +1032,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.VerticalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_VerticalContentAlignment_Is_Changed()
 		{
@@ -1062,6 +1086,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(VerticalAlignment.Stretch, contentElement.VerticalAlignment);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Size_Zero_Fluent_Default()
 		{
@@ -1072,6 +1097,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaDesktop | RuntimeTestPlatforms.Wasm | RuntimeTestPlatforms.Android)]
 		public async Task When_Focus_Immediately()
@@ -1100,6 +1126,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		private void Given_TextBox_Showing(InputPane sender, InputPaneVisibilityEventArgs args) => throw new NotImplementedException();
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Size_Zero_Default()
 		{
@@ -1110,6 +1137,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			textBox.ActualHeight.Should().Be(0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		public async Task When_Size_Zero_Fluent_ComboBoxTextBoxStyle()
 		{
@@ -1122,6 +1150,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18040")]
 #if !HAS_INPUT_INJECTOR
@@ -1200,6 +1229,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TextBoxTests/Given_TextBox.cs
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18790")]
 #if !HAS_INPUT_INJECTOR

@@ -25,6 +25,7 @@ public partial class Given_DependencyProperty
 		private static object CreateDefaultValue() => _value++;
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyProperty.cs
 	[TestMethod]
 	public void When_Unsubscribe_From_PropertyChanges()
 	{
@@ -38,6 +39,7 @@ public partial class Given_DependencyProperty
 		Assert.AreEqual(0, changedCount);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyProperty.cs
 	[TestMethod]
 	public void When_CreateDefaultValueCallback()
 	{
@@ -52,6 +54,7 @@ public partial class Given_DependencyProperty
 	private partial class CustomControl : Control { }
 	private partial class CustomUserControl : UserControl { }
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/DependencyProperty/Given_DependencyProperty.cs
 	[TestMethod]
 	public void When_IsTabStop()
 	{

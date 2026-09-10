@@ -22,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml; //Was previou
 [RunsOnUIThread]
 public partial class Given_VisualStateManager
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	public async Task When_Transition_Modifies_SubProperty_Of_Property_Set_By_Previous_State()
 	{
@@ -44,6 +45,7 @@ public partial class Given_VisualStateManager
 		Assert.AreEqual(Microsoft.UI.Colors.Red, ((SolidColorBrush)border.Background).Color);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	public async Task SelectorItem_SelectedState()
 	{
@@ -62,9 +64,11 @@ public partial class Given_VisualStateManager
 		Assert.IsTrue(states.Contains("Selected"), $"container2 is not in 'Selected' state: states={states.JoinBy(",")}");
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	public Task SelectorItem_MultiSelectState_GV() => SelectorItem_MultiSelectState_Impl<GridView>();
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	public Task SelectorItem_MultiSelectState_LV() => SelectorItem_MultiSelectState_Impl<ListView>();
 
@@ -85,6 +89,7 @@ public partial class Given_VisualStateManager
 		Assert.IsTrue(states.Contains("MultiSelectEnabled"), $"container2 is not in 'MultiSelectEnabled' state: states={states.JoinBy(",")}");
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/kahua-private/issues/339")]
 	public async Task When_VisualState_In_UserControl_No_Trigger()
@@ -126,6 +131,7 @@ public partial class Given_VisualStateManager
 		Assert.IsFalse(SUT.IsTaskTextVisible);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/kahua-private/issues/339")]
 	public async Task When_VisualState_In_UserControl_With_Trigger_Min()
@@ -154,6 +160,7 @@ public partial class Given_VisualStateManager
 		Assert.AreEqual(true, SUT.LastGoToStateResult);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/kahua-private/issues/339")]
 	public async Task When_VisualState_In_UserControl_With_Trigger_Max()
@@ -184,6 +191,7 @@ public partial class Given_VisualStateManager
 	}
 
 #if HAS_CODEBRIX
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/uno/issues/19364")]
 	public async Task When_StateTriggers_Evaluated_Before_First_Layout()
@@ -227,6 +235,7 @@ public partial class Given_VisualStateManager
 		Assert.AreEqual("MyVisualState2", uc.VisualStateOnFirstMeasure?.Name);
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/VisualState.feature, src/Platform.UI.Tests/Windows_UI_Xaml/VisualStateManagerTests/Given_VisualStateManager.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20708")]
 	public async Task When_Custom_StateTriggers_Initial_State()

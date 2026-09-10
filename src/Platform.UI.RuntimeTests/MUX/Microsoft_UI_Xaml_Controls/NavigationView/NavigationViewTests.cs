@@ -463,6 +463,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public async Task VerifyDefaultsAndBasicSettingAsync()
 		{
@@ -561,6 +562,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyValuesCoercion()
 		{
@@ -580,6 +582,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyPaneProperties()
 		{
@@ -753,6 +756,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyNavigationItemUIAType()
 		{
@@ -786,6 +790,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyAutomationPeerExpandCollapsePatternBehavior()
 		{
@@ -816,6 +821,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifySettingsItemToolTip()
 		{
@@ -841,6 +847,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifySettingsItemTag()
 		{
@@ -1025,6 +1032,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyNavigationViewItemInFooterDoesNotCrash()
 		{
@@ -1108,6 +1116,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyOverflowButtonToolTip()
 		{
@@ -1170,6 +1179,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public void VerifyHierarchicalNavigationTopModeMenuItemsSourceDoesNotCrash()
 		{
@@ -1188,6 +1198,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public async Task VerifyNavigationViewItemToolTipCreation()
 		{
@@ -1247,6 +1258,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 #if false
 		[Ignore("Currently fails on Android https://github.com/unoplatform/uno/issues/9080")]
@@ -1326,6 +1338,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/NavigationView.feature
 		[TestMethod]
 		public async Task VerifyNVIOutlivingNVDoesNotCrashAsync()
 		{

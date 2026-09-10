@@ -47,6 +47,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			_testsResources = new TestsResources();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -107,6 +108,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Presenter_Doesnt_Take_Up_All_Space()
 		{
@@ -140,6 +142,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[DataRow(175, 175, 26, 26)]
 		// [DataRow(1, 0, 2, 2)] // https://github.com/unoplatform/uno/issues/13907
@@ -200,6 +203,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(horizontalDelta, SUT.HorizontalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -239,6 +243,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(secondItem, focused);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -290,6 +295,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(scrollViewer.VerticalOffset > 0, "ScrollViewer should not have scrolled down when focusing the second item");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -345,6 +351,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(scrollViewer.VerticalOffset > 0, "ScrollViewer should have scrolled down when focusing the 21st item.");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -385,6 +392,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(border.FindVisualChildByType<ItemsControl>(), FocusManager.GetFocusedElement(border.XamlRoot));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Home_End_PageDown_PageUp()
 		{
@@ -442,6 +450,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, SUT.HorizontalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Args_Handled_Home_End_PageDown_PageUp()
 		{
@@ -509,6 +518,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, keyDownCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Args_Handled_ArrowKeys()
 		{
@@ -580,6 +590,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Scrolled_ViewportSizeLargerThanContent()
 		{
@@ -621,6 +632,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -674,6 +686,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			scp.VerticalOffset.Should().Be(0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaIslands)] // Flaky on Skia WPF Islands #9080
 #if false
@@ -806,6 +819,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(outer.VerticalOffset > outer.ScrollableHeight / 2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -861,6 +875,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if NETFX_CORE
@@ -895,6 +910,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -962,6 +978,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		// Issue needs to be fixed first for WASM for Right and Bottom Margin missing
@@ -999,6 +1016,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(ScrollViewerHeight, SUT.ExtentHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		// Issue needs to be fixed first for WASM for Right and Bottom Margin missing
@@ -1036,6 +1054,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(ScrollViewerWidth, SUT.ExtentWidth);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1069,6 +1088,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(400, scrollViewer.VerticalOffset, 5);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1164,6 +1184,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_NonRound_Content_Height()
@@ -1187,6 +1208,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(outerScrollViewer.ExtentHeight, outerScrollViewer.ViewportHeight, 0.000001);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1393,6 +1415,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -1442,6 +1465,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			events.Should().BeEquivalentTo("enter", "pressed", "capturelost");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -1487,6 +1511,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			events.Should().BeEquivalentTo("enter", "pressed", "release", "exited");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaX11)] // Flaky on Skia X11 #9080
@@ -1541,6 +1566,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER
 		[Ignore("We're only testing managed scrollers.")]
@@ -1585,6 +1611,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX // uses internal ToMatrix
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER
 		[Ignore("We're only testing managed scrollers.")]
@@ -1628,6 +1655,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_SCP_Content_EmptySized_WithMargin_LayoutCycle()
 		{
@@ -1653,6 +1681,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await UITestHelper.Load(SUT, x => x.IsLoaded);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR || !CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER
 		[Ignore("This test only applies to managed scroll presenter and requires input injector.")]
@@ -1691,6 +1720,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(50, SUT.VerticalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Zero_Size_With_Margin()
 		{
@@ -1720,6 +1750,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX // ScrollViewerUpdatesMode is Uno-specific
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -1759,6 +1790,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreNotEqual(0, sut.VerticalOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -1811,6 +1843,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(Math.Abs(childEndOffset - child.VerticalOffset) < 1, $"childEndOffset {childEndOffset} minus parent.VerticalOffset {child.VerticalOffset} is not lower than 1");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -1866,6 +1899,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 				$"abs(childEndOffset - child.VerticalOffset)={Math.Abs(childEndOffset - child.VerticalOffset)}, expected to be < 1");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -1931,6 +1965,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 		public async Task When_Hosting_TextBlock_With_Margin()
 		{
@@ -1964,6 +1999,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX // ScrollViewer.UpdatesMode is Uno-specific
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/ScrollViewer.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]

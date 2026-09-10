@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls; //
 [TestClass]
 public class Given_RatingControl
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/RatingControl.feature
 	[TestMethod]
 	[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR

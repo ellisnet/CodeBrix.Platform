@@ -100,6 +100,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 #if false
 		[Ignore("UNO: Test does not pass yet with Uno https://github.com/unoplatform/uno/issues/4529")]
@@ -199,6 +200,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 #if false
 		[Ignore("UNO: Test does not pass yet with Uno (causes infinite layout cycle) https://github.com/unoplatform/uno/issues/4529")]
@@ -233,6 +235,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public void VerifyStackLayoutCycleShortcut()
 		{
@@ -337,6 +340,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		public async Task VerifyUniformGridLayoutDoesntCrashWhenTryingToScrollToEnd()
 		{
@@ -383,6 +387,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests.RepeaterTests
 			Verify.IsTrue(true);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 #if !HAS_CODEBRIX_WINUI
 		[Ignore("Fails on UWP")]

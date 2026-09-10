@@ -10,6 +10,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[TestClass]
 	public class ToggleSplitButtonTests
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ToggleButton.feature
 		[TestMethod]
 		[Description("Verifies that the TextBlock representing the Chevron glyph uses the correct font")]
 		[RunsOnUIThread]

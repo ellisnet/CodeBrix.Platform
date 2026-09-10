@@ -15,6 +15,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	public partial class TabViewTests
 	{
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 #if false
 		[Ignore("Currently fails on iOS")]
@@ -55,16 +56,19 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20976")]
 		public async Task When_First_Tab_Selected_And_Closed() => await When_Tab_Selected_And_Closed(0, 1);
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20976")]
 		public async Task When_Middle_Tab_Selected_And_Closed() => await When_Tab_Selected_And_Closed(1, 2);
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20976")]

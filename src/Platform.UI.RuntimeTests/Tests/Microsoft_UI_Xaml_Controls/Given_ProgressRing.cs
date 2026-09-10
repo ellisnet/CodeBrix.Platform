@@ -14,6 +14,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls; //
 [TestClass, RunsOnUIThread]
 public class Given_ProgressRing
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressRing.feature
 	[TestMethod]
 #if !(WINAPPSDK || __SKIA__)
 	[Ignore("IAnimatedVisualSource is not implemented")]
@@ -52,6 +53,7 @@ public class Given_ProgressRing
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressRing.feature
 	[TestMethod]
 #if !(WINAPPSDK || __SKIA__)
 	[Ignore("IAnimatedVisualSource is not implemented")]
@@ -93,6 +95,7 @@ public class Given_ProgressRing
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressRing.feature
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("The test is unreliable when DPI scaling is not 1")]

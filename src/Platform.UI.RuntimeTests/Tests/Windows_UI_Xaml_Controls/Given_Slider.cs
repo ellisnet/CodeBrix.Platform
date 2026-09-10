@@ -19,6 +19,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public class Given_Slider
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 		public async Task When_Value_At_Maximum()
 		{
@@ -35,6 +36,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(thumb.ActualHeight > 0);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 		public async Task When_Slider_Constrained_Horizontal()
 		{
@@ -50,6 +52,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, slider.HorizontalDecreaseRect.ActualWidth);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 		public async Task When_Slider_Constrained_Vertical()
 		{
@@ -66,6 +69,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 		public async Task When_Value_Decimal()
 		{
@@ -89,6 +93,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -131,6 +136,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/Slider.feature
 		[TestMethod]
 		public async Task When_Reloaded_With_Value_Binding()
 		{

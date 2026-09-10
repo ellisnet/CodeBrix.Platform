@@ -28,6 +28,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 
 	// TODO Uno tests: PersonObject
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task CanInstantiate()
@@ -36,6 +37,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		act.Should().NotThrow();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task CanEnterAndLeaveLiveTree()
@@ -52,6 +54,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitFor(() => unloaded);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanComboBoxLoadFromXaml()
 	{
@@ -104,6 +107,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.CloseComboBox(comboBox);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task VerfifyDefaultProperties()
 	{
@@ -141,6 +145,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitForIdle();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanExpandAndClose()
 	{
@@ -178,6 +183,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.CloseComboBox(comboBox);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanInsertItemAfterExpandAndClose()
 	{
@@ -461,6 +467,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//		}
 	//	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateVeryWideComboBoxItems()
 	{
@@ -485,6 +492,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitForIdle();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -570,6 +578,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//	VERIFY_IS_FALSE(backButtonPressHandled);
 	//}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task DropDownClosesOnComboBoxUnloaded()
 	{
@@ -1041,6 +1050,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		return comboBox;
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -1174,12 +1184,14 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.VerifySelectedIndex(comboBox, 1);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanCloseComboBoxWithAltDown()
 	{
 		await CanCloseComboBoxWithKeySequence("$d$_alt#$d$_down#$u$_down#$u$_alt");
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanCloseComboBoxWithF4()
 	{
@@ -1243,6 +1255,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.VerifySelectedIndex(comboBox, 0);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -1295,6 +1308,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await dropDownClosedEvent.WaitForDefault();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !CODEBRIX_HAS_ENHANCED_LIFECYCLE
 	[Ignore("Due to lifecycle differences, the selection gets updated before the index is reset. Probably fixed by #18261. #17988")]
@@ -1477,6 +1491,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//await TestServices.WindowHelper.WaitForIdle();
 	//	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task DoesGetFocusWhenProgrammaticallyOpened()
 	{
@@ -1528,12 +1543,14 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanNavigateAscendingComboBoxesWithGamepad()
 	{
 		await CanNavigateAscendingComboBoxes(InputDevice.Gamepad);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanNavigateAscendingComboBoxesWithKeyboard()
 	{
@@ -1588,6 +1605,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.VerifySelectedIndex(comboBox, 10);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task SelectionChangedIsNotRaisedUntilClose()
 	{
@@ -1950,6 +1968,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//	});
 	//}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -1981,6 +2000,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateMaximumHeightIsHonored()
 	{
@@ -2795,6 +2815,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -2804,6 +2825,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateForComboBoxWorker(ComboBoxHelper.OpenMethod.Touch, FocusState.Pointer);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.LeftMouseClick properly on input injector targets. #17988")]
@@ -2813,12 +2835,14 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateForComboBoxWorker(ComboBoxHelper.OpenMethod.Mouse, FocusState.Pointer);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateFocusStateForComboBoxOpenedWithKeyboard()
 	{
 		await ValidateFocusStateForComboBoxWorker(ComboBoxHelper.OpenMethod.Keyboard, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateFocusStateForComboBoxOpenedWithGamepad()
 	{
@@ -2851,6 +2875,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitForIdle();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.LeftMouseClick on Skia targets. #17988")]
@@ -2860,6 +2885,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Mouse, ComboBoxHelper.CloseMethod.Mouse, FocusState.Pointer);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.LeftMouseClick on Skia targets. #17988")]
@@ -2869,18 +2895,21 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Touch, ComboBoxHelper.CloseMethod.Touch, FocusState.Pointer);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateFocusStateOfClosedComboBoxWhenOpenedAndClosedWithKeyboard()
 	{
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Keyboard, ComboBoxHelper.CloseMethod.Keyboard, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateFocusStateOfClosedComboBoxWhenOpenedAndClosedWithGamepad()
 	{
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Gamepad, ComboBoxHelper.CloseMethod.Gamepad, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -2890,6 +2919,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Touch, ComboBoxHelper.CloseMethod.Keyboard, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -2899,6 +2929,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Touch, ComboBoxHelper.CloseMethod.Gamepad, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.LeftMouseClick properly on input injector targets. #17988")]
@@ -2908,6 +2939,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateFocusStateOfClosedComboBoxWorker(ComboBoxHelper.OpenMethod.Mouse, ComboBoxHelper.CloseMethod.Keyboard, FocusState.Keyboard);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.LeftMouseClick properly on input injector targets. #17988")]
@@ -3718,6 +3750,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//	await ComboBoxHelper.CloseComboBox(comboBox);
 	//}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateOpeningWithPendingClosedEventDoesNotCloseComboBox()
 	{
@@ -3759,6 +3792,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.CloseComboBox(comboBox);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanSetIsDropDownOpenBeforeTemplateIsAppliedAndGotFocus()
 	{
@@ -4275,6 +4309,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//	});
 	//}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task DoesNotShowMulitpleSelectionVisuals()
 	{
@@ -4389,6 +4424,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ComboBoxHelper.CloseComboBox(comboBox);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanSetEditableMode()
 	{
@@ -4438,6 +4474,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task CanSetComboBoxTextOnNonEditableMode()
 	{
@@ -4490,6 +4527,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !HAS_CODEBRIX_WINUI
 	[Ignore("This test is failing on UWP. #17988")]
@@ -4621,6 +4659,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitForIdle();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4630,6 +4669,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await CanRaiseTextSubmittedEventComboBox(false);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4639,6 +4679,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await CanRaiseTextSubmittedEventComboBox(true);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4648,6 +4689,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await CanRaiseTextSubmittedEventComboBox(false, true);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4758,6 +4800,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4767,6 +4810,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 		await ValidateEditableModeSearchAndSelection(false);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -4842,6 +4886,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateEditableModeSelectedItemAndValueAreSetToNull()
 	{
@@ -4889,6 +4934,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("Focus does not behave correctly in this case because we move it asynchronously in TextBox.ProcessFocusChanged #17988")]
@@ -5177,6 +5223,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -5218,6 +5265,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if false
 	[Ignore("We cannot simulate keyboard input into focused TextBox on Android, iOS, and WASM #17220")]
@@ -5300,6 +5348,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 			});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 #if !__SKIA__
 	[Ignore("We currently only support InputHelper.Tap properly on input injector targets. #17988")]
@@ -5606,6 +5655,7 @@ public class ComboBoxIntegrationTests : BaseDxamlTestClass
 	//await ComboBoxHelper.CloseComboBox(comboBox);
 	//    }
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ComboBox.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ComboBoxTests/Given_ComboBox.cs
 	[TestMethod]
 	public async Task ValidateRestoreOnCancelIndexResetOnClose()
 	{

@@ -33,6 +33,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 #endif
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task CanInstantiate()
@@ -41,6 +42,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		act.Should().NotThrow();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task CanEnterAndLeaveLiveTree()
@@ -54,6 +56,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		await TestServices.WindowHelper.WaitFor(() => unloaded);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanRaiseNavigationEvents()
 	{
@@ -91,6 +94,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		await frameNavigatedEvent.WaitForDefault();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanNavigateBetweenPages()
 	{
@@ -175,6 +179,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanDisableNavigationHistoryUsingNavigationMethod()
 	{
@@ -255,6 +260,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanDisableNavigationHistoryFromFrame()
 	{
@@ -329,6 +335,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		VERIFY_ARE_EQUAL(frame.ForwardStack.Count, expectedForwardStackDepth);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanNavigateWithNavigationTransitionInfo()
 	{
@@ -399,6 +406,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task ValidateReEntrancyPrevention()
 	{
@@ -502,6 +510,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 	}
 
 #if HAS_CODEBRIX_WINUI // The navigation string tests rely on "Microsoft" namespace, which has different length than "Windows"
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanGetNavigationStateWithCurrentPageNull()
 	{
@@ -530,6 +539,7 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanSetNavigationStateWithoutNavigatingToCurrent()
 	{
@@ -684,24 +694,28 @@ public class FrameIntegrationTests : BaseDxamlTestClass
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CacheModeDisabled()
 	{
 		await VerifyCachePageNavigationHelper(NavigationCacheMode.Disabled, new int[7] { 1, 10, 2, 11, 20, 12, 3 });
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CacheModeEnabled()
 	{
 		await VerifyCachePageNavigationHelper(NavigationCacheMode.Enabled, new int[7] { 1, 10, 1, 10, 20, 10, 3 });
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CacheModeRequired()
 	{
 		await VerifyCachePageNavigationHelper(NavigationCacheMode.Required, new int[7] { 1, 10, 1, 10, 20, 10, 1 });
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Frame.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/Frame/Given_Frame.cs
 	[TestMethod]
 	public async Task CanceledNavigation()
 	{

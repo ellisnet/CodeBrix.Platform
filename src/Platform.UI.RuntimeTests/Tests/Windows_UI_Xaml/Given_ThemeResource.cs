@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[RunsOnUIThread]
 	public class Given_ThemeResource
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 #if WINAPPSDK
 		[Ignore("Fails on UWP with 'The parameter is incorrect.'")]
@@ -43,6 +44,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_Parent_Resource_Override_On_Loaded()
 		{
@@ -58,6 +60,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX // On UWP/WinUI, the Samples app is always in Fluent theme
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_DefaultForeground_Non_Fluent()
@@ -67,6 +70,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_DefaultForeground_Fluent()
@@ -74,6 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			await When_DefaultForeground(Color.FromArgb(228, 0, 0, 0), Colors.White);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_AppLevel_Resource_CheckBox_Override()
 		{
@@ -96,6 +101,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(Colors.Red, normalRectangle.Fill.GetValue(SolidColorBrush.ColorProperty));
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_AppLevel_Resource_SplitButton_Override()
 		{
@@ -118,6 +124,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreNotEqual(color, contentPresenter.Foreground.GetValue(SolidColorBrush.ColorProperty));
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_ThemeResource_Style_Switch()
 		{
@@ -138,6 +145,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(Colors.Red, color);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_Theme_Changed()
 		{
@@ -172,6 +180,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_Refresh_On_Loading()
 		{
@@ -194,6 +203,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Theme.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Given_ThemeResource.cs
 		[TestMethod]
 		public async Task When_ActualThemeChanged_Throws()
 		{

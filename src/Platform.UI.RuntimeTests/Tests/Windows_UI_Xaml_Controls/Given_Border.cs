@@ -55,6 +55,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		[CombinatorialData]
 #if false
@@ -123,6 +124,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNull(innerBorder.Clip);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 #if !HAS_RENDER_TARGET_BITMAP
 		[Ignore("Cannot take screenshot on this platform.")]
@@ -173,6 +175,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreNotEqualAsync(nullBorderScreenshot, noBorderScreenshot);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 #if false
 		[Ignore("It doesn't yet work properly on Android")]
@@ -208,6 +211,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorAt(screenshot, 155, 155, Microsoft.UI.Colors.Red, tolerance: 10);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 #if false
 		[Ignore("Fails on Android")]
@@ -240,6 +244,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(bitmap, new System.Drawing.Rectangle(0, 50, 100, 50), Microsoft.UI.Colors.Red);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Check_DataContext_Propagation()
 		{
@@ -267,6 +272,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			public string TestText => "Vampire squid";
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task When_Border_Centered_With_Margin_Inside_Tall_Rectangle()
 		{
@@ -297,6 +303,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForEqual(ScrollViewerHeight, () => SUT.ActualHeight);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task When_Border_Centered_With_Margin_Inside_Wide_Rectangle()
 		{
@@ -327,6 +334,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await WindowHelper.WaitForEqual(ScrollViewerWidth, () => SUT.ActualWidth);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Check_CornerRadius_Border_Basic()
 		{
@@ -376,6 +384,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_CornerRadius_BorderThickness()
 		{
@@ -442,6 +451,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_CornerRadius_Clipping()
 		{
@@ -481,6 +491,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_CornerRadius_Content_Clipping()
 		{
@@ -519,6 +530,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 #if false
 		[Ignore("Not supported yet")]
@@ -586,6 +598,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_LinearGradient()
 		{
@@ -607,6 +620,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAt(screenshot, textBoxRect.CenterX - (float)(0.45 * textBoxRect.Width), textBoxRect.Y, "#FF0000", tolerance: 20);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Child_Set_Same_Reference()
@@ -663,6 +677,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Nested_Element_Tapped()
@@ -701,6 +716,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Parent_DoubleTapped_When_Child_Has_Tapped()
@@ -741,6 +757,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_CornerRadius_GradientBrush()
 		{
@@ -754,6 +771,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAt(result, textBoxRect.CenterX, textBoxRect.CenterY, "#FF00FF00", tolerance: 10);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task When_CornerRadius()
 		{
@@ -845,6 +863,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, (~RuntimeTestPlatforms.SkiaDesktop) | RuntimeTestPlatforms.SkiaMacOS)]
 		[RequiresScaling(1.0f)]
@@ -890,6 +909,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 #if !__SKIA__
 		[Ignore("Only skia accurately hittests CorderRadius")]
@@ -1014,6 +1034,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Border.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/BorderTests/Given_Border.cs
 		[TestMethod]
 		public async Task Border_AntiAlias()
 		{

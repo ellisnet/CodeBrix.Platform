@@ -64,6 +64,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -84,6 +85,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(default, SUT.DesiredSize);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow(200)]
@@ -140,6 +142,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Size(Math.Min(100, newClipValue) - 1, Math.Min(75, newClipValue) - 1), new Size(redBounds.Width, redBounds.Height));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -198,6 +201,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Rect(65, 25, 4, 24), deepSkyBlueBounds);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/17642")]
@@ -207,6 +211,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX // Tests use IsArrangeDirty, which is an internal property
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Visible_InvalidateArrange()
@@ -222,6 +227,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if true // Fails on Android & iOS (issue #5002)
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Collapsed_InvalidateArrange()
@@ -243,6 +249,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_TextBlock_ActualSize()
@@ -271,6 +278,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			await TestServices.WindowHelper.WaitFor(() => Math.Abs(text.ActualHeight - text.ActualSize.Y) < 1);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Rectangle_Set_ActualSize()
@@ -306,6 +314,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 				Math.Abs(rectangle.ActualHeight - rectangle.ActualSize.Y) < 0.01);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -321,6 +330,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(Vector3.Zero, border.ActualOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -339,6 +349,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Vector3(10, 10, 0), border.ActualOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -363,6 +374,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(new Vector3(110, 60, 0), button.ActualOffset);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -406,6 +418,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PreviewKeyDown_Basic()
@@ -486,6 +499,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PreviewKeyDown_KeyDown_DifferentArgs()
@@ -506,6 +520,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			// Assert.AreNotEqual(keyDownArgs, previewKeyDownArgs);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PreviewKeyDown_Handled()
@@ -590,6 +605,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PreviewKeyDown_Handled_Then_Unhandled()
@@ -766,6 +782,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_PreviewKeyDown_FocusChanged()
@@ -852,6 +869,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_UpdateLayout_Then_ReentrancyNotAllowed()
@@ -865,6 +883,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_GetVisualTreeParent()
@@ -895,6 +914,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_LayoutInformation_GetAvailableSize_Constraints()
@@ -920,6 +940,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(313, maxHeightAvailableSize.Height, delta: 1); // Should return unmodified measure size, ignoring constraints like MaxHeight
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !MEASURE_DIRTY_PATH_AVAILABLE
@@ -949,6 +970,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow(0d)]
@@ -975,6 +997,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			sut.ArrangeCount.Should().Be(0);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow(0d)]
@@ -1010,6 +1033,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !ARRANGE_DIRTY_PATH_AVAILABLE
@@ -1036,6 +1060,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			ctl3.ArrangeCount.Should().Be(1);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !(MEASURE_DIRTY_PATH_AVAILABLE && ARRANGE_DIRTY_PATH_AVAILABLE)
@@ -1063,6 +1088,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			ctl3.ArrangeCount.Should().BeInRange(1, 2); // both are acceptable, depends on the capabilities of the platform
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !(MEASURE_DIRTY_PATH_AVAILABLE && ARRANGE_DIRTY_PATH_AVAILABLE)
@@ -1196,6 +1222,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if __CROSSRUNTIME__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void MeasureDirtyTest()
@@ -1223,6 +1250,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void ArrangeDirtyTest()
@@ -1247,6 +1275,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Measure_Explicitly_Called()
@@ -1301,6 +1330,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 
 #if __SKIA__
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_Explicit_Size_Clip_Changes()
@@ -1318,6 +1348,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1380,6 +1411,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1559,6 +1591,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -1586,6 +1619,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1656,6 +1690,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -1767,6 +1802,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -1816,6 +1852,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #if HAS_CODEBRIX
 		#region Drag and Drop
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/18770")]
@@ -1876,6 +1913,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(setAcceptedOperation ? 1 : 0, dropCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -1965,6 +2003,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(waitAfterRelease ? 1 : 0, dropCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_INPUT_INJECTOR
@@ -2029,6 +2068,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(1, dragOverCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Clip.feature, src/UIReqs/Platform.UI.Core/Features/Layout/RenderTransform.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]

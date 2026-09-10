@@ -23,6 +23,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 	[TestClass]
 	public class Given_GestureRecognizer
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Input/Given_GestureRecognizer.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		// Note: Timeout is handled inside the test method by the CTS. No need to add an attribute here.

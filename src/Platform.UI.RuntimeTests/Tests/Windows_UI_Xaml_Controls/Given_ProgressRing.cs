@@ -22,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[TestClass]
 	public class Given_ProgressRing
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressRing.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ProgressRing_Visible()
@@ -54,6 +55,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Range/ProgressRing.feature
 		[TestMethod]
 		public Task When_ProgressRing_Collapsed() =>
 			RunOnUIThread.ExecuteAsync(() =>

@@ -27,6 +27,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public class Given_FlipView
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		public async Task When_Observable_ItemsSource_And_Added()
 		{
@@ -57,6 +58,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, flipView.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Given_Infinite_Width()
@@ -100,6 +102,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.DoesNotHaveColorInRectangle(bitmap, new(default, new(bitmap.Width, bitmap.Height)), Microsoft.UI.Colors.Blue);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		public async Task When_Background_Color()
 		{
@@ -142,6 +145,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		public async Task When_Inline_Items_SelectedIndex()
 		{
@@ -173,6 +177,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 #if false
 		[Ignore("Currently fails on iOS https://github.com/unoplatform/uno/issues/9080")]
@@ -243,6 +248,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			return result;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 #if false
 		[Ignore("Currently fails on iOS, https://github.com/unoplatform/uno/issues/9080")]
@@ -363,6 +369,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		[GitHubWorkItem("https://github.com/unoplatform/uno/issues/20571")]
 		public async Task When_Decimal_Size()
@@ -430,6 +437,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(2, flipView.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 		public async Task When_Navigate_Skips_An_Item()
 		{
@@ -550,6 +558,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -611,6 +620,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(0, flipView.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]
@@ -719,6 +729,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, flipView.SelectedIndex);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/FlipView.feature
 		[TestMethod]
 #if false
 		[Ignore("Scrolling is handled by native code and InputInjector is not yet able to inject native pointers.")]

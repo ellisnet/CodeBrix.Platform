@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RequiresFullWindow]
 	public class Given_RelativePanel
 	{
+		//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RelativePanelTests/Given_RelativePanel.cs
 		[TestMethod]
 		public async Task When_Padding_Set_In_SizeChanged()
 		{
@@ -53,6 +54,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(200, ((UIElement)VisualTreeHelper.GetChild(SUT, 0)).ActualOffset.Y);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RelativePanelTests/Given_RelativePanel.cs
 		[TestMethod]
 		public async Task When_Child_Aligns_Horizontal_Center_With_Panel()
 		{
@@ -74,6 +76,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(100, 0, 100, 100), border.GetRelativeBounds(SUT));
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RelativePanelTests/Given_RelativePanel.cs
 		[TestMethod]
 		public async Task When_Child_Aligns_Vertical_Center_With_Panel()
 		{
@@ -95,6 +98,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(0, 100, 100, 100), border.GetRelativeBounds(SUT));
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RelativePanelTests/Given_RelativePanel.cs
 		[TestMethod]
 		public async Task When_Child_Aligns_Two_Directions_Center_With_Panel()
 		{
@@ -117,6 +121,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(new Rect(100, 100, 100, 100), border.GetRelativeBounds(SUT));
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/RelativePanelTests/Given_RelativePanel.cs
 		[TestMethod]
 		public async Task When_NativeElement()
 		{

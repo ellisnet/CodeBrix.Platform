@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 [TestClass]
 public class Given_UniformGridLayout
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_AdaptiveChildren_Then_DoesNotConstraintsThem()

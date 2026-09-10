@@ -43,6 +43,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[RequiresFullWindow]
 	public partial class TabViewTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS)] // Due to lifecycle differences , this test fails on iOS native.
 		public async Task VerifyCompactTabWidthVisualStates_ItemsMode()
@@ -50,6 +51,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			await VerifyCompactTabWidthVisualStates();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS)] // Due to lifecycle differences , this test fails on iOS native.
 		public async Task VerifyCompactTabWidthVisualStates_ItemsSourceMode()
@@ -142,6 +144,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task VerifyTabViewUIABehavior()
 		{
@@ -166,6 +169,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task VerifyTabViewItemUIABehavior()
 		{
@@ -222,6 +226,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task VerifyTabViewWithoutTabsDoesNotCrash()
 		{
@@ -242,6 +247,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task TabViewItemBackgroundTest()
 		{
@@ -287,6 +293,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task TabViewItemHeaderTest()
 		{
@@ -338,6 +345,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TabView.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/TabViewTests/Given_TabViewItem.cs
 		[TestMethod]
 		public async Task TabViewItemForegroundTest()
 		{

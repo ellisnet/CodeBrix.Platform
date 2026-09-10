@@ -176,6 +176,7 @@ public class TeachingTipTests
 		});
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/TeachingTip.feature
 	[TestMethod]
 	public async Task TeachingTipWithContentAndWithoutHeroContentDoesNotCrash()
 	{
@@ -196,6 +197,7 @@ public class TeachingTipTests
 		await loadedEvent.WaitOne();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/TeachingTip.feature
 	[TestMethod]
 	public async Task TeachingTipWithContentAndWithoutIconSourceDoesNotCrash()
 	{
@@ -215,6 +217,7 @@ public class TeachingTipTests
 		await loadedEvent.WaitOne();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/TeachingTip.feature
 	[TestMethod]
 	public async Task PropagatePropertiesDown()
 	{
@@ -254,6 +257,7 @@ public class TeachingTipTests
 	}
 
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/TeachingTip.feature
 	[TestMethod]
 	public void TeachingTipHeroContentPlacementTest()
 	{

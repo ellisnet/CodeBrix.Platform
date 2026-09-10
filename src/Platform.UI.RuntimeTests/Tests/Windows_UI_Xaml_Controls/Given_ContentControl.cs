@@ -58,6 +58,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			_testsResources = new TestsResources();
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[DataRow(typeof(Grid))]
@@ -74,6 +75,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await UITestHelper.Load(control);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		public async Task When_Binding_Within_Control_Template()
 		{
@@ -99,6 +101,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await TestServices.WindowHelper.WaitFor(() => tb.Text == "Steve");
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		public async Task When_ContentTemplateSelector_And_Default_Style()
 		{
@@ -135,6 +138,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		public async Task When_ContentTemplateSelector_And_Default_Style_And_Uwp()
 		{
@@ -142,6 +146,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await When_ContentTemplateSelector_And_Default_Style();
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		public async Task When_Template_Applied_On_Loading_DataContext_Propagation()
 		{
@@ -164,6 +169,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(1, itemsSourceChangedCounter);
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		public async Task When_Content_Set_Null_ComboBox()
 		{
@@ -200,6 +206,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_FindName_ContentControl_Without_ContentTemplate()
@@ -217,6 +224,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNotNull(sut.FindName("ContentElement"));
 		}
 
+		//TEST PARTLY REPLACED - by src/Platform.UI.Tests/Windows_UI_XAML_Controls/ControlTests/Given_Control.cs, src/Platform.UI.Tests/Windows_UI_Xaml/FrameworkElementTests/Given_FindName.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_FindName_ContentControl_With_ContentTemplate()

@@ -6,6 +6,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[TestClass]
 	public class Given_FrameworkElement_FocusVisuals
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_PrimaryThickness_Default()
@@ -16,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(expectedThickness, actualThickness);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_SecondaryThickness_Default()
@@ -26,6 +28,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(expectedThickness, actualThickness);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_Margin_Default()
@@ -36,6 +39,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(expectedMargin, actualMargin);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_PrimaryBrush_Default()
@@ -46,6 +50,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(expectedBrush, actualBrush);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public void When_SecondaryBrush_Default()

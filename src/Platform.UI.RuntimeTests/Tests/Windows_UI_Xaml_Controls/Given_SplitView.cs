@@ -12,6 +12,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [TestClass]
 public class Given_SplitView
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/SplitView.feature
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task Update_OpenPaneLength()

@@ -15,6 +15,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 	[RunsOnUIThread]
 	public partial class Given_FrameworkElement
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public void When_LayoutUpdated()
 		{
@@ -91,6 +92,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 #if !CODEBRIX_HAS_ENHANCED_LIFECYCLE
 		[Ignore("Properly works only with enhanced lifecycle")]
@@ -145,6 +147,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 #if false
 		[Ignore("Fails for unknown reason")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		// https://github.com/unoplatform/uno-private/issues/801
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.SkiaWasm | RuntimeTestPlatforms.SkiaUIKit)]
@@ -170,6 +173,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public void When_MaxWidth_NaN()
 		{
@@ -182,6 +186,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public void When_SuppressIsEnabled()
 		{
@@ -203,6 +208,7 @@ namespace CodeBrix.Platform.UI.Tests.Windows_UI_Xaml.FrameworkElementTests //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/LayoutSpacing.feature
 		[TestMethod]
 		public void When_DP_IsEnabled_Null()
 		{

@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 	[RunsOnUIThread]
 	public class Given_ResourceDictionary
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 #if false
 		[Ignore("iOS and macOS don't yet load/unload from resources - https://github.com/unoplatform/uno/issues/5208")]
@@ -87,6 +88,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 #if false
 		[Ignore("iOS and macOS don't yet load/unload from resources - https://github.com/unoplatform/uno/issues/5208")]
@@ -154,6 +156,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 #endif
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_Key_Overwritten()
 		{
@@ -168,6 +171,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.AreEqual(newValue, resourceDictionary[key]);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public async Task When_ResourceDictionary_DP()
 		{
@@ -180,6 +184,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 		}
 
 #if HAS_CODEBRIX // uses uno specifics code
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_LinkedResDict_ThemeUpdated()
 		{
@@ -245,6 +250,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_Key_Added_Then_NotFound_Cleared()
 		{
@@ -255,6 +261,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsTrue(resourceDictionary.TryGetValue("Key1", out var res2, shouldCheckSystem: false));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_Merged_Dictionary_Added_Then_NotFound_Cleared()
 		{
@@ -270,6 +277,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsTrue(resourceDictionary.TryGetValue("Key1", out var res2, shouldCheckSystem: false));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_Merged_Dictionary_Key_Added_Then_NotFound_Cleared()
 		{
@@ -287,6 +295,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml //Was previous
 			Assert.IsTrue(resourceDictionary.TryGetValue("Key1", out var res3, shouldCheckSystem: false));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_ResourceDictionary.cs
 		[TestMethod]
 		public void When_Theme_Dictionary_Key_Added_Then_NotFound_Cleared()
 		{

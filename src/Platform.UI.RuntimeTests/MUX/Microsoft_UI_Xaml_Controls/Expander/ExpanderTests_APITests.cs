@@ -20,6 +20,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[TestClass]
 	public class ExpanderTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Navigation/Expander.feature
 		[TestMethod]
 		public void ExpanderAutomationPeerTest()
 		{

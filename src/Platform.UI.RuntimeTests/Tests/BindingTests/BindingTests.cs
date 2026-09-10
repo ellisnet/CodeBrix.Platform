@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests; //Was previously: Uno.UI.Runt
 [RunsOnUIThread]
 public partial class BindingTests
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_Binding_Setter_Value_In_Style()
 	{
@@ -36,6 +37,7 @@ public partial class BindingTests
 		}
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_BindingShouldBeAppliedOnPropertyChangedEvent()
 	{
@@ -55,6 +57,7 @@ public partial class BindingTests
 	}
 
 #if __SKIA__ && HAS_CODEBRIX_WINUI
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	[GitHubWorkItem("https://github.com/unoplatform/uno/issues/16520")]
 	public async Task When_XBind_In_Window()
@@ -83,6 +86,7 @@ public partial class BindingTests
 	}
 #endif
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_TargetNullValueThemeResource()
 	{
@@ -100,6 +104,7 @@ public partial class BindingTests
 		Assert.AreEqual(Microsoft.UI.Colors.Red, ((SolidColorBrush)myBtn.Foreground).Color);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_FallbackValueThemeResource_NoDataContext()
 	{
@@ -122,6 +127,7 @@ public partial class BindingTests
 		Assert.AreEqual(Microsoft.UI.Colors.Red, ((SolidColorBrush)myBtn.Foreground).Color);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_FallbackValueThemeResource_WithDataContext()
 	{
@@ -140,6 +146,7 @@ public partial class BindingTests
 		Assert.AreEqual(Microsoft.UI.Colors.Red, ((SolidColorBrush)myBtn.Foreground).Color);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_XBind_To_Const_Page()
 	{
@@ -150,6 +157,7 @@ public partial class BindingTests
 		Assert.AreEqual(200, SUT.XBoundBorder.ActualHeight);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_XBind_To_Const_Control_Template()
 	{
@@ -160,6 +168,7 @@ public partial class BindingTests
 		Assert.AreEqual(200, SUT.XBoundBorder.ActualHeight);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_XBind_Teardown_19641()
 	{
@@ -208,6 +217,7 @@ public partial class BindingTests
 		Assert.IsFalse(failed);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs, src/Platform.UI.Tests/BinderTests/Given_Binder.cs
 	[TestMethod]
 	public async Task When_XBind_Resurrection_20625()
 	{

@@ -43,6 +43,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ContainerSet_Then_ContentShouldBeSet()
@@ -79,6 +80,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			public override string ToString() => "This is .ToString() result - should not be used";
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_SpecifyingDisplayMemberPath_Then_ContentShouldBeSet()
@@ -123,6 +125,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await Assert(2, "item 2");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_IsItsOwnItemContainer_FromSource()
@@ -156,6 +159,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_NoItemTemplate()
@@ -185,6 +189,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual("Item 1", tb.Text);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_Creation_Count_ItemsSource_Before_Load()
@@ -213,6 +218,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(4, CounterGrid2.BindCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_Creation_Count_ItemsSource_After_Load()
@@ -249,6 +255,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(4, CounterGrid2.BindCount);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_ItemContainerStyle_TextBlock()
@@ -295,6 +302,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(thirdTb.Style, containerStyle);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task Check_ItemContainerStyle_ContentControl()
@@ -361,6 +369,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(third.Style, containerStyle);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ContentControl_ContainerRecycled_And_Explicit_Item()
@@ -422,6 +431,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsNotNull(third.ContentTemplateSelector);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ContentPresenter_ContainerRecycled_And_Explicit_Item()
@@ -484,6 +494,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ContentPresenter_ContainerRecycled_And_ContentControl_Template()
@@ -565,6 +576,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsControl.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/ItemsControlTests/Given_ItemsControl.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false

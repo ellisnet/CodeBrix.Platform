@@ -40,6 +40,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public class Given_MenuFlyout
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Toggle_IsEnabled_Via_Binding()
@@ -85,6 +86,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await AssertIsEnabled(false);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Native_AppBarButton_And_Managed_Popups()
@@ -118,6 +120,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Add_MenuFlyoutSeparator_To_MenuBarItem()
@@ -189,6 +192,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task Verify_MenuBarItem_Bounds()
@@ -286,6 +290,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		public async Task When_MenuFlyoutItem_CommandChanging()
 		{
@@ -325,6 +330,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			item.CloseMenuFlyout();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		public async Task When_MenuFlyout_Added_In_Opening()
 		{
@@ -367,6 +373,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		[RequiresFullWindow]
 #if false
@@ -431,6 +438,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		public async Task When_MenuFlyout_DataContext_Changes_In_Opening()
 		{
@@ -462,6 +470,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		public async Task When_Toggle_Item_HasToggle()
 		{
@@ -469,6 +478,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsTrue(toggleItem.HasToggle());
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/MenuFlyout.feature
 		[TestMethod]
 		public async Task When_Menu_Contains_Toggle()
 		{

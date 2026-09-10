@@ -28,6 +28,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 	[TestClass]
 	public class Given_ItemsRepeater
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_NoScrollViewer_Then_ShowMoreThanFirstItem()
@@ -74,6 +75,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -191,6 +193,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			await TestHelper.RetryAssert(Do, 3);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !HAS_CODEBRIX
@@ -239,6 +242,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_UnloadAndReload_Then_StillListenToCollectionChanged()
@@ -327,6 +331,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			reloadedItems.Count(item => middleItems.Contains(item)).Should().BeGreaterThan(2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_AddItemWhileUnloaded_Then_MaterializeItems()
@@ -346,6 +351,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			sut.Materialized.Should().Be(4);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_RemoveItemWhileUnloaded_Then_MaterializeItems()
@@ -365,6 +371,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			sut.Materialized.Should().Be(2);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_EditItemWhileUnloaded_Then_MaterializeItems()
@@ -384,6 +391,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			sut.Repeater.Children.FirstOrDefault(g => g.DataContext as string == "Item #1 - Edited").Should().NotBeNull();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_ClearItemsWhileUnloaded_Then_MaterializeItems()
@@ -404,6 +412,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -464,6 +473,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			ImageAssert.HasColorAt(result, 100, 10, Colors.FromARGB("#008000")); // For safety also check it's effectively the item 3 that is visible
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -494,6 +504,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 			LayoutInformation.GetLayoutSlot(sut.MaterializedElements.OrderBy(e => e.DataContext).First()).Y.Should().Be(0, "Item #0 should be at the origin of the IR (negative offset means we are in trouble!)");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if !__SKIA__
@@ -524,6 +535,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Repea
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/ItemsRepeater.feature
 		[TestMethod]
 		[RunsOnUIThread]
 #if __MACOS__

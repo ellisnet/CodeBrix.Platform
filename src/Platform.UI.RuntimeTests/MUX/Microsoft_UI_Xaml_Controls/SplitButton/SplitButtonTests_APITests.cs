@@ -18,6 +18,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 	[TestClass]
 	public partial class SplitButtonTests : MUXApiTestBase
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 		[Description("Verifies SplitButton default properties.")]
 		public async Task VerifyDefaultsAndBasicSetting()
@@ -54,6 +55,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 			});
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/SplitButton.feature
 		[TestMethod]
 		[Description("Verifies ToggleSplitButton IsChecked property.")]
 		public void VerifyIsCheckedProperty()

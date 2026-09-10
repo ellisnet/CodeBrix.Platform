@@ -8,6 +8,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Animatio
 [RunsOnUIThread]
 public class Given_Storyboard
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media_Animation/Given_Storyboard.cs
 	[TestMethod]
 	public async Task When_Empty_Storyboard_Completes()
 	{
@@ -18,6 +19,7 @@ public class Given_Storyboard
 		await TestServices.WindowHelper.WaitFor(() => completed);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media_Animation/Given_Storyboard.cs
 	[TestMethod]
 	public async Task When_Empty_Storyboard_Completed_Attached_After()
 	{
@@ -28,6 +30,7 @@ public class Given_Storyboard
 		await TestServices.WindowHelper.WaitFor(() => completed);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media_Animation/Given_Storyboard.cs
 	[TestMethod]
 	public async Task When_Empty_Storyboard_Stopped()
 	{
@@ -39,6 +42,7 @@ public class Given_Storyboard
 		await TestServices.WindowHelper.WaitForIdle();
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature, src/Platform.UI.Tests/Windows_UI_Xaml_Media_Animation/Given_Storyboard.cs
 	[TestMethod]
 	public async Task When_Empty_Storyboard_Paused()
 	{

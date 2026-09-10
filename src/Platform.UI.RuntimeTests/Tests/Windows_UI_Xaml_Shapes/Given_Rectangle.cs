@@ -23,6 +23,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Shapes; //Was 
 [RunsOnUIThread]
 public class Given_Rectangle
 {
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 	[TestMethod]
 	[DataRow(Stretch.Fill, double.NaN, double.NaN, 0d, 0d, 50d, 50d, 0d, 0d)]
 	[DataRow(Stretch.Fill, double.NaN, double.NaN, 10d, 20d, 50d, 50d, 10d, 20d)]
@@ -63,6 +64,7 @@ public class Given_Rectangle
 		}
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 	[TestMethod]
 	[DataRow(50.0d, 5.0d, 50.0d, 99.0d, 54.0d)]
 	[DataRow(70.0d, 5.0d, 50.0d, 119.0d, 54.0d)]
@@ -109,6 +111,7 @@ public class Given_Rectangle
 		Assert.AreEqual(expectedHeight, shapeBounds.Height);
 	}
 
+	//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Shapes.feature
 	[TestMethod]
 	[DataRow(19.0d, 19.0d, 199.0d)]
 	[DataRow(20.0d, 39.0d, 219.0d)]

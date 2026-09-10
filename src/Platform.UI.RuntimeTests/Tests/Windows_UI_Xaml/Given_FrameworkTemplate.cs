@@ -24,6 +24,7 @@ public partial class Given_FrameworkTemplate;
 #if HAS_CODEBRIX
 partial class Given_FrameworkTemplate // tests
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public void When_TemplatesHaveSameFactoryTarget_Then_AreEqual()
 	{
@@ -37,6 +38,7 @@ partial class Given_FrameworkTemplate // tests
 		Assert.AreEqual(template1.GetHashCode(), template2.GetHashCode());
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public void When_TemplatesHaveSameStaticFactoryTarget_Then_AreEqual()
 	{
@@ -50,6 +52,7 @@ partial class Given_FrameworkTemplate // tests
 		Assert.AreEqual(template1.GetHashCode(), template2.GetHashCode());
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public void When_TemplatesHaveDifferentFactories_Then_AreNotEqual()
 	{
@@ -61,6 +64,7 @@ partial class Given_FrameworkTemplate // tests
 		Assert.AreNotEqual(template1, template2);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public async Task InstancedFactory_ShouldNotLeak()
 	{
@@ -77,6 +81,7 @@ partial class Given_FrameworkTemplate // tests
 		Assert.IsNull(setupWR.Target);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public async Task InstancedLegacyFactory_ShouldNotLeak()
 	{
@@ -93,6 +98,7 @@ partial class Given_FrameworkTemplate // tests
 		Assert.IsNull(setupWR.Target);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public async Task LambdaExpressionFactory1_ShouldNotBeCollected()
 	{
@@ -116,6 +122,7 @@ partial class Given_FrameworkTemplate // tests
 		GC.KeepAlive(template);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml/Given_FrameworkTemplate.cs
 	[TestMethod]
 	public async Task LambdaExpressionFactory2_ShouldNotBeCollected()
 	{

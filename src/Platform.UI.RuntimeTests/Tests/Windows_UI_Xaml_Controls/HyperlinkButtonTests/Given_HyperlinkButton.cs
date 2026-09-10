@@ -14,6 +14,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls.Hyper
 	public class Given_HyperlinkButton
 	{
 #if !WINAPPSDK // GetTemplateChild is protected in UWP while public in Uno.
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/HyperlinkButton.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task When_HyperlinkButton_With_Implicit_Content_Should_Be_Underlined()

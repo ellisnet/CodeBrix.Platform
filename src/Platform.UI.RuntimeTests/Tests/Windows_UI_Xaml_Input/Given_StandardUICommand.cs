@@ -12,6 +12,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input; //Was p
 [RunsOnUIThread]
 public class Given_StandardUICommand
 {
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_KeyboardAccelerators_Retrieved()
 	{
@@ -20,6 +21,7 @@ public class Given_StandardUICommand
 		Assert.IsNotNull(keyboardAccelerators);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_CanExecute_Default()
 	{
@@ -28,6 +30,7 @@ public class Given_StandardUICommand
 		Assert.IsTrue(command.CanExecute(null));
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_Execute()
 	{
@@ -39,6 +42,7 @@ public class Given_StandardUICommand
 		Assert.IsTrue(executed);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_CanExecute_Handled()
 	{
@@ -49,6 +53,7 @@ public class Given_StandardUICommand
 	}
 
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_CanExecute_Changed()
 	{
@@ -61,6 +66,7 @@ public class Given_StandardUICommand
 	}
 
 #if HAS_CODEBRIX
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_Child_Command_CanExecute()
 	{
@@ -84,6 +90,7 @@ public class Given_StandardUICommand
 	}
 #endif
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	[DataRow(
 		StandardUICommandKind.Cut,
@@ -209,6 +216,7 @@ public class Given_StandardUICommand
 		AssertStandardUICommandProperties(SUT, label, description, symbol, virtualKey, modifiers);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_StandardUICommand_In_Xaml()
 	{
@@ -231,6 +239,7 @@ public class Given_StandardUICommand
 			VirtualKeyModifiers.Control);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_Kind_Changes_Overrides_Default_Properties()
 	{
@@ -265,6 +274,7 @@ public class Given_StandardUICommand
 			VirtualKeyModifiers.Control);
 	}
 
+	//TEST PARTLY REPLACED - by src/Platform.UI.Headless.Tests/StandardUICommandTests.cs
 	[TestMethod]
 	public void When_Kind_Changes_Does_Not_Override_Set_Properties()
 	{

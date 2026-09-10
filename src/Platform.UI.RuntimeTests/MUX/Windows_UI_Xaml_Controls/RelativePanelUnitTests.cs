@@ -31,6 +31,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			return graph.GetNodes().First.Value;
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyHorizontalDependencyResolution()
 		{
@@ -66,6 +67,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyVerticalDependencyResolution()
 		{
@@ -101,6 +103,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyDownwardPrecedence()
 		{
@@ -246,6 +249,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyUpwardPrecedence()
 		{
@@ -391,6 +395,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyRightwardPrecedence()
 		{
@@ -536,6 +541,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyLeftwardPrecedence()
 		{
@@ -681,6 +687,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyVerticallyFloatingAndOverlapping()
 		{
@@ -724,6 +731,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node3.m_arrangeRect, ar3);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyHorizontallyFloatingAndOverlapping()
 		{
@@ -767,6 +775,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node3.m_arrangeRect, ar3);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyAboveAndOutOfPanel()
 		{
@@ -799,6 +808,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node1.m_arrangeRect, ar1);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyBelowAndOutOfPanel()
 		{
@@ -831,6 +841,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node1.m_arrangeRect, ar1);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyLeftAndOutOfPanel()
 		{
@@ -863,6 +874,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node1.m_arrangeRect, ar1);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyRightAndOutOfPanel()
 		{
@@ -895,6 +907,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			VERIFY_ARE_EQUAL(node1.m_arrangeRect, ar1);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyVerticalMultiDirectionalLeaf()
 		{
@@ -1009,6 +1022,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyHorizontalMultiDirectionalLeaf()
 		{
@@ -1123,6 +1137,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyAboveVerticallyCenteredRoot()
 		{
@@ -1180,6 +1195,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyBelowVerticallyCenteredRoot()
 		{
@@ -1237,6 +1253,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyLeftOfHorizontallyCenteredRoot()
 		{
@@ -1294,6 +1311,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyRightOfHorizontallyCenteredRoot()
 		{
@@ -1351,6 +1369,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyVerticallyCenteredChains()
 		{
@@ -1428,6 +1447,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyHorizontallyCenteredChains()
 		{
@@ -1505,6 +1525,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifySimultaneousTopAndBottomAlignment()
 		{
@@ -1649,6 +1670,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifySimultaneousLeftAndRightAlignment()
 		{
@@ -1792,6 +1814,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifySimultaneousTopAndBottomAlignmentToChains()
 		{
@@ -1919,6 +1942,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifySimultaneousLeftAndRightAlignmentToChains()
 		{
@@ -2046,6 +2070,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyChainWithHorizontallyCenteredSiblings()
 		{
@@ -2126,6 +2151,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyChainWithVerticallyCenteredSiblings()
 		{
@@ -2206,6 +2232,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.MUX.Windows_UI_Xaml_Controls //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Headless.Tests/RelativePanelLayoutTests.cs
 		[TestMethod]
 		public void VerifyPhysicallyImpossibleDefinitions()
 		{

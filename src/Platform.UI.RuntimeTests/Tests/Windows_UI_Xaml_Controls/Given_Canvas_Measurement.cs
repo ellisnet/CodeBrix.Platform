@@ -22,6 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		private const string Green = "#FF008000";
 		private const string Brown = "#FFA52A2A";
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Canvas.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/CanvasTests/Given_Canvas.cs
 		[TestMethod]
 		public async Task When_Measure_CanvasChildren()
 		{
@@ -35,6 +36,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			inBorder.Height.Should().Be(outBorder.Height, "Border in canvas measurement failed");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Canvas.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/CanvasTests/Given_Canvas.cs
 		[TestMethod]
 #if false
 		[Ignore("Currently fails on Android https://github.com/unoplatform/uno/issues/9080")]
@@ -60,6 +62,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAtChild(bitmap, unclippedLocation, (float)unclippedLocation.Width / 2, (float)unclippedLocation.Height / 2, Blue);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Canvas.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/CanvasTests/Given_Canvas.cs
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_Verify_Canvas_ZIndex()
@@ -102,6 +105,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Canvas.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/CanvasTests/Given_Canvas.cs
 		[TestMethod]
 		public async Task When_Verify_Canvas_In_Canvas()
 		{
@@ -118,6 +122,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			ImageAssert.HasColorAtChild(bitmap, clippedLocation, (float)clippedLocation.Width / 2, clippedLocation.Height / 2, Blue);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Canvas.feature, src/Platform.UI.Tests/Windows_UI_XAML_Controls/CanvasTests/Given_Canvas.cs
 		[TestMethod]
 #if false
 		[Ignore("Fails on Android.")]

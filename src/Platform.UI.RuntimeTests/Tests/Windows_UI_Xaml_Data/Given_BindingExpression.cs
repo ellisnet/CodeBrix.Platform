@@ -13,6 +13,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Data; //Was pr
 [TestClass]
 public class Given_BindingExpression
 {
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Binding_Should_Have_Correct_Default()
@@ -22,6 +23,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("", binding.ConverterLanguage);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Binding_Outer_Inner_DC_Null()
@@ -54,6 +56,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Binding_Outer_Inner_DC_Not_Null_Outer_Null()
@@ -86,6 +89,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -120,6 +124,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(canReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Binding_Outer_DC_Null()
@@ -152,6 +157,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -186,6 +192,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(canReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_Binding_EmptyPath_DC_Null()
@@ -218,6 +225,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindNoDataTemplate_Outer_Inner_DC_Null()
@@ -250,6 +258,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindNoDataTemplate_Outer_Inner_DC_Not_Null_Outer_Null()
@@ -282,6 +291,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -316,6 +326,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(canReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -350,6 +361,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(canReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindNoDataTemplate_Outer_DC_Null()
@@ -382,6 +394,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindInDataTemplate_Outer_Inner_DC_Null()
@@ -416,6 +429,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("default", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindInDataTemplate_Outer_DC_Null()
@@ -450,6 +464,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Data.NestedItem", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindInDataTemplate_EmptyPath_DC_Null()
@@ -484,6 +499,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Data.TestItem", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	public async Task When_xBindInDataTemplate_Outer_Inner_DC_Not_Null_Outer_Null()
@@ -518,6 +534,7 @@ public class Given_BindingExpression
 		Assert.AreEqual("fallback", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -555,6 +572,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(BoolToVisibilityConverter.CanReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[CombinatorialData]
@@ -591,6 +609,7 @@ public class Given_BindingExpression
 		Assert.AreEqual(BoolToVisibilityConverter.CanReturnNull ? "targetnullvalue" : "convertervalue", SUT.Prop);
 	}
 
+	//TEST FULLY REPLACED - by src/Platform.UI.Tests/BinderTests/Given_Binder.cs, src/Platform.UI.Tests/Windows_UI_Xaml_Data/BindingTests/Given_Binding.cs
 	[TestMethod]
 	[RunsOnUIThread]
 	[DataRow("SUT_S")]

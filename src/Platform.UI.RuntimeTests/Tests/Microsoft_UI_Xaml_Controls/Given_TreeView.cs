@@ -66,6 +66,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 	public partial class Given_TreeView
 	{
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -109,6 +110,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		[CombinatorialData]
 #if false
@@ -193,6 +195,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("The behaviour of virtualizing panels is only accurate for managed virtualizing panels.")]
@@ -236,6 +239,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 
 #if HAS_CODEBRIX
 		// https://github.com/unoplatform/uno/issues/16041
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -318,6 +322,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			Assert.IsFalse(TestableTreeViewItem.DraggingThrewException);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -399,6 +404,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task When_Setting_SelectedItem_DoesNotTakeEffect()
 		{
@@ -423,6 +429,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #if false
 		[Ignore("Fails on iOS 17 https://github.com/unoplatform/uno/issues/17102")]
 #endif
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task When_Setting_SelectedItem_TakesEffect()
 		{
@@ -448,6 +455,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 		}
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		[RequiresFullWindow]
 		public async Task When_ItemTemplateSelector_DataTemplate_Root_IsNot_TreeViewItem()
@@ -501,6 +509,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task When_SubList_Of_Last_Item_Cleared()
 		{
@@ -540,6 +549,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 			TestTreeNodeModel Get_Depth_2_Item() => new TestTreeNodeModel($"Subitem {(char)(++initial_Depth_2)}");
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -600,6 +610,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -651,6 +662,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -718,6 +730,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -785,6 +798,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -858,6 +872,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("failing due to #16216; selection offset correction happens too late on ios")]
@@ -929,6 +944,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Microsoft_UI_Xaml_Controls //W
 #endif
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task When_Simple_ItemsSource()
 		{

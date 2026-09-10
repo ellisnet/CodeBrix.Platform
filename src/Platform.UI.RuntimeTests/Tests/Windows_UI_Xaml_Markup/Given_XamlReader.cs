@@ -24,6 +24,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 	[RunsOnUIThread]
 	public partial class Given_XamlReader
 	{
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_DoubleCollection()
 		{
@@ -41,6 +42,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(2, value[1]);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_PointCollection()
 		{
@@ -60,12 +62,14 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(new Point(4, 5), value[2]);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Enum_HasNumericalValue()
 		{
 			XamlHelper.LoadXaml<StackPanel>("""<StackPanel Orientation="0" />""");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_ResDict_ComprehensiveSetup()
 		{
@@ -97,6 +101,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.TryGetValue("Color3", out var _, shouldCheckSystem: false), "Failed to resolve key: Color3");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FrameworkElement_Resources_ComprehensiveSetup()
 		{
@@ -141,6 +146,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 		// - but, not both a res-dict AND (any child resource OR another res-dict)
 		//		^ doing so resulting in: Xaml Internal Error error WMC9999: This Member 'Resources' has more than one item, use the Items property
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FrameworkElement_Resources_Nest_ResDict()
 		{
@@ -160,6 +166,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.Resources.ContainsKey("Asd"), "Failed to resolve key: Asd");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FrameworkElement_Resources_Nest_Resources()
 		{
@@ -178,6 +185,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.Resources.ContainsKey("Asd2"), "Failed to resolve key: Asd2");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FrameworkElement_Resources_Nest_ResDictAndRes()
 		{
@@ -195,6 +203,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			"""), "FE.Resources nested both a res-dict and any resource should throw");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FrameworkElement_Resources_Nest_ManyResDicts()
 		{
@@ -214,6 +223,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			"""), "FE.Resources nested multiple res-dicts should throw");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_ResDict_MergedDict() // uno#13100
 		{
@@ -232,6 +242,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.MergedDictionaries.FirstOrDefault()?.ContainsKey("Asd"), "Failed to resolve key: Asd");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_CustomResDict_NormalProperty() // uno#13099
 		{
@@ -250,6 +261,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.MemberDict?.ContainsKey("Asd"), "Failed to resolve key: Asd");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_CustomResDict_NormalProperty_NestedRD() // uno#13099
 		{
@@ -268,6 +280,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.MemberDict2?.ContainsKey("Asd"), "Failed to resolve key: Asd");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_CustomResDict_NormalProperty_DirectRes() // uno#13099
 		{
@@ -284,6 +297,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(sut.MemberDict2?.ContainsKey("Asd"), "Failed to resolve key: Asd");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_TemplateBinding_AttachedProperty()
 		{
@@ -318,6 +332,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(ScrollMode.Enabled, sut.HorizontalScrollMode);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Input_Namespace()
 		{
@@ -332,6 +347,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsInstanceOfType(xaml, typeof(StandardUICommand));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_XMLNS()
 		{
@@ -344,6 +360,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsInstanceOfType(xaml, typeof(Style));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_FullName_NodeSyntax()
 		{
@@ -355,6 +372,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(value as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ShortName_NodeSyntax()
 		{
@@ -366,6 +384,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(value as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_FullName_AttributeSyntax_Generic()
 		{
@@ -379,6 +398,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(host.Tag as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ShortName_AttributeSyntax_Generic()
 		{
@@ -392,6 +412,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(host.Tag as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_FullName_AttributeSyntax_TextBlock()
 		{
@@ -405,6 +426,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(host.Tag as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ShortName_AttributeSyntax_TextBlock()
 		{
@@ -418,6 +440,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsTrue(host.Tag as bool? ?? false);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_TextBlock_Inlines_Explicit()
 		{
@@ -442,6 +465,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			VerifyInlineTree(expectation, host, DescribeInline);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_TextBlock_Inlines_Implicit()
 		{
@@ -484,6 +508,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 		}
 #endif
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ServiceProvider_DirectDP()
 		{
@@ -518,6 +543,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(setup, rop.RootObject, "IRootObjectProvider.RootObject");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ServiceProvider_InheritedDP()
 		{
@@ -552,6 +578,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(setup, rop.RootObject, "IRootObjectProvider.RootObject");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ServiceProvider_Nested()
 		{
@@ -587,6 +614,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(setup, rop.RootObject, "IRootObjectProvider.RootObject");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_MarkupExtension_ServiceProvider_InlineLiteral()
 		{
@@ -631,6 +659,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(rootGrid, rop.RootObject, "IRootObjectProvider.RootObject");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Invalid_Enum_Value_Template()
 		{
@@ -653,6 +682,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual("Requested value 'Invalid' was not found.", ex.InnerException.Message);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Invalid_Enum_Value_Template_Nested()
 		{
@@ -689,6 +719,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual("Requested value 'Invalid2' was not found. [Line: 11 Position: 9]", (aggregateException.InnerExceptions[1] as XamlParseException).Message);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Invalid_Ampersand_Escape()
 		{
@@ -700,6 +731,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Invalid_Root()
 		{
@@ -711,6 +743,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Unknown_Type()
 		{
@@ -722,6 +755,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Unknown_Type_In_Template()
 		{
@@ -739,6 +773,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Unknown_Property()
 		{
@@ -760,6 +795,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_Binding()
 		{
@@ -778,6 +814,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_Binding_Inside_DataTemplate()
 		{
@@ -802,6 +839,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_Multi_Positional_Binding_Inside_DataTemplate()
 		{
@@ -826,6 +864,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Invalid_Multi_Positional_Binding_Inside_DataTemplate()
 		{
@@ -856,6 +895,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_StaticResource()
 		{
@@ -874,6 +914,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_Positional()
 		{
@@ -892,6 +933,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Valid_Nested()
 		{
@@ -913,6 +955,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_FailOnUnknownProperties_With_Top_Level_Binding()
 		{
@@ -942,6 +985,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			return Disposable.Create(() => FeatureConfiguration.XamlReader.FailOnUnknownProperties = original);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Unknown_Property_In_Template()
 		{
@@ -969,6 +1013,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Multiple_Exceptions_1()
 		{
@@ -995,6 +1040,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Multiple_Exceptions_Nested_1()
 		{
@@ -1023,6 +1069,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public void When_Multiple_Exceptions_InvalidFormats()
 		{
@@ -1051,6 +1098,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			}
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public async Task When_ListView_ItemsPanelTemplate()
 		{
@@ -1069,6 +1117,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			await WindowHelper.WaitForLoaded(sut);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public async Task When_ItemsControl_ItemsPanelTemplate_In_DataTemplate()
 		{
@@ -1092,6 +1141,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			await WindowHelper.WaitForLoaded(sut);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/XamlReaderTests/Given_XamlReader.cs
 		[TestMethod]
 		public async Task When_ControlTemplate_In_DataTemplate()
 		{

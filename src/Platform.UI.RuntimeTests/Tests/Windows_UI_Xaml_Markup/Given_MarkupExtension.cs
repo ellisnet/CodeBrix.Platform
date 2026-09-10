@@ -20,6 +20,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 	public class Given_MarkupExtension
 	{
 #if HAS_CODEBRIX || !WINAPPSDK // the signatures are present from winui, uno\uwp and uno\winui, just not uwp
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_Default()
 		{
@@ -36,6 +37,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(rop.RootObject, page);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_Nested()
 		{
@@ -52,6 +54,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(rop.RootObject, page);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public async Task When_MarkupExtension_ResourceDictionary1()
 		{
@@ -69,6 +72,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsInstanceOfType(rop.RootObject, typeof(ResourceDictionary));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public async Task When_MarkupExtension_ResourceDictionary2()
 		{
@@ -86,6 +90,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsInstanceOfType(rop.RootObject, typeof(ResourceDictionary));
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_Enum()
 		{
@@ -95,6 +100,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(Orientation.Vertical, page.EnumMarkupExtension_Vertical.Orientation);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_ReturnNullForNullableStructType()
 		{
@@ -105,6 +111,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.IsNull(page.SUT.IsChecked, "Property value should be set to null by the markup-extension");
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_FullNameFirst()
 		{
@@ -114,6 +121,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Markup //Was p
 			Assert.AreEqual(nameof(ShortNameMarkup), (page.ShortName as TextBlock).Tag);
 		}
 
+		//TEST FULLY REPLACED - by src/Platform.UI.Tests/Windows_UI_Xaml_Markup/MarkupExtensionTests/Given_MarkupExtension.cs
 		[TestMethod]
 		public void When_MarkupExtension_MultiLevelNesting()
 		{

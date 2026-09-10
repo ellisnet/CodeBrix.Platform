@@ -18,6 +18,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 	[RunsOnUIThread]
 	public class Given_Popup
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task Check_Can_Reach_Main_Visual_Tree()
 		{
@@ -58,6 +59,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public void When_IsLightDismissEnabled_Default()
 		{
@@ -65,6 +67,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			Assert.IsFalse(popup.IsLightDismissEnabled);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public void When_Closed_Immediately()
 		{
@@ -75,6 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Visual_Parents_Do_Not_Include_Popup()
 		{
@@ -87,6 +91,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Logical_Parents_Include_Popup()
 		{
@@ -99,6 +104,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Visual_Parent_Is_Canvas()
 		{
@@ -114,6 +120,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Logical_Parent_Is_Popup()
 		{
@@ -127,6 +134,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 		}
 
 #if HAS_CODEBRIX // PopupPanel is Uno-specific
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Visual_Parents_Do_Not_Include_PopupPanel()
 		{
@@ -139,6 +147,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Child_Logical_Parents_Do_Not_Include_PopupPanel()
 		{
@@ -182,6 +191,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			return false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Removed_From_VisualTree()
 		{
@@ -217,6 +227,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 		}
 
 #if HAS_CODEBRIX // FeatureConfiguration is Uno-only
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS)] // On iOS native the flyout sizing is not handled differently, so the results are different.
 		[CombinatorialData]
@@ -273,6 +284,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 #endif
 
 #if HAS_CODEBRIX
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Escape_Handled()
 		{
@@ -306,6 +318,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			popup.IsOpen = false;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Escape_Canceled()
 		{
@@ -339,6 +352,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 			Assert.IsTrue(popup.IsOpen);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		[RunsOnUIThread]
 		[CombinatorialData]
@@ -366,6 +380,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls_Primi
 		}
 #endif
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Popups/Popup.feature
 		[TestMethod]
 		public async Task When_Multiple_Popups_Opened_Order_Is_Most_Recent_First()
 		{

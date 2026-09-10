@@ -42,6 +42,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			return true;
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanPerformLayout()
 		{
@@ -230,6 +231,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task VerifyGridLengthForRowsAndColumns()
 		{
@@ -299,6 +301,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task VerifyPixelTakesPriorityOverStar()
 		{
@@ -336,6 +339,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task VerifyAutoTakesPriorityOverStar()
 		{
@@ -374,6 +378,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task ThrowsInvalidArgumentForNegativePixelSize()
 		{
@@ -386,6 +391,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanSetCellDimensionsToZero()
 		{
@@ -428,6 +434,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanSetCellPixelDimensions()
 		{
@@ -459,6 +466,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		[RequiresFullWindow] // the test fails if the available size for window content isn't wide enough
 		public async Task ValidateLayoutRoundingForPixelDimensions()
@@ -492,6 +500,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanStarSizedCellsEquallyDivideAllocatedSpace()
 		{
@@ -542,6 +551,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanNegativelyWeightedCellsThrowInvalidArgument()
 		{
@@ -555,6 +565,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 #if false
 		[Ignore]
@@ -663,6 +674,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanAutoSizeCellDefaultToZero()
 		{
@@ -702,6 +714,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 #if false
 		[Ignore] // ViewportHeight is not implemented in Wasm
@@ -765,6 +778,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task ThrowsInvalidArgumentForNegativeRowAndColumnSpan()
 		{
@@ -780,6 +794,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task ThrowsInvalidArgumentForZeroRowAndColumnSpan()
 		{
@@ -795,6 +810,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanSpanRowsAndColumns()
 		{
@@ -836,6 +852,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanSpanAllRowsAndColumns()
 		{
@@ -887,6 +904,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task CanSetSpanToMoreThanTotalRowsAndColumns()
 		{
@@ -928,6 +946,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task ValidateEnsureMinSizeInDefinitionRange()
 		{
@@ -1112,6 +1131,7 @@ namespace Microsoft.UI.Xaml.Tests.Controls.Grid_Tests
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Layout/Grid.feature, src/Platform.UI.Headless.Tests/GridLayoutingTests.cs, src/Platform.UI.Tests/Windows_UI_XAML_Controls/GridTests/Given_Grid.cs
 		[TestMethod]
 		public async Task BorderChromeForComplexGrid()
 		{

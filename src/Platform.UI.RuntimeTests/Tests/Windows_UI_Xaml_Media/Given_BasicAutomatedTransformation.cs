@@ -20,6 +20,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 		private const string White = "#FFFFFF";
 		private const float PixelIncertitude = 2;
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_Rotate()
 		{
@@ -55,6 +56,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 			Assert(SUT, result, 80 + PixelIncertitude, 99, White);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_Translate()
 		{
@@ -77,6 +79,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 			Assert(SUT, result, 99, 15 + PixelIncertitude, colored);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_Skew()
 		{
@@ -101,6 +104,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 			Assert(SUT, result, 99, 99, colored);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_Scale()
 		{
@@ -127,6 +131,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 			Assert(SUT, result, 90 + PixelIncertitude, 90 + PixelIncertitude, White);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Animation.feature
 		[TestMethod]
 		public async Task When_Composite()
 		{

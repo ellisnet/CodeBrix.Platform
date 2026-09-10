@@ -9,6 +9,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls; //Wa
 [RunsOnUIThread]
 public class Given_ToggleSwitch
 {
+	//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/ToggleSwitch.feature
 	[TestMethod]
 #if false
 	[Ignore("Failing in CI")]

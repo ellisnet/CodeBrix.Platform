@@ -54,6 +54,7 @@ namespace MUXControlsTestApp
 	[TestClass]
 	public class TreeViewTests : MUXApiTestBase
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task TreeViewNodeTest()
 		{
@@ -112,6 +113,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task TreeViewClearAndSetAtTest()
 		{
@@ -166,6 +168,7 @@ namespace MUXControlsTestApp
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemSourceResetRecreateItems()
 		{
@@ -200,6 +203,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task TreeViewUpdateTest()
 		{
@@ -281,6 +285,7 @@ namespace MUXControlsTestApp
 			stackPanel.UpdateLayout();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task VerifyTreeViewIsNotTabStop()
 		{
@@ -301,6 +306,7 @@ namespace MUXControlsTestApp
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public async Task VerifyClearingNodeWithNoChildren()
 		{
@@ -337,6 +343,7 @@ namespace MUXControlsTestApp
 			await TestServices.WindowHelper.WaitForIdle();
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewNodeDPTest()
 		{
@@ -361,6 +368,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemTemplateTest()
 		{
@@ -383,6 +391,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("Fails on iOS 17 https://github.com/unoplatform/uno/issues/17102")]
@@ -419,6 +428,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemContainerStyleTest()
 		{
@@ -441,6 +451,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemContainerTransitionTest()
 		{
@@ -464,6 +475,7 @@ namespace MUXControlsTestApp
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemsSourceTest()
 		{
@@ -478,6 +490,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewItemsSourceUpdateTest()
 		{
@@ -511,6 +524,7 @@ namespace MUXControlsTestApp
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void TreeViewNodeStringableTest()
 		{
@@ -525,6 +539,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("Fails on iOS 17 https://github.com/unoplatform/uno/issues/17102")]
@@ -571,6 +586,7 @@ namespace MUXControlsTestApp
 		//	VisualTreeTestHelper.VerifyVisualTree(root: treeView, verificationFileNamePrefix: "TreeView");
 		//}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 #if false
 		[Ignore("Fails on iOS 17 https://github.com/unoplatform/uno/issues/17102")]
@@ -760,6 +776,7 @@ namespace MUXControlsTestApp
 			});
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Items/TreeView.feature
 		[TestMethod]
 		public void RemovingLastChildrenSetsIsExpandedToFalse()
 		{

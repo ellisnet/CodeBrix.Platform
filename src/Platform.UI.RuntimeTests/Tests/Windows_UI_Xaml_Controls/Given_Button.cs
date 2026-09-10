@@ -33,6 +33,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 	[RunsOnUIThread]
 	public class Given_Button
 	{
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		[CombinatorialData]
 		public async Task When_NavigationViewButtonStyles(bool useFluent)
@@ -55,6 +56,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.AreEqual(8, normalBtnRect.Right - smallBtnRect.Right);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Enabled_Inside_Disabled_Control()
 		{
@@ -108,6 +110,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(SUT.IsEnabled);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Command_Executing_IsEnabled()
 		{
@@ -115,6 +118,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await RunIsExecutingCommandCommon(command);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Command_Executing_With_Delay_IsEnabled()
 		{
@@ -122,6 +126,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await RunIsExecutingCommandCommon(command);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		[DataRow(typeof(Button))]
 		[DataRow(typeof(ToggleButton))]
@@ -159,6 +164,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await ImageAssert.AreEqualAsync(opacityZero, borderThicknessZero);
 		}
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Command_Never_Stops()
 		{
@@ -181,6 +187,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			Assert.IsFalse(firstButton.Focus(FocusState.Programmatic));
 		}
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -258,6 +265,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 #if !HAS_INPUT_INJECTOR
 		[Ignore("InputInjector is not supported on this platform.")]
@@ -287,6 +295,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 #endif
 
 #if HAS_CODEBRIX
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Button_Flyout_TemplateBinding()
 		{
@@ -320,6 +329,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		}
 #endif
 
+		//TEST FULLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Buttons/Button.feature, src/UIReqs/Platform.UI.Core/Features/Buttons/ButtonCommand.feature
 		[TestMethod]
 		public async Task When_Command_CanExecute_Throws()
 		{

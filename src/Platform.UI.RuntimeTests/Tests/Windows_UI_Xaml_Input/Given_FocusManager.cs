@@ -17,6 +17,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 	[TestClass]
 	public class Given_FocusManager
 	{
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task GotLostFocus()
@@ -145,6 +146,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			}
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		public async Task IsTabStop_False_Check_Inner()
@@ -174,6 +176,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -205,6 +208,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -236,6 +240,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -271,6 +276,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -308,6 +314,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 				() => !object.ReferenceEquals(FocusManager.GetFocusedElement(TestServices.WindowHelper.XamlRoot), button));
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -340,6 +347,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -404,6 +412,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -437,6 +446,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -473,6 +483,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			await AssertNavigationFocusSequence(expectedSequence, navigationAction);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -522,6 +533,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 			Assert.AreEqual(button, focused);
 		}
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 #if false
@@ -566,6 +578,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
@@ -604,6 +617,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Input //Was pr
 		}
 
 
+		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/ThemeFocus/Focus.feature, src/Platform.UI.Tests/Windows_UI_Xaml/Input/Focus/Given_FocusSelection.cs
 		[TestMethod]
 		[RunsOnUIThread]
 		[RequiresFullWindow]
