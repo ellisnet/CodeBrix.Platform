@@ -30,7 +30,7 @@
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
          (Platform.WinUI.nuspec), so replacing that package with project references dropped it;
          re-added here. Version matches the platform's pin in src/Directory.Build.targets. -->
-    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.181.669" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" />
   </ItemGroup>
 
   <!--

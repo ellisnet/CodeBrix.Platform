@@ -17,7 +17,7 @@
 
 		<dependencies>
 			<group targetFramework="net10.0">
-				<dependency id="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.181.669" />
+				<dependency id="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.248.1204" />
 				<!-- Brought in by the folded Microsoft.Extensions.Logging adapter + Extensions.Logging.
 				     All versions below come from the packed projects' own PackageReferences at pack
 				     time and are never authored here. -->

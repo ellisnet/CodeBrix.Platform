@@ -73,7 +73,7 @@
 
 	<PropertyGroup>
 		<MSTestVersion>4.4.0</MSTestVersion>
-		<MicrosoftTestingPlatformVersion>2.2.3</MicrosoftTestingPlatformVersion>
+		<MicrosoftTestingPlatformVersion>2.4.0</MicrosoftTestingPlatformVersion>
 		<SkiaSharpVersion>4.152.0</SkiaSharpVersion>
 		<HarfBuzzSharpVersion>14.2.1.200</HarfBuzzSharpVersion>
 	</PropertyGroup>
@@ -88,7 +88,7 @@
 		<PackageReference Update="NUnit" Version="4.6.0" />
 		<PackageReference Update="NUnit3TestAdapter" Version="6.2.0" />
 		<PackageReference Update="Microsoft.Testing.Extensions.TrxReport" Version="$(MicrosoftTestingPlatformVersion)" />
-		<PackageReference Update="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.181.669" />
+		<PackageReference Update="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" version="1.0.248.1204" />
     <!--The version of this NuGet.Packaging package MUST be compatible with the Microsoft.CodeAnalysis.Testing package version that is being used-->
 		<PackageReference Update="NuGet.Packaging" Version="7.9.0" />
 
