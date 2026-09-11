@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using CodeBrix.Platform.UI.Core.UIReqs.Canvas;
@@ -53,6 +52,15 @@ public sealed class RangeSteps
 	/// <summary>The template part a RatingControl's stars are laid out in.</summary>
 	public const string RatingStarsPart = "RatingBackgroundStackPanel";
 
+	/// <summary>How far out an "is {float}" claim about a range control's number may be.</summary>
+	public const double ExactTolerance = 0.001;
+
+	/// <summary>
+	/// How far out an "is about {float}" claim may be: a tenth, which is the shape for a number
+	/// a control took from a measured quantity rather than from the scenario.
+	/// </summary>
+	public const double AboutTolerance = 0.1;
+
 	private const int PointerId = 0;
 
 	private readonly ScenarioContext _scenarioContext;
@@ -95,6 +103,71 @@ public sealed class RangeSteps
 	public async Task Then_the_Value_of_is_less_than(string name, float threshold) =>
 		(await ValueOfAsync(name).ConfigureAwait(false)).Should().BeLessThan(threshold,
 			"the Value of \"{0}\" was asserted", name);
+
+	// ----------------------------------------------------- Maximum and Minimum
+
+	/// <summary>
+	/// Asserts the Maximum a range control carries. A control that takes its Maximum from
+	/// somewhere else - a scrubber bound to a clip's length, a bar bound to a total - promises
+	/// exactly this and nothing else, so the requirement has to be able to say it.
+	/// </summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="expected">The value it must carry.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Maximum of {string} is {float}")]
+	public async Task Then_the_Maximum_of_is(string name, float expected) =>
+		(await MaximumOfAsync(name).ConfigureAwait(false)).Should().BeApproximately(expected, ExactTolerance,
+			"the Maximum of \"{0}\" was asserted", name);
+
+	/// <summary>
+	/// Asserts the Maximum a range control carries, to within a tenth. This is the form for a
+	/// Maximum that came from a MEASURED quantity - a file's length, a duration an engine
+	/// reported - where the exact number is the engine's to decide and the requirement is that
+	/// the control took it.
+	/// </summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="expected">The value it must be near.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Maximum of {string} is about {float}")]
+	public async Task Then_the_Maximum_of_is_about(string name, float expected) =>
+		(await MaximumOfAsync(name).ConfigureAwait(false)).Should().BeApproximately(expected, AboutTolerance,
+			"the Maximum of \"{0}\" was asserted", name);
+
+	/// <summary>Asserts that a range control's Maximum is above a number.</summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="threshold">The number it must be above.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Maximum of {string} is more than {float}")]
+	public async Task Then_the_Maximum_of_is_more_than(string name, float threshold) =>
+		(await MaximumOfAsync(name).ConfigureAwait(false)).Should().BeGreaterThan(threshold,
+			"the Maximum of \"{0}\" was asserted", name);
+
+	/// <summary>Asserts the Minimum a range control carries.</summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="expected">The value it must carry.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Minimum of {string} is {float}")]
+	public async Task Then_the_Minimum_of_is(string name, float expected) =>
+		(await MinimumOfAsync(name).ConfigureAwait(false)).Should().BeApproximately(expected, ExactTolerance,
+			"the Minimum of \"{0}\" was asserted", name);
+
+	/// <summary>Asserts the Minimum a range control carries, to within a tenth.</summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="expected">The value it must be near.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Minimum of {string} is about {float}")]
+	public async Task Then_the_Minimum_of_is_about(string name, float expected) =>
+		(await MinimumOfAsync(name).ConfigureAwait(false)).Should().BeApproximately(expected, AboutTolerance,
+			"the Minimum of \"{0}\" was asserted", name);
+
+	/// <summary>Asserts that a range control's Minimum is below a number.</summary>
+	/// <param name="name">The Gherkin name of the control.</param>
+	/// <param name="threshold">The number it must be below.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the Minimum of {string} is less than {float}")]
+	public async Task Then_the_Minimum_of_is_less_than(string name, float threshold) =>
+		(await MinimumOfAsync(name).ConfigureAwait(false)).Should().BeLessThan(threshold,
+			"the Minimum of \"{0}\" was asserted", name);
 
 	/// <summary>Asserts how often a range control raised ValueChanged.</summary>
 	/// <param name="name">The Gherkin name of the control.</param>
@@ -313,26 +386,17 @@ public sealed class RangeSteps
 	[Then("the ProgressBar {string} paints an indicator in {string} within {int} milliseconds")]
 	public async Task Then_the_ProgressBar_paints_an_indicator_within(string name, Color color, int milliseconds)
 	{
-		var budget = Stopwatch.StartNew();
+		await Poll.UntilTheRegionShowsAsync(
+			_scenarioContext,
+			name,
+			region => CanvasAssert.FractionMatching(region, color) >= CanvasAssert.ContainsFraction,
+			TimeSpan.FromMilliseconds(milliseconds),
+			IndicatorPollInterval).ConfigureAwait(false);
 
-		while (true)
-		{
-			await ScenarioFrames.CaptureAsync(_scenarioContext, ScenarioFrames.CurrentFrameName)
-				.ConfigureAwait(false);
-			var region = await ScenarioFrames.RegionAsync(_scenarioContext, name).ConfigureAwait(false);
-			var showing = CanvasAssert.FractionMatching(region, color) >= CanvasAssert.ContainsFraction;
-
-			if (showing || budget.ElapsedMilliseconds >= milliseconds)
-			{
-				// Either the indicator has shown itself or the budget is gone. Stating the
-				// requirement either way is what puts the panel's colours in the report when it
-				// never showed.
-				region.Contains(color);
-				return;
-			}
-
-			await DelayAsync(IndicatorPollInterval).ConfigureAwait(false);
-		}
+		// Either the indicator showed itself or the budget is gone; the last frame the poll
+		// looked at is the scenario's current frame either way. Stating the requirement even
+		// when the poll gave up is what puts the panel's colours in the report.
+		(await ScenarioFrames.RegionAsync(_scenarioContext, name).ConfigureAwait(false)).Contains(color);
 	}
 
 	// --------------------------------------------------------- ScrollBar
@@ -423,6 +487,24 @@ public sealed class RangeSteps
 			value = RangeElements.ValueOf(ElementRegistry.Resolve(name))).ConfigureAwait(false);
 
 		return value;
+	}
+
+	private static async Task<double> MaximumOfAsync(string name)
+	{
+		var maximum = 0.0;
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+			maximum = RangeElements.MaximumOf(ElementRegistry.Resolve(name))).ConfigureAwait(false);
+
+		return maximum;
+	}
+
+	private static async Task<double> MinimumOfAsync(string name)
+	{
+		var minimum = 0.0;
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+			minimum = RangeElements.MinimumOf(ElementRegistry.Resolve(name))).ConfigureAwait(false);
+
+		return minimum;
 	}
 
 	private static async Task<DeviceRect> TrackOfAsync(string name, string partName)

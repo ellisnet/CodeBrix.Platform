@@ -63,6 +63,10 @@ public partial class SkiaGLCanvasElement : Grid
 
 	private readonly Func<Window>? _getWindowFunc;
 
+	// Set by Invalidate, cleared by Render. Without it the element renders continuously: see
+	// SkiaGLVisual.Paint.
+	private bool _renderRequested;
+
 	// Valid once loaded on a head that provides OpenGL; null otherwise.
 	private OffscreenGLContext? _context;
 	private GRContext? _grContext;
@@ -282,6 +286,12 @@ public partial class SkiaGLCanvasElement : Grid
 
 	private unsafe void Render()
 	{
+		// Cleared here rather than after the guards below, so that an element which cannot draw
+		// yet (or ever - one arranged at zero size, or one whose context could not be created)
+		// is not left permanently asking to be rendered, which would be the loop this flag
+		// exists to stop. UpdateSurface calls Invalidate again as soon as there IS a surface.
+		_renderRequested = false;
+
 		if (!IsLoaded || _context is null || _grContext is null || _surface is null || _backBuffer is null)
 		{
 			return;
@@ -323,7 +333,13 @@ public partial class SkiaGLCanvasElement : Grid
 #if WINAPPSDK
 	public void Invalidate() => DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Low, Render);
 #else
-	public void Invalidate() => Compositor.GetSharedCompositor().InvalidateRender(Visual);
+	public void Invalidate()
+	{
+		// The flag is what makes ONE call here produce exactly ONE paint, which is what this
+		// method's documentation promises. See SkiaGLVisual.Paint below.
+		_renderRequested = true;
+		Compositor.GetSharedCompositor().InvalidateRender(Visual);
+	}
 
 	private protected override ContainerVisual CreateElementVisual()
 		=> new SkiaGLVisual(this, Compositor.GetSharedCompositor());
@@ -332,7 +348,17 @@ public partial class SkiaGLCanvasElement : Grid
 	{
 		internal override void Paint(in PaintingSession session)
 		{
-			NativeDispatcher.Main.Enqueue(owner.Render, NativeDispatcherPriority.High);
+			// ONLY when a render was actually asked for. Enqueuing unconditionally makes the
+			// element render forever: Render ends with _backBuffer.Invalidate(), which dirties
+			// this visual, which paints it again, which enqueues another Render - a loop that
+			// never settles and that redraws the GPU surface hundreds of times a second on an
+			// idle screen. The paint that FOLLOWS the render still happens (that is the same
+			// _backBuffer.Invalidate()), and it is the one that draws the new bitmap.
+			if (owner._renderRequested)
+			{
+				NativeDispatcher.Main.Enqueue(owner.Render, NativeDispatcherPriority.High);
+			}
+
 			base.Paint(session);
 		}
 	}

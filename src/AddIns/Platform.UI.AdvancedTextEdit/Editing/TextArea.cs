@@ -868,6 +868,18 @@ public partial class TextArea : Control, ITextEditorComponent, IWeakEventListene
 	protected override void OnGotFocus(RoutedEventArgs e)
 	{
 		base.OnGotFocus(e);
+		//GotFocus BUBBLES in this framework, so this also runs when a child hosted
+		//inside the text area's grid - the search panel's text box - takes the focus.
+		//The caret belongs to the text area itself: it is shown only when the text
+		//area is what was focused, exactly the guard AdvancedTextEdit.OnGotFocus uses
+		//before forwarding focus here. MEASURED (UIReqs AdvancedTextEdit, 2026-09-10):
+		//without this guard the caret was shown and blinking in the document while the
+		//search box had the focus.
+		if (!ReferenceEquals(e.OriginalSource, this))
+		{
+			return;
+		}
+
 		caret.Show();
 		//An editable text area summons the software keyboard on heads that have
 		//one. A fully read-only editor (IsReadOnly sets the ReadOnlySectionDocument

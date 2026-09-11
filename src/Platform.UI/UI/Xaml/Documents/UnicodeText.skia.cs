@@ -962,7 +962,17 @@ internal readonly partial struct UnicodeText : IParsedText
 					_ => 0
 				};
 
+				// The line is as tall as the tallest font drawn on it, but never shorter than the text's
+				// own font: a line whose glyphs all came from a fallback face with smaller metrics (a
+				// PasswordBox masked in a character its font lacks, say) would otherwise be shorter
+				// than the empty line and the caret, which both use the text's font, so a box would
+				// change height as it emptied and filled. CodeBrix.Platform addition.
 				var fontDetailsWithMaxHeight = lineRuns.MaxBy(r => r.fontDetails.LineHeight).fontDetails;
+				if (defaultFontDetails.LineHeight > fontDetailsWithMaxHeight.LineHeight)
+				{
+					fontDetailsWithMaxHeight = defaultFontDetails;
+				}
+
 				var (currentLineHeight, baselineOffset) = GetLineHeightAndBaselineOffset(lineStackingStrategy, lineHeight, fontDetailsWithMaxHeight, lineIndex == 0, lineIndex == lines.Count - 1);
 				layoutedLine = new LayoutedLine(currentLineHeight, baselineOffset, lineIndex, alignmentOffset, currentLineY, line.startInText, line.endInText, layoutedRuns);
 			}

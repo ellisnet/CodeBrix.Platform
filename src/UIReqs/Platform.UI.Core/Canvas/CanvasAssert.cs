@@ -416,7 +416,21 @@ public static partial class CanvasAssert
 	/// <summary>Forgets the last failure report. The scenario hooks call this per scenario.</summary>
 	public static void ResetLastReport() => LastReport = null;
 
-	private static string Explain(Region region, string statement)
+	/// <summary>
+	/// Builds the standard failure report for a statement about a region - the statement itself,
+	/// the region report beneath it and the path of the saved frame - and remembers it as
+	/// <see cref="LastReport"/> so the scenario hooks print it again after the scenario has ended.
+	/// <para>
+	/// This is the seam an ADD-IN's own pixel primitive uses. A partial class cannot span
+	/// assemblies, so a coverage group that genuinely needs a new primitive writes it in a static
+	/// class of its own and reports through this, rather than printing one line less than every
+	/// other failure in the suite.
+	/// </para>
+	/// </summary>
+	/// <param name="region">The region the statement is about.</param>
+	/// <param name="statement">What was required of it, in the words a person would use.</param>
+	/// <returns>The report, ready to be handed to an assertion as its reason.</returns>
+	public static string Explain(Region region, string statement)
 	{
 		var report = statement + Environment.NewLine
 			+ RegionReport.Describe(region, FrameArchive.TrySave(region.Frame));

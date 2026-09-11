@@ -31,12 +31,18 @@ public static partial class ElementFactory
 {
 	private static readonly Dictionary<string, Func<FrameworkElement>> Kinds = BuildKinds();
 	private static readonly Dictionary<string, Action<FrameworkElement, string>> Properties = BuildProperties();
+	private static readonly Dictionary<string, List<TypedSetter>> TypedProperties =
+		new(StringComparer.OrdinalIgnoreCase);
+
+	private static readonly List<TypedReader> TextReaders = [];
 
 	/// <summary>The element kinds a feature file may ask for, in alphabetical order.</summary>
 	public static IReadOnlyCollection<string> KnownKinds => Sorted(Kinds.Keys);
 
 	/// <summary>The properties a feature file may set, in alphabetical order.</summary>
-	public static IReadOnlyCollection<string> KnownProperties => Sorted(Properties.Keys);
+	public static IReadOnlyCollection<string> KnownProperties =>
+		Sorted(new HashSet<string>(Properties.Keys, StringComparer.OrdinalIgnoreCase)
+			.Union(TypedProperties.Keys, StringComparer.OrdinalIgnoreCase));
 
 	/// <summary>Registers an element kind a feature file may ask for.</summary>
 	/// <param name="kind">The name a feature file uses.</param>
@@ -74,6 +80,121 @@ public static partial class ElementFactory
 		}
 
 		Properties[property] = setter;
+	}
+
+	/// <summary>
+	/// Registers a property a feature file may set on ONE kind of element. The universal words a
+	/// requirement uses - Padding, Text, FontSize - mean different things on different elements,
+	/// and a control that spells one of them its own way must not have to be given a
+	/// control-specific name for it (nor may it silently take the word away from every other
+	/// element). A typed setter is therefore consulted before the general table, and only for an
+	/// element it actually applies to.
+	/// </summary>
+	/// <typeparam name="TElement">The element type this setter applies to.</typeparam>
+	/// <param name="property">The name a feature file uses.</param>
+	/// <param name="setter">How to apply it to an element of that type.</param>
+	/// <exception cref="InvalidOperationException">
+	/// That name is already registered for that same type with a different setter.
+	/// </exception>
+	public static void RegisterProperty<TElement>(string property, Action<TElement, string> setter)
+		where TElement : FrameworkElement
+	{
+		ArgumentException.ThrowIfNullOrEmpty(property);
+		ArgumentNullException.ThrowIfNull(setter);
+
+		if (!TypedProperties.TryGetValue(property, out var handlers))
+		{
+			handlers = new List<TypedSetter>();
+			TypedProperties[property] = handlers;
+		}
+
+		foreach (var handler in handlers)
+		{
+			if (handler.ElementType != typeof(TElement))
+			{
+				continue;
+			}
+
+			if (!handler.Setter.Equals(setter))
+			{
+				throw AlreadyTaken(
+					string.Create(CultureInfo.InvariantCulture, $"{typeof(TElement).Name} property"), property);
+			}
+
+			return;
+		}
+
+		handlers.Add(new TypedSetter(
+			typeof(TElement),
+			setter,
+			(element, value) => setter((TElement) element, value)));
+	}
+
+	/// <summary>
+	/// Registers how to read the text of ONE kind of element, so that the universal sentence
+	/// "the Text of ... is ..." can be said about a control the core harness has never heard of.
+	/// It is the mirror of <see cref="RegisterProperty{TElement}"/>: the reader is consulted
+	/// before the harness's own switch, and only for an element it actually applies to, so a
+	/// group teaching the word to its own control takes it away from nothing else.
+	/// </summary>
+	/// <typeparam name="TElement">The element type this reader applies to.</typeparam>
+	/// <param name="reader">How to read the text of an element of that type.</param>
+	/// <exception cref="InvalidOperationException">
+	/// That type is already registered with a different reader.
+	/// </exception>
+	public static void RegisterTextReader<TElement>(Func<TElement, string> reader)
+		where TElement : FrameworkElement
+	{
+		ArgumentNullException.ThrowIfNull(reader);
+
+		foreach (var registered in TextReaders)
+		{
+			if (registered.ElementType != typeof(TElement))
+			{
+				continue;
+			}
+
+			if (!registered.Reader.Equals(reader))
+			{
+				throw AlreadyTaken(
+					string.Create(CultureInfo.InvariantCulture, $"{typeof(TElement).Name} text reader"), "Text");
+			}
+
+			return;
+		}
+
+		TextReaders.Add(new TypedReader(typeof(TElement), reader, element => reader((TElement) element)));
+	}
+
+	/// <summary>
+	/// Reads an element's text through the reader a coverage group registered for its type. The
+	/// most-derived registration wins, as it does for a typed setter. Call this on the UI thread.
+	/// </summary>
+	/// <param name="element">The element to read.</param>
+	/// <param name="text">The text, when a reader was registered for it.</param>
+	/// <returns><c>true</c> when a reader answered; <c>false</c> when none applies.</returns>
+	public static bool TryReadText(FrameworkElement element, out string text)
+	{
+		ArgumentNullException.ThrowIfNull(element);
+
+		text = string.Empty;
+		TypedReader? best = null;
+		foreach (var reader in TextReaders)
+		{
+			if (reader.ElementType.IsInstanceOfType(element)
+				&& (best is null || best.ElementType.IsAssignableFrom(reader.ElementType)))
+			{
+				best = reader;
+			}
+		}
+
+		if (best is null)
+		{
+			return false;
+		}
+
+		text = best.Read(element) ?? string.Empty;
+		return true;
 	}
 
 	/// <summary>
@@ -134,6 +255,15 @@ public static partial class ElementFactory
 		ArgumentNullException.ThrowIfNull(element);
 		ArgumentException.ThrowIfNullOrEmpty(property);
 
+		// A setter registered for this element's own type wins over the general one: the general
+		// "Padding" knows a Border, a Control and a TextBlock, and a panel that has a Padding of
+		// its own is neither of those.
+		if (TryTypedSetter(element, property, out var typed))
+		{
+			typed(element, GherkinValue.Unquote(value));
+			return;
+		}
+
 		if (!Properties.TryGetValue(property, out var setter))
 		{
 			throw new NotSupportedException(
@@ -142,6 +272,72 @@ public static partial class ElementFactory
 		}
 
 		setter(element, GherkinValue.Unquote(value));
+	}
+
+	private static bool TryTypedSetter(FrameworkElement element, string property,
+		out Action<FrameworkElement, string> setter)
+	{
+		setter = null!;
+		if (!TypedProperties.TryGetValue(property, out var handlers))
+		{
+			return false;
+		}
+
+		TypedSetter? best = null;
+		foreach (var handler in handlers)
+		{
+			if (!handler.ElementType.IsInstanceOfType(element))
+			{
+				continue;
+			}
+
+			if (best is null || best.ElementType.IsAssignableFrom(handler.ElementType))
+			{
+				// The most-derived registration wins, so a group that teaches the word to a base
+				// class and another that teaches it to one of its subclasses both get what they
+				// asked for.
+				best = handler;
+				continue;
+			}
+
+			if (!handler.ElementType.IsAssignableFrom(best.ElementType))
+			{
+				var subject = string.Create(CultureInfo.InvariantCulture,
+					$"A {element.GetType().Name} named \"{element.Name}\"");
+				var registrations = string.Create(CultureInfo.InvariantCulture,
+					$"\"{property}\" ({best.ElementType.Name} and {handler.ElementType.Name})");
+
+				throw new InvalidOperationException(
+					$"{subject} matches two unrelated registrations of {registrations}, so there is no "
+					+ "way to know which one the scenario meant.");
+			}
+		}
+
+		if (best is null)
+		{
+			return false;
+		}
+
+		setter = best.Apply;
+		return true;
+	}
+
+	private sealed class TypedSetter(Type elementType, object setter, Action<FrameworkElement, string> apply)
+	{
+		public Type ElementType { get; } = elementType;
+
+		public object Setter { get; } = setter;
+
+		public Action<FrameworkElement, string> Apply { get; } = apply;
+	}
+
+	private sealed class TypedReader(Type elementType, object reader, Func<FrameworkElement, string> read)
+	{
+		public Type ElementType { get; } = elementType;
+
+		public object Reader { get; } = reader;
+
+		public Func<FrameworkElement, string> Read { get; } = read;
 	}
 
 	private static FrameworkElement Build(string kind, string name)

@@ -88,6 +88,36 @@ public sealed class TextSteps
 		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 	}
 
+	/// <summary>
+	/// Presses and releases one key while the Control key is held down. The panel's keyboard
+	/// carries no modifier field of its own: the modifier state is what the modifier keys that
+	/// are down say it is, exactly as it is on a real head, so a chord is the modifier pressed,
+	/// the key pressed and released, and the modifier let go - in that order.
+	/// </summary>
+	/// <param name="key">The key to press.</param>
+	/// <returns>A task that completes once the keys have been delivered and the UI thread is idle.</returns>
+	[When("the key {string} is pressed with the Control key held down")]
+	public async Task When_the_key_is_pressed_with_the_Control_key_held_down(VirtualKey key) =>
+		await ChordAsync(key, control: true, shift: false).ConfigureAwait(false);
+
+	/// <summary>Presses and releases one key while the Shift key is held down.</summary>
+	/// <param name="key">The key to press.</param>
+	/// <returns>A task that completes once the keys have been delivered and the UI thread is idle.</returns>
+	[When("the key {string} is pressed with the Shift key held down")]
+	public async Task When_the_key_is_pressed_with_the_Shift_key_held_down(VirtualKey key) =>
+		await ChordAsync(key, control: false, shift: true).ConfigureAwait(false);
+
+	/// <summary>
+	/// Presses and releases one key while both the Control and the Shift keys are held down -
+	/// the shape of chord a control reserves for itself precisely because the plain one already
+	/// means something to whatever it is hosting.
+	/// </summary>
+	/// <param name="key">The key to press.</param>
+	/// <returns>A task that completes once the keys have been delivered and the UI thread is idle.</returns>
+	[When("the key {string} is pressed with the Control and Shift keys held down")]
+	public async Task When_the_key_is_pressed_with_the_Control_and_Shift_keys_held_down(VirtualKey key) =>
+		await ChordAsync(key, control: true, shift: true).ConfigureAwait(false);
+
 	/// <summary>Selects everything a text control holds, as a long press and drag would.</summary>
 	/// <param name="name">The Gherkin name of the control.</param>
 	/// <returns>A task that completes once the UI thread has applied the change.</returns>
@@ -202,6 +232,26 @@ public sealed class TextSteps
 		region.InkIsTallerThan(other);
 	}
 
+	/// <summary>
+	/// Asserts that a piece of text's ink grew taller between two captured frames by at least a
+	/// factor the scenario names. The plain "is taller than" step leaves the factor at the
+	/// harness's default, which is the smallest growth that counts as growth at all; a doubled
+	/// font size deserves a claim with a number in it.
+	/// </summary>
+	/// <param name="name">The Gherkin name of the text element.</param>
+	/// <param name="frameName">The later frame.</param>
+	/// <param name="factor">How many times as tall the ink must be.</param>
+	/// <param name="otherFrameName">The earlier frame.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the ink of {string} in frame {string} is at least {float} times as tall as in frame {string}")]
+	public async Task Then_the_ink_of_in_frame_is_at_least_times_as_tall_as_in_frame(string name, string frameName,
+		float factor, string otherFrameName)
+	{
+		var region = await RegionAsync(name, frameName).ConfigureAwait(false);
+		var other = await RegionAsync(name, otherFrameName).ConfigureAwait(false);
+		region.InkIsTallerThan(other, factor);
+	}
+
 	/// <summary>Asserts that a piece of text's ink is the same height in two captured frames.</summary>
 	/// <param name="name">The Gherkin name of the text element.</param>
 	/// <param name="frameName">The later frame.</param>
@@ -220,6 +270,36 @@ public sealed class TextSteps
 
 	private Task<Region> RegionAsync(string elementName, string frameName = ScenarioFrames.CurrentFrameName) =>
 		ScenarioFrames.RegionAsync(_scenarioContext, elementName, frameName);
+
+	private static async Task ChordAsync(VirtualKey key, bool control, bool shift)
+	{
+		var session = TestTargetFixture.Session;
+
+		if (control)
+		{
+			session.KeyDown(VirtualKey.Control);
+		}
+
+		if (shift)
+		{
+			session.KeyDown(VirtualKey.Shift);
+		}
+
+		session.KeyDown(key);
+		session.KeyUp(key);
+
+		if (shift)
+		{
+			session.KeyUp(VirtualKey.Shift);
+		}
+
+		if (control)
+		{
+			session.KeyUp(VirtualKey.Control);
+		}
+
+		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
+	}
 
 	private static async Task<FocusState> FocusStateAsync(string name)
 	{

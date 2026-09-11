@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.TextLayout.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.TextLayout.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It ships no XAML type at all: it is a layout
+		     engine that hands back geometry and paints onto a Skia canvas, so it needs nothing
+		     registered and nothing initialised - the engine initialises itself on its first call. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+
+		<!-- The painting surface the scenarios look at. The engine draws onto an SKCanvas, and this
+		     is the family's element that owns one: the software present path (a pinned staging
+		     buffer, a WriteableBitmap and an ImageBrush) that this panel already proves twice over. -->
+		<ProjectReference Include="..\..\AddIns\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

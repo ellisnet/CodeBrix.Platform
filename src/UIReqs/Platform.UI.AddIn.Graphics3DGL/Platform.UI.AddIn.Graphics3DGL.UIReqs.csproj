@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.Graphics3DGL.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.Graphics3DGL.UIReqs</RootNamespace>
+
+		<!-- The GL binding hands vertex-attribute offsets over as raw pointers, so a fixture that
+		     uploads a vertex buffer cannot be written without them. Same setting the add-in's own
+		     sample needs. -->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It brings the GL binding the fixtures compile
+		     their shaders with. Nothing has to be registered from here: the emulated panel's own
+		     host registers the off-screen OpenGL wrapper, lazily, so it is only ever built when a
+		     scenario actually shows a GL element. -->
+		<ProjectReference Include="..\..\AddIns\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.csproj" />
+	</ItemGroup>
+
+</Project>

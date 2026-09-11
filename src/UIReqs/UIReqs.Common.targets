@@ -1,0 +1,182 @@
+<Project>
+
+	<!-- Everything every UIReqs project is: the runner, the framework flavour, the packages, the
+	     fonts, the feature root and the twin's linked sources. A UIReqs csproj imports this file
+	     EXPLICITLY (there is no implicit import at this level of the tree, and one would apply to
+	     every project under src/), sets its own AssemblyName/RootNamespace and its own
+	     ProjectReferences, and says nothing else.
+
+	     A Portrait twin sets $(UIReqsLandscapeProjectDir) - the folder of the Landscape project it
+	     is the twin of, relative to the twin - BEFORE importing this file, and gets the linked
+	     sources, the linked feature files, the linked assets and the Landscape project's Features
+	     folder as its feature root.
+
+	     Paths that point OUT of a project are computed from $(MSBuildThisFileDirectory), which is
+	     src/UIReqs/ - the folder THIS file is in - not from the importing project's folder. -->
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+
+		<!-- The scenarios exercise the framework flavour that actually ships, not the .Reference
+		     API shells (whose bodies throw). Same choice Platform.UI.Headless.Tests makes. -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+
+		<!-- Keeps Reqnroll's generated *.feature.cs in obj/ instead of beside the .feature file.
+		     Mandatory in BOTH projects of a pair: without it the Portrait twin, which links the
+		     Landscape project's feature files, writes its generated code into that project's own
+		     Features folder, where the next build reports it as a stale code-behind file. -->
+		<ReqnrollUseIntermediateOutputPathForCodeBehind>true</ReqnrollUseIntermediateOutputPathForCodeBehind>
+
+		<!-- Where this assembly's .feature sources live, for the opt-in review archive. A twin owns
+		     no feature file: it links the Landscape project's, so it points at that folder. -->
+		<!-- Absolute, because it is read at run time by a process whose working directory is not
+		     the project folder: $(UIReqsLandscapeProjectDir) is relative TO the project folder. -->
+		<UIReqsFeatureRoot Condition="'$(UIReqsFeatureRoot)' == '' and '$(UIReqsLandscapeProjectDir)' != ''">$(MSBuildProjectDirectory)/$(UIReqsLandscapeProjectDir)/Features</UIReqsFeatureRoot>
+		<UIReqsFeatureRoot Condition="'$(UIReqsFeatureRoot)' == ''">$(MSBuildProjectDirectory)/Features</UIReqsFeatureRoot>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<PackageReference Include="Reqnroll.xunit.v3" Version="3.3.4" />
+		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<!-- No Version: src/Directory.Build.targets pins this one centrally, and a Version here
+		     would be silently overridden by its PackageReference Update. Only needed for the
+		     TRX report option, which is otherwise reported as "Zero tests ran". -->
+		<PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Skia's and HarfBuzz's native binaries have to be named per-OS and there is no head in
+		     a test run. ICU comes from the system dynamic linker search path on Linux, so it needs
+		     no package. Versions are central (src/Directory.Build.targets). -->
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The virtual application carries its own fonts, exactly as every sample does: the
+		     framework default is "Segoe UI", which no Linux box has, and the family rule is no
+		     system-font fallback. Neither package is produced from this repository. The symbols
+		     package is centrally pinned (src/Directory.Build.targets), so it takes no Version. -->
+		<PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.248.1181" />
+		<PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- reqnroll.json is a PHYSICAL file in every project folder, twins included: the code
+		     generator only picks the file up when it exists in the project folder itself, and a
+		     linked one is invisible to it. A project's own copy is written to the output folder
+		     AFTER the copies its references bring along, so its own settings win. -->
+		<None Update="reqnroll.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The opt-in review archive puts a copy of the .feature file beside the frames the
+		     scenarios of that feature produced, and a test assembly has no other way back to its
+		     own sources. Read at run time by Canvas/FrameReview.cs. -->
+		<AssemblyMetadata Include="CodeBrix.UIReqs.FeatureRoot" Value="$(UIReqsFeatureRoot)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(UIReqsLandscapeProjectDir)' != ''">
+		<!-- One source tree, two entry projects: every file of the Landscape project except its
+		     own orientation attribute, which the twin's own PanelOrientation.cs replaces. -->
+		<Compile Include="$(UIReqsLandscapeProjectDir)\**\*.cs"
+			Exclude="$(UIReqsLandscapeProjectDir)\obj\**;$(UIReqsLandscapeProjectDir)\bin\**;$(UIReqsLandscapeProjectDir)\PanelOrientation.cs"
+			Link="%(RecursiveDir)%(Filename)%(Extension)" />
+
+		<!-- Reqnroll generates xUnit classes from LINKED feature files too. The Link metadata is
+		     load-bearing: Reqnroll uses it as the Cucumber-messages resource name, so a linked
+		     feature resolves to the same logical name it has in the Landscape project. -->
+		<ReqnrollFeatureFile Include="$(UIReqsLandscapeProjectDir)\Features\**\*.feature"
+			Link="Features\%(RecursiveDir)%(Filename)%(Extension)" />
+
+		<!-- A fixture a scenario loads through a URI exists once, in the Landscape project, and
+		     lands beside BOTH executables at the same relative path. -->
+		<Content Include="$(UIReqsLandscapeProjectDir)\Assets\**\*"
+			Link="Assets\%(RecursiveDir)%(Filename)%(Extension)"
+			CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.csproj" />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI\Platform.UI.Skia.csproj" />
+		<!-- XamlControlsResources: controls have no templates without the Fluent theme. -->
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- These three are what the target below swaps in, and nothing else in a UIReqs project's
+		     reference graph builds them: the compile-time reference to CodeBrix.Platform resolves
+		     to the .Reference flavour, so without these a STALE .Skia build would be copied beside
+		     the scenarios and the run would silently measure yesterday's framework.
+		     ReferenceOutputAssembly is false because they are needed at run time only. -->
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<!-- Assembly resolution hands a host-free test process the .Reference variants of the runtime
+	     assemblies, whose stubs throw NotSupportedException("Ref assembly") - so swap in the .Skia
+	     variants, exactly as src/Platform.UI.Headless.Tests and the from-source sample heads do. -->
+	<Target Name="_UIReqsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<_CbSkiaUwp>$(MSBuildThisFileDirectory)..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbSkiaUwp>
+			<_CbSkiaComp>$(MSBuildThisFileDirectory)..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbSkiaComp>
+			<_CbSkiaDisp>$(MSBuildThisFileDirectory)..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbSkiaDisp>
+		</PropertyGroup>
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+		</ItemGroup>
+	</Target>
+
+	<!-- The font packages carry their .ttf files as library assets beside the package assembly
+	     (lib/<tfm>/<assembly name>/Fonts). A head unpacks those through the Platform.UI.Tasks
+	     asset targets; a UIReqs project imports none of that XAML machinery on purpose, so the
+	     fonts are placed beside the test Exe here, at exactly the paths the ms-appx:/// font URIs
+	     resolve to. A missing font is a silent disaster - text renders as nothing and only a pixel
+	     assertion notices - so both steps are hard errors. -->
+	<Target Name="_UIReqsCopyFontAssets" AfterTargets="CopyFilesToOutputDirectory" DependsOnTargets="ResolvePackageAssets">
+		<ItemGroup>
+			<_UIReqsFontAssembly Include="@(RuntimeCopyLocalItems)"
+				Condition="'%(Extension)' == '.dll' and $([System.String]::new('%(Filename)').StartsWith('CodeBrix.Platform.Fonts.'))" />
+		</ItemGroup>
+		<Error Condition="'@(_UIReqsFontAssembly)' == ''"
+			Text="No CodeBrix.Platform.Fonts.* package was resolved, so the virtual application would have no font to draw text with." />
+		<ItemGroup>
+			<!-- The .manifest beside a face is how the text engine resolves a FontWeight to the
+			     right file; without it every weight renders as the one face the URI names. -->
+			<_UIReqsFontFile Include="%(_UIReqsFontAssembly.RootDir)%(_UIReqsFontAssembly.Directory)%(_UIReqsFontAssembly.Filename)\Fonts\*.ttf;%(_UIReqsFontAssembly.RootDir)%(_UIReqsFontAssembly.Directory)%(_UIReqsFontAssembly.Filename)\Fonts\*.ttf.manifest">
+				<CodeBrixFontFolder>%(_UIReqsFontAssembly.Filename)</CodeBrixFontFolder>
+			</_UIReqsFontFile>
+		</ItemGroup>
+		<Error Condition="'@(_UIReqsFontFile)' == ''"
+			Text="The resolved CodeBrix.Platform.Fonts.* packages carry no .ttf assets: @(_UIReqsFontAssembly)." />
+		<Copy SourceFiles="@(_UIReqsFontFile)"
+			DestinationFiles="@(_UIReqsFontFile->'$(OutDir)%(CodeBrixFontFolder)\Fonts\%(Filename)%(Extension)')"
+			SkipUnchangedFiles="true" />
+		<ItemGroup>
+			<FileWrites Include="@(_UIReqsFontFile->'$(OutDir)%(CodeBrixFontFolder)\Fonts\%(Filename)%(Extension)')" />
+		</ItemGroup>
+	</Target>
+
+</Project>

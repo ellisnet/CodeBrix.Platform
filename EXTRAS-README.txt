@@ -165,6 +165,41 @@ Run:
     dotnet run --project samples/CodeBrixPlatform/ParityDemo/ParityDemo.LinuxX11
     dotnet run --project samples/CodeBrixPlatform/ParityDemo/ParityDemo.LinuxWayland
 
+EvaluateUIElementsDemo
+----------------------
+    samples/CodeBrixPlatform/EvaluateUIElementsDemo    six heads
+    Add-in: CodeBrix.Platform.Lottie (for the ProgressRing scenario)
+
+An evaluation rig for looking at UI elements by hand rather than in saved
+frames. The main screen is a scrolling list of numbered buttons, one per UI
+element or scenario the UI requirements frame review rated "suspicious", each
+with a one-line description. Tapping a button shows a SimpleDialog message
+saying what is being demonstrated and what to look for; OK replaces the list
+with a page holding the element itself (styled the way the review's scenario
+styled it, beside comparison controls) and a "< Back" button to the list. The
+person evaluating reports what they saw by number.
+
+Scenarios: a styled TextBox and a styled PasswordBox with keyboard focus (each
+beside a box that overrides the focused and pointer-over theme resources, the
+WinUI way to keep an application's own colours in those states), the
+ProgressRing, a NavigationView with its pane shut, a SplitView with an Overlay
+pane, an Image under Stretch UniformToFill (the two-colour picture is made at
+run time with SkiaSharp), ToggleSwitches reaching their off state by different
+routes, and a ToggleButton checked and cleared.
+
+Demonstrates: the .Core + .UI + heads layout with the catalogue of scenarios in
+.Core (a plain model list) and one SimpleViewModel command behind every
+button; a DataTemplate button bound to the page's command through the page's
+name with the row as its parameter; SimpleDialog from a page; Frame navigation
+to a page that takes a parameter and comes back with GoBack; a static factory
+that maps a catalogue key to a UserControl; and the Lottie add-in referenced
+from source, which is what makes the core's ProgressRing draw at all.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/EvaluateUIElementsDemo/EvaluateUIElementsDemo.LinuxX11
+    dotnet run --project samples/CodeBrixPlatform/EvaluateUIElementsDemo/EvaluateUIElementsDemo.LinuxWayland
+    (the FrameBuffer, MacOS, Win32Skia and WinWpfSkia heads follow the same pattern)
+
 FileFolderDialogDemo
 --------------------
     samples/CodeBrixPlatform/FileFolderDialogDemo    six heads

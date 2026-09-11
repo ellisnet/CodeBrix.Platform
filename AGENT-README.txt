@@ -1582,6 +1582,25 @@ documentation. A member that is present but not backed by an implementation
 throws a "not implemented" exception naming it - see WHAT THIS PACKAGE DOES
 NOT DO.
 
+PASSWORDBOX MASK CHARACTER: the default PasswordChar is the BULLET, U+2022, on
+every head. This is an intentional divergence from WinUI, whose default is the
+BLACK CIRCLE, U+25CF. A CodeBrix.Platform application draws its text from the
+fonts it ships, and U+25CF is missing from several of the application-font
+packages (every Open Sans face and every Roboto Mono face among them; Roboto and
+Merriweather carry it), so a black-circle default would be drawn from whatever
+font the host happened to have - and a masked line drawn in a borrowed font
+takes that font's line height, which made a PasswordBox change height as it
+emptied and filled. U+2022 is in every face of every application-font package,
+so the default mask is always drawn from the application's own font, and a
+default-style PasswordBox is exactly as tall as a default-style TextBox of the
+same font and size, empty or full, on every head. Set PasswordChar yourself to
+get another glyph (PasswordChar="&#x25CF;" for the WinUI look), and then choose
+a font that carries it: a glyph the application's font lacks is drawn from a
+host font on the desktop heads and renders as the font's missing-glyph shape
+where fonts are isolated. Independently of the mask, a line of text is never
+laid out shorter than its own font's line height, whatever font supplied its
+glyphs.
+
 ACCESS KEYS (Alt+letter) work on the Skia heads. Put an AccessKey on any
 element and Alt plus that letter invokes it: the element's AccessKeyInvoked
 event is raised, and when nothing handles that event the element is invoked

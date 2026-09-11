@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.VideoPlayer.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.VideoPlayer.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are, in its .Skia flavour. The playback engine and
+		     the off-screen graphics context (Graphics3DGL) flow in through it; nothing here ever
+		     names the AV1, Opus or authoring packages, which are an application's own choice. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Skia.csproj" />
+
+		<!-- The add-in references this with PrivateAssets="all" - the assembly has no nuget of its
+		     own and ships inside the main framework package - so it does NOT flow across the
+		     project reference into a test run, and the presenter logs through it (the once-per-
+		     process processor-effects warning and the line that says why the graphics path was not
+		     taken). The add-in's own .Tests csproj names it for exactly this reason. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The three clips the scenarios play. A video fixture cannot be a C# literal: the player
+		     opens a container by name and reads it with its own demuxer. They land beside both
+		     executables of the pair (the twin links them through the common targets) and the steps
+		     reach them by absolute path, computed from the assembly's own folder. -->
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

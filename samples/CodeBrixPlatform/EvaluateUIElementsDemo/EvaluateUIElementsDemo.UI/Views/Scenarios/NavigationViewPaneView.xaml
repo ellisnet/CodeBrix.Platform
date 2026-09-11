@@ -1,0 +1,45 @@
+<UserControl x:Class="EvaluateUIElementsDemo.Views.Scenarios.NavigationViewPaneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <StackPanel Spacing="12" Padding="4,8,4,8">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <Button Content="Open pane" Click="OpenPane_Click" />
+      <Button Content="Close pane" Click="ClosePane_Click" />
+      <TextBlock x:Name="PaneState" VerticalAlignment="Center" />
+    </StackPanel>
+
+    <!-- A: the survey's NavigationView exactly - 900 x 500, PaneDisplayMode Left, two items that
+         have a label and no icon, and a coloured page that follows the selection. -->
+    <TextBlock Text="A: as in the survey - 900 x 500, PaneDisplayMode Left, items with labels only (no icons)" />
+    <NavigationView x:Name="NavA" Width="900" Height="500" HorizontalAlignment="Left"
+                    PaneDisplayMode="Left" IsSettingsVisible="False" IsBackButtonVisible="Collapsed"
+                    SelectionChanged="Nav_SelectionChanged">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Content="Alpha" Tag="Red" />
+        <NavigationViewItem Content="Beta" Tag="Blue" />
+      </NavigationView.MenuItems>
+      <Border x:Name="PageA" Background="Red" />
+    </NavigationView>
+
+    <!-- B: the same, with an icon on every item, which is what a compact strip is meant to show. -->
+    <TextBlock Text="B: the same, with an icon on every item" Margin="0,12,0,0" />
+    <NavigationView x:Name="NavB" Width="900" Height="360" HorizontalAlignment="Left"
+                    PaneDisplayMode="Left" IsSettingsVisible="False" IsBackButtonVisible="Collapsed"
+                    SelectionChanged="Nav_SelectionChanged">
+      <NavigationView.MenuItems>
+        <NavigationViewItem Content="Alpha" Tag="Red">
+          <NavigationViewItem.Icon>
+            <SymbolIcon Symbol="Home" />
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+        <NavigationViewItem Content="Beta" Tag="Blue">
+          <NavigationViewItem.Icon>
+            <SymbolIcon Symbol="Contact" />
+          </NavigationViewItem.Icon>
+        </NavigationViewItem>
+      </NavigationView.MenuItems>
+      <Border x:Name="PageB" Background="Red" />
+    </NavigationView>
+  </StackPanel>
+</UserControl>

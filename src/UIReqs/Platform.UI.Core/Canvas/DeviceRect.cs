@@ -55,6 +55,20 @@ public readonly record struct DeviceRect(int X, int Y, int Width, int Height)
 		return new DeviceRect(left, top, Math.Max(0, right - left), Math.Max(0, bottom - top));
 	}
 
+	/// <summary>
+	/// The same rectangle with every edge pulled in by the same number of pixels - the way a
+	/// rectangle an engine computed is turned into one whose antialiased edges are outside it.
+	/// <see cref="FromBounds"/> does this for an element's transformed bounds; this does it for a
+	/// rectangle that was worked out some other way.
+	/// </summary>
+	/// <param name="inset">How far to pull each edge in. A negative value grows the rectangle.</param>
+	/// <returns>The inset rectangle, which may be empty.</returns>
+	public DeviceRect Inset(int inset) => new(
+		X + inset,
+		Y + inset,
+		Math.Max(0, Width - (2 * inset)),
+		Math.Max(0, Height - (2 * inset)));
+
 	/// <summary>How far this rectangle's edges are from another's, edge by edge.</summary>
 	/// <param name="other">The rectangle to compare with.</param>
 	/// <returns>The largest edge difference, in pixels.</returns>

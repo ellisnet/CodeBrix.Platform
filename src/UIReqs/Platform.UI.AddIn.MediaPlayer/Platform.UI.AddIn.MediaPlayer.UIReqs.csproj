@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.MediaPlayer.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.MediaPlayer.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It brings the playback engine package with
+		     it, which is LGPL: that dependency lives in THIS TEST GRAPH ONLY. Nothing is packed
+		     from a UIReqs project and nothing ships from one, so the reference is confined to the
+		     scenarios - it must never be copied into a project that ships. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.MediaPlayer.Skia\Platform.UI.MediaPlayer.Skia.csproj" />
+
+		<!-- The add-in logs through this assembly and references it PrivateAssets="all", because in
+		     a shipped application it arrives inside the main framework package rather than as a
+		     NuGet of its own. Nothing therefore flows to a project that references the add-in
+		     directly, and the first thing that needs it is the engine's own teardown - which fails
+		     to load, from inside a catch block, with a message about an assembly nobody mentioned.
+		     Referencing it here puts it beside the test executable. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The clips the scenarios play. They are handed to the engine as absolute file:/// URIs
+		     of these copies, so they are read from the folder the test executable runs in and
+		     nothing is written anywhere. The twin links the same files through the common targets. -->
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

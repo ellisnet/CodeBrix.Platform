@@ -1,0 +1,43 @@
+<UserControl x:Class="EvaluateUIElementsDemo.Views.Scenarios.ImageUniformToFillView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- The same 40 x 20 two-colour picture (Red left, Blue right, made at run time) in four Images,
+       each in a Border whose outline is the box the Image was given. The Border takes the size the
+       Image actually lays out at, so a box that is not the size stated is visible too. -->
+  <StackPanel Spacing="16" Padding="4,8,4,8">
+    <TextBlock Text="The picture: 40 x 20 pixels, left half Red, right half Blue. Each grey outline is the Image's box." />
+
+    <StackPanel Orientation="Horizontal" Spacing="28">
+      <StackPanel Spacing="6">
+        <TextBlock Text="UniformToFill, 200 x 300 (the survey case)" />
+        <Border BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+          <Image x:Name="UniformToFillImage" Width="200" Height="300" Stretch="UniformToFill" />
+        </Border>
+      </StackPanel>
+      <StackPanel Spacing="6">
+        <TextBlock Text="Uniform, 400 x 300" />
+        <Border BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+          <Image x:Name="UniformImage" Width="400" Height="300" Stretch="Uniform" />
+        </Border>
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Orientation="Horizontal" Spacing="28">
+      <StackPanel Spacing="6">
+        <TextBlock Text="Fill, 400 x 200" />
+        <Border BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+          <Image x:Name="FillImage" Width="400" Height="200" Stretch="Fill" />
+        </Border>
+      </StackPanel>
+      <StackPanel Spacing="6">
+        <TextBlock Text="None, 400 x 200" />
+        <Border BorderBrush="Gray" BorderThickness="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+          <Image x:Name="NoneImage" Width="400" Height="200" Stretch="None" />
+        </Border>
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock x:Name="PictureNote" Opacity="0.8" />
+  </StackPanel>
+</UserControl>

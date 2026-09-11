@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.WebView.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.WebView.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It brings no engine of its own: the three WPE
+		     WebKit libraries it binds come from the machine, which is why every scenario here is
+		     tagged @needs-wpe. Registration.cs is what turns the add-in on in a project that has
+		     no XAML for the generator to write a registration into. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
+
+		<!-- The add-in logs through this assembly, and its own project reference to it is private
+		     (the assembly ships INSIDE the main framework package, so it has no package of its own
+		     and must not flow to consumers as a dependency). A from-source consumer therefore does
+		     not get it copied beside the executable - and the very first thing the add-in does,
+		     starting its engine thread, is a method the runtime cannot even compile without it. That
+		     failure lands inside a layout pass, so it is worth naming here rather than meeting again. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The two pages a scenario loads through a file:// URI. Everything else a scenario shows
+		     is a C# string literal in Support/HtmlPages.cs; these two exist on disk because a
+		     file:// navigation is what they are there to prove. The Portrait twin links them
+		     through the common targets, so each file exists once. -->
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

@@ -1,0 +1,28 @@
+<UserControl x:Class="EvaluateUIElementsDemo.Views.Scenarios.ToggleSwitchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <StackPanel Spacing="10" Padding="4,8,4,8">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+      <Button Content="Set A and B on" Click="AllOn_Click" />
+      <Button Content="Set A and B off" Click="AllOff_Click" />
+      <Button Content="Flip A and B" Click="Flip_Click" />
+      <TextBlock x:Name="State" VerticalAlignment="Center" />
+    </StackPanel>
+
+    <!-- A and B are the survey's plain ToggleSwitch: no header, nothing overridden. A starts off
+         (Scenario 1 and 3 of the survey); B starts on and is switched off (Scenario 2). -->
+    <TextBlock Text="A: starts off" Margin="0,12,0,0" />
+    <ToggleSwitch x:Name="SwitchA" Toggled="Switch_Toggled" />
+
+    <TextBlock Text="B: starts on" Margin="0,12,0,0" />
+    <ToggleSwitch x:Name="SwitchB" IsOn="True" Toggled="Switch_Toggled" />
+
+    <!-- C and D show what a DISABLED switch looks like, off and on, for comparison. -->
+    <TextBlock Text="C: disabled, off" Margin="0,12,0,0" />
+    <ToggleSwitch IsEnabled="False" />
+
+    <TextBlock Text="D: disabled, on" Margin="0,12,0,0" />
+    <ToggleSwitch IsEnabled="False" IsOn="True" />
+  </StackPanel>
+</UserControl>

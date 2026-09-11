@@ -587,6 +587,11 @@ COMMON PITFALLS TO AVOID
     popup/new-window requests navigate the current view (NewWindowRequested is
     the hook if you want to intercept them); the mouse cursor does not change
     shape over links.
+  - Linux NavigationStarting: raised when the engine asks whether a navigation
+    may go ahead (so args.Cancel refuses it) - which the engine also asks for
+    navigations inside a frame of the page, and its question carries no
+    main-frame flag. A handler that only cares about the page itself should
+    look at args.Uri rather than assume every event is a top-level navigation.
   - Do not reference the package from a head project or try to construct
     WpeNativeWebViewProvider yourself; the framework wires it.
 

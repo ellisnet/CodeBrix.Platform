@@ -280,6 +280,16 @@ internal sealed class FrameBufferNativeOpenGLWrapper : INativeOpenGLWrapper
 		{
 			EglHelper.EglDestroyContext(_eglDisplay, _glContext);
 		}
+		// The display has to be ended BEFORE the device behind it goes away. MEASURED
+		// 2026-09-10: without this, the display was left initialised, pointing at a GBM device
+		// that had been freed and a DRM descriptor that had been closed - and creating a SECOND
+		// off-screen context in the same process then walked into what was left and ended the
+		// process inside the driver (a segmentation fault in driCreateContextAttribs, twice in
+		// six runs; six runs of six clean with this in place).
+		if (_eglDisplay != IntPtr.Zero)
+		{
+			EglHelper.EglTerminate(_eglDisplay);
+		}
 		if (_gbmDevice != IntPtr.Zero)
 		{
 			gbm_device_destroy(_gbmDevice);

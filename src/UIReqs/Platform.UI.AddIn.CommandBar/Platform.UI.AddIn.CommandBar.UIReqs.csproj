@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.CommandBar.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.CommandBar.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are, in its .Skia flavour (never .Reference, whose
+		     bodies throw). -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.CommandBar\Platform.UI.CommandBar.Skia.csproj" />
+
+		<!-- Named although the bar add-in already depends on it: every icon in the bar is drawn
+		     through an SvgImageSource, and Registration.cs has to name the provider type to turn
+		     that route on in a project with no XAML of its own. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The light/dark artwork pair is the one fixture that CANNOT be a C# string: an icon
+		     source picks its dark artwork by URI, and there is no "dark markup". The two files land
+		     beside both executables of the pair (the twin links them through the common targets)
+		     and the scenarios reach them as file: URIs computed from the assembly's own folder. -->
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

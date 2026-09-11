@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.PlotterView.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.PlotterView.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file and every feature file of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.PlotterView</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

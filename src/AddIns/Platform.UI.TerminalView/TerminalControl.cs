@@ -324,6 +324,15 @@ public sealed partial class TerminalControl : Control
     public void Reset()
     {
         _terminal.Reset();
+
+        //The engine's RIS restores the modes but leaves the screen and the
+        //scrollback exactly as they were, so a reset on its own would hand the
+        //next session the previous one's output. Emptying the active buffer is
+        //what "reset to initial state" means to the person looking at the
+        //control - and it is the state a freshly constructed buffer is in, since
+        //the engine's own Buffer constructor starts by calling Clear().
+        _terminal.Buffer.Clear();
+
         _selection.SelectNone();
         UpdateScrollBar();
         _canvas.Invalidate();

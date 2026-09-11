@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.TerminalView.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.TerminalView.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It needs nothing registered and nothing
+		     initialised: the terminal control builds its own ControlTemplate in its constructor,
+		     and the VT engine, the text-layout engine and the monospace font package all arrive
+		     through this one reference. The monospace face is placed beside the test executable by
+		     the common targets' font-copy target, which globs every resolved font package. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

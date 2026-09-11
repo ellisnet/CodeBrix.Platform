@@ -98,6 +98,23 @@ public sealed class ScenarioHooks
 		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 	}
 
+	/// <summary>
+	/// Lifts a finger a scenario left resting on the panel. A scenario that puts one down and
+	/// then fails before its lift would otherwise hand the next scenario a panel with a pointer
+	/// still captured on it, which is not the known state every scenario starts from.
+	/// </summary>
+	/// <returns>A task that completes once no finger is down and the UI thread is idle.</returns>
+	public static async Task ReleaseAFingerLeftDownAsync()
+	{
+		if (!Finger.TryLift(out var position) || !TestTargetFixture.IsLaunched)
+		{
+			return;
+		}
+
+		TestTargetFixture.Session.TouchRelease(Finger.PointerId, position.X, position.Y);
+		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
+	}
+
 	/// <summary>How many popups are open right now, which is what "no popup is open" asks.</summary>
 	/// <returns>The number of popups showing beside the application's root.</returns>
 	public static async Task<int> OpenPopupCountAsync()
@@ -146,6 +163,24 @@ public sealed class ScenarioHooks
 	}
 
 	/// <summary>
+	/// Skips a scenario whose system prerequisite this machine has not got. A coverage group
+	/// records what it could not find from its own <c>[BeforeTestRun]</c>; a scenario says what
+	/// it needs with a <c>@needs-&lt;name&gt;</c> tag. The point is the report: a machine without
+	/// the engine a scenario is about says so, instead of failing with "the region is blank".
+	/// Nothing is skipped on a machine that has everything, which is every machine that records
+	/// no missing prerequisite.
+	/// </summary>
+	[BeforeScenario(Order = 101)]
+	public void Skip_a_scenario_whose_prerequisite_is_missing()
+	{
+		var reason = Prerequisite.SkipReason(_scenarioContext.ScenarioInfo.CombinedTags);
+		if (reason is not null)
+		{
+			_unitTestRuntimeProvider.TestIgnore(reason);
+		}
+	}
+
+	/// <summary>
 	/// Archives and attaches the last frame when the scenario failed, prints the report of the
 	/// region that failed, and then resets the panel so the next scenario starts from the known
 	/// background: every open popup is closed and the root is emptied.
@@ -159,15 +194,27 @@ public sealed class ScenarioHooks
 			ReportFailure();
 		}
 
+		// The reset is bounded as a whole, as well as through the fixture's own bound on every
+		// wait inside it: a UI thread wedged by the scenario that has just ended must fail this
+		// run rather than park it. A run that hangs here holds the machine - and whatever lock
+		// the build was taken under - until somebody notices.
+		await TestTargetFixture.BoundAsync(ResetThePanelAsync(), "the between-scenario reset")
+			.ConfigureAwait(false);
+
+		ElementRegistry.Clear();
+		EventRecorder.Clear();
+	}
+
+	private static async Task ResetThePanelAsync()
+	{
+		await ReleaseAFingerLeftDownAsync().ConfigureAwait(false);
+
 		if (TestTargetFixture.IsLaunched)
 		{
 			await CloseOpenPopupsAsync().ConfigureAwait(false);
 			await TestTargetFixture.ClearContentAsync().ConfigureAwait(false);
 			await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 		}
-
-		ElementRegistry.Clear();
-		EventRecorder.Clear();
 	}
 
 	private static IReadOnlyList<Popup> OpenPopups() =>

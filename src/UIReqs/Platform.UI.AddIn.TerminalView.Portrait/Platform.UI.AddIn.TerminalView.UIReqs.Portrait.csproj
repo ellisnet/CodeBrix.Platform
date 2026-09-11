@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.TerminalView.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.TerminalView.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file and every feature file of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.TerminalView</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -163,11 +163,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 						return;
 					}
 
-					var duration = _animation.Duration;
-					player.SetValue(AnimatedVisualPlayer.DurationProperty, duration);
-
-					var isLoaded = duration > TimeSpan.Zero;
-					player.SetValue(AnimatedVisualPlayer.IsAnimatedVisualLoadedProperty, isLoaded);
+					PublishAnimationState();
 
 					Invalidate();
 				}
@@ -201,6 +197,33 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 #endif
 
 			_animation = animation;
+
+			// The player learns that it has something to play HERE, where the decoded animation
+			// actually arrives - not at the end of the update pass that asked for it. That pass
+			// may have run to its end long before: a plain source reads its JSON asynchronously,
+			// so the animation is handed over from a continuation, and the update pass had no
+			// animation to report when it looked. Nothing runs a second pass unless something
+			// else changes a property of the player, which is why the state used to appear only
+			// when the animation happened to start playing by itself.
+			PublishAnimationState();
+		}
+
+		/// <summary>
+		/// Publishes the decoded animation's duration, and the fact that there IS one, on the
+		/// player. Both are read-only dependency properties an application binds to; setting the
+		/// same values again is a no-op, so this may be called from every path that could be the
+		/// first to hold a decoded animation.
+		/// </summary>
+		private void PublishAnimationState()
+		{
+			if (_player is not { } player || _animation is not { } animation)
+			{
+				return;
+			}
+
+			var duration = animation.Duration;
+			player.SetValue(AnimatedVisualPlayer.DurationProperty, duration);
+			player.SetValue(AnimatedVisualPlayer.IsAnimatedVisualLoadedProperty, duration > TimeSpan.Zero);
 		}
 
 		private UIElement BuildRenderSurface()
@@ -370,8 +393,14 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 				}
 				else
 				{
-					// Free the animation at the "to" progress value
-					_progress = frameTime;
+					// Free the animation at the "to" progress value - at the END OF THE SEGMENT,
+					// not at the overshoot of whichever tick happened to cross it. The two are
+					// not the same: a tick lands when it lands, so keeping the overshoot left
+					// the stopped animation resting on a frame that depended on how busy the
+					// thread had been, and this frame is the one that then stays on screen.
+					var segmentEnd = playState.GetToProgressUsingDuration(_animation.Duration);
+					_progress = segmentEnd;
+					frameTime = segmentEnd;
 
 					Stop();
 				}

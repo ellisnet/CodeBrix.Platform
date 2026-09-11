@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.AdvancedTextEdit.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.AdvancedTextEdit.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file and every feature file of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.AdvancedTextEdit</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The monospaced face the scenarios draw with, exactly as the Landscape project: a font
+		     package is resolved per project, not linked, so the twin names it too. -->
+		<PackageReference Include="CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever" Version="1.0.248.1223" />
+	</ItemGroup>
+
+</Project>

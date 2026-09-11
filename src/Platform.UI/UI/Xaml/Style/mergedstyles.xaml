@@ -17200,7 +17200,12 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="MediaPlayerElement">
-          <Grid x:Name="LayoutRoot">
+          <!-- LayoutRoot paints the element's own Background. MEASURED 2026-09-10: without it the
+						 element draws NOTHING at all before a source arrives, after a MediaFailed, and with the
+						 transport controls turned off - the brush reached only the presenter below, which stays
+						 collapsed until there is something to show, so the style's own Background="Black" had no
+						 effect until playback had started. -->
+          <Grid x:Name="LayoutRoot" Background="{TemplateBinding Background}">
             <Border Background="Transparent" />
             <Image x:Name="PosterImage" Visibility="Collapsed" Source="{TemplateBinding PosterSource}" Stretch="{TemplateBinding Stretch}" />
             <MediaPlayerPresenter x:Name="MediaPlayerPresenter" IsFullWindow="{TemplateBinding IsFullWindow}" Stretch="{TemplateBinding Stretch}" MediaPlayer="{TemplateBinding MediaPlayer}" Visibility="Collapsed" Background="{TemplateBinding Background}" />

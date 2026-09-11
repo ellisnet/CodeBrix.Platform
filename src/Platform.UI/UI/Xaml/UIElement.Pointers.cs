@@ -1258,7 +1258,32 @@ namespace Microsoft.UI.Xaml
 		/// So it means that this flag will be maintained only if you subscribe at least to one pointer event
 		/// (or override one of the OnPointer*** methods).
 		/// </remarks>
-		internal bool IsPointerOver { get; set; } // TODO: 'Set' should be private, but we need to update all controls that are setting
+		internal bool IsPointerOver // TODO: 'Set' should be private, but we need to update all controls that are setting
+		{
+			get => _isPointerOver;
+			set
+			{
+				if (_isPointerOver == value)
+				{
+					return;
+				}
+
+				_isPointerOver = value;
+
+				OnIsPointerOverChanged(value);
+			}
+		}
+
+		private bool _isPointerOver;
+
+		/// <summary>
+		/// Called when <see cref="IsPointerOver"/> has changed, so that a derived type which also publishes
+		/// the over state as a dependency property can keep that property in step with it.
+		/// </summary>
+		/// <param name="isPointerOver">Whether a pointer is now over this element.</param>
+		private protected virtual void OnIsPointerOverChanged(bool isPointerOver)
+		{
+		}
 
 		/// <summary>
 		/// Indicates if a pointer is currently over the element (i.e. OverState)

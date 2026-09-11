@@ -99,6 +99,40 @@ public static class ScenarioFrames
 		return new Region(frame, bounds, description);
 	}
 
+	/// <summary>
+	/// A rectangle CUT OUT of one named element's region, addressed in that element's own
+	/// coordinates. The element's rectangle is taken with NO inset, so the coordinates a scenario
+	/// writes are measured from the element's real top left corner rather than from a shrunken
+	/// one; <paramref name="inset"/> then pulls the block's own edges in, which is what a shape
+	/// that was stroked as well as filled needs before anything is claimed about its fill.
+	/// </summary>
+	/// <param name="context">The scenario.</param>
+	/// <param name="elementName">The Gherkin name of the element the block is inside.</param>
+	/// <param name="insideElement">The block, in the element's own coordinates.</param>
+	/// <param name="description">What the block is, in the words a feature file used.</param>
+	/// <param name="inset">How far to pull the block's own edges in; the default is none.</param>
+	/// <param name="frameName">The frame to cut the region from; the default is the current one.</param>
+	/// <returns>The region.</returns>
+	public static async Task<Region> SubRegionAsync(ScenarioContext context, string elementName,
+		DeviceRect insideElement, string description, int inset = 0, string frameName = CurrentFrameName)
+	{
+		var element = ElementRegistry.Resolve(elementName);
+		var bounds = await DeviceRect.OfAsync(element, inset: 0).ConfigureAwait(false);
+		var block = new DeviceRect(
+			bounds.X + insideElement.X,
+			bounds.Y + insideElement.Y,
+			insideElement.Width,
+			insideElement.Height).Inset(inset);
+
+		if (block.IsEmpty)
+		{
+			throw new InvalidOperationException(
+				$"{description} came out as {block}, which has nothing in it to look at.");
+		}
+
+		return new Region(Get(context, frameName), block, description);
+	}
+
 	/// <summary>Every frame name the scenario has captured.</summary>
 	/// <param name="context">The scenario.</param>
 	/// <returns>The names.</returns>

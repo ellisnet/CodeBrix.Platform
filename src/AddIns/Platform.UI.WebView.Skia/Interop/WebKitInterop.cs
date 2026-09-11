@@ -141,6 +141,17 @@ internal static class WebKitInterop
 
 	// policy decisions ("decide-policy" signal)
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern IntPtr webkit_navigation_policy_decision_get_navigation_action(IntPtr decision); // borrowed
+
+	// Accepts the decision: the engine carries on with the navigation it asked about.
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_policy_decision_use(IntPtr decision);
+
+	// Refuses the decision: the provisional load is abandoned and the current document stays.
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_policy_decision_ignore(IntPtr decision);
+
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
 	public static extern IntPtr webkit_response_policy_decision_get_response(IntPtr decision); // borrowed
 
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]

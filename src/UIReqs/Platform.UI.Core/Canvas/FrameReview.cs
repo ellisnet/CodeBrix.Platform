@@ -122,8 +122,8 @@ public static class FrameReview
 		if (_featureRoot is null)
 		{
 			Console.Out.WriteLine(
-				$"UIReqs: this assembly carries no \"{FeatureRootMetadataKey}\" assembly metadata, so the saved "
-				+ "frames get no copy of the feature file they came from.");
+				$"UIReqs: {TestTargetFixture.TestAssembly.GetName().Name} carries no \"{FeatureRootMetadataKey}\" "
+				+ "assembly metadata, so the saved frames get no copy of the feature file they came from.");
 		}
 	}
 
@@ -304,7 +304,10 @@ public static class FrameReview
 
 	private static string? ReadFeatureRoot()
 	{
-		foreach (var metadata in typeof(FrameReview).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>())
+		// The assembly the scenarios are running from, not the one this class is compiled into:
+		// an add-in coverage group is its own executable that takes this harness from a
+		// reference, and the feature files being run are ITS files.
+		foreach (var metadata in TestTargetFixture.TestAssembly.GetCustomAttributes<AssemblyMetadataAttribute>())
 		{
 			if (!string.Equals(metadata.Key, FeatureRootMetadataKey, StringComparison.Ordinal)
 				|| string.IsNullOrWhiteSpace(metadata.Value))

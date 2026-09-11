@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.MediaPlayer.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.MediaPlayer.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file, every feature file and every asset of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.MediaPlayer</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<!-- LGPL, and in this test graph only - see the Landscape project's comment. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.MediaPlayer.Skia\Platform.UI.MediaPlayer.Skia.csproj" />
+		<!-- The add-in's logging assembly does not flow through the reference above - see the
+		     Landscape project's comment. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+</Project>

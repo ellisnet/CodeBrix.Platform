@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.AdvancedTextEdit.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.AdvancedTextEdit.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It needs nothing registered and nothing
+		     initialised: it has no default styles, no resource dictionary and no extension point -
+		     the control builds its whole visual tree in code. The text layout engine it draws
+		     through comes with it, as a project reference of its own. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The editor's own default font family is the generic name "monospace", which resolves
+		     to nothing on Linux, and the family rule forbids a system-font fallback: every
+		     scenario therefore draws with a real monospaced face named by URI. This is the same
+		     package - and the same version - the TerminalView add-in ships its default font from;
+		     it is not centrally pinned, so it carries its version here. The common targets' font
+		     target places every resolved CodeBrix.Platform.Fonts.* face beside the test
+		     executable, and the first scenario of the Document feature proves it did. -->
+		<PackageReference Include="CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever" Version="1.0.248.1223" />
+	</ItemGroup>
+
+</Project>

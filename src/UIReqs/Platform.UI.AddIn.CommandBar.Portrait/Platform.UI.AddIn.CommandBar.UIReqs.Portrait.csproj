@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.CommandBar.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.CommandBar.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file, every feature file and every asset of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.CommandBar</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.CommandBar\Platform.UI.CommandBar.Skia.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

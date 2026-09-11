@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.AudioPlayer.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.AudioPlayer.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file, every feature file and every asset of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.AudioPlayer</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Skia.csproj" />
+
+		<!-- The add-in reads its own failures out to the framework's logging seam, and it references
+		     that assembly PrivateAssets="all" because the assembly ships inside the main framework
+		     package rather than as a nuget of its own. Nothing therefore flows to a project that
+		     references the add-in from SOURCE, and the first thing either player does when a load
+		     fails is throw FileNotFoundException instead of raising MediaFailed. Referencing it here
+		     puts the assembly beside the tests; it is a test-graph reference and nothing ships from
+		     it. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using CodeBrix.Platform.UI.Core.UIReqs.Canvas;
 using CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.TestTarget;
@@ -34,10 +35,45 @@ public static class TestTargetFixture
 	/// <summary>How long the application is given to shut down.</summary>
 	public static readonly TimeSpan ShutdownTimeout = TimeSpan.FromSeconds(10);
 
+	/// <summary>
+	/// How long any wait on the UI thread is given before the run is failed. Sixty seconds is
+	/// deliberately generous: nothing this harness asks the UI thread to do takes anything like
+	/// that long, so a wait that reaches it is a WEDGED UI thread and not a slow one.
+	/// <para>
+	/// It has to be bounded at all because a UI thread can be lost for the rest of the process:
+	/// an exception thrown out of a layout pass - a missing assembly a template's code first
+	/// touches, say - can leave the dispatcher unable to finish that pass, and every later
+	/// <see cref="RunOnUIThreadAsync(Action)"/>, <see cref="WaitForIdleAsync"/> and frame
+	/// handshake then waits on a thread that will never answer. Unbounded, that is a run which
+	/// hangs for as long as the machine is left alone, holding whatever lock the build was taken
+	/// under; bounded, it is a scenario that fails with a sentence saying which wait it was.
+	/// </para>
+	/// <para>
+	/// Set it to <see cref="TimeSpan.Zero"/> (or anything not positive) to take the bound off
+	/// again, which is what a session under a debugger wants.
+	/// </para>
+	/// </summary>
+	public static TimeSpan UIThreadTimeout { get; set; } = TimeSpan.FromSeconds(60);
+
 	private static readonly TimeSpan LayoutPollInterval = TimeSpan.FromMilliseconds(25);
 
 	private static TestTargetSession? _session;
 	private static TestDisplayOrientation? _orientation;
+
+	/// <summary>
+	/// The assembly whose scenarios are running: the process's entry assembly, which under the
+	/// test platform is the test executable itself.
+	/// <para>
+	/// This is deliberately NOT the assembly this harness is compiled into. An add-in coverage
+	/// group is its own executable that REFERENCES the core harness and takes its steps and
+	/// hooks from it: the panel it declares and the feature folder it carries are on that
+	/// executable, not on the harness. Falling back to the harness's own assembly keeps a
+	/// process with no entry assembly at all - a host that loads the tests rather than running
+	/// them - working exactly as it did.
+	/// </para>
+	/// </summary>
+	public static Assembly TestAssembly =>
+		Assembly.GetEntryAssembly() ?? typeof(TestTargetFixture).Assembly;
 
 	/// <summary>The session that owns the panel.</summary>
 	/// <exception cref="InvalidOperationException">The application has not launched yet.</exception>
@@ -95,7 +131,7 @@ public static class TestTargetFixture
 			throw new InvalidOperationException("The test target has already been launched in this process.");
 		}
 
-		_orientation = ReadOrientation(typeof(TestTargetFixture).Assembly);
+		_orientation = ReadOrientation(TestAssembly);
 
 		var session = LinuxTestTarget.Setup(_orientation.Value);
 		_session = session;
@@ -135,21 +171,73 @@ public static class TestTargetFixture
 
 		var attribute = testAssembly.GetCustomAttribute<TestPanelAttribute>()
 			?? throw new InvalidOperationException(
-				$"Assembly '{testAssembly.GetName().Name}' carries no [assembly: TestPanel(...)] attribute, "
-				+ "so there is no way to know which panel its scenarios run against.");
+				$"The assembly the scenarios are running from, '{testAssembly.GetName().Name}', carries no "
+				+ "[assembly: TestPanel(...)] attribute, so there is no way to know which panel its scenarios "
+				+ "run against. Every UIReqs project declares one in its own PanelOrientation.cs.");
 
 		return attribute.Orientation;
 	}
 
-	/// <summary>Runs an action on the UI thread and waits for it.</summary>
+	/// <summary>Runs an action on the UI thread and waits for it, with a bound.</summary>
 	/// <param name="action">The work to run.</param>
 	/// <returns>A task that completes once the action has run.</returns>
-	public static Task RunOnUIThreadAsync(Action action) => Session.RunOnUIThreadAsync(action);
+	/// <exception cref="InvalidOperationException">The UI thread did not answer in time.</exception>
+	public static Task RunOnUIThreadAsync(Action action) =>
+		BoundAsync(Session.RunOnUIThreadAsync(action), "an action on the UI thread");
 
-	/// <summary>Runs asynchronous work on the UI thread and waits for it.</summary>
+	/// <summary>Runs asynchronous work on the UI thread and waits for it, with a bound.</summary>
 	/// <param name="action">The work to run.</param>
 	/// <returns>A task that completes once the work has run.</returns>
-	public static Task RunOnUIThreadAsync(Func<Task> action) => Session.RunOnUIThreadAsync(action);
+	/// <exception cref="InvalidOperationException">The UI thread did not answer in time.</exception>
+	public static Task RunOnUIThreadAsync(Func<Task> action) =>
+		BoundAsync(Session.RunOnUIThreadAsync(action), "asynchronous work on the UI thread");
+
+	/// <summary>
+	/// Gives a wait on the UI thread a bound, so that a wedged UI thread fails the run instead
+	/// of hanging it. Every wait this fixture makes goes through here; a hook or a steps class
+	/// with a wait of its own - a teardown that resets the panel, say - wraps it the same way.
+	/// </summary>
+	/// <param name="work">The wait to bound. It has already started.</param>
+	/// <param name="waitName">What the wait is, named as the failure message will name it.</param>
+	/// <returns>The same wait, failed after <see cref="UIThreadTimeout"/> if it has not finished.</returns>
+	/// <exception cref="InvalidOperationException">The wait did not finish inside the budget.</exception>
+	public static async Task BoundAsync(Task work, string waitName)
+	{
+		ArgumentNullException.ThrowIfNull(work);
+		ArgumentException.ThrowIfNullOrEmpty(waitName);
+
+		var budget = UIThreadTimeout;
+		if (budget <= TimeSpan.Zero)
+		{
+			await work.ConfigureAwait(false);
+			return;
+		}
+
+		try
+		{
+			await work.WaitAsync(budget).ConfigureAwait(false);
+		}
+		catch (TimeoutException)
+		{
+			// The abandoned wait may still fault later, and a faulted task nobody looks at is
+			// reported by the runtime as an unobserved exception; this looks at it.
+			_ = work.ContinueWith(
+				static abandoned => _ = abandoned.Exception,
+				CancellationToken.None,
+				TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
+				TaskScheduler.Default);
+
+			// Formatted in two pieces on purpose: a CONCATENATED interpolated string binds
+			// string.Create to its ref-handler overload and does not compile (CS1620).
+			var wait = string.Create(CultureInfo.InvariantCulture,
+				$"The UI thread did not answer within {budget.TotalSeconds} seconds, waiting for {waitName}.");
+
+			throw new InvalidOperationException(wait
+				+ " The panel's UI thread is wedged rather than slow - an exception thrown out of a layout"
+				+ " pass leaves it unable to finish that pass, and every wait after it waits forever - so the"
+				+ " run is failed here instead of hanging. TestTargetFixture.UIThreadTimeout sets this budget.");
+		}
+	}
 
 	/// <summary>
 	/// Waits for the UI thread to go idle: everything already queued has run by the time this
@@ -157,6 +245,7 @@ public static class TestTargetFixture
 	/// what makes an input event's effect complete before a frame is asked for.
 	/// </summary>
 	/// <returns>A task that completes when the dispatcher has drained.</returns>
+	/// <exception cref="InvalidOperationException">The UI thread did not drain in time.</exception>
 	public static async Task WaitForIdleAsync()
 	{
 		var idle = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -170,7 +259,9 @@ public static class TestTargetFixture
 			}
 		}).ConfigureAwait(false);
 
-		await idle.Task.ConfigureAwait(false);
+		// The no-op is queued BEHIND everything the UI thread already had to do, so this is the
+		// wait that a wedged pass never ends: it is bounded for the same reason the others are.
+		await BoundAsync(idle.Task, "the UI thread to go idle").ConfigureAwait(false);
 	}
 
 	/// <summary>
@@ -186,8 +277,12 @@ public static class TestTargetFixture
 	/// is on; see <see cref="FrameReview"/>.
 	/// </param>
 	/// <returns>The frame that shows everything applied before the call.</returns>
+	/// <exception cref="InvalidOperationException">The UI thread did not lay out or drain in time.</exception>
 	public static async Task<TestFrame> NextFrameAsync(TimeSpan? timeout = null, string? label = null)
 	{
+		// Both halves of the drain are bounded (see UIThreadTimeout): the layout pass through
+		// RunOnUIThreadAsync and the queue through WaitForIdleAsync. The frame request itself
+		// has always had FrameTimeout, so from here on nothing in the handshake can hang.
 		await RunOnUIThreadAsync(() => VirtualApplication.Running?.Root.UpdateLayout()).ConfigureAwait(false);
 		await WaitForIdleAsync().ConfigureAwait(false);
 

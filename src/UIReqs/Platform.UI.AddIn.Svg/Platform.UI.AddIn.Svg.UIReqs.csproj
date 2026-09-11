@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.Svg.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.Svg.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. The .Skia flavour, never .Reference (whose
+		     bodies throw): it brings the SkiaSharp views, the 2D drawing surface and the SVG
+		     renderer along with it, and nothing else has to be referenced for an SvgImageSource to
+		     draw. Registration.cs is what actually turns it on in a project that has no XAML. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -51,7 +51,13 @@ internal sealed unsafe class WpeWebView
 
 	// Raised on the WPE thread.
 	public event Action<SKImage>? FrameArrived;
-	public event Action<Uri?>? NavigationStarting;
+
+	// Raised on the WPE thread when the engine asks whether a navigation may go ahead, BEFORE it
+	// commits to it. The arguments are the URI being asked about and the engine's decision, which
+	// this event has already referenced: the handler may answer it later, from any thread, but it
+	// must answer it exactly once through DecideNavigation. Until it does, that one navigation
+	// waits - the engine thread itself carries on.
+	public event Action<Uri?, IntPtr>? NavigationPolicyRequested;
 	public event Action<Uri?, bool, bool, bool>? NavigationCompleted; // uri, isSuccess, canGoBack, canGoForward
 	public event Action<string?>? TitleChanged;
 	public event Action<string>? WebMessageReceived;
@@ -258,12 +264,14 @@ internal sealed unsafe class WpeWebView
 
 		try
 		{
+			// LOAD_STARTED does NOT announce the navigation. MEASURED on WPE WebKit 2.48: this
+			// signal arrives after the engine has already committed to the load, and the URI it
+			// carries is the URI of the view - which for anything the engine started itself (a
+			// link, a script assigning location) is still the page being LEFT. Both halves of the
+			// announcement - when it happens and what it says - belong to the policy seam
+			// (NavigationPolicyRequested), which is emitted first and carries the destination.
 			switch (loadEvent)
 			{
-				case WebKitInterop.LoadStarted:
-					self.NavigationStarting?.Invoke(TryGetUri(view));
-					break;
-
 				case WebKitInterop.LoadFinished:
 					if (self._suppressNextNavigationCompleted)
 					{
@@ -357,9 +365,14 @@ internal sealed unsafe class WpeWebView
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static int OnDecidePolicyNative(IntPtr view, IntPtr decision, int decisionType, IntPtr userData)
 	{
+		if (decisionType == WebKitInterop.PolicyDecisionTypeNavigationAction)
+		{
+			return FromUserData(userData)?.DeferNavigationDecision(decision) ?? 0;
+		}
+
 		if (decisionType != WebKitInterop.PolicyDecisionTypeResponse)
 		{
-			return 0; // default handling for navigation/new-window decisions
+			return 0; // default handling for new-window decisions
 		}
 
 		try
@@ -390,6 +403,79 @@ internal sealed unsafe class WpeWebView
 		}
 		return 0;
 	}
+
+	/// <summary>
+	/// Hands one navigation the engine is asking about to <see cref="NavigationPolicyRequested"/>
+	/// and keeps the engine waiting for the answer.
+	/// <para>
+	/// MEASURED on WPE WebKit 2.48 (this machine, every navigation kind the control can start):
+	/// this decision is emitted BEFORE load-changed/LOAD_STARTED and before anything of the new
+	/// page is committed, for a page handed over as text (navigation type Other, request URI
+	/// about:blank), a URI load, a reload, a back/forward, a link the user followed, and a script
+	/// assigning location - which is why it, and not LOAD_STARTED, is where a navigation is
+	/// announced and where a refusal can still refuse it.
+	/// </para>
+	/// <para>
+	/// The answer is deferred rather than given here: returning TRUE parks this one navigation
+	/// until <see cref="DecideNavigation"/> answers it, so the consumer can raise its own event on
+	/// the UI thread without blocking the engine thread, which has the whole engine on it. The
+	/// engine emits this for SUBFRAME navigations too, and this API version exposes no main-frame
+	/// flag on a navigation decision (only a response decision has one, and a data: or file:
+	/// document produces none), so every navigation the engine asks about is announced.
+	/// </para>
+	/// </summary>
+	/// <param name="decision">The engine's decision object, valid for this emission only.</param>
+	/// <returns>1 when the decision has been taken over, 0 to leave it to the engine.</returns>
+	private int DeferNavigationDecision(IntPtr decision)
+	{
+		var handler = NavigationPolicyRequested;
+		if (handler is null)
+		{
+			return 0; // nobody to ask: the engine's own default decides
+		}
+
+		var action = WebKitInterop.webkit_navigation_policy_decision_get_navigation_action(decision);
+		var request = action == IntPtr.Zero ? IntPtr.Zero : WebKitInterop.webkit_navigation_action_get_request(action);
+		var requestUri = request == IntPtr.Zero ? null : Marshal.PtrToStringUTF8(WebKitInterop.webkit_uri_request_get_uri(request));
+		Uri.TryCreate(requestUri, UriKind.Absolute, out var uri);
+
+		// The decision has to outlive this signal emission, so it is referenced here and released
+		// by DecideNavigation - the one place that answers it.
+		GLibInterop.g_object_ref(decision);
+		try
+		{
+			handler(uri, decision);
+			return 1;
+		}
+		catch (Exception e)
+		{
+			typeof(WpeWebView).Log().Error("decide-policy (navigation) handler failed.", e);
+			GLibInterop.g_object_unref(decision);
+			return 0;
+		}
+	}
+
+	/// <summary>
+	/// Answers one decision handed out by <see cref="NavigationPolicyRequested"/>: the navigation
+	/// goes ahead when <paramref name="allow"/> is true, and is abandoned - leaving the document
+	/// that is showing where it is - when it is false. Call this exactly once per decision, from
+	/// any thread; the reference the event took is released here.
+	/// </summary>
+	/// <param name="decision">The decision the event handed over.</param>
+	/// <param name="allow">Whether the navigation may go ahead.</param>
+	public void DecideNavigation(IntPtr decision, bool allow) => WpeThread.Post(() =>
+	{
+		if (allow)
+		{
+			WebKitInterop.webkit_policy_decision_use(decision);
+		}
+		else
+		{
+			WebKitInterop.webkit_policy_decision_ignore(decision);
+		}
+
+		GLibInterop.g_object_unref(decision);
+	});
 
 	[UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
 	private static void OnDownloadStartedNative(IntPtr session, IntPtr download, IntPtr userData)

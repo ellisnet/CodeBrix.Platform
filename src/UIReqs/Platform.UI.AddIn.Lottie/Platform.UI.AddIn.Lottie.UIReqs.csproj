@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.Lottie.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.Lottie.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. The .Skia flavour, never .Reference (whose
+		     bodies throw) and never .Tests (which is the same assembly built WITHOUT the decoder):
+		     it is the only flavour that decodes and draws an animation, and it brings the decoder,
+		     the SkiaSharp views and the 2D drawing surface along with it. The decoder's version is
+		     pinned centrally with the rest of the Skia stack, so nothing is named here. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.Lottie\Platform.UI.Lottie.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The two animations the scenarios play. They are loaded through ms-appx:/// URIs, which
+		     resolve against the folder the test executable is in, so they have to BE there; an
+		     embedded:// URI would name the assembly and the two twins do not share one. The twin
+		     links these same files through the common targets. -->
+		<Content Include="Assets\pulse.json" CopyToOutputDirectory="PreserveNewest" />
+		<Content Include="Assets\themed.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

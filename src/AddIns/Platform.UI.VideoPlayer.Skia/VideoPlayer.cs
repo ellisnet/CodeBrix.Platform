@@ -695,6 +695,13 @@ public sealed partial class VideoPlayer : Panel
 		}
 		_driver.ResolveRenderPath();
 
+		// The container is read - and its first frame decoded and posted to the session's mailbox -
+		// BEFORE the presenter above was attached to that mailbox, so the notification that came
+		// with it reached nobody and the driver has not been told there is a picture waiting.
+		// Ask for one frame now: a player that has opened a source shows that source's first
+		// picture, whether or not it is ever played.
+		_driver.PresentPausedFrame();
+
 		if (AutoPlay)
 		{
 			Play();

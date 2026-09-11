@@ -1,0 +1,31 @@
+<UserControl x:Class="EvaluateUIElementsDemo.Views.Scenarios.ToggleButtonView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <StackPanel Spacing="16" Padding="4,8,4,8">
+    <StackPanel Orientation="Horizontal" Spacing="28">
+      <!-- The survey's control: a 240 x 80 ToggleButton with Content "Bold". -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="ToggleButton 240 x 80 (the survey's control)" />
+        <ToggleButton x:Name="Bold" Content="Bold" Width="240" Height="80"
+                      Checked="Bold_Changed" Unchecked="Bold_Changed" />
+      </StackPanel>
+
+      <!-- A plain Button of the same size: what the cleared ToggleButton's face should match. -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="A plain Button of the same size, for comparison" />
+        <Button Content="Plain" Width="240" Height="80" />
+      </StackPanel>
+
+      <!-- A ToggleButton that starts checked, so the checked look is on the page from the start. -->
+      <StackPanel Spacing="6">
+        <TextBlock Text="A ToggleButton that starts checked" />
+        <ToggleButton Content="Checked" Width="240" Height="80" IsChecked="True" />
+      </StackPanel>
+    </StackPanel>
+
+    <TextBlock x:Name="State" Text="Bold IsChecked: False   (Checked raised 0 times, Unchecked raised 0 times)" />
+
+    <Button Content="Move keyboard focus here" Margin="0,8,0,0" />
+  </StackPanel>
+</UserControl>

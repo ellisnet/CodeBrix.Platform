@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.PlotterView.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.PlotterView.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It needs nothing registered and nothing
+		     initialised: the chart control brings its plotting engine in through its own package
+		     reference and draws on the family's software present path. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

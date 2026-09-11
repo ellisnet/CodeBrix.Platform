@@ -187,4 +187,38 @@
     <Project Path="src/UIReqs/Platform.UI.Core/Platform.UI.Core.UIReqs.csproj" />
     <Project Path="src/UIReqs/Platform.UI.Core.Portrait/Platform.UI.Core.UIReqs.Portrait.csproj" />
   </Folder>
+  <!-- One pair per shipped add-in that has a UI component. Each pair references the core pair's
+       Landscape project for its hosting, steps and hooks, and the add-in it is about. -->
+  <Folder Name="/UI Requirements/AddIns/">
+    <Project Path="src/UIReqs/Platform.UI.AddIn.FlexPanel/Platform.UI.AddIn.FlexPanel.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.FlexPanel.Portrait/Platform.UI.AddIn.FlexPanel.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Graphics2DSK/Platform.UI.AddIn.Graphics2DSK.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Graphics2DSK.Portrait/Platform.UI.AddIn.Graphics2DSK.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Svg/Platform.UI.AddIn.Svg.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Svg.Portrait/Platform.UI.AddIn.Svg.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.SkiaSharpViews/Platform.UI.AddIn.SkiaSharpViews.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.SkiaSharpViews.Portrait/Platform.UI.AddIn.SkiaSharpViews.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.PlotterView/Platform.UI.AddIn.PlotterView.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.PlotterView.Portrait/Platform.UI.AddIn.PlotterView.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.TextLayout/Platform.UI.AddIn.TextLayout.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.TextLayout.Portrait/Platform.UI.AddIn.TextLayout.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.TerminalView/Platform.UI.AddIn.TerminalView.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.TerminalView.Portrait/Platform.UI.AddIn.TerminalView.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.AdvancedTextEdit/Platform.UI.AddIn.AdvancedTextEdit.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.AdvancedTextEdit.Portrait/Platform.UI.AddIn.AdvancedTextEdit.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.CommandBar/Platform.UI.AddIn.CommandBar.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.CommandBar.Portrait/Platform.UI.AddIn.CommandBar.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.VideoPlayer/Platform.UI.AddIn.VideoPlayer.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.VideoPlayer.Portrait/Platform.UI.AddIn.VideoPlayer.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Lottie/Platform.UI.AddIn.Lottie.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Lottie.Portrait/Platform.UI.AddIn.Lottie.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.MediaPlayer/Platform.UI.AddIn.MediaPlayer.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.MediaPlayer.Portrait/Platform.UI.AddIn.MediaPlayer.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.WebView/Platform.UI.AddIn.WebView.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.WebView.Portrait/Platform.UI.AddIn.WebView.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.AudioPlayer/Platform.UI.AddIn.AudioPlayer.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.AudioPlayer.Portrait/Platform.UI.AddIn.AudioPlayer.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Graphics3DGL/Platform.UI.AddIn.Graphics3DGL.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.Graphics3DGL.Portrait/Platform.UI.AddIn.Graphics3DGL.UIReqs.Portrait.csproj" />
+  </Folder>
 </Solution>

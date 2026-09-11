@@ -31,12 +31,32 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 	// Pixels of scroll per 120-unit wheel detent, matching common browser behavior.
 	private const double WheelPixelsPerTick = 53.0;
 
+	// The URI the engine gives a document built from text: webkit_web_view_load_html is handed no
+	// base URI of its own, so the document it builds is about:blank as far as the engine knows.
+	private const string TextDocumentUri = "about:blank";
+
 	private readonly CoreWebView2 _coreWebView;
 	private readonly ContentPresenter _presenter;
 	private readonly WpeWebViewHostElement _element;
 	private readonly WpeWebView _wpe;
 	private readonly Control? _focusTarget;
 	private double _scale = 1.0;
+
+	// The page most recently handed over as TEXT, kept until the load it starts is announced.
+	// The engine only knows the base URI such a load was given (none, i.e. about:blank), but the
+	// control's contract - and every other head - announces it as the data: document the text
+	// becomes, which is what CoreWebView2.RaiseNavigationStarting builds when it is given the
+	// html rather than a Uri. Written and read on the UI thread only.
+	private string? _pendingHtml;
+
+	// The page the control is SHOWING because it was handed over as text, or null when the
+	// document showing came from a URI. Reload re-issues it: see Reload(). Written and read on
+	// the UI thread only.
+	private string? _lastHtml;
+
+	// Where the engine says the document showing came from, as of the last navigation that
+	// completed. Written and read on the UI thread only.
+	private string? _currentUri;
 
 	public WpeNativeWebView(CoreWebView2 coreWebView2, ContentPresenter presenter)
 	{
@@ -83,21 +103,23 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 			}
 		};
 
-		_wpe.NavigationStarting += uri => _presenter.DispatcherQueue.TryEnqueue(() =>
+		// The engine asks before it commits to a navigation, and waits for the answer: the event
+		// is raised on the UI thread - where a XAML application's handler has to run - and the
+		// engine is answered afterwards, so a handler that sets Cancel REFUSES the navigation
+		// rather than chasing one that has already happened. Nothing blocks the engine thread
+		// while the handler runs; that one navigation is what waits.
+		_wpe.NavigationPolicyRequested += (uri, decision) =>
 		{
-			if (uri is null)
+			if (!_presenter.DispatcherQueue.TryEnqueue(() => DecideNavigation(uri, decision)))
 			{
-				return;
+				// No UI thread left to ask: the engine must not be left holding a navigation.
+				_wpe.DecideNavigation(decision, allow: true);
 			}
-			_coreWebView.RaiseNavigationStarting(uri, out var cancel);
-			if (cancel)
-			{
-				_wpe.StopLoading();
-			}
-		});
+		};
 
 		_wpe.NavigationCompleted += (uri, isSuccess, canGoBack, canGoForward) => _presenter.DispatcherQueue.TryEnqueue(() =>
 		{
+			_currentUri = uri?.ToString();
 			_coreWebView.SetHistoryProperties(canGoBack, canGoForward);
 			_coreWebView.RaiseHistoryChanged();
 			_coreWebView.RaiseNavigationCompleted(uri, isSuccess, httpStatusCode: isSuccess ? 200 : 0, errorStatus: CoreWebView2WebErrorStatus.Unknown, shouldSetSource: true);
@@ -150,6 +172,38 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 				}
 			});
 		});
+	}
+
+	/// <summary>
+	/// Announces one navigation on the UI thread and answers the engine with what the application
+	/// decided. A page handed over as text is announced as the data: document it becomes; anything
+	/// else is announced as the URI the engine asked about, which is the page being navigated TO.
+	/// </summary>
+	/// <param name="uri">The URI the engine asked about, when it parsed as one.</param>
+	/// <param name="decision">The engine's parked decision, answered exactly once here.</param>
+	private void DecideNavigation(Uri? uri, IntPtr decision)
+	{
+		var cancel = false;
+		try
+		{
+			var html = _pendingHtml;
+			_pendingHtml = null;
+			if (((object?)html ?? uri) is { } navigation)
+			{
+				_coreWebView.RaiseNavigationStarting(navigation, out cancel);
+			}
+
+			if (html is not null && !cancel)
+			{
+				// The document about to show came from text, so Reload has to be given it again:
+				// the engine has nowhere to fetch about:blank back from.
+				_lastHtml = html;
+			}
+		}
+		finally
+		{
+			_wpe.DecideNavigation(decision, allow: !cancel);
+		}
 	}
 
 	// ---------------------------------------------------------------------
@@ -346,10 +400,28 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 
 	public void Stop() => _wpe.StopLoading();
 
-	public void Reload() => _wpe.Reload();
+	public void Reload()
+	{
+		// MEASURED: webkit_web_view_load_html gives the document it builds the URI about:blank,
+		// and the text itself is nowhere the engine can get back to - so asking the engine to
+		// reload while THAT document is showing re-fetches about:blank and the page comes back
+		// empty. A page handed over as text is therefore handed over again, which is what every
+		// other head's reload of such a page amounts to. Anything the engine can fetch for itself
+		// - a file, a request, a page reached from one of them - is reloaded by the engine.
+		if (_lastHtml is { } html && (_currentUri is null || string.Equals(_currentUri, TextDocumentUri, StringComparison.Ordinal)))
+		{
+			_pendingHtml = html;
+			_wpe.LoadHtml(html);
+			return;
+		}
+
+		_wpe.Reload();
+	}
 
 	public void ProcessNavigation(Uri uri)
 	{
+		_pendingHtml = null;
+		_lastHtml = null;
 		if (_coreWebView.HostToFolderMap.TryGetValue(uri.Host.ToLowerInvariant(), out var folderName))
 		{
 			// Virtual-host-to-folder mapping resolves into the app's install directory.
@@ -363,10 +435,16 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		}
 	}
 
-	public void ProcessNavigation(string html) => _wpe.LoadHtml(html);
+	public void ProcessNavigation(string html)
+	{
+		_pendingHtml = html;
+		_wpe.LoadHtml(html);
+	}
 
 	public void ProcessNavigation(HttpRequestMessage httpRequestMessage)
 	{
+		_pendingHtml = null;
+		_lastHtml = null;
 		var url = httpRequestMessage.RequestUri?.ToString();
 		if (url is null)
 		{

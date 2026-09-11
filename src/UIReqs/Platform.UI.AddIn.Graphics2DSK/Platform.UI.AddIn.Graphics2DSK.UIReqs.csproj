@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.Graphics2DSK.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.Graphics2DSK.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. The CROSSRUNTIME flavour is the one that runs
+		     on a Skia head; the .Windows flavour is never referenced from here. The element needs
+		     nothing registered and nothing initialised: the compositor factory it draws through is
+		     registered by the framework's own Application, which the virtual application is one of.
+		     The add-in brings the managed SkiaSharp assembly the fixtures draw with. -->
+		<ProjectReference Include="..\..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+	</ItemGroup>
+
+</Project>

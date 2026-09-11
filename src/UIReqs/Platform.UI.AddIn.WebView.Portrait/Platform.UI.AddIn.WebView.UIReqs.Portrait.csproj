@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.WebView.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.WebView.UIReqs.Portrait</RootNamespace>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file, every feature file and every asset of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.WebView</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.WebView.Skia\Platform.UI.WebView.Skia.csproj" />
+
+		<!-- The add-in logs through this assembly, and its own project reference to it is private
+		     (the assembly ships INSIDE the main framework package, so it has no package of its own
+		     and must not flow to consumers as a dependency). A from-source consumer therefore does
+		     not get it copied beside the executable - and the very first thing the add-in does,
+		     starting its engine thread, is a method the runtime cannot even compile without it. That
+		     failure lands inside a layout pass, so it is worth naming here rather than meeting again. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -596,7 +596,18 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 	{
 		NativeDispatcher.Main.Enqueue(() =>
 		{
-			Events?.RaiseMediaFailed(MediaPlayerError.Unknown, null, null);
+			// LibVLC reports only THAT playback failed - it exposes no reason through this event -
+			// so the message is built from the one thing that is known: which media the player was
+			// on. It is worth building, because MediaPlayerFailedEventArgs.ErrorMessage is the only
+			// part of a failure an application can put in front of a person: Error is always
+			// MediaPlayerError.Unknown from this engine and ExtendedErrorCode is always null.
+			// Passing null here left an app with nothing at all to show.
+			var mrl = VlcPlayer.Media?.Mrl;
+			var errorMessage = string.IsNullOrEmpty(mrl)
+				? "The media could not be played."
+				: $"The media \"{mrl}\" could not be played.";
+
+			Events?.RaiseMediaFailed(MediaPlayerError.Unknown, errorMessage, null);
 			Player.PlaybackSession.PlaybackState = MediaPlaybackState.None;
 		});
 	}

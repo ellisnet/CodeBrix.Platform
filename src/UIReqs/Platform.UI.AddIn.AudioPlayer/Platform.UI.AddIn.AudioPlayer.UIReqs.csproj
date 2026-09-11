@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.AudioPlayer.UIReqs</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.AudioPlayer.UIReqs</RootNamespace>
+	</PropertyGroup>
+
+	<!-- The runner, the framework flavour, the packages, the fonts, the feature root and the
+	     Skia-assembly swap. This is the Landscape project of the pair, so it sets no
+	     $(UIReqsLandscapeProjectDir) - it IS one. -->
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<!-- The core harness, referenced rather than duplicated: hosting, the canvas vocabulary,
+		     the shared steps, the hooks and the argument transformations all come from here. This
+		     project's reqnroll.json names that assembly as a binding assembly, which is what makes
+		     its steps and hooks run for THESE scenarios. -->
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+
+		<!-- The add-in whose requirements these are. It needs nothing registered and nothing
+		     initialised: its two elements are plain code over the framework's FrameworkElement, and
+		     the audio engine (with its native backend) flows in with the add-in's own package
+		     reference. No codec or synthesizer add-on is opted into here. -->
+		<ProjectReference Include="..\..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Skia.csproj" />
+
+		<!-- The add-in reads its own failures out to the framework's logging seam, and it references
+		     that assembly PrivateAssets="all" because the assembly ships inside the main framework
+		     package rather than as a nuget of its own. Nothing therefore flows to a project that
+		     references the add-in from SOURCE, and the first thing either player does when a load
+		     fails is throw FileNotFoundException instead of raising MediaFailed. Referencing it here
+		     puts the assembly beside the tests; it is a test-graph reference and nothing ships from
+		     it. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The silent fixtures the scenarios play. An .sfz names its samples as separate files
+		     beside it, so Samples\silence.wav has to keep its place in the tree. -->
+		<Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+</Project>

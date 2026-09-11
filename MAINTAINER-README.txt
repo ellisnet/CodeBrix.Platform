@@ -307,6 +307,84 @@ universal gets a control-specific name ("RatingValue", not "Value").
 Registering the identical delegate again is allowed, so a registration hook may
 safely run twice. The Portrait twin needs no edit at all.
 
+ADD-IN UIREQS PROJECTS. Every add-in under src/AddIns that ships as its own
+package and has something to look at has its own pair, alongside the core
+pair, under src/UIReqs/Platform.UI.AddIn.<Name>/ and .../<Name>.Portrait/,
+with the assembly and namespace CodeBrix.Platform.UI.AddIn.<Name>.UIReqs. The
+fifteen at the time of writing: FlexPanel, Graphics2DSK, SkiaSharpViews, Svg,
+PlotterView, TextLayout, CommandBar, AdvancedTextEdit, TerminalView, Lottie,
+Graphics3DGL, WebView, AudioPlayer, VideoPlayer and MediaPlayer (AppSettings
+has no UI and MSAL is not packed from this repository). All thirty projects
+sit in the "UI Requirements/AddIns" folder of CodeBrix.Platform.Linux.slnx and
+run from the same solution-wide command as the core pair.
+
+An add-in pair duplicates nothing from the core: its csproj imports
+src/UIReqs/UIReqs.Common.targets (the runner, the Skia flavour, the packages,
+the fonts, the feature root, the Skia-assembly swap; a twin adds one property,
+UIReqsLandscapeProjectDir, and the targets link every source, feature and
+asset of the Landscape project), it PROJECT-REFERENCES the core Landscape
+project, and its reqnroll.json names that assembly under "bindingAssemblies",
+which is what makes the core steps, hooks and argument transformations run
+for the add-in's scenarios. Each project therefore holds only a
+PanelOrientation.cs, an AssemblyInfo.cs, a physical reqnroll.json (a linked
+one is invisible to the generator), Features/<Name>/, Steps/<Name>Steps.cs,
+Support/ fixtures as C# literals or small Assets, and - only where the add-in
+needs it - a Registration.cs. The orientation and the feature root are read
+from the ENTRY assembly, so the core harness serves whichever executable is
+running. A step text that exists in both an add-in assembly and the core is
+ambiguous and fails every scenario using it: vocabulary that more than one
+add-in needs lives in the core, and an add-in defines only the sentences the
+core cannot say. The frame review archive files an add-in's frames under
+<Orientation>/<Name>/.
+
+REGISTRATION. An application's XAML source generator turns the add-ins'
+[assembly: ApiExtension] attributes into ApiExtensibility.Register calls; a
+UIReqs project compiles no XAML, so the add-ins that extend the framework
+through that mechanism register themselves from a [ModuleInitializer] guarded
+by ApiExtensibility.IsRegistered<T>() (Svg's ISvgProvider, Lottie's
+ILottieVisualSourceProvider, WebView's INativeWebViewProvider, MediaPlayer's
+two extensions). An add-in that carries default styles (CommandBar) calls its
+generated GlobalStaticResources.Initialize / RegisterDefaultStyles /
+RegisterResourceDictionariesBySource from a [BeforeTestRun(Order = 10)] hook
+on the UI thread, after the core's Order 0 hook has launched the virtual
+application; a module initializer runs too early for that. An add-in whose
+package references CodeBrix.Platform.Extensions.Logging with
+PrivateAssets="all" (the media add-ins and WebView) needs an explicit
+ProjectReference to it, or every failure path throws FileNotFoundException
+from its first this.Log() call instead of raising MediaFailed.
+
+PREREQUISITES AND FIXTURES. A system engine an add-in needs (libvlc, the WPE
+WebKit libraries, an EGL context, an audio output device) is probed in the
+add-in's [BeforeTestRun]; a missing one is recorded through
+Support/Prerequisite.cs and every scenario tagged @needs-<name> is then
+skipped with that reason, so another machine reports "skipped: libvlc not
+found" rather than "the region is blank". Nothing is skipped on a machine
+that has everything. Media fixtures are small synthetic clips authored from
+one filter graph (red for the first second, blue for the second; every audio
+track is digital silence; players are muted as well) and committed as Assets
+of the Landscape project; nothing is downloaded and nothing is written
+outside the test output folder. Audio fixtures are 22.05 kHz: the shared
+audio output opens once per process at the rate of the first thing played,
+and the SFZ synthesizer refuses anything below 16 kHz. Every wait is a signal
+or a bounded poll with a stated budget; engines get larger budgets on the
+first scenario of a feature. Timers that repaint (a caret, a cursor,
+animation ticks) are stopped or hidden by an explicit Given before any
+two-frame comparison.
+
+RUNNING THEM TOGETHER. WebView spawns WebKit child processes, MediaPlayer
+holds a libvlc instance, Graphics3DGL and VideoPlayer take the one off-screen
+EGL context a process gets, and AudioPlayer opens the audio device, so cap the
+solution-wide run at four test modules at a time:
+
+    dotnet test --solution CodeBrix.Platform.Linux.slnx -c Release --max-parallel-test-modules 4
+
+Scenario counts per orientation at the time of writing: FlexPanel 15,
+Graphics2DSK 13, SkiaSharpViews 14, Svg 13, PlotterView 15, TextLayout 15,
+CommandBar 16, AdvancedTextEdit 15, TerminalView 14, Lottie 14, Graphics3DGL
+14, WebView 15, AudioPlayer 14, VideoPlayer 16, MediaPlayer 16 - 219 per
+orientation beside the core's 266. None of this belongs in an add-in's
+AGENT-README: self-test material is maintainer material.
+
 MAINTENANCE FACTS, none of them obvious from the source:
 
   - The Portrait project is a twin, not a copy: it links every .cs and every

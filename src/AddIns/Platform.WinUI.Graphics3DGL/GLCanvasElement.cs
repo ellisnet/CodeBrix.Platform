@@ -60,6 +60,10 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	// compile reports the failure and then stays quiet instead of rethrowing on every frame.
 	private bool _subclassGlFailed;
 
+	// Set by Invalidate, cleared by Render. Without it the element renders continuously: see
+	// GLVisual.Paint.
+	private bool _renderRequested;
+
 	// valid if and only if GLCanvasElement was loaded at least once and OpenGL is available on the running platform
 	private INativeOpenGLWrapper? _nativeOpenGlWrapper;
 	// These are valid if and only if IsLoaded and _nativeOpenGlWrapper is not null
@@ -249,6 +253,9 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	// Invalidate() inside RenderOverride(), we will enter an infinite loop that completely hangs the app.
 	public void Invalidate()
 	{
+		// The flag is what makes ONE call here produce exactly ONE call to RenderOverride, which
+		// is what this method's documentation promises. See GLVisual.Paint below.
+		_renderRequested = true;
 		Compositor.GetSharedCompositor().InvalidateRender(Visual);
 	}
 
@@ -258,7 +265,20 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	{
 		internal override void Paint(in PaintingSession session)
 		{
-			NativeDispatcher.Main.Enqueue(owner.Render, NativeDispatcherPriority.High);
+			// ONLY when a render was actually asked for. Enqueuing unconditionally makes the
+			// element render forever: Render ends with _backBuffer.Invalidate(), which dirties
+			// this visual, which paints it again, which enqueues another Render - a loop that
+			// never settles and that redraws the 3D scene hundreds of times a second on an idle
+			// screen. It also broke the element's own contract, since RenderOverride then ran
+			// many times per Invalidate() and many times without one.
+			// The paint that FOLLOWS the render still happens (that is the same
+			// _backBuffer.Invalidate()), and it is the one that draws the new bitmap - so the
+			// picture still reaches the screen, it just stops there instead of going round again.
+			if (owner._renderRequested)
+			{
+				NativeDispatcher.Main.Enqueue(owner.Render, NativeDispatcherPriority.High);
+			}
+
 			base.Paint(session);
 		}
 	}
@@ -487,6 +507,14 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 
 	private unsafe void Render()
 	{
+		// The render that was asked for is this one, whether or not it turns out to be possible.
+		// Clearing the flag BEFORE the guards below is what keeps a canvas that cannot draw yet
+		// (or ever - one arranged at zero size, one whose shaders did not compile) from asking
+		// to be rendered on every paint for the rest of its life, which is the loop the flag
+		// exists to stop. UpdateFramebuffer calls Invalidate again as soon as there IS something
+		// to draw.
+		_renderRequested = false;
+
 		// _details/_backBuffer are null until UpdateFramebuffer has run with a real (non-zero) size,
 		// which may be after the first paint is requested; skip painting until then.
 		// _subclassGlFailed means the subclass already threw once; the failure is recorded and

@@ -11,11 +11,18 @@ namespace Microsoft.UI.Xaml.Controls
 {
 	public partial class PasswordBox : TextBox
 	{
-		// On Windows, \u25CF is used as password character.
-		// However, this character can't be retrieved on Android (doesn't exist in any system font) and on some browser/OS combinations.
-		// We use \u2022 instead, which is already the one normally used by Android and all the major browsers.
-		// See https://github.com/mozilla/gecko-dev/blob/1d4c27f9f166ce6e967fb0e8c8d6e0795dbbd12e/widget/android/nsLookAndFeel.cpp#L441
-		internal static readonly string DefaultPasswordChar = OperatingSystem.IsAndroid() || OperatingSystem.IsBrowser() ? "\u2022" : "\u25CF";
+		// CodeBrix.Platform: the default masking character is the BULLET (U+2022) on EVERY head.
+		// This is an intentional divergence from WinUI, whose default is the BLACK CIRCLE (U+25CF).
+		// A CodeBrix.Platform application draws its text from the fonts it ships, and U+25CF is
+		// missing from several of the application-font packages (every Open Sans face and every
+		// Roboto Mono face among them), so a black-circle default would have to come from whatever
+		// font the host happens to have - and a masked line drawn in a host font takes that font's
+		// line height, which made a PasswordBox change height as it emptied and filled. U+2022 is in
+		// every face of every application-font package, so the default mask is always drawn from the
+		// application's own font, on every head, and a PasswordBox is exactly as tall as a TextBox of
+		// the same font and size. An application that wants the WinUI look sets PasswordChar to
+		// "\u25CF" itself, and is then responsible for choosing a font that carries it.
+		internal const string DefaultPasswordChar = "\u2022";
 
 		public event RoutedEventHandler PasswordChanged;
 

@@ -67,6 +67,29 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			set => base.IsPointerOver = value;
 		}
 
+		/// <summary>
+		/// Keeps <see cref="IsPointerOverProperty"/> in step with the over state that the pointer plumbing
+		/// maintains on the element itself.
+		/// </summary>
+		/// <param name="isPointerOver">Whether a pointer is now over this button.</param>
+		/// <remarks>
+		/// MEASURED (2026-09-10): the over state lives in a plain field on the element and the property above
+		/// forwards straight to it, so nothing ever wrote <see cref="IsPointerOverProperty"/>. That dependency
+		/// property read false for the whole life of every button, and a change callback registered on it was
+		/// never invoked - which is how SplitButton, MenuBarItem and BreadcrumbBarItem ask to be told, and how
+		/// an application's own control asks. A control that recomputes its visual state from that callback
+		/// therefore never heard that the pointer had left: a traced touch tap raised PointerExited and set the
+		/// over state false, no further state change followed, and the control stayed in its PointerOver state
+		/// with the hover overlay its template fades in left up for the rest of its life. Writing the value
+		/// here is what makes the public dependency property - and every binding and callback on it - true.
+		/// </remarks>
+		private protected override void OnIsPointerOverChanged(bool isPointerOver)
+		{
+			base.OnIsPointerOverChanged(isPointerOver);
+
+			SetValue(IsPointerOverProperty, isPointerOver);
+		}
+
 		private void InitializeProperties()
 		{
 			PartialInitializeProperties();

@@ -100,6 +100,56 @@ public sealed class LayoutSteps
 		DataTable properties) =>
 		await AddChildAsync(parentName, kind, childName, ReadProperties(properties)).ConfigureAwait(false);
 
+	/// <summary>
+	/// Puts a new element whose kind starts with a vowel inside a container. The harness's own
+	/// sentence says "a {kind}", and "a AudioPlayer" is not a sentence anybody would write into
+	/// a requirements document; this is the same step with the other article.
+	/// </summary>
+	/// <param name="parentName">The Gherkin name of the container.</param>
+	/// <param name="kind">The kind of element to build.</param>
+	/// <param name="childName">The name the scenario will refer to the child by.</param>
+	/// <returns>A task that completes once the child is in the tree and laid out.</returns>
+	[Given("the layout {string} holds an {word} named {string}")]
+	[When("the layout {string} holds an {word} named {string}")]
+	public async Task Given_the_layout_holds_an_named(string parentName, string kind, string childName) =>
+		await AddChildAsync(parentName, kind, childName, Array.Empty<KeyValuePair<string, string>>())
+			.ConfigureAwait(false);
+
+	/// <summary>
+	/// Puts a new element whose kind starts with a vowel inside a container, at a fixed size and
+	/// colour.
+	/// </summary>
+	/// <param name="parentName">The Gherkin name of the container.</param>
+	/// <param name="kind">The kind of element to build.</param>
+	/// <param name="childName">The name the scenario will refer to the child by.</param>
+	/// <param name="width">The child's width in device pixels.</param>
+	/// <param name="height">The child's height in device pixels.</param>
+	/// <param name="background">The colour to paint it.</param>
+	/// <returns>A task that completes once the child is in the tree and laid out.</returns>
+	[Given("the layout {string} holds an {word} named {string} {int} by {int} with Background {string}")]
+	public async Task Given_the_layout_holds_an_named_sized(string parentName, string kind, string childName,
+		int width, int height, Color background) =>
+		await AddChildAsync(parentName, kind, childName, new[]
+		{
+			new KeyValuePair<string, string>("Width", Number(width)),
+			new KeyValuePair<string, string>("Height", Number(height)),
+			new KeyValuePair<string, string>("Background", Colors.Describe(background)),
+		}).ConfigureAwait(false);
+
+	/// <summary>
+	/// Puts a new element whose kind starts with a vowel inside a container, with the properties
+	/// a table lists.
+	/// </summary>
+	/// <param name="parentName">The Gherkin name of the container.</param>
+	/// <param name="kind">The kind of element to build.</param>
+	/// <param name="childName">The name the scenario will refer to the child by.</param>
+	/// <param name="properties">A Property/Value table.</param>
+	/// <returns>A task that completes once the child is in the tree and laid out.</returns>
+	[Given("the layout {string} holds an {word} named {string} with:")]
+	public async Task Given_the_layout_holds_an_named_with_table(string parentName, string kind, string childName,
+		DataTable properties) =>
+		await AddChildAsync(parentName, kind, childName, ReadProperties(properties)).ConfigureAwait(false);
+
 	// --------------------------------------------------- positions in the tree
 
 	/// <summary>Asserts that one element's bottom edge is another's top edge.</summary>
@@ -268,6 +318,143 @@ public sealed class LayoutSteps
 	public async Task Then_the_half_of_the_region_of_has_ink(string half, string name) =>
 		Half(await RegionAsync(name).ConfigureAwait(false), half).HasInk();
 
+	/// <summary>
+	/// Asserts that a block at known coordinates INSIDE an element is painted one colour. The
+	/// rest of the pixel vocabulary says where a colour boundary is - halves, strips, corners -
+	/// which cannot say where a small shape is; a control that was told to draw at coordinates it
+	/// was given is asserted about with this.
+	/// </summary>
+	/// <param name="width">The block's width in device pixels.</param>
+	/// <param name="height">The block's height in device pixels.</param>
+	/// <param name="x">Where its left edge is, inside the element.</param>
+	/// <param name="y">Where its top edge is, inside the element.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="color">The colour the block must be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the {int} by {int} block at {int}, {int} inside {string} is uniformly {string}")]
+	public async Task Then_the_block_inside_is_uniformly(int width, int height, int x, int y, string name,
+		Color color) =>
+		(await BlockAsync(width, height, x, y, name).ConfigureAwait(false)).IsUniformly(color);
+
+	/// <summary>Asserts that a block at known coordinates inside an element was left empty.</summary>
+	/// <param name="width">The block's width in device pixels.</param>
+	/// <param name="height">The block's height in device pixels.</param>
+	/// <param name="x">Where its left edge is, inside the element.</param>
+	/// <param name="y">Where its top edge is, inside the element.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the {int} by {int} block at {int}, {int} inside {string} is blank")]
+	public async Task Then_the_block_inside_is_blank(int width, int height, int x, int y, string name) =>
+		(await BlockAsync(width, height, x, y, name).ConfigureAwait(false)).IsBlank();
+
+	/// <summary>Asserts that something was drawn in a block at known coordinates inside an element.</summary>
+	/// <param name="width">The block's width in device pixels.</param>
+	/// <param name="height">The block's height in device pixels.</param>
+	/// <param name="x">Where its left edge is, inside the element.</param>
+	/// <param name="y">Where its top edge is, inside the element.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the {int} by {int} block at {int}, {int} inside {string} has ink")]
+	public async Task Then_the_block_inside_has_ink(int width, int height, int x, int y, string name) =>
+		(await BlockAsync(width, height, x, y, name).ConfigureAwait(false)).HasInk();
+
+	/// <summary>
+	/// Asserts that a block at known coordinates inside an element shows the same picture in two
+	/// captured frames. A whole region that changed somewhere ELSE - an overlay that opened
+	/// across the top of it - cannot be claimed unchanged, and the share of a whole region that
+	/// one thin mark covers is below what "the same picture" allows anyway; a claim that
+	/// something did NOT appear is therefore made about the part of the element it would have
+	/// appeared in.
+	/// </summary>
+	/// <param name="width">The block's width in device pixels.</param>
+	/// <param name="height">The block's height in device pixels.</param>
+	/// <param name="x">Where its left edge is, inside the element.</param>
+	/// <param name="y">Where its top edge is, inside the element.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="frameName">The later frame.</param>
+	/// <param name="otherFrameName">The earlier frame.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the {int} by {int} block at {int}, {int} inside {string} in frame {string} is unchanged from frame {string}")]
+	public async Task Then_the_block_inside_in_frame_is_unchanged_from_frame(int width, int height, int x, int y,
+		string name, string frameName, string otherFrameName)
+	{
+		var block = await BlockAsync(width, height, x, y, name, frameName).ConfigureAwait(false);
+		var other = await BlockAsync(width, height, x, y, name, otherFrameName).ConfigureAwait(false);
+		block.SameAs(other);
+	}
+
+	// --------------------------------------------------------- strips of a region
+
+	/// <summary>Asserts that the strip along the left edge of an element was left empty.</summary>
+	/// <param name="width">How many pixels wide the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the leftmost {int} pixels of {string} are blank")]
+	public async Task Then_the_leftmost_pixels_of_are_blank(int width, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).LeftStrip(width).IsBlank();
+
+	/// <summary>Asserts that the strip along the right edge of an element was left empty.</summary>
+	/// <param name="width">How many pixels wide the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the rightmost {int} pixels of {string} are blank")]
+	public async Task Then_the_rightmost_pixels_of_are_blank(int width, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).RightStrip(width).IsBlank();
+
+	/// <summary>Asserts that something was drawn in the strip along the left edge of an element.</summary>
+	/// <param name="width">How many pixels wide the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the leftmost {int} pixels of {string} have ink")]
+	public async Task Then_the_leftmost_pixels_of_have_ink(int width, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).LeftStrip(width).HasInk();
+
+	/// <summary>Asserts that something was drawn in the strip along the right edge of an element.</summary>
+	/// <param name="width">How many pixels wide the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the rightmost {int} pixels of {string} have ink")]
+	public async Task Then_the_rightmost_pixels_of_have_ink(int width, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).RightStrip(width).HasInk();
+
+	/// <summary>Asserts that something was drawn in the strip along the top edge of an element.</summary>
+	/// <param name="height">How many pixels tall the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the topmost {int} pixels of {string} have ink")]
+	public async Task Then_the_topmost_pixels_of_have_ink(int height, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).TopStrip(height).HasInk();
+
+	/// <summary>Asserts that something was drawn in the strip along the bottom edge of an element.</summary>
+	/// <param name="height">How many pixels tall the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the bottommost {int} pixels of {string} have ink")]
+	public async Task Then_the_bottommost_pixels_of_have_ink(int height, string name) =>
+		(await RegionAsync(name).ConfigureAwait(false)).BottomStrip(height).HasInk();
+
+	/// <summary>
+	/// Asserts that the strip along the top edge of an element is painted one colour throughout.
+	/// This is how a claim is made about the part of a control that has nothing in it while
+	/// ANOTHER part of the same control legitimately has - a picture area above a row of chrome.
+	/// </summary>
+	/// <param name="height">How many pixels tall the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="color">The colour it must be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the topmost {int} pixels of {string} are uniformly {string}")]
+	public async Task Then_the_topmost_pixels_of_are_uniformly(int height, string name, Color color) =>
+		(await RegionAsync(name).ConfigureAwait(false)).TopStrip(height).IsUniformly(color);
+
+	/// <summary>Asserts that the strip along the bottom edge of an element is painted one colour.</summary>
+	/// <param name="height">How many pixels tall the strip is.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="color">The colour it must be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the bottommost {int} pixels of {string} are uniformly {string}")]
+	public async Task Then_the_bottommost_pixels_of_are_uniformly(int height, string name, Color color) =>
+		(await RegionAsync(name).ConfigureAwait(false)).BottomStrip(height).IsUniformly(color);
+
 	// ------------------------------------------------------- ink across frames
 
 	/// <summary>Asserts how far an element's ink moved between two captured frames.</summary>
@@ -316,10 +503,58 @@ public sealed class LayoutSteps
 		region.HasMoreInkThan(other);
 	}
 
+	/// <summary>Asserts that an element's ink is wider than it was in an earlier frame.</summary>
+	/// <param name="name">The Gherkin name of the element whose region is watched.</param>
+	/// <param name="frameName">The later frame.</param>
+	/// <param name="otherFrameName">The earlier frame.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the ink of {string} in frame {string} is wider than in frame {string}")]
+	public async Task Then_the_ink_of_in_frame_is_wider_than_in_frame(string name, string frameName,
+		string otherFrameName)
+	{
+		var ink = (await RegionAsync(name, frameName).ConfigureAwait(false)).InkBounds();
+		var other = (await RegionAsync(name, otherFrameName).ConfigureAwait(false)).InkBounds();
+
+		ink.Width.Should().BeGreaterThan(other.Width,
+			"the ink of \"{0}\" must be wider in frame \"{1}\" than in frame \"{2}\": it is {3} and it was {4}",
+			name, frameName, otherFrameName, ink, other);
+	}
+
+	/// <summary>Asserts that an element's ink starts further right than it did in an earlier frame.</summary>
+	/// <param name="name">The Gherkin name of the element whose region is watched.</param>
+	/// <param name="frameName">The later frame.</param>
+	/// <param name="otherFrameName">The earlier frame.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the ink of {string} in frame {string} starts further right than in frame {string}")]
+	public async Task Then_the_ink_of_in_frame_starts_further_right_than_in_frame(string name, string frameName,
+		string otherFrameName)
+	{
+		var ink = (await RegionAsync(name, frameName).ConfigureAwait(false)).InkBounds();
+		var other = (await RegionAsync(name, otherFrameName).ConfigureAwait(false)).InkBounds();
+
+		ink.X.Should().BeGreaterThan(other.X,
+			"the ink of \"{0}\" must start further right in frame \"{1}\" than in frame \"{2}\": it is {3} and it was {4}",
+			name, frameName, otherFrameName, ink, other);
+	}
+
 	// --------------------------------------------------------------- inner
 
 	private Task<Region> RegionAsync(string elementName, string frameName = ScenarioFrames.CurrentFrameName) =>
 		ScenarioFrames.RegionAsync(_scenarioContext, elementName, frameName);
+
+	private Task<Region> BlockAsync(int width, int height, int x, int y, string name,
+		string frameName = ScenarioFrames.CurrentFrameName)
+	{
+		var description = string.Create(CultureInfo.InvariantCulture,
+			$"the {width} by {height} block at {x}, {y} inside \"{name}\"");
+		if (frameName != ScenarioFrames.CurrentFrameName)
+		{
+			description += string.Create(CultureInfo.InvariantCulture, $" in frame \"{frameName}\"");
+		}
+
+		return ScenarioFrames.SubRegionAsync(_scenarioContext, name, new DeviceRect(x, y, width, height),
+			description, frameName: frameName);
+	}
 
 	private static Region Half(Region region, string half) => half.ToUpperInvariant() switch
 	{

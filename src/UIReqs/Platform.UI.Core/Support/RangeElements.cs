@@ -82,6 +82,36 @@ public static class RangeElements
 		};
 	}
 
+	/// <summary>The Maximum an element carries, whatever kind of range control it is.</summary>
+	/// <param name="element">The element to read. Call this on the UI thread.</param>
+	/// <returns>The maximum.</returns>
+	public static double MaximumOf(FrameworkElement element)
+	{
+		ArgumentNullException.ThrowIfNull(element);
+
+		return element switch
+		{
+			RangeBase range => range.Maximum,
+			ProgressRing ring => ring.Maximum,
+			_ => throw Unsupported(element, "Maximum"),
+		};
+	}
+
+	/// <summary>The Minimum an element carries, whatever kind of range control it is.</summary>
+	/// <param name="element">The element to read. Call this on the UI thread.</param>
+	/// <returns>The minimum.</returns>
+	public static double MinimumOf(FrameworkElement element)
+	{
+		ArgumentNullException.ThrowIfNull(element);
+
+		return element switch
+		{
+			RangeBase range => range.Minimum,
+			ProgressRing ring => ring.Minimum,
+			_ => throw Unsupported(element, "Minimum"),
+		};
+	}
+
 	private static void SetValue(FrameworkElement element, double value)
 	{
 		switch (element)
