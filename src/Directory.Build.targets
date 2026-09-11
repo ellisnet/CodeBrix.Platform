@@ -79,7 +79,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Update="CodeBrix.Platform.Extensions.ApacheLicenseForever" Version="1.0.165.1317" />
+		<PackageReference Update="CodeBrix.Platform.Extensions.ApacheLicenseForever" Version="1.0.254.219" />
 		<PackageReference Update="MSTest" Version="$(MSTestVersion)" />
 		<PackageReference Update="MSTest.TestFramework" Version="$(MSTestVersion)" />
 		<PackageReference Update="MSTest.TestAdapter" Version="$(MSTestVersion)" />
@@ -103,7 +103,7 @@
 		<PackageReference Update="HarfBuzzSharp.NativeAssets.Linux" Version="$(HarfBuzzSharpVersion)" />
 
 		<PackageReference Condition=" '$(TargetFramework)' == '$(NetPrevious)' " Update="Microsoft.Win32.SystemEvents" Version="9.0.0" />
-		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.0-rc.2.25502.107" />
+		<PackageReference Condition=" '$(TargetFramework)' == '$(NetCurrent)' " Update="Microsoft.Win32.SystemEvents" Version="10.0.12" />
 
 		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
