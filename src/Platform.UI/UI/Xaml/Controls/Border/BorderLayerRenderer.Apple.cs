@@ -158,7 +158,6 @@ partial class BorderLayerRenderer
 			var caLayer = background switch
 			{
 				GradientBrush gradientBackground => gradientBackground.GetLayer(backgroundArea.Size),
-				RadialGradientBrush radialBackground => radialBackground.GetLayer(backgroundArea.Size),
 				_ => null,
 			};
 
@@ -235,7 +234,6 @@ partial class BorderLayerRenderer
 			var borderCALayer = borderBrush switch
 			{
 				GradientBrush gradientBorder when gradientBorder.CanApplyToBorder(cornerRadius) => gradientBorder.GetLayer(area.Size),
-				RadialGradientBrush radialBorder => radialBorder.GetLayer(area.Size),
 				_ => null,
 			};
 
@@ -301,7 +299,6 @@ partial class BorderLayerRenderer
 			var caLayer = background switch
 			{
 				GradientBrush gradientBackground => gradientBackground.GetLayer(backgroundArea.Size),
-				RadialGradientBrush radialBackground => radialBackground.GetLayer(backgroundArea.Size),
 				_ => null,
 			};
 
@@ -371,7 +368,6 @@ partial class BorderLayerRenderer
 				var borderCALayer = borderBrush switch
 				{
 					GradientBrush gradientBorder when gradientBorder.CanApplyToBorder(cornerRadius) => gradientBorder.GetLayer(area.Size),
-					RadialGradientBrush radialBorder => radialBorder.GetLayer(area.Size),
 					_ => null,
 				};
 

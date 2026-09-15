@@ -159,6 +159,14 @@
           <Button x:Name="RestoreAllButton" Content="Restore all" Click="OnRestoreAll" />
         </StackPanel>
 
+        <StackPanel Margin="0,0,14,6" Spacing="2">
+          <TextBlock Text="Nesting" FontSize="12" />
+          <CheckBox x:Name="NestedCheck"
+                    Content="Nested control in the upper pane"
+                    Checked="OnNestedChanged"
+                    Unchecked="OnNestedChanged" />
+        </StackPanel>
+
       </flex:FlexPanel>
     </ScrollViewer>
 

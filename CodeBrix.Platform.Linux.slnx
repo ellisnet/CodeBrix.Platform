@@ -142,6 +142,7 @@
     <Project Path="src/Platform.UWP/Platform.Tests.csproj" />
     <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj" />
     <Project Path="src/Platform.UI.Headless.Tests/Platform.UI.Headless.Tests.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.Tests/Platform.UI.Runtime.Skia.Tests.csproj" />
     <!-- CodeBrix.Platform Linux solution: Uno.UI.RuntimeTests.Windows excluded — its only
          ProjectReference is to Platform.UI.Toolkit.Windows.csproj (which is itself excluded above
          due to the XamlCompiler.exe dependency), so it cannot be satisfied on Linux. Build

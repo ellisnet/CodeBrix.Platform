@@ -187,6 +187,41 @@ public class IconMarkupExtensionTests
 	}
 
 	[Fact]
+	public void a_suffix_that_matches_two_embedded_resources_resolves_to_nothing()
+	{
+		//Arrange
+		//Two icon sets in one assembly, Light and Dark, each holding a file of the same name: the
+		//shape a themed icon set has, and the shape that makes the terse form of the URI ambiguous.
+		var uri = IconFixtures.ResourceUri(IconFixtures.AmbiguousSvg);
+
+		//Act
+		var found = IconResourceScheme.TryOpen(uri, out var stream);
+
+		//Assert
+		//It resolves to NOTHING rather than to one of the two, and nothing throws - which the icon
+		//pipeline turns into a blank icon. An application that hits this sees no error at all, so
+		//it is fenced here and written down beside the pitfalls in the AGENT-README.
+		found.Should().BeFalse();
+		stream.Should().BeNull();
+	}
+
+	[Fact]
+	public void a_suffix_long_enough_to_name_one_resource_resolves_to_it()
+	{
+		//Arrange
+		var uri = IconFixtures.ResourceUri("Light." + IconFixtures.AmbiguousSvg);
+
+		//Act
+		var found = IconResourceScheme.TryOpen(uri, out var stream);
+
+		//Assert
+		//The cure for the ambiguity above: say enough of the manifest name to pick one out.
+		found.Should().BeTrue();
+		using var reader = new StreamReader(stream!);
+		reader.ReadToEnd().Should().Contain("stroke-width=\"2\"");
+	}
+
+	[Fact]
 	public void an_ordinary_uri_is_not_a_resource_uri()
 	{
 		//Arrange

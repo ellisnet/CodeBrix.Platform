@@ -160,6 +160,20 @@ Wayland protocol bindings under src/Platform.UI.Runtime.Skia.Wayland/
 Wayland_Bindings/ are GENERATED and committed; regenerate them with
 tools/WaylandBindingsGenerator (see EXTRAS-README.txt), never by hand.
 
+WINDOW SIZING, ONE RULE ACROSS THE HEADS. The two public seams an application
+sets - ApplicationView.PreferredLaunchViewSize and
+OverlappedPresenter.PreferredMinimum*/Maximum* - are in EFFECTIVE (logical)
+PIXELS on every head, and each head converts to its own native units at the
+native call. The arithmetic is in one place,
+src/Platform.UI.Runtime.Skia/Xaml/Window/WindowSizeConversion.cs; the X11 and
+Win32 heads multiply by the display scale, the Wayland, macOS and WPF heads
+pass the numbers through because their native calls already speak logical
+units, and every call site says which it is. AppWindow.Size and
+AppWindow.Resize are the exception: they are RAW pixels of the FRAMED window,
+a matched pair, on every head. Whether a seam means the client area or the
+framed window still differs per head and is stated in the XML docs of each
+member.
+
 TESTING
 =======
 Test projects (each is a normal `dotnet test` target; the runner is
@@ -173,6 +187,12 @@ Microsoft.Testing.Platform per global.json):
     src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj
         (runtime tests hosted in a real Skia head; the .Windows.csproj variant
         is Windows-only and excluded from the Linux solution)
+    src/Platform.UI.Runtime.Skia.Tests/Platform.UI.Runtime.Skia.Tests.csproj
+        (host-free unit tests for the Skia runtime's pure window-sizing
+        arithmetic - effective-pixel to raw-pixel conversion, framed-to-client
+        conversion - and for the X11 head's EWMH window-state rule; xunit.v3
+        under Microsoft.Testing.Platform, no window, no X server, no Skia
+        surface. Linux solution only)
     src/Platform.Foundation/Platform.Foundation.Tests.csproj
     src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj
     src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj
@@ -195,6 +215,15 @@ Microsoft.Testing.Platform per global.json):
     $(SkiaSharpVersion), and the SKXamlCanvas paint-and-present path down to the
     presented pixels. Run it after changing $(SkiaSharpVersion) in
     src/Directory.Build.targets, before launching any head.
+
+    A host-free add-in suite that builds XAML objects must run its
+    XAML-touching test classes one at a time: the bootstrap those suites use
+    makes every thread report that it has dispatcher access, and the object
+    model is not thread-safe. Platform.UI.CommandBar.Tests does it
+    assembly-wide with [assembly: Parallelization(Mode = ParallelMode.None)];
+    a bigger suite can serialise only the XAML classes with a
+    [CollectionDefinition(..., DisableParallelization = true)] collection. The
+    add-in's AGENT-README has the consumer-facing version of this.
 
 UI REQUIREMENTS (UIReqs): a second kind of test project, and the only one in
 this repository that looks at rendered pixels. Requirements are written as
@@ -259,7 +288,7 @@ the run says so in one line and carries on without saving. With the variable
 unset nothing is read, created or written, and the run behaves exactly as it
 does without the feature.
 
-COVERAGE. 266 scenarios per orientation at the time of writing: 265 pass and
+COVERAGE. 275 scenarios per orientation at the time of writing: 274 pass and
 one is skipped, the skip being the Harness group's orientation-tagged scenario
 that belongs to the other panel (@landscape-only and @portrait-only are the
 only way a scenario is excluded from one of the two runs). By coverage group,
@@ -269,10 +298,12 @@ again at the time of writing:
                     ink, a Button tap, the between-scenario reset, and the
                     orientation tags (the one skip per run is in the Harness
                     group)
-    Layout      56  layout and visuals: Grid, StackPanel, Canvas, Border, the
-                    shapes, solid and gradient brushes, Opacity and
-                    Visibility, RenderTransform, Clip,
-                    margin/padding/alignment
+    Layout      62  layout and visuals: Grid, StackPanel, Canvas, Border, the
+                    shapes, solid, linear-gradient and radial-gradient
+                    brushes (including an off-centre GradientOrigin),
+                    Opacity and Visibility, RenderTransform, Clip,
+                    margin/padding/alignment, and the width a container
+                    offers its content, which arrange alone cannot show
     Text        28  text: TextBlock appearance and wrapping, TextBox focus,
                     typing, MaxLength and read-only, PasswordBox masking
     Buttons     36  buttons and toggles: Button, Command and CanExecute,
@@ -283,8 +314,11 @@ again at the time of writing:
     Items       35  items and selection: ListView, GridView, ComboBox,
                     ItemsControl, ItemsRepeater, FlipView, TreeView, Pivot,
                     TabView, SelectorBar
-    Popups      22  popups and dialogs: Flyout, MenuFlyout, Popup,
-                    ContentDialog, TeachingTip, InfoBar
+    Popups      25  popups and dialogs: Flyout, MenuFlyout, Popup,
+                    ContentDialog, TeachingTip, InfoBar, and the two
+                    requirements a popup surface has to meet: a flyout too
+                    tall for the panel stays on it and scrolls, and a
+                    flyout's presenter covers what is behind it
     Navigation  32  navigation and containers: Frame, NavigationView,
                     SplitView, Expander, ScrollViewer, TwoPaneView
     ThemeFocus  26  theme, focus, keyboard, animation and images: the dark
@@ -382,7 +416,7 @@ Scenario counts per orientation at the time of writing: FlexPanel 15,
 Graphics2DSK 13, SkiaSharpViews 14, Svg 13, PlotterView 15, TextLayout 15,
 CommandBar 16, AdvancedTextEdit 15, TerminalView 14, Lottie 14, Graphics3DGL
 14, WebView 15, AudioPlayer 14, VideoPlayer 16, MediaPlayer 16 - 219 per
-orientation beside the core's 266. None of this belongs in an add-in's
+orientation beside the core's 275. None of this belongs in an add-in's
 AGENT-README: self-test material is maintainer material.
 
 MAINTENANCE FACTS, none of them obvious from the source:
@@ -858,6 +892,18 @@ CODING CONVENTIONS
     .cursor/rules/agent-readme.mdc, .windsurfrules,
     .github/copilot-instructions.md, .junie/guidelines.md) all point at
     AGENT-README.txt and are maintained centrally across the family.
+  - XML documentation: the eleven packable add-ins under src/AddIns (the
+    _CsprojPackage list in build/CodeBrix.Platform.Build.csproj) each set
+    GenerateDocumentationFile, so their packages carry lib/net10.0/*.xml and a
+    consumer gets IntelliSense text; CS1591 is fixed at source in those
+    projects, never suppressed. The CORE packages do NOT ship XML docs yet:
+    the switch has not been turned on for them, because the ported framework
+    sources would raise CS1591 in the thousands and each one is a comment to
+    be written rather than a warning to be silenced. That sweep is a separate,
+    later decision. The five add-ins packed by the hand-written nuspecs in
+    build/nuget (Svg, Lottie, SkiaSharp.Views, Graphics2DSK, Graphics3DGL)
+    also ship no .xml: their nuspecs name each lib file explicitly, so adding
+    one is a packaging change.
   - Root doc filenames use dashes (CODEBRIX-PLATFORM-README.md,
     NOT-IMPLEMENTED.md, THIRD-PARTY-NOTICES.txt).
 

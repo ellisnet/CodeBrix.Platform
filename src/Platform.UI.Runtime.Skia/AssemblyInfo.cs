@@ -9,3 +9,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.MacOS")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Tests")]

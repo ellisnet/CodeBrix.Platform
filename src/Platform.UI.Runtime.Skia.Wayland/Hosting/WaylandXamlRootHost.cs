@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -241,6 +241,10 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 			var connection = WaylandConnection.ConnectOrThrow();
 			_connection = connection;
 
+			// ApplicationView.PreferredLaunchViewSize is in EFFECTIVE PIXELS, and an xdg surface's window
+			// geometry is surface-local logical coordinates, which is the same unit - so no conversion
+			// here, deliberately (item 8 of the FIXLIST). Window geometry excludes the client-side
+			// decorations, so this is the CLIENT area.
 			var size = ApplicationView.PreferredLaunchViewSize;
 			if (size == Size.Empty)
 			{

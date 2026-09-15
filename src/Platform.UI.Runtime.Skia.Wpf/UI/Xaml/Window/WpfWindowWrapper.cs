@@ -158,7 +158,7 @@ internal class WpfWindowWrapper : NativeWindowWrapperBase
 
 	protected override IDisposable ApplyOverlappedPresenter(OverlappedPresenter presenter)
 	{
-		presenter.SetNative(new NativeOverlappedPresenter(_wpfWindow, this));
+		presenter.SetNative(new NativeOverlappedPresenter(_wpfWindow));
 		return Disposable.Create(() => presenter.SetNative(null));
 	}
 

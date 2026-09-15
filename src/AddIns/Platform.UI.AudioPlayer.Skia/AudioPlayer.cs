@@ -47,6 +47,13 @@ public sealed partial class AudioPlayer : FrameworkElement
 	private TimeSpan _pendingSeek;
 	private bool _isSourceLoaded;
 
+	/// <summary>
+	/// Initializes a new audio player control.
+	/// </summary>
+	/// <remarks>
+	/// Playback is paused when the control leaves the visual tree, so a page that is navigated
+	/// away from does not keep playing.
+	/// </remarks>
 	public AudioPlayer()
 	{
 		Unloaded += (_, _) => Pause();

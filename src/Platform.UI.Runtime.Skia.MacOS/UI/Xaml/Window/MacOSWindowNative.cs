@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 using CodeBrix.Platform.Foundation.Logging;
 
@@ -19,6 +19,9 @@ internal class MacOSWindowNative
 	{
 		_winUIWindow = winUIWindow ?? throw new ArgumentNullException(nameof(winUIWindow));
 
+		// ApplicationView.PreferredLaunchViewSize is in EFFECTIVE PIXELS, and an NSWindow's contentRect
+		// is in points, which is the same unit - so no conversion here, deliberately (item 8 of the
+		// FIXLIST). A contentRect is the CLIENT area, without the title bar.
 		double initialWidth = NativeWindowWrapperBase.InitialWidth;
 		double initialHeight = NativeWindowWrapperBase.InitialHeight;
 		var preferredWindowSize = ApplicationView.PreferredLaunchViewSize;

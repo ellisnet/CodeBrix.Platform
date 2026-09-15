@@ -257,6 +257,14 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 		timer.Start();
 	}
 
+	/// <summary>
+	/// Releases the native player when the extension was not disposed explicitly.
+	/// </summary>
+	/// <remarks>
+	/// The native handles this owns outlive managed collection, so the finalizer is the last
+	/// chance to give them back; <see cref="Dispose"/> is idempotent and doing it here costs
+	/// nothing when the owner already called it.
+	/// </remarks>
 	~SkiaMediaPlayerExtension()
 	{
 		Dispose();

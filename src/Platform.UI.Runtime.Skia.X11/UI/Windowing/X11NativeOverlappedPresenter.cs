@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Windowing.Native;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.Foundation.Logging;
+using CodeBrix.Platform.UI.Runtime.Skia;
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11; //Was previously: Uno.WinUI.Runtime.Skia.X11
 
 internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrapper wrapper) : INativeOverlappedPresenter
@@ -140,7 +141,22 @@ internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrappe
 
 		if (actualType == X11Helper.None)
 		{
-			if (this.Log().IsEnabled(LogLevel.Error))
+			// A window the window manager has not mapped yet legitimately has no _NET_WM_STATE: the
+			// property is set when the window is managed. SetNative -> Restore(false) -> here runs on
+			// every launch, before the first map, for every application whether or not it ever touches
+			// the presenter, so treating that as an EWMH fault put two Error lines in every launch log.
+			// An absent property on a MAPPED window is still a real EWMH complaint.
+			XWindowAttributes attributes = default;
+			_ = XLib.XGetWindowAttributes(x11Window.Display, x11Window.Window, ref attributes);
+
+			if (X11WindowStateRules.IsMissingWMStateExpected(attributes.map_state))
+			{
+				if (this.Log().IsEnabled(LogLevel.Debug))
+				{
+					this.Log().Debug($"{X11Helper._NET_WM_STATE} does not exist on the window yet; it has not been mapped, so {nameof(OverlappedPresenterState)} is {nameof(OverlappedPresenterState.Restored)}.");
+				}
+			}
+			else if (this.Log().IsEnabled(LogLevel.Error))
 			{
 				this.Log().Error($"Couldn't get {nameof(OverlappedPresenterState)}: {X11Helper._NET_WM_STATE} does not exist on the window. Make sure you use an EWMH-compliant WM.");
 			}
@@ -154,12 +170,23 @@ internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrappe
 		return span.ToArray();
 	}
 
+	/// <summary>
+	/// Applies the <see cref="OverlappedPresenter"/> size constraints, which are EFFECTIVE PIXELS of
+	/// the CLIENT area, to WM_NORMAL_HINTS, which is raw device pixels of the client window.
+	/// </summary>
+	/// <param name="preferredMinimumWidth">The minimum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMinimumHeight">The minimum height in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumWidth">The maximum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumHeight">The maximum height in effective pixels, or null for none.</param>
 	public unsafe void SetSizeConstraints(int? preferredMinimumWidth, int? preferredMinimumHeight, int? preferredMaximumWidth, int? preferredMaximumHeight)
 	{
-		var minWidth = preferredMinimumWidth ?? 0;
-		var minHeight = preferredMinimumHeight ?? 0;
-		var maxWidth = preferredMaximumWidth ?? int.MaxValue;
-		var maxHeight = preferredMaximumHeight ?? int.MaxValue;
+		// One conversion, one rule: the numbers arrive in effective pixels and XSetWMNormalHints wants
+		// raw pixels, so everything below is multiplied by the window's scale - see item 8.
+		var scale = wrapper.RasterizationScale;
+		var minWidth = WindowSizeConversion.LogicalToNative(preferredMinimumWidth ?? 0, scale);
+		var minHeight = WindowSizeConversion.LogicalToNative(preferredMinimumHeight ?? 0, scale);
+		var maxWidth = WindowSizeConversion.LogicalToNative(preferredMaximumWidth ?? int.MaxValue, scale);
+		var maxHeight = WindowSizeConversion.LogicalToNative(preferredMaximumHeight ?? int.MaxValue, scale);
 		XSizeHints hints = new();
 		hints.min_width = minWidth;
 		hints.min_height = minHeight;
@@ -168,4 +195,24 @@ internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrappe
 		hints.flags = (int)XSizeHintsFlags.PMinSize | (int)XSizeHintsFlags.PMaxSize;
 		XLib.XSetWMNormalHints(x11Window.Display, x11Window.Window, ref hints);
 	}
+
+}
+
+/// <summary>
+/// The pure rules behind <see cref="X11NativeOverlappedPresenter"/>'s reading of the EWMH window
+/// state. They live in their own class so that a host-free unit test can exercise them without
+/// loading the presenter, which implements an interface only a running head can see.
+/// </summary>
+internal static class X11WindowStateRules
+{
+	/// <summary>
+	/// Decides whether a window with no <c>_NET_WM_STATE</c> property is simply too young to have one.
+	/// A window that has never been mapped is not managed by the window manager yet, so the absence is
+	/// expected and says nothing about the window manager's EWMH compliance; on any other map state the
+	/// property should exist and its absence is worth an error.
+	/// </summary>
+	/// <param name="mapState">The window's <c>map_state</c>, as read by <c>XGetWindowAttributes</c>.</param>
+	/// <returns>True when the missing property is expected rather than a fault.</returns>
+	internal static bool IsMissingWMStateExpected(MapState mapState)
+		=> mapState == MapState.IsUnmapped;
 }

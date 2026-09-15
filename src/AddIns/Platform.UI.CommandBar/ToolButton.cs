@@ -32,8 +32,6 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// </remarks>
 public partial class ToolButton : ButtonBase
 {
-	/// <summary>The accelerators this button copied from a bound command, so it can take them back.</summary>
-
 	/// <summary>The tooltip text this button last composed, so an application-set tooltip is left alone.</summary>
 	private object? _composedToolTip;
 

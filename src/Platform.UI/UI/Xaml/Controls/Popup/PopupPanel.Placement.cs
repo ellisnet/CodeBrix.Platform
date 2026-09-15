@@ -334,6 +334,38 @@ partial class PopupPanel
 				finalRect.Height);
 		}
 
+		// No placement fitted, so finalRect is the preferred placement's rectangle and may still
+		// hang off an edge - which puts part of the popup where nothing can reach it, and hides the
+		// scroll affordance of a presenter that has already been limited to the visible bounds.
+		// The content was clamped to those bounds at the top of this method, so a rectangle that is
+		// no larger than them can always be slid back onto them. The top and left edges are settled
+		// last, so a popup that is exactly as big as the bounds starts at their origin.
+		if (finalRect.Height <= visibleBounds.Height)
+		{
+			if (finalRect.Bottom > visibleBounds.Bottom)
+			{
+				finalRect = new Rect(finalRect.Left, visibleBounds.Bottom - finalRect.Height, finalRect.Width, finalRect.Height);
+			}
+
+			if (finalRect.Top < visibleBounds.Top)
+			{
+				finalRect = new Rect(finalRect.Left, visibleBounds.Top, finalRect.Width, finalRect.Height);
+			}
+		}
+
+		if (finalRect.Width <= visibleBounds.Width)
+		{
+			if (finalRect.Right > visibleBounds.Right)
+			{
+				finalRect = new Rect(visibleBounds.Right - finalRect.Width, finalRect.Top, finalRect.Width, finalRect.Height);
+			}
+
+			if (finalRect.Left < visibleBounds.Left)
+			{
+				finalRect = new Rect(visibleBounds.Left, finalRect.Top, finalRect.Width, finalRect.Height);
+			}
+		}
+
 		return finalRect;
 	}
 

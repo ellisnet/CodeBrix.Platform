@@ -52,6 +52,14 @@ namespace Microsoft.UI.Composition
 				}
 				else
 				{
+					// The two-point conical gradient runs the other way round: its start circle is the
+					// ellipse (centre, radius) at t = 0 and its end circle is the origin (radius 0) at
+					// t = 1, so the LAST stop is what the outer circle carries and the FIRST stop is what
+					// the focal point carries. An original offset p therefore sits at t = 1 - p, which is
+					// the stop list read backwards: both the colour AND the position at index i come from
+					// index (length - 1 - i). Mirroring each position in place instead would only be right
+					// for a [0, a, 1] stop set - [0, 0.25, 0.75, 1] would come out as [0, 0.75, 0.25, 1],
+					// which Skia forces monotonic and the middle colours land in the wrong places.
 					var reversedColors = new SKColor[Colors!.Length];
 					for (int i = 0; i < reversedColors.Length; i++)
 					{
@@ -61,8 +69,7 @@ namespace Microsoft.UI.Composition
 					var reversedColorPositions = new float[ColorPositions!.Length];
 					for (var i = 0; i < ColorPositions.Length; i++)
 					{
-						var colorPosition = ColorPositions[i];
-						reversedColorPositions[i] = (colorPosition > 0 && colorPosition < 1) ? Math.Abs(1 - colorPosition) : colorPosition;
+						reversedColorPositions[i] = 1f - ColorPositions[ColorPositions.Length - 1 - i];
 					}
 
 					var totalMatrix = transform.PreConcat(matrix);

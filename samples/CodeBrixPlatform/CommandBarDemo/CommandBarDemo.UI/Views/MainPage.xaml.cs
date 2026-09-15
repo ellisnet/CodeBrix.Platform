@@ -58,6 +58,9 @@ public sealed partial class MainPage : Page
 	private readonly MainViewModel _model = new();
 	private bool _hooked;
 
+	/// <summary>The probe in the measure host, built once the page is loaded.</summary>
+	private MeasureProbe _measureProbe;
+
 	//The BUTTONS stream's own subjects. A command built from an action alone is the shape an
 	//application reaches for most often, and the shape the add-in's suite fences host-free.
 	private readonly SimpleCommand _saveCommand;
@@ -263,6 +266,7 @@ public sealed partial class MainPage : Page
 		Log($"Loaded. scale={XamlRoot?.RasterizationScale:0.##} size={XamlRoot?.Size.Width:0}x{XamlRoot?.Size.Height:0}");
 
 		SetUpIconProof();
+		SetUpMeasureProbe();
 
 		if (Environment.GetEnvironmentVariable("COMMANDBARDEMO_SELFTEST") == "1")
 		{
@@ -284,6 +288,24 @@ public sealed partial class MainPage : Page
 		Log($"Icon proof: svg markup {ProofSvgMarkup.Length} chars, png {pngPath}");
 		Log($"Reference demo icons: {DemoIcons.Folder}");
 	}
+
+	/// <summary>
+	/// Puts a probe in the measure host, so the self-test can read the width a ContentControl
+	/// offered its content rather than the width it arranged it at.
+	/// </summary>
+	private void SetUpMeasureProbe()
+	{
+		_measureProbe = new MeasureProbe { Height = 24d, Background = new SolidColorBrush(Microsoft.UI.Colors.Gainsboro) };
+		MeasureHost.Content = _measureProbe;
+	}
+
+	/// <summary>Describes a measure offer in words a log line can carry.</summary>
+	/// <param name="value">The offered length.</param>
+	/// <returns>The number, or what it was instead of a number.</returns>
+	private static string Describe(double value) =>
+		double.IsPositiveInfinity(value) ? "UNBOUNDED"
+		: double.IsNaN(value) ? "never measured"
+		: value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
 
 	private void Log(string message)
 	{
@@ -343,6 +365,22 @@ public sealed partial class MainPage : Page
 				$"bar={MainBar.Template != null} button={NewButton.Template != null} "
 				+ $"hosted button={HostedButton.Template != null} "
 				+ $"hosted separator={HostedSeparator.Template != null}");
+
+			// 4b. A ContentControl offers its content the width it has itself, not an unbounded
+			//     one. Content that lays itself out from the width it is offered - a tray that
+			//     wraps, a bar that decides its overflow - has already decided by the time arrange
+			//     says how wide the host really is, so measure and arrange are read separately.
+			Check("contentcontrol-offers-a-bounded-width",
+				_measureProbe != null && double.IsFinite(_measureProbe.LastOfferedWidth),
+				$"offered={Describe(_measureProbe?.LastOfferedWidth ?? double.NaN)} "
+				+ $"host arranged={MeasureHost.ActualWidth:0.##} "
+				+ $"measured {_measureProbe?.MeasureCount ?? 0} time(s)");
+
+			Check("contentcontrol-offers-its-own-width",
+				_measureProbe != null && MeasureHost.ActualWidth > 0
+				&& Math.Abs(_measureProbe.LastOfferedWidth - MeasureHost.ActualWidth) < 1.0,
+				$"offered={Describe(_measureProbe?.LastOfferedWidth ?? double.NaN)} "
+				+ $"host arranged={MeasureHost.ActualWidth:0.##}");
 
 			// 5. Those styles reach the SCREEN: the templated controls under a parent that lays
 			//    out have a real arranged size on the head.
@@ -1313,6 +1351,22 @@ public sealed partial class MainPage : Page
 			geometry.Figures.Add(figure);
 
 			return new PathIcon { Data = geometry };
+		}
+	}
+
+	/// <summary>A panel that remembers the size it was last offered.</summary>
+	private sealed class MeasureProbe : Grid
+	{
+		public double LastOfferedWidth { get; private set; } = double.NaN;
+
+		public int MeasureCount { get; private set; }
+
+		protected override Size MeasureOverride(Size availableSize)
+		{
+			LastOfferedWidth = availableSize.Width;
+			MeasureCount++;
+
+			return base.MeasureOverride(availableSize);
 		}
 	}
 

@@ -30,6 +30,16 @@ internal static class IconFixtures
 	/// <summary>An 8x8 24-bit BMP, solid #00AA00.</summary>
 	internal const string Bmp = "swatch.bmp";
 
+	/// <summary>
+	/// A file name that TWO embedded resources end with - Fixtures/Light and Fixtures/Dark each
+	/// hold one - so that the suffix form of a <c>cb-res://</c> URI is ambiguous for it.
+	/// </summary>
+	/// <remarks>
+	/// Deliberately not readable through <see cref="Text"/> or <see cref="Bytes"/>: those take the
+	/// first manifest name that ends the right way, which is exactly the ambiguity under test.
+	/// </remarks>
+	internal const string AmbiguousSvg = "zoom-in.svg";
+
 	/// <summary>This assembly's simple name, which is what a <c>cb-res://</c> URI names.</summary>
 	internal static string AssemblyName { get; } = typeof(IconFixtures).Assembly.GetName().Name!;
 

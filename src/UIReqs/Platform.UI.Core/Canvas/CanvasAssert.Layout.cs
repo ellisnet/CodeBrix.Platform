@@ -151,6 +151,65 @@ public static partial class CanvasAssert
 		}
 	}
 
+	/// <summary>
+	/// Asserts what colour ONE pixel of a region is, addressed as a fraction of the region's own
+	/// width and height so that a scenario never has to know where the element landed on the
+	/// panel. The corner, half and strip primitives all say what a whole area looks like, which
+	/// cannot state where a gradient puts a particular colour; this can.
+	/// </summary>
+	/// <param name="region">The region to look in.</param>
+	/// <param name="x">How far across the region, from 0 at the left edge to 1 at the right.</param>
+	/// <param name="y">How far down the region, from 0 at the top edge to 1 at the bottom.</param>
+	/// <param name="color">The colour that pixel must be.</param>
+	public static void PixelIs(this Region region, double x, double y, Color color)
+	{
+		var (px, py) = PixelOf(region, x, y);
+		var pixel = region[px, py];
+		if (!ColorMatch.Matches(pixel, color, Background))
+		{
+			ColorMatch.Describe(pixel).Should().Be(ColorMatch.Describe(color), "{0}", Explain(region,
+				string.Create(CultureInfo.InvariantCulture,
+					$"the pixel at {x}, {y} of {region.Description}, at ({px},{py}) inside it, must be {ColorMatch.Describe(color)}")));
+		}
+	}
+
+	/// <summary>
+	/// Asserts what colour one pixel of a region is NOT. This is how a scenario says that
+	/// something moved without claiming to know what took its place.
+	/// </summary>
+	/// <param name="region">The region to look in.</param>
+	/// <param name="x">How far across the region, from 0 at the left edge to 1 at the right.</param>
+	/// <param name="y">How far down the region, from 0 at the top edge to 1 at the bottom.</param>
+	/// <param name="color">The colour that pixel must not be.</param>
+	public static void PixelIsNot(this Region region, double x, double y, Color color)
+	{
+		var (px, py) = PixelOf(region, x, y);
+		var pixel = region[px, py];
+		if (ColorMatch.Matches(pixel, color, Background))
+		{
+			ColorMatch.Describe(pixel).Should().NotBe(ColorMatch.Describe(color), "{0}", Explain(region,
+				string.Create(CultureInfo.InvariantCulture,
+					$"the pixel at {x}, {y} of {region.Description}, at ({px},{py}) inside it, must not be {ColorMatch.Describe(color)}")));
+		}
+	}
+
+	private static (int X, int Y) PixelOf(Region region, double x, double y)
+	{
+		ArgumentNullException.ThrowIfNull(region);
+		return (Coordinate(x, region.Bounds.Width, nameof(x)), Coordinate(y, region.Bounds.Height, nameof(y)));
+
+		static int Coordinate(double fraction, int size, string axis)
+		{
+			if (double.IsNaN(fraction) || fraction < 0 || fraction > 1)
+			{
+				throw new ArgumentOutOfRangeException(axis, fraction,
+					"A pixel inside a region is addressed as a fraction from 0 to 1 of the region.");
+			}
+
+			return (int) Math.Round(fraction * (size - 1), MidpointRounding.AwayFromZero);
+		}
+	}
+
 	private static Region Part(Region region, string what, Func<DeviceRect, DeviceRect> cut)
 	{
 		ArgumentNullException.ThrowIfNull(region);

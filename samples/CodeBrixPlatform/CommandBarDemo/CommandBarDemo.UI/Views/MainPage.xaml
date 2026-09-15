@@ -19,6 +19,7 @@
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
       <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
 
@@ -246,7 +247,12 @@
       <cb:ToolButton x:Name="VerticalSecond" Content="Two" />
     </cb:ToolBar>
 
-    <ScrollViewer Grid.Row="12">
+    <!-- The measure host: a bare ContentControl with stretched content, which is the shape a
+         window's toolbar host has. What goes in it decides its own layout from the width it is
+         offered, so the self-test reads that width back rather than the arranged one. -->
+    <ContentControl x:Name="MeasureHost" Grid.Row="12" HorizontalContentAlignment="Stretch" />
+
+    <ScrollViewer Grid.Row="13">
       <TextBlock x:Name="LogText" FontFamily="monospace" FontSize="11" TextWrapping="Wrap" />
     </ScrollViewer>
   </Grid>

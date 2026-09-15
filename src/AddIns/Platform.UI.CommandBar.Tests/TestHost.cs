@@ -22,12 +22,28 @@ namespace CodeBrix.Platform.UI.CommandBar.Tests;
 /// </remarks>
 internal static class TestHost
 {
+	/// <summary>Serialises the one-time preparation, so a second caller waits for it.</summary>
+	private static readonly object ReadyLock = new();
+
 	/// <summary>Whether the process has already been prepared.</summary>
-	private static bool _ready;
+	private static volatile bool _ready;
 
 	/// <summary>
 	/// Prepares the process to measure a templated control, once.
 	/// </summary>
+	/// <remarks>
+	/// The flag is set AFTER the work, under a lock, and that order is the whole point: setting it
+	/// first lets a second thread return from here while the first is still half way through
+	/// registering the default styles, and a control built in that window gets
+	/// "ResourceDictionary was registered as style provider for ToolBarOverflowButton but doesn't
+	/// contain matching style". The lock alone is not enough either - a reader that sees a
+	/// half-written flag is exactly the same race - so the flag is volatile and is written last.
+	/// <para>
+	/// This makes the bootstrap safe to CALL from several threads; it does not make the framework's
+	/// object model thread-safe. Test classes that build XAML objects still have to be serialised -
+	/// see the "the host-free bootstrap" section of the add-in's AGENT-README.txt.
+	/// </para>
+	/// </remarks>
 	/// <exception cref="InvalidOperationException">
 	/// The framework no longer exposes the text engine's initialization entry point, so the
 	/// bootstrap here needs updating to match it.
@@ -39,10 +55,18 @@ internal static class TestHost
 			return;
 		}
 
-		_ready = true;
+		lock (ReadyLock)
+		{
+			if (_ready)
+			{
+				return;
+			}
 
-		RegisterDefaultStyles();
-		InitializeTextEngine();
+			RegisterDefaultStyles();
+			InitializeTextEngine();
+
+			_ready = true;
+		}
 	}
 
 	/// <summary>

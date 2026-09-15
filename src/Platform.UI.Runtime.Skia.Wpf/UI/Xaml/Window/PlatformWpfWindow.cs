@@ -35,6 +35,10 @@ internal class CodeBrixWpfWindow : WpfWindow
 		_windowToWpfWindow[winUIWindow ?? throw new ArgumentNullException(nameof(winUIWindow))] = this;
 		winUIWindow.Closed += (_, _) => _windowToWpfWindow.TryRemove(winUIWindow, out _);
 
+		// ApplicationView.PreferredLaunchViewSize is in EFFECTIVE PIXELS and a WPF Window's
+		// Width/Height are device-independent units, which is the same thing - so no conversion here,
+		// deliberately (item 8 of the FIXLIST). These are the FRAMED dimensions: WPF's Width includes
+		// the window chrome.
 		var preferredWindowSize = ApplicationView.PreferredLaunchViewSize;
 		if (preferredWindowSize.IsEmpty)
 		{

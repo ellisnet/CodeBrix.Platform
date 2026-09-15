@@ -23,7 +23,8 @@ namespace CodeBrix.Platform.UI.Toolkit;
 /// within a pair matters. A weight of zero means the pane it belongs to is minimized; the user
 /// reaches that state by dragging a divider all the way over, and code reaches it through
 /// <see cref="MinimizeSidePane"/>, <see cref="MinimizeUpperPane"/>,
-/// <see cref="MinimizeLowerPane"/> or the matching <c>IsMinimized</c> properties.
+/// <see cref="MinimizeLowerPane"/>, <see cref="MinimizeStack"/> or the matching
+/// <c>IsMinimized</c> properties.
 /// </para>
 /// <para>
 /// Minimizing never detaches anything. The pane's content element stays exactly where it is in the
@@ -87,6 +88,13 @@ public sealed partial class TriPaneView : Control
 	private FrameworkElement? _stackGrid;
 	private TriPaneViewDivider? _sideDivider;
 	private TriPaneViewDivider? _stackDivider;
+
+	//The four weights as they were when the current gesture started, whichever divider it is on.
+	//DividerDragCompleted is raised only when the gesture left at least one of them somewhere else.
+	private double _dragStartSidePercent;
+	private double _dragStartStackPercent;
+	private double _dragStartUpperPercent;
+	private double _dragStartLowerPercent;
 
 	private bool _isSideDragActive;
 	private bool _sideDragHasMoved;
@@ -220,6 +228,11 @@ public sealed partial class TriPaneView : Control
 	/// </remarks>
 	internal void StartDividerDrag(TriPaneViewDividerKind kind, double firstLength, double secondLength)
 	{
+		_dragStartSidePercent = SidePanePercent;
+		_dragStartStackPercent = StackPercent;
+		_dragStartUpperPercent = UpperPanePercent;
+		_dragStartLowerPercent = LowerPanePercent;
+
 		if (kind == TriPaneViewDividerKind.Side)
 		{
 			_isSideDragActive = true;
@@ -307,11 +320,18 @@ public sealed partial class TriPaneView : Control
 	/// counts as a tap and restores the minimized pane; a cancelled drag puts the axis back exactly
 	/// where it was when the drag started. <see cref="DividerDragCompleted"/> is raised afterwards,
 	/// with the weights already written back, and only when the interaction actually changed the
-	/// layout - a bare click on an ordinary divider, and a cancelled drag, raise nothing.
+	/// layout - a bare click on an ordinary divider, a cancelled drag, and a drag that ends with all
+	/// four weights back where they started all raise nothing.
 	/// </summary>
 	/// <param name="kind">The divider that was being dragged.</param>
 	/// <param name="totalTravel">The total distance, in pixels, the pointer travelled.</param>
 	/// <param name="canceled">Whether the drag was cancelled rather than completed.</param>
+	/// <remarks>
+	/// The tap that restores a pane is a gesture that never passed the drag threshold at all, not
+	/// one that happens to END where it began: <paramref name="totalTravel"/> is net displacement,
+	/// so a drag taken out and brought back would otherwise read as a tap and reopen the very pane
+	/// the user had just dragged shut. The latched "this gesture has moved" flag decides.
+	/// </remarks>
 	internal void CompleteDividerDrag(TriPaneViewDividerKind kind, double totalTravel, bool canceled)
 	{
 		bool wasActive;
@@ -344,7 +364,7 @@ public sealed partial class TriPaneView : Control
 			RollBackDrag(kind);
 			hasChanged = false;
 		}
-		else if (TriPaneViewLayoutMath.IsTap(totalTravel))
+		else if (!hasMoved && TriPaneViewLayoutMath.IsTap(totalTravel))
 		{
 			hasChanged = RestoreFromGrip(kind) || hasChanged;
 		}
@@ -353,11 +373,24 @@ public sealed partial class TriPaneView : Control
 		//model asks for; both were left alone while the gesture was running.
 		UpdateState();
 
-		if (hasChanged)
+		if (hasChanged && HasLeftTheStartingWeights())
 		{
 			DividerDragCompleted?.Invoke(this, new TriPaneViewDividerDragCompletedEventArgs(kind));
 		}
 	}
+
+	/// <summary>
+	/// Tests whether the gesture that has just ended left any of the four weights somewhere other
+	/// than where it found it. A press, a move and a release on a divider already sitting on its
+	/// floor moves the pointer but not the layout, and an application that persists the weights has
+	/// nothing to persist.
+	/// </summary>
+	/// <returns><see langword="true"/> when at least one weight is different.</returns>
+	private bool HasLeftTheStartingWeights()
+		=> SidePanePercent != _dragStartSidePercent
+			|| StackPercent != _dragStartStackPercent
+			|| UpperPanePercent != _dragStartUpperPercent
+			|| LowerPanePercent != _dragStartLowerPercent;
 
 	/// <summary>
 	/// Recomputes the whole state model - effective weights, minimized flags, minimize causes - and
@@ -398,6 +431,7 @@ public sealed partial class TriPaneView : Control
 		SyncMinimizedFlags(
 			version,
 			isSideMinimized,
+			isStackMinimized,
 			isStackMinimized || isUpperWeightZero,
 			isStackMinimized || isLowerWeightZero);
 
@@ -569,7 +603,26 @@ public sealed partial class TriPaneView : Control
 		return null;
 	}
 
-	private void OnSizeChanged(object sender, SizeChangedEventArgs e) => ApplyScrollSettings();
+	private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+	{
+		ApplyScrollSettings();
+
+		//The four minimum lengths are resolved against the room the control has, so a control that
+		//has just been given more or less of it has to resolve them again. Nothing else in the state
+		//model depends on the size, and the floors are a pure function of a size the pass below does
+		//not itself change, so this cannot oscillate.
+		ApplyRegionLengths(
+			SidePaneEffectiveWeight,
+			StackEffectiveWeight,
+			UpperPaneEffectiveWeight,
+			LowerPaneEffectiveWeight,
+			TriPaneViewLayoutMath.ResolveDividerTrackLength(
+				IsSideDividerVisible || _isSideDragActive,
+				DividerThickness),
+			TriPaneViewLayoutMath.ResolveDividerTrackLength(
+				IsStackDividerVisible || _isStackDragActive,
+				DividerThickness));
+	}
 
 	private void OnSideDividerDragStarted(object sender, DragStartedEventArgs e)
 	{
@@ -894,33 +947,20 @@ public sealed partial class TriPaneView : Control
 		var isStackDividerShown = isStackDividerVisible || _isStackDragActive;
 
 		var thickness = DividerThickness;
-
-		ApplyColumn(
-			_sideColumn,
-			isPlacedLeft ? sideWeight : stackWeight,
-			isPlacedLeft ? SidePaneMinLength : StackMinLength);
-
-		ApplyColumn(
-			_stackColumn,
-			isPlacedLeft ? stackWeight : sideWeight,
-			isPlacedLeft ? StackMinLength : SidePaneMinLength);
+		var sideDividerTrack = TriPaneViewLayoutMath.ResolveDividerTrackLength(isSideDividerShown, thickness);
+		var stackDividerTrack = TriPaneViewLayoutMath.ResolveDividerTrackLength(isStackDividerShown, thickness);
 
 		if (_sideDividerColumn is not null)
 		{
-			_sideDividerColumn.Width = new GridLength(
-				TriPaneViewLayoutMath.ResolveDividerTrackLength(isSideDividerShown, thickness),
-				GridUnitType.Pixel);
+			_sideDividerColumn.Width = new GridLength(sideDividerTrack, GridUnitType.Pixel);
 		}
-
-		ApplyRow(_upperRow, upperWeight, UpperPaneMinLength);
-		ApplyRow(_lowerRow, lowerWeight, LowerPaneMinLength);
 
 		if (_stackDividerRow is not null)
 		{
-			_stackDividerRow.Height = new GridLength(
-				TriPaneViewLayoutMath.ResolveDividerTrackLength(isStackDividerShown, thickness),
-				GridUnitType.Pixel);
+			_stackDividerRow.Height = new GridLength(stackDividerTrack, GridUnitType.Pixel);
 		}
+
+		ApplyRegionLengths(sideWeight, stackWeight, upperWeight, lowerWeight, sideDividerTrack, stackDividerTrack);
 
 		ApplyDividerState(
 			_sideDivider,
@@ -935,6 +975,54 @@ public sealed partial class TriPaneView : Control
 			CanUserDragStackDivider || _isStackDragActive,
 			isStackGripVisible,
 			isStackGripTowardStart);
+	}
+
+	/// <summary>
+	/// Hands the two column widths and the two row heights to the template's grid definitions, with
+	/// the four minimum lengths resolved against the room the control actually has on each axis.
+	/// </summary>
+	/// <param name="sideWeight">The effective weight of the side pane.</param>
+	/// <param name="stackWeight">The effective weight of the stack.</param>
+	/// <param name="upperWeight">The effective weight of the upper pane.</param>
+	/// <param name="lowerWeight">The effective weight of the lower pane.</param>
+	/// <param name="sideDividerTrack">The length, in pixels, of the side divider's own column.</param>
+	/// <param name="stackDividerTrack">The length, in pixels, of the stack divider's own row.</param>
+	private void ApplyRegionLengths(
+		double sideWeight,
+		double stackWeight,
+		double upperWeight,
+		double lowerWeight,
+		double sideDividerTrack,
+		double stackDividerTrack)
+	{
+		var isPlacedLeft = SidePanePlacement == TriPaneViewSidePanePlacement.Left;
+
+		var (sideFloor, stackFloor) = TriPaneViewLayoutMath.ResolveMinLengths(
+			SidePaneMinLength,
+			StackMinLength,
+			ActualWidth - sideDividerTrack,
+			TriPaneViewLayoutMath.IsMinimized(sideWeight),
+			TriPaneViewLayoutMath.IsMinimized(stackWeight));
+
+		var (upperFloor, lowerFloor) = TriPaneViewLayoutMath.ResolveMinLengths(
+			UpperPaneMinLength,
+			LowerPaneMinLength,
+			(_stackGrid?.ActualHeight ?? 0d) - stackDividerTrack,
+			TriPaneViewLayoutMath.IsMinimized(upperWeight),
+			TriPaneViewLayoutMath.IsMinimized(lowerWeight));
+
+		ApplyColumn(
+			_sideColumn,
+			isPlacedLeft ? sideWeight : stackWeight,
+			isPlacedLeft ? sideFloor : stackFloor);
+
+		ApplyColumn(
+			_stackColumn,
+			isPlacedLeft ? stackWeight : sideWeight,
+			isPlacedLeft ? stackFloor : sideFloor);
+
+		ApplyRow(_upperRow, upperWeight, upperFloor);
+		ApplyRow(_lowerRow, lowerWeight, lowerFloor);
 	}
 
 	private static void ApplyDividerState(

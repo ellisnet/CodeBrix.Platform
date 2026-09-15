@@ -271,6 +271,38 @@ public sealed class LayoutSteps
 	public async Task Then_the_corner_pixels_of_are(string name, Color color) =>
 		(await RegionAsync(name).ConfigureAwait(false)).CornerPixelsAre(color);
 
+	/// <summary>Asserts what colour one pixel of an element's region is.</summary>
+	/// <param name="x">How far across the region, from 0 at the left edge to 1 at the right.</param>
+	/// <param name="y">How far down the region, from 0 at the top edge to 1 at the bottom.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="color">The colour that pixel must be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the pixel at {double}, {double} of {string} is {string}")]
+	public async Task Then_the_pixel_at_of_is(double x, double y, string name, Color color) =>
+		(await RegionAsync(name).ConfigureAwait(false)).PixelIs(x, y, color);
+
+	/// <summary>Asserts what colour one pixel of an element's region is not.</summary>
+	/// <param name="x">How far across the region, from 0 at the left edge to 1 at the right.</param>
+	/// <param name="y">How far down the region, from 0 at the top edge to 1 at the bottom.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="color">The colour that pixel must not be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the pixel at {double}, {double} of {string} is not {string}")]
+	public async Task Then_the_pixel_at_of_is_not(double x, double y, string name, Color color) =>
+		(await RegionAsync(name).ConfigureAwait(false)).PixelIsNot(x, y, color);
+
+	/// <summary>Asserts what colour one pixel of an element's region is in a named frame.</summary>
+	/// <param name="x">How far across the region, from 0 at the left edge to 1 at the right.</param>
+	/// <param name="y">How far down the region, from 0 at the top edge to 1 at the bottom.</param>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="frameName">The captured frame to look at.</param>
+	/// <param name="color">The colour that pixel must be.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the pixel at {double}, {double} of {string} in frame {string} is {string}")]
+	public async Task Then_the_pixel_at_of_in_frame_is(double x, double y, string name, string frameName,
+		Color color) =>
+		(await RegionAsync(name, frameName).ConfigureAwait(false)).PixelIs(x, y, color);
+
 	/// <summary>Asserts that half of an element's region is painted one colour.</summary>
 	/// <param name="half">left, right, top or bottom.</param>
 	/// <param name="name">The Gherkin name of the element.</param>
@@ -536,6 +568,70 @@ public sealed class LayoutSteps
 			"the ink of \"{0}\" must start further right in frame \"{1}\" than in frame \"{2}\": it is {3} and it was {4}",
 			name, frameName, otherFrameName, ink, other);
 	}
+
+	// --------------------------------------------------- the width a child was offered
+
+	/// <summary>
+	/// Asserts that a measure probe was offered a real width rather than an unbounded one.
+	/// </summary>
+	/// <param name="name">The Gherkin name of the probe.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the measured width of {string} is bounded")]
+	public async Task Then_the_measured_width_of_is_bounded(string name)
+	{
+		var offered = await OfferedWidthAsync(name).ConfigureAwait(false);
+
+		double.IsFinite(offered).Should().BeTrue(
+			"\"{0}\" must be measured with the width its container has, and it was offered {1}",
+			name, Describe(offered));
+	}
+
+	/// <summary>Asserts the exact width a measure probe was offered.</summary>
+	/// <param name="name">The Gherkin name of the probe.</param>
+	/// <param name="width">The width it must have been offered, in device pixels.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the measured width of {string} is {int} device pixels")]
+	public async Task Then_the_measured_width_of_is_device_pixels(string name, int width)
+	{
+		var offered = await OfferedWidthAsync(name).ConfigureAwait(false);
+
+		Describe(offered).Should().Be(Describe(width),
+			"\"{0}\" must be measured with {1} device pixels of width", name, width);
+	}
+
+	/// <summary>
+	/// Asserts that a measure probe was offered the whole panel's width, which is what a
+	/// container that fills the panel has to pass on.
+	/// </summary>
+	/// <param name="name">The Gherkin name of the probe.</param>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the measured width of {string} is the width of the panel")]
+	public async Task Then_the_measured_width_of_is_the_width_of_the_panel(string name)
+	{
+		var offered = await OfferedWidthAsync(name).ConfigureAwait(false);
+
+		Describe(offered).Should().Be(Describe(TestTargetFixture.PanelWidth),
+			"\"{0}\" must be measured with the panel's whole width", name);
+	}
+
+	private static async Task<double> OfferedWidthAsync(string name)
+	{
+		var offered = double.NaN;
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+		{
+			offered = ElementRegistry.Resolve(name) is MeasureProbe probe
+				? probe.LastOfferedWidth
+				: throw new NotSupportedException(
+					$"\"{name}\" is not a MeasureProbe, so it did not record the width it was offered.");
+		}).ConfigureAwait(false);
+
+		return offered;
+	}
+
+	private static string Describe(double value) =>
+		double.IsPositiveInfinity(value) ? "an unbounded width"
+		: double.IsNaN(value) ? "never measured"
+		: value.ToString("0.##", CultureInfo.InvariantCulture);
 
 	// --------------------------------------------------------------- inner
 

@@ -98,7 +98,11 @@ public partial class AcrylicBrush
 #if CODEBRIX_DISABLE_ACRYLIC_ON_CPU
 				compositor.IsSoftwareRenderer is true ||
 #endif
-				!EnsureNoiseBrush() || _noiseBrush is null
+				// A brush whose author asked for the fallback gets the fallback: the property is
+				// already wired to rebuild the brush when it changes, and the fallback branch below
+				// is what it has to reach.
+				AlwaysUseFallback
+				|| !EnsureNoiseBrush() || _noiseBrush is null
 			)
 			{
 				CreateAcrylicBrush(false, false);

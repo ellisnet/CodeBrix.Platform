@@ -1,4 +1,4 @@
-using global::System.Runtime.CompilerServices;
+﻿using global::System.Runtime.CompilerServices;
 using CodeBrix.Platform.Foundation.Extensibility;
 using CodeBrix.Platform.UI.Graphics;
 
@@ -10,6 +10,7 @@ using CodeBrix.Platform.UI.Graphics;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests.HRApp")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost.Skia.Wpf")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.WebAssembly.Browser")]

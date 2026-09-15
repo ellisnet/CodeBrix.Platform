@@ -34,6 +34,15 @@ internal static class TriPaneViewLayoutMath
 	internal const double TapDistanceThreshold = 2d;
 
 	/// <summary>
+	/// The length, in pixels, a region that has NOT been minimized is guaranteed on its axis once
+	/// the minimum lengths have been resolved against the room the control actually has. It is
+	/// deliberately small - a sliver rather than a usable pane - because its only job is to keep the
+	/// region, its divider and its restore grip reachable: a region laid out at zero while its
+	/// weight says it is open has no grip, no divider and no way back.
+	/// </summary>
+	internal const double MinimumVisibleRegionLength = 24d;
+
+	/// <summary>
 	/// Reduces a raw weight to a usable star weight. Negative values, <see cref="double.NaN"/> and
 	/// the infinities are all treated as zero, which is the value that means "minimized".
 	/// </summary>
@@ -111,11 +120,22 @@ internal static class TriPaneViewLayoutMath
 	/// start lengths did.
 	/// </returns>
 	/// <remarks>
+	/// <para>
 	/// A pane whose minimum length is zero can always be dragged to zero, with or without
 	/// <paramref name="isDragToMinimizeEnabled"/>; that is the only way a pane reaches zero when
 	/// drag-to-minimize is off. When the shared space is too small to honor both minimum lengths at
 	/// once and drag-to-minimize is off, the drag is refused and the start lengths are returned
 	/// unchanged.
+	/// </para>
+	/// <para>
+	/// With drag-to-minimize on, the pane that snaps shut is always THE PANE THE DRAG IS HEADING
+	/// INTO - the one the divider is moving toward, which is the second pane while
+	/// <paramref name="delta"/> is positive and the first pane while it is negative - and the rule
+	/// holds whether or not the shared space could pay both minimum lengths. The pane on the other
+	/// side of the divider is the one the gesture is opening, and a pane being opened from zero
+	/// stays at zero until the drag has carried it past its own minimum length, so no pane is ever
+	/// left stranded between zero and its floor.
+	/// </para>
 	/// </remarks>
 	internal static (double First, double Second) ResolveDragLengths(
 		double firstStartLength,
@@ -141,16 +161,32 @@ internal static class TriPaneViewLayoutMath
 
 		if (isDragToMinimizeEnabled)
 		{
-			if (first > 0d && first < firstMin)
-			{
-				first = 0d;
-			}
-
 			var second = total - first;
 
-			if (second > 0d && second < secondMin)
+			if (moved > 0d)
 			{
-				first = total;
+				//The divider is heading into the second pane, so the second pane is the one that
+				//snaps shut; the first is being opened, and only takes space once it is past its own
+				//floor.
+				if (second > 0d && second < secondMin)
+				{
+					first = total;
+				}
+				else if (firstStart <= 0d && first > 0d && first < firstMin)
+				{
+					first = 0d;
+				}
+			}
+			else if (moved < 0d)
+			{
+				if (first > 0d && first < firstMin)
+				{
+					first = 0d;
+				}
+				else if (secondStart <= 0d && second > 0d && second < secondMin)
+				{
+					first = total;
+				}
 			}
 
 			return (first, total - first);
@@ -164,6 +200,57 @@ internal static class TriPaneViewLayoutMath
 		first = Math.Clamp(first, firstMin, total - secondMin);
 
 		return (first, total - first);
+	}
+
+	/// <summary>
+	/// Resolves the pair of minimum lengths the layout is actually given, against the room the two
+	/// regions have to share. The minimum lengths a consumer sets are wishes: two regions can easily
+	/// ask for more than the control was given - a nested control inside another control's pane is
+	/// the usual way it happens - and a grid asked for more than it has pays the first floor in full
+	/// and leaves the second region nothing.
+	/// </summary>
+	/// <param name="firstMinLength">The minimum length, in pixels, asked for the first region.</param>
+	/// <param name="secondMinLength">The minimum length, in pixels, asked for the second region.</param>
+	/// <param name="available">
+	/// The room the two regions share, in pixels: the length of the axis less the divider track. Zero
+	/// or less means the control has not been laid out yet, and the floors are passed through as they
+	/// were asked for.
+	/// </param>
+	/// <param name="isFirstMinimized">Whether the first region is minimized.</param>
+	/// <param name="isSecondMinimized">Whether the second region is minimized.</param>
+	/// <returns>The minimum lengths to hand the layout, in pixels.</returns>
+	/// <remarks>
+	/// A minimized region asks for nothing - it is deliberately at zero and its floor would fight
+	/// that. Every region that is NOT minimized asks for at least
+	/// <see cref="MinimumVisibleRegionLength"/>, so a region whose weight says it is open is never
+	/// laid out at zero and its divider and restore grip stay reachable. When the two floors still
+	/// come to more than the room there is, the shortfall is shared PROPORTIONALLY, so both regions
+	/// keep a share of what is left rather than one of them keeping all of it.
+	/// </remarks>
+	internal static (double First, double Second) ResolveMinLengths(
+		double firstMinLength,
+		double secondMinLength,
+		double available,
+		bool isFirstMinimized,
+		bool isSecondMinimized)
+	{
+		var first = isFirstMinimized
+			? 0d
+			: Math.Max(SanitizeLength(firstMinLength), MinimumVisibleRegionLength);
+		var second = isSecondMinimized
+			? 0d
+			: Math.Max(SanitizeLength(secondMinLength), MinimumVisibleRegionLength);
+		var room = SanitizeLength(available);
+		var total = first + second;
+
+		if (room <= 0d || total <= room)
+		{
+			return (first, second);
+		}
+
+		var firstShare = room * (first / total);
+
+		return (firstShare, room - firstShare);
 	}
 
 	/// <summary>

@@ -1,4 +1,4 @@
-using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Windowing.Native;
 using CodeBrix.Platform.Foundation.Logging;
 
@@ -82,6 +82,19 @@ internal class WaylandNativeOverlappedPresenter(WaylandXamlRootHost host) : INat
 		}
 	}
 
+	/// <summary>
+	/// Applies the <see cref="OverlappedPresenter"/> size constraints, which are EFFECTIVE PIXELS of
+	/// the CLIENT area, to the shell surface.
+	/// </summary>
+	/// <param name="preferredMinimumWidth">The minimum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMinimumHeight">The minimum height in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumWidth">The maximum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumHeight">The maximum height in effective pixels, or null for none.</param>
+	/// <remarks>
+	/// No conversion: xdg_toplevel's min/max sizes are surface-local logical coordinates of the window
+	/// geometry, which is the same unit the presenter seam speaks and the same unit this head takes its
+	/// launch size in - see item 8 of the FIXLIST.
+	/// </remarks>
 	public void SetSizeConstraints(int? preferredMinimumWidth, int? preferredMinimumHeight, int? preferredMaximumWidth, int? preferredMaximumHeight)
 	{
 		if (host.ShellSurface is { } shellSurface && !host.IsClosed)

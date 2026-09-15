@@ -1,4 +1,4 @@
-using Microsoft.UI.Windowing;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Windowing.Native;
 
 using CodeBrix.Platform.Foundation.Logging;
@@ -45,6 +45,20 @@ internal class MacOSNativeOverlappedPresenter : INativeOverlappedPresenter
 
 	public void SetIsResizable(bool isResizable) => NativeCodeBrix.codebrix_window_set_resizable(_handle, isResizable);
 
+	/// <summary>
+	/// Applies the <see cref="OverlappedPresenter"/> size constraints, which are EFFECTIVE PIXELS of
+	/// the FRAMED window, to the NSWindow.
+	/// </summary>
+	/// <param name="preferredMinimumWidth">The minimum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMinimumHeight">The minimum height in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumWidth">The maximum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumHeight">The maximum height in effective pixels, or null for none.</param>
+	/// <remarks>
+	/// No conversion: an NSWindow's minSize and maxSize are in points, which is the same unit the
+	/// presenter seam speaks and the same unit this head takes its launch size in - see item 8 of the
+	/// FIXLIST. Unlike the launch size, these are FRAME sizes: NSWindow.minSize constrains the whole
+	/// window, title bar included (contentMinSize would be the client area).
+	/// </remarks>
 	public void SetSizeConstraints(int? preferredMinimumWidth, int? preferredMinimumHeight, int? preferredMaximumWidth, int? preferredMaximumHeight)
 	{
 		double minWidth = preferredMinimumWidth ?? 0.0;

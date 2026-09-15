@@ -346,6 +346,41 @@ public sealed class CommonSteps
 	public async Task Then_the_region_of_has_ink(string name) =>
 		(await RegionAsync(name).ConfigureAwait(false)).HasInk();
 
+	/// <summary>Waits for something to be drawn inside an element's region.</summary>
+	/// <remarks>
+	/// <para>
+	/// The sentence without a budget states the requirement about the frame the scenario already
+	/// has. This one polls, capturing a fresh frame each time, for ink that arrives under its own
+	/// steam - a decoded video frame, a late first paint - and so it is a Given and a When as well
+	/// as a Then, because "there is a picture" is a PRECONDITION at least as often as it is a
+	/// claim. The requirement is stated after the poll gives up, against the last frame the poll
+	/// looked at, so a run that never gets there fails with the region's real colours in the
+	/// report rather than with a bare timeout.
+	/// </para>
+	/// </remarks>
+	/// <param name="name">The Gherkin name of the element.</param>
+	/// <param name="milliseconds">How long the ink has to appear in.</param>
+	/// <returns>A task that completes when there is ink, or the budget is gone.</returns>
+	[Given("the region of {string} has ink within {int} milliseconds")]
+	[When("the region of {string} has ink within {int} milliseconds")]
+	[Then("the region of {string} has ink within {int} milliseconds")]
+	public async Task Then_the_region_of_has_ink_within(string name, int milliseconds)
+	{
+		var inked = await Poll.UntilTheRegionShowsAsync(
+			_scenarioContext,
+			name,
+			region => CanvasAssert.InkFraction(region) >= CanvasAssert.HasInkFraction,
+			TimeSpan.FromMilliseconds(milliseconds),
+			PollInterval).ConfigureAwait(false);
+
+		if (!inked)
+		{
+			// The poll left the last frame it looked at as the scenario's current one, so this
+			// states the requirement about exactly the frame that did not satisfy it.
+			(await RegionAsync(name).ConfigureAwait(false)).HasInk();
+		}
+	}
+
 	/// <summary>Asserts that an element's region is nothing but panel background.</summary>
 	/// <param name="name">The Gherkin name of the element.</param>
 	/// <returns>A task that completes when the assertion has been made.</returns>

@@ -67,4 +67,13 @@
 		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
 		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and `dotnet pack` puts it in the package's lib folder by itself, so nothing in
+		     the packaging recipe needs to know about it. CS1591 (a public member with no XML
+		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
 </Project>

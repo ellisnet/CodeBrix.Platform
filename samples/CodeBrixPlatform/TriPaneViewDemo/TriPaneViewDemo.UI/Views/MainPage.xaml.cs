@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using CodeBrix.Platform.UI.Toolkit;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Windows.Foundation;
 using Windows.UI.Input.Preview.Injection;
@@ -22,11 +23,26 @@ namespace TriPaneViewDemo.Views;
 /// failures; TRIPANEVIEWDEMO_RESULTS names a file to write the PASS/FAIL lines to.
 /// </summary>
 /// <remarks>
+/// <para>
 /// The self-test drives the dividers with real pointer input through
 /// Windows.UI.Input.Preview.Injection.InputInjector and resizes the real window with xdotool, so
 /// what it proves is the whole path: the default style found and applied, the template parts wired,
 /// the pointer drag reaching the divider, the weights written back, and the columns and rows the
 /// grid actually arranged.
+/// </para>
+/// <para>
+/// TRIPANEVIEWDEMO_NESTED=1 opens the demo with the NESTED control in the outer control's upper
+/// pane and starts a probe that writes a PROBE line every second and a half carrying the
+/// window-space bounds of all four dividers and the weights of both controls, plus a POINTER line
+/// for every pointer event the page sees. That is what lets a script outside the process put the
+/// DESKTOP's own pointer on a divider: read a PROBE line for the bounds, and calibrate the screen
+/// offset from a POINTER line rather than from the window manager's idea of where the window is -
+/// the frame origin and the client origin differ, and a divider is only six pixels thick, so an
+/// uncalibrated probe misses every divider and looks exactly like a divider that cannot be dragged.
+/// TRIPANEVIEWDEMO_NESTED_STRICT=1 additionally puts both controls into the shape a nesting
+/// application uses: every pane's vertical scrolling off, no restore grips, drag-to-minimize off
+/// and a floor on every region.
+/// </para>
 /// </remarks>
 public sealed partial class MainPage : Page
 {
@@ -38,6 +54,13 @@ public sealed partial class MainPage : Page
 
 	/// <summary>The pane length, in pixels, the min-length checks put the floor at.</summary>
 	private const double SideMinLengthUnderTest = 200d;
+
+	/// <summary>
+	/// The floor, in pixels, the squeeze check puts on every region of the nested control. The
+	/// control is then given less room than the sum of them, which is the case the floors have to
+	/// share out rather than pay the first one in full and leave the second nothing.
+	/// </summary>
+	private const double NestedFloorUnderTest = 200d;
 
 	private readonly StringBuilder _log = new();
 
@@ -54,6 +77,25 @@ public sealed partial class MainPage : Page
 	private bool _hooked;
 	private int _dragCompletedCount;
 
+	/// <summary>
+	/// The control nested INSIDE the outer control's upper pane. Nesting is the only way an
+	/// application gets four regions out of this control, and a nested control's dividers sit under
+	/// another control's pane, which is a different tree from the one every other check exercises.
+	/// </summary>
+	private TriPaneView _nestedPanes;
+
+	private TriPaneViewDivider _nestedSideDivider;
+	private TriPaneViewDivider _nestedStackDivider;
+	private ScrollViewer _nestedSidePaneScrollViewer;
+	private ScrollViewer _nestedUpperPaneScrollViewer;
+	private ScrollViewer _nestedLowerPaneScrollViewer;
+	private Grid _nestedStackGrid;
+	private Grid _nestedRootGrid;
+	private int _nestedDragCompletedCount;
+	private int _nestedStackDragStartedCount;
+	private int _nestedStackDragDeltaCount;
+	private int _nestedStackDragCompletedCount;
+
 	/// <summary>This process's own window, once a probe has proven which one it is.</summary>
 	private string _ownWindow;
 
@@ -62,6 +104,7 @@ public sealed partial class MainPage : Page
 		InitializeComponent();
 
 		BuildSideList();
+		BuildNestedControl();
 		BuildControlStrip();
 
 		SurvivalTextBox.Text = SurvivalText;
@@ -82,6 +125,73 @@ public sealed partial class MainPage : Page
 		{
 			SideList.Children.Add(new TextBlock { Text = $"Side pane row {row:00}" });
 		}
+	}
+
+	/// <summary>
+	/// Builds the control that goes INSIDE the outer control's upper pane, mirroring the shape an
+	/// application reaches for when three regions are not enough: an outer control with its side
+	/// pane on the left, and an inner one with its side pane on the right, so the two side panes end
+	/// up on opposite edges and the inner stack divides what is left.
+	/// </summary>
+	private void BuildNestedControl()
+	{
+		_nestedPanes = new TriPaneView
+		{
+			SidePanePlacement = TriPaneViewSidePanePlacement.Right,
+			DividerThickness = 6d,
+			SidePaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+			UpperPaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+			LowerPaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled,
+			SidePane = NestedPane("#1FEF6C00", "Nested side pane - the inner control's own side pane, on the right."),
+			UpperPane = NestedPane("#1F1565C0", "Nested upper pane - drag the divider below it."),
+			LowerPane = NestedPane("#1F2E7D32", "Nested lower pane."),
+		};
+
+		_nestedPanes.DividerDragCompleted += OnNestedDividerDragCompleted;
+	}
+
+	private static Border NestedPane(string background, string text)
+		=> new()
+		{
+			Background = new SolidColorBrush(ParseColor(background)),
+			Padding = new Thickness(8),
+			Child = new TextBlock { Text = text, TextWrapping = TextWrapping.Wrap },
+		};
+
+	private static Windows.UI.Color ParseColor(string argb)
+		=> Windows.UI.Color.FromArgb(
+			byte.Parse(argb.Substring(1, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture),
+			byte.Parse(argb.Substring(3, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture),
+			byte.Parse(argb.Substring(5, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture),
+			byte.Parse(argb.Substring(7, 2), System.Globalization.NumberStyles.HexNumber, System.Globalization.CultureInfo.InvariantCulture));
+
+	private void OnNestedDividerDragCompleted(object sender, TriPaneViewDividerDragCompletedEventArgs args)
+	{
+		_nestedDragCompletedCount++;
+		Log($"NESTED DividerDragCompleted: {args.Divider} divider, side={_nestedPanes.SidePanePercent:0.#} "
+			+ $"stack={_nestedPanes.StackPercent:0.#} upper={_nestedPanes.UpperPanePercent:0.#} "
+			+ $"lower={_nestedPanes.LowerPanePercent:0.#}");
+	}
+
+	private void OnNestedChanged(object sender, RoutedEventArgs e)
+	{
+		if (_isBuildingControls)
+		{
+			return;
+		}
+
+		ShowNestedControl(NestedCheck.IsChecked == true);
+	}
+
+	/// <summary>
+	/// Puts the nested control into the outer control's upper pane, or takes it out again and gives
+	/// the pane its ordinary content back.
+	/// </summary>
+	/// <param name="isNested">Whether the nested control should be shown.</param>
+	private void ShowNestedControl(bool isNested)
+	{
+		Panes.UpperPane = isNested ? _nestedPanes : UpperGrid;
+		UpdateLayout();
 	}
 
 	/// <summary>
@@ -197,10 +307,110 @@ public sealed partial class MainPage : Page
 		Log($"Loaded. scale={XamlRoot?.RasterizationScale:0.##} "
 			+ $"size={XamlRoot?.Size.Width:0}x{XamlRoot?.Size.Height:0}");
 
+		if (Environment.GetEnvironmentVariable("TRIPANEVIEWDEMO_NESTED") == "1")
+		{
+			_isBuildingControls = true;
+			NestedCheck.IsChecked = true;
+			_isBuildingControls = false;
+			ShowNestedControl(true);
+			_ = RunProbeAsync();
+		}
+
 		if (Environment.GetEnvironmentVariable("TRIPANEVIEWDEMO_SELFTEST") == "1")
 		{
 			_ = RunSelfTestAsync();
 		}
+	}
+
+	/// <summary>
+	/// Writes a PROBE line every second and a half carrying the window-space bounds of all four
+	/// dividers and the weights of both controls, so a script outside the process can put the
+	/// DESKTOP's own pointer on a divider and see what the drag did. The self-test's injected
+	/// pointer cannot answer that question: it never reaches the window manager.
+	/// </summary>
+	private async Task RunProbeAsync()
+	{
+		if (Environment.GetEnvironmentVariable("TRIPANEVIEWDEMO_NESTED_STRICT") == "1")
+		{
+			//Exactly the arrangement the report measured: every pane of both controls with its
+			//vertical scrolling off, drag-to-minimize off, no restore grips, and a floor on every
+			//region of both controls.
+			Panes.SidePaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+			Panes.UpperPaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+			Panes.LowerPaneVerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+			Panes.IsDragToMinimizeEnabled = false;
+			Panes.RestoreGripMode = TriPaneViewRestoreGripMode.Never;
+			Panes.SidePaneMinLength = 200d;
+			Panes.StackMinLength = 200d;
+			Panes.UpperPaneMinLength = 200d;
+			Panes.LowerPaneMinLength = 80d;
+			_nestedPanes.IsDragToMinimizeEnabled = false;
+			_nestedPanes.RestoreGripMode = TriPaneViewRestoreGripMode.Never;
+			_nestedPanes.SidePaneMinLength = NestedFloorUnderTest;
+			_nestedPanes.StackMinLength = NestedFloorUnderTest;
+			_nestedPanes.UpperPaneMinLength = 200d;
+			_nestedPanes.LowerPaneMinLength = 80d;
+		}
+
+		await Task.Delay(1500);
+		UpdateLayout();
+		ResolveParts();
+		ResolveNestedParts();
+
+		//Everything the page sees, handled or not, so a gesture that reaches the window but not the
+		//divider can be told apart from one that never reached the window at all.
+		AddHandler(
+			PointerPressedEvent,
+			new PointerEventHandler((_, e) => LogPointer("pressed", e)),
+			handledEventsToo: true);
+		AddHandler(
+			PointerReleasedEvent,
+			new PointerEventHandler((_, e) => LogPointer("released", e)),
+			handledEventsToo: true);
+		AddHandler(
+			PointerMovedEvent,
+			new PointerEventHandler((_, e) => LogPointer("moved", e)),
+			handledEventsToo: true);
+
+		while (true)
+		{
+			UpdateLayout();
+
+			Log("PROBE "
+				+ $"outerSide={Bounds(_sideDivider)} outerStack={Bounds(_stackDivider)} "
+				+ $"nestedSide={Bounds(_nestedSideDivider)} nestedStack={Bounds(_nestedStackDivider)} "
+				+ $"outer={Panes.SidePanePercent:0.###}/{Panes.StackPercent:0.###}/"
+				+ $"{Panes.UpperPanePercent:0.###}/{Panes.LowerPanePercent:0.###} "
+				+ $"nested={_nestedPanes.SidePanePercent:0.###}/{_nestedPanes.StackPercent:0.###}/"
+				+ $"{_nestedPanes.UpperPanePercent:0.###}/{_nestedPanes.LowerPanePercent:0.###} "
+				+ $"drags={_dragCompletedCount}/{_nestedDragCompletedCount} "
+				+ $"nestedStackEvents={_nestedStackDragStartedCount}/{_nestedStackDragDeltaCount}/"
+				+ $"{_nestedStackDragCompletedCount}");
+
+			await Task.Delay(1500);
+		}
+	}
+
+	private void LogPointer(string what, PointerRoutedEventArgs e)
+	{
+		var point = e.GetCurrentPoint(null);
+
+		Log($"POINTER {what} at {point.Position.X:0.#},{point.Position.Y:0.#} "
+			+ $"raw {point.RawPosition.X:0.#},{point.RawPosition.Y:0.#} "
+			+ $"left={point.Properties.IsLeftButtonPressed} handled={e.Handled} "
+			+ $"source={(e.OriginalSource as FrameworkElement)?.Name ?? e.OriginalSource?.GetType().Name}");
+	}
+
+	private static string Bounds(FrameworkElement element)
+	{
+		if (element == null)
+		{
+			return "null";
+		}
+
+		var bounds = AbsoluteBounds(element);
+
+		return $"{bounds.X:0},{bounds.Y:0},{bounds.Width:0},{bounds.Height:0}";
 	}
 
 	private void Log(string message)
@@ -317,6 +527,212 @@ public sealed partial class MainPage : Page
 
 		await RunMinimizeChecksAsync(check);
 		await RunPlacementAndPortraitChecksAsync(check);
+		await RunNestedChecksAsync(check);
+	}
+
+	/// <summary>
+	/// The nested control: an inner <see cref="TriPaneView"/> living inside the outer control's
+	/// upper pane. Both of its dividers have to drag, the stack one included - that is the one a
+	/// nested control loses if anything in the pointer path depends on not being nested.
+	/// </summary>
+	/// <param name="check">Records one PASS or FAIL line.</param>
+	private async Task RunNestedChecksAsync(Action<string, bool, string> check)
+	{
+		ShowNestedControl(true);
+		_isBuildingControls = true;
+		NestedCheck.IsChecked = true;
+		_isBuildingControls = false;
+		await SettleAsync();
+		await SettleAsync();
+
+		// 20. The nested control got its own template and its own parts.
+		var partsFound = ResolveNestedParts();
+
+		check("nested-control-template-applied-and-parts-found",
+			partsFound,
+			$"template={(_nestedPanes.Template == null ? "null" : "applied")} "
+			+ $"size={_nestedPanes.ActualWidth:0.#}x{_nestedPanes.ActualHeight:0.#} "
+			+ $"sideDivider={Describe(_nestedSideDivider)} stackDivider={Describe(_nestedStackDivider)} "
+			+ $"upper={Describe(_nestedUpperPaneScrollViewer)} lower={Describe(_nestedLowerPaneScrollViewer)}");
+
+		if (!partsFound || _mouse == null)
+		{
+			check("nested-checks-needed-a-template-and-an-injector", false,
+				$"partsFound={partsFound} injector={_mouse != null}");
+			ShowNestedControl(false);
+
+			return;
+		}
+
+		LogDividerState("nested side divider", _nestedSideDivider);
+		LogDividerState("nested stack divider", _nestedStackDivider);
+
+		// 21. The nested SIDE divider drags. This is the control case: it proves the nested tree
+		//     reaches the pointer at all.
+		var nestedSideBefore = _nestedPanes.SidePanePercent;
+
+		await DragAsync(_nestedSideDivider, -60d, 0d);
+
+		check("nested-side-divider-drags",
+			Math.Abs(_nestedPanes.SidePanePercent - nestedSideBefore) > 1d,
+			$"side percent {nestedSideBefore:0.##} -> {_nestedPanes.SidePanePercent:0.##}");
+
+		// 22. The nested STACK divider drags. Same gesture, one axis over, and the one the FIXLIST
+		//     entry says a nested control never converts into a drag.
+		var nestedUpperBefore = _nestedPanes.UpperPanePercent;
+		var nestedHeightBefore = _nestedUpperPaneScrollViewer.ActualHeight;
+		var completedBefore = _nestedDragCompletedCount;
+
+		_nestedStackDragStartedCount = 0;
+		_nestedStackDragDeltaCount = 0;
+		_nestedStackDragCompletedCount = 0;
+
+		await DragAsync(_nestedStackDivider, 0d, -50d);
+
+		check("nested-stack-divider-drags",
+			Math.Abs(_nestedPanes.UpperPanePercent - nestedUpperBefore) > 1d
+			&& _nestedDragCompletedCount == completedBefore + 1,
+			$"upper percent {nestedUpperBefore:0.##} -> {_nestedPanes.UpperPanePercent:0.##}; "
+			+ $"upper height {nestedHeightBefore:0.#} -> {_nestedUpperPaneScrollViewer.ActualHeight:0.#}; "
+			+ $"DividerDragCompleted raised {_nestedDragCompletedCount - completedBefore} time(s); "
+			+ $"divider events started={_nestedStackDragStartedCount} "
+			+ $"delta={_nestedStackDragDeltaCount} completed={_nestedStackDragCompletedCount}");
+
+		// 23. A control given LESS room than the sum of its own floors. The outer control's stack is
+		//     held at 200 pixels while the nested control inside it wants 200 + 6 + 200, so the two
+		//     nested regions cannot both be paid - and neither of them may end up at zero, because a
+		//     region at zero has no divider, no grip and no way back.
+		if (string.IsNullOrEmpty(_ownWindow))
+		{
+			check("a-squeezed-nested-control-lays-no-region-out-at-zero", false,
+				"no window was claimed, so the control could not be squeezed");
+		}
+		else
+		{
+			Panes.SidePanePercent = 95d;
+			Panes.StackPercent = 5d;
+			Panes.SidePaneMinLength = 0d;
+			Panes.StackMinLength = NestedFloorUnderTest;
+			_nestedPanes.SidePaneMinLength = NestedFloorUnderTest;
+			_nestedPanes.StackMinLength = NestedFloorUnderTest;
+			await ResizeWindowAsync(900, 700);
+
+			var nestedWidth = _nestedPanes.ActualWidth;
+			var nestedSideWidth = _nestedSidePaneScrollViewer.ActualWidth;
+			var nestedStackWidth = _nestedStackGrid.ActualWidth;
+
+			var laidOut = _nestedRootGrid.ColumnDefinitions[0].ActualWidth
+				+ _nestedRootGrid.ColumnDefinitions[1].ActualWidth
+				+ _nestedRootGrid.ColumnDefinitions[2].ActualWidth;
+
+			check("a-squeezed-nested-control-lays-no-region-out-at-zero",
+				nestedSideWidth > 0d
+				&& nestedStackWidth > 0d
+				&& _nestedSideDivider.ActualWidth > 0d
+				&& _nestedSideDivider.Visibility == Visibility.Visible
+				&& nestedSideWidth < NestedFloorUnderTest,
+				$"nested control {nestedWidth:0.#} wide (root grid {_nestedRootGrid.ActualWidth:0.#}) "
+				+ $"with two {NestedFloorUnderTest:0} pixel floors: side={nestedSideWidth:0.#} stack={nestedStackWidth:0.#} "
+				+ $"divider={_nestedSideDivider.ActualWidth:0.#} "
+				+ $"visibility={_nestedSideDivider.Visibility}; columns "
+				+ $"{_nestedRootGrid.ColumnDefinitions[0].ActualWidth:0.#}+"
+				+ $"{_nestedRootGrid.ColumnDefinitions[1].ActualWidth:0.#}+"
+				+ $"{_nestedRootGrid.ColumnDefinitions[2].ActualWidth:0.#} = {laidOut:0.#}");
+
+			Panes.StackMinLength = 0d;
+			Panes.SidePanePercent = 33.3d;
+			Panes.StackPercent = 66.7d;
+			_nestedPanes.SidePaneMinLength = 0d;
+			_nestedPanes.StackMinLength = 0d;
+			await ResizeWindowAsync(1100, 700);
+		}
+
+		ShowNestedControl(false);
+		_isBuildingControls = true;
+		NestedCheck.IsChecked = false;
+		_isBuildingControls = false;
+		await SettleAsync();
+	}
+
+	/// <summary>
+	/// Writes everything about a divider that could stop it starting a drag, which is what the
+	/// nested case needs in order to say WHY rather than only THAT.
+	/// </summary>
+	/// <param name="name">The name to log the divider under.</param>
+	/// <param name="divider">The divider to describe.</param>
+	private void LogDividerState(string name, TriPaneViewDivider divider)
+	{
+		var parent = (divider.Parent as UIElement)?.GetType().Name ?? "not a UIElement";
+		var transform = (divider.Parent as UIElement)?.TransformToVisual(null);
+		var inverse = transform?.Inverse;
+		var bounds = AbsoluteBounds(divider);
+
+		Log($"{name}: enabled={divider.IsEnabled} dragging={divider.IsDragging} "
+			+ $"visibility={divider.Visibility} grip={divider.IsRestoreGrip} "
+			+ $"size={divider.ActualWidth:0.#}x{divider.ActualHeight:0.#} "
+			+ $"bounds=({bounds.X:0.#},{bounds.Y:0.#},{bounds.Width:0.#},{bounds.Height:0.#}) "
+			+ $"parent={parent} transform={(transform == null ? "null" : "ok")} "
+			+ $"inverse={(inverse == null ? "NULL" : "ok")}");
+	}
+
+	/// <summary>
+	/// Finds the nested control's template parts the same way <see cref="ResolveParts"/> finds the
+	/// outer control's, and hooks the inner stack divider's own drag events so a gesture that goes
+	/// nowhere can be traced to the step that dropped it.
+	/// </summary>
+	/// <returns><see langword="true"/> when every part was found.</returns>
+	private bool ResolveNestedParts()
+	{
+		var rootGrid = FirstVisualChild<Grid>(_nestedPanes);
+
+		if (rootGrid == null)
+		{
+			return false;
+		}
+
+		_nestedRootGrid = rootGrid;
+		_nestedSideDivider = rootGrid.Children.OfType<TriPaneViewDivider>().FirstOrDefault();
+		_nestedSidePaneScrollViewer = rootGrid.Children.OfType<ScrollViewer>().FirstOrDefault();
+
+		var stackGrid = rootGrid.Children.OfType<Grid>().FirstOrDefault();
+
+		if (stackGrid == null)
+		{
+			return false;
+		}
+
+		_nestedStackGrid = stackGrid;
+		_nestedStackDivider = stackGrid.Children.OfType<TriPaneViewDivider>().FirstOrDefault();
+		_nestedUpperPaneScrollViewer = stackGrid.Children.OfType<ScrollViewer>()
+			.FirstOrDefault(pane => Grid.GetRow(pane) == 0);
+		_nestedLowerPaneScrollViewer = stackGrid.Children.OfType<ScrollViewer>()
+			.FirstOrDefault(pane => Grid.GetRow(pane) == 2);
+
+		if (_nestedStackDivider != null)
+		{
+			_nestedStackDivider.DragStarted += (_, _) => _nestedStackDragStartedCount++;
+			_nestedStackDivider.DragDelta += (_, e) =>
+			{
+				_nestedStackDragDeltaCount++;
+
+				if (_nestedStackDragDeltaCount <= 3)
+				{
+					Log($"nested stack divider DragDelta {e.HorizontalChange:0.##},{e.VerticalChange:0.##}");
+				}
+			};
+			_nestedStackDivider.DragCompleted += (_, e) =>
+			{
+				_nestedStackDragCompletedCount++;
+				Log($"nested stack divider DragCompleted {e.HorizontalChange:0.##},"
+					+ $"{e.VerticalChange:0.##} canceled={e.Canceled}");
+			};
+		}
+
+		return _nestedSideDivider != null
+			&& _nestedSidePaneScrollViewer != null
+			&& _nestedStackDivider != null
+			&& _nestedUpperPaneScrollViewer != null
+			&& _nestedLowerPaneScrollViewer != null;
 	}
 
 	/// <summary>

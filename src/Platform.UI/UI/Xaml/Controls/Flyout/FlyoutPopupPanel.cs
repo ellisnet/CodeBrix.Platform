@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml.Media;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI.Extensions;
+using Windows.Foundation;
 
 namespace Microsoft.UI.Xaml.Controls;
 
@@ -28,6 +29,17 @@ internal partial class FlyoutBasePopupPanel : PopupPanel
 		// Required for the dismiss handling
 		// This should however be customized depending of the Popup.DismissMode
 		Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
+	}
+
+	protected override Size MeasureOverride(Size availableSize)
+	{
+		// The presenter has to know how much room the window can give it BEFORE it is measured:
+		// that is what lets a presenter with more content than the window can hold measure itself
+		// to the window and scroll the rest, rather than measuring to its full content and being
+		// placed with part of itself past the window's edge.
+		_flyout.ConstrainPresenterToAvailableWindow();
+
+		return base.MeasureOverride(availableSize);
 	}
 
 	protected override bool FullPlacementRequested => _flyout.EffectivePlacement == FlyoutPlacementMode.Full;

@@ -313,9 +313,19 @@ public sealed partial class TriPaneView
 	/// <see langword="true"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// Setting this to <see langword="false"/> stops the divider being dragged, but a divider that
 	/// is currently a restore grip can still be clicked to restore its pane. Use
 	/// <see cref="TriPaneViewRestoreGripMode.Never"/> to take that away as well.
+	/// </para>
+	/// <para>
+	/// The rule this gates is narrow, and deliberately so: it gates THE DRAG DELTA AND NOTHING ELSE.
+	/// A press on the divider still starts a gesture and a release still ends one - so the divider
+	/// still takes the pointer, still shows itself pressed and still answers a tap on a restore grip
+	/// - and only the movement in between is dropped. That is what lets a grip stay clickable while
+	/// dragging is off, and it is why turning this off in the middle of a gesture stops the drag
+	/// where it is rather than cancelling it.
+	/// </para>
 	/// </remarks>
 	public bool CanUserDragSideDivider
 	{
@@ -338,9 +348,19 @@ public sealed partial class TriPaneView
 	/// <see langword="true"/>.
 	/// </summary>
 	/// <remarks>
+	/// <para>
 	/// Setting this to <see langword="false"/> stops the divider being dragged, but a divider that
 	/// is currently a restore grip can still be clicked to restore its pane. Use
 	/// <see cref="TriPaneViewRestoreGripMode.Never"/> to take that away as well.
+	/// </para>
+	/// <para>
+	/// The rule this gates is narrow, and deliberately so: it gates THE DRAG DELTA AND NOTHING ELSE.
+	/// A press on the divider still starts a gesture and a release still ends one - so the divider
+	/// still takes the pointer, still shows itself pressed and still answers a tap on a restore grip
+	/// - and only the movement in between is dropped. That is what lets a grip stay clickable while
+	/// dragging is off, and it is why turning this off in the middle of a gesture stops the drag
+	/// where it is rather than cancelling it.
+	/// </para>
 	/// </remarks>
 	public bool CanUserDragStackDivider
 	{
@@ -575,6 +595,33 @@ public sealed partial class TriPaneView
 			typeof(bool),
 			typeof(TriPaneView),
 			new PaneMetadata(false, OnIsLowerPaneMinimizedChanged));
+
+	/// <summary>
+	/// Gets a value indicating whether the stack - the whole region holding the upper and lower
+	/// panes - is minimized, so the side pane has the control to itself. It is set by the control
+	/// and should be treated as read-only by everything else: <see cref="MinimizeStack"/> and
+	/// <see cref="RestoreStack"/> are how code moves it, and a divider drag moves it too.
+	/// </summary>
+	/// <remarks>
+	/// The stack is not a pane and has no content of its own, which is why this one is read-only
+	/// where <see cref="IsSidePaneMinimized"/>, <see cref="IsUpperPaneMinimized"/> and
+	/// <see cref="IsLowerPaneMinimized"/> are settable: minimizing the stack is a request that can
+	/// be refused - it is ignored when the side pane is minimized too, because that would leave no
+	/// pane open at all - and a property that silently sets itself back is a worse contract than a
+	/// method that plainly did nothing. Both stack panes report themselves minimized while this is
+	/// <see langword="true"/>, and neither pane's content ever leaves the visual tree.
+	/// </remarks>
+	public bool IsStackMinimized => (bool)GetValue(IsStackMinimizedProperty);
+
+	/// <summary>
+	/// Identifies the <see cref="IsStackMinimized"/> dependency property.
+	/// </summary>
+	public static DependencyProperty IsStackMinimizedProperty { get; } =
+		DependencyProperty.Register(
+			nameof(IsStackMinimized),
+			typeof(bool),
+			typeof(TriPaneView),
+			new PaneMetadata(false));
 
 	/// <summary>
 	/// Gets or sets the vertical scroll bar visibility of the side pane. The default is

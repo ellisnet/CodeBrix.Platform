@@ -60,6 +60,12 @@ public partial class ToolBar : ItemsControl
 
 	private const double FallbackChevronExtent = 28d;
 
+	/// <summary>How many times an unbounded bar's partition may be recomputed before it settles.</summary>
+	private const int MaxUnboundedRecomputes = 2;
+
+	/// <summary>How close two arranged extents have to be to count as the same one.</summary>
+	private const double ExtentTolerance = 0.5d;
+
 	private readonly List<UIElement> _layoutItems = new();
 	private readonly List<ContentPresenter> _wrapperPool = new();
 
@@ -68,6 +74,11 @@ public partial class ToolBar : ItemsControl
 	private ToolBarOverflowButton? _overflowButton;
 	private Flyout? _overflowFlyout;
 	private int _splitIndex = -1;
+
+	//The three fields below carry the unbounded-measure case, and nothing else touches them.
+	private bool _measuredUnbounded;
+	private double _unboundedExtent = double.NaN;
+	private int _unboundedRecomputeCount;
 
 	/// <summary>Identifies the <see cref="Orientation"/> dependency property.</summary>
 	public static readonly DependencyProperty OrientationProperty =
@@ -371,15 +382,127 @@ public partial class ToolBar : ItemsControl
 		//The partition is decided BEFORE the template is measured, so no panel ever gains or loses
 		//a child while it is measuring. That is what keeps a bar which is one pixel too narrow from
 		//oscillating between "the chevron fits" and "then it does not".
-		var padding = Padding;
-		var border = BorderThickness;
-		var inner = new Size(
-			Math.Max(0, availableSize.Width - padding.Left - padding.Right - border.Left - border.Right),
-			Math.Max(0, availableSize.Height - padding.Top - padding.Bottom - border.Top - border.Bottom));
+		var inner = InnerExtent(availableSize);
+		var horizontal = Orientation == Orientation.Horizontal;
+		var limit = horizontal ? inner.Width : inner.Height;
 
-		UpdateOverflow(inner);
+		_measuredUnbounded = !double.IsFinite(limit);
+
+		if (_measuredUnbounded)
+		{
+			//An unbounded offer says nothing about where the bar ends, so the partition is decided
+			//from the width the ARRANGE pass last reported instead (see ArrangeOverride). Using the
+			//remembered extent here rather than the infinity is what stops the two passes fighting:
+			//measure would otherwise put every item back in the bar, arrange would take them out
+			//again, and the bar would flicker for as long as it was on screen.
+			UpdateOverflow(WithExtent(inner, _unboundedExtent, horizontal));
+		}
+		else
+		{
+			//A real limit retires whatever the arrange pass had to work out for itself.
+			_unboundedExtent = double.NaN;
+			_unboundedRecomputeCount = 0;
+
+			UpdateOverflow(inner);
+		}
 
 		return base.MeasureOverride(availableSize);
+	}
+
+	/// <inheritdoc />
+	protected override Size ArrangeOverride(Size finalSize)
+	{
+		//A bar in an unbounded container - a horizontal StackPanel, an unbounded Grid column, a
+		//ContentControl that passes an infinity on - is measured with no limit at all, so measure
+		//alone can only answer "everything fits" and the bar runs off the edge with no chevron.
+		//The arrange pass knows the width the bar really got, so the partition is recomputed here,
+		//for that case ONLY.
+		//
+		//Two things keep that from oscillating. The partition is never revisited while the arranged
+		//extent stays put, so a settled bar is left alone; and a bar whose arranged extent keeps
+		//changing because the partition changed it is recomputed at most MaxUnboundedRecomputes
+		//times before it is left as it is, so the passes cannot trade the chevron back and forth.
+		//Reaching a stable extent clears that count, so a later resize is followed normally.
+		if (_measuredUnbounded)
+		{
+			//NOT finalSize: an element whose desired size is larger than the slot it was given is
+			//arranged at its DESIRED size and clipped, so under an unbounded measure finalSize is
+			//the width the bar wanted rather than the width it got. The layout slot is the width
+			//the parent really handed over, and it is stored before this runs.
+			var inner = InnerExtent(SlotSize(finalSize));
+			var extent = Orientation == Orientation.Horizontal ? inner.Width : inner.Height;
+
+			if (double.IsFinite(extent) && Math.Abs(extent - _unboundedExtent) < ExtentTolerance)
+			{
+				_unboundedRecomputeCount = 0;
+			}
+			else if (double.IsFinite(extent) && _unboundedRecomputeCount < MaxUnboundedRecomputes)
+			{
+				_unboundedExtent = extent;
+				_unboundedRecomputeCount++;
+
+				UpdateOverflow(inner);
+				InvalidateMeasure();
+			}
+		}
+
+		return base.ArrangeOverride(finalSize);
+	}
+
+	/// <summary>
+	/// Forgets the extent an unbounded bar settled its partition at, so the next arrange pass
+	/// works it out again.
+	/// </summary>
+	private void ForgetUnboundedExtent()
+	{
+		_unboundedExtent = double.NaN;
+		_unboundedRecomputeCount = 0;
+	}
+
+	/// <summary>The size the bar's parent gave it, margins taken off.</summary>
+	/// <param name="finalSize">The size the arrange pass was called with, used when there is no slot.</param>
+	/// <returns>The size to read the bar's real extent from.</returns>
+	private Size SlotSize(Size finalSize)
+	{
+		var slot = LayoutInformation.GetLayoutSlot(this);
+		if (!double.IsFinite(slot.Width) || !double.IsFinite(slot.Height) || slot.Width <= 0)
+		{
+			return finalSize;
+		}
+
+		var margin = Margin;
+
+		return new Size(
+			Math.Max(0, slot.Width - margin.Left - margin.Right),
+			Math.Max(0, slot.Height - margin.Top - margin.Bottom));
+	}
+
+	/// <summary>The space inside the bar's border and padding.</summary>
+	/// <param name="outer">The space the bar itself was given.</param>
+	/// <returns>What is left of it for the items.</returns>
+	private Size InnerExtent(Size outer)
+	{
+		var padding = Padding;
+		var border = BorderThickness;
+
+		return new Size(
+			Math.Max(0, outer.Width - padding.Left - padding.Right - border.Left - border.Right),
+			Math.Max(0, outer.Height - padding.Top - padding.Bottom - border.Top - border.Bottom));
+	}
+
+	/// <summary>Replaces the extent along the bar's own axis, when one is known.</summary>
+	/// <param name="size">The size to change.</param>
+	/// <param name="extent">The extent to use, or <see cref="double.NaN"/> to leave the size alone.</param>
+	/// <param name="horizontal">Whether the bar lays its items out left to right.</param>
+	/// <returns>The size to decide the partition from.</returns>
+	private static Size WithExtent(Size size, double extent, bool horizontal)
+	{
+		if (!double.IsFinite(extent))
+		{
+			return size;
+		}
+
+		return horizontal ? new Size(extent, size.Height) : new Size(size.Width, extent);
 	}
 
 	/// <inheritdoc />
@@ -635,6 +758,7 @@ public partial class ToolBar : ItemsControl
 		bar.SyncPanelSettings();
 		bar.SyncItemOrientation();
 		bar._splitIndex = -1;
+		bar.ForgetUnboundedExtent();
 		bar.InvalidateMeasure();
 	}
 
@@ -769,8 +893,10 @@ public partial class ToolBar : ItemsControl
 		SyncItemOrientation();
 
 		//A rebuild changes what the split index means, so the panels are repopulated from scratch;
-		//the next measure works the partition out again.
+		//the next measure works the partition out again - and an unbounded bar has to be allowed to
+		//work it out again too, or the partition it settled on before the rebuild would stand.
 		_splitIndex = -1;
+		ForgetUnboundedExtent();
 		ApplySplit(_layoutItems.Count, hasOverflow: false);
 		InvalidateMeasure();
 	}

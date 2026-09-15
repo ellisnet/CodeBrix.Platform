@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Runtime.Skia.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+
+		<!-- Host-free by design: everything under test is pure arithmetic or a pure decision, so no
+		     window, no X server and no Skia surface is created. That is what makes the window-sizing
+		     rule cheap to fence. -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+</Project>

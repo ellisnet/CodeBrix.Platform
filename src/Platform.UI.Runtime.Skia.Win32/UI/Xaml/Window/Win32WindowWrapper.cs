@@ -20,6 +20,7 @@ using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.Helpers.Theming;
 using CodeBrix.Platform.UI.Hosting;
 using CodeBrix.Platform.UI.NativeElementHosting;
+using CodeBrix.Platform.UI.Runtime.Skia;
 using CodeBrix.Platform.UI.Runtime.Skia.Win32.UI.Xaml.Window;
 using CodeBrix.Platform.UI.Xaml.Controls;
 using Windows.Devices.Input;
@@ -114,8 +115,10 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 		UpdateDisplayInfo();
 		if (RasterizationScale != 1)
 		{
-			// https://github.com/unoplatform/uno/issues/20021
-			Resize(new SizeInt32((int)(Size.Width * RasterizationScale), (int)(Size.Height * RasterizationScale)));
+			// The launch size handed to CreateWindowEx was in effective pixels (see CreateWindow), which
+			// Windows took as raw pixels. Now that the window exists its true scale is known, so convert
+			// the size once, before the window is shown. https://github.com/unoplatform/uno/issues/20021
+			Resize(WindowSizeConversion.LogicalToNative(Size, RasterizationScale));
 		}
 
 		window.AppWindow.TitleBar.Changed += OnAppWindowTitleBarChanged;
@@ -172,6 +175,11 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 	{
 		using var title = new Win32Helper.NativeNulTerminatedUtf16String("CodeBrix Platform");
 
+		// ApplicationView.PreferredLaunchViewSize is in EFFECTIVE PIXELS of the FRAMED window, and
+		// CreateWindowEx below wants raw device pixels. A window's DPI is only knowable once the window
+		// exists, so the numbers go in unconverted here and the constructor converts them immediately
+		// afterwards, using the window's own scale - see the launch-size block in Initialize and item 8
+		// of the FIXLIST.
 		var preferredWindowSize = ApplicationView.PreferredLaunchViewSize;
 		if (preferredWindowSize.IsEmpty)
 		{
@@ -283,10 +291,13 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 				this.LogTrace()?.Trace($"WndProc received a {nameof(PInvoke.WM_GETMINMAXINFO)} message.");
 				if (Window?.AppWindow?.Presenter is OverlappedPresenter overlappedPresenter)
 				{
-					int minWidth = overlappedPresenter.PreferredMinimumWidth ?? 0;
-					int minHeight = overlappedPresenter.PreferredMinimumHeight ?? 0;
-					int maxWidth = overlappedPresenter.PreferredMaximumWidth ?? int.MaxValue;
-					int maxHeight = overlappedPresenter.PreferredMaximumHeight ?? int.MaxValue;
+					// The presenter's constraints are EFFECTIVE PIXELS of the FRAMED window; ptMinTrackSize
+					// and ptMaxTrackSize are raw device pixels of the window rect - see item 8.
+					var scale = RasterizationScale;
+					int minWidth = WindowSizeConversion.LogicalToNative(overlappedPresenter.PreferredMinimumWidth ?? 0, scale);
+					int minHeight = WindowSizeConversion.LogicalToNative(overlappedPresenter.PreferredMinimumHeight ?? 0, scale);
+					int maxWidth = WindowSizeConversion.LogicalToNative(overlappedPresenter.PreferredMaximumWidth ?? int.MaxValue, scale);
+					int maxHeight = WindowSizeConversion.LogicalToNative(overlappedPresenter.PreferredMaximumHeight ?? int.MaxValue, scale);
 
 					MINMAXINFO* info = (MINMAXINFO*)lParam.Value;
 					info->ptMinTrackSize = new Point(minWidth, minHeight);

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Microsoft.UI.Windowing.Native;
 
 namespace Microsoft.UI.Windowing;
@@ -121,6 +121,15 @@ public partial class OverlappedPresenter : AppWindowPresenter
 	/// <summary>
 	/// Gets or sets the preferred minimum width for the window.
 	/// </summary>
+	/// <remarks>
+	/// The value is in EFFECTIVE PIXELS - the unit the XAML tree is laid out in, not raw display pixels
+	/// - so one number is right on every head and at every display scale; each head converts it to
+	/// whatever its own windowing system wants. It is NOT the unit <see cref="AppWindow.Size"/> and
+	/// <see cref="AppWindow.Resize(Windows.Graphics.SizeInt32)"/> use, which are raw pixels.
+	/// The constraint applies to the CLIENT area on the X11 and Wayland heads and to the FRAMED
+	/// window - decorations included - on the Win32, WPF and macOS heads, because that is what each
+	/// windowing system constrains.
+	/// </remarks>
 	public int? PreferredMinimumWidth
 	{
 		get => _preferredMinimumWidth;
@@ -138,6 +147,15 @@ public partial class OverlappedPresenter : AppWindowPresenter
 	/// <summary>
 	/// Gets or sets the preferred minimum height for the window.
 	/// </summary>
+	/// <remarks>
+	/// The value is in EFFECTIVE PIXELS - the unit the XAML tree is laid out in, not raw display pixels
+	/// - so one number is right on every head and at every display scale; each head converts it to
+	/// whatever its own windowing system wants. It is NOT the unit <see cref="AppWindow.Size"/> and
+	/// <see cref="AppWindow.Resize(Windows.Graphics.SizeInt32)"/> use, which are raw pixels.
+	/// The constraint applies to the CLIENT area on the X11 and Wayland heads and to the FRAMED
+	/// window - decorations included - on the Win32, WPF and macOS heads, because that is what each
+	/// windowing system constrains.
+	/// </remarks>
 	public int? PreferredMinimumHeight
 	{
 		get => _preferredMinimumHeight;
@@ -155,6 +173,15 @@ public partial class OverlappedPresenter : AppWindowPresenter
 	/// <summary>
 	/// Gets or sets the preferred maximum width for the window.
 	/// </summary>
+	/// <remarks>
+	/// The value is in EFFECTIVE PIXELS - the unit the XAML tree is laid out in, not raw display pixels
+	/// - so one number is right on every head and at every display scale; each head converts it to
+	/// whatever its own windowing system wants. It is NOT the unit <see cref="AppWindow.Size"/> and
+	/// <see cref="AppWindow.Resize(Windows.Graphics.SizeInt32)"/> use, which are raw pixels.
+	/// The constraint applies to the CLIENT area on the X11 and Wayland heads and to the FRAMED
+	/// window - decorations included - on the Win32, WPF and macOS heads, because that is what each
+	/// windowing system constrains.
+	/// </remarks>
 	public int? PreferredMaximumWidth
 	{
 		get => _preferredMaximumWidth;
@@ -172,6 +199,15 @@ public partial class OverlappedPresenter : AppWindowPresenter
 	/// <summary>
 	/// Gets or sets the preferred maximum height for the window.
 	/// </summary>
+	/// <remarks>
+	/// The value is in EFFECTIVE PIXELS - the unit the XAML tree is laid out in, not raw display pixels
+	/// - so one number is right on every head and at every display scale; each head converts it to
+	/// whatever its own windowing system wants. It is NOT the unit <see cref="AppWindow.Size"/> and
+	/// <see cref="AppWindow.Resize(Windows.Graphics.SizeInt32)"/> use, which are raw pixels.
+	/// The constraint applies to the CLIENT area on the X11 and Wayland heads and to the FRAMED
+	/// window - decorations included - on the Win32, WPF and macOS heads, because that is what each
+	/// windowing system constrains.
+	/// </remarks>
 	public int? PreferredMaximumHeight
 	{
 		get => _preferredMaximumHeight;

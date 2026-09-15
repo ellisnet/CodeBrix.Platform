@@ -58,6 +58,16 @@ public partial class ToolToggleButtonAutomationPeer : ToolButtonAutomationPeer, 
 			return this;
 		}
 
+		//A toggle has a STATE, not an action: "on" and "off" are what an automation client sets,
+		//and Invoke has no answer to which of the two it would leave the button in. WinUI's own
+		//ToggleButtonAutomationPeer advertises Toggle alone for that reason, and the drop-down
+		//peer here already drops a pattern its button cannot honour. The base peer implements
+		//IInvokeProvider and would otherwise hand it out for every toggle in a bar.
+		if (patternInterface == PatternInterface.Invoke)
+		{
+			return null!;
+		}
+
 		return base.GetPatternCore(patternInterface);
 	}
 

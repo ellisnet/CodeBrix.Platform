@@ -174,7 +174,8 @@ public sealed class TextLayoutResult : IDisposable
 	/// <returns>The combined path. The caller owns it and must dispose it.</returns>
 	/// <remarks>
 	/// Fill it to draw the text, stroke it to outline the text, or do both for outlined text - which
-	/// is the case <see cref="Draw"/> cannot serve, because a text blob can only be filled.
+	/// is the case <see cref="Draw(SKCanvas, SKPoint, SKPaint)"/> cannot serve, because a text blob
+	/// can only be filled.
 	/// </remarks>
 	public SKPath GetOutlinePath() => _layout.GetOutlinePath();
 

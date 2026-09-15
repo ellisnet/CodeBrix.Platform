@@ -74,7 +74,6 @@ namespace Microsoft.UI.Xaml.Media
 		public static DependencyProperty GradientOriginProperty { get; } = DependencyProperty.Register(
 			nameof(GradientOrigin), typeof(Point), typeof(RadialGradientBrush), new FrameworkPropertyMetadata(new Point(0.5d, 0.5d)));
 
-		[NotImplemented]
 		public Point GradientOrigin
 		{
 			get => (Point)GetValue(GradientOriginProperty);

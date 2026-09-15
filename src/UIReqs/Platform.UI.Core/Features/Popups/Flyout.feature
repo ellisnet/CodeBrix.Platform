@@ -36,3 +36,10 @@ Scenario: An application can take its own Flyout away
 	And the frame is captured
 	Then the flyout "sheet" is closed
 	And no popup is open
+
+Scenario: A Flyout's presenter covers whatever it is shown over
+	Given a Flyout named "sheet" with an empty panel 400 by 300 is attached to a light and dark backdrop named "page"
+	When the flyout "sheet" is shown at "page"
+	And the frame is captured
+	Then the flyout "sheet" is open
+	And the open flyout hides what is behind it

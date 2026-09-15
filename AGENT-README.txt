@@ -1268,6 +1268,14 @@ implemented on the Skia heads and how the framework expects it to be used.
     Converters implement Microsoft.UI.Xaml.Data.IValueConverter (the Toolkit
     ships the common ones - see TOOLKIT TYPES below).
 
+    Binding to a property the generated bindable metadata knows only a getter
+    for - a property with a private setter, or one whose DependencyProperty is
+    internal - now writes. The engine used to hand back a setter that
+    discarded the value in that case; it falls through to its reflection path
+    instead, the way the value getter always has. On a head this means a
+    binding that appeared to do nothing starts working; nothing that already
+    worked changes.
+
   CONTENTDIALOG
 
     public object Title { get; set; }
@@ -1291,6 +1299,22 @@ implemented on the Skia heads and how the framework expects it to be used.
     throws InvalidOperationException ("A ContentDialog is already opened."), so
     keep one dialog on screen at a time - as on WinUI - and await the result
     before showing the next.
+
+  FLYOUTS, MENUS AND POPUP SURFACES
+
+    A flyout is kept on the window. A flyout or menu with more content than
+    the window can show is measured against the window, is placed so that no
+    part of it is off the window's edge, and offers the rest of its items by
+    scrolling its presenter.
+
+    A flyout presenter is OPAQUE on the Skia heads: the in-app acrylic
+    material a flyout, menu, combo-box drop-down, tool tip or command-bar
+    overflow paints itself with resolves to its own solid fallback colour
+    rather than letting the page behind it show through. That is a deliberate
+    divergence from WinUI's acrylic, so that a popup over light content stays
+    readable. AcrylicBrush honours AlwaysUseFallback on the Skia heads and the
+    framework's in-app acrylic material sets it; a brush that does not ask for
+    the fallback is still built as blurred acrylic.
 
   FRAME NAVIGATION (Microsoft.UI.Xaml.Controls.Frame)
 

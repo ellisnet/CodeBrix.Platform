@@ -27,7 +27,7 @@ Scenario: Opening a clip reports how long it is and that it has a picture
 	And the media of "player" has a picture
 	And the NaturalVideoDimensionChanged of "player" was raised at least once
 	And the video surface of "player" is showing
-	And the region of "player" has ink
+	And the region of "player" has ink within 8000 milliseconds
 
 Scenario: A clip that has only been opened already shows its first picture
 	Given the application shows a MediaPlayerElement named "player" with:

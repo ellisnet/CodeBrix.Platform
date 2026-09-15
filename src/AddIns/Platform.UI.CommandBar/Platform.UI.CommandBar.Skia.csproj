@@ -20,6 +20,12 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the pack driver takes the whole output folder, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<PropertyGroup>

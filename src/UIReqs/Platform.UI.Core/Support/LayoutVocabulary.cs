@@ -24,6 +24,9 @@ namespace CodeBrix.Platform.UI.Core.UIReqs.Support;
 /// </summary>
 public static class LayoutVocabulary
 {
+	/// <summary>What separates a radial gradient's stop list from its gradient origin.</summary>
+	private const string FromKeyword = " from ";
+
 	private static readonly object RegistrationLock = new();
 
 	private static bool _registered;
@@ -51,6 +54,8 @@ public static class LayoutVocabulary
 		ElementFactory.RegisterKind("Ellipse", () => new Ellipse());
 		ElementFactory.RegisterKind("Line", () => new Line());
 		ElementFactory.RegisterKind("Path", () => new Path());
+		ElementFactory.RegisterKind("ContentControl", () => new ContentControl());
+		ElementFactory.RegisterKind("MeasureProbe", () => new MeasureProbe());
 	}
 
 	private static void RegisterProperties()
@@ -92,12 +97,28 @@ public static class LayoutVocabulary
 			(element, value) => SetFill(element, LinearGradient(value, horizontal: true)));
 		ElementFactory.RegisterProperty("VerticalGradient",
 			(element, value) => SetFill(element, LinearGradient(value, horizontal: false)));
+		ElementFactory.RegisterProperty("RadialGradient",
+			(element, value) => SetFill(element, RadialGradient(value)));
 
 		// Transforms and clipping
 		ElementFactory.RegisterProperty("RenderTransform", (element, value) => element.RenderTransform = ToTransform(value));
 		ElementFactory.RegisterProperty("RenderTransformOrigin", (element, value) => element.RenderTransformOrigin = ToPoint(value));
 		ElementFactory.RegisterProperty("Clip", (element, value) => element.Clip = ToClip(value));
+
+		// Content alignment, on a ContentControl. It is a Control property rather than a
+		// FrameworkElement one, so it is registered for that type: an element that is not a
+		// Control is then told it has no such property instead of silently ignoring it.
+		ElementFactory.RegisterProperty<Control>("HorizontalContentAlignment",
+			(control, value) => control.HorizontalContentAlignment = ToHorizontalAlignment(value));
+		ElementFactory.RegisterProperty<Control>("VerticalContentAlignment",
+			(control, value) => control.VerticalContentAlignment = ToVerticalAlignment(value));
 	}
+
+	private static HorizontalAlignment ToHorizontalAlignment(string value) =>
+		GherkinValue.ToEnum<HorizontalAlignment>(value);
+
+	private static VerticalAlignment ToVerticalAlignment(string value) =>
+		GherkinValue.ToEnum<VerticalAlignment>(value);
 
 	private static int ToInt(string value) => (int) Math.Round(GherkinValue.ToDouble(value));
 
@@ -268,6 +289,63 @@ public static class LayoutVocabulary
 		return brush;
 	}
 
+	/// <summary>
+	/// Reads a radial gradient: a comma-separated list of stops, each a colour with an optional
+	/// "@offset", followed by an optional " from x,y" that moves the gradient origin off the
+	/// centre. A stop written without an offset takes its place evenly along the run, so the
+	/// first is at 0 and the last at 1 - "Red,Blue" is Red at the origin fading to Blue at the
+	/// ellipse. Center stays 0.5,0.5 and both radii stay 0.5, so the painted ellipse is the
+	/// element's own bounding box and the device radius is half the element.
+	/// </summary>
+	private static RadialGradientBrush RadialGradient(string value)
+	{
+		var stops = value;
+		var origin = new Point(0.5, 0.5);
+
+		var from = value.IndexOf(FromKeyword, StringComparison.OrdinalIgnoreCase);
+		if (from >= 0)
+		{
+			stops = value[..from];
+			var (x, y) = ToPair(value[(from + FromKeyword.Length)..]);
+			origin = new Point(x, y);
+		}
+
+		var parts = stops.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+		if (parts.Length < 2)
+		{
+			throw new FormatException(
+				$"\"{value}\" is not a radial gradient. Write two or more colours separated by commas, "
+				+ "each with an optional \"@offset\", and an optional \" from x,y\" for the gradient "
+				+ "origin - such as \"Red,Blue\" or \"Red,Lime@0.25,Blue@0.75,White from 0.2,0.5\".");
+		}
+
+		var brush = new RadialGradientBrush
+		{
+			Center = new Point(0.5, 0.5),
+			RadiusX = 0.5,
+			RadiusY = 0.5,
+			GradientOrigin = origin,
+		};
+
+		for (var index = 0; index < parts.Length; index++)
+		{
+			brush.GradientStops.Add(ToGradientStop(parts[index], index, parts.Length));
+		}
+
+		return brush;
+	}
+
+	private static GradientStop ToGradientStop(string text, int index, int count)
+	{
+		var at = text.IndexOf('@', StringComparison.Ordinal);
+		var name = at < 0 ? text : text[..at].TrimEnd();
+		var offset = at < 0
+			? index / (double) (count - 1)
+			: GherkinValue.ToDouble(text[(at + 1)..]);
+
+		return new GradientStop { Color = Colors.Parse(name), Offset = offset };
+	}
+
 	private static Transform? ToTransform(string value)
 	{
 		if (string.Equals(value, "None", StringComparison.OrdinalIgnoreCase))
@@ -389,4 +467,38 @@ public static class LayoutVocabulary
 	private static NotSupportedException Unsupported(FrameworkElement element, string property) =>
 		new(string.Create(CultureInfo.InvariantCulture,
 			$"A {element.GetType().Name} named \"{element.Name}\" has no {property} the harness can set."));
+}
+
+/// <summary>
+/// A panel that remembers the size it was last offered, so a requirement can state what a
+/// container measured its content with rather than only what it arranged it at.
+/// <para>
+/// Measure and arrange can disagree: a container that offers an unbounded width still arranges
+/// its child at the real width, so every pixel assertion passes while content that lays itself
+/// out from the width it is offered - a wrapping panel, a tool bar deciding its overflow - never
+/// sees a limit. Nothing in the visual tree records that, which is why this probe exists.
+/// </para>
+/// </summary>
+public sealed class MeasureProbe : Grid
+{
+	/// <summary>Gets the width this element was last offered, in logical pixels.</summary>
+	/// <remarks><see cref="double.PositiveInfinity"/> when the offer was unbounded, and
+	/// <see cref="double.NaN"/> before the first measure.</remarks>
+	public double LastOfferedWidth { get; private set; } = double.NaN;
+
+	/// <summary>Gets the height this element was last offered, in logical pixels.</summary>
+	public double LastOfferedHeight { get; private set; } = double.NaN;
+
+	/// <summary>Gets how many times the element has been measured.</summary>
+	public int MeasureCount { get; private set; }
+
+	/// <inheritdoc/>
+	protected override Size MeasureOverride(Size availableSize)
+	{
+		LastOfferedWidth = availableSize.Width;
+		LastOfferedHeight = availableSize.Height;
+		MeasureCount++;
+
+		return base.MeasureOverride(availableSize);
+	}
 }

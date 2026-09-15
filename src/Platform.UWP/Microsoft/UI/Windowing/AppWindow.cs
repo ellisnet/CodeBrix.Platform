@@ -94,6 +94,15 @@ partial class AppWindow
 	/// <summary>
 	/// Gets the current size of the window in screen coordinates.
 	/// </summary>
+	/// <remarks>
+	/// This is the FRAMED size: the whole window, including whatever title bar, border or shadow the
+	/// windowing system draws around it. <see cref="ClientSize"/> is the client area inside that frame,
+	/// which is what the page is laid out into, and the two differ by the frame extents. The number is
+	/// in RAW (physical) pixels of the display, not effective pixels, so it is not the unit
+	/// <c>ApplicationView.PreferredLaunchViewSize</c> or the <c>OverlappedPresenter</c> size
+	/// constraints use. <see cref="Resize(SizeInt32)"/> takes the same size this reports, so
+	/// <c>Resize(Size)</c> is a no-op round trip on every head.
+	/// </remarks>
 	public SizeInt32 Size => _nativeAppWindow.Size;
 
 	/// <summary>
@@ -170,6 +179,13 @@ partial class AppWindow
 	/// Resizes the window to the specified size.
 	/// </summary>
 	/// <param name="size">The height and width of the window in screen coordinates.</param>
+	/// <remarks>
+	/// The size is the FRAMED size - the same size <see cref="Size"/> reports, decorations included -
+	/// in RAW (physical) pixels of the display. An application that stores a window size to restore it
+	/// on the next launch therefore stores <see cref="Size"/>, not <c>Window.Bounds</c>: <c>Bounds</c>
+	/// and <see cref="ClientSize"/> answer the client area, so feeding one of those back in shrinks the
+	/// window by the frame once per launch.
+	/// </remarks>
 	public void Resize(SizeInt32 size) => _nativeAppWindow.Resize(size);
 
 	/// <summary>

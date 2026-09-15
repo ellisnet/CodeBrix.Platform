@@ -1266,4 +1266,192 @@ public class TriPaneViewTests
 		view.IsUpperPaneMinimized.Should().BeTrue();
 		view.IsSidePaneMinimized.Should().BeTrue();
 	}
+
+	[TestMethod]
+	public void CompleteDividerDrag_a_drag_that_returns_to_its_start_is_not_a_tap()
+	{
+		//Arrange
+		var view = new TriPaneView { SidePanePercent = 0d, StackPercent = 100d };
+
+		//Act - out and back, so the NET travel is zero but the gesture certainly moved.
+		view.StartDividerDrag(TriPaneViewDividerKind.Side, 0d, 400d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Side, 60d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Side, -60d);
+		view.CompleteDividerDrag(TriPaneViewDividerKind.Side, 0d, false);
+
+		//Assert
+		view.IsSidePaneMinimized.Should().BeTrue();
+		view.SidePanePercent.Should().Be(0d);
+	}
+
+	[TestMethod]
+	public void CompleteDividerDrag_a_stack_drag_that_returns_to_its_start_is_not_a_tap()
+	{
+		//Arrange
+		var view = new TriPaneView { UpperPanePercent = 0d, LowerPanePercent = 100d };
+
+		//Act
+		view.StartDividerDrag(TriPaneViewDividerKind.Stack, 0d, 400d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Stack, 60d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Stack, -60d);
+		view.CompleteDividerDrag(TriPaneViewDividerKind.Stack, 0d, false);
+
+		//Assert
+		view.IsUpperPaneMinimized.Should().BeTrue();
+		view.UpperPanePercent.Should().Be(0d);
+	}
+
+	[TestMethod]
+	public void CompleteDividerDrag_raises_nothing_when_the_gesture_changed_no_weight()
+	{
+		//Arrange - a drag already sitting on its floor, with drag-to-minimize off, so the drag is
+		//refused and all four weights end where they started.
+		var view = new TriPaneView
+		{
+			SidePanePercent = 50d,
+			StackPercent = 50d,
+			SidePaneMinLength = 300d,
+			StackMinLength = 300d,
+		};
+		var raisedCount = 0;
+		view.DividerDragCompleted += (_, _) => raisedCount++;
+
+		//Act
+		view.StartDividerDrag(TriPaneViewDividerKind.Side, 200d, 200d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Side, -40d);
+		view.CompleteDividerDrag(TriPaneViewDividerKind.Side, -40d, false);
+
+		//Assert
+		raisedCount.Should().Be(0);
+		view.SidePanePercent.Should().Be(50d);
+		view.StackPercent.Should().Be(50d);
+	}
+
+	[TestMethod]
+	public void CompleteDividerDrag_still_raises_when_the_gesture_moved_a_weight()
+	{
+		//Arrange
+		var view = new TriPaneView();
+		var raisedCount = 0;
+		view.DividerDragCompleted += (_, _) => raisedCount++;
+
+		//Act
+		view.StartDividerDrag(TriPaneViewDividerKind.Side, 100d, 300d);
+		view.UpdateDividerDrag(TriPaneViewDividerKind.Side, 60d);
+		view.CompleteDividerDrag(TriPaneViewDividerKind.Side, 60d, false);
+
+		//Assert
+		raisedCount.Should().Be(1);
+	}
+
+	[TestMethod]
+	public void IsStackMinimized_defaults_to_false() =>
+		new TriPaneView().IsStackMinimized.Should().BeFalse();
+
+	[TestMethod]
+	public void IsStackMinimized_follows_a_zero_stack_weight()
+	{
+		//Arrange
+		var view = new TriPaneView();
+
+		//Act
+		view.StackPercent = 0d;
+
+		//Assert
+		view.IsStackMinimized.Should().BeTrue();
+		view.IsUpperPaneMinimized.Should().BeTrue();
+		view.IsLowerPaneMinimized.Should().BeTrue();
+	}
+
+	[TestMethod]
+	public void MinimizeStack_collapses_the_stack_and_leaves_the_side_pane_with_the_control()
+	{
+		//Arrange
+		var view = new TriPaneView();
+
+		//Act
+		view.MinimizeStack();
+
+		//Assert
+		view.IsStackMinimized.Should().BeTrue();
+		view.StackPercent.Should().Be(0d);
+		view.SidePanePercent.Should().Be(DefaultSidePercent);
+		view.StackEffectiveWeight.Should().Be(0d);
+		view.SidePaneEffectiveWeight.Should().BeApproximately(100d, Tolerance);
+	}
+
+	[TestMethod]
+	public void MinimizeStack_is_ignored_when_it_would_leave_no_pane_open()
+	{
+		//Arrange
+		var view = new TriPaneView { SidePanePercent = 0d, StackPercent = 100d };
+
+		//Act
+		view.MinimizeStack();
+
+		//Assert
+		view.IsStackMinimized.Should().BeFalse();
+		view.StackPercent.Should().Be(100d);
+	}
+
+	[TestMethod]
+	public void MinimizeStack_gives_no_restore_grip_under_auto_because_the_cause_is_code()
+	{
+		//Arrange
+		var view = new TriPaneView();
+
+		//Act
+		view.MinimizeStack();
+
+		//Assert
+		view.IsSideRestoreGripVisible.Should().BeFalse();
+	}
+
+	[TestMethod]
+	public void RestoreStack_brings_back_a_stack_that_code_minimized()
+	{
+		//Arrange
+		var view = new TriPaneView { StackPercent = 80d };
+		view.MinimizeStack();
+
+		//Act
+		view.RestoreStack();
+
+		//Assert
+		view.IsStackMinimized.Should().BeFalse();
+		view.StackPercent.Should().Be(80d);
+		view.UpperPanePercent.Should().Be(50d);
+		view.LowerPanePercent.Should().Be(50d);
+	}
+
+	[TestMethod]
+	public void RestoreStack_brings_back_both_stack_panes_when_both_are_at_zero()
+	{
+		//Arrange
+		var view = new TriPaneView();
+		view.MinimizeUpperPane();
+		view.MinimizeLowerPane();
+
+		//Act
+		view.RestoreStack();
+
+		//Assert
+		view.IsStackMinimized.Should().BeFalse();
+		view.IsUpperPaneMinimized.Should().BeFalse();
+		view.IsLowerPaneMinimized.Should().BeFalse();
+	}
+
+	[TestMethod]
+	public void RestoreStack_does_nothing_to_a_stack_that_is_already_open()
+	{
+		//Arrange
+		var view = new TriPaneView { StackPercent = 70d, SidePanePercent = 30d };
+
+		//Act
+		view.RestoreStack();
+
+		//Assert
+		view.StackPercent.Should().Be(70d);
+		view.SidePanePercent.Should().Be(30d);
+	}
 }

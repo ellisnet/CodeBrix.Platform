@@ -692,6 +692,18 @@ COMMON PITFALLS TO AVOID
     DockPanel - if you want Fill="True" to push something to the far end. This
     is the same rule a star-sized column follows in an auto-sized container.
 
+    THE SAME UNBOUNDED WIDTH ALSO DECIDES THE OVERFLOW, ONE PASS LATE. A bar in
+    a container that offers it no width limit at all - a horizontal StackPanel,
+    an unbounded Grid column, a horizontally scrolling ScrollViewer, or any host
+    that passes an infinity on - is MEASURED with nothing to partition against,
+    so measure alone can only answer "everything fits". The bar reads the width
+    it was actually ARRANGED at and works the partition out again from that, so
+    the chevron does appear; it appears one layout pass later than it does in a
+    width-bounded container, and the partition it settles on is then left alone
+    until that arranged width changes. Give a bar a real width where you can -
+    a Grid cell, a stretched host, or a MaxWidth - and the decision is made in
+    the measure pass, where it belongs.
+
  8. AN ICON SOURCE IS A VALUE; AN ICON ELEMENT IS A THING - AND THE NAME TELLS
     YOU WHICH ONE YOU JUST WROTE.
     SvgIconSource / RasterIconSource are what you hand to a property that wants
@@ -734,6 +746,77 @@ COMMON PITFALLS TO AVOID
     A missing file, a missing embedded resource or an unknown assembly leaves
     the icon blank and the application running. Check ResolvedUriSource when an
     icon does not appear.
+
+CONSUMER TRAPS
+==============
+Not defects - these are all working as designed - but they are silent, and each
+one has cost somebody an afternoon.
+
+ A. AN AMBIGUOUS cb-res:// SUFFIX RESOLVES TO NOTHING AT ALL.
+    The short form of the URI is matched as a suffix only when EXACTLY ONE
+    embedded resource ends that way. Two matches is not "pick one": it is no
+    stream, which pitfall 12 then turns into a blank icon with nothing logged
+    and nothing thrown. A themed icon set is the usual way to hit it - one
+    assembly embedding both
+
+        <Root>.Icons.Light.zoom-in.svg
+        <Root>.Icons.Dark.zoom-in.svg
+
+    makes cb-res://<Assembly>/zoom-in.svg match two resources and draw neither.
+    Say enough of the manifest name to pick one out - the full name, or a longer
+    suffix such as Light.zoom-in.svg - or build the URI with
+    IconResourceScheme.Create(assembly, prefix + name + ".svg"), which also
+    registers the assembly for you.
+
+ B. A TINT CANNOT REACH A COLOUR INSIDE AN INLINE style= ATTRIBUTE.
+    The tint is delivered to the SVG as a stylesheet, and an inline style
+    attribute outranks a stylesheet, so an icon set whose files carry colours in
+    style="fill:#000000" renders MIXED under a Tint: the currentColor parts take
+    the tint and the inline-styled parts keep their literal colour. This is a
+    property of the artwork, not of the icon: exported icon sets commonly have
+    it in most of their files. Either set no Tint and let the files draw their
+    own colours - the safe route - or clean the inline styles out of the
+    artwork, which is an application-side decision.
+
+TESTING AGAINST THIS ADD-IN WITHOUT A WINDOW
+============================================
+Every control here can be built, measured and arranged in an ordinary unit test
+with no head and no window, which is how this package's own suite works. Two
+things an application head would have done have to be done by the test process
+instead - registering the add-in's default styles, and initialising the text
+engine - and the suite's TestHost.cs and DefaultStyleInitializer.cs are there to
+be copied.
+
+COPY THE SERIALISATION TOO. The framework's object model is not thread-safe -
+correct for a UI framework - and the host-free bootstrap makes EVERY thread
+report that it has dispatcher access, so nothing stops two test classes from
+building XAML objects at the same time. xUnit runs test CLASSES in parallel by
+default, and two that do will corrupt shared framework state: duplicate keys
+added to a shared hashtable, null references inside the dependency-property
+callbacks, "ResourceDictionary was registered as style provider for
+ToolBarOverflowButton but doesn't contain matching style", and - the one that
+costs a day - "Operations that change non-concurrent collections must have
+exclusive access" raised inside a test that touches no XAML at all. Every one of
+those classes passes when it is run on its own.
+
+Serialise the XAML-touching classes, by either mechanism:
+
+    // the whole assembly runs one test at a time - simplest, and what this
+    // package's own suite does, because everything in it touches XAML
+    [assembly: Parallelization(Mode = ParallelMode.None)]
+
+    // or: only the XAML-touching classes are serialised, and the rest of a
+    // large suite keeps running in parallel
+    [CollectionDefinition(XamlTestCollection.Name, DisableParallelization = true)]
+    public sealed class XamlTestCollection { public const string Name = "XAML"; }
+
+    [Collection(XamlTestCollection.Name)]
+    public class ToolBarMeasureTests { ... }
+
+Set your own readiness flag AFTER the bootstrap work and under a lock, never
+before it: setting it first lets a second thread return from "ensure ready"
+while the first is still half way through registering the default styles, which
+is exactly what produces the ToolBarOverflowButton message above.
 
 WHAT THIS PACKAGE DOES NOT DO
 =============================

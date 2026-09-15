@@ -62,6 +62,13 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 
 		internal bool IsTargetPositionSet => m_isTargetPositionSet;
 
+		// The presenter's own MaxWidth / MaxHeight, as its style or its author left them, kept so
+		// that ConstrainPresenterToAvailableWindow can re-apply the window constraint from the
+		// original values on every measure instead of ratcheting the presenter smaller and smaller.
+		private Control _constrainedPresenter;
+		private double _presenterAuthoredMaxWidth;
+		private double _presenterAuthoredMaxHeight;
+
 		private bool m_isPositionedForDateTimePicker;
 
 		private bool m_openingCanceled;
@@ -675,6 +682,53 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 
 		internal virtual Control GetPresenter() => _popup?.Child as Control;
 
+		/// <summary>
+		/// Limits the presenter to the window the flyout has to fit in, so that a flyout with more
+		/// content than the window can hold is measured against the window and scrolls its own
+		/// content instead of running past the window's edge where nothing can reach it.
+		/// </summary>
+		/// <remarks>
+		/// The constraint has to be in place BEFORE the presenter is measured, which is why the
+		/// flyout's popup panel calls this from its measure pass: the rest of the flyout's layout
+		/// arithmetic runs from an arrange pass, far too late to decide a measure-time limit. The
+		/// presenter's authored limits are remembered on the first call so that a later window
+		/// resize re-applies the constraint from those rather than from the constrained values.
+		/// </remarks>
+		internal void ConstrainPresenterToAvailableWindow()
+		{
+			if (_popup is null || GetPresenter() is not { } presenter)
+			{
+				return;
+			}
+
+			if (!ReferenceEquals(_constrainedPresenter, presenter))
+			{
+				_constrainedPresenter = presenter;
+				_presenterAuthoredMaxWidth = presenter.MaxWidth;
+				_presenterAuthoredMaxHeight = presenter.MaxHeight;
+			}
+
+			var availableWindowRect = CalculateAvailableWindowRect(
+				this is MenuFlyout,
+				_popup,
+				placementTarget: null,
+				m_isTargetPositionSet,
+				m_targetPoint,
+				EffectivePlacement == FlyoutPlacementMode.Full);
+
+			if (availableWindowRect.Width <= 0 || availableWindowRect.Height <= 0)
+			{
+				return;
+			}
+
+			presenter.MaxWidth = double.IsNaN(_presenterAuthoredMaxWidth)
+				? availableWindowRect.Width
+				: Math.Min(_presenterAuthoredMaxWidth, availableWindowRect.Width);
+			presenter.MaxHeight = double.IsNaN(_presenterAuthoredMaxHeight)
+				? availableWindowRect.Height
+				: Math.Min(_presenterAuthoredMaxHeight, availableWindowRect.Height);
+		}
+
 		internal Rect UpdateTargetPosition(Rect availableWindowRect, Size presenterSize, Rect presenterRect)
 		{
 			double horizontalOffset = 0.0;
@@ -889,12 +943,10 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			//}
 			//else
 			{
-				// Uno TODO: currently the Flyout layout calculations are done from the popup panel's ArrangeOverride(), which is too late to be setting MaxWidth/MaxHeight.
-				//// Set the max width and height with the available windows bounds
-				//(m_tpPresenter as Control.put_MaxWidth(
-				//	double.IsNaN(maxWidth) ? availableWindowRect.Width : Math.Min(maxWidth, availableWindowRect.Width)));
-				//(m_tpPresenter as Control.put_MaxHeight(
-				//	double.IsNaN(maxHeight) ? availableWindowRect.Height : Math.Min(maxHeight, availableWindowRect.Height)));
+				// The presenter's max width and height are clamped to the available window bounds by
+				// ConstrainPresenterToAvailableWindow, called from the flyout popup panel's MEASURE
+				// pass. This method runs from an arrange pass, which is too late for a measure-time
+				// limit, so the clamp is deliberately not repeated here.
 
 				if (flowDirection == FlowDirection.LeftToRight)
 				{

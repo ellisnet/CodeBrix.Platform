@@ -124,7 +124,7 @@
       <AcrylicBrush x:Key="SystemControlAltHighAcrylicElementBrush" TintColor="{StaticResource SystemChromeAltHighColor}" TintOpacity="0.8" FallbackColor="{StaticResource SystemAltHighColor}" />
       <SolidColorBrush x:Key="SystemControlTransientBorderBrush" Color="#000000" Opacity="0.36" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" TintColor="#2C2C2C" TintOpacity="0.15" FallbackColor="#2C2C2C" />
-      <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultBrush" TintColor="#2C2C2C" TintOpacity="0.15" FallbackColor="#2C2C2C" />
+      <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultBrush" TintColor="#2C2C2C" TintOpacity="0.15" FallbackColor="#2C2C2C" AlwaysUseFallback="True" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorDefaultInverseBrush" TintColor="#FCFCFC" TintOpacity="0.0" FallbackColor="#F9F9F9" />
       <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultInverseBrush" TintColor="#FCFCFC" TintOpacity="0.0" FallbackColor="#F9F9F9" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorBaseBrush" TintColor="#202020" TintOpacity="0.5" FallbackColor="#1C1C1C" />
@@ -1945,7 +1945,7 @@
       <AcrylicBrush x:Key="SystemControlAltHighAcrylicElementBrush" TintColor="{StaticResource SystemChromeAltHighColor}" TintOpacity="0.8" FallbackColor="{StaticResource SystemAltHighColor}" />
       <SolidColorBrush x:Key="SystemControlTransientBorderBrush" Color="#000000" Opacity="0.14" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorDefaultBrush" TintColor="#FCFCFC" TintOpacity="0.0" FallbackColor="#F9F9F9" />
-      <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultBrush" TintColor="#FCFCFC" TintOpacity="0.0" FallbackColor="#F9F9F9" />
+      <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultBrush" TintColor="#FCFCFC" TintOpacity="0.0" FallbackColor="#F9F9F9" AlwaysUseFallback="True" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorDefaultInverseBrush" TintColor="#2C2C2C" TintOpacity="0.15" FallbackColor="#2C2C2C" />
       <AcrylicBrush x:Key="AcrylicInAppFillColorDefaultInverseBrush" TintColor="#2C2C2C" TintOpacity="0.15" FallbackColor="#2C2C2C" />
       <AcrylicBrush x:Key="AcrylicBackgroundFillColorBaseBrush" TintColor="#F3F3F3" TintOpacity="0.0" FallbackColor="#EEEEEE" />

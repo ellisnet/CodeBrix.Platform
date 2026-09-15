@@ -222,6 +222,144 @@ public class TriPaneViewLayoutMathTests
 	}
 
 	[TestMethod]
+	public void ResolveDragLengths_snaps_the_pane_the_drag_is_heading_into_when_no_floor_fits()
+	{
+		//Arrange - 400 pixels shared by two regions that each want 250, so neither floor can be paid
+		//and branch order used to decide which one closed.
+
+		//Act
+		var (firstBack, secondBack) = TriPaneViewLayoutMath.ResolveDragLengths(200d, 200d, -10d, 250d, 250d, true);
+		var (firstForward, secondForward) = TriPaneViewLayoutMath.ResolveDragLengths(200d, 200d, 10d, 250d, 250d, true);
+
+		//Assert
+		firstBack.Should().Be(0d);
+		secondBack.Should().Be(400d);
+		firstForward.Should().Be(400d);
+		secondForward.Should().Be(0d);
+	}
+
+	[TestMethod]
+	public void ResolveDragLengths_snaps_the_pane_the_drag_is_heading_into_when_the_floors_fit()
+	{
+		//Arrange - 400 pixels shared by two regions that each want 120, so both floors are payable.
+
+		//Act
+		var (firstBack, secondBack) = TriPaneViewLayoutMath.ResolveDragLengths(200d, 200d, -110d, 120d, 120d, true);
+		var (firstForward, secondForward) = TriPaneViewLayoutMath.ResolveDragLengths(200d, 200d, 110d, 120d, 120d, true);
+
+		//Assert
+		firstBack.Should().Be(0d);
+		secondBack.Should().Be(400d);
+		firstForward.Should().Be(400d);
+		secondForward.Should().Be(0d);
+	}
+
+	[TestMethod]
+	public void ResolveDragLengths_a_pane_being_reopened_still_waits_for_its_own_floor()
+	{
+		//Act - the first pane is shut and the drag is opening it, but has not carried it past its
+		//own 80 pixel floor yet; the second pane is nowhere near its floor, so nothing snaps.
+		var (first, second) = TriPaneViewLayoutMath.ResolveDragLengths(0d, 400d, 79d, 80d, 250d, true);
+
+		//Assert
+		first.Should().Be(0d);
+		second.Should().Be(400d);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_floors_that_fit_are_passed_through()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(200d, 200d, 800d, false, false);
+
+		//Assert
+		first.Should().Be(200d);
+		second.Should().Be(200d);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_shares_the_shortfall_proportionally_across_the_nested_control()
+	{
+		//Arrange - the entry's numbers: an outer stack floor of 200 holding a control that wants
+		//200 + 6 + 200, so 194 pixels are left for two regions asking for 400.
+
+		//Act
+		var (side, stack) = TriPaneViewLayoutMath.ResolveMinLengths(200d, 200d, 194d, false, false);
+
+		//Assert
+		side.Should().BeApproximately(97d, Tolerance);
+		stack.Should().BeApproximately(97d, Tolerance);
+		(side + stack).Should().BeApproximately(194d, Tolerance);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_keeps_the_ratio_of_two_unequal_floors()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(300d, 100d, 200d, false, false);
+
+		//Assert
+		first.Should().BeApproximately(150d, Tolerance);
+		second.Should().BeApproximately(50d, Tolerance);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_never_lays_a_region_that_is_open_out_at_zero()
+	{
+		//Act - the second region asks for everything there is, and the first asks for nothing.
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(0d, 600d, 300d, false, false);
+
+		//Assert
+		first.Should().BeGreaterThan(0d);
+		second.Should().BeGreaterThan(0d);
+		(first + second).Should().BeApproximately(300d, Tolerance);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_gives_an_unfloored_open_region_the_visible_minimum()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(0d, 0d, 800d, false, false);
+
+		//Assert
+		first.Should().Be(TriPaneViewLayoutMath.MinimumVisibleRegionLength);
+		second.Should().Be(TriPaneViewLayoutMath.MinimumVisibleRegionLength);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_a_minimized_region_asks_for_nothing()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(200d, 200d, 194d, true, false);
+
+		//Assert
+		first.Should().Be(0d);
+		second.Should().Be(194d);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_both_regions_still_share_a_room_smaller_than_the_visible_minimum()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(0d, 0d, 30d, false, false);
+
+		//Assert
+		first.Should().BeApproximately(15d, Tolerance);
+		second.Should().BeApproximately(15d, Tolerance);
+	}
+
+	[TestMethod]
+	public void ResolveMinLengths_passes_the_floors_through_before_the_control_has_been_laid_out()
+	{
+		//Act
+		var (first, second) = TriPaneViewLayoutMath.ResolveMinLengths(200d, 400d, 0d, false, false);
+
+		//Assert
+		first.Should().Be(200d);
+		second.Should().Be(400d);
+	}
+
+	[TestMethod]
 	public void ResolveDragLengths_returns_the_start_lengths_when_there_is_no_space()
 	{
 		//Act

@@ -981,11 +981,15 @@ namespace CodeBrix.Platform.UI.DataBinding //Was previously: Uno.UI.DataBinding
 							}
 						}
 
-						var once = Actions.CreateOnce(
-							() => _log.ErrorFormat("The property setter for [{0}] does not exist on [{1}]", property, type)
-						);
-
-						return delegate { once(); };
+						// The metadata knows the TYPE but lists no dependency property and no setter for this
+						// member -- a generator MISS, not a proof that the member cannot be written. Fall
+						// through to the reflection path below (which is what the getter above already does,
+						// and what a host-free flavour with no metadata provider always did), so the write
+						// lands instead of being silently discarded by a no-op setter.
+						if (_log.IsEnabled(CodeBrix.Platform.Foundation.Logging.LogLevel.Debug))
+						{
+							_log.Debug($"GetValueSetter({type}, {property}) [BindableMetadataProvider miss, falling back to reflection]");
+						}
 					}
 				}
 			}

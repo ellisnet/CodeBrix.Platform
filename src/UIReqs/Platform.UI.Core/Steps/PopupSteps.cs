@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using CodeBrix.Platform.UI.Core.UIReqs.Canvas;
@@ -196,6 +197,146 @@ public sealed class PopupSteps
 	public async Task Then_the_flyout_is_closed(string flyoutName) =>
 		(await IsFlyoutOpenAsync(flyoutName).ConfigureAwait(false)).Should()
 			.BeFalse("the flyout \"{0}\" must be closed", flyoutName);
+
+	/// <summary>
+	/// Fills the panel with a backdrop that is white down one half and black down the other, and
+	/// attaches a Flyout with an empty presenter to it. A flyout shown over this straddles the
+	/// two halves, so anything it lets through from behind it shows up as two colours inside one
+	/// presenter rather than one.
+	/// </summary>
+	/// <param name="backdropName">The name the scenario refers to the backdrop by.</param>
+	/// <param name="flyoutName">The name the scenario refers to the flyout by.</param>
+	/// <param name="width">The flyout content's width in logical pixels.</param>
+	/// <param name="height">The flyout content's height in logical pixels.</param>
+	/// <returns>A task that completes once the backdrop is showing and the flyout is attached.</returns>
+	[Given("a Flyout named {string} with an empty panel {int} by {int} is attached to a light and dark backdrop named {string}")]
+	public async Task Given_a_Flyout_with_an_empty_panel_over_a_split_backdrop(string flyoutName,
+		int width, int height, string backdropName)
+	{
+		Grid backdrop = null!;
+		FlyoutBase flyout = null!;
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+		{
+			backdrop = new Grid { Name = backdropName };
+			backdrop.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+			backdrop.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+			var light = new Border { Background = new SolidColorBrush(Microsoft.UI.Colors.White) };
+			var dark = new Border { Background = new SolidColorBrush(Microsoft.UI.Colors.Black) };
+			Grid.SetColumn(dark, 1);
+			backdrop.Children.Add(light);
+			backdrop.Children.Add(dark);
+			ElementRegistry.Register(backdropName, backdrop);
+
+			// The content carries no background of its own, so what is seen inside the presenter
+			// is the presenter's own surface and nothing else.
+			var panel = new Border { Width = width, Height = height };
+			flyout = new Flyout { Content = panel };
+			FlyoutBase.SetAttachedFlyout(backdrop, flyout);
+		}).ConfigureAwait(false);
+
+		await TestTargetFixture.SetContentAsync(backdrop).ConfigureAwait(false);
+		_scenarioContext[FlyoutKeyPrefix + flyoutName] = flyout;
+	}
+
+	/// <summary>
+	/// Asserts that the flyout that is open covers what is behind it: its surface is one colour
+	/// all the way across, whatever it was shown over.
+	/// </summary>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the open flyout hides what is behind it")]
+	public async Task Then_the_open_flyout_hides_what_is_behind_it() =>
+		(await OpenFlyoutInteriorAsync().ConfigureAwait(false)).IsOneOpaqueSurface();
+
+	/// <summary>
+	/// Attaches a MenuFlyout holding a given number of equally tall items, named "Item 1" to
+	/// "Item N", to an element that is already showing. A menu built this way is how a scenario
+	/// asks for one TALLER than the panel it has to fit on, without depending on how tall the
+	/// theme happens to draw a menu item.
+	/// </summary>
+	/// <param name="flyoutName">The name the scenario refers to the menu by.</param>
+	/// <param name="targetName">The Gherkin name of the element the menu belongs to.</param>
+	/// <param name="count">How many items the menu holds.</param>
+	/// <param name="itemHeight">How tall each item is, in logical pixels.</param>
+	/// <returns>A task that completes once the menu is attached.</returns>
+	[Given("a MenuFlyout named {string} is attached to {string} with {int} items {int} tall")]
+	public async Task Given_a_MenuFlyout_is_attached_with_sized_items(string flyoutName, string targetName,
+		int count, int itemHeight)
+	{
+		var texts = Enumerable.Range(1, count)
+			.Select(number => string.Create(CultureInfo.InvariantCulture, $"Item {number}"))
+			.ToArray();
+
+		FlyoutBase flyout = null!;
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+		{
+			var menu = new MenuFlyout();
+			foreach (var text in texts)
+			{
+				var item = new MenuFlyoutItem { Name = text, Text = text, Height = itemHeight };
+				item.Click += (_, _) => EventRecorder.Record(text, "Click");
+				ElementRegistry.Register(text, item);
+				menu.Items.Add(item);
+			}
+
+			flyout = menu;
+			FlyoutBase.SetAttachedFlyout(ElementRegistry.Resolve(targetName), menu);
+		}).ConfigureAwait(false);
+
+		_scenarioContext[FlyoutKeyPrefix + flyoutName] = flyout;
+	}
+
+	/// <summary>
+	/// Asserts that the flyout that is open lies inside the panel. A flyout the application
+	/// cannot fit is not allowed to run off the panel's edge, because everything past that edge
+	/// is unreachable: it has to be made small enough to fit and let the person scroll it.
+	/// </summary>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the open flyout fits within the panel")]
+	public static async Task Then_the_open_flyout_fits_within_the_panel()
+	{
+		var presenter = await OpenFlyoutPresenterAsync().ConfigureAwait(false);
+		var bounds = await PresenterBoundsAsync(presenter).ConfigureAwait(false);
+		var (width, height) = TestTargetFixture.PanelSize;
+
+		bounds.Height.Should().BeLessThanOrEqualTo(height,
+			"the open flyout must not be taller than the {0} by {1} panel", width, height);
+		bounds.Width.Should().BeLessThanOrEqualTo(width,
+			"the open flyout must not be wider than the {0} by {1} panel", width, height);
+		bounds.Bottom.Should().BeLessThanOrEqualTo(height,
+			"the bottom of the open flyout must be on the panel, not past it");
+		bounds.Top.Should().BeGreaterThanOrEqualTo(0.0,
+			"the top of the open flyout must be on the panel, not above it");
+	}
+
+	/// <summary>Asserts that the flyout that is open offers more content than it can show at once.</summary>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the open flyout can be scrolled")]
+	public static async Task Then_the_open_flyout_can_be_scrolled() =>
+		(await OpenFlyoutScrollableHeightAsync().ConfigureAwait(false)).Should().BeGreaterThan(0.0,
+			"a flyout too tall for the panel must offer the rest of its items by scrolling");
+
+	/// <summary>Asserts that the flyout that is open shows everything it holds.</summary>
+	/// <returns>A task that completes when the assertion has been made.</returns>
+	[Then("the open flyout cannot be scrolled")]
+	public static async Task Then_the_open_flyout_cannot_be_scrolled() =>
+		(await OpenFlyoutScrollableHeightAsync().ConfigureAwait(false)).Should().Be(0.0,
+			"a flyout that fits on the panel must show all of itself at once");
+
+	/// <summary>Scrolls the flyout that is open to the bottom of its items, and lets it settle.</summary>
+	/// <returns>A task that completes once the last item is in view and the frame is still.</returns>
+	[When("the open flyout is scrolled to its end")]
+	public static async Task When_the_open_flyout_is_scrolled_to_its_end()
+	{
+		var presenter = await OpenFlyoutPresenterAsync().ConfigureAwait(false);
+		await TestTargetFixture.RunOnUIThreadAsync(() =>
+		{
+			var scroller = FlyoutScroller(presenter);
+			scroller.ChangeView(null, scroller.ScrollableHeight, null, true);
+		}).ConfigureAwait(false);
+
+		await SettleAsync(FlyoutSettleDelay).ConfigureAwait(false);
+	}
 
 	/// <summary>Hides a flyout the way an application does, without a finger.</summary>
 	/// <param name="flyoutName">The name the scenario gave the flyout.</param>
@@ -645,6 +786,56 @@ public sealed class PopupSteps
 
 		await TapAsync(button).ConfigureAwait(false);
 	}
+
+	private static async Task<FrameworkElement> OpenFlyoutPresenterAsync()
+	{
+		FrameworkElement? presenter = null;
+		await TestTargetFixture.RunOnUIThreadAsync(() => presenter = PopupElements.OpenPopupContent())
+			.ConfigureAwait(false);
+
+		return presenter ?? throw new InvalidOperationException(
+			"No flyout is open, so there is nothing over the panel to look at.");
+	}
+
+	private static async Task<(double Top, double Bottom, double Width, double Height)> PresenterBoundsAsync(
+		FrameworkElement presenter)
+	{
+		var bounds = default(Windows.Foundation.Rect);
+		await TestTargetFixture.RunOnUIThreadAsync(() => bounds = presenter
+			.TransformToVisual(null)
+			.TransformBounds(new Windows.Foundation.Rect(0, 0, presenter.ActualWidth, presenter.ActualHeight)))
+			.ConfigureAwait(false);
+
+		return (bounds.Top, bounds.Bottom, bounds.Width, bounds.Height);
+	}
+
+	private static async Task<double> OpenFlyoutScrollableHeightAsync()
+	{
+		var presenter = await OpenFlyoutPresenterAsync().ConfigureAwait(false);
+		var scrollable = 0.0;
+		await TestTargetFixture.RunOnUIThreadAsync(() => scrollable = FlyoutScroller(presenter).ScrollableHeight)
+			.ConfigureAwait(false);
+
+		return scrollable;
+	}
+
+	private async Task<Region> OpenFlyoutInteriorAsync()
+	{
+		var presenter = await OpenFlyoutPresenterAsync().ConfigureAwait(false);
+		var bounds = await DeviceRect.OfAsync(presenter).ConfigureAwait(false);
+
+		// The presenter draws a border and rounds its corners, and a shadow may fall just inside
+		// its rectangle, so the surface a requirement is about starts a little way in.
+		var inset = Math.Max(CanvasAssert.SurfaceInset,
+			Math.Min(bounds.Width, bounds.Height) / CanvasAssert.SurfaceInsetDivisor);
+		return new Region(ScenarioFrames.Current(_scenarioContext), bounds.Inset(inset),
+			"the interior of the open flyout");
+	}
+
+	private static ScrollViewer FlyoutScroller(FrameworkElement presenter) =>
+		VisualTreeSearch.FindDescendant<ScrollViewer>(presenter)
+			?? throw new InvalidOperationException(
+				"The open flyout's presenter holds no ScrollViewer, so its items cannot be scrolled.");
 
 	private static async Task TapAsync(FrameworkElement element)
 	{

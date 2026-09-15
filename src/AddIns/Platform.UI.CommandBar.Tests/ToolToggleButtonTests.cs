@@ -116,7 +116,7 @@ public class ToolToggleButtonTests
 	}
 
 	[Fact]
-	public void The_automation_peer_still_offers_the_invoke_pattern()
+	public void The_automation_peer_offers_toggle_and_not_invoke()
 	{
 		//Arrange
 		var toggle = new ToolToggleButton();
@@ -124,11 +124,14 @@ public class ToolToggleButtonTests
 
 		//Act
 		var invoke = peer.GetPattern(PatternInterface.Invoke);
+		var togglePattern = peer.GetPattern(PatternInterface.Toggle);
 
 		//Assert
-		//A toggle is still a button: an automation client that only knows how to invoke should be
-		//able to press it.
-		invoke.Should().BeSameAs(peer);
+		//A toggle has a STATE, not an action, and Invoke has no answer to which of its two states
+		//it would leave the button in. The framework's own toggle peer advertises Toggle alone, and
+		//the drop-down peer beside this one already drops a pattern its button cannot honour.
+		invoke.Should().BeNull();
+		togglePattern.Should().BeSameAs(peer);
 	}
 
 	[Fact]

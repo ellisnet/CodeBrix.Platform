@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +18,7 @@ using Microsoft.UI.Xaml;
 using SkiaSharp;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.UI;
+using CodeBrix.Platform.UI.Runtime.Skia;
 using CodeBrix.Platform.UI.Xaml.Controls;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11; //Was previously: Uno.WinUI.Runtime.Skia.X11
@@ -385,11 +386,18 @@ internal partial class X11XamlRootHost : IXamlRootHost
 
 		int screen = XLib.XDefaultScreen(display);
 
+		// ApplicationView.PreferredLaunchViewSize - and the default fallback below - are EFFECTIVE
+		// PIXELS, the unit the XAML tree is laid out in. XCreateWindow wants raw device pixels, so the
+		// conversion happens here, once, for both the root window and the top window created from it.
+		// The scale has to come from X11DisplayScale rather than from DisplayInformation, because no
+		// window exists yet and so there is no display to ask; see item 8 of the FIXLIST.
 		var size = ApplicationView.PreferredLaunchViewSize;
 		if (size == Size.Empty)
 		{
 			size = new Size(NativeWindowWrapperBase.InitialWidth, NativeWindowWrapperBase.InitialHeight);
 		}
+
+		size = WindowSizeConversion.LogicalToNative(size, X11DisplayScale.GetLaunchScale());
 
 		// For the root window (that does nothing but act as an anchor for children,
 		// we don't bother with OpenGL, since we don't render on this window anyway.

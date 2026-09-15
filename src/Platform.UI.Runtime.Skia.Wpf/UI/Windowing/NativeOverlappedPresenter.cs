@@ -12,15 +12,15 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Wpf.UI.Controls; //Was previously: U
 internal class NativeOverlappedPresenter : INativeOverlappedPresenter
 {
 	private readonly CodeBrixWpfWindow _wpfWindow;
-	private readonly WpfWindowWrapper _windowWrapper;
 	private bool _isMinimizable = true;
 	private bool _isMaximizable = true;
 	private bool _isResizable = true;
 
-	public NativeOverlappedPresenter(CodeBrixWpfWindow wpfWindow, WpfWindowWrapper windowWrapper)
+	// The window wrapper used to be held here only to divide the presenter's size constraints by its
+	// rasterization scale; SetSizeConstraints no longer converts, so nothing needs it - see item 8.
+	public NativeOverlappedPresenter(CodeBrixWpfWindow wpfWindow)
 	{
 		_wpfWindow = wpfWindow;
-		_windowWrapper = windowWrapper;
 	}
 
 	public OverlappedPresenterState State => _wpfWindow.WindowState switch
@@ -97,42 +97,25 @@ internal class NativeOverlappedPresenter : INativeOverlappedPresenter
 		}
 	}
 
+	/// <summary>
+	/// Applies the <see cref="OverlappedPresenter"/> size constraints, which are EFFECTIVE PIXELS of
+	/// the FRAMED window, to the WPF window's own minimum and maximum.
+	/// </summary>
+	/// <param name="preferredMinimumWidth">The minimum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMinimumHeight">The minimum height in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumWidth">The maximum width in effective pixels, or null for none.</param>
+	/// <param name="preferredMaximumHeight">The maximum height in effective pixels, or null for none.</param>
+	/// <remarks>
+	/// No conversion: WPF's <c>MinWidth</c>, <c>MaxWidth</c> and friends are device-independent units,
+	/// which is the same unit the presenter seam speaks, and the same unit this head already assigns
+	/// the launch size in. This used to divide by the rasterization scale, which made the head
+	/// disagree with itself at any scale other than 1 - see item 8 of the FIXLIST.
+	/// </remarks>
 	public void SetSizeConstraints(int? preferredMinimumWidth, int? preferredMinimumHeight, int? preferredMaximumWidth, int? preferredMaximumHeight)
 	{
-		if (preferredMinimumWidth is null)
-		{
-			_wpfWindow.MinWidth = 0;
-		}
-		else
-		{
-			_wpfWindow.MinWidth = preferredMinimumWidth.Value / _windowWrapper.RasterizationScale;
-		}
-
-		if (preferredMinimumHeight is null)
-		{
-			_wpfWindow.MinHeight = 0;
-		}
-		else
-		{
-			_wpfWindow.MinHeight = preferredMinimumHeight.Value / _windowWrapper.RasterizationScale;
-		}
-
-		if (preferredMaximumWidth is null)
-		{
-			_wpfWindow.MaxWidth = double.PositiveInfinity;
-		}
-		else
-		{
-			_wpfWindow.MaxWidth = preferredMaximumWidth.Value / _windowWrapper.RasterizationScale;
-		}
-
-		if (preferredMaximumHeight is null)
-		{
-			_wpfWindow.MaxHeight = double.PositiveInfinity;
-		}
-		else
-		{
-			_wpfWindow.MaxHeight = preferredMaximumHeight.Value / _windowWrapper.RasterizationScale;
-		}
+		_wpfWindow.MinWidth = preferredMinimumWidth ?? 0;
+		_wpfWindow.MinHeight = preferredMinimumHeight ?? 0;
+		_wpfWindow.MaxWidth = preferredMaximumWidth ?? double.PositiveInfinity;
+		_wpfWindow.MaxHeight = preferredMaximumHeight ?? double.PositiveInfinity;
 	}
 }

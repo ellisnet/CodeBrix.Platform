@@ -383,11 +383,62 @@ public sealed partial class TriPaneView
 	}
 
 	/// <summary>
-	/// Restores the stack - the column holding the upper and lower panes - to the width weight it
-	/// had when it was minimized. When both stack panes are also at zero they are restored with it,
-	/// so the stack comes back usable. Does nothing when the stack is already open.
+	/// Minimizes the stack - the whole region holding the upper and lower panes: its width weight is
+	/// snapshotted and set to zero, so both panes collapse together and the side pane takes the
+	/// control. Neither pane's content element leaves the visual tree, and
+	/// <see cref="RestoreStack"/> brings the very same instances back.
 	/// </summary>
-	internal void RestoreStack()
+	/// <remarks>
+	/// A request that would leave no pane open at all - the side pane is minimized too - is ignored
+	/// and the control's state is left exactly as it was. Because this is a request from code, no
+	/// restore grip is offered while <see cref="RestoreGripMode"/> is
+	/// <see cref="TriPaneViewRestoreGripMode.Auto"/>; <see cref="RestoreStack"/> is then the only way
+	/// back, and it works whatever collapsed the stack.
+	/// </remarks>
+	public void MinimizeStack()
+	{
+		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
+
+		if (TriPaneViewLayoutMath.IsMinimized(sideWeight) || TriPaneViewLayoutMath.IsMinimized(stackWeight))
+		{
+			UpdateState();
+
+			return;
+		}
+
+		_stackSnapshot = StackPercent;
+
+		var wasBatchUpdating = _isBatchUpdating;
+		_isBatchUpdating = true;
+
+		try
+		{
+			StackPercent = 0d;
+		}
+		finally
+		{
+			_isBatchUpdating = wasBatchUpdating;
+
+			//The cause belongs to THIS region and nothing else: a code minimize here must not turn
+			//off the restore grip of a pane the user dragged shut.
+			_stackCause = TriPaneViewMinimizeCause.Code;
+			UpdateState();
+		}
+	}
+
+	/// <summary>
+	/// Restores the stack - the region holding the upper and lower panes - to the width weight it
+	/// had when it was minimized, or to the default weight when there is no snapshot to go back to.
+	/// When both stack panes are also at zero they are restored with it, so the stack comes back
+	/// usable. Does nothing when the stack is already open.
+	/// </summary>
+	/// <remarks>
+	/// This is the counterpart of <see cref="MinimizeStack"/> and it does not care what collapsed
+	/// the stack: a stack the user dragged shut and a stack code shut both come back through here.
+	/// No pane content is ever detached while the stack is minimized, so this shows the very same
+	/// element instances that were there before.
+	/// </remarks>
+	public void RestoreStack()
 	{
 		var (_, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
 
@@ -489,6 +540,7 @@ public sealed partial class TriPaneView
 	/// </summary>
 	/// <param name="version">The number of the state pass these values were computed by.</param>
 	/// <param name="isSideMinimized">Whether the side pane is minimized.</param>
+	/// <param name="isStackMinimized">Whether the whole stack is minimized.</param>
 	/// <param name="isUpperMinimized">Whether the upper pane is minimized.</param>
 	/// <param name="isLowerMinimized">Whether the lower pane is minimized.</param>
 	/// <remarks>
@@ -499,13 +551,22 @@ public sealed partial class TriPaneView
 	/// external commands; and the pass number is re-checked between the writes, so once a newer pass
 	/// has published a newer state this one abandons the values it computed before.
 	/// </remarks>
-	private void SyncMinimizedFlags(int version, bool isSideMinimized, bool isUpperMinimized, bool isLowerMinimized)
+	private void SyncMinimizedFlags(
+		int version,
+		bool isSideMinimized,
+		bool isStackMinimized,
+		bool isUpperMinimized,
+		bool isLowerMinimized)
 	{
 		var wasSyncing = _isSyncingMinimizedFlags;
 		_isSyncingMinimizedFlags = true;
 
 		try
 		{
+			//The stack flag is read-only, so nothing it runs can come back through a setter of ours;
+			//it is published first so a handler of one of the three settable flags below already
+			//sees it.
+			SetValue(IsStackMinimizedProperty, isStackMinimized);
 			SetValue(IsSidePaneMinimizedProperty, isSideMinimized);
 
 			if (_stateVersion != version)

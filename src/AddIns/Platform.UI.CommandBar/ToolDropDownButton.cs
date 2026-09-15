@@ -379,6 +379,9 @@ public partial class ToolDropDownButton : ToolButton
 	/// <inheritdoc/>
 	protected override void OnPointerExited(PointerRoutedEventArgs args)
 	{
+		//Cancelling the press unconditionally is the framework's own ButtonBase behaviour: a
+		//pointer that leaves the button before it is released produces no click, even if it comes
+		//back. Matching it is deliberate - do not "fix" this into a re-entry that clicks.
 		CancelPress();
 		base.OnPointerExited(args);
 	}
@@ -396,6 +399,10 @@ public partial class ToolDropDownButton : ToolButton
 		var point = args.GetCurrentPoint(this).Position;
 		var origin = _arrowPart.TransformToVisual(this).TransformPoint(new Point(0, 0));
 
+		//A full rectangle test against the arrow's own transformed origin and arranged size, so it
+		//is orientation-agnostic: the four comparisons below are one && chain and their order is
+		//short-circuit order alone. An arrow stacked above or below the main part would be found
+		//by exactly this code.
 		return point.X >= origin.X
 			&& point.X <= origin.X + _arrowPart.ActualWidth
 			&& point.Y >= origin.Y

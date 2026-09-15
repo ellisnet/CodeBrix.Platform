@@ -139,11 +139,9 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 {
 	internal class X11DisplayInformationExtension : IDisplayInformationExtension
 	{
-		private const string EnvironmentCodeBrixDisplayScaleOverride = "CODEBRIX_DISPLAY_SCALE_OVERRIDE";
 		private const double InchesToMilliMeters = 25.4;
-		private const string XftDotdpi = "Xft.dpi";
 
-		private readonly float? _scaleOverride;
+		private readonly double? _scaleOverride;
 		private readonly DisplayInformation _owner;
 		private readonly X11XamlRootHost _host;
 		private DisplayInformationDetails _details;
@@ -160,11 +158,9 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 		{
 			_owner = (DisplayInformation)owner;
 
-			if (float.TryParse(
-				Environment.GetEnvironmentVariable(EnvironmentCodeBrixDisplayScaleOverride),
-				NumberStyles.Any,
-				CultureInfo.InvariantCulture,
-				out var environmentScaleOverride))
+			// Both the override and the Xft.dpi resource below are read through X11DisplayScale, which
+			// X11XamlRootHost also uses to size a window before this extension exists - see item 8.
+			if (X11DisplayScale.TryGetScaleOverride(out var environmentScaleOverride))
 			{
 				_scaleOverride = environmentScaleOverride;
 			}
@@ -231,7 +227,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 				var yres = X11Helper.XHeightOfScreen(screen) * InchesToMilliMeters / X11Helper.XHeightMMOfScreen(screen);
 				var dpi = (float)Math.Round(Math.Sqrt(xres * yres)); // TODO: what to do if dpi in the 2 normal directions is different??
 
-				var rawScale = _scaleOverride ?? (TryGetXResource(XftDotdpi, out var xrdbScaling) ? xrdbScaling.Value : dpi / DisplayInformation.BaseDpi);
+				var rawScale = _scaleOverride ?? (X11DisplayScale.TryGetXResourceScale(out var xrdbScaling) ? xrdbScaling.Value : dpi / DisplayInformation.BaseDpi);
 
 				// This returns very incorrect numbers as far as I've tested.
 				var widthInInches = (uint)Math.Round(X11Helper.XWidthMMOfScreen(screen) / InchesToMilliMeters);
@@ -267,34 +263,6 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 
 		public void StartDpiChanged() { }
 		public void StopDpiChanged() { }
-
-		private bool TryGetXResource(string resourceName, [NotNullWhen(true)] out double? scaling)
-		{
-			// For some reason, querying the resources with a preexisting display yields outdated values, so
-			// we have to open a new display here.
-			IntPtr display = XLib.XOpenDisplay(IntPtr.Zero);
-			using var displayDisposable = new DisposableStruct<IntPtr>(static d => { _ = XLib.XCloseDisplay(d); }, display);
-			var xdefs = X11Helper.XResourceManagerString(display);
-			if (xdefs != IntPtr.Zero)
-			{
-				IntPtr xrdb = X11Helper.XrmGetStringDatabase(xdefs);
-				using var databaseDisposable = new DisposableStruct<IntPtr>(X11Helper.XrmDestroyDatabase, xrdb);
-				var resourceNamePtr = Marshal.StringToHGlobalAnsi(resourceName);
-				using var resourceNameDisposable = new DisposableStruct<IntPtr>(Marshal.FreeHGlobal, resourceNamePtr);
-				var found = X11Helper.XrmGetResource(xrdb, resourceNamePtr, resourceNamePtr, out _, out X11Helper.XrmValue value);
-				// don't free value.addr. It's managed by the X server.
-				if (found && value.addr != IntPtr.Zero)
-				{
-					if (Marshal.PtrToStringAnsi(value.addr, (int)value.size) is { } str && int.TryParse(str, out var result))
-					{
-						scaling = result / DisplayInformation.BaseDpi;
-						return true;
-					}
-				}
-			}
-			scaling = null;
-			return false;
-		}
 
 		// START OF EXCERPT 1
 		// 1.2 Introduction to version 1.2 of the extension
@@ -451,7 +419,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11 //Was previously: Uno.WinUI.R
 
 			// With XRandR, we don't use the xScaling and yScaling values, since the server will "stretch" the window to
 			// the required scaling. We don't need to do any scale by <x|y>Scaling ourselves.
-			var rawScale = _scaleOverride ?? (TryGetXResource(XftDotdpi, out var xrdbScaling) ? xrdbScaling.Value : 1);
+			var rawScale = _scaleOverride ?? (X11DisplayScale.TryGetXResourceScale(out var xrdbScaling) ? xrdbScaling.Value : 1);
 
 			// Note: This returns nondeterministic values when testing on WSL or on a VM. Testing on a real device
 			// with the same Ubuntu version returns accurate results.

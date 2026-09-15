@@ -1,4 +1,4 @@
-#pragma warning disable 108 // new keyword hiding
+﻿#pragma warning disable 108 // new keyword hiding
 #pragma warning disable 114 // new keyword hiding
 #pragma warning disable 67
 
@@ -155,6 +155,20 @@ namespace Windows.UI.ViewManagement
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the size the next window this application opens is created at.
+		/// </summary>
+		/// <remarks>
+		/// The size is in EFFECTIVE PIXELS - the unit the XAML tree is laid out in, not raw display
+		/// pixels - so one pair of numbers is right on every head and at every display scale; each head
+		/// converts it to whatever its own windowing system wants. It is NOT the unit
+		/// <see cref="global::Microsoft.UI.Windowing.AppWindow.Size"/> and
+		/// <see cref="global::Microsoft.UI.Windowing.AppWindow.Resize(global::Windows.Graphics.SizeInt32)"/>
+		/// use, which are raw pixels. The size is the CLIENT area on the X11, Wayland and macOS heads -
+		/// where the windowing system creates a window from its content rectangle - and the FRAMED
+		/// window, decorations included, on the Win32 and WPF heads. It is read once, when a window is
+		/// created, so it has to be set before the first window opens to have any effect.
+		/// </remarks>
 		public static Size PreferredLaunchViewSize
 		{
 			get
