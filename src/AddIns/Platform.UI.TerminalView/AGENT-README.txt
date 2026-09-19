@@ -138,6 +138,12 @@ Events (all raised on the UI thread):
         channel - for SSH, ShellStream.ChangeWindowSize(cols, rows, 0, 0);
         for a PTY, Pty.SetWinSize. Fires only when the numbers actually
         change; a resize that keeps the same grid is silent.
+        IT ALSO FIRES THE FIRST TIME THE CONTENT SCROLLS, with nobody
+        touching the window: the scrollbar is collapsed until there is
+        scrollback, and when it appears it takes its width out of the
+        grid, so the column count drops by a column or two - always in
+        the middle of whatever is being written at that moment. See
+        COMMON PITFALLS if your application writes a prompt of its own.
 
     public event Action<string>? TitleChanged
         The window title set by OSC 0 / OSC 2. (OSC 1 icon titles are
@@ -517,6 +523,19 @@ COMMON PITFALLS TO AVOID
   - An escape-driven resize request from the application (DECSLPP and the
     like) is deliberately ignored; the grid follows the control, and the
     host learns the size through GridResized.
+  - NO HOST AT ALL (a REPL, a chat, anything that writes its own prompt and
+    input line): do not answer GridResized by repainting the prompt while
+    your application is in the middle of writing output. GridResized fires
+    by itself at the first scroll (the scrollbar appears), which is always
+    mid-output, and a prompt written then lands inside that output - and
+    the attribute reset a colored prompt carries silently ends whatever
+    color or dim the output was being written in. Record the new column
+    count, carry on, and lay the NEXT prompt out against it. Repaint the
+    input line only when the prompt is what is on screen - and do repaint
+    it then after the grid gets NARROWER: the engine re-lays every row
+    above the cursor's line and loses nothing, but it leaves the cursor's
+    own line to the application and cuts it to the new width (the xterm
+    rule that real shells rely on).
   - ConvertEol defaults to FALSE. A bare-LF source (pipe-connected process,
     log tail) needs true, or every line steps one column to the right.
   - Set Scrollback before the control loads; afterwards it applies only at
@@ -620,4 +639,6 @@ QUICK REFERENCE CARD
                    wheel 3 lines
     Rules:         bounded size | Feed after Loaded | ConvertEol per source |
                    Scrollback before load | monospaced font | no mouse
-                   reporting, no IME, no TrueColor
+                   reporting, no IME, no TrueColor | GridResized also fires
+                   at the first scroll - never repaint a prompt of your own
+                   into running output
