@@ -72,8 +72,8 @@
 	</Target>
 
 	<PropertyGroup>
-		<MSTestVersion>4.4.0</MSTestVersion>
-		<MicrosoftTestingPlatformVersion>2.4.0</MicrosoftTestingPlatformVersion>
+		<MSTestVersion>4.4.1</MSTestVersion>
+		<MicrosoftTestingPlatformVersion>2.4.1</MicrosoftTestingPlatformVersion>
 		<SkiaSharpVersion>4.152.0</SkiaSharpVersion>
 		<HarfBuzzSharpVersion>14.2.1.200</HarfBuzzSharpVersion>
 	</PropertyGroup>
