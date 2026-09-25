@@ -3,43 +3,43 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Calls
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public enum DtmfKey
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D0 = 0,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D1 = 1,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D2 = 2,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D3 = 3,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D4 = 4,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D5 = 5,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D6 = 6,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D7 = 7,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D8 = 8,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		D9 = 9,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		Star = 10,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		Pound = 11,
 #endif
 	}

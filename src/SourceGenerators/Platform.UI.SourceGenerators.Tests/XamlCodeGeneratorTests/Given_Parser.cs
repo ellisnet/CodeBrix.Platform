@@ -241,7 +241,7 @@ public partial class Given_Parser
 		var test = new Verify.Test(xamlFiles) { TestState = { Sources = { _emptyCodeBehind } } }.AddGeneratedSources();
 
 		test.ExpectedDiagnostics.AddRange([
-			DiagnosticResult.CompilerError("CS0117").WithSpan(System.IO.Path.Combine("CodeBrix.Platform.UI.SourceGenerators", "CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator", "MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs"), 56, 5, 56, 18).WithArguments("Microsoft.UI.Xaml.Controls.Grid", "InvalidMember")
+			DiagnosticResult.CompilerError("CS0117").WithSpan(System.IO.Path.Combine("CodeBrix.Platform.UI.SourceGenerators", "CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator", "MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs"), 52, 5, 52, 18).WithArguments("Microsoft.UI.Xaml.Controls.Grid", "InvalidMember")
 			// ==> When XAML is invalid, we still generate the class structure, so we should not miss InitializeComponent.
 		]);
 
@@ -271,7 +271,7 @@ public partial class Given_Parser
 		var test = new Verify.Test(xamlFiles) { TestState = { Sources = { _emptyCodeBehind } } }.AddGeneratedSources();
 
 		test.ExpectedDiagnostics.AddRange([
-			DiagnosticResult.CompilerError("CS0246").WithSpan(System.IO.Path.Combine("CodeBrix.Platform.UI.SourceGenerators", "CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator", "MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs"), 59, 10, 59, 30).WithArguments("TypeThatDoesNotExist"),
+			DiagnosticResult.CompilerError("CS0246").WithSpan(System.IO.Path.Combine("CodeBrix.Platform.UI.SourceGenerators", "CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator", "MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs"), 55, 10, 55, 30).WithArguments("TypeThatDoesNotExist"),
 			// ==> When XAML is invalid, we still generate the class structure, so we should not miss InitializeComponent.
 		]);
 

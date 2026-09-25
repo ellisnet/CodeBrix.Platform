@@ -1,4 +1,4 @@
-#if !IS_UNIT_TESTS && !__SKIA__ && !__NETSTD_REFERENCE__
+#if !IS_UNIT_TESTS && !__CROSSRUNTIME__
 using Windows.Storage.Streams;
 
 namespace Windows.Devices.Midi

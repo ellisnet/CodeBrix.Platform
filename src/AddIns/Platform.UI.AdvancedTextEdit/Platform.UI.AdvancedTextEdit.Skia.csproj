@@ -1,4 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.AdvancedTextEdit: since the Core/Skia split, only the canvas supply (the *.skia.cs files: the
+	Skia implementation of the add-in's IRenderCanvasPlatform contract, the add-in's software RenderCanvas) and the
+	package. The editor itself is in CodeBrix.Platform.UI.AdvancedTextEdit.Core
+	(Platform.UI.AdvancedTextEdit.Core.csproj), which this package carries beside this assembly.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,7 +26,15 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.AdvancedTextEdit.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
@@ -37,13 +51,16 @@
 
 	<ItemGroup>
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
-		     Platform.UI.TextLayout.Skia as the CodeBrix.Platform.TextLayout.ApacheLicenseForever
+		     Platform.UI.TextLayout.Core (the whole TextLayout add-in since the text-engine home change)
+		     as the CodeBrix.Platform.TextLayout.ApacheLicenseForever
 		     dependency, both at the same family version as this build (the whole family ships
-		     together). The editor reaches framework internals (typed-character input, the shared
-		     text engine's line metrics) through InternalsVisibleTo, declared in
-		     src/Platform.UI/AssemblyInfo.cs. -->
+		     together). The editor itself is in the Core project below. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
+
+		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
+		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->
+		<ProjectReference Include="Platform.UI.AdvancedTextEdit.Core.csproj" CodeBrixBundleInPackage="true" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -51,11 +68,6 @@
 		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
 		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
 		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Highlighting\Resources\*.xshd" />
-		<EmbeddedResource Include="Highlighting\Resources\*.xsd" />
 	</ItemGroup>
 
 	<PropertyGroup>
@@ -66,4 +78,5 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="..\AddIn.CorePackaging.targets" />
 </Project>

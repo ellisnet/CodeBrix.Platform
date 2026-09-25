@@ -1,27 +1,26 @@
 <Solution>
   <Folder Name="/Platform/" />
   <Folder Name="/Platform/Core/">
-    <Project Path="../../../src/Platform.Foundation.Logging/Platform.Foundation.Logging.csproj" />
-    <Project Path="../../../src/Platform.Foundation/Platform.Foundation.Reference.csproj" />
-    <Project Path="../../../src/Platform.Foundation/Platform.Foundation.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.Composition/Platform.UI.Composition.Reference.csproj" />
+    <Project Path="../../../src/Platform.Foundation.Logging/Platform.Foundation.Logging.Core.csproj" />
+    <Project Path="../../../src/Platform.Foundation/Platform.Foundation.Core.csproj" />
+    <Project Path="../../../src/Platform.UI.Composition/Platform.UI.Composition.Core.csproj" />
     <Project Path="../../../src/Platform.UI.Composition/Platform.UI.Composition.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.Dispatching/Platform.UI.Dispatching.Reference.csproj" />
+    <Project Path="../../../src/Platform.UI.Dispatching/Platform.UI.Dispatching.Core.csproj" />
     <Project Path="../../../src/Platform.UI.Dispatching/Platform.UI.Dispatching.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
-    <Project Path="../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+    <Project Path="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
+    <Project Path="../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
   </Folder>
   <Folder Name="/Platform/UWP/">
-    <Project Path="../../../src/Platform.UWP/Platform.Reference.csproj" />
+    <Project Path="../../../src/Platform.UWP/Platform.Core.csproj" />
     <Project Path="../../../src/Platform.UWP/Platform.Skia.csproj" />
   </Folder>
   <Folder Name="/Platform/UI/">
-    <Project Path="../../../src/Platform.UI/Platform.UI.Reference.csproj" />
+    <Project Path="../../../src/Platform.UI/Platform.UI.Core.csproj" />
     <Project Path="../../../src/Platform.UI/Platform.UI.Skia.csproj" />
     <Project Path="../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Skia.csproj" />
-    <Project Path="../../../src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Skia.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Core.csproj" />
+    <Project Path="../../../src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Core.csproj" />
   </Folder>
   <Folder Name="/Platform/Runtime/">
     <Project Path="../../../src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
@@ -36,6 +35,7 @@
     <Project Path="../../../src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj" />
   </Folder>
   <Folder Name="/Platform/AddIns/">
+    <Project Path="../../../src/AddIns/Platform.UI.PlotterView/Platform.UI.PlotterView.Core.csproj" />
     <Project Path="../../../src/AddIns/Platform.UI.PlotterView/Platform.UI.PlotterView.Skia.csproj" />
   </Folder>
   <Folder Name="/Platform/Tools/">

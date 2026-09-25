@@ -1,5 +1,4 @@
-﻿#if !__SKIA__
-#nullable enable
+﻿#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -25,4 +24,3 @@ namespace CodeBrix.Platform.AuthenticationBroker //Was previously: Uno.Authentic
 		}
 	}
 }
-#endif

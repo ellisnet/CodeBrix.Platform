@@ -102,7 +102,7 @@ internal sealed class WaylandShmRenderer : IWaylandRenderer
 			var canvas = slot.Surface?.Canvas;
 			canvas?.Clear(_background);
 
-			_ = ((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(canvas, size =>
+			_ = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!, canvas, size =>
 			{
 				Resize((int)size.Width, (int)size.Height);
 				slot = GetFreeSlot()!; // fresh buffers are all free

@@ -4,7 +4,7 @@
 namespace Windows.Graphics.Display
 {
 	// This type is deprecated. Consider not implementing it.
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public delegate void DisplayPropertiesEventHandler(object sender);
 #endif
 }

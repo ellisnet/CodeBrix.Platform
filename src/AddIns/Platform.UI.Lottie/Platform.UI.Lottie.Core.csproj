@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Lottie.Core: the Lottie add-in's platform-neutral half - the animation sources
+	(LottieVisualSource, ThemableLottieVisualSource), their JSON handling and theming, the provider the framework's
+	AnimatedVisualPlayer and ProgressRing resolve (LottieVisualSourceProvider, registered through its
+	[assembly: ApiExtension]), and the Skottie playback that draws each frame on an SKCanvas. It references SkiaSharp,
+	SkiaSharp.Skottie, the SkiaSharp views Core (the SKCanvas-typed paint callback of the Skia-canvas host seam) and the
+	framework's Core assemblies, never the framework's Skia assemblies (plan rule R7). The element that supplies the
+	canvas is the platform contract Contracts/ILottieCanvasPlatform.cs; the Skia project in this folder
+	(Platform.UI.Lottie.Skia.csproj, assembly CodeBrix.Platform.UI.Lottie) implements it and is loaded by name through
+	Contracts/PlatformContract.cs.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);Uno0001</NoWarn>
+		<Deterministic>true</Deterministic>
+		<Nullable>enable</Nullable>
+
+		<AssemblyName>CodeBrix.Platform.UI.Lottie.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Lottie</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<DefineConstants>$(DefineConstants);HAS_SKOTTIE</DefineConstants>
+
+		<!-- Ships inside the Lottie package (build/nuget/Platform.WinUI.Lottie.nuspec); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp.Skottie" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Core.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

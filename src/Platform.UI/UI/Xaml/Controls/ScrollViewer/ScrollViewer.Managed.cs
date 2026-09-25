@@ -149,7 +149,12 @@ namespace Microsoft.UI.Xaml.Controls
 		internal Size ScrollBarSize => (_presenter as ScrollContentPresenter)?.ScrollBarSize ?? default;
 
 		private bool ChangeViewNative(double? horizontalOffset, double? verticalOffset, double? zoomFactor, bool disableAnimation)
-			=> (_presenter as ScrollContentPresenter)?.Set(horizontalOffset, verticalOffset, disableAnimation: disableAnimation) ?? true;
+			// Element handler seam, hook H10: the platform scrolls a ScrollViewer whose handler owns scrolling.
+			=> AreHandlersActive && TryGetHandlerWith(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.OwnsScrolling, out var scrollingHandler)
+				? scrollingHandler.Invoke(
+					CodeBrix.Platform.UI.Contracts.ElementHandlerCommands.ChangeView,
+					new CodeBrix.Platform.UI.Contracts.ChangeViewRequest(horizontalOffset, verticalOffset, zoomFactor, disableAnimation))
+				: (_presenter as ScrollContentPresenter)?.Set(horizontalOffset, verticalOffset, disableAnimation: disableAnimation) ?? true;
 
 		private partial void OnLoadedPartial() { }
 		private partial void OnUnloadedPartial() { }

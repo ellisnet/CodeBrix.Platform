@@ -8,3 +8,29 @@ using global::System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
+
+// Since the Core/Skia split this assembly holds only the Skia implementations; it keeps every grant the
+// single pre-split assembly had (the list below is the one of the shared AssemblyInfo.cs, which now goes to
+// the Core assembly), so every head, add-in and test that reached these internals still reaches them.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests.Windows")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.WebAssembly.Browser")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Android")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.AppleUIKit")]
+[assembly: InternalsVisibleTo("SamplesApp")]
+[assembly: InternalsVisibleTo("SamplesApp.Windows")]
+[assembly: InternalsVisibleTo("SamplesApp.Droid")]
+[assembly: InternalsVisibleTo("SamplesApp.macOS")]
+[assembly: InternalsVisibleTo("SamplesApp.Wasm")]
+[assembly: InternalsVisibleTo("SamplesApp.Skia")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics2DSK")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.PlatformIslandsSamplesApp")]
+[assembly: InternalsVisibleTo("CodeBrix.PlatformIslandsSamplesApp.Skia")]
+
+[assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]

@@ -238,7 +238,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 				// When the control template property is set, we clear the visual children
 				var pUIElement = this.GetFirstChild();
-				if (pUIElement is { })
+				if (pUIElement is { } && !IsChildOwnedByHandler(pUIElement))
 				{
 					//CFrameworkTemplate* pNewTemplate = NULL;
 					//if (e.NewValue?.GetType() == valueObject)
@@ -260,6 +260,25 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 
 		#endregion
+
+#if CODEBRIX_HAS_ENHANCED_LIFECYCLE
+		/// <summary>
+		/// Element handler seam: whether <paramref name="child"/> belongs to this control's platform handler rather than
+		/// to a template. A control whose handler owns the visuals never materializes its template (hook H5), so none of
+		/// its children is a template root; a ContentControl whose handler hosts the content has the hosted content as
+		/// its ContentTemplateRoot. <see cref="OnTemplateChanged"/> must leave such a child in place (a Template set by
+		/// the default style when the control enters the tree would otherwise remove content hosted before it).
+		/// </summary>
+		/// <param name="child">The child <see cref="OnTemplateChanged"/> would remove.</param>
+		/// <returns><see langword="true"/> when the child is the handler's; always <see langword="false"/> when no
+		/// handler service is registered (the Skia heads).</returns>
+		private bool IsChildOwnedByHandler(UIElement child)
+			=> AreHandlersActive
+				&& (HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.OwnsVisuals)
+					|| (this is ContentControl contentControl
+						&& contentControl.HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.HostsContent)
+						&& ReferenceEquals(contentControl.ContentTemplateRoot, child)));
+#endif
 
 		/// <summary>
 		/// Represents the single child that is the result of the control template application.
@@ -522,6 +541,23 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 
 		private protected override FrameworkTemplate GetTemplate() => Template;
+
+		/// <summary>
+		/// Releases the materialized template (the template root leaves the visual tree and the control forgets it), for
+		/// a platform handler that owns the control's visuals (hook H5 of the element handler seam). The next measure
+		/// materializes the template again unless the handler still owns the visuals. Template parts the control took in
+		/// OnApplyTemplate stay referenced but are no longer in the tree.
+		/// </summary>
+		internal void ReleaseTemplateForHandler()
+		{
+			if (TemplatedRoot is UIElement templateRoot)
+			{
+#if CODEBRIX_HAS_ENHANCED_LIFECYCLE
+				RemoveChild(templateRoot);
+#endif
+				TemplatedRoot = null;
+			}
+		}
 
 		/// <summary>
 		/// Applies default Style and implicit/explicit Style if not applied already, and materializes template.
@@ -1062,7 +1098,7 @@ namespace Microsoft.UI.Xaml.Controls
 		protected virtual void OnDragOver(global::Microsoft.UI.Xaml.DragEventArgs e) { }
 		protected virtual void OnDragLeave(global::Microsoft.UI.Xaml.DragEventArgs e) { }
 		protected virtual void OnDrop(global::Microsoft.UI.Xaml.DragEventArgs e) { }
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		protected virtual void OnPreviewKeyDown(KeyRoutedEventArgs e) { }
 		protected virtual void OnPreviewKeyUp(KeyRoutedEventArgs e) { }
 #endif
@@ -1134,7 +1170,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private static readonly DragEventHandler OnDropHandler =
 			(object sender, global::Microsoft.UI.Xaml.DragEventArgs args) => ((Control)sender).OnDrop(args);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private static readonly KeyEventHandler OnPreviewKeyDownHandler =
 			(object sender, KeyRoutedEventArgs args) => ((Control)sender).OnPreviewKeyDown(args);
 
@@ -1290,7 +1326,7 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				result |= RoutedEventFlag.Drop;
 			}
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (GetIsEventOverrideImplemented(type, nameof(OnPreviewKeyDown), _keyArgsType))
 			{
 				result |= RoutedEventFlag.PreviewKeyDown;

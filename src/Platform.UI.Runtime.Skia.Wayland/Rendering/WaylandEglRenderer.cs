@@ -132,7 +132,7 @@ internal sealed class WaylandEglRenderer : IWaylandRenderer
 			}
 
 			_surface?.Canvas.Clear(_background);
-			_ = ((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(_surface?.Canvas, size =>
+			_ = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!, _surface?.Canvas, size =>
 			{
 				Resize((int)size.Width, (int)size.Height);
 				_surface!.Canvas.Clear(_background);

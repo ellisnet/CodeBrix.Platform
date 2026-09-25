@@ -24,25 +24,19 @@
   </PropertyGroup>
 
   <!--
-    Runtime-replace, reproduced (build-integrated). Platform.UI.Skia compiles against the
-    .Reference WinRT projection and the .Reference Composition/Dispatching layers; the NuGet's
-    runtime-replace targets swapped in the .Skia implementations. We consume the platform via
-    project references (no NuGet), so reference resolution puts the .Reference variants of these
-    same-named/same-versioned assemblies in the copy-local list. The Reference variants lack
-    Skia-only types (e.g. Windows.UI.ViewManagement.IApplicationViewExtension in
-    CodeBrix.Platform.dll) -> TypeLoadException in the host.
+    Runtime-replace, reproduced (build-integrated). Before the Core/Skia split, Platform.UI.Skia compiled
+    against the .Reference WinRT projection and the .Reference Composition/Dispatching layers, and this
+    target swapped the .Skia implementations into the copy-local list in their place.
 
-    We edit the copy-local list right after reference resolution and before the output copy: drop
-    the .Reference entries and add the .Skia ones, so the normal CopyFilesToOutputDirectory places
-    the .Skia builds. Four assemblies are swapped (CodeBrix.Platform, .UI.Composition,
-    .UI.Dispatching, and .Foundation); UI/Toolkit/FluentTheme already resolve to .Skia. Compile
-    still uses the .Reference API surface (identical), so only runtime copy is affected.
-
-    Foundation must be swapped too: the .Skia and .Reference Foundation are NOT byte-identical.
-    Platform.Foundation/AssemblyInfo.skia.cs adds InternalsVisibleTo("...Runtime.Skia.MacOS"),
-    which is present only in the .Skia variant. The MacOS runtime compiles against .Skia Foundation
-    (so Disposable.Create etc. are legal), but if the .Reference Foundation (no IVT) is left in the
-    output, the runtime hits MethodAccessException on those internal calls.
+    Since the split there is no .Reference flavor: every framework library is a platform-neutral
+    CodeBrix.Platform*.Core.dll (built once, from its *.Core.csproj) plus, for the libraries that have
+    Skia code, a Skia twin under the old assembly name (CodeBrix.Platform, .UI, .UI.Composition,
+    .UI.Dispatching, .UI.Toolkit). Reference resolution now puts the Skia twins in the copy-local list
+    directly, so the swap below re-adds the very files it removes; it is kept (inert) so this file keeps
+    working unchanged for a head that still resolves an older build. Foundation is Core by whole
+    (CodeBrix.Platform.Foundation.Core.dll, whose AssemblyInfo carries the Runtime.Skia.MacOS grant), so it
+    is no longer swapped.
+    NOTE (WPB1): this file cannot be built on Linux; it was edited by inspection.
   -->
   <Target Name="_CodeBrixMacOSUseSkiaRuntimeAssemblies"
           AfterTargets="ResolveAssemblyReferences"
@@ -51,12 +45,11 @@
       <_CbMacSkiaUwp>$(MSBuildThisFileDirectory)..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbMacSkiaUwp>
       <_CbMacSkiaComp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbMacSkiaComp>
       <_CbMacSkiaDisp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbMacSkiaDisp>
-      <_CbMacSkiaFound>$(MSBuildThisFileDirectory)..\..\src\Platform.Foundation\bin\Platform.Foundation.Skia\$(Configuration)\net10.0</_CbMacSkiaFound>
     </PropertyGroup>
     <ItemGroup>
       <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching' or '%(FileName)' == 'CodeBrix.Platform.Foundation'" />
+        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
       <!-- Add the .Skia variants in their place. -->
       <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.dll')" />
       <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb')" />
@@ -64,8 +57,6 @@
       <ReferenceCopyLocalPaths Include="$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
       <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
       <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.dll" Condition="Exists('$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.pdb" Condition="Exists('$(_CbMacSkiaFound)\CodeBrix.Platform.Foundation.pdb')" />
     </ItemGroup>
   </Target>
 

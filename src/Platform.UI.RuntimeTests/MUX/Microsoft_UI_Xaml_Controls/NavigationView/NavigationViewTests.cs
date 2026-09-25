@@ -871,7 +871,7 @@ namespace Microsoft.UI.Xaml.Tests.MUXControls.ApiTests
 		[Ignore("This test is disabled in WinUI")]
 		public void VerifyCanNotAddWUXItems()
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Controls.NavigationViewItem, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Controls.NavigationViewItem, CodeBrix.Platform.UI.Core"))
 			{
 				Log.Warning("WUX version of NavigationViewItem only available starting in RS3.");
 				return;

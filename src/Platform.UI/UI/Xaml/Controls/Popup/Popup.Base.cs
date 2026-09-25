@@ -54,6 +54,23 @@ public partial class Popup : FrameworkElement, IPopup
 		base.OnUnloaded();
 	}
 
+	/// <summary>
+	/// The mirror of <see cref="OnUnloaded"/>: a Popup whose IsOpen was set to true before it entered the live tree
+	/// (declared <c>IsOpen="True"</c> in XAML, or opened in code and then added to a panel) could not reach a
+	/// XamlRoot at that moment; it is shown now that it has one. A Popup that is closed, or already shown, is left alone.
+	/// </summary>
+	private protected override void OnLoaded()
+	{
+		base.OnLoaded();
+		EnsureOpenedInRoot();
+	}
+
+	/// <summary>
+	/// Called by <see cref="Microsoft.UI.Xaml.XamlRoot"/> when a XamlRoot is assigned to this Popup through its XamlRoot property. A
+	/// parentless Popup whose IsOpen was set to true before its XamlRoot is shown at that point.
+	/// </summary>
+	internal void OnXamlRootAssigned() => EnsureOpenedInRoot();
+
 	partial void OnUnloadedPartial();
 
 	/// <inheritdoc />
@@ -72,49 +89,58 @@ public partial class Popup : FrameworkElement, IPopup
 		return finalSize;
 	}
 
-	partial void OnIsOpenChangedPartial(bool oldIsOpen, bool newIsOpen)
+	/// <summary>
+	/// The XamlRoot the Popup opens in: its own, its child's, or (CoreWindow hosting only) the window's.
+	/// </summary>
+	private XamlRoot ResolveOpenXamlRoot() =>
+		XamlRoot ?? Child?.XamlRoot ?? WinUICoreServices.Instance.ContentRootCoordinator.Unsafe_IslandsIncompatible_CoreWindowContentRoot?.XamlRoot;
+
+	/// <summary>
+	/// The first half of opening (see EnsureOpenedInRoot): adopts the XamlRoot, registers the Popup as open in that
+	/// root's PopupRoot, and takes focus for a light-dismiss or flyout Popup.
+	/// </summary>
+	/// <param name="xamlRoot">The XamlRoot the Popup opens in (not null).</param>
+	private void RegisterOpenInRoot(XamlRoot xamlRoot)
 	{
-		if (newIsOpen)
+		if (xamlRoot != XamlRoot)
 		{
-			var xamlRoot = XamlRoot ?? Child?.XamlRoot ?? WinUICoreServices.Instance.ContentRootCoordinator.Unsafe_IslandsIncompatible_CoreWindowContentRoot?.XamlRoot;
+			XamlRoot = xamlRoot;
+		}
 
-			if (xamlRoot != XamlRoot)
+		_openPopupRegistration = xamlRoot.VisualTree.PopupRoot.RegisterOpenPopup(this);
+
+		if (IsLightDismissEnabled || AssociatedFlyout is { })
+		{
+			if (IsLightDismissEnabled)
 			{
-				XamlRoot = xamlRoot;
+				m_fIsLightDismiss = true;
 			}
 
-			if (xamlRoot is not null)
+			// Store last focused element
+			var focusManager = VisualTree.GetFocusManagerForElement(this);
+			var focusedElement = focusManager?.FocusedElement as UIElement;
+			var focusState = focusManager?.GetRealFocusStateForFocusedElement() ?? FocusState.Unfocused;
+			if (focusedElement != null && focusState != FocusState.Unfocused)
 			{
-				_openPopupRegistration = xamlRoot.VisualTree.PopupRoot.RegisterOpenPopup(this);
+				_lastFocusedElement = WeakReferencePool.RentWeakReference(this, focusedElement);
+				_lastFocusState = focusState;
 			}
 
-			if (IsLightDismissEnabled || AssociatedFlyout is { })
+			// Usually, FrameworkElements handle focus management inside OnLoaded/OnUnloaded,
+			// but since popups are (un)loaded, we have to do it here.
+			if (Child is FrameworkElement fw && fw.AllowFocusOnInteraction)
 			{
-				if (IsLightDismissEnabled)
-				{
-					m_fIsLightDismiss = true;
-				}
-
-				// Store last focused element
-				var focusManager = VisualTree.GetFocusManagerForElement(this);
-				var focusedElement = focusManager?.FocusedElement as UIElement;
-				var focusState = focusManager?.GetRealFocusStateForFocusedElement() ?? FocusState.Unfocused;
-				if (focusedElement != null && focusState != FocusState.Unfocused)
-				{
-					_lastFocusedElement = WeakReferencePool.RentWeakReference(this, focusedElement);
-					_lastFocusState = focusState;
-				}
-
-				// Usually, FrameworkElements handle focus management inside OnLoaded/OnUnloaded,
-				// but since popups are (un)loaded, we have to do it here.
-				if (Child is FrameworkElement fw && fw.AllowFocusOnInteraction)
-				{
-					// Give the child focus if allowed
-					Focus(FocusState.Programmatic);
-				}
+				// Give the child focus if allowed
+				Focus(FocusState.Programmatic);
 			}
 		}
-		else
+	}
+
+	partial void OnIsOpenChangedPartial(bool oldIsOpen, bool newIsOpen)
+	{
+		// Opening is EnsureOpenedInRoot (Popup.WithPopupRoot.cs), called from OnIsOpenChangedPartialNative, from
+		// OnLoaded and when a XamlRoot is assigned: a Popup opened before it can reach a XamlRoot is shown later.
+		if (!newIsOpen)
 		{
 			_openPopupRegistration?.Dispose();
 			if (IsLightDismissEnabled)

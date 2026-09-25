@@ -193,7 +193,7 @@ public static partial class ApplicationLanguages
 			.ToArray();
 #else
 		var languages = ManifestLanguages;
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		if (OperatingSystem.IsWindows() && GlobalizationPreferences.Languages is { Count: > 0 } preferences)
 		{
 			languages = preferences;

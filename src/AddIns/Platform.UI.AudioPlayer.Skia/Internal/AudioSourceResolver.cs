@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Windows.ApplicationModel;
-using Microsoft.UI.Xaml;
+using CodeBrix.Platform.UI.AudioPlayer.Skia.Contracts;
 
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 
@@ -13,6 +12,12 @@ namespace CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 /// </summary>
 internal static class AudioSourceResolver
 {
+	//Where the application's assets are (WPE1 C10: the platform's IAssetLocation instead of the WinRT Package and the
+	//  XAML Application, so the resolver - and SoundEffect - run without the XAML object model). Resolved once.
+	private static IAssetLocation? _assets;
+
+	private static IAssetLocation Assets => _assets ??= PlatformContract.Resolve<IAssetLocation>();
+
 	/// <summary>
 	/// Resolves <paramref name="source"/> to either a local file path or an open stream
 	/// (exactly one of the two is non-null). Throws when the source cannot be resolved.
@@ -61,7 +66,7 @@ internal static class AudioSourceResolver
 				case "embedded":
 					return null;
 				case "ms-appx":
-					return Path.Join(Package.Current.InstalledPath, AssetRelativePath(source));
+					return Path.Join(Assets.InstalledPath, AssetRelativePath(source));
 				case "file":
 					return uri.LocalPath;
 			}
@@ -101,7 +106,7 @@ internal static class AudioSourceResolver
 	{
 		var assemblyName = uri.Host;
 		var assembly = assemblyName == "."
-			? Application.Current.GetType().Assembly
+			? Assets.ApplicationAssembly
 			: Assembly.Load(assemblyName);
 
 		var resourceName = Uri.UnescapeDataString(uri.AbsolutePath[1..]).Replace("(assembly)", assembly.GetName().Name);

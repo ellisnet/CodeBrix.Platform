@@ -112,7 +112,7 @@ namespace Microsoft.UI.Xaml.Controls
 			set => _forceChangeToCurrentView = value;
 		}
 
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		bool _forceChangeToCurrentView;
 		internal bool ForceChangeToCurrentView
 		{

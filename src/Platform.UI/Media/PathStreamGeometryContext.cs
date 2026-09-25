@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Linq;
 using static System.Math;
 using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.UI.Contracts;
 
 #if false
 using UIKit;
@@ -15,8 +16,6 @@ using ObjCRuntime;
 using Android.Graphics.Drawables.Shapes;
 using Path = Android.Graphics.Path;
 using CodeBrix.Platform.UI;
-#elif __SKIA__
-using Path = SkiaSharp.SKPath;
 #else
 using Path = System.Object;
 #endif
@@ -27,8 +26,8 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 	{
 		private readonly List<Point> _points = new List<Point>();
 		private readonly StreamGeometry _owner;
-#if __SKIA__
-		private SkiaSharp.SKPathBuilder bezierPath = new SkiaSharp.SKPathBuilder();
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+		private readonly IGeometryPathBuilder bezierPath = PlatformServices.Geometry.CreatePathBuilder();
 #else
 		private Path bezierPath = new Path();
 #endif
@@ -44,8 +43,8 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 			bezierPath.MoveTo(startPoint);
 #elif false
 			bezierPath.MoveTo((float)startPoint.X, (float)startPoint.Y);
-#elif __SKIA__
-			bezierPath.MoveTo(new SkiaSharp.SKPoint((float)startPoint.X, (float)startPoint.Y));
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			bezierPath.MoveTo(startPoint);
 #endif
 
 			_points.Add(startPoint);
@@ -57,8 +56,8 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 			bezierPath.AddLineTo(point);
 #elif false
 			bezierPath.LineTo((float)point.X, (float)point.Y);
-#elif __SKIA__
-			bezierPath.LineTo((float)point.X, (float)point.Y);
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			bezierPath.LineTo(point);
 #endif
 
 			_points.Add(point);
@@ -70,8 +69,8 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 			bezierPath.AddCurveToPoint(point3, point1, point2);
 #elif false
 			bezierPath.CubicTo((float)point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y, (float)point3.X, (float)point3.Y);
-#elif __SKIA__
-			bezierPath.CubicTo((float)point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y, (float)point3.X, (float)point3.Y);
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			bezierPath.CubicTo(point1, point2, point3);
 #endif
 			_points.Add(point3);
 		}
@@ -82,8 +81,8 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 			bezierPath.AddQuadCurveToPoint(point2, point1);
 #elif false
 			bezierPath.QuadTo((float)point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y);
-#elif __SKIA__
-			bezierPath.QuadTo((float)point1.X, (float)point1.Y, (float)point2.X, (float)point2.Y);
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			bezierPath.QuadTo(point1, point2);
 #endif
 
 			_points.Add(point2);
@@ -135,7 +134,7 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 				(float)startAngle,
 				(float)sweepAngle
 			);
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			var sweepAngle = endAngle - startAngle;
 
 			// Convert to degrees
@@ -152,12 +151,7 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 				sweepAngle -= 360;
 			}
 
-			bezierPath.ArcTo(
-				new SkiaSharp.SKRect((float)circle.Left, (float)circle.Top, (float)circle.Right, (float)circle.Bottom),
-				(float)startAngle,
-				(float)sweepAngle,
-				false
-			);
+			bezierPath.ArcTo(circle, startAngle, sweepAngle);
 #endif
 
 			_points.Add(point);
@@ -217,7 +211,7 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 					bezierPath.ClosePath();
 #elif false
 					bezierPath.Close();
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					bezierPath.Close();
 #elif false
 					// TODO: In most cases, the path is handled by the browser.
@@ -234,7 +228,7 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 
 		public override void Dispose()
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			_owner.Close(bezierPath.Snapshot());
 #else
 			_owner.Close(bezierPath);

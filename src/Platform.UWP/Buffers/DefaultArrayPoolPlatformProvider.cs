@@ -23,7 +23,7 @@ namespace CodeBrix.Platform.Buffers //Was previously: Uno.Buffers
 		static DefaultArrayPoolPlatformProvider()
 		{
 			_canUseMemoryManager =
-				Windows.Foundation.Metadata.ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform", "AppMemoryUsage")
+				Windows.Foundation.Metadata.ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform.Core", "AppMemoryUsage")
 				&& Windows.System.MemoryManager.IsAvailable;
 		}
 

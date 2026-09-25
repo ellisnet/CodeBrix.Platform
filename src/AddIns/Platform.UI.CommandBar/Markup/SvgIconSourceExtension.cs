@@ -54,8 +54,8 @@ public sealed class SvgIconSourceExtension : MarkupExtension
 	internal SvgIconSource CreateSource()
 		=> new()
 		{
-			Source = IconUri.Parse(Source),
-			Dark = IconUri.Parse(Dark),
+			Source = Engine.IconUri.Parse(Source),
+			Dark = Engine.IconUri.Parse(Dark),
 			Markup = Markup,
 			Tint = Tint,
 			TintMode = TintMode,

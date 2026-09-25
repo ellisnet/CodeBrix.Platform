@@ -1024,6 +1024,12 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private protected virtual void UpdateItems(NotifyCollectionChangedEventArgs args)
 		{
+			if (TryNotifyItemsHost(args))
+			{
+				// Hook H14: the platform list realizes the containers (OwnsItemsHost).
+				return;
+			}
+
 			if (ItemsPanelRoot == null
 				|| !ShouldItemsControlManageChildren
 #if false
@@ -1590,6 +1596,12 @@ namespace Microsoft.UI.Xaml.Controls
 
 		internal protected virtual IEnumerable<DependencyObject> GetItemsPanelChildren()
 		{
+			if (TryGetItemsHostContainers(out var hostContainers))
+			{
+				// Hook H14: the containers the platform list realized (OwnsItemsHost).
+				return hostContainers;
+			}
+
 			return ItemsPanelRoot?.Children.OfType<DependencyObject>() ?? Enumerable.Empty<DependencyObject>();
 		}
 

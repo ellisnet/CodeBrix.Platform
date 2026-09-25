@@ -22,7 +22,7 @@
 		     nothing registered and nothing initialised: the compositor factory it draws through is
 		     registered by the framework's own Application, which the virtual application is one of.
 		     The add-in brings the managed SkiaSharp assembly the fixtures draw with. -->
-		<ProjectReference Include="..\..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" />
 	</ItemGroup>
 
 </Project>

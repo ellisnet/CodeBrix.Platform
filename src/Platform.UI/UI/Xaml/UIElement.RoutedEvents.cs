@@ -148,7 +148,7 @@ namespace Microsoft.UI.Xaml
 		/* ** */
 		internal /* ** */  static RoutedEvent DropCompletedEvent { get; } = new RoutedEvent(RoutedEventFlag.DropCompleted);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		public static RoutedEvent PreviewKeyDownEvent { get; } = new RoutedEvent(RoutedEventFlag.PreviewKeyDown);
 
 		public static RoutedEvent PreviewKeyUpEvent { get; } = new RoutedEvent(RoutedEventFlag.PreviewKeyUp);
@@ -415,7 +415,7 @@ namespace Microsoft.UI.Xaml
 			remove => RemoveHandler(DropCompletedEvent, value);
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		public event KeyEventHandler PreviewKeyDown
 		{
 			add => AddHandler(PreviewKeyDownEvent, value, false);
@@ -761,7 +761,7 @@ namespace Microsoft.UI.Xaml
 				KeyboardStateTracker.ReconcileModifiers(keyArgs.KeyboardModifiers, keyArgs.OriginalKey);
 
 				if (routedEvent == KeyDownEvent
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					|| routedEvent == PreviewKeyDownEvent
 #endif
 					)
@@ -769,7 +769,7 @@ namespace Microsoft.UI.Xaml
 					KeyboardStateTracker.OnKeyDown(keyArgs.OriginalKey);
 				}
 				else if (routedEvent == KeyUpEvent
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					|| routedEvent == PreviewKeyUpEvent
 #endif
 					)

@@ -41,7 +41,7 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				_forceChangeToCurrentView = value;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				if (_presenter != null)
 				{
 					_presenter.ForceChangeToCurrentView = value;

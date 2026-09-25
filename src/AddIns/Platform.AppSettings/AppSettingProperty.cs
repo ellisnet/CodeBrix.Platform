@@ -31,6 +31,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization.Metadata;
 
 namespace CodeBrix.Platform.AppSettings; //was previously: Doom.Brix.Settings.ConfigurationProperty (and MonoDevelop.Core before that)
 
@@ -77,12 +79,18 @@ public abstract class AppSettingProperty<T>
 sealed class CoreAppSettingProperty<T> : AppSettingProperty<T>
 {
     T value;
+    readonly Action<string, T?> write;
 
     public string Key { get; }
 
-    public CoreAppSettingProperty(string key, T defaultValue, string? oldKey = null)
+    /// <summary>
+    /// Creates the handle. The value is read and written through the given delegates: the reflection-based
+    /// AppSettingsService members (created by the Requires*-annotated factory) or the JsonTypeInfo&lt;T&gt; ones.
+    /// </summary>
+    public CoreAppSettingProperty(string key, T defaultValue, string? oldKey, Func<string, T, T> read, Action<string, T?> write)
     {
         Key = key ?? throw new ArgumentNullException(nameof(key));
+        this.write = write;
 
         // Migrate the setting from oldKey to key.
         if (!string.IsNullOrEmpty(oldKey) && AppSettingsService.HasValue(oldKey))
@@ -90,13 +98,13 @@ sealed class CoreAppSettingProperty<T> : AppSettingProperty<T>
             // Migrate the old value if the new one is not set.
             if (!AppSettingsService.HasValue(Key))
             {
-                var oldValue = AppSettingsService.Get<T>(oldKey);
-                AppSettingsService.Set(Key, oldValue);
+                var oldValue = read(oldKey, default!);
+                write(Key, oldValue);
             }
-            AppSettingsService.Set(oldKey, null);
+            AppSettingsService.Store.Remove(oldKey);
         }
 
-        value = AppSettingsService.Get(Key, defaultValue);
+        value = read(Key, defaultValue);
     }
 
     protected override T OnGetValue() => value;
@@ -107,7 +115,7 @@ sealed class CoreAppSettingProperty<T> : AppSettingProperty<T>
             return false;
 
         this.value = value;
-        AppSettingsService.Set(Key, value);
+        write(Key, value);
         OnChanged();
         return true;
     }
@@ -120,6 +128,23 @@ public abstract class AppSettingProperty
     /// Creates a typed property handle over the given setting key, optionally
     /// migrating the stored value from a previous key name.
     /// </summary>
+    [RequiresUnreferencedCode(AppSettingsStore.ReflectionSerializationMessage)]
+    [RequiresDynamicCode(AppSettingsStore.ReflectionSerializationMessage)]
     public static AppSettingProperty<T> Create<T>(string key, T defaultValue, string? oldKey = null)
-        => new CoreAppSettingProperty<T>(key, defaultValue, oldKey);
+        => new CoreAppSettingProperty<T>(key, defaultValue, oldKey,
+            (k, fallback) => AppSettingsService.Get(k, fallback),
+            (k, v) => AppSettingsService.Set(k, v));
+
+    /// <summary>
+    /// Creates a typed property handle over the given setting key whose value is serialized with
+    /// <paramref name="jsonTypeInfo"/> (no reflection: the form a trimmed or native AOT application uses), optionally
+    /// migrating the stored value from a previous key name.
+    /// </summary>
+    public static AppSettingProperty<T> Create<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo, string? oldKey = null)
+    {
+        ArgumentNullException.ThrowIfNull(jsonTypeInfo);
+        return new CoreAppSettingProperty<T>(key, defaultValue, oldKey,
+            (k, fallback) => AppSettingsService.Get(k, fallback, jsonTypeInfo),
+            (k, v) => AppSettingsService.Set(k, v, jsonTypeInfo));
+    }
 }

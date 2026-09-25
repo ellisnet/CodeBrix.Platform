@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	public enum TabViewTearOutRequestedEventArgs
 	{
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutRequestedEventArgs.Items.get

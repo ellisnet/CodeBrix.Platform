@@ -28,8 +28,6 @@ using static Microsoft.UI.Xaml.Controls._Tracing;
 
 namespace Microsoft.UI.Xaml.Controls;
 
-#if !__SKIA__
-#endif
 public partial class ScrollView : Control, IScrollView
 {
 	// Change to 'true' to turn on debugging outputs in Output window

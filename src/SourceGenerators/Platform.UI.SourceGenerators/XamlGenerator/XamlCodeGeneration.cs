@@ -113,9 +113,6 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 		internal Lazy<INamedTypeSymbol> ImageSourceSymbol { get; }
 		internal Lazy<INamedTypeSymbol> ImageSymbol { get; }
 		internal Lazy<INamedTypeSymbol> DependencyObjectParseSymbol { get; }
-		internal Lazy<INamedTypeSymbol?> AndroidContentContextSymbol { get; }
-		internal Lazy<INamedTypeSymbol?> AndroidViewSymbol { get; }
-		internal Lazy<INamedTypeSymbol?> IOSViewSymbol { get; }
 		internal Lazy<INamedTypeSymbol?> AppKitViewSymbol { get; }
 		internal Lazy<INamedTypeSymbol> ICollectionSymbol { get; }
 		internal Lazy<INamedTypeSymbol> ICollectionOfTSymbol { get; }
@@ -294,9 +291,6 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			ColorsSymbol = GetMandatorySymbolAsLazy(XamlConstants.Types.Colors);
 			FontWeightsSymbol = GetMandatorySymbolAsLazy(XamlConstants.Types.FontWeights);
 			SolidColorBrushHelperSymbol = GetMandatorySymbolAsLazy(XamlConstants.Types.SolidColorBrushHelper);
-			AndroidContentContextSymbol = GetOptionalSymbolAsLazy("Android.Content.Context");
-			AndroidViewSymbol = GetOptionalSymbolAsLazy("Android.Views.View");
-			IOSViewSymbol = GetOptionalSymbolAsLazy("UIKit.UIView");
 			AppKitViewSymbol = GetOptionalSymbolAsLazy("AppKit.NSView");
 			CreateFromStringAttributeSymbol = GetMandatorySymbolAsLazy(XamlConstants.Types.CreateFromStringAttribute);
 			NativePageSymbol = GetOptionalSymbolAsLazy(XamlConstants.Types.NativePage);
@@ -384,7 +378,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 
 			try
 			{
-				var isInsideMainAssembly = _isCodeBrixHead || PlatformHelper.IsAndroid(_generatorContext);
+				var isInsideMainAssembly = _isCodeBrixHead;
 
 				var resourceDetailsCollection = BuildResourceDetails(ct);
 				TryGenerateCodeBrixResourcesKeyAttribute(resourceDetailsCollection);
@@ -604,11 +598,13 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			var query = from sym in assembliesQuery
 						from module in sym.Modules
 
-							// Only consider assemblies that reference Uno.UI
-						where module.ReferencedAssemblies.Any(r => r.Name == "CodeBrix.Platform.UI") || sym.Name == "CodeBrix.Platform.UI"
+							// Only consider assemblies that reference the framework (CodeBrix.Platform.UI or its platform-neutral Core assembly)
+						where module.ReferencedAssemblies.Any(r => r.Name is "CodeBrix.Platform.UI" or "CodeBrix.Platform.UI.Core")
+							|| sym.Name is "CodeBrix.Platform.UI" or "CodeBrix.Platform.UI.Core"
 
-						// Don't consider Uno.UI.FluentTheme assemblies, as they manage their own initialization
-						where sym.Name != "CodeBrix.Platform.UI.FluentTheme" && !sym.Name.StartsWith("CodeBrix.Platform.UI.FluentTheme.v", StringComparison.InvariantCulture)
+						// Don't consider the FluentTheme assemblies (including their Core names), as they manage their own initialization
+						where sym.Name is not ("CodeBrix.Platform.UI.FluentTheme" or "CodeBrix.Platform.UI.FluentTheme.Core")
+							&& !sym.Name.StartsWith("CodeBrix.Platform.UI.FluentTheme.v", StringComparison.InvariantCulture)
 
 						from typeName in sym.GlobalNamespace.GetNamespaceTypes()
 						where typeName.Name.EndsWith("GlobalStaticResources", StringComparison.Ordinal)

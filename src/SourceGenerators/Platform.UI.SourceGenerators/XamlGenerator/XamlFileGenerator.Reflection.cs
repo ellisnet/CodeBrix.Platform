@@ -178,32 +178,15 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			return IsType(xamlType, Generation.FrameworkElementSymbol.Value);
 		}
 
-		private bool IsAndroidView(XamlType xamlType)
-		{
-			return IsType(xamlType, Generation.AndroidViewSymbol.Value);
-		}
-
-		private bool IsIOSUIView(XamlType xamlType)
-		{
-			return IsType(xamlType, Generation.IOSViewSymbol.Value);
-		}
-
 		private bool IsDependencyObject(XamlObjectDefinition component)
 			=> GetType(component.Type).GetAllInterfaces().Any(i => SymbolEqualityComparer.Default.Equals(i, Generation.DependencyObjectSymbol.Value));
 
 		private bool IsUIElement(INamedTypeSymbol? symbol)
 			=> IsType(symbol, Generation.UIElementSymbol.Value);
 
-		/// <summary>
-		/// Is the type derived from the native view type on a Xamarin platform?
-		/// </summary>
-		private bool IsNativeView(XamlType xamlType) => IsAndroidView(xamlType) || IsIOSUIView(xamlType);
-
-		/// <summary>
-		/// Is the type one of the base view types in WinUI? (UIElement is most commonly used to mean 'any WinUI view type,' but
-		/// FrameworkElement is valid too)
-		/// </summary>
-		private bool IsManagedViewBaseType(INamedTypeSymbol? targetType) => SymbolEqualityComparer.Default.Equals(targetType, Generation.UIElementSymbol.Value) || SymbolEqualityComparer.Default.Equals(targetType, Generation.FrameworkElementSymbol.Value);
+		// There is no native-view detection (and no VisualTreeHelper.AdaptNative wrapping of native views): this
+		// family has no Android-native or UIKit-native head, and every consumer compiles XAML against the Core
+		// element tree, where a type deriving from Android.Views.View or UIKit.UIView is not an element.
 
 		private static bool IsDependencyProperty(INamedTypeSymbol? propertyOwner, string name)
 		{

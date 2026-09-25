@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.Core: the platform-neutral half of the WinRT API surface (the shared tree; *.skia.cs files are
+	excluded because CodeBrixRuntimeIdentifier is Core). No SkiaSharp reference: the Skia half (Platform.Skia.csproj,
+	assembly CodeBrix.Platform) implements the platform contracts this assembly calls.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.Core</AssemblyName>
+		<RootNamespace>Windows</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX;HAS_UMBRELLA_UI;HAS_UMBRELLA_BINDING;HAS_CRIPPLEDREFLECTION</DefineConstants>
+		<CodeBrixDisableAnalyzersForSamples>true</CodeBrixDisableAnalyzersForSamples>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\Platform.UI.Dispatching\Platform.UI.Dispatching.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\UI\Input\WinRT\*.cs" />
+		<Compile Include="..\Platform.UI\UI\Colors.cs" />
+		<Compile Include="..\Platform.UI\UI\ColorHelper.cs" />
+		<Compile Include="..\Platform.UI\UI\Text\FontWeights.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PRIResource Include="Storage\Pickers\Strings\**\*.resw" />
+	</ItemGroup>
+
+</Project>

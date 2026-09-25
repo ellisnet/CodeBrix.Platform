@@ -1,4 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Svg: since the Core/Skia split, only the composition hookup (the *.skia.cs files: the
+	[assembly: ApiExtension] that registers SvgProvider as the framework's ISvgProvider - the XAML source generator of
+	an application finds it in this referenced assembly and emits the registration) and the package id. SvgProvider and
+	the drawing are in CodeBrix.Platform.UI.Svg.Core (Platform.UI.Svg.Core.csproj), which the package carries beside
+	this assembly (build/nuget/Platform.WinUI.Svg.nuspec).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -24,17 +31,26 @@
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
 		<Nullable>enable</Nullable>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.Svg.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.252.363" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="Platform.UI.Svg.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
-		<ProjectReference Include="..\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+		<ProjectReference Include="..\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" />
 	</ItemGroup>
 
 	<Target Name="_CodeBrixUISvgOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">

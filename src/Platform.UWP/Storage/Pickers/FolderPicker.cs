@@ -61,7 +61,7 @@ namespace Windows.Storage.Pickers
 		PickerLocationId IFilePicker.SuggestedStartLocationInternal => SuggestedStartLocation;
 		IList<string> IFilePicker.FileTypeFilterInternal => FileTypeFilter;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		public FolderPicker()
 		{
 			InitializePlatform();

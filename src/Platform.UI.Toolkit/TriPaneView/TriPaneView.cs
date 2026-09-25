@@ -1,5 +1,6 @@
 #nullable enable
 
+using CodeBrix.Platform.UI.Toolkit.Engine;
 using CodeBrix.Platform.UI.Toolkit.Internal;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -91,30 +92,12 @@ public sealed partial class TriPaneView : Control
 
 	//The four weights as they were when the current gesture started, whichever divider it is on.
 	//DividerDragCompleted is raised only when the gesture left at least one of them somewhere else.
-	private double _dragStartSidePercent;
-	private double _dragStartStackPercent;
-	private double _dragStartUpperPercent;
-	private double _dragStartLowerPercent;
+	//The pane logic (WPE1 C12): the minimize/restore state machine, the divider drags and the state pass live in the
+	//WinUI-free engine (Engine/TriPaneLayoutState, over this control's weights through LayoutHost); created on first
+	//use because a weight's property callback can run before the constructor body.
+	private TriPaneLayoutState? _state;
 
-	private bool _isSideDragActive;
-	private bool _sideDragHasMoved;
-	private double _sideDragFirstLength;
-	private double _sideDragSecondLength;
-	private double _sideDragTotalDelta;
-	private double _sideDragStartSidePercent;
-	private double _sideDragStartStackPercent;
-	private double? _sideDragStartSideSnapshot;
-	private double? _sideDragStartStackSnapshot;
-
-	private bool _isStackDragActive;
-	private bool _stackDragHasMoved;
-	private double _stackDragFirstLength;
-	private double _stackDragSecondLength;
-	private double _stackDragTotalDelta;
-	private double _stackDragStartUpperPercent;
-	private double _stackDragStartLowerPercent;
-	private double? _stackDragStartUpperSnapshot;
-	private double? _stackDragStartLowerSnapshot;
+	private TriPaneLayoutState State => _state ??= new TriPaneLayoutState(new LayoutHost(this));
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="TriPaneView"/> class.
@@ -227,41 +210,7 @@ public sealed partial class TriPaneView : Control
 	/// that is already at zero keeps the snapshot it already had, which is the weight it was open at.
 	/// </remarks>
 	internal void StartDividerDrag(TriPaneViewDividerKind kind, double firstLength, double secondLength)
-	{
-		_dragStartSidePercent = SidePanePercent;
-		_dragStartStackPercent = StackPercent;
-		_dragStartUpperPercent = UpperPanePercent;
-		_dragStartLowerPercent = LowerPanePercent;
-
-		if (kind == TriPaneViewDividerKind.Side)
-		{
-			_isSideDragActive = true;
-			_sideDragHasMoved = false;
-			_sideDragFirstLength = firstLength;
-			_sideDragSecondLength = secondLength;
-			_sideDragTotalDelta = 0d;
-			_sideDragStartSidePercent = SidePanePercent;
-			_sideDragStartStackPercent = StackPercent;
-			_sideDragStartSideSnapshot = _sideSnapshot;
-			_sideDragStartStackSnapshot = _stackSnapshot;
-			_sideSnapshot = SnapshotWeight(SidePanePercent, _sideSnapshot);
-			_stackSnapshot = SnapshotWeight(StackPercent, _stackSnapshot);
-		}
-		else
-		{
-			_isStackDragActive = true;
-			_stackDragHasMoved = false;
-			_stackDragFirstLength = firstLength;
-			_stackDragSecondLength = secondLength;
-			_stackDragTotalDelta = 0d;
-			_stackDragStartUpperPercent = UpperPanePercent;
-			_stackDragStartLowerPercent = LowerPanePercent;
-			_stackDragStartUpperSnapshot = _upperSnapshot;
-			_stackDragStartLowerSnapshot = _lowerSnapshot;
-			_upperSnapshot = SnapshotWeight(UpperPanePercent, _upperSnapshot);
-			_lowerSnapshot = SnapshotWeight(LowerPanePercent, _lowerSnapshot);
-		}
-	}
+		=> State.StartDividerDrag(kind, firstLength, secondLength);
 
 	/// <summary>
 	/// Advances a divider drag by the distance the pointer has moved since the previous step, and
@@ -280,40 +229,7 @@ public sealed partial class TriPaneView : Control
 	/// to where it began.
 	/// </remarks>
 	internal void UpdateDividerDrag(TriPaneViewDividerKind kind, double delta)
-	{
-		var moved = double.IsFinite(delta) ? delta : 0d;
-
-		if (kind == TriPaneViewDividerKind.Side)
-		{
-			if (!_isSideDragActive)
-			{
-				return;
-			}
-
-			_sideDragTotalDelta += moved;
-
-			if (_sideDragHasMoved || !TriPaneViewLayoutMath.IsTap(_sideDragTotalDelta))
-			{
-				_sideDragHasMoved = true;
-				ApplySideDrag();
-			}
-		}
-		else
-		{
-			if (!_isStackDragActive)
-			{
-				return;
-			}
-
-			_stackDragTotalDelta += moved;
-
-			if (_stackDragHasMoved || !TriPaneViewLayoutMath.IsTap(_stackDragTotalDelta))
-			{
-				_stackDragHasMoved = true;
-				ApplyStackDrag();
-			}
-		}
-	}
+		=> State.UpdateDividerDrag(kind, delta);
 
 	/// <summary>
 	/// Ends a divider drag. A drag that barely moved while the divider was acting as a restore grip
@@ -334,114 +250,18 @@ public sealed partial class TriPaneView : Control
 	/// </remarks>
 	internal void CompleteDividerDrag(TriPaneViewDividerKind kind, double totalTravel, bool canceled)
 	{
-		bool wasActive;
-		bool hasMoved;
-
-		if (kind == TriPaneViewDividerKind.Side)
-		{
-			wasActive = _isSideDragActive;
-			hasMoved = _sideDragHasMoved;
-			_isSideDragActive = false;
-			_sideDragHasMoved = false;
-		}
-		else
-		{
-			wasActive = _isStackDragActive;
-			hasMoved = _stackDragHasMoved;
-			_isStackDragActive = false;
-			_stackDragHasMoved = false;
-		}
-
-		if (!wasActive)
-		{
-			return;
-		}
-
-		var hasChanged = hasMoved;
-
-		if (canceled)
-		{
-			RollBackDrag(kind);
-			hasChanged = false;
-		}
-		else if (!hasMoved && TriPaneViewLayoutMath.IsTap(totalTravel))
-		{
-			hasChanged = RestoreFromGrip(kind) || hasChanged;
-		}
-
-		//The drag is over, so the divider goes back to the visibility and enabled state the state
-		//model asks for; both were left alone while the gesture was running.
-		UpdateState();
-
-		if (hasChanged && HasLeftTheStartingWeights())
+		if (State.CompleteDividerDrag(kind, totalTravel, canceled))
 		{
 			DividerDragCompleted?.Invoke(this, new TriPaneViewDividerDragCompletedEventArgs(kind));
 		}
 	}
 
 	/// <summary>
-	/// Tests whether the gesture that has just ended left any of the four weights somewhere other
-	/// than where it found it. A press, a move and a release on a divider already sitting on its
-	/// floor moves the pointer but not the layout, and an application that persists the weights has
-	/// nothing to persist.
-	/// </summary>
-	/// <returns><see langword="true"/> when at least one weight is different.</returns>
-	private bool HasLeftTheStartingWeights()
-		=> SidePanePercent != _dragStartSidePercent
-			|| StackPercent != _dragStartStackPercent
-			|| UpperPanePercent != _dragStartUpperPercent
-			|| LowerPanePercent != _dragStartLowerPercent;
-
-	/// <summary>
 	/// Recomputes the whole state model - effective weights, minimized flags, minimize causes - and
 	/// then pushes the result at the template. Every state change funnels through here, and none of
 	/// it needs a template to be correct.
 	/// </summary>
-	internal void UpdateState()
-	{
-		if (_isBatchUpdating)
-		{
-			return;
-		}
-
-		//Every pass takes a number. Writing the minimized flags can run application code - they are
-		//meant to be bound two way - which can change the state and start a NEWER pass; when that
-		//happens this one has to stand down rather than write the values it computed before.
-		var version = ++_stateVersion;
-
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-
-		var isSideMinimized = TriPaneViewLayoutMath.IsMinimized(sideWeight);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isUpperWeightZero = TriPaneViewLayoutMath.IsMinimized(upperWeight);
-		var isLowerWeightZero = TriPaneViewLayoutMath.IsMinimized(lowerWeight);
-
-		//The causes are tracked off the RAW weights, not the normalized ones: "was this region
-		//deliberately zeroed" is a question about what was set, and a pair in which BOTH weights are
-		//zero normalizes to an even split, which would otherwise wipe the causes of two regions that
-		//are about to be minimized again the moment one of them is restored. A cause is only ever
-		//read while the matching minimized test is already true, so a cause held for a pair that is
-		//laid out evenly is inert.
-		_sideCause = ResolveCause(_sideCause, TriPaneViewLayoutMath.SanitizeWeight(SidePanePercent) <= 0d);
-		_stackCause = ResolveCause(_stackCause, TriPaneViewLayoutMath.SanitizeWeight(StackPercent) <= 0d);
-		_upperCause = ResolveCause(_upperCause, TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) <= 0d);
-		_lowerCause = ResolveCause(_lowerCause, TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) <= 0d);
-
-		SyncMinimizedFlags(
-			version,
-			isSideMinimized,
-			isStackMinimized,
-			isStackMinimized || isUpperWeightZero,
-			isStackMinimized || isLowerWeightZero);
-
-		if (_stateVersion != version)
-		{
-			return;
-		}
-
-		ApplyLayout(sideWeight, stackWeight, upperWeight, lowerWeight);
-	}
+	internal void UpdateState() => State.UpdateState();
 
 	private static void AttachDivider(
 		TriPaneViewDivider? divider,
@@ -617,10 +437,10 @@ public sealed partial class TriPaneView : Control
 			UpperPaneEffectiveWeight,
 			LowerPaneEffectiveWeight,
 			TriPaneViewLayoutMath.ResolveDividerTrackLength(
-				IsSideDividerVisible || _isSideDragActive,
+				IsSideDividerVisible || State.IsSideDragActive,
 				DividerThickness),
 			TriPaneViewLayoutMath.ResolveDividerTrackLength(
-				IsStackDividerVisible || _isStackDragActive,
+				IsStackDividerVisible || State.IsStackDragActive,
 				DividerThickness));
 	}
 
@@ -664,207 +484,6 @@ public sealed partial class TriPaneView : Control
 	private void OnStackDividerDragCompleted(object sender, DragCompletedEventArgs e)
 		=> CompleteDividerDrag(TriPaneViewDividerKind.Stack, e.VerticalChange, e.Canceled);
 
-	private void ApplySideDrag()
-	{
-		var isPlacedLeft = SidePanePlacement == TriPaneViewSidePanePlacement.Left;
-		var firstMinLength = isPlacedLeft ? SidePaneMinLength : StackMinLength;
-		var secondMinLength = isPlacedLeft ? StackMinLength : SidePaneMinLength;
-
-		var (firstLength, secondLength) = TriPaneViewLayoutMath.ResolveDragLengths(
-			_sideDragFirstLength,
-			_sideDragSecondLength,
-			_sideDragTotalDelta,
-			firstMinLength,
-			secondMinLength,
-			IsDragToMinimizeEnabled);
-
-		if (TriPaneViewLayoutMath.LengthsToPercent(firstLength, secondLength) is not { } percent)
-		{
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			if (isPlacedLeft)
-			{
-				SidePanePercent = percent.First;
-				StackPercent = percent.Second;
-			}
-			else
-			{
-				StackPercent = percent.First;
-				SidePanePercent = percent.Second;
-			}
-
-			//A region the drag has opened again is described by its live weight, not by a snapshot
-			//taken before the gesture, so the stale slot is dropped.
-			if (TriPaneViewLayoutMath.SanitizeWeight(SidePanePercent) > 0d)
-			{
-				_sideSnapshot = null;
-			}
-
-			if (TriPaneViewLayoutMath.SanitizeWeight(StackPercent) > 0d)
-			{
-				_stackSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-		}
-
-		UpdateState();
-	}
-
-	private void ApplyStackDrag()
-	{
-		var (firstLength, secondLength) = TriPaneViewLayoutMath.ResolveDragLengths(
-			_stackDragFirstLength,
-			_stackDragSecondLength,
-			_stackDragTotalDelta,
-			UpperPaneMinLength,
-			LowerPaneMinLength,
-			IsDragToMinimizeEnabled);
-
-		if (TriPaneViewLayoutMath.LengthsToPercent(firstLength, secondLength) is not { } percent)
-		{
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			UpperPanePercent = percent.First;
-			LowerPanePercent = percent.Second;
-
-			//A region the drag has opened again is described by its live weight, not by a snapshot
-			//taken before the gesture, so the stale slot is dropped.
-			if (TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) > 0d)
-			{
-				_upperSnapshot = null;
-			}
-
-			if (TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) > 0d)
-			{
-				_lowerSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-		}
-
-		UpdateState();
-	}
-
-	/// <summary>
-	/// Picks the weight to record as a region's restore snapshot when a drag starts: the weight it
-	/// is open at, or - for a region that is already minimized - the snapshot it already carries,
-	/// which is the weight it was open at before it closed.
-	/// </summary>
-	/// <param name="current">The region's current raw weight.</param>
-	/// <param name="existing">The snapshot the region already carries, if there is one.</param>
-	/// <returns>The snapshot the region should carry for the duration of the drag.</returns>
-	private static double? SnapshotWeight(double current, double? existing)
-		=> TriPaneViewLayoutMath.SanitizeWeight(current) > 0d ? current : existing;
-
-	/// <summary>
-	/// Puts one axis back exactly where it was when a cancelled drag started - both weights and both
-	/// restore snapshots - so nothing the gesture did survives it.
-	/// </summary>
-	/// <param name="kind">The divider whose axis is being rolled back.</param>
-	private void RollBackDrag(TriPaneViewDividerKind kind)
-	{
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			if (kind == TriPaneViewDividerKind.Side)
-			{
-				SidePanePercent = _sideDragStartSidePercent;
-				StackPercent = _sideDragStartStackPercent;
-				_sideSnapshot = _sideDragStartSideSnapshot;
-				_stackSnapshot = _sideDragStartStackSnapshot;
-			}
-			else
-			{
-				UpperPanePercent = _stackDragStartUpperPercent;
-				LowerPanePercent = _stackDragStartLowerPercent;
-				_upperSnapshot = _stackDragStartUpperSnapshot;
-				_lowerSnapshot = _stackDragStartLowerSnapshot;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-		}
-	}
-
-	/// <summary>
-	/// Answers a tap on a divider that is currently a restore grip by restoring the pane - or the
-	/// whole stack - the grip belongs to.
-	/// </summary>
-	/// <param name="kind">The divider that was tapped.</param>
-	/// <returns><see langword="true"/> when a region really was restored.</returns>
-	private bool RestoreFromGrip(TriPaneViewDividerKind kind)
-	{
-		var mode = RestoreGripMode;
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-
-		if (kind == TriPaneViewDividerKind.Side)
-		{
-			if (TriPaneViewLayoutMath.IsMinimized(sideWeight))
-			{
-				if (TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_sideCause)))
-				{
-					RestoreSidePane();
-
-					return true;
-				}
-			}
-			else if (TriPaneViewLayoutMath.IsMinimized(stackWeight)
-				&& TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_stackCause)))
-			{
-				RestoreStack();
-
-				return true;
-			}
-
-			return false;
-		}
-
-		if (TriPaneViewLayoutMath.IsMinimized(stackWeight))
-		{
-			return false;
-		}
-
-		if (TriPaneViewLayoutMath.IsMinimized(upperWeight))
-		{
-			if (TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_upperCause)))
-			{
-				RestoreUpperPane();
-
-				return true;
-			}
-		}
-		else if (TriPaneViewLayoutMath.IsMinimized(lowerWeight)
-			&& TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_lowerCause)))
-		{
-			RestoreLowerPane();
-
-			return true;
-		}
-
-		return false;
-	}
-
 	private void ApplyPlacement()
 	{
 		var isPlacedLeft = SidePanePlacement == TriPaneViewSidePanePlacement.Left;
@@ -880,50 +499,11 @@ public sealed partial class TriPaneView : Control
 		}
 	}
 
-	private void ApplyLayout(double sideWeight, double stackWeight, double upperWeight, double lowerWeight)
+	private void ApplyLayout(TriPaneLayoutResult layout)
 	{
-		var isPlacedLeft = SidePanePlacement == TriPaneViewSidePanePlacement.Left;
-		var mode = RestoreGripMode;
-
-		var isSideMinimized = TriPaneViewLayoutMath.IsMinimized(sideWeight);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isUpperWeightZero = TriPaneViewLayoutMath.IsMinimized(upperWeight);
-		var isLowerWeightZero = TriPaneViewLayoutMath.IsMinimized(lowerWeight);
-
-		var isSideGripVisible = false;
-		var isSideGripTowardStart = false;
-
-		if (isSideMinimized)
-		{
-			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_sideCause));
-			isSideGripTowardStart = isPlacedLeft;
-		}
-		else if (isStackMinimized)
-		{
-			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_stackCause));
-			isSideGripTowardStart = !isPlacedLeft;
-		}
-
-		var isSideDividerVisible = (!isSideMinimized && !isStackMinimized) || isSideGripVisible;
-
-		var isStackGripVisible = false;
-		var isStackGripTowardStart = false;
-
-		if (!isStackMinimized)
-		{
-			if (isUpperWeightZero)
-			{
-				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_upperCause));
-				isStackGripTowardStart = true;
-			}
-			else if (isLowerWeightZero)
-			{
-				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_lowerCause));
-			}
-		}
-
-		var isStackDividerVisible = !isStackMinimized
-			&& ((!isUpperWeightZero && !isLowerWeightZero) || isStackGripVisible);
+		//What the state pass computed (the engine's TriPaneLayoutState.ComputeLayout); this pushes it at the template.
+		var (sideWeight, stackWeight, upperWeight, lowerWeight, isPlacedLeft, isSideDividerVisible, isSideGripVisible,
+			isSideGripTowardStart, isStackDividerVisible, isStackGripVisible, isStackGripTowardStart) = layout;
 
 		SidePaneEffectiveWeight = sideWeight;
 		StackEffectiveWeight = stackWeight;
@@ -943,8 +523,8 @@ public sealed partial class TriPaneView : Control
 		//mid-drag with the shipped defaults, and hiding, shrinking or disabling the very element the
 		//pointer is holding would take the handle away in the middle of the drag - and disabling it
 		//would cancel the drag from inside this method.
-		var isSideDividerShown = isSideDividerVisible || _isSideDragActive;
-		var isStackDividerShown = isStackDividerVisible || _isStackDragActive;
+		var isSideDividerShown = isSideDividerVisible || State.IsSideDragActive;
+		var isStackDividerShown = isStackDividerVisible || State.IsStackDragActive;
 
 		var thickness = DividerThickness;
 		var sideDividerTrack = TriPaneViewLayoutMath.ResolveDividerTrackLength(isSideDividerShown, thickness);
@@ -965,14 +545,14 @@ public sealed partial class TriPaneView : Control
 		ApplyDividerState(
 			_sideDivider,
 			isSideDividerShown,
-			CanUserDragSideDivider || _isSideDragActive,
+			CanUserDragSideDivider || State.IsSideDragActive,
 			isSideGripVisible,
 			isSideGripTowardStart);
 
 		ApplyDividerState(
 			_stackDivider,
 			isStackDividerShown,
-			CanUserDragStackDivider || _isStackDragActive,
+			CanUserDragStackDivider || State.IsStackDragActive,
 			isStackGripVisible,
 			isStackGripTowardStart);
 	}

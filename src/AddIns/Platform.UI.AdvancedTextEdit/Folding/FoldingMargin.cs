@@ -52,14 +52,14 @@ public partial class FoldingMargin : AbstractMargin
 	//was previously: the frozen WPF Pens were created with thickness 1.
 	const float FoldLineThickness = 1f;
 
-	readonly RenderCanvas renderCanvas = new RenderCanvas();
+	readonly FrameworkElement renderCanvas = RenderCanvasSupply.Create();
 
 	/// <summary>
 	/// Creates a new FoldingMargin instance.
 	/// </summary>
 	public FoldingMargin()
 	{
-		renderCanvas.Paint += RenderCanvasPaint;
+		RenderCanvasSupply.AddPaintHandler(renderCanvas, RenderCanvasPaint);
 		Children.Add(renderCanvas);
 
 		//was previously: a HitTestCore override accepted clicks on the transparent background.
@@ -140,7 +140,7 @@ public partial class FoldingMargin : AbstractMargin
 	{
 		//was previously: rebuilt the frozen pens (and also resolved the margin from a TextEditor
 		//for the attached-property route); colors are read at paint time here, so a repaint suffices.
-		((FoldingMargin)d).renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(((FoldingMargin)d).renderCanvas);
 	}
 
 	SKColor FoldingMarkerColor {
@@ -168,7 +168,7 @@ public partial class FoldingMargin : AbstractMargin
 	protected override Size ArrangeOverride(Size finalSize)
 	{
 		renderCanvas.Arrange(new Rect(new Point(0, 0), finalSize));
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 		return finalSize;
 	}
 
@@ -239,7 +239,7 @@ public partial class FoldingMargin : AbstractMargin
 		if (hoveredSection != null && !markers.Any(m => m.FoldingSection == hoveredSection))
 			hoveredSection = null;
 		InvalidateMeasure();
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 	}
 
 	void UpdateMarkerRects(TextView textView, Size pixelSize, double marginWidth)
@@ -290,7 +290,7 @@ public partial class FoldingMargin : AbstractMargin
 		if (newHoveredSection != hoveredSection)
 		{
 			hoveredSection = newHoveredSection;
-			renderCanvas.Invalidate();
+			RenderCanvasSupply.Invalidate(renderCanvas);
 		}
 	}
 
@@ -299,7 +299,7 @@ public partial class FoldingMargin : AbstractMargin
 		if (hoveredSection != null)
 		{
 			hoveredSection = null;
-			renderCanvas.Invalidate();
+			RenderCanvasSupply.Invalidate(renderCanvas);
 		}
 	}
 	#endregion

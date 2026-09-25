@@ -3,18 +3,18 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Effects
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IBasicAudioEffect : global::Windows.Media.IMediaExtension
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::System.Collections.Generic.IReadOnlyList<global::Windows.Media.MediaProperties.AudioEncodingProperties> SupportedEncodingProperties
 		{
 			get;
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		bool UseInputFrameForOutput
 		{
 			get;
@@ -22,16 +22,16 @@ namespace Windows.Media.Effects
 #endif
 		// Forced skipping of method Windows.Media.Effects.IBasicAudioEffect.UseInputFrameForOutput.get
 		// Forced skipping of method Windows.Media.Effects.IBasicAudioEffect.SupportedEncodingProperties.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void SetEncodingProperties(global::Windows.Media.MediaProperties.AudioEncodingProperties encodingProperties);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void ProcessFrame(global::Windows.Media.Effects.ProcessAudioFrameContext context);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void Close(global::Windows.Media.Effects.MediaEffectClosedReason reason);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void DiscardQueuedFrames();
 #endif
 	}

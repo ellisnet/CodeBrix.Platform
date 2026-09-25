@@ -102,7 +102,7 @@ public class Given_ProgressRing
 #endif
 	public async Task When_Stretch_Fill()
 	{
-		if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+		if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 		{
 			Assert.Inconclusive(); // System.NotImplementedException: RenderTargetBitmap is not supported on this platform.;
 		}

@@ -192,7 +192,7 @@ namespace Microsoft.UI.Xaml.Controls
 					this.AddView(_layoutRoot);
 #elif false
 					this.Add(_layoutRoot);
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					this.AddChild(_layoutRoot);
 					_mediaPlayerPresenter?.ExitFullScreen();
 #else

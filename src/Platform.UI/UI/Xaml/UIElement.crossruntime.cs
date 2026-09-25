@@ -74,7 +74,7 @@ namespace Microsoft.UI.Xaml
 			UpdateHitTest();
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private void OnChildAdded(UIElement child)
 		{
 			if (!child._isFrameworkElement)

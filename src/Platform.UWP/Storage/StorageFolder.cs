@@ -23,6 +23,19 @@ namespace Windows.Storage
 			Implementation.InitOwner(this);
 		}
 
+		/// <summary>
+		/// Creates a folder over a platform-provided implementation: the entry point a platform uses to hand out folders
+		/// that are not paths on the local file system, such as a document tree a system folder picker returned as a
+		/// content URI (the Skia heads' own pickers keep returning local folders).
+		/// </summary>
+		/// <param name="implementation">The platform's implementation of the folder: its name, listing and item
+		/// operations (<see cref="ImplementationBase"/> is the provider contract; <see cref="ImplementationBase.Path"/> is
+		/// whatever identifies the folder on that platform, such as the tree URI).</param>
+		/// <returns>A new <see cref="StorageFolder"/> backed by <paramref name="implementation"/>.</returns>
+		/// <remarks>Implementers: Android, Mobile. Platform (Skia): not used. Reached through InternalsVisibleTo.</remarks>
+		internal static StorageFolder FromImplementation(ImplementationBase implementation)
+			=> new StorageFolder(implementation ?? throw new ArgumentNullException(nameof(implementation)));
+
 		public StorageProvider Provider => Implementation.Provider;
 
 		public string Path => Implementation.Path;

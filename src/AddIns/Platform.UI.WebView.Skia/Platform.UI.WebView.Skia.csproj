@@ -37,7 +37,7 @@
 		     PrivateAssets="all" because it has no standalone nuget - its assembly ships inside the main
 		     framework package. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" PrivateAssets="all" />
 
 		<!-- Pack-time ONLY: locates the Microsoft Edge WebView2 redistributable so its runtime assets
 		     can be bundled into this package (see the buildTransitive .targets and the ItemGroup below).

@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using CodeBrix.Platform.UI.Runtime.Skia;
 
 namespace CodeBrix.Platform.UI.Hosting; //Was previously: Uno.UI.Hosting
 

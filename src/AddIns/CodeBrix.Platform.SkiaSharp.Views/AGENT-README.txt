@@ -51,8 +51,10 @@ core framework). The Lottie and Svg add-ins depend on this package
 themselves; reference it directly only when your OWN code uses SKXamlCanvas
 or the conversion helpers.
 
-Requirements: any CodeBrix.Platform head (all are Skia heads). A single
-net10.0 assembly; no extra native libraries.
+Requirements: any CodeBrix.Platform head (all are Skia heads). Two net10.0
+assemblies (CodeBrix.Platform.SkiaSharp.Views.Core.dll, the element API, and
+CodeBrix.Platform.SkiaSharp.Views.dll, its Skia surfaces); no extra native
+libraries.
 
 KEY NAMESPACES / USINGS
 =======================

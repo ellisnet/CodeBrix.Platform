@@ -4,12 +4,12 @@ namespace Windows.ApplicationModel.Contacts
 	{
 		AllContactsReadOnly = 1,
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
 		[global::CodeBrix.Platform.NotImplemented]
 		AppContactsReadWrite = 0,
 #endif
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
 		[global::CodeBrix.Platform.NotImplemented]
 		AllContactsReadWrite = 2,
 #endif

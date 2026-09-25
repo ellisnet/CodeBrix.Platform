@@ -23,7 +23,7 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 
 		partial void RefreshPartial()
 		{
-			if (VirtualizingPanel != null)
+			if (VirtualizingPanel != null && ItemsHostHandler is null)
 			{
 				VirtualizingPanel.GetLayouter().Refresh();
 

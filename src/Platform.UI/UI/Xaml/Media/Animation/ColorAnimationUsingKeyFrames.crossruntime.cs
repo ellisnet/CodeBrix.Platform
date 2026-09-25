@@ -1,0 +1,14 @@
+﻿#if !__NETSTD_REFERENCE__
+namespace Microsoft.UI.Xaml.Media.Animation
+{
+	partial class ColorAnimationUsingKeyFrames
+	{
+		private bool ReportEachFrame() => true;
+
+		partial void OnFrame(IValueAnimator currentAnimator)
+		{
+			SetValue(currentAnimator.AnimatedValue);
+		}
+	}
+}
+#endif

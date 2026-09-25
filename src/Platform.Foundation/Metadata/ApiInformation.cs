@@ -188,7 +188,10 @@ public partial class ApiInformation
 			{
 				var fullyQualifierName = parts[0].Trim();
 				var assemblyName = parts[1].Trim();
-				var assembly = _assemblies.FirstOrDefault(a => a.FullName?.Split(',')[0] == assemblyName);
+				var assembly = _assemblies.FirstOrDefault(a => a.FullName?.Split(',')[0] == assemblyName)
+					// Since the Core/Skia split the framework's types live in the ".Core" assemblies, while a caller may
+					// still name the pre-split assembly (for example "Microsoft.UI.Xaml.UIElement, CodeBrix.Platform.UI").
+					?? _assemblies.FirstOrDefault(a => a.FullName?.Split(',')[0] == assemblyName + ".Core");
 
 				type = AssemblyGetType(assembly, fullyQualifierName);
 

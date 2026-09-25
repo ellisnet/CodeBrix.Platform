@@ -9,7 +9,7 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 	public static partial class CommandBarFlyoutCommandBarAutomationProperties
 	{
 #if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty ControlTypeProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(
 			"ControlType", typeof(global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType),
@@ -18,14 +18,14 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 #endif
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarAutomationProperties.ControlTypeProperty.get
 #if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType GetControlType(global::Microsoft.UI.Xaml.UIElement element)
 		{
 			return (global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType)element.GetValue(ControlTypeProperty);
 		}
 #endif
 #if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static void SetControlType(global::Microsoft.UI.Xaml.UIElement element, global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType value)
 		{
 			element.SetValue(ControlTypeProperty, value);

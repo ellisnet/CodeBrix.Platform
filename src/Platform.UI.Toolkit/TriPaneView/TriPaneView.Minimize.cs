@@ -1,24 +1,16 @@
 #nullable enable
 
+using CodeBrix.Platform.UI.Toolkit.Engine;
 using CodeBrix.Platform.UI.Toolkit.Internal;
 
 namespace CodeBrix.Platform.UI.Toolkit;
 
 public sealed partial class TriPaneView
 {
-	private double? _sideSnapshot;
-	private double? _stackSnapshot;
-	private double? _upperSnapshot;
-	private double? _lowerSnapshot;
-
-	private TriPaneViewMinimizeCause? _sideCause;
-	private TriPaneViewMinimizeCause? _stackCause;
-	private TriPaneViewMinimizeCause? _upperCause;
-	private TriPaneViewMinimizeCause? _lowerCause;
-
-	private bool _isBatchUpdating;
+	//WPE1 C12: the minimize/restore state machine (snapshots, causes, the batch guard, the state-pass numbers) moved
+	//into the WinUI-free engine (Engine/TriPaneLayoutState); these public members forward to it, and this control keeps
+	//the dependency-property half (the minimized flags it publishes, LayoutHost below).
 	private bool _isSyncingMinimizedFlags;
-	private int _stateVersion;
 
 	/// <summary>
 	/// Minimizes the side pane: its width weight is snapshotted and set to zero, so the pane
@@ -31,43 +23,7 @@ public sealed partial class TriPaneView
 	/// <see cref="RestoreGripMode"/> is <see cref="TriPaneViewRestoreGripMode.Auto"/>; calling this
 	/// on a pane the user had already dragged shut turns its grip off for the same reason.
 	/// </remarks>
-	public void MinimizeSidePane()
-	{
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isUpperOpen = !isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(upperWeight);
-		var isLowerOpen = !isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(lowerWeight);
-
-		if (!isUpperOpen && !isLowerOpen)
-		{
-			UpdateState();
-
-			return;
-		}
-
-		if (!TriPaneViewLayoutMath.IsMinimized(sideWeight))
-		{
-			_sideSnapshot = SidePanePercent;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			SidePanePercent = 0d;
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-
-			//The cause belongs to THIS region and nothing else: a code minimize here must not turn
-			//off the restore grip of a pane the user dragged shut.
-			_sideCause = TriPaneViewMinimizeCause.Code;
-			UpdateState();
-		}
-	}
+	public void MinimizeSidePane() => State.MinimizeSidePane();
 
 	/// <summary>
 	/// Restores the side pane to the width weight it had when it was minimized, or to the default
@@ -77,33 +33,7 @@ public sealed partial class TriPaneView
 	/// The pane's content element never left the visual tree, so this shows the very same instance
 	/// - with its scroll position, its text and its selection - that was there before.
 	/// </remarks>
-	public void RestoreSidePane()
-	{
-		var (sideWeight, _) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-
-		if (!TriPaneViewLayoutMath.IsMinimized(sideWeight))
-		{
-			UpdateState();
-
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			SidePanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-				_sideSnapshot,
-				TriPaneViewLayoutMath.DefaultSidePanePercent);
-			_sideSnapshot = null;
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-			UpdateState();
-		}
-	}
+	public void RestoreSidePane() => State.RestoreSidePane();
 
 	/// <summary>
 	/// Minimizes the upper pane: its height weight is snapshotted and set to zero, so the pane
@@ -117,51 +47,7 @@ public sealed partial class TriPaneView
 	/// left exactly as it was. Because this is a request from code, no restore grip is offered while
 	/// <see cref="RestoreGripMode"/> is <see cref="TriPaneViewRestoreGripMode.Auto"/>.
 	/// </remarks>
-	public void MinimizeUpperPane()
-	{
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isSideOpen = !TriPaneViewLayoutMath.IsMinimized(sideWeight);
-		var isLowerOpen = !isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(lowerWeight);
-
-		if (!isSideOpen && !isLowerOpen)
-		{
-			UpdateState();
-
-			return;
-		}
-
-		if (!TriPaneViewLayoutMath.IsMinimized(upperWeight))
-		{
-			_upperSnapshot = UpperPanePercent;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		var didMinimizeStack = false;
-		_isBatchUpdating = true;
-
-		try
-		{
-			UpperPanePercent = 0d;
-			didMinimizeStack = MinimizeStackIfBothPanesAreZero(isStackMinimized);
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-
-			//Only the regions this call actually minimized get the code cause; every other
-			//minimized region keeps the cause it already had.
-			_upperCause = TriPaneViewMinimizeCause.Code;
-
-			if (didMinimizeStack)
-			{
-				_stackCause = TriPaneViewMinimizeCause.Code;
-			}
-
-			UpdateState();
-		}
-	}
+	public void MinimizeUpperPane() => State.MinimizeUpperPane();
 
 	/// <summary>
 	/// Restores the upper pane to the height weight it had when it was minimized, or to the default
@@ -173,40 +59,7 @@ public sealed partial class TriPaneView
 	/// later <see cref="RestoreLowerPane"/>. The pane's content element never left the visual tree,
 	/// so this shows the very same instance that was there before.
 	/// </remarks>
-	public void RestoreUpperPane()
-	{
-		var (_, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, _) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-
-		if (!isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(upperWeight))
-		{
-			UpdateState();
-
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			RestoreStackWeight(isStackMinimized);
-
-			if (TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) <= 0d)
-			{
-				UpperPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_upperSnapshot,
-					TriPaneViewLayoutMath.DefaultUpperPanePercent);
-				_upperSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-			UpdateState();
-		}
-	}
+	public void RestoreUpperPane() => State.RestoreUpperPane();
 
 	/// <summary>
 	/// Minimizes the lower pane: its height weight is snapshotted and set to zero, so the pane
@@ -220,51 +73,7 @@ public sealed partial class TriPaneView
 	/// left exactly as it was. Because this is a request from code, no restore grip is offered while
 	/// <see cref="RestoreGripMode"/> is <see cref="TriPaneViewRestoreGripMode.Auto"/>.
 	/// </remarks>
-	public void MinimizeLowerPane()
-	{
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isSideOpen = !TriPaneViewLayoutMath.IsMinimized(sideWeight);
-		var isUpperOpen = !isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(upperWeight);
-
-		if (!isSideOpen && !isUpperOpen)
-		{
-			UpdateState();
-
-			return;
-		}
-
-		if (!TriPaneViewLayoutMath.IsMinimized(lowerWeight))
-		{
-			_lowerSnapshot = LowerPanePercent;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		var didMinimizeStack = false;
-		_isBatchUpdating = true;
-
-		try
-		{
-			LowerPanePercent = 0d;
-			didMinimizeStack = MinimizeStackIfBothPanesAreZero(isStackMinimized);
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-
-			//Only the regions this call actually minimized get the code cause; every other
-			//minimized region keeps the cause it already had.
-			_lowerCause = TriPaneViewMinimizeCause.Code;
-
-			if (didMinimizeStack)
-			{
-				_stackCause = TriPaneViewMinimizeCause.Code;
-			}
-
-			UpdateState();
-		}
-	}
+	public void MinimizeLowerPane() => State.MinimizeLowerPane();
 
 	/// <summary>
 	/// Restores the lower pane to the height weight it had when it was minimized, or to the default
@@ -276,40 +85,7 @@ public sealed partial class TriPaneView
 	/// later <see cref="RestoreUpperPane"/>. The pane's content element never left the visual tree,
 	/// so this shows the very same instance that was there before.
 	/// </remarks>
-	public void RestoreLowerPane()
-	{
-		var (_, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (_, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-
-		if (!isStackMinimized && !TriPaneViewLayoutMath.IsMinimized(lowerWeight))
-		{
-			UpdateState();
-
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			RestoreStackWeight(isStackMinimized);
-
-			if (TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) <= 0d)
-			{
-				LowerPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_lowerSnapshot,
-					TriPaneViewLayoutMath.DefaultLowerPanePercent);
-				_lowerSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-			UpdateState();
-		}
-	}
+	public void RestoreLowerPane() => State.RestoreLowerPane();
 
 	/// <summary>
 	/// Restores every minimized region at once, each to the weight it had when it was minimized or
@@ -330,57 +106,7 @@ public sealed partial class TriPaneView
 	/// instances - with all of their state - that were there before.
 	/// </para>
 	/// </remarks>
-	public void RestoreAll()
-	{
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(UpperPanePercent, LowerPanePercent);
-		var isStackMinimized = TriPaneViewLayoutMath.IsMinimized(stackWeight);
-		var isSideMinimized = TriPaneViewLayoutMath.IsMinimized(sideWeight);
-		var isUpperMinimized = isStackMinimized || TriPaneViewLayoutMath.IsMinimized(upperWeight);
-		var isLowerMinimized = isStackMinimized || TriPaneViewLayoutMath.IsMinimized(lowerWeight);
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			if (isSideMinimized)
-			{
-				SidePanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_sideSnapshot,
-					TriPaneViewLayoutMath.DefaultSidePanePercent);
-				_sideSnapshot = null;
-			}
-
-			if (isStackMinimized)
-			{
-				StackPercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_stackSnapshot,
-					TriPaneViewLayoutMath.DefaultStackPercent);
-				_stackSnapshot = null;
-			}
-
-			if (isUpperMinimized && TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) <= 0d)
-			{
-				UpperPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_upperSnapshot,
-					TriPaneViewLayoutMath.DefaultUpperPanePercent);
-				_upperSnapshot = null;
-			}
-
-			if (isLowerMinimized && TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) <= 0d)
-			{
-				LowerPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_lowerSnapshot,
-					TriPaneViewLayoutMath.DefaultLowerPanePercent);
-				_lowerSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-			UpdateState();
-		}
-	}
+	public void RestoreAll() => State.RestoreAll();
 
 	/// <summary>
 	/// Minimizes the stack - the whole region holding the upper and lower panes: its width weight is
@@ -395,36 +121,7 @@ public sealed partial class TriPaneView
 	/// <see cref="TriPaneViewRestoreGripMode.Auto"/>; <see cref="RestoreStack"/> is then the only way
 	/// back, and it works whatever collapsed the stack.
 	/// </remarks>
-	public void MinimizeStack()
-	{
-		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
-
-		if (TriPaneViewLayoutMath.IsMinimized(sideWeight) || TriPaneViewLayoutMath.IsMinimized(stackWeight))
-		{
-			UpdateState();
-
-			return;
-		}
-
-		_stackSnapshot = StackPercent;
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			StackPercent = 0d;
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-
-			//The cause belongs to THIS region and nothing else: a code minimize here must not turn
-			//off the restore grip of a pane the user dragged shut.
-			_stackCause = TriPaneViewMinimizeCause.Code;
-			UpdateState();
-		}
-	}
+	public void MinimizeStack() => State.MinimizeStack();
 
 	/// <summary>
 	/// Restores the stack - the region holding the upper and lower panes - to the width weight it
@@ -438,102 +135,9 @@ public sealed partial class TriPaneView
 	/// No pane content is ever detached while the stack is minimized, so this shows the very same
 	/// element instances that were there before.
 	/// </remarks>
-	public void RestoreStack()
-	{
-		var (_, stackWeight) = TriPaneViewLayoutMath.NormalizePair(SidePanePercent, StackPercent);
+	public void RestoreStack() => State.RestoreStack();
 
-		if (!TriPaneViewLayoutMath.IsMinimized(stackWeight))
-		{
-			UpdateState();
-
-			return;
-		}
-
-		var wasBatchUpdating = _isBatchUpdating;
-		_isBatchUpdating = true;
-
-		try
-		{
-			RestoreStackWeight(true);
-
-			if (TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) <= 0d
-				&& TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) <= 0d)
-			{
-				UpperPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_upperSnapshot,
-					TriPaneViewLayoutMath.DefaultUpperPanePercent);
-				LowerPanePercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-					_lowerSnapshot,
-					TriPaneViewLayoutMath.DefaultLowerPanePercent);
-				_upperSnapshot = null;
-				_lowerSnapshot = null;
-			}
-		}
-		finally
-		{
-			_isBatchUpdating = wasBatchUpdating;
-			UpdateState();
-		}
-	}
-
-	/// <summary>
-	/// Reads a minimize cause that may not have been recorded yet - a weight that arrived at zero
-	/// straight from XAML, for instance - and falls back to
-	/// <see cref="TriPaneViewMinimizeCause.Drag"/>, the cause a developer-set zero is given.
-	/// </summary>
-	/// <param name="cause">The recorded cause, if there is one.</param>
-	/// <returns>The cause to reason with.</returns>
-	private static TriPaneViewMinimizeCause CauseOrDefault(TriPaneViewMinimizeCause? cause)
-		=> cause ?? TriPaneViewMinimizeCause.Drag;
-
-	/// <summary>
-	/// Collapses the whole stack once both of its panes have reached zero.
-	/// </summary>
-	/// <param name="wasStackAlreadyMinimized">Whether the stack was already minimized when the call began.</param>
-	/// <returns>
-	/// <see langword="true"/> when this call is what minimized the stack, so the caller knows whether
-	/// the stack's minimize cause is its to stamp.
-	/// </returns>
-	private bool MinimizeStackIfBothPanesAreZero(bool wasStackAlreadyMinimized)
-	{
-		if (wasStackAlreadyMinimized
-			|| TriPaneViewLayoutMath.SanitizeWeight(UpperPanePercent) > 0d
-			|| TriPaneViewLayoutMath.SanitizeWeight(LowerPanePercent) > 0d)
-		{
-			return false;
-		}
-
-		_stackSnapshot = StackPercent;
-		StackPercent = 0d;
-
-		return true;
-	}
-
-	private void RestoreStackWeight(bool isStackMinimized)
-	{
-		if (!isStackMinimized)
-		{
-			return;
-		}
-
-		StackPercent = TriPaneViewLayoutMath.ResolveRestoreWeight(
-			_stackSnapshot,
-			TriPaneViewLayoutMath.DefaultStackPercent);
-		_stackSnapshot = null;
-	}
-
-	/// <summary>
-	/// Keeps one region's minimize cause up to date: a region that is not minimized has no cause, a
-	/// region that has just become minimized without a recorded cause was zeroed by a drag or by a
-	/// developer-set zero, and a region that already had a cause keeps it.
-	/// </summary>
-	/// <param name="current">The cause recorded for the region so far, if there is one.</param>
-	/// <param name="isMinimized">Whether the region's own raw weight is zero.</param>
-	/// <returns>The cause the region should carry now.</returns>
-	private static TriPaneViewMinimizeCause? ResolveCause(TriPaneViewMinimizeCause? current, bool isMinimized)
-		=> isMinimized ? current ?? TriPaneViewMinimizeCause.Drag : null;
-
-	private void OnWeightChanged() => UpdateState();
+	private void OnWeightChanged() => State.OnWeightChanged();
 
 	/// <summary>
 	/// Publishes one state pass's minimized flags.
@@ -569,14 +173,14 @@ public sealed partial class TriPaneView
 			SetValue(IsStackMinimizedProperty, isStackMinimized);
 			SetValue(IsSidePaneMinimizedProperty, isSideMinimized);
 
-			if (_stateVersion != version)
+			if (State.StateVersion != version)
 			{
 				return;
 			}
 
 			SetValue(IsUpperPaneMinimizedProperty, isUpperMinimized);
 
-			if (_stateVersion != version)
+			if (State.StateVersion != version)
 			{
 				return;
 			}
@@ -596,29 +200,44 @@ public sealed partial class TriPaneView
 			return;
 		}
 
-		switch (region)
-		{
-			case TriPaneViewRegion.Side when isMinimized:
-				MinimizeSidePane();
-				break;
-			case TriPaneViewRegion.Side:
-				RestoreSidePane();
-				break;
-			case TriPaneViewRegion.Upper when isMinimized:
-				MinimizeUpperPane();
-				break;
-			case TriPaneViewRegion.Upper:
-				RestoreUpperPane();
-				break;
-			case TriPaneViewRegion.Lower when isMinimized:
-				MinimizeLowerPane();
-				break;
-			case TriPaneViewRegion.Lower:
-				RestoreLowerPane();
-				break;
-			default:
-				UpdateState();
-				break;
-		}
+		State.SetMinimized(region, isMinimized);
+	}
+
+	/// <summary>
+	/// The engine's host (WPE1 C12): the four weights and the settings the pane logic reads are this control's
+	/// dependency properties, and a state pass's results go to <see cref="SyncMinimizedFlags"/> and the template.
+	/// </summary>
+	private sealed class LayoutHost : ITriPaneLayoutHost
+	{
+		private readonly TriPaneView _owner;
+
+		internal LayoutHost(TriPaneView owner) => _owner = owner;
+
+		public double SidePanePercent { get => _owner.SidePanePercent; set => _owner.SidePanePercent = value; }
+
+		public double StackPercent { get => _owner.StackPercent; set => _owner.StackPercent = value; }
+
+		public double UpperPanePercent { get => _owner.UpperPanePercent; set => _owner.UpperPanePercent = value; }
+
+		public double LowerPanePercent { get => _owner.LowerPanePercent; set => _owner.LowerPanePercent = value; }
+
+		public TriPaneViewSidePanePlacement SidePanePlacement => _owner.SidePanePlacement;
+
+		public TriPaneViewRestoreGripMode RestoreGripMode => _owner.RestoreGripMode;
+
+		public bool IsDragToMinimizeEnabled => _owner.IsDragToMinimizeEnabled;
+
+		public double SidePaneMinLength => _owner.SidePaneMinLength;
+
+		public double StackMinLength => _owner.StackMinLength;
+
+		public double UpperPaneMinLength => _owner.UpperPaneMinLength;
+
+		public double LowerPaneMinLength => _owner.LowerPaneMinLength;
+
+		public void SyncMinimizedFlags(int version, bool isSideMinimized, bool isStackMinimized, bool isUpperMinimized, bool isLowerMinimized)
+			=> _owner.SyncMinimizedFlags(version, isSideMinimized, isStackMinimized, isUpperMinimized, isLowerMinimized);
+
+		public void ApplyLayout(TriPaneLayoutResult layout) => _owner.ApplyLayout(layout);
 	}
 }

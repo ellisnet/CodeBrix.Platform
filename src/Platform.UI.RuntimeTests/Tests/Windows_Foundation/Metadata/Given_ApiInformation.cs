@@ -15,9 +15,9 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_Foundation.Metadata //
 			// but the second call resulted in false
 
 			// Application.Current is implemented on all targets
-			var isPresent = ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Application, CodeBrix.Platform.UI", "Current");
+			var isPresent = ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Application, CodeBrix.Platform.UI.Core", "Current");
 			Assert.IsTrue(isPresent);
-			var secondIsPresent = ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Application, CodeBrix.Platform.UI", "Current");
+			var secondIsPresent = ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Application, CodeBrix.Platform.UI.Core", "Current");
 			Assert.IsTrue(secondIsPresent);
 		}
 

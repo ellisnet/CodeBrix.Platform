@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Composition
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class KeyFrameAnimation : global::Microsoft.UI.Composition.CompositionAnimation
@@ -15,8 +15,8 @@ namespace Microsoft.UI.Composition
 		// Skipping already declared property DelayTime
 		// Skipping already declared property KeyFrameCount
 		// Skipping already declared property Direction
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Microsoft.UI.Composition.AnimationDelayBehavior DelayBehavior
 		{
 			get
@@ -31,8 +31,8 @@ namespace Microsoft.UI.Composition
 #endif
 		// Forced skipping of method Microsoft.UI.Composition.KeyFrameAnimation.StopBehavior.get
 		// Forced skipping of method Microsoft.UI.Composition.KeyFrameAnimation.StopBehavior.set
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void InsertExpressionKeyFrame(float normalizedProgressKey, string value)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Composition.KeyFrameAnimation", "void KeyFrameAnimation.InsertExpressionKeyFrame(float normalizedProgressKey, string value)");
@@ -48,8 +48,8 @@ namespace Microsoft.UI.Composition
 		// Forced skipping of method Microsoft.UI.Composition.KeyFrameAnimation.IterationCount.set
 		// Forced skipping of method Microsoft.UI.Composition.KeyFrameAnimation.KeyFrameCount.get
 		// Forced skipping of method Microsoft.UI.Composition.KeyFrameAnimation.DelayTime.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void InsertExpressionKeyFrame(float normalizedProgressKey, string value, global::Microsoft.UI.Composition.CompositionEasingFunction easingFunction)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Composition.KeyFrameAnimation", "void KeyFrameAnimation.InsertExpressionKeyFrame(float normalizedProgressKey, string value, CompositionEasingFunction easingFunction)");

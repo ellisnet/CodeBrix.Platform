@@ -98,7 +98,9 @@ namespace Microsoft.UI.Xaml
 #endif
 
 			// If we're not hit (usually means we don't have a Background/Fill), we're invisible. Our children will be visible or not, depending on their state.
-			if (!IsViewHit())
+			// Element handler seam: an element whose handler owns the visuals has no painted background of its own (its
+			// template is suppressed), so it is hit-testable and UIElement.HitTest asks the handler (hook H8).
+			if (!IsViewHit() && !(AreHandlersActive && HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.OwnsVisuals)))
 			{
 				return HitTestability.Invisible;
 			}

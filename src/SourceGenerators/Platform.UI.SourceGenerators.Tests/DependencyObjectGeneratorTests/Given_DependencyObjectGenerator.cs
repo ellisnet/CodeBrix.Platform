@@ -145,7 +145,7 @@ public class Given_DependencyObjectGenerator
 	 			}
 	 		}
 	 						
-	 		public override string ToString() => GetType().FullName;		// hasOverridesAttachedToWindowiOS=false		// hasOverridesAttachedToWindowiOS=false		// Skipped _iosViewSymbol: False, hasNoWillMoveToSuperviewMethod: True		// Skipped _macosViewSymbol: False, hasNoViewWillMoveToSuperviewMethod: True
+	 		public override string ToString() => GetType().FullName;		// hasOverridesAttachedToWindowiOS=false		// Skipped _macosViewSymbol: False, hasNoViewWillMoveToSuperviewMethod: True
 	 		
 	 		
 	 		#region DataContext DependencyProperty

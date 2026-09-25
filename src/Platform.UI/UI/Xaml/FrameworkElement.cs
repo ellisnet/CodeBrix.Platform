@@ -141,7 +141,7 @@ namespace Microsoft.UI.Xaml
 		{
 			InternalBackgroundSizing = (BackgroundSizing)e.NewValue;
 			OnBackgroundSizingChangedPartial(e);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			(this as IBorderInfoProvider)?.UpdateBackgroundSizing();
 #endif
 		}

@@ -9,10 +9,11 @@
 		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
 
-		<!-- The add-in's whole present path (SKXamlCanvas.Skia.cs, SKSwapChainPanel.Skia.cs) lives
-		     in the Skia flavour of the add-in, which in turn binds the Skia flavour of the
-		     framework. Binding that same flavour here is what lets this suite exercise the code
-		     that actually ships, rather than the .Reference API shells (whose bodies throw). -->
+		<!-- The add-in's whole present path (Skia/SKXamlCanvasSkiaPlatform.skia.cs,
+		     Skia/SKSwapChainPanelSkiaPlatform.skia.cs) lives in the add-in's Skia assembly, which in
+		     turn binds the Skia assemblies of the framework; the element API it serves is in the
+		     add-in's Core assembly, which the Skia project references. Binding the Skia project here
+		     is what lets this suite exercise the code that actually ships. -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 
 		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views.Tests</AssemblyName>
@@ -22,8 +23,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
-		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

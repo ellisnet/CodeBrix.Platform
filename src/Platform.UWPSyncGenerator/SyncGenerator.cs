@@ -16,7 +16,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 	{
 		protected override void ProcessType(INamedTypeSymbol type, INamespaceSymbol ns)
 		{
-			var folder = $@"{GetNamespaceBasePath(type)}\{ns}";
+			var folder = Path.Combine(GetNamespaceBasePath(type), ns.ToString());
 			var info = Directory.CreateDirectory(folder);
 
 			// Console.WriteLine(type.ToString());
@@ -80,11 +80,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			var uwpAttributes = type.GetAttributes().Where(a => !IsIgnoredAttribute(a));
 			var attributesToGenerate = new HashSet<string>();
 
-			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.AndroidSymbol), attributesToGenerate);
-			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.IOSSymbol), attributesToGenerate);
-			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.TvOSSymbol), attributesToGenerate);
 			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.SkiaSymbol), attributesToGenerate);
-			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.WasmSymbol), attributesToGenerate);
 			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.UnitTestsymbol), attributesToGenerate);
 			AddAttributesToGenerate(GetMissingAttributes(uwpAttributes, allSymbols.NetStdReferenceSymbol), attributesToGenerate);
 

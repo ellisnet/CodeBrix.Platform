@@ -1,12 +1,9 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
-using System.Text;
+using CodeBrix.Platform.UI.TerminalView.Engine;
 using CodeBrix.Platform.UI.TerminalView.Input;
 using CodeBrix.Platform.UI.TerminalView.Internal;
-using CodeBrix.Platform.UI.TerminalView.Rendering;
-using CodeBrix.Platform.UI.TextLayout;
 using CodeBrix.Platform.UI.Xaml.Controls.Extensions;
 using CodeBrix.Terminal.Engine;
 using Microsoft.UI.Xaml;
@@ -17,10 +14,6 @@ using Microsoft.UI.Xaml.Media;
 using SkiaSharp;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.System;
-using TerminalBuffer = CodeBrix.Terminal.Engine.Buffer;   //Required: 'Buffer' alone is ambiguous with System.Buffer
-using TerminalEngine = CodeBrix.Terminal.Engine.Terminal; //Required: inside the CodeBrix.Platform.UI.TerminalView
-                                                          //  namespace the simple name 'Terminal' binds to the
-                                                          //  CodeBrix.Terminal NAMESPACE, not the engine type
 
 namespace CodeBrix.Platform.UI.TerminalView;
 
@@ -34,6 +27,10 @@ namespace CodeBrix.Platform.UI.TerminalView;
 //moved onto the engine's TerminalKeyEncoder, the UnicodeKeyReader reflection hack replaced
 //by direct internal KeyRoutedEventArgs.UnicodeKey access (InternalsVisibleTo), and
 //clipboard copy AND paste owned by the control (context menu + Ctrl+Shift+C/V).
+//WPE1 C6: the grid drawing, the terminal, the selection gestures and the key encoding moved
+//into the WinUI-free engine (Engine/TerminalRenderer, Engine/TerminalInputEncoder); this
+//control wraps them and keeps only the XAML half (surface, scroll bar, menu, timers, focus,
+//clipboard, VirtualKey mapping).
 
 /// <summary>
 /// A terminal view: renders a CodeBrix.Terminal buffer as a fixed monospace
@@ -62,14 +59,11 @@ namespace CodeBrix.Platform.UI.TerminalView;
 /// </remarks>
 public sealed partial class TerminalControl : Control
 {
-    private const string DefaultFontFamily =
-        "ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf";
-
     private const double ScrollBarThickness = 12.0;
 
-    private readonly TerminalEngine _terminal;
-    private readonly SelectionService _selection;
-    private readonly RenderCanvas _canvas;
+    private readonly TerminalRenderer _renderer;
+    private readonly TerminalInputEncoder _keyInput = new();
+    private readonly FrameworkElement _canvas;
     private readonly ScrollBar _verticalScrollBar;
     private readonly MenuFlyout _contextMenu;
     private readonly MenuFlyoutItem _copyMenuItem;
@@ -77,47 +71,21 @@ public sealed partial class TerminalControl : Control
     private readonly DispatcherTimer _blinkTimer;
     private readonly DispatcherTimer _dragScrollTimer;
 
-    private CellMetrics? _metrics;
-    private bool _selecting;
     private bool _updatingScrollBar;
-    private (int Column, int Row) _lastDragCell = (-1, -1);
-    private double _lastPointerX;
-    private double _lastPointerY;
-    private long _lastClickTick;
-    private (int Column, int Row) _lastClickCell = (-1, -1);
-    private string _fontFamily = DefaultFontFamily;
-    private float _fontSize = 14f;
-    private bool _blinkOn = true;
-    private bool _focused;
-    private bool _shiftDown;
-    private bool _controlDown;
-    private bool _altDown;
-    private bool _capsLock;
 
     /// <summary>Creates the control with an 80x25 terminal that resizes to fit.</summary>
     public TerminalControl()
     {
-        _terminal = new TerminalEngine(new ViewDelegate(this), new TerminalOptions
-        {
-            Cols = 80,
-            Rows = 25,
-            //Most terminal hosts feed explicit CR+LF; double conversion would add blank rows
-            ConvertEol = false
-        });
-
-        _selection = new SelectionService(_terminal);
-        _selection.SelectionChanged += () => _canvas?.Invalidate();
-
-        _terminal.Scrolled += (_, _) =>
-        {
-            UpdateScrollBar();
-            _canvas?.Invalidate();
-        };
+        _renderer = new TerminalRenderer();
+        _renderer.InvalidateRequested += InvalidateCanvas;
+        _renderer.Scrolled += UpdateScrollBar;
+        _renderer.TitleChanged += title => TitleChanged?.Invoke(title);
+        _renderer.InputSent += data => InputEmitted?.Invoke(data);
 
         IsTabStop = true;               //Required for key events
 
-        _canvas = new RenderCanvas();
-        _canvas.Paint += OnPaint;
+        _canvas = RenderCanvasSupply.Create();
+        RenderCanvasSupply.AddPaintHandler(_canvas, _renderer.Paint);
         _canvas.SizeChanged += (_, _) => RecalculateGrid();
         _canvas.PointerPressed += OnCanvasPointerPressed;
         _canvas.PointerMoved += OnCanvasPointerMoved;
@@ -162,10 +130,13 @@ public sealed partial class TerminalControl : Control
         Template = new ControlTemplate(CreateTemplateRoot);
 
         _dragScrollTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(90) };
-        _dragScrollTimer.Tick += (_, _) => AutoScrollDrag();
+        _dragScrollTimer.Tick += (_, _) =>
+        {
+            if (!_renderer.AutoScrollDrag()) { _dragScrollTimer.Stop(); }
+        };
 
         _blinkTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
-        _blinkTimer.Tick += (_, _) => { _blinkOn = !_blinkOn; _canvas.Invalidate(); };
+        _blinkTimer.Tick += (_, _) => { _renderer.IsBlinkOn = !_renderer.IsBlinkOn; RenderCanvasSupply.Invalidate(_canvas); };
         Loaded += (_, _) => _blinkTimer.Start();
         Unloaded += (_, _) => { _blinkTimer.Stop(); _dragScrollTimer.Stop(); };
     }
@@ -190,37 +161,31 @@ public sealed partial class TerminalControl : Control
     /// </summary>
     public event Action<string>? CopyRequested;
 
-    private SKColor _selectionColor = new(0x4d, 0x8b, 0xd8, 0x66);
-
     /// <summary>The translucent overlay painted over selected cells.</summary>
     public SKColor SelectionColor
     {
-        get => _selectionColor;
-        set { _selectionColor = value; _canvas?.Invalidate(); }
+        get => _renderer.SelectionColor;
+        set { _renderer.SelectionColor = value; InvalidateCanvas(); }
     }
 
     /// <summary>The terminal's current column count.</summary>
-    public int Columns => _terminal.Cols;
+    public int Columns => _renderer.Columns;
 
     /// <summary>The terminal's current row count.</summary>
-    public int Rows => _terminal.Rows;
-
-    private SKColor _foregroundColor = new(0xff, 0xff, 0xff);
+    public int Rows => _renderer.Rows;
 
     /// <summary>The default text color. Default: the engine's white.</summary>
     public SKColor ForegroundColor
     {
-        get => _foregroundColor;
-        set { _foregroundColor = value; _canvas?.Invalidate(); }
+        get => _renderer.ForegroundColor;
+        set { _renderer.ForegroundColor = value; InvalidateCanvas(); }
     }
-
-    private SKColor _backgroundColor = new(0x00, 0x00, 0x00);
 
     /// <summary>The terminal background. Default: the engine's black.</summary>
     public SKColor BackgroundColor
     {
-        get => _backgroundColor;
-        set { _backgroundColor = value; _canvas?.Invalidate(); }
+        get => _renderer.BackgroundColor;
+        set { _renderer.BackgroundColor = value; InvalidateCanvas(); }
     }
 
     /// <summary>
@@ -230,8 +195,8 @@ public sealed partial class TerminalControl : Control
     /// </summary>
     public bool ConvertEol
     {
-        get => _terminal.Options.ConvertEol;
-        set => _terminal.Options.ConvertEol = value;
+        get => _renderer.ConvertEol;
+        set => _renderer.ConvertEol = value;
     }
 
     /// <summary>
@@ -241,8 +206,8 @@ public sealed partial class TerminalControl : Control
     /// </summary>
     public int Scrollback
     {
-        get => _terminal.Options.Scrollback ?? 0;
-        set => _terminal.Options.Scrollback = Math.Max(0, value);
+        get => _renderer.Scrollback;
+        set => _renderer.Scrollback = value;
     }
 
     /// <summary>
@@ -252,26 +217,24 @@ public sealed partial class TerminalControl : Control
     /// </summary>
     public string TerminalFontFamily
     {
-        get => _fontFamily;
+        get => _renderer.FontFamily;
         set
         {
-            _fontFamily = string.IsNullOrWhiteSpace(value) ? DefaultFontFamily : value;
-            _metrics = null;
+            _renderer.FontFamily = value;
             RecalculateGrid();
-            _canvas?.Invalidate();
+            InvalidateCanvas();
         }
     }
 
     /// <summary>The terminal font size in DIPs. Default 14.</summary>
     public float TerminalFontSize
     {
-        get => _fontSize;
+        get => _renderer.FontSize;
         set
         {
-            _fontSize = value > 4f ? value : 4f;
-            _metrics = null;
+            _renderer.FontSize = value;
             RecalculateGrid();
-            _canvas?.Invalidate();
+            InvalidateCanvas();
         }
     }
 
@@ -288,9 +251,9 @@ public sealed partial class TerminalControl : Control
 
         queue.TryEnqueue(() =>
         {
-            _terminal.Feed(data);
+            _renderer.Feed(data);
             UpdateScrollBar();
-            _canvas.Invalidate();
+            RenderCanvasSupply.Invalidate(_canvas);
         });
     }
 
@@ -311,9 +274,9 @@ public sealed partial class TerminalControl : Control
 
         queue.TryEnqueue(() =>
         {
-            _terminal.Feed(copy, copy.Length);
+            _renderer.Feed(copy, copy.Length);
             UpdateScrollBar();
-            _canvas.Invalidate();
+            RenderCanvasSupply.Invalidate(_canvas);
         });
     }
 
@@ -323,19 +286,10 @@ public sealed partial class TerminalControl : Control
     /// </summary>
     public void Reset()
     {
-        _terminal.Reset();
-
-        //The engine's RIS restores the modes but leaves the screen and the
-        //scrollback exactly as they were, so a reset on its own would hand the
-        //next session the previous one's output. Emptying the active buffer is
-        //what "reset to initial state" means to the person looking at the
-        //control - and it is the state a freshly constructed buffer is in, since
-        //the engine's own Buffer constructor starts by calling Clear().
-        _terminal.Buffer.Clear();
-
-        _selection.SelectNone();
+        //RIS plus emptying the screen and the scrollback (see TerminalRenderer.Reset)
+        _renderer.Reset();
         UpdateScrollBar();
-        _canvas.Invalidate();
+        RenderCanvasSupply.Invalidate(_canvas);
     }
 
     /// <summary>Gives the control keyboard focus.</summary>
@@ -422,25 +376,24 @@ public sealed partial class TerminalControl : Control
 
     private void RaiseInput(string data)
     {
-        //Typing snaps the view back to the live tail, like every terminal
-        _terminal.ScrollToBottom();
-        _blinkOn = true;
+        _renderer.PrepareForInput();
         InputEmitted?.Invoke(data);
-        _canvas.Invalidate();
+        RenderCanvasSupply.Invalidate(_canvas);
     }
 
     private void UpdateScrollBar()
     {
         if (_verticalScrollBar == null) { return; }
 
-        var buffer = _terminal.Buffer;
+        var terminal = _renderer.Terminal;
+        var buffer = terminal.Buffer;
 
         _updatingScrollBar = true;
         try
         {
             _verticalScrollBar.Maximum = buffer.YBase;
-            _verticalScrollBar.ViewportSize = _terminal.Rows;
-            _verticalScrollBar.LargeChange = Math.Max(1, _terminal.Rows - 1);
+            _verticalScrollBar.ViewportSize = terminal.Rows;
+            _verticalScrollBar.LargeChange = Math.Max(1, terminal.Rows - 1);
             _verticalScrollBar.Value = buffer.YDisp;
             _verticalScrollBar.Visibility = buffer.YBase > 0 ? Visibility.Visible : Visibility.Collapsed;
         }
@@ -454,33 +407,22 @@ public sealed partial class TerminalControl : Control
     {
         if (_updatingScrollBar) { return; }
 
-        var delta = (int)Math.Round(e.NewValue) - _terminal.Buffer.YDisp;
-        if (delta != 0) { _terminal.ScrollLines(delta); }
+        var delta = (int)Math.Round(e.NewValue) - _renderer.Terminal.Buffer.YDisp;
+        if (delta != 0) { _renderer.ScrollLines(delta); }
     }
 
     private void RecalculateGrid()
     {
         if (_canvas.ActualWidth < 1 || _canvas.ActualHeight < 1) { return; }
 
-        var cell = EnsureMetrics();
-        var cols = Math.Max(4, (int)(_canvas.ActualWidth / cell.Width));
-        var rows = Math.Max(2, (int)(_canvas.ActualHeight / cell.Height));
-
-        if (cols != _terminal.Cols || rows != _terminal.Rows)
+        if (_renderer.FitToSize(_canvas.ActualWidth, _canvas.ActualHeight, out var cols, out var rows))
         {
-            var wasAtBottom = _terminal.IsAtBottom;
-            _terminal.Resize(cols, rows);
-            if (wasAtBottom) { _terminal.ScrollToBottom(); }
-
             GridResized?.Invoke(cols, rows);
             UpdateScrollBar();
         }
 
-        _canvas.Invalidate();
+        RenderCanvasSupply.Invalidate(_canvas);
     }
-
-    private CellMetrics EnsureMetrics() =>
-        _metrics ??= CellMetrics.Measure(_fontFamily, _fontSize);
 
     private void OnCanvasPointerPressed(object sender, PointerRoutedEventArgs e)
     {
@@ -489,7 +431,7 @@ public sealed partial class TerminalControl : Control
 
         if (point.Properties.IsRightButtonPressed)
         {
-            _copyMenuItem.IsEnabled = _selection.Active;
+            _copyMenuItem.IsEnabled = _renderer.Selection.Active;
             _contextMenu.ShowAt(_canvas, new FlyoutShowOptions { Position = point.Position });
             e.Handled = true;
             return;
@@ -501,26 +443,10 @@ public sealed partial class TerminalControl : Control
             return;
         }
 
-        var cell = SelectionGeometry.ToCell(point.Position.X, point.Position.Y,
-            EnsureMetrics(), _terminal.Cols, _terminal.Rows);
-        var now = Environment.TickCount64;
-
-        if (now - _lastClickTick < 400 && cell == _lastClickCell)
+        //A double-click selects the word/expression; any other press starts a drag selection
+        if (_renderer.PressAt(point.Position.X, point.Position.Y, Environment.TickCount64))
         {
-            //Double-click: word/expression selection. NOTE the engine's
-            //  (col, row) parameter order - unlike its (row, col) siblings.
-            _selection.SelectWordOrExpression(cell.Column, cell.Row);
-            _lastClickTick = 0;
-        }
-        else
-        {
-            if (_selection.Active) { _selection.SelectNone(); }
-            _selection.SetSoftStart(cell.Row, cell.Column);
-            _selecting = true;
-            _lastDragCell = cell;
             _canvas.CapturePointer(e.Pointer);
-            _lastClickTick = now;
-            _lastClickCell = cell;
         }
 
         e.Handled = true;
@@ -528,11 +454,9 @@ public sealed partial class TerminalControl : Control
 
     private void OnCanvasPointerMoved(object sender, PointerRoutedEventArgs e)
     {
-        if (!_selecting) { return; }
+        if (!_renderer.IsSelecting) { return; }
 
         var position = e.GetCurrentPoint(_canvas).Position;
-        _lastPointerX = position.X;
-        _lastPointerY = position.Y;
 
         //Dragging beyond the top/bottom edge scrolls the view while held there
         if (position.Y < 0 || position.Y > _canvas.ActualHeight)
@@ -544,49 +468,22 @@ public sealed partial class TerminalControl : Control
             _dragScrollTimer.Stop();
         }
 
-        ExtendSelectionTo(position.X, position.Y);
+        _renderer.DragTo(position.X, position.Y);
         e.Handled = true;
     }
 
     private void OnCanvasPointerReleased(object sender, PointerRoutedEventArgs e)
     {
-        if (!_selecting) { return; }
+        if (!_renderer.EndDrag()) { return; }
 
-        _selecting = false;
         _dragScrollTimer.Stop();
         _canvas.ReleasePointerCapture(e.Pointer);
         e.Handled = true;
     }
 
-    private void ExtendSelectionTo(double x, double y)
-    {
-        var cell = SelectionGeometry.ToCell(x, y, EnsureMetrics(),
-            _terminal.Cols, _terminal.Rows);
-        if (cell == _lastDragCell && _selection.Active) { return; }
-
-        if (!_selection.Active) { _selection.StartSelection(); }
-        _selection.DragExtend(cell.Row, cell.Column);
-        _lastDragCell = cell;
-    }
-
-    private void AutoScrollDrag()
-    {
-        if (!_selecting)
-        {
-            _dragScrollTimer.Stop();
-            return;
-        }
-
-        //Above the top edge scrolls back into history; below scrolls forward
-        _terminal.ScrollLines(_lastPointerY < 0 ? -1 : 1);
-        ExtendSelectionTo(_lastPointerX, _lastPointerY);
-    }
-
     private void CopySelection()
     {
-        if (!_selection.Active) { return; }
-
-        var text = _selection.GetSelectedText();
+        var text = _renderer.GetSelectedText();
         if (string.IsNullOrEmpty(text)) { return; }
 
         var data = new DataPackage();
@@ -632,9 +529,7 @@ public sealed partial class TerminalControl : Control
 
     private void OnCanvasPointerWheelChanged(object sender, PointerRoutedEventArgs e)
     {
-        var delta = e.GetCurrentPoint(_canvas).Properties.MouseWheelDelta;
-        //Wheel up (positive delta) scrolls back into history
-        _terminal.ScrollLines(-(delta / 120 * 3));
+        _renderer.ScrollWheel(e.GetCurrentPoint(_canvas).Properties.MouseWheelDelta);
         e.Handled = true;
     }
 
@@ -642,9 +537,9 @@ public sealed partial class TerminalControl : Control
     protected override void OnGotFocus(RoutedEventArgs e)
     {
         base.OnGotFocus(e);
-        _focused = true;
-        _blinkOn = true;
-        _canvas.Invalidate();
+        _renderer.IsFocused = true;
+        _renderer.IsBlinkOn = true;
+        RenderCanvasSupply.Invalidate(_canvas);
         //A focused terminal is typed into, so it summons the software keyboard
         //on heads that have one. Consume the guard's hold even when disabled,
         //so a suppressed round-trip can never leave it armed.
@@ -659,8 +554,8 @@ public sealed partial class TerminalControl : Control
     protected override void OnLostFocus(RoutedEventArgs e)
     {
         base.OnLostFocus(e);
-        _focused = false;
-        _canvas.Invalidate();
+        _renderer.IsFocused = false;
+        RenderCanvasSupply.Invalidate(_canvas);
         if (!_keyboardGuard.ShouldSuppressUnfocus())
         {
             SoftwareKeyboardFocus.NotifyUnfocused(this);
@@ -669,39 +564,37 @@ public sealed partial class TerminalControl : Control
 
     /// <inheritdoc/>
     protected override void OnKeyUp(KeyRoutedEventArgs e) =>
-        UpdateModifier(e.Key, isDown: false);
+        _keyInput.UpdateModifier(VirtualKeyMapper.ToModifierKey(e.Key), isDown: false);
 
     /// <inheritdoc/>
     protected override void OnKeyDown(KeyRoutedEventArgs e)
     {
-        if (UpdateModifier(e.Key, isDown: true)) { return; }
+        if (_keyInput.UpdateModifier(VirtualKeyMapper.ToModifierKey(e.Key), isDown: true)) { return; }
 
-        //Ctrl+Shift+C / Ctrl+Shift+V are the terminal-conventional clipboard
-        //chords (never reach the shell as input)
-        if (_controlDown && _shiftDown && e.Key == VirtualKey.C)
+        var key = VirtualKeyMapper.ToTerminalKey(e.Key);
+        switch (_keyInput.GetCommand(key))
         {
-            CopySelection();
-            e.Handled = true;
-            return;
+            case TerminalKeyCommand.Copy:
+                CopySelection();
+                e.Handled = true;
+                return;
+
+            case TerminalKeyCommand.Paste:
+                PasteFromClipboard();
+                e.Handled = true;
+                return;
+
+            case TerminalKeyCommand.ScrollPageUp:
+            case TerminalKeyCommand.ScrollPageDown:
+                _renderer.ScrollPage(up: key == TerminalKey.PageUp);
+                e.Handled = true;
+                return;
         }
 
-        if (_controlDown && _shiftDown && e.Key == VirtualKey.V)
-        {
-            PasteFromClipboard();
-            e.Handled = true;
-            return;
-        }
-
-        //Shift+PageUp/PageDown page through the scrollback
-        if (_shiftDown && e.Key is VirtualKey.PageUp or VirtualKey.PageDown)
-        {
-            var page = Math.Max(1, _terminal.Rows - 1);
-            _terminal.ScrollLines(e.Key == VirtualKey.PageUp ? -page : page);
-            e.Handled = true;
-            return;
-        }
-
-        var encoded = EncodeKey(e);
+        //Printables prefer the platform's layout-composed character. UnicodeKey is
+        //  internal framework API, reached via InternalsVisibleTo (the
+        //  AdvancedTextEdit TextArea precedent).
+        var encoded = _keyInput.Encode(key, e.UnicodeKey, _renderer.ApplicationCursor);
         if (encoded != null)
         {
             RaiseInput(encoded);
@@ -709,242 +602,13 @@ public sealed partial class TerminalControl : Control
         }
     }
 
-    private string? EncodeKey(KeyRoutedEventArgs e)
+    //The canvas comes from the platform's canvas supply (Internal/RenderCanvasSupply.cs); the null check covers the
+    //  callbacks the constructor wires up before the canvas exists.
+    private void InvalidateCanvas()
     {
-        var key = VirtualKeyMapper.ToTerminalKey(e.Key);
-        var modifiers = CurrentModifiers();
-
-        //Chords go through the full key mapping (Ctrl -> C0 codes, Alt -> ESC prefix)
-        if (_controlDown || _altDown)
+        if (_canvas is not null)
         {
-            return TerminalKeyEncoder.Encode(key, modifiers, _terminal.ApplicationCursor);
+            RenderCanvasSupply.Invalidate(_canvas);
         }
-
-        //Shift+Tab must reach Encode to become back-tab (EncodeSpecial is modifier-free)
-        if (key == TerminalKey.Tab && _shiftDown)
-        {
-            return TerminalKeyEncoder.Encode(key, modifiers, _terminal.ApplicationCursor);
-        }
-
-        var special = TerminalKeyEncoder.EncodeSpecial(key, _terminal.ApplicationCursor);
-        if (special != null) { return special; }
-
-        //Printables: prefer the platform's layout-composed character - the
-        //  raw-key path cannot see shifted digit-row symbols like '(' on
-        //  non-US layouts. UnicodeKey is internal framework API, reached via
-        //  InternalsVisibleTo (the AdvancedTextEdit TextArea precedent).
-        if (e.UnicodeKey is { } composed)
-        {
-            var encoded = TerminalKeyEncoder.EncodeComposed(composed, modifiers);
-            if (encoded != null) { return encoded; }
-        }
-
-        return TerminalKeyEncoder.Encode(key, modifiers, _terminal.ApplicationCursor);
-    }
-
-    private TerminalModifiers CurrentModifiers()
-    {
-        var modifiers = TerminalModifiers.None;
-        if (_shiftDown) { modifiers |= TerminalModifiers.Shift; }
-        if (_controlDown) { modifiers |= TerminalModifiers.Control; }
-        if (_altDown) { modifiers |= TerminalModifiers.Alt; }
-        if (_capsLock) { modifiers |= TerminalModifiers.CapsLock; }
-        return modifiers;
-    }
-
-    private bool UpdateModifier(VirtualKey key, bool isDown)
-    {
-        switch (key)
-        {
-            case VirtualKey.Shift:
-            case VirtualKey.LeftShift:
-            case VirtualKey.RightShift:
-                _shiftDown = isDown;
-                return true;
-
-            case VirtualKey.Control:
-            case VirtualKey.LeftControl:
-            case VirtualKey.RightControl:
-                _controlDown = isDown;
-                return true;
-
-            case VirtualKey.Menu:
-            case VirtualKey.LeftMenu:
-            case VirtualKey.RightMenu:
-                _altDown = isDown;
-                return true;
-
-            case VirtualKey.CapitalLock:
-                if (isDown) { _capsLock = !_capsLock; }
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    private void OnPaint(SKCanvas canvas, SKSize size)
-    {
-        canvas.Clear(BackgroundColor);
-
-        var cell = EnsureMetrics();
-        var buffer = _terminal.Buffer;
-
-        for (var row = 0; row < _terminal.Rows; row++)
-        {
-            var lineIndex = buffer.YDisp + row;
-            if (lineIndex >= buffer.Lines.Length) { break; }
-
-            DrawLine(canvas, RunBuilder.BuildRuns(buffer.Lines[lineIndex]), row * cell.Height, cell);
-        }
-
-        if (_selection.Active) { DrawSelection(canvas, buffer, cell); }
-
-        DrawCursor(canvas, buffer, cell);
-    }
-
-    private void DrawSelection(SKCanvas canvas, TerminalBuffer buffer, CellMetrics cell)
-    {
-        var start = _selection.Start;
-        var end = _selection.End;
-        using var paint = new SKPaint { Color = SelectionColor };
-
-        for (var row = 0; row < _terminal.Rows; row++)
-        {
-            if (SelectionGeometry.TryGetRowSpan(start.X, start.Y, end.X, end.Y,
-                buffer.YDisp + row, _terminal.Cols, out var first, out var last))
-            {
-                canvas.DrawRect(first * cell.Width, row * cell.Height,
-                    (last - first + 1) * cell.Width, cell.Height, paint);
-            }
-        }
-    }
-
-    private void DrawLine(SKCanvas canvas, List<TextRunSegment> segments,
-        float top, CellMetrics cell)
-    {
-        foreach (var segment in segments)
-        {
-            var style = AttributeDecoder.Decode(segment.Attribute, ForegroundColor, BackgroundColor);
-            var left = segment.StartColumn * cell.Width;
-            var width = segment.CellCount * cell.Width;
-
-            if (style.HasVisibleBackground(BackgroundColor))
-            {
-                using var backPaint = new SKPaint { Color = style.Background };
-                canvas.DrawRect(left, top, width, cell.Height, backPaint);
-            }
-
-            var isBlank = string.IsNullOrWhiteSpace(segment.Text);
-            if (!isBlank)
-            {
-                var descriptor = new TextRunDescriptor(segment.Text, _fontFamily, _fontSize,
-                    style.Bold ? TextFontWeight.Bold : TextFontWeight.Normal,
-                    style.Italic ? TextFontStyle.Italic : TextFontStyle.Normal)
-                {
-                    Color = style.Foreground
-                };
-
-                using var layout = TextLayoutEngine.Layout([descriptor]);
-                using var textPaint = new SKPaint { Color = style.Foreground, IsAntialias = true };
-                layout.Draw(canvas, new SKPoint(left, top), textPaint);
-            }
-
-            if (style.Underline || style.CrossedOut)
-            {
-                using var linePaint = new SKPaint
-                {
-                    Color = style.Foreground,
-                    StrokeWidth = Math.Max(1f, _fontSize / 14f)
-                };
-
-                if (style.Underline)
-                {
-                    var y = top + cell.Baseline + 2f;
-                    canvas.DrawLine(left, y, left + width, y, linePaint);
-                }
-
-                if (style.CrossedOut)
-                {
-                    var y = top + cell.Height * 0.5f;
-                    canvas.DrawLine(left, y, left + width, y, linePaint);
-                }
-            }
-        }
-    }
-
-    private void DrawCursor(SKCanvas canvas, TerminalBuffer buffer, CellMetrics cell)
-    {
-        if (_terminal.CursorHidden) { return; }
-
-        var screenRow = buffer.YBase + buffer.Y - buffer.YDisp;
-        if (screenRow < 0 || screenRow >= _terminal.Rows) { return; }
-
-        var left = buffer.X * cell.Width;
-        var top = screenRow * cell.Height;
-
-        if (!_focused)
-        {
-            //Steady hollow cursor while unfocused
-            using var stroke = new SKPaint
-            {
-                Color = ForegroundColor,
-                Style = SKPaintStyle.Stroke,
-                StrokeWidth = 1f
-            };
-            canvas.DrawRect(left + 0.5f, top + 0.5f, cell.Width - 1f, cell.Height - 1f, stroke);
-            return;
-        }
-
-        if (!_blinkOn) { return; }
-
-        using var fill = new SKPaint { Color = ForegroundColor };
-        canvas.DrawRect(left, top, cell.Width, cell.Height, fill);
-
-        //Repaint the character under the block in the background color
-        var lineIndex = buffer.YBase + buffer.Y;
-        if (lineIndex < buffer.Lines.Length && buffer.X < buffer.Lines[lineIndex].Length)
-        {
-            var text = RunBuilder.CellText(buffer.Lines[lineIndex][buffer.X]);
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                var descriptor = new TextRunDescriptor(text, _fontFamily, _fontSize)
-                {
-                    Color = BackgroundColor
-                };
-                using var layout = TextLayoutEngine.Layout([descriptor]);
-                using var paint = new SKPaint { Color = BackgroundColor, IsAntialias = true };
-                layout.Draw(canvas, new SKPoint(left, top), paint);
-            }
-        }
-    }
-
-    private sealed class ViewDelegate : ITerminalDelegate
-    {
-        private readonly TerminalControl _owner;
-
-        public ViewDelegate(TerminalControl owner) => _owner = owner;
-
-        public void ShowCursor(TerminalEngine source) => _owner._canvas?.Invalidate();
-
-        public void SetTerminalTitle(TerminalEngine source, string title) =>
-            _owner.TitleChanged?.Invoke(title);
-
-        public void SetTerminalIconTitle(TerminalEngine source, string title)
-        {
-        }
-
-        public void SizeChanged(TerminalEngine source)
-        {
-            //Escape-sequence-driven resize is not supported; the grid follows the control size
-        }
-
-        public void Send(byte[] data) =>
-            _owner.InputEmitted?.Invoke(Encoding.UTF8.GetString(data));
-
-        public string? WindowCommand(TerminalEngine source, WindowManipulationCommand command,
-            params int[] args) => null;
-
-        public bool IsProcessTrusted() => true;
     }
 }

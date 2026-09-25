@@ -41,6 +41,11 @@ Scenario: A popup left open by a scenario is closed by the reset
 	When "next" is tapped
 	Then the Click of "next" was raised once
 
+Scenario: The colour the harness reports for a shade is its most common exact colour
+	Given pixels of one colour shade: 1 of "#FF0909" first, then 20 of "#FF0000"
+	Then the harness reports their colour as exactly "#FF0000"
+	And the harness reports that colour for 21 of them
+
 @landscape-only
 Scenario: The landscape panel is wider than it is tall
 	Then the panel is wider than it is tall

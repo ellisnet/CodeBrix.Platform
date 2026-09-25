@@ -551,6 +551,69 @@ public partial class TabView : Control
 		}
 	}
 
+	/// <summary>
+	/// Raise entry point for a platform handler: the native "add tab" button was clicked (same path as the template's
+	/// add button: AddTabButtonClick and the automation notification).
+	/// </summary>
+	internal void RaiseAddTabButtonClickFromPlatform() => OnAddButtonClick(this, new RoutedEventArgs(this));
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native tab strip selected the tab at <paramref name="index"/>.
+	/// With the template's list present this is the list's own selection path; without it (a handler that owns the
+	/// visuals) it updates SelectedIndex and SelectedItem, the tab content, and raises SelectionChanged with the removed
+	/// and added item, as the template's list does. Nothing happens when the tab is already the selected one.
+	/// </summary>
+	/// <param name="index">The index of the selected tab in the TabView's items, or -1 for no selection.</param>
+	internal void RaiseSelectionChangedFromPlatform(int index)
+	{
+		if (m_listView is { } listView)
+		{
+			// Same path as a tap on a template tab: the list raises SelectionChanged, OnListViewSelectionChanged relays it.
+			listView.SelectedIndex = index;
+			return;
+		}
+
+		var newItem = GetTabItemAt(index);
+		if (index == SelectedIndex && Equals(newItem, SelectedItem))
+		{
+			return;
+		}
+
+		var oldItem = SelectedItem;
+		SelectedIndex = index;
+		SelectedItem = newItem;
+		UpdateTabContent();
+
+		var removed = oldItem is null ? global::System.Array.Empty<object>() : new[] { oldItem };
+		var added = newItem is null ? global::System.Array.Empty<object>() : new[] { newItem };
+		SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(this, removed, added));
+	}
+
+	/// <summary>Gets the item at <paramref name="index"/> of TabItemsSource (when set) or TabItems, or null.</summary>
+	private object GetTabItemAt(int index)
+	{
+		if (index < 0)
+		{
+			return null;
+		}
+
+		if (TabItemsSource is global::System.Collections.IEnumerable source)
+		{
+			var i = 0;
+			foreach (var item in source)
+			{
+				if (i++ == index)
+				{
+					return item;
+				}
+			}
+
+			return null;
+		}
+
+		return TabItems is { } items && index < items.Count ? items[index] : null;
+	}
+
 	private void OnAddButtonClick(object sender, RoutedEventArgs args)
 	{
 		AddTabButtonClick?.Invoke(this, args);

@@ -12,8 +12,8 @@ namespace Microsoft.UI.Xaml.Controls;
 /// <summary>
 /// Represents an object that enables the hosting of web content.
 /// </summary>
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
+[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 #endif
 public partial class WebView2 : Control, IWebView
 {
@@ -39,7 +39,7 @@ public partial class WebView2 : Control, IWebView
 		CoreWebView2.WebMessageReceived += CoreWebView2_WebMessageReceived;
 
 		Loaded += WebView2_Loaded;
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		Unloaded += WebView2_Unloaded;
 #endif
 	}
@@ -94,12 +94,12 @@ public partial class WebView2 : Control, IWebView
 			EnsureCoreWebView2();
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		CoreWebView2.OnLoaded();
 #endif
 	}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	private void WebView2_Unloaded(object sender, RoutedEventArgs e) => CoreWebView2?.OnUnloaded();
 #endif
 

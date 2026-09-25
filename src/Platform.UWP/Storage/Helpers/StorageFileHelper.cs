@@ -25,7 +25,7 @@ internal partial class StorageFileHelper
 		=> throw new NotImplementedException();
 #endif
 
-#if __SKIA__ || WINDOWS || WINAPPSDK || WINDOWS_UWP || WINUI
+#if (__CROSSRUNTIME__ && !__NETSTD_REFERENCE__) || WINDOWS || WINAPPSDK || WINDOWS_UWP || WINUI
 	private static Task<bool> FileExistsInPackage(string fileName)
 	{
 		var installDir = Package.GetAppInstallDirectory(Assembly.GetExecutingAssembly());

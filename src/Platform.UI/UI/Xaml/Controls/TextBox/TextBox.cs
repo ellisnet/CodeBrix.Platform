@@ -126,16 +126,6 @@ namespace Microsoft.UI.Xaml.Controls
 			DefaultStyleKey = typeof(TextBox);
 			SizeChanged += OnSizeChanged;
 
-#if __SKIA__
-			ActualThemeChanged += (_, _) =>
-			{
-				TextBoxView?.DisplayBlock.InvalidateInlines(false);
-				TextBoxView?.UpdateTheme();
-			};
-			_timer.Tick += TimerOnTick;
-			EnsureHistory();
-#endif
-
 			InitializePartial();
 		}
 
@@ -173,8 +163,8 @@ namespace Microsoft.UI.Xaml.Controls
 				// When support for TemplateBinding for attached DPs was added, TextBox broke (test: TextBox_AutoGrow_Vertically_Wrapping_Test) because of
 				// change in the values of these properties. The following code serves as a workaround to set the values to what they used to be
 				// before the support for TemplateBinding for attached DPs.
-#if __SKIA__
-				if (!_isSkiaTextBox)
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				if (!TextBoxPlatform.IsManagedEditing)
 #endif
 				{
 					scrollViewer.HorizontalScrollMode = ScrollMode.Enabled; // The template sets this to Auto
@@ -247,7 +237,7 @@ namespace Microsoft.UI.Xaml.Controls
 			base.OnApplyTemplate();
 
 			// Ensures we don't keep a reference to a textBoxView that exists in a previous template
-			_textBoxView = null;
+			ResetTextBoxView();
 
 			_placeHolder = GetTemplateChild(TextBoxConstants.PlaceHolderPartName) as IFrameworkElement;
 			_contentElement = GetTemplateChild(TextBoxConstants.ContentElementPartName) as ContentControl;
@@ -269,6 +259,10 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 
 		partial void InitializePropertiesPartial();
+
+		partial void ResetTextBoxView();
+
+		partial void UpdateTextBoxView();
 
 		internal void OnInputReturnTypeChanged(InputReturnType inputReturnType, bool initial)
 		{
@@ -334,12 +328,12 @@ namespace Microsoft.UI.Xaml.Controls
 			RaiseTextChanging();
 
 			if (!_isInputModifyingText
-#if __SKIA__
-				|| _isSkiaTextBox
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				|| TextBoxPlatform.IsManagedEditing
 #endif
 				)
 			{
-				_textBoxView?.SetTextNative(Text);
+				SetTextNative();
 			}
 
 			UpdatePlaceholderVisibility();
@@ -370,6 +364,8 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 
 		partial void OnTextChangedPartial();
+
+		partial void SetTextNative();
 
 		private void RaiseTextChanging()
 		{
@@ -434,8 +430,8 @@ namespace Microsoft.UI.Xaml.Controls
 			if (MaxLength > 0 && baseString.Length > MaxLength)
 			{
 				// Reject the new string if it's longer than the MaxLength
-#if __SKIA__
-				_pendingSelection = null;
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				TextBoxPlatform.ClearPendingSelection();
 #endif
 				return DependencyProperty.UnsetValue;
 			}
@@ -444,43 +440,21 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				baseString = GetFirstLine(baseString);
 			}
-#if __SKIA__
-			else if (_isSkiaTextBox)
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			else
 			{
-				// WinUI replaces all \n's and and \r\n's by \r. This is annoying because
-				// the _pendingSelection uses indices before this removal.
-				// On UIKit targets we use invisible overlay and replacing newlines would break the sync between
-				// the native input and the managed representation.
-				baseString = RemoveLF(baseString);
+				baseString = TextBoxPlatform.CoerceMultilineText(baseString);
 			}
 
-			// make sure this coercion doesn't cause the pending selection to be out of range
-			if (_pendingSelection is { } selection2)
-			{
-				var start = Math.Min(selection2.start, baseString.Length);
-				var end = Math.Min(selection2.start + selection2.length, baseString.Length);
-				_pendingSelection = (start, end - start);
-			}
+			TextBoxPlatform.ClampPendingSelection(baseString.Length);
 #endif
 
 			var args = new TextBoxBeforeTextChangingEventArgs(baseString);
 			BeforeTextChanging?.Invoke(this, args);
 			if (args.Cancel)
 			{
-#if __SKIA__
-				if (_isSkiaTextBox)
-				{
-					// On WinUI, when a selection is canceled, the TextBox invokes a bunch of weird
-					// SelectionChanging events followed by a bunch of matching SelectionChanged.
-					// Probing for the value of SelectionStart and SelectionLength during these SelectionChanging
-					// events will give incorrect transient values and the SelectionChanged events will end up
-					// with the selection where it started (before the text change). Also, the direction of
-					// of the selection will be reset, i.e. if the selection end was "at the start", then it won't be
-					// so anymore.
-					// In Uno, we choose a simpler sequence. We just reset the selection direction (like WinUI) and
-					// we don't invoke any selection change events (since selection was in fact not changed).
-					_pendingSelection = (SelectionStart, SelectionLength);
-				}
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				TextBoxPlatform.OnBeforeTextChangingCanceled();
 #endif
 				return DependencyProperty.UnsetValue;
 			}
@@ -783,8 +757,8 @@ namespace Microsoft.UI.Xaml.Controls
 		partial void OnFlowDirectionChangedPartial();
 #endif
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
+		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 #endif
 		public CharacterCasing CharacterCasing
 		{
@@ -792,8 +766,8 @@ namespace Microsoft.UI.Xaml.Controls
 			set => this.SetValue(CharacterCasingProperty, value);
 		}
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
+		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 #endif
 		public static DependencyProperty CharacterCasingProperty { get; } =
 			DependencyProperty.Register(
@@ -1099,11 +1073,11 @@ namespace Microsoft.UI.Xaml.Controls
 					Focus(FocusState.Pointer);
 				}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				if (wasFocused)
 				{
 					// See comment in OnPointerReleased for why we do this
-					_textBoxNotificationsSingleton?.OnFocused(this);
+					TextBoxPlatform.OnFocusedByPointer();
 				}
 #endif
 			}
@@ -1128,7 +1102,7 @@ namespace Microsoft.UI.Xaml.Controls
 			if (!ShouldFocusOnPointerPressed(args))
 			{
 				Focus(FocusState.Pointer);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				if (wasFocused)
 				{
 					// We already call UpdateFocusState in TextBoxView when focus changes, but this is not enough.
@@ -1140,7 +1114,7 @@ namespace Microsoft.UI.Xaml.Controls
 					// 3. User taps on TextBox again. In this case, we want to call UpdateFocusState so that the soft keyboard is re-shown again.
 					//
 					// This approach feels hacky though and may not handle programmatic focus properly, i.e, when programmatic focus is requested on an already-focused TextBox. This is a niche case though.
-					_textBoxNotificationsSingleton?.OnFocused(this);
+					TextBoxPlatform.OnFocusedByPointer();
 				}
 #endif
 			}
@@ -1170,10 +1144,10 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private protected override void OnPostKeyDown(KeyRoutedEventArgs args)
 		{
-#if __SKIA__
-			if (_isSkiaTextBox)
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			if (TextBoxPlatform.IsManagedEditing)
 			{
-				OnKeyDownSkia(args);
+				TextBoxPlatform.OnPostKeyDown(args);
 			}
 			else
 #endif
@@ -1196,8 +1170,8 @@ namespace Microsoft.UI.Xaml.Controls
 		{
 			// On skia, sometimes SelectionStart is updated to a new value before KeyDown is fired, so
 			// we need to get selectionStart from another source on Skia.
-#if __SKIA__
-			var selectionStart = TextBoxView.SelectionBeforeKeyDown.start;
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			var selectionStart = TextBoxPlatform.SelectionStartBeforeKeyDown;
 #else
 			var selectionStart = SelectionStart;
 #endif
@@ -1269,32 +1243,10 @@ namespace Microsoft.UI.Xaml.Controls
 				changed |= VisualStateManager.GoToState(this, TextBoxConstants.ButtonCollapsedStateName, true);
 			}
 
-#if __SKIA__
-			DispatchUpdateScrolling();
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			TextBoxPlatform.DispatchUpdateScrolling();
 #endif
 		}
-
-
-#if __SKIA__
-		bool _pendingUpdateScrolling;
-
-		private void DispatchUpdateScrolling()
-		{
-			if (!_pendingUpdateScrolling)
-			{
-				_pendingUpdateScrolling = true;
-
-				// We may be pushing scrolling updates too often
-				// when pushing keystrokes programmatically.
-				DispatcherQueue.TryEnqueue(() =>
-				{
-					_pendingUpdateScrolling = false;
-
-					UpdateScrolling();
-				});
-			}
-		}
-#endif
 
 		/// <summary>
 		/// Respond to text input from user interaction.
@@ -1311,15 +1263,8 @@ namespace Microsoft.UI.Xaml.Controls
 				var oldText = Text;
 				Text = newText;
 
-#if __SKIA__
-				if (_pendingSelection is { } selection && Text == oldText)
-				{
-					// OnTextChanged won't fire, so we immediately change the selection.
-					// Note how we check that Text (after assignment) == oldText and
-					// not oldText == newText. This is because CoerceText can make it so that
-					// newText != oldText but Text (after assignment) == oldText
-					SelectInternal(selection.start, selection.length);
-				}
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				TextBoxPlatform.OnTextInputProcessed(oldText);
 #endif
 			}
 			finally
@@ -1333,6 +1278,52 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 
 			return Text; //This may have been modified by BeforeTextChanging, TextChanging, DP callback, etc
+		}
+
+		/// <summary>
+		/// Raise entry point for a platform handler: the user edited the native text field. Runs the same text-input
+		/// path as managed editing (BeforeTextChanging through the Text coercion, TextChanging, the Text change, then
+		/// TextChanged on the dispatcher) and then SelectionChanged: through Select when the caret the platform reports
+		/// differs from the text box's current selection, or directly when the platform's selection is already the
+		/// text box's.
+		/// </summary>
+		/// <param name="text">The native field's new text.</param>
+		/// <param name="selectionStart">The native field's selection start after the edit.</param>
+		/// <param name="selectionLength">The native field's selection length after the edit.</param>
+		/// <returns>The effective Text, which differs from <paramref name="text"/> when it was coerced (MaxLength,
+		/// a cancelled BeforeTextChanging, single-line folding); the handler then writes it back to the native field.</returns>
+		internal string ApplyTextFromPlatform(string text, int selectionStart, int selectionLength)
+		{
+			var effectiveText = ProcessTextInput(text ?? string.Empty);
+
+			var start = Math.Clamp(selectionStart, 0, effectiveText.Length);
+			var length = Math.Clamp(selectionLength, 0, effectiveText.Length - start);
+			if (SelectionStart != start || SelectionLength != length)
+			{
+				Select(start, length);
+			}
+			else
+			{
+				OnSelectionChanged();
+			}
+
+			return effectiveText;
+		}
+
+		/// <summary>
+		/// Raise entry point for a platform handler: the user asked the native field to paste. Raises Paste.
+		/// </summary>
+		/// <returns><see langword="true"/> when an application handler handled the paste (the native paste must then be
+		/// cancelled).</returns>
+		internal bool RaisePasteFromPlatform()
+		{
+#if !IS_UNIT_TESTS
+			var args = new TextControlPasteEventArgs();
+			RaisePaste(args);
+			return args.Handled;
+#else
+			return false;
+#endif
 		}
 
 		private void DeleteButtonClick()
@@ -1395,8 +1386,8 @@ namespace Microsoft.UI.Xaml.Controls
 				length = textLength - start;
 			}
 
-#if __SKIA__
-			_pendingSelection = null;
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			TextBoxPlatform.ClearPendingSelection();
 #endif
 
 			if (SelectionStart == start && SelectionLength == length)
@@ -1481,26 +1472,19 @@ namespace Microsoft.UI.Xaml.Controls
 			currentText = currentText.Insert(selectionStart, adjustedClipboardText);
 			PasteFromClipboardPartial(adjustedClipboardText, selectionStart, currentText);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			try
 			{
-				_clearHistoryOnTextChanged = false;
-				_suppressCurrentlyTyping = true;
+				TextBoxPlatform.OnPasteStarting();
 #else
 			{
 #endif
 				ProcessTextInput(currentText);
 			}
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			finally
 			{
-				_suppressCurrentlyTyping = false;
-				_clearHistoryOnTextChanged = true;
-				if (Text.IsNullOrEmpty())
-				{
-					// On WinUI, the caret never has thumbs if there is no text
-					CaretMode = CaretDisplayMode.ThumblessCaretShowing;
-				}
+				TextBoxPlatform.OnPasteFinished();
 			}
 #endif
 
@@ -1537,19 +1521,19 @@ namespace Microsoft.UI.Xaml.Controls
 
 			CopySelectionToClipboard();
 			CutSelectionToClipboardPartial();
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			try
 			{
-				_suppressCurrentlyTyping = true;
+				TextBoxPlatform.OnCutStarting();
 #else
 			{
 #endif
 				Text = Text.Remove(SelectionStart, SelectionLength);
 			}
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			finally
 			{
-				_suppressCurrentlyTyping = false;
+				TextBoxPlatform.OnCutFinished();
 			}
 #endif
 		}

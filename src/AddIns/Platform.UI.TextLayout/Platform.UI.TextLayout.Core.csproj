@@ -1,0 +1,130 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.TextLayout.Core: the whole TextLayout add-in - TextLayoutEngine, TextLayoutResult,
+	GlyphOutline, TextRunDescriptor, the options and enums - AND its own copy of the shared text engine.
+
+	Since the text-engine home change (WPE1 C5) the add-in is Core BY WHOLE (decision P1: no Skia assembly and no
+	shell under the old name CodeBrix.Platform.UI.TextLayout). The engine (UnicodeText, its ICU loader, FontDetails,
+	FontDetailsCache, TextRunSpec and the engine's own value types) is ONE source: the neutral engine files under
+	src/Platform.UI/UI/Xaml/Documents are compiled into the framework's Skia assembly (for TextBlock and TextBox) and
+	link-compiled here (the Compile items below), internal in both. They name no XAML or WinRT type, so this assembly
+	references no framework XAML assembly at all: only Foundation (the ApiExtensibility registry, the font source
+	contract IFontSourcePlatform, the engine's internal helpers) and Foundation.Logging, reached through
+	InternalsVisibleTo, plus SkiaSharp, HarfBuzz and the ICU packages (plan rule R7: the public surface is
+	SkiaSharp-typed). What differs per platform is only the font source, which the platform registers (on Skia the
+	framework's FontSourceSkiaPlatform, so a family resolves to the same typeface in a TextBlock and here).
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.TextLayout.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.TextLayout</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the AudioPlayer add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.TextLayout.ApacheLicenseForever</PackageId>
+		<Description>Advanced text layout and measurement for building your own text-heavy control, with no XAML or application host required. Shapes and measures text using the same HarfBuzz-based engine used throughout the toolkit, including support for right-to-left and mixed-direction text. Draws directly onto a drawing surface, so you can use it for anything from a custom editor to exporting text into a document.</Description>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and `dotnet pack` puts it in the package's lib folder by itself, so nothing in
+		     the packaging recipe needs to know about it. CS1591 (a public member with no XML
+		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<!-- The shared text engine (WPE1 C5), link-compiled from the framework's source tree. Only the NEUTRAL engine files:
+	     the XAML-typed partials (UnicodeText.Inlines, FontDetailsCache.Xaml, TextEngineXamlConversions) and the older
+	     ParsedText engine stay framework-only. This assembly's own partial of the font cache is
+	     Engine/FontDetailsCache.FontSource.cs. -->
+	<PropertyGroup>
+		<_CodeBrixTextEngineDir>..\..\Platform.UI\UI\Xaml\Documents\</_CodeBrixTextEngineDir>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="$(_CodeBrixTextEngineDir)UnicodeText.skia.cs" Link="Engine\Shared\UnicodeText.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)UnicodeText.ICU.skia.cs" Link="Engine\Shared\UnicodeText.ICU.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)UnicodeText.TextLayout.skia.cs" Link="Engine\Shared\UnicodeText.TextLayout.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)TextFormatting\FontDetails.skia.cs" Link="Engine\Shared\FontDetails.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)TextFormatting\FontDetailsCache.skia.cs" Link="Engine\Shared\FontDetailsCache.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)TextFormatting\TextEngineTypes.skia.cs" Link="Engine\Shared\TextEngineTypes.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)TextFormatting\TextGlyphOutline.skia.cs" Link="Engine\Shared\TextGlyphOutline.skia.cs" />
+		<Compile Include="$(_CodeBrixTextEngineDir)TextFormatting\TextRunSpec.skia.cs" Link="Engine\Shared\TextRunSpec.skia.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp supplies the public surface's geometry types (SKRect, SKPath, SKCanvas) and the engine's fonts;
+		     HarfBuzz shapes. SkiaSharp.HarfBuzz is referenced family-wide so a consumer cannot pull it in at a version
+		     that disagrees with the pinned SkiaSharp; the versions come from the PackageReference Update entries in
+		     src/Directory.Build.targets. -->
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="SkiaSharp.HarfBuzz" />
+		<PackageReference Include="HarfBuzzSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- ICU, and the reason this add-in can honour "no application host required" on every
+		     platform rather than only on Linux. Linux gets ICU from the dynamic linker search path,
+		     so nothing has to ship; Windows and macOS have no system copy at all, and until these
+		     packages are here a consumer with no head fails on the very first layout call with
+		     "Failed to load libicuuc." An application head already pulls the same packages in
+		     through its runtime package, where the shared version pin makes this a no-op.
+
+		     Referenced unconditionally, not per-OS: a NuGet dependency is chosen at restore time
+		     and has to hold for every platform the consumer builds for. The natives sit under
+		     runtimes/<rid>/native, so a build for one platform never loads the other's. Versions
+		     match Runtime.Skia.Win32 and Runtime.Skia.MacOS, which reference the same packages -
+		     the family resolves one version of each. -->
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.249.1295" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.249.1295" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Foundation: the registry, the font source contract and the engine's internal helpers (CI, the memoizer,
+		     DisposableStruct); Foundation.Logging: the engine's logging. Both are in the framework package
+		     (CodeBrix.Platform.ApacheLicenseForever, at the same family version - the whole family ships together),
+		     which Platform.UI.Skia.csproj carries; CodeBrixPackAs makes it this package's dependency when packing (see
+		     ../AddIn.CorePackaging.targets), exactly the dependency the retired Skia project gave it. On a Skia head the
+		     framework's Skia assembly supplies the font source; a head-less consumer gets it from the same package. -->
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" CodeBrixPackAs="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation.Logging\Platform.Foundation.Logging.Core.csproj" CodeBrixPackAs="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<Import Project="..\AddIn.CorePackaging.targets" />
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the framework's font source in trimmed Skia apps with no other use of it (WPE1 C1/C5); see the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

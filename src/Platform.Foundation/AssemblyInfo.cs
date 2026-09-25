@@ -3,21 +3,30 @@ using global::System.Runtime.CompilerServices;
 using global::System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.Foundation.Runtime.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Toolkit.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RemoteControl")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v1")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v1.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v2")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.FluentTheme.v2.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Lottie")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Lottie.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Svg")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Svg.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Svg.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wpf")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Win32")]
@@ -48,8 +57,81 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("XamlGenerationTests")]
 [assembly: InternalsVisibleTo("XamlGenerationTests.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Dispatching")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Dispatching.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL.Core")]
+
+// CodeBrix.Platform.Foundation.Core (the platform-neutral Core assembly this file is compiled into since the Core/Skia split):
+// and, by rule (decision P4), the CodeBrix.Android and CodeBrix.Mobile assemblies (and their tests) for the same library.
+[assembly: InternalsVisibleTo("CodeBrix.Android.Foundation")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.Foundation.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.Foundation")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.Foundation.Tests")]
+
+// Merged from the former AssemblyInfo.skia.cs: Foundation is Core by whole (decision P1), so there is no Skia flavor any more.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Skia.Platform")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.MacOS")]
+
+// The host-free Core suite (src/Platform.UI.Core.Tests) registers test doubles for the platform contracts.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Core.Tests")]
+
+// Element handler seam (WPH1, decisions D-P3 and the AP1-B cross-assembly rule): the CodeBrix.Android and CodeBrix.Mobile
+// counterparts (and their tests) of every Skia-side assembly granted above - the framework Skia twins and the add-ins'
+// platform assemblies - so that a platform implementation of a Core contract, or a platform handler, compiles against the
+// same internals the Skia side uses.
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Toolkit")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Toolkit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Toolkit")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Toolkit.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Lottie")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Lottie.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Lottie")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Lottie.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Svg")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Svg.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Svg")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Svg.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.MediaPlayer")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.MediaPlayer.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.MediaPlayer")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.MediaPlayer.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Composition")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Composition.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Composition")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Composition.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Dispatching")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Dispatching.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Dispatching")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Dispatching.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.WinUI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.WinUI.Graphics3DGL.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.WinUI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.WinUI.Graphics3DGL.Tests")]
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
+
+// The shared text engine (WPE1 C5): its second copy is compiled into the TextLayout add-in's Core assembly, which reads
+// the font source contract (Contracts/IFontSourcePlatform) and the engine's Foundation helpers (CI, the memoizer,
+// DisposableStruct) like the framework's copy does; the host-free engine proof registers a test font source; and, by
+// rule (decision P4), the CodeBrix.Android and CodeBrix.Mobile assemblies (and their tests) for the same library.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TextLayout.Core")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Engine.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.TextLayout")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.TextLayout.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.TextLayout")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.TextLayout.Tests")]
+// The chart add-in's Core (WPE1 C7): its engine (PlotHost) takes the chart typefaces straight from the platform's font
+// source (Contracts/IFontSourcePlatform), with no TextLayout dependency.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Core")]

@@ -13,7 +13,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
-		<ProjectReference Include="..\..\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
 	</ItemGroup>
 
 </Project>

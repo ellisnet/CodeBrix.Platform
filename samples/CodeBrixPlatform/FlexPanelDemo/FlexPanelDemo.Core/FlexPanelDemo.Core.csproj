@@ -39,20 +39,20 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
     <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 
     <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
          in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
          CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
          Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
          Referenced here in Core so all heads inherit them. -->
-    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
 
     <!-- The FlexPanel AddIn, normally consumed as the
          CodeBrix.Platform.FlexPanel.ApacheLicenseForever NuGet; referenced from source here.
          Referenced ONCE in Core: every head inherits it transitively, and it is live on all six
          heads (FlexPanel is pure managed layout - no native dependency of any kind). -->
-    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
   </ItemGroup>
 </Project>

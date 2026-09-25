@@ -3,12 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Foundation
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IMemoryBufferReference : global::System.IDisposable
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		uint Capacity
 		{
 			get;
@@ -17,7 +17,7 @@ namespace Windows.Foundation
 		// Forced skipping of method Windows.Foundation.IMemoryBufferReference.Capacity.get
 		// Forced skipping of method Windows.Foundation.IMemoryBufferReference.Closed.add
 		// Forced skipping of method Windows.Foundation.IMemoryBufferReference.Closed.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Windows.Foundation.IMemoryBufferReference, object> Closed;
 #endif
 	}

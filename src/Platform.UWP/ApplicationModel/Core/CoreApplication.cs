@@ -52,7 +52,7 @@ public static partial class CoreApplication
 	/// </summary>
 	public static event EventHandler<LeavingBackgroundEventArgs> LeavingBackground;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	/// <summary>
 	/// Occurs when the app is shutting down.
 	/// </summary>
@@ -84,7 +84,7 @@ public static partial class CoreApplication
 
 	public static CoreApplicationView GetCurrentView() => _currentView;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	/// <summary>
 	/// Shuts down the app.
 	/// </summary>

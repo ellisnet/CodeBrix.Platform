@@ -1,0 +1,31 @@
+﻿#if !__NETSTD_REFERENCE__
+#nullable enable
+
+using System;
+using System.Globalization;
+using System.Reflection;
+using CodeBrix.Platform.Foundation;
+using CodeBrix.Platform.Foundation.Logging;
+
+namespace Windows.System
+{
+	public partial class MemoryManager
+	{
+		public static ulong AppMemoryUsage
+		{
+			get
+			{
+				return (ulong)GC.GetGCMemoryInfo().MemoryLoadBytes;
+			}
+		}
+
+		public static ulong AppMemoryUsageLimit
+		{
+			get
+			{
+				return (ulong)GC.GetGCMemoryInfo().HighMemoryLoadThresholdBytes;
+			}
+		}
+	}
+}
+#endif

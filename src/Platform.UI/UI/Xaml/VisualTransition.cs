@@ -94,7 +94,7 @@ namespace Microsoft.UI.Xaml
 		/// <remarks>
 		/// The code was moved here to override the LogLevel.
 		/// </remarks>
-		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public Duration GeneratedDuration
 		{
 			get

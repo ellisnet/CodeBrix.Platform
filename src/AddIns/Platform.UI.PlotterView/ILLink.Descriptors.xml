@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <!--
+  Trimming (WPE1 C1): nothing in an application references CodeBrix.Platform.UI.PlotterView - the Skia assembly that implements
+  this Core's platform contracts - by type: it is loaded by name (Contracts/PlatformContract.cs). Without this descriptor a trimmed
+  publish (TrimMode=full) removes it and the first contract use fails. It is rooted whole, but only when the feature
+  switch CodeBrix.Platform.RootSkiaPlatformAssemblies is on (the default, so every Skia head keeps it with no setting).
+  A consumer without the Skia assemblies (CodeBrix.Android, CodeBrix.Mobile) turns it off, which also avoids the IL2007
+  "could not resolve assembly" warning:
+      <RuntimeHostConfigurationOption Include="CodeBrix.Platform.RootSkiaPlatformAssemblies" Value="false" Trim="true" />
+  -->
+  <assembly fullname="CodeBrix.Platform.UI.PlotterView" preserve="all" feature="CodeBrix.Platform.RootSkiaPlatformAssemblies" featurevalue="true" featuredefault="true" />
+</linker>

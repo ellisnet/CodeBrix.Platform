@@ -1,0 +1,75 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.WinUI.Graphics3DGL.Core: the GLCanvasElement API (plan section 4.6) - the element, its OpenGL
+	lifecycle (the context from the head's INativeOpenGLWrapper, the version floor, Init/RenderOverride/OnDestroy, the
+	off-screen framebuffer and the read-back into the element's bitmap, the render scheduling and the initialization
+	state). It references the platform-neutral framework Core assemblies and the managed OpenGL binding
+	(CodeBrix.Platform.OpenGL: no native code and no SkiaSharp; the element's public API is typed on its GL and
+	INativeContext), and no SkiaSharp. How the element's visual takes part in the platform's painting is the platform's,
+	behind Contracts/IGLCanvasPlatform.cs; the project Platform.WinUI.Graphics3DGL.csproj in this folder (assembly
+	CodeBrix.Platform.WinUI.Graphics3DGL) implements it and holds the GPU-Skia half of the add-in (SkiaGLCanvasElement,
+	SkiaGpuContext, OffscreenGLContext: their public API is made of SkiaSharp types). Both ship in the Graphics3DGL
+	package, through build/nuget/Platform.WinUI.Graphics3DGL.nuspec.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.WinUI.Graphics3DGL.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.WinUI.Graphics3DGL</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Packaging is nuspec-driven (build/nuget/Platform.WinUI.Graphics3DGL.nuspec carries this dll beside the
+		     Skia one); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<Nullable>enable</Nullable>
+
+		<!-- The same constant the Skia project defines for the desktop target framework. -->
+		<DefineConstants>$(DefineConstants);CROSSRUNTIME</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DefaultItemExcludes>$(DefaultItemExcludes);angle/**;angle_binaries/**</DefaultItemExcludes>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.Platform.OpenGL.MitLicenseForever" Version="1.0.252.16" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The Skia twin, which implements Contracts/IGLCanvasPlatform, and, by rule (decision P4), the CodeBrix.Android
+		     and CodeBrix.Mobile assemblies (and their tests) for the same library. As csproj items rather than a .cs file,
+		     so that the Skia project's Windows target framework, which compiles every file of this folder, is unchanged. -->
+		<InternalsVisibleTo Include="CodeBrix.Platform.WinUI.Graphics3DGL" />
+		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics3DGL" />
+		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics3DGL.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics3DGL" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics3DGL.Tests" />
+		<!-- The host-free Core suite (src/Platform.UI.Core.Tests) registers a test double for the platform contract. -->
+		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Core.Tests" />
+	</ItemGroup>
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

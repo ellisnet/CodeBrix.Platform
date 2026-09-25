@@ -4,10 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using CodeBrix.Platform.UI.TextLayout.Internal;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Documents.TextFormatting;
-using Windows.Foundation;
 
 namespace CodeBrix.Platform.UI.TextLayout;
 
@@ -55,7 +51,7 @@ public static class TextLayoutEngine
 		// Shaping, bidi and line breaking all call into native ICU, which an application head sets up
 		// from a generated module initializer. There is no head here by design, so ask the engine to
 		// initialise itself; inside an application this is already done and costs nothing.
-		UnicodeText.EnsureEngineInitialized();
+		TextLayoutPlatform.Engine.EnsureEngineInitialized();
 
 		// The base direction has to be settled before the runs are built, because a run that asks for
 		// TextDirection.Auto inherits it.
@@ -64,38 +60,34 @@ public static class TextLayoutEngine
 		{
 			TextDirection.LeftToRight => false,
 			TextDirection.RightToLeft => true,
-			_ => UnicodeText.DetectIsRightToLeft(combinedText),
+			_ => TextLayoutPlatform.Engine.DetectIsRightToLeft(combinedText),
 		};
-		var flowDirection = isRightToLeft ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
+		var baseDirection = isRightToLeft ? TextDirection.RightToLeft : TextDirection.LeftToRight;
 
-		var specs = new TextRunSpec[runs.Count];
 		for (var i = 0; i < runs.Count; i++)
 		{
-			var run = runs[i];
-			if (run is null)
+			if (runs[i] is null)
 			{
 				throw new ArgumentNullException(nameof(runs), $"Run at index {i} is null.");
 			}
-
-			specs[i] = BuildSpec(run, flowDirection);
 		}
 
 		// With no width there is no box to align within, so pass zero: the engine's alignment maths
 		// only shifts a line when it fits inside the available width, and nothing fits inside zero.
 		// Passing infinity here would produce an infinite alignment offset.
 		var availableWidth = options.MaxWidth ?? 0f;
-		var wrapping = options.MaxWidth.HasValue ? TextWrapping.Wrap : TextWrapping.NoWrap;
+		var wrap = options.MaxWidth.HasValue;
 
-		var layout = new UnicodeText(
-			new Size(availableWidth, double.PositiveInfinity),
-			specs,
-			specs[0].FontDetails,
+		// Each run is resolved to a font and built into the engine's run spec by the engine
+		// (Engine/TextLayoutEnginePlatform.cs), in order, before the engine lays the runs out.
+		var layout = TextLayoutPlatform.Engine.CreateLayout(
+			runs,
+			baseDirection,
+			availableWidth,
 			Math.Max(0, options.MaxLines),
 			options.LineHeight,
-			LineStackingStrategy.MaxHeight,
-			flowDirection,
-			options.Alignment.ToTextAlignment(),
-			wrapping,
+			options.Alignment,
+			wrap,
 			out var desiredSize);
 
 		return new TextLayoutResult(layout, desiredSize);
@@ -137,26 +129,5 @@ public static class TextLayoutEngine
 		}
 
 		return builder.ToString();
-	}
-
-	private static TextRunSpec BuildSpec(TextRunDescriptor run, FlowDirection layoutFlowDirection)
-	{
-		var weight = run.Weight.ToFontWeight();
-		var stretch = run.Stretch.ToFontStretch();
-		var style = run.Style.ToFontStyle();
-
-		// GetFont also hands back a task that completes if the family resolves to a font that has to
-		// be downloaded or loaded asynchronously. The details returned immediately are always usable -
-		// a fallback face until then - so layout never blocks on it.
-		var (details, _) = FontDetailsCache.GetFont(run.FontFamily, run.FontSize, weight, stretch, style);
-
-		var runFlowDirection = run.Direction switch
-		{
-			TextDirection.LeftToRight => FlowDirection.LeftToRight,
-			TextDirection.RightToLeft => FlowDirection.RightToLeft,
-			_ => layoutFlowDirection,
-		};
-
-		return new TextRunSpec(run.Text, details, runFlowDirection, run.FontSize, weight, stretch, style, run.Color);
 	}
 }

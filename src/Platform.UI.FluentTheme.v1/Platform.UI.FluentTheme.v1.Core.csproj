@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.FluentTheme.v1.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.FluentTheme.v1</RootNamespace>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<!-- The theme XAML is generated exactly as it was for the Skia flavor (XamarinProjectType=skia). -->
+		<CodeBrixUIRuntimeIdentifier>Skia</CodeBrixUIRuntimeIdentifier>
+		<_CodeBrixUnderlyingPlatform>skia</_CodeBrixUnderlyingPlatform>
+
+		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Core.csproj" />
+	</ItemGroup>
+
+	<Import Project="FluentMerge.targets" />
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+</Project>

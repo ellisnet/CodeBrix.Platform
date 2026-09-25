@@ -4423,13 +4423,13 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			SUT.Focus(FocusState.Programmatic);
 			await WindowHelper.WaitForIdle();
 
-			Assert.AreEqual(0, SUT.TextBoxView.DisplayBlock.Opacity);
+			Assert.AreEqual(0, CodeBrix.Platform.UI.Skia.TextBoxSkiaPlatform.Of(SUT).TextBoxView.DisplayBlock.Opacity);
 
 			FeatureConfiguration.TextBox.UseOverlayOnSkia = false;
 
 			await UITestHelper.Load(new Button()); // a random control to unload SUT
 
-			Assert.AreEqual(1, SUT.TextBoxView.DisplayBlock.Opacity);
+			Assert.AreEqual(1, CodeBrix.Platform.UI.Skia.TextBoxSkiaPlatform.Of(SUT).TextBoxView.DisplayBlock.Opacity);
 		}
 
 		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
@@ -4522,7 +4522,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			char defaultPasswordBoxChar = PasswordBox.DefaultPasswordChar[0];
 #endif
 
-			Assert.AreEqual(new string(defaultPasswordBoxChar, 4), SUT.TextBoxView.DisplayBlock.Text);
+			Assert.AreEqual(new string(defaultPasswordBoxChar, 4), CodeBrix.Platform.UI.Skia.TextBoxSkiaPlatform.Of(SUT).TextBoxView.DisplayBlock.Text);
 
 			var injector = InputInjector.TryCreate() ?? throw new InvalidOperationException("Failed to init the InputInjector");
 			using var mouse = injector.GetMouse();
@@ -4532,7 +4532,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			mouse.Press();
 			await WindowHelper.WaitForIdle();
 
-			Assert.AreEqual("test", SUT.TextBoxView.DisplayBlock.Text);
+			Assert.AreEqual("test", CodeBrix.Platform.UI.Skia.TextBoxSkiaPlatform.Of(SUT).TextBoxView.DisplayBlock.Text);
 		}
 
 		//TEST PARTLY REPLACED - by src/UIReqs/Platform.UI.Core/Features/Text/TextBox.feature
@@ -4716,7 +4716,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 
 			var selectionChangedToStart = false;
 
-			var displayBlock = SUT.TextBoxView.DisplayBlock;
+			var displayBlock = CodeBrix.Platform.UI.Skia.TextBoxSkiaPlatform.Of(SUT).TextBoxView.DisplayBlock;
 			displayBlock.SelectionChanged += (s, e) =>
 			{
 				if (displayBlock.SelectionStart.Offset == 0)

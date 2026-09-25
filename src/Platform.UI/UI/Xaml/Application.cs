@@ -93,7 +93,7 @@ namespace Microsoft.UI.Xaml
 			CoreApplication.StaticInitialize();
 
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			Package.SetEntryAssembly(this.GetType().Assembly);
 #endif
 			Current = this;
@@ -109,8 +109,8 @@ namespace Microsoft.UI.Xaml
 		private static void RegisterExtensions()
 		{
 			ApiExtensibility.Register<MessageDialog>(typeof(IMessageDialogExtension), dialog => new MessageDialogExtension(dialog));
-#if __SKIA__
-			ApiExtensibility.Register(typeof(CodeBrix.Platform.UI.Graphics.SKCanvasVisualBaseFactory), _ => new CodeBrix.Platform.UI.Graphics.SKCanvasVisualFactory());
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+			CodeBrix.Platform.UI.Contracts.PlatformServices.Application.RegisterExtensions();
 #endif
 		}
 
@@ -276,7 +276,7 @@ namespace Microsoft.UI.Xaml
 		/// </summary>
 		public event UnhandledExceptionEventHandler UnhandledException;
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
 		public void Exit()
 		{
@@ -346,7 +346,7 @@ namespace Microsoft.UI.Xaml
 			UISettings.OnColorValuesChanged();
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private IDisposable WritePhaseEventTrace(int startEventId, int stopEventId)
 		{
 			if (_trace.IsEnabled)
@@ -571,7 +571,7 @@ namespace Microsoft.UI.Xaml
 			}
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private static string GetCommandLineArgsWithoutExecutable()
 		{
 			if (!string.IsNullOrEmpty(_argumentsOverride))

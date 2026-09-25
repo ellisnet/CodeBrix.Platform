@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls.Primitives
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Selector : global::Microsoft.UI.Xaml.Controls.ItemsControl
@@ -35,8 +35,8 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.Selector.SelectedValueProperty.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.Selector.SelectedValuePathProperty.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.Selector.IsSynchronizedWithCurrentItemProperty.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static bool GetIsSelectionActive(global::Microsoft.UI.Xaml.DependencyObject element)
 		{
 			throw new global::System.NotImplementedException("The member bool Selector.GetIsSelectionActive(DependencyObject element) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

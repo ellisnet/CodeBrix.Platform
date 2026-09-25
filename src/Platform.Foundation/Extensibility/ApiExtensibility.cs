@@ -65,7 +65,10 @@ public static class ApiExtensibility
 	/// <returns>If registered or not.</returns>
 	public static bool IsRegistered<T>()
 	{
-		return _registrations.ContainsKey(typeof(T));
+		lock (_gate)
+		{
+			return _registrations.ContainsKey(typeof(T));
+		}
 	}
 
 	/// <summary>
@@ -78,16 +81,21 @@ public static class ApiExtensibility
 	public static bool CreateInstance<T>(object owner, [NotNullWhen(true)] out T? instance)
 		where T : class
 	{
+		Func<object, object>? builder;
 		lock (_gate)
 		{
-			if (_registrations.TryGetValue(typeof(T), out var builder))
-			{
-				if (builder(owner) is { } o)
-				{
-					instance = (T)o;
-					return true;
-				}
-			}
+			_registrations.TryGetValue(typeof(T), out builder);
+		}
+
+		// The builder runs OUTSIDE the lock: a builder may load a platform assembly and run its module initializer (the
+		// add-in contracts load their platform twin by name), and that initializer registers and resolves contracts
+		// itself. Holding the registry lock across it deadlocked two threads resolving contracts at once (one inside the
+		// module initializer waiting for the lock, the other holding the lock waiting for the module initializer; seen
+		// in the parallel TextLayout suite, WPE1-5).
+		if (builder?.Invoke(owner) is { } o)
+		{
+			instance = (T)o;
+			return true;
 		}
 
 		instance = null;

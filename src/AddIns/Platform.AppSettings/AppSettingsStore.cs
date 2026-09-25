@@ -12,12 +12,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using CodeBrix.Sqlite;
+using System.Text.Json.Serialization.Metadata;
+using CodeBrix.Platform.AppSettings.Contracts;
 
 namespace CodeBrix.Platform.AppSettings; //was previously: Doom.Brix.Settings (and CodeBrix.Develop.Core.Options before that)
 
@@ -36,6 +36,12 @@ namespace CodeBrix.Platform.AppSettings; //was previously: Doom.Brix.Settings (a
 /// itself. <see cref="Set"/> does accept a <c>byte[]</c>, because
 /// <see cref="JsonSerializer"/> renders one as a base64 JSON string, but the
 /// column holding it is still text and the base64 cost is real.
+/// <para>
+/// The values, their JSON form and the change notification are handled
+/// here; the database itself, its folder and every step of the file's
+/// life are the platform's, reached through the storage contract
+/// <see cref="IAppSettingsStoragePlatform"/>.
+/// </para>
 /// </remarks>
 public sealed class AppSettingsStore : IDisposable
 {
@@ -81,20 +87,33 @@ public sealed class AppSettingsStore : IDisposable
     /// </summary>
     public const string FamilyFolderName = "CodeBrix";
 
-    static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions
+    // The options of the reflection-based members (Get<T>(key...), Set(key, object)). Created on first use, so an
+    // application that only uses the JsonTypeInfo<T> members never builds reflection serialization state.
+    static JsonSerializerOptions? serializerOptions;
+
+    /// <summary>The message of the trimming / AOT annotations on the reflection-based members.</summary>
+    internal const string ReflectionSerializationMessage =
+        "Serializes the value with reflection-based System.Text.Json, which trimming and native AOT can break. "
+        + "Use the overload that takes a JsonTypeInfo<T> (from a JsonSerializerContext) in a trimmed or AOT application.";
+
+    [RequiresUnreferencedCode(ReflectionSerializationMessage)]
+    [RequiresDynamicCode(ReflectionSerializationMessage)]
+    static JsonSerializerOptions GetSerializerOptions() => serializerOptions ??= new JsonSerializerOptions
     {
         Converters = { new JsonStringEnumConverter() },
     };
-
-    // SQLite's companion files, kept (or moved) with the database they belong to.
-    static readonly string[] sidecarSuffixes = { "-wal", "-shm", "-journal" };
 
     readonly object gate = new object();
     readonly Dictionary<string, string> values = new Dictionary<string, string>(StringComparer.Ordinal);
     readonly Dictionary<string, EventHandler<AppSettingChangedEventArgs>> keyHandlers =
         new Dictionary<string, EventHandler<AppSettingChangedEventArgs>>(StringComparer.Ordinal);
-    readonly Func<DateTime> clock;
-    SqliteDatabase? database;
+    readonly IAppSettingsStorage storage;
+
+    // The platform's storage contract, resolved once for the process.
+    static IAppSettingsStoragePlatform? platform;
+
+    static IAppSettingsStoragePlatform Platform =>
+        platform ??= PlatformContract.Resolve<IAppSettingsStoragePlatform>();
 
     /// <summary>The application name this store belongs to.</summary>
     public string AppName { get; }
@@ -109,19 +128,19 @@ public sealed class AppSettingsStore : IDisposable
     /// True when this run started without a usable existing settings file and
     /// the store was created fresh with first-run settings.
     /// </summary>
-    public bool WasCreatedFresh { get; private set; }
+    public bool WasCreatedFresh { get; }
 
     /// <summary>
     /// True when the existing settings file was corrupt and the store was
     /// restored from the most recent automatic backup.
     /// </summary>
-    public bool WasRestoredFromBackup { get; private set; }
+    public bool WasRestoredFromBackup { get; }
 
     /// <summary>
     /// True when a staged settings_incoming.sqlite file was adopted at startup,
     /// replacing the previous settings.sqlite (kept as a settings_old_ copy).
     /// </summary>
-    public bool WasReplacedByImport { get; private set; }
+    public bool WasReplacedByImport { get; }
 
     /// <summary>Raised after any setting value changes.</summary>
     public event EventHandler<AppSettingChangedEventArgs>? SettingChanged;
@@ -136,8 +155,7 @@ public sealed class AppSettingsStore : IDisposable
     public static string GetDefaultDirectory(string appName)
     {
         ValidateAppName(appName);
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            FamilyFolderName, appName, "settings");
+        return Platform.GetDefaultDirectory(appName);
     }
 
     /// <summary>
@@ -164,21 +182,19 @@ public sealed class AppSettingsStore : IDisposable
             throw new ArgumentException("A directory path is required", nameof(directoryPath));
 
         AppName = appName;
-        clock = testClock ?? (() => DateTime.Now);
-        DirectoryPath = Path.GetFullPath(directoryPath);
-        DatabaseFilePath = Path.Combine(DirectoryPath, SettingsFileName);
-        Directory.CreateDirectory(DirectoryPath);
-
-        AdoptIncomingFile();
-        OpenWithRecovery();
+        storage = Platform.Open(appName, directoryPath, values, testClock ?? (() => DateTime.Now));
+        DirectoryPath = storage.DirectoryPath;
+        DatabaseFilePath = storage.DatabaseFilePath;
+        WasCreatedFresh = storage.WasCreatedFresh;
+        WasRestoredFromBackup = storage.WasRestoredFromBackup;
+        WasReplacedByImport = storage.WasReplacedByImport;
 
         var retention = AutoBackupRetention;
         if (retention > 0)
         {
             try
             {
-                CreateAutoBackup();
-                PruneAutoBackups(retention);
+                storage.CreateAutoBackupAndPrune(retention);
             }
             catch (Exception ex)
             {
@@ -200,8 +216,8 @@ public sealed class AppSettingsStore : IDisposable
     /// </remarks>
     public int AutoBackupRetention
     {
-        get => Math.Clamp(Get(AutoBackupRetentionKey, DefaultAutoBackupRetention), 0, MaxAutoBackupRetention);
-        set => Set(AutoBackupRetentionKey, Math.Clamp(value, 0, MaxAutoBackupRetention));
+        get => Math.Clamp(Get(AutoBackupRetentionKey, DefaultAutoBackupRetention, AppSettingsJsonContext.Default.Int32), 0, MaxAutoBackupRetention);
+        set => Set(AutoBackupRetentionKey, Math.Clamp(value, 0, MaxAutoBackupRetention), AppSettingsJsonContext.Default.Int32);
     }
 
     /// <summary>
@@ -213,18 +229,9 @@ public sealed class AppSettingsStore : IDisposable
     /// </summary>
     public void ExportToFile(string destinationFilePath)
     {
-        if (string.IsNullOrEmpty(destinationFilePath))
-            throw new ArgumentException("A destination file path is required", nameof(destinationFilePath));
-
-        var fullPath = Path.GetFullPath(destinationFilePath);
-        var insideSettingsFolder = string.Equals(Path.GetDirectoryName(fullPath), DirectoryPath, StringComparison.Ordinal)
-            || fullPath.StartsWith(DirectoryPath + Path.DirectorySeparatorChar, StringComparison.Ordinal);
-        if (insideSettingsFolder)
-            throw new InvalidOperationException(
-                "Settings cannot be exported into the settings folder itself; please choose another location.");
-
+        var fullPath = storage.GetExportDestination(destinationFilePath);
         lock (gate)
-            Database.BackupToFile(fullPath);
+            storage.ExportTo(fullPath);
         AppSettingLoggingService.LogInfo($"Settings exported to {fullPath}");
     }
 
@@ -236,66 +243,7 @@ public sealed class AppSettingsStore : IDisposable
     /// <see cref="InvalidDataException"/> when the file appears to have
     /// problems; the validation never opens the user's file in place.
     /// </summary>
-    public void StageIncomingFile(string sourceFilePath)
-    {
-        if (string.IsNullOrEmpty(sourceFilePath))
-            throw new ArgumentException("A source file path is required", nameof(sourceFilePath));
-        if (!File.Exists(sourceFilePath))
-            throw new FileNotFoundException("The selected file does not exist.", sourceFilePath);
-
-        // Work on a private copy so the selected file is never opened (or
-        // given WAL companion files) where the user keeps it.
-        var tempDirectory = Path.Combine(Path.GetTempPath(), FamilyFolderName, AppName, Path.GetRandomFileName());
-        Directory.CreateDirectory(tempDirectory);
-        try
-        {
-            var tempPath = Path.Combine(tempDirectory, SettingsFileName);
-            File.Copy(sourceFilePath, tempPath);
-            foreach (var suffix in sidecarSuffixes)
-            {
-                if (File.Exists(sourceFilePath + suffix))
-                    File.Copy(sourceFilePath + suffix, tempPath + suffix);
-            }
-
-            using var candidate = new SqliteDatabase(tempPath, null, new SqliteDatabaseOptions());
-            try
-            {
-                candidate.SafeOpen();
-                if (!string.Equals(candidate.ExecuteScalar("PRAGMA integrity_check") as string, "ok", StringComparison.OrdinalIgnoreCase))
-                    throw new InvalidDataException("The file failed the SQLite integrity check.");
-            }
-            catch (InvalidDataException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidDataException($"The file could not be opened as a SQLite database: {ex.Message}", ex);
-            }
-
-            if (candidate.ExecuteScalar("SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'Setting'") == null)
-                throw new InvalidDataException("The file is a SQLite database, but does not contain the Setting table a settings file holds.");
-            try
-            {
-                // Reading every row proves the table is usable, not merely present;
-                // the rows themselves are of no interest here.
-                _ = candidate.Connection.Query("SELECT Key, Value FROM Setting").Count();
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidDataException($"The file's Setting table could not be read: {ex.Message}", ex);
-            }
-
-            // Stage a clean, checkpointed, self-contained copy — never the raw
-            // source bytes, which may depend on companion files.
-            candidate.BackupToFile(Path.Combine(DirectoryPath, IncomingFileName));
-            AppSettingLoggingService.LogInfo($"Settings file {sourceFilePath} staged as {IncomingFileName}");
-        }
-        finally
-        {
-            try { Directory.Delete(tempDirectory, recursive: true); } catch { /* best effort */ }
-        }
-    }
+    public void StageIncomingFile(string sourceFilePath) => storage.StageIncomingFile(sourceFilePath);
 
     /// <summary>Whether a value is stored for the given key.</summary>
     public bool HasValue(string key)
@@ -305,13 +253,34 @@ public sealed class AppSettingsStore : IDisposable
     }
 
     /// <summary>Returns the stored value for the key, or the type's default when not set.</summary>
+    [RequiresUnreferencedCode(ReflectionSerializationMessage)]
+    [RequiresDynamicCode(ReflectionSerializationMessage)]
     public T? Get<T>(string key) => Get(key, default(T));
 
     /// <summary>
     /// Returns the stored value for the key, or the given default when the key
     /// is not set or its stored JSON cannot be read as the requested type.
     /// </summary>
+    [RequiresUnreferencedCode(ReflectionSerializationMessage)]
+    [RequiresDynamicCode(ReflectionSerializationMessage)]
     public T Get<T>(string key, T defaultValue)
+        => Read(key, defaultValue, json => JsonSerializer.Deserialize<T>(json, GetSerializerOptions()));
+
+    /// <summary>
+    /// Returns the stored value for the key, or the given default when the key is not set or its stored JSON cannot be
+    /// read as the requested type; the value is read with <paramref name="jsonTypeInfo"/> (source-generated
+    /// System.Text.Json metadata), so no reflection is used - the form a trimmed or native AOT application uses.
+    /// </summary>
+    /// <param name="key">The setting key.</param>
+    /// <param name="defaultValue">The value returned when the key is not set or cannot be read.</param>
+    /// <param name="jsonTypeInfo">The JSON metadata of <typeparamref name="T"/>, e.g. MyJsonContext.Default.MyType.</param>
+    public T Get<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo)
+    {
+        ArgumentNullException.ThrowIfNull(jsonTypeInfo);
+        return Read(key, defaultValue, json => JsonSerializer.Deserialize(json, jsonTypeInfo));
+    }
+
+    T Read<T>(string key, T defaultValue, Func<string, T?> deserialize)
     {
         string? json;
         lock (gate)
@@ -321,7 +290,7 @@ public sealed class AppSettingsStore : IDisposable
         }
         try
         {
-            var value = JsonSerializer.Deserialize<T>(json, serializerOptions);
+            var value = deserialize(json);
             return value is null ? defaultValue : value;
         }
         catch (Exception ex)
@@ -336,34 +305,58 @@ public sealed class AppSettingsStore : IDisposable
     /// immediately); a null value removes the key. Returns true when the
     /// stored value actually changed.
     /// </summary>
+    [RequiresUnreferencedCode(ReflectionSerializationMessage)]
+    [RequiresDynamicCode(ReflectionSerializationMessage)]
     public bool Set(string key, object? value)
     {
         if (string.IsNullOrEmpty(key))
             throw new ArgumentException("A setting key is required", nameof(key));
 
+        return Write(key, value, value == null ? null : JsonSerializer.Serialize(value, value.GetType(), GetSerializerOptions()));
+    }
+
+    /// <summary>
+    /// Stores a value for the key (writing through to settings.sqlite immediately), serialized with
+    /// <paramref name="jsonTypeInfo"/> (source-generated System.Text.Json metadata), so no reflection is used - the form
+    /// a trimmed or native AOT application uses; a null value removes the key. Returns true when the stored value
+    /// actually changed.
+    /// </summary>
+    /// <param name="key">The setting key.</param>
+    /// <param name="value">The value, or null to remove the key.</param>
+    /// <param name="jsonTypeInfo">The JSON metadata of <typeparamref name="T"/>, e.g. MyJsonContext.Default.MyType.</param>
+    public bool Set<T>(string key, T? value, JsonTypeInfo<T> jsonTypeInfo)
+    {
+        if (string.IsNullOrEmpty(key))
+            throw new ArgumentException("A setting key is required", nameof(key));
+        ArgumentNullException.ThrowIfNull(jsonTypeInfo);
+
+        return Write(key, value, value is null ? null : JsonSerializer.Serialize(value, jsonTypeInfo));
+    }
+
+    /// <summary>Removes the key (the null-value form of Set, without serializing anything).</summary>
+    internal bool Remove(string key) => Write(key, null, null);
+
+    bool Write(string key, object? value, string? newJson)
+    {
         object? oldValue;
         lock (gate)
         {
             values.TryGetValue(key, out var oldJson);
-            if (value == null)
+            if (newJson == null)
             {
                 if (oldJson == null)
                     return false;
                 oldValue = oldJson;
                 values.Remove(key);
-                Database.Connection.Execute("DELETE FROM Setting WHERE Key = @key", new { key });
+                storage.Delete(key);
             }
             else
             {
-                var newJson = JsonSerializer.Serialize(value, value.GetType(), serializerOptions);
                 if (newJson == oldJson)
                     return false;
                 oldValue = oldJson;
                 values[key] = newJson;
-                Database.Connection.Execute(
-                    "INSERT INTO Setting (Key, Value) VALUES (@key, @newJson) " +
-                    "ON CONFLICT (Key) DO UPDATE SET Value = @newJson",
-                    new { key, newJson });
+                storage.Write(key, newJson);
             }
         }
 
@@ -405,14 +398,8 @@ public sealed class AppSettingsStore : IDisposable
     public void Dispose()
     {
         lock (gate)
-        {
-            database?.Dispose();
-            database = null;
-        }
+            storage.Dispose();
     }
-
-    SqliteDatabase Database =>
-        database ?? throw new ObjectDisposedException(nameof(AppSettingsStore));
 
     static void ValidateAppName(string appName)
     {
@@ -422,188 +409,5 @@ public sealed class AppSettingsStore : IDisposable
             throw new ArgumentException(
                 "An application name becomes a folder name, so it cannot contain characters that are invalid in one.",
                 nameof(appName));
-    }
-
-    void AdoptIncomingFile()
-    {
-        var incomingPath = Path.Combine(DirectoryPath, IncomingFileName);
-        if (!File.Exists(incomingPath))
-            return;
-        try
-        {
-            if (File.Exists(DatabaseFilePath))
-            {
-                var oldPath = Path.Combine(DirectoryPath,
-                    $"{OldFilePrefix}{clock().ToString(TimestampFormat, CultureInfo.InvariantCulture)}.sqlite");
-                File.Move(DatabaseFilePath, oldPath, overwrite: true);
-                foreach (var suffix in sidecarSuffixes)
-                {
-                    var sidecar = DatabaseFilePath + suffix;
-                    if (File.Exists(sidecar))
-                        File.Move(sidecar, oldPath + suffix, overwrite: true);
-                }
-                AppSettingLoggingService.LogInfo($"Previous settings kept as {Path.GetFileName(oldPath)}");
-            }
-            else
-            {
-                // Orphaned companion files must not pair up with the adopted file.
-                foreach (var suffix in sidecarSuffixes)
-                {
-                    var sidecar = DatabaseFilePath + suffix;
-                    if (File.Exists(sidecar))
-                        File.Delete(sidecar);
-                }
-            }
-
-            File.Move(incomingPath, DatabaseFilePath);
-            WasReplacedByImport = true;
-            AppSettingLoggingService.LogInfo($"Imported settings file {IncomingFileName} adopted as {SettingsFileName}");
-        }
-        catch (Exception ex)
-        {
-            // A failed adoption must never prevent the application from
-            // starting; continue with whatever settings file is in place.
-            AppSettingLoggingService.LogError("The imported settings file could not be adopted", ex);
-        }
-    }
-
-    void OpenWithRecovery()
-    {
-        WasCreatedFresh = !File.Exists(DatabaseFilePath);
-        try
-        {
-            OpenAndLoad();
-            return;
-        }
-        catch (Exception ex)
-        {
-            AppSettingLoggingService.LogError($"The settings file '{DatabaseFilePath}' could not be opened; quarantining it", ex);
-            QuarantineCorruptFile();
-        }
-
-        // The corrupt file has been renamed away; try the most recent
-        // automatic backup, and fall back to a fresh first-run store.
-        if (TryRestoreNewestAutoBackup())
-        {
-            try
-            {
-                OpenAndLoad();
-                WasRestoredFromBackup = true;
-                return;
-            }
-            catch (Exception ex)
-            {
-                AppSettingLoggingService.LogError("The restored settings backup could not be opened either; starting fresh", ex);
-                QuarantineCorruptFile();
-            }
-        }
-
-        WasCreatedFresh = true;
-        OpenAndLoad();
-    }
-
-    void OpenAndLoad()
-    {
-        var db = new SqliteDatabase(DatabaseFilePath, null, new SqliteDatabaseOptions());
-        try
-        {
-            db.SafeOpen();
-            if (!string.Equals(db.ExecuteScalar("PRAGMA integrity_check") as string, "ok", StringComparison.OrdinalIgnoreCase))
-                throw new InvalidDataException("PRAGMA integrity_check did not report 'ok'");
-            db.ExecuteNonQuery("CREATE TABLE IF NOT EXISTS Setting (Key TEXT NOT NULL PRIMARY KEY, Value TEXT NOT NULL)");
-
-            values.Clear();
-            foreach (var row in db.Connection.Query("SELECT Key, Value FROM Setting"))
-                values[(string) row.Key] = (string) row.Value;
-        }
-        catch
-        {
-            db.Dispose();
-            throw;
-        }
-        database = db;
-    }
-
-    void QuarantineCorruptFile()
-    {
-        database?.Dispose();
-        database = null;
-        values.Clear();
-
-        if (!File.Exists(DatabaseFilePath))
-            return;
-        var quarantinePath = Path.Combine(DirectoryPath,
-            $"{CorruptFilePrefix}{clock().ToString(TimestampFormat, CultureInfo.InvariantCulture)}.sqlite");
-        File.Move(DatabaseFilePath, quarantinePath, overwrite: true);
-        foreach (var suffix in sidecarSuffixes)
-        {
-            var sidecar = DatabaseFilePath + suffix;
-            if (File.Exists(sidecar))
-                File.Move(sidecar, quarantinePath + suffix, overwrite: true);
-        }
-    }
-
-    bool TryRestoreNewestAutoBackup()
-    {
-        var newest = EnumerateAutoBackups().OrderByDescending(backup => backup.Timestamp).FirstOrDefault();
-        if (newest.Path == null)
-            return false;
-        try
-        {
-            File.Copy(newest.Path, DatabaseFilePath, overwrite: true);
-            AppSettingLoggingService.LogInfo($"Settings restored from backup {Path.GetFileName(newest.Path)}");
-            return true;
-        }
-        catch (Exception ex)
-        {
-            AppSettingLoggingService.LogError($"Could not restore settings backup {newest.Path}", ex);
-            return false;
-        }
-    }
-
-    void CreateAutoBackup()
-    {
-        var backupPath = Path.Combine(DirectoryPath,
-            $"{AutoBackupFilePrefix}{clock().ToString(TimestampFormat, CultureInfo.InvariantCulture)}.sqlite");
-        // Orchestrated clean copy: quiesce, checkpoint the WAL, then run
-        // SQLite's online backup — the single resulting file is the
-        // complete database.
-        Database.BackupToFile(backupPath);
-        AppSettingLoggingService.LogInfo($"Settings auto-backup created: {Path.GetFileName(backupPath)}");
-    }
-
-    void PruneAutoBackups(int retainCount)
-    {
-        // Recency comes from the timestamp encoded in the file name — never
-        // from file-system created/modified metadata. Files that do not
-        // match the auto-backup naming scheme exactly (including manual
-        // copies a user made) are never deleted.
-        var expired = EnumerateAutoBackups()
-            .OrderByDescending(backup => backup.Timestamp)
-            .Skip(retainCount);
-        foreach (var backup in expired)
-        {
-            try
-            {
-                File.Delete(backup.Path);
-                AppSettingLoggingService.LogInfo($"Settings auto-backup pruned: {Path.GetFileName(backup.Path)}");
-            }
-            catch (Exception ex)
-            {
-                AppSettingLoggingService.LogWarning($"Could not prune settings auto-backup {backup.Path}: {ex.Message}");
-            }
-        }
-    }
-
-    IEnumerable<(string Path, DateTime Timestamp)> EnumerateAutoBackups()
-    {
-        foreach (var path in Directory.EnumerateFiles(DirectoryPath, $"{AutoBackupFilePrefix}*.sqlite"))
-        {
-            var name = System.IO.Path.GetFileName(path);
-            var stampText = name.Substring(AutoBackupFilePrefix.Length, name.Length - AutoBackupFilePrefix.Length - ".sqlite".Length);
-            if (DateTime.TryParseExact(stampText, TimestampFormat, CultureInfo.InvariantCulture,
-                    DateTimeStyles.None, out var stamp))
-                yield return (path, stamp);
-        }
     }
 }

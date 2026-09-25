@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class StorageProvider
@@ -12,8 +12,8 @@ namespace Windows.Storage
 		// Skipping already declared property Id
 		// Forced skipping of method Windows.Storage.StorageProvider.Id.get
 		// Forced skipping of method Windows.Storage.StorageProvider.DisplayName.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Foundation.IAsyncOperation<bool> IsPropertySupportedForPartialFileAsync(string propertyCanonicalName)
 		{
 			throw new global::System.NotImplementedException("The member IAsyncOperation<bool> StorageProvider.IsPropertySupportedForPartialFileAsync(string propertyCanonicalName) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

@@ -23,9 +23,11 @@ Scenario: Text is drawn in the light theme's colour until the root asks for anot
 Scenario: Asking the root for the dark theme repaints the text under it
 	Given the application shows a Grid named "page" 600 by 400 with Background "Gray"
 	And the layout "page" holds a TextBlock named "label" with:
-		| Property | Value |
-		| Text     | Theme |
-		| FontSize | 48    |
+		| Property            | Value |
+		| Text                | Theme |
+		| FontSize            | 48    |
+		| HorizontalAlignment | Left  |
+		| VerticalAlignment   | Top   |
 	When the frame is captured as "light"
 	And the root theme is set to "Dark"
 	And the frame is captured as "dark"
@@ -53,9 +55,11 @@ Scenario: A control's own fill is resolved from the theme as well as its text
 Scenario: Putting the root's theme back brings the light picture back
 	Given the application shows a Grid named "page" 600 by 400 with Background "Gray"
 	And the layout "page" holds a TextBlock named "label" with:
-		| Property | Value |
-		| Text     | Theme |
-		| FontSize | 48    |
+		| Property            | Value |
+		| Text                | Theme |
+		| FontSize            | 48    |
+		| HorizontalAlignment | Left  |
+		| VerticalAlignment   | Top   |
 	When the frame is captured as "light"
 	And the root theme is set to "Dark"
 	And the frame is captured as "dark"

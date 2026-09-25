@@ -45,7 +45,7 @@ internal static class DisplayScale
 	internal static void Initialize()
 	{
 		var extensionType = Type.GetType(
-			"Windows.Graphics.Display.IDisplayInformationExtension, CodeBrix.Platform");
+			"Windows.Graphics.Display.IDisplayInformationExtension, CodeBrix.Platform.Core");
 		if (extensionType is null)
 		{
 			throw new InvalidOperationException(

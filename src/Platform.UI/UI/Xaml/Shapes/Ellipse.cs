@@ -4,7 +4,7 @@ namespace Microsoft.UI.Xaml.Shapes
 {
 	public partial class Ellipse : Shape
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		protected override Size MeasureOverride(Size availableSize) => MeasureRelativeShape(availableSize);
 #endif
 

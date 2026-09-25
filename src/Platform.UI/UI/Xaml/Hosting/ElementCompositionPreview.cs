@@ -10,7 +10,7 @@ namespace Microsoft.UI.Xaml.Hosting;
 /// </summary>
 public partial class ElementCompositionPreview
 {
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	private const string ChildVisualName = "childVisual";
 #else
 	static readonly Compositor _compositor = new Compositor();
@@ -23,7 +23,7 @@ public partial class ElementCompositionPreview
 	/// <returns>The Microsoft.UI.Composition.Visual object that backs the XAML element.</returns>
 	public static Visual GetElementVisual(UIElement element)
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		return element.Visual;
 #else
 		return new Composition.Visual(_compositor)
@@ -54,7 +54,7 @@ public partial class ElementCompositionPreview
 			fe.SizeChanged +=
 				(s, e) => visual.NativeLayer.Frame = new CoreGraphics.CGRect(0, 0, element.Frame.Width, element.Frame.Height);
 		}
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 
 		var container = new Composition.ContainerVisual(element.Visual.Compositor) { Comment = ChildVisualName };
 		container.Children.InsertAtTop(visual);
@@ -68,7 +68,7 @@ public partial class ElementCompositionPreview
 #endif
 	}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	public static void SetIsTranslationEnabled(UIElement element, bool value)
 	{
 		element.Visual.IsTranslationEnabled = value;

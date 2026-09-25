@@ -3,24 +3,24 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Networking.Vpn
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IVpnPlugIn
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void Connect(global::Windows.Networking.Vpn.VpnChannel channel);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void Disconnect(global::Windows.Networking.Vpn.VpnChannel channel);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void GetKeepAlivePayload(global::Windows.Networking.Vpn.VpnChannel channel, out global::Windows.Networking.Vpn.VpnPacketBuffer keepAlivePacket);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void Encapsulate(global::Windows.Networking.Vpn.VpnChannel channel, global::Windows.Networking.Vpn.VpnPacketBufferList packets, global::Windows.Networking.Vpn.VpnPacketBufferList encapulatedPackets);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void Decapsulate(global::Windows.Networking.Vpn.VpnChannel channel, global::Windows.Networking.Vpn.VpnPacketBuffer encapBuffer, global::Windows.Networking.Vpn.VpnPacketBufferList decapsulatedPackets, global::Windows.Networking.Vpn.VpnPacketBufferList controlPacketsToSend);
 #endif
 	}

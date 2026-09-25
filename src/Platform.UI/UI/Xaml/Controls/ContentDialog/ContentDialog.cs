@@ -36,6 +36,9 @@ namespace Microsoft.UI.Xaml.Controls
 		private bool _hiding;
 		private bool _templateApplied;
 
+		// Element handler seam, hook H11: true while the platform's overlay presenter shows this dialog (Core's popup stays closed).
+		private bool _isPresentedByPlatform;
+
 		private Border m_tpBackgroundElementPart;
 		private Border m_tpButton1HostPart;
 		private Border m_tpButton2HostPart;
@@ -205,6 +208,12 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				if (!args.Cancel)
 				{
+					if (_isPresentedByPlatform)
+					{
+						_isPresentedByPlatform = false;
+						CodeBrix.Platform.UI.Contracts.PlatformServices.OverlayPresenter?.HideContentDialog(this, result);
+					}
+
 					m_isShowing = false;
 					_popup.IsOpen = false;
 					_popup.Child = null;
@@ -297,6 +306,11 @@ namespace Microsoft.UI.Xaml.Controls
 					throw new InvalidOperationException("A ContentDialog is already opened.");
 				}
 
+				if (_isPresentedByPlatform)
+				{
+					throw new InvalidOperationException("A ContentDialog is already opened.");
+				}
+
 #if !HAS_CODEBRIX_WINUI
 				if (XamlRoot is null &&
 					WinUICoreServices.Instance.InitializationType != InitializationType.IslandsOnly)
@@ -307,6 +321,22 @@ namespace Microsoft.UI.Xaml.Controls
 
 				// TODO: support in-place
 				m_placementMode = PlacementMode.EntireControlInPopup;
+
+				// Element handler seam, hook H11: the platform presents the dialog; Core's popup is not opened, the result task
+				// and the button/Closing protocol stay Core's.
+				if (TryShowWithPlatformPresenter(out var platformTcs))
+				{
+					using (ct.Register(() =>
+					{
+						platformTcs.TrySetCanceled();
+						Hide();
+					}
+						, useSynchronizationContext: true
+						))
+					{
+						return await platformTcs.Task;
+					}
+				}
 
 				// Make sure default template is applied, so visual states etc can be set correctly
 				EnsureTemplate();
@@ -336,6 +366,66 @@ namespace Microsoft.UI.Xaml.Controls
 					return await _tcs.Task;
 				}
 			});
+
+		/// <summary>
+		/// Element handler seam, hook H11: offers the dialog to the platform's overlay presenter. The result task is
+		/// created first, so a presenter that completes synchronously still completes it.
+		/// </summary>
+		/// <param name="tcs">The dialog's result task source, when the method returns <see langword="true"/>.</param>
+		/// <returns><see langword="true"/> when the platform presents the dialog.</returns>
+		private bool TryShowWithPlatformPresenter(out TaskCompletionSource<ContentDialogResult> tcs)
+		{
+			tcs = null;
+			if (!AreHandlersActive || CodeBrix.Platform.UI.Contracts.PlatformServices.OverlayPresenter is not { } presenter)
+			{
+				return false;
+			}
+
+			var candidate = new TaskCompletionSource<ContentDialogResult>();
+			_tcs = candidate;
+			m_isShowing = true;
+			_isPresentedByPlatform = true;
+
+			if (presenter.TryShowContentDialog(this))
+			{
+				tcs = candidate;
+				return true;
+			}
+
+			_tcs = null;
+			m_isShowing = false;
+			_isPresentedByPlatform = false;
+			return false;
+		}
+
+		/// <summary>
+		/// Raise entry point for a platform dialog presenter: the user chose <paramref name="button"/>. Runs the same
+		/// path as a click on the template's button (the ButtonClick event and its deferral, the button's command,
+		/// then Hide with the Closing event and its deferral); <see cref="ContentDialogButton.None"/> and
+		/// <see cref="ContentDialogButton.Close"/> run the close button's path.
+		/// </summary>
+		/// <param name="button">The button the user chose.</param>
+		internal void RaiseButtonFromPlatform(ContentDialogButton button)
+		{
+			switch (button)
+			{
+				case ContentDialogButton.Primary:
+					ProcessPrimaryButton();
+					break;
+				case ContentDialogButton.Secondary:
+					ProcessSecondaryButton();
+					break;
+				default:
+					ProcessCloseButton();
+					break;
+			}
+		}
+
+		/// <summary>
+		/// Raise entry point for a platform dialog presenter: the platform dialog is now shown (raises Opened, which
+		/// Core's popup raises on the Skia path).
+		/// </summary>
+		internal void RaiseOpenedFromPlatform() => Opened?.Invoke(this, new ContentDialogOpenedEventArgs());
 
 		public event TypedEventHandler<ContentDialog, ContentDialogClosedEventArgs> Closed;
 

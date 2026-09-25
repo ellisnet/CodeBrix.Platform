@@ -42,29 +42,43 @@
 		<file src="..\..\CODEBRIX-PLATFORM-README.md" target="/" />
 
 		<!-- ============================================================ -->
-		<!-- net10.0 reference assemblies (lib)                           -->
+		<!-- net10.0 compile assemblies (lib)                             -->
 		<!-- ============================================================ -->
-		<file src="..\..\src\Platform.UI\bin\Platform.UI.Reference\Release\net10.0\CodeBrix.Platform.UI.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Reference\Release\net10.0\CodeBrix.Platform.UI.Composition.dll" target="lib\net10.0" />
+		<!-- Since the Core/Skia split, lib/ carries the platform-neutral Core assemblies AND the Skia
+		     assemblies (the Skia ones are byte-identical to codebrix-platform-runtime/net10.0/skia below).
+		     There is no Reference flavor any more. -->
+		<!-- Core assemblies of the split libraries -->
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Core\Release\net10.0\CodeBrix.Platform.UI.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Core\Release\net10.0\CodeBrix.Platform.UI.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Core\Release\net10.0\CodeBrix.Platform.UI.Composition.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Core\Release\net10.0\CodeBrix.Platform.UI.Composition.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Core\Release\net10.0\CodeBrix.Platform.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Core\Release\net10.0\CodeBrix.Platform.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Core\Release\net10.0\CodeBrix.Platform.UI.Dispatching.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Core\Release\net10.0\CodeBrix.Platform.UI.Dispatching.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Core\Release\net10.0\CodeBrix.Platform.UI.Toolkit.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Core\Release\net10.0\CodeBrix.Platform.UI.Toolkit.Core.pdb" target="lib\net10.0" />
+		<!-- Skia assemblies of the split libraries (same files as the runtime folder) -->
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\Release\net10.0\CodeBrix.Platform.UI.Composition.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Skia\Release\net10.0\CodeBrix.Platform.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\Release\net10.0\CodeBrix.Platform.UI.Dispatching.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Skia\Release\net10.0\CodeBrix.Platform.UI.Toolkit.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Skia\Release\net10.0\CodeBrix.Platform.UI.Toolkit.pdb" target="lib\net10.0" />
+		<!-- XAML parser -->
 		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.dll" target="lib\net10.0" />
 		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.pdb" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.pdb" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Reference\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.pdb" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Reference\Release\net10.0\CodeBrix.Platform.UI.Toolkit.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Reference\Release\net10.0\CodeBrix.Platform.UI.Toolkit.pdb" target="lib\net10.0" />
-
-		<!-- Folded-in: Foundation, WinRT (Platform), Dispatching, Foundation.Logging (reference) -->
-		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Reference\Release\net10.0\CodeBrix.Platform.Foundation.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UWP\bin\Platform.Reference\Release\net10.0\CodeBrix.Platform.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Reference\Release\net10.0\CodeBrix.Platform.UI.Dispatching.dll" target="lib\net10.0" />
-		<file src="..\..\src\Platform.Foundation.Logging\bin\Platform.Foundation.Logging\Release\net10.0\CodeBrix.Platform.Foundation.Logging.dll" target="lib\net10.0" />
-		<!-- Folded-in: Microsoft.Extensions.Logging adapter + Extensions.Logging (reference) -->
-		<file src="..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\bin\Platform.UI.Adapter.Microsoft.Extensions.Logging\Release\net10.0\CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.dll" target="lib\net10.0" />
-		<file src="..\..\src\CodeBrix.Platform.Extensions.Logging\bin\Release\net10.0\CodeBrix.Platform.Extensions.Logging.dll" target="lib\net10.0" />
+		<!-- Core by whole (decision P1): themes, Foundation, logging -->
+		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Core\Release\net10.0\CodeBrix.Platform.Foundation.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.Foundation.Logging\bin\Platform.Foundation.Logging.Core\Release\net10.0\CodeBrix.Platform.Foundation.Logging.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\bin\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core\Release\net10.0\CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\CodeBrix.Platform.Extensions.Logging\bin\Release\net10.0\CodeBrix.Platform.Extensions.Logging.Core.dll" target="lib\net10.0" />
 
 		<!-- ============================================================ -->
 		<!-- net10.0 Skia runtime assemblies (runtime-replace payload)    -->
@@ -73,29 +87,42 @@
 		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\CodeBrix.Platform.UI.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\Release\net10.0\CodeBrix.Platform.UI.Composition.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\Release\net10.0\CodeBrix.Platform.UI.Composition.pdb" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI\bin\Platform.UI.Skia\Release\net10.0\*.xml" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\SourceGenerators\System.Xaml\bin\Release\netstandard2.0\CodeBrix.Platform.Xaml.pdb" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.pdb" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.pdb" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Skia\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme\bin\Platform.UI.FluentTheme.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v1\bin\Platform.UI.FluentTheme.v1.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v1.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.FluentTheme.v2\bin\Platform.UI.FluentTheme.v2.Core\Release\net10.0\CodeBrix.Platform.UI.FluentTheme.v2.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Skia\Release\net10.0\CodeBrix.Platform.UI.Toolkit.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Skia\Release\net10.0\CodeBrix.Platform.UI.Toolkit.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 
-		<!-- Folded-in: Foundation, WinRT (Platform), Dispatching, Foundation.Logging (skia) -->
-		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Skia\Release\net10.0\CodeBrix.Platform.Foundation.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Skia\Release\net10.0\CodeBrix.Platform.Foundation.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<!-- The Core assemblies of the split libraries, beside their Skia twins: runtime-replace swaps EVERY runtime
+		     assembly of this package for the content of this folder, so an assembly that is only in lib/ would be
+		     missing from the application's output. Byte-identical to the lib/ copies. -->
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Core\Release\net10.0\CodeBrix.Platform.UI.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI\bin\Platform.UI.Core\Release\net10.0\CodeBrix.Platform.UI.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Core\Release\net10.0\CodeBrix.Platform.UI.Composition.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Core\Release\net10.0\CodeBrix.Platform.UI.Composition.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Core\Release\net10.0\CodeBrix.Platform.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UWP\bin\Platform.Core\Release\net10.0\CodeBrix.Platform.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Core\Release\net10.0\CodeBrix.Platform.UI.Dispatching.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Core\Release\net10.0\CodeBrix.Platform.UI.Dispatching.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Core\Release\net10.0\CodeBrix.Platform.UI.Toolkit.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.UI.Toolkit\bin\Platform.UI.Toolkit.Core\Release\net10.0\CodeBrix.Platform.UI.Toolkit.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
+
+		<!-- Folded-in: Foundation (Core by whole), WinRT (Platform), Dispatching, Foundation.Logging (Core by whole) -->
+		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Core\Release\net10.0\CodeBrix.Platform.Foundation.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.Foundation\bin\Platform.Foundation.Core\Release\net10.0\CodeBrix.Platform.Foundation.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UWP\bin\Platform.Skia\Release\net10.0\CodeBrix.Platform.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UWP\bin\Platform.Skia\Release\net10.0\CodeBrix.Platform.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\Release\net10.0\CodeBrix.Platform.UI.Dispatching.dll" target="codebrix-platform-runtime\net10.0\skia" />
 		<file src="..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\Release\net10.0\CodeBrix.Platform.UI.Dispatching.pdb" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\Platform.Foundation.Logging\bin\Platform.Foundation.Logging\Release\net10.0\CodeBrix.Platform.Foundation.Logging.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<!-- Folded-in: Microsoft.Extensions.Logging adapter + Extensions.Logging (skia) -->
-		<file src="..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\bin\Platform.UI.Adapter.Microsoft.Extensions.Logging\Release\net10.0\CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.dll" target="codebrix-platform-runtime\net10.0\skia" />
-		<file src="..\..\src\CodeBrix.Platform.Extensions.Logging\bin\Release\net10.0\CodeBrix.Platform.Extensions.Logging.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\Platform.Foundation.Logging\bin\Platform.Foundation.Logging.Core\Release\net10.0\CodeBrix.Platform.Foundation.Logging.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<!-- Folded-in: Microsoft.Extensions.Logging adapter + Extensions.Logging (Core by whole) -->
+		<file src="..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\bin\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core\Release\net10.0\CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\CodeBrix.Platform.Extensions.Logging\bin\Release\net10.0\CodeBrix.Platform.Extensions.Logging.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
 
 		<!-- ============================================================ -->
 		<!-- Analyzers + Roslyn source generators                         -->

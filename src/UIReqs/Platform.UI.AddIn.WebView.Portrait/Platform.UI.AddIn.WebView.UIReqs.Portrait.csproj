@@ -21,7 +21,7 @@
 		     not get it copied beside the executable - and the very first thing the add-in does,
 		     starting its engine thread, is a method the runtime cannot even compile without it. That
 		     failure lands inside a layout pass, so it is worth naming here rather than meeting again. -->
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 </Project>

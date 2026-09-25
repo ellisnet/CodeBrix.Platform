@@ -7,7 +7,7 @@ public partial class RevealBrush : XamlCompositionBrushBase
 
 	}
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public global::Windows.UI.Color Color
 	{
 		get
@@ -20,7 +20,7 @@ public partial class RevealBrush : XamlCompositionBrushBase
 		}
 	}
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public static global::Microsoft.UI.Xaml.DependencyProperty ColorProperty { get; } =
 	Microsoft.UI.Xaml.DependencyProperty.Register(
 		nameof(Color), typeof(global::Windows.UI.Color),

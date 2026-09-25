@@ -9,7 +9,7 @@ namespace Microsoft.UI.Xaml.Media.Imaging;
 
 public partial class RenderTargetBitmap
 {
-	private unsafe class UnmanagedArrayOfBytes
+	internal unsafe class UnmanagedArrayOfBytes
 	{
 		public nint Pointer;
 		public int Length { get; }

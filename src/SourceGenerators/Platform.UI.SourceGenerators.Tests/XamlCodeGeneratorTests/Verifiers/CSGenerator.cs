@@ -1,7 +1,8 @@
 ﻿#if DEBUG
 // Uncomment the following line to write expected files to disk
-// Don't commit this line uncommented.
-#define WRITE_EXPECTED
+// Don't commit this line uncommented. (It was left active until WPE1-5, so a Debug test run REWROTE every Out/ baseline
+// and skipped the content check; with it commented out, Debug checks the baselines exactly as Release does.)
+//#define WRITE_EXPECTED
 #endif
 
 #if IS_CI && WRITE_EXPECTED

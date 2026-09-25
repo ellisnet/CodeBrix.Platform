@@ -1,4 +1,4 @@
 ﻿<linker>
-  <assembly fullname="CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging" />
+  <assembly fullname="CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core" />
 </linker>
 

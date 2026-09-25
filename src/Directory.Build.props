@@ -99,19 +99,18 @@
   -->
 	<PropertyGroup>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Tests.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Reference.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Reference.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Reference.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.RuntimeTests.Skia.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.RuntimeTests.netcoremobile.csproj</_AdjustedOutputProjects>
@@ -126,16 +125,16 @@
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Lottie.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Lottie.Skia.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Lottie.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Lottie.Reference.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Lottie.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Svg.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Svg.Skia.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Svg.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Svg.Reference.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Svg.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);CodeBrix.Platform.SkiaSharp.Views.Skia.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);CodeBrix.Platform.SkiaSharp.Views.Reference.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Logging.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);CodeBrix.Platform.SkiaSharp.Views.Core.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Logging.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.MediaPlayer.Skia.X11.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.MediaPlayer.Skia.Win32.csproj</_AdjustedOutputProjects>
@@ -149,8 +148,8 @@
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.Reference.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Toolkit.Windows.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Foldable.netcoremobile.csproj</_AdjustedOutputProjects>
@@ -158,42 +157,65 @@
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.GooglePlay.netcoremobile.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.Tests.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.Reference.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v1.Tests.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v1.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v1.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v1.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v1.Reference.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v2.Tests.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v2.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v2.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v2.netcoremobile.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.FluentTheme.v2.Reference.csproj</_AdjustedOutputProjects>
 
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj</_AdjustedOutputProjects>
 
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Logging.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.Foundation.Logging.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Dispatching.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Dispatching.netcoremobile.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Dispatching.Skia.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Dispatching.Reference.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Dispatching.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Composition.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Composition.netcoremobile.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Composition.Skia.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Composition.Reference.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.Composition.Core.csproj</_AdjustedOutputProjects>
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.XamlHost.Tests.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.XamlHost.netcoremobile.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.XamlHost.Skia.csproj</_AdjustedOutputProjects>
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.XamlHost.Reference.csproj</_AdjustedOutputProjects>
 
-		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics2DSK.Crossruntime.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics2DSK.Core.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics2DSK.netcoremobile.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics2DSK.Windows.csproj</_AdjustedOutputProjects>
+
+		<!-- Add-ins split into a Core and a Skia project in one folder (Phase C). -->
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.CommandBar.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.CommandBar.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.AppSettings.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.AppSettings.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.AudioPlayer.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.AudioPlayer.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.TextLayout.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.AdvancedTextEdit.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.AdvancedTextEdit.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.TerminalView.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.TerminalView.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.PlotterView.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.PlotterView.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics3DGL.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.WinUI.Graphics3DGL.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.VideoPlayer.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.VideoPlayer.Core.csproj</_AdjustedOutputProjects>
 	</PropertyGroup>
 
 	<PropertyGroup>

@@ -339,7 +339,7 @@ partial class CommandBarFlyoutCommandBar
 			secondaryItemsRoot.SizeChanged += sizeChangedHandler;
 			m_secondaryItemsRootSizeChangedRevoker.Disposable = Disposable.Create(() => secondaryItemsRoot.SizeChanged -= sizeChangedHandler);
 
-			if (ApiInformation.IsEventPresent("Microsoft.UI.Xaml.UIElement, CodeBrix.Platform.UI", "PreviewKeyDown"))
+			if (ApiInformation.IsEventPresent("Microsoft.UI.Xaml.UIElement, CodeBrix.Platform.UI.Core", "PreviewKeyDown"))
 			{
 				void previewKeyDownHandler(object sender, KeyRoutedEventArgs args)
 				{

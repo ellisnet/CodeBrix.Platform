@@ -14,12 +14,7 @@ using Windows.Storage;
 using Microsoft.UI.Composition;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.Foundation.Logging;
-
-#if __SKIA__
-using System.Runtime.InteropServices;
-using SkiaSharp;
-using System.Runtime.InteropServices.JavaScript;
-#endif
+using CodeBrix.Platform.UI.Contracts;
 
 namespace CodeBrix.Platform.Helpers; //Was previously: Uno.Helpers
 
@@ -38,7 +33,7 @@ internal static partial class ImageSourceHelpers
 		return ImageData.FromBytes(data);
 	}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	public static async Task<ImageData> ReadFromStreamAsCompositionSurface(Stream imageStream, CancellationToken ct, bool attemptLoadingWithBrowserCanvasApi = true)
 	{
 		var buffer = new byte[imageStream.Length - imageStream.Position];
@@ -46,52 +41,13 @@ internal static partial class ImageSourceHelpers
 
 		if (OperatingSystem.IsBrowser() && attemptLoadingWithBrowserCanvasApi)
 		{
-			var decodedBufferObject = await LoadFromArray(buffer);
-
-			if (decodedBufferObject.GetPropertyAsString("error") is { } errorMessage)
+			if (await PlatformServices.Imaging.TryDecodeWithBrowserAsync(buffer) is { } decoded)
 			{
-				typeof(ImageSourceHelpers).LogError()?.Error($"Failed to load image with the browser Canvas API. Falling back to SKCodec-based loading/decoding: {errorMessage}");
-			}
-			else
-			{
-				var width = decodedBufferObject.GetPropertyAsInt32("width");
-				var height = decodedBufferObject.GetPropertyAsInt32("height");
-
-				if (width == 0 || height == 0)
-				{
-					return ImageData.Empty;
-				}
-
-				var bytes = decodedBufferObject.GetPropertyAsByteArray("bytes");
-				SKImage image;
-				unsafe
-				{
-					var gcHandle = GCHandle.Alloc(bytes, GCHandleType.Pinned);
-					fixed (void* ptr = bytes)
-					{
-						try
-						{
-							image = SKImage.FromPixels(new SKPixmap(new SKImageInfo(width, height, SKColorType.Rgba8888), new IntPtr(ptr)), static (_, gcHandle) =>
-							{
-								((GCHandle)gcHandle).Free();
-							}, gcHandle);
-							if (image == null)
-							{
-								throw new InvalidOperationException($"{nameof(SKImage)}.{nameof(SKImage.FromPixels)} returned null.");
-							}
-							return ImageData.FromCompositionSurface(new SkiaCompositionSurface(image));
-						}
-						catch (Exception e)
-						{
-							gcHandle.Free();
-							return ImageData.FromError(e);
-						}
-					}
-				}
+				return decoded;
 			}
 		}
 
-		var surface = new SkiaCompositionSurface();
+		var surface = new PlatformCompositionSurface();
 		var result = surface.LoadFromStream(new MemoryStream(buffer));
 
 		if (result.success)
@@ -104,10 +60,6 @@ internal static partial class ImageSourceHelpers
 			return ImageData.FromError(exception);
 		}
 	}
-
-	// https://learn.microsoft.com/en-us/dotnet/core/compatibility/aspnet-core/6.0/byte-array-interop#receive-byte-array-in-javascript-from-net-1
-	[JSImport($"globalThis.CodeBrix.Platform.UI.Runtime.Skia.ImageLoader.loadFromArray")]
-	private static partial Task<JSObject> LoadFromArray(byte[] array);
 #endif
 
 	public static async Task<ImageData> GetImageDataFromUriAsBytes(Uri uri, CancellationToken ct)
@@ -123,7 +75,7 @@ internal static partial class ImageSourceHelpers
 		}
 	}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	public static async Task<ImageData> GetImageDataFromUriAsCompositionSurface(Uri uri, CancellationToken ct)
 	{
 		try

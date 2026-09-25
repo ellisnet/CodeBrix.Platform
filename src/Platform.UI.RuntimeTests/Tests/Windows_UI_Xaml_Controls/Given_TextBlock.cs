@@ -57,7 +57,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[DataRow((ushort)600, FontStyle.Normal, FontStretch.SemiCondensed, "ms-appx:///Assets/Fonts/OpenSans/OpenSans_SemiCondensed-SemiBold.ttf#Open Sans")]
 		public async Task When_Font_Has_Manifest(ushort weight, FontStyle style, FontStretch stretch, string ttfFile)
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive(); // System.NotImplementedException: RenderTargetBitmap is not supported on this platform.;
 			}
@@ -226,13 +226,13 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 			await UITestHelper.Load(SUT);
 
 #if __SKIA__
-			var segments = ((Run)SUT.Inlines.Single()).Segments;
+			var segments = ((Run)SUT.Inlines.Single()).GetSegments();
 			Assert.AreEqual(2, segments.Count);
 			Assert.IsTrue(segments[0].IsTab);
 			Assert.AreEqual("\r", segments[1].Text.ToString());
 #endif
 
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive(); // System.NotImplementedException: RenderTargetBitmap is not supported on this platform.;
 			}
@@ -637,7 +637,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[TestMethod]
 		public async Task When_Inlines_Transitively_Change()
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive(); // System.NotImplementedException: RenderTargetBitmap is not supported on this platform.;
 			}
@@ -1035,7 +1035,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[TestMethod]
 		public async Task When_Padding()
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive("RenderTargetBitmap is not supported on this platform");
 			}
@@ -1805,7 +1805,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[TestMethod]
 		public async Task When_Focus_Changes_Selection_Is_Not_Shown()
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive("RenderTargetBitmap is not supported on this platform");
 			}

@@ -61,9 +61,9 @@ namespace Microsoft.UI.Xaml.Documents.TextFormatting
 			{
 				var inline = _segmentSpans[i].Segment.Inline;
 
-				maxStackHeight = Math.Max(maxStackHeight, inline.LineHeight);
-				maxAboveBaselineHeight = Math.Max(maxAboveBaselineHeight, inline.AboveBaselineHeight);
-				maxBelowBaselineHeight = Math.Max(maxBelowBaselineHeight, inline.BelowBaselineHeight);
+				maxStackHeight = Math.Max(maxStackHeight, inline.GetLineHeight());
+				maxAboveBaselineHeight = Math.Max(maxAboveBaselineHeight, inline.GetAboveBaselineHeight());
+				maxBelowBaselineHeight = Math.Max(maxBelowBaselineHeight, inline.GetBelowBaselineHeight());
 			}
 
 			switch (lineStackingStrategy)

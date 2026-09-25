@@ -32,10 +32,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.UWP\Platform.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.UI.Toolkit\Platform.UI.Toolkit.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" />
 		<ProjectReference Include="..\XamlGenerationTests.Core\XamlGenerationTests.Core.csproj" />
 	</ItemGroup>
 

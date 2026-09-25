@@ -241,7 +241,7 @@ namespace Microsoft.UI.Xaml
 		void IFrameworkElement_EffectiveViewport.OnLayoutUpdated() { }  // Nothing to do here: this won't be invoked for real FrameworkElement, instead we receive OnViewportUpdated
 #endif
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private protected sealed override void OnViewportUpdated() // a.k.a. OnLayoutUpdated / OnClippingApplied
 		{
 			base.OnViewportUpdated();
@@ -309,7 +309,7 @@ namespace Microsoft.UI.Xaml
 
 				// The visible window of the SCP
 				// TODO: We should constrain the clip to only the axes on which we can scroll
-#if __SKIA__ // The viewport on an IsScrollPort element should not be affected by its ScrollOffsets. Skia does this correctly, but the other platforms need this inaccuracy due to the way TransformToVisual works (which is only correct on skia).
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // The viewport on an IsScrollPort element should not be affected by its ScrollOffsets. Skia does this correctly, but the other platforms need this inaccuracy due to the way TransformToVisual works (which is only correct on skia).
 				var scrollport = LayoutInformation.GetLayoutSlot(this);
 #else
 				var scrollport = new Rect(

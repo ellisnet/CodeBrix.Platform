@@ -21,13 +21,13 @@ namespace Windows.Security.ExchangeActiveSyncProvisioning
 		/// Gets the friendly name of the local device.
 		/// This value might come from a NetBIOS computer name.
 		/// </summary>
-		[NotImplemented("__SKIA__")]
+		[NotImplemented("__SKIA__", "__CODEBRIX_CORE__")]
 		public string FriendlyName { get; private set; } = "";
 
 		/// <summary>
 		/// Returns the identifier of the local device.
 		/// </summary>
-		[NotImplemented("__SKIA__")]
+		[NotImplemented("__SKIA__", "__CODEBRIX_CORE__")]
 		public Guid Id { get; private set; } = Guid.Empty;
 
 		/// <summary>

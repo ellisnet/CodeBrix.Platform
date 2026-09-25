@@ -173,7 +173,7 @@ namespace CodeBrix.Platform.UI.Toolkit //Was previously: Uno.UI.Toolkit
 #elif false
 				_invalidateShadow = true;
 				((ViewGroup)this).Invalidate();
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				this.SetElevationInternal(Elevation, ShadowColor);
 #elif (WINAPPSDK || WINDOWS_UWP || NETCOREAPP) && !HAS_CODEBRIX
 				_border.SetElevationInternal(Elevation, ShadowColor, _shadowHost as DependencyObject, CornerRadius);

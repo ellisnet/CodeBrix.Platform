@@ -323,12 +323,11 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 
 				// For Subclass build functionality
 				writer.AppendLineIndented("");
+				// The template root type is the Core UIElement whether or not the consumer defines __ANDROID__,
+				// __APPLE_UIKIT__, __IOS__ or __TVOS__: this family has no Android-native or UIKit-native head
+				// (CodeBrix.Android is built on the Core assemblies).
 				writer.AppendLineIndented("#if HAS_CODEBRIX_SKIA");
 				writer.AppendLineIndented("using _View = Microsoft.UI.Xaml.UIElement;");
-				writer.AppendLineIndented("#elif __ANDROID__");
-				writer.AppendLineIndented("using _View = Android.Views.View;");
-				writer.AppendLineIndented("#elif __APPLE_UIKIT__ || __IOS__ || __TVOS__");
-				writer.AppendLineIndented("using _View = UIKit.UIView;");
 				writer.AppendLineIndented("#else");
 				writer.AppendLineIndented("using _View = Microsoft.UI.Xaml.UIElement;");
 				writer.AppendLineIndented("#endif");
@@ -385,26 +384,6 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 								Safely(BuildCompiledBindings, writer);
 
 								Safely(BuildXBindTryGetDeclarations, writer);
-							}
-						}
-
-						if (_isHotReloadEnabled && Generation.IOSViewSymbol.Value is not null)
-						{
-							// Workaround for HR behaving incorrectly on iOS
-							// https://github.com/xamarin/xamarin-macios/issues/22102
-
-							using (writer.BlockInvariant($"namespace __internal"))
-							{
-								writer.AppendLineIndented("/// <remarks>Internal Use for iOS only.</remarks>");
-								writer.AppendLineIndented("[global::System.ComponentModel.EditorBrowsable(global::System.ComponentModel.EditorBrowsableState.Never)]");
-								writer.AppendLineIndented("[global::System.Diagnostics.DebuggerNonUserCodeAttribute()]");
-								using (writer.BlockInvariant($"static partial class __{_xClassName.ClassName}_Dummy"))
-								{
-									using (writer.BlockInvariant("private static class Dummy_Bindings"))
-									{
-										writer.AppendLineIndented("private static object Owner { get; set; }");
-									}
-								}
 							}
 						}
 					}
@@ -2283,10 +2262,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 							writer.AppendLineInvariantIndented("{0}Child = ", setterPrefix);
 
 							var implicitContent = implicitContentChild.Objects.First();
-							using (TryAdaptNative(writer, implicitContent, Generation.UIElementSymbol.Value))
-							{
-								BuildChild(writer, implicitContentChild, implicitContent);
-							}
+							BuildChild(writer, implicitContentChild, implicitContent);
 						}
 					}
 					else if (IsType(topLevelControlSymbol, Generation.SolidColorBrushSymbol.Value))
@@ -2437,10 +2413,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 										}
 
 										var xamlObjectDefinition = implicitContentChild.Objects.First();
-										using (TryAdaptNative(writer, xamlObjectDefinition, contentProperty.Type as INamedTypeSymbol))
-										{
-											BuildChild(writer, implicitContentChild, xamlObjectDefinition);
-										}
+										BuildChild(writer, implicitContentChild, xamlObjectDefinition);
 
 										if (isInline)
 										{
@@ -3443,10 +3416,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 								writer.AppendLineIndented($"{writer.AppliedParameterName}.{lazyContentProperty.Name} = ");
 
 								var xamlObjectDefinition = implicitContentChild.Objects.First();
-								using (TryAdaptNative(writer, xamlObjectDefinition, lazyContentProperty.Type as INamedTypeSymbol))
-								{
-									BuildChild(writer, implicitContentChild, xamlObjectDefinition);
-								}
+								BuildChild(writer, implicitContentChild, xamlObjectDefinition);
 								writer.AppendLineIndented($";");
 							}
 						}
@@ -3819,16 +3789,8 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 
 			writer.AppendLineInvariantIndented("// UI automation id: {0}", uiAutomationId);
 
-			// ContentDescription and AccessibilityIdentifier are used by Xamarin.UITest (Test Cloud) to identify visual elements
-			if (IsAndroidView(parent.Type))
-			{
-				writer.AppendLineInvariantIndented("{0}.ContentDescription = \"{1}\";", closureName, uiAutomationId);
-			}
-
-			if (IsIOSUIView(parent.Type))
-			{
-				writer.AppendLineInvariantIndented("{0}.AccessibilityIdentifier = \"{1}\";", closureName, uiAutomationId);
-			}
+			// No native accessibility identifier is set: the upstream UIKit-native head set
+			// AccessibilityIdentifier on UIKit views; this family has no such head.
 		}
 
 		private bool IsRelativePanelSiblingProperty(string name)
@@ -4849,13 +4811,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 					case XamlConstants.Types.GridLength:
 						return BuildGridLength(GetMemberValue(), owner);
 
-					case "UIKit.UIColor":
-						return BuildColor(GetMemberValue());
-
 					case "Windows.UI.Color":
-						return BuildColor(GetMemberValue());
-
-					case "Android.Graphics.Color":
 						return BuildColor(GetMemberValue());
 
 					case "System.Uri":
@@ -4906,14 +4862,6 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 
 					case "Microsoft.UI.Xaml.Input.InputScope":
 						return "new global::Microsoft.UI.Xaml.Input.InputScope { Names = { new global::Microsoft.UI.Xaml.Input.InputScopeName { NameValue = global::Microsoft.UI.Xaml.Input.InputScopeNameValue." + memberValue + "} } }";
-
-					case "UIKit.UIImage":
-						var imageValue = GetMemberValue();
-						if (imageValue.StartsWith(XamlConstants.BundleResourcePrefix, StringComparison.InvariantCultureIgnoreCase))
-						{
-							return "UIKit.UIImage.FromBundle(\"" + imageValue.Substring(XamlConstants.BundleResourcePrefix.Length, imageValue.Length - XamlConstants.BundleResourcePrefix.Length) + "\")";
-						}
-						return imageValue;
 
 					case "Microsoft.UI.Xaml.Controls.IconElement":
 						return "new Microsoft.UI.Xaml.Controls.SymbolIcon { Symbol = Microsoft.UI.Xaml.Controls.Symbol." + memberValue + "}";
@@ -5813,10 +5761,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 								{
 									writer.AppendIndented($"{fullValueSetter} = ");
 									var nonBindingObject = nonBindingObjects.First();
-									using (TryAdaptNative(writer, nonBindingObject, FindPropertyType(member.Member)))
-									{
-										BuildChild(writer, member, nonBindingObject);
-									}
+									BuildChild(writer, member, nonBindingObject);
 								}
 
 								writer.AppendLineIndented(closingPunctuation);
@@ -6640,35 +6585,10 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			}
 		}
 
-		/// <summary>
-		/// Checks if the element is a native view and, if so, wraps it in a container for addition to the managed visual tree.
-		/// </summary>
-		private IDisposable? TryAdaptNative(IIndentedStringBuilder writer, XamlObjectDefinition xamlObjectDefinition, INamedTypeSymbol? targetType)
-		{
-			if (IsManagedViewBaseType(targetType) && !IsFrameworkElement(xamlObjectDefinition.Type) && IsNativeView(xamlObjectDefinition.Type))
-			{
-				writer.AppendLineIndented("global::Microsoft.UI.Xaml.Media.VisualTreeHelper.AdaptNative(");
-				return new DisposableAction(() => writer.AppendIndented(")"));
-			}
-
-			return null;
-		}
-
 		private string GenerateConstructorParameters(INamedTypeSymbol? type)
 		{
-			if (IsType(type, Generation.AndroidViewSymbol.Value))
-			{
-				// For android, all native control must take a context as their first parameters
-				// To be able to use this control from the Xaml, we need to generate a constructor
-				// call that takes the ContextHelper.Current as the first parameter.
-				var hasContextConstructor = type.Constructors.Any(c => c.Parameters.Length == 1 && SymbolEqualityComparer.Default.Equals(c.Parameters[0].Type, Generation.AndroidContentContextSymbol.Value));
-
-				if (hasContextConstructor)
-				{
-					return "(global::CodeBrix.Platform.UI.ContextHelper.Current)";
-				}
-			}
-
+			// Every XAML element is created with its parameterless constructor. (The upstream Android-native
+			// head passed an Android Context to native Android views; this family has no such head.)
 			return "";
 		}
 
@@ -6704,7 +6624,6 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 					case XamlConstants.Types.CornerRadius:
 					case XamlConstants.Types.Brush:
 					case XamlConstants.Types.Duration:
-					case "UIKit.UIColor":
 					case "Windows.UI.Color":
 					case "Color":
 					case "Microsoft.UI.Xaml.Media.ImageSource":
@@ -6933,7 +6852,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			=> CurrentResourceOwner ?? "this";
 
 		public bool HasImplicitViewPinning
-			=> Generation.IOSViewSymbol.Value is not null || Generation.AppKitViewSymbol.Value is not null;
+			=> Generation.AppKitViewSymbol.Value is not null;
 
 		/// <summary>
 		/// Pushes a ResourceOwner variable name onto the stack

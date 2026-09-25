@@ -48,9 +48,6 @@
 		<Compile Include="..\..\Platform.UWP\ApplicationModel\Resources\Core\ResourceQualifier.cs">
 			<Link>Resources\ResourceQualifier.cs</Link>
 		</Compile>
-		<Compile Include="..\..\Platform.UWP\Helpers\AndroidResourceNameEncoder.cs">
-			<Link>Resources\AndroidResourceNameEncoder.cs</Link>
-		</Compile>
 		<Compile Include="..\Platform.UI.SourceGenerators\BindableTypeProviders\LinkerHintsHelpers.cs" Link="Helpers\LinkerHintsHelpers.cs" />
 		<!-- CodeBrix.Platform fork: HotReloadInfoHelper.cs Compile removed (Uno.UI.RemoteControl folder dropped). -->
 	</ItemGroup>

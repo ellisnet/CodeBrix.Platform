@@ -38,7 +38,7 @@ namespace Microsoft.UI.Xaml.Automation
 
 		private static void OnNamePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs args)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (AutomationPeer.AutomationPeerListener?.ListenerExistsHelper(AutomationEvents.PropertyChanged) == true &&
 				dependencyObject is UIElement element && // TODO: Adjust when TextElement's automation peers are supported.
 				element.GetOrCreateAutomationPeer() is { } peer)
@@ -241,7 +241,7 @@ namespace Microsoft.UI.Xaml.Automation
 				typeof(AutomationProperties),
 				new FrameworkPropertyMetadata(default(AutomationLandmarkType)));
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		internal static string FindHtmlRole(UIElement uIElement)
 		{
 			if (__LinkerHints.Is_Microsoft_UI_Xaml_Controls_Button_Available && uIElement is Button)

@@ -26,7 +26,7 @@ namespace Microsoft.UI.Xaml.Controls;
 
 partial class RatingControl
 {
-#if __SKIA__ // TODO Uno: Expression animation is only supported on Skia
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // TODO Uno: Expression animation is only supported on Skia
 	private const float c_scaleAnimationCenterPointXValue = 16.0f;
 	private const float c_scaleAnimationCenterPointYValue = 16.0f;
 #endif
@@ -419,7 +419,7 @@ partial class RatingControl
 
 	private void ApplyScaleExpressionAnimation(UIElement uiElement, int starIndex)
 	{
-#if !__SKIA__ // TODO Uno: Expression animation is only supported on Skia
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__ // TODO Uno: Expression animation is only supported on Skia
 		var scaleTransform = new ScaleTransform()
 		{
 			ScaleX = 0.5,
@@ -996,7 +996,7 @@ partial class RatingControl
 		return totalWidth;
 	}
 
-#if __SKIA__ // TODO Uno: Expression animation is only supported on Skia
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // TODO Uno: Expression animation is only supported on Skia
 	private double CalculateStarCenter(int starIndex)
 	{
 		// TODO: MSFT sub in real API DP values

@@ -28,7 +28,7 @@ public sealed partial class ApplicationData
 	{
 		_localFolderLazy = new(() => CreateStorageFolder(GetLocalFolder()));
 		_roamingFolderLazy = new(() => CreateStorageFolder(GetRoamingFolder()));
-#if !__SKIA__ // The concept of Shared Local folder is not implemented for Skia.
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__ // The concept of Shared Local folder is not implemented for Skia.
 		_sharedLocalFolderLazy = new(() => CreateStorageFolder(".shared", GetSharedLocalFolder()));
 #else
 		_sharedLocalFolderLazy = new((StorageFolder?)null);
@@ -131,7 +131,7 @@ public sealed partial class ApplicationData
 		}
 	}
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 	private static StorageFolder CreateStorageFolder(string name, string folder)
 	{
 		try

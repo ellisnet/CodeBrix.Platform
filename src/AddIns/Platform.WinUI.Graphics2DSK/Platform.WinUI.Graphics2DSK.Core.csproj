@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.WinUI.Graphics2DSK.Core: the whole cross-runtime Graphics2DSK add-in (SKCanvasElement, the
+	immediate-mode SkiaSharp surface). Since the Core/Skia split it is Core by whole (decision P1: renamed, no shell):
+	it references SkiaSharp and the framework's Core assembly only (plan rule R7), and its canvas comes from the
+	platform's registered SKCanvasVisualBaseFactory. Formerly Platform.WinUI.Graphics2DSK.Crossruntime.csproj, assembly
+	CodeBrix.Platform.WinUI.Graphics2DSK; packed by build/nuget/Platform.WinUI.Graphics2DSK.nuspec. The Windows project
+	in this folder (Platform.WinUI.Graphics2DSK.Windows.csproj) is a separate WinAppSDK build and is unchanged.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetReferencePreviousAndCurrent)</TargetFrameworks>
+		<CodeBrixDisableTargetFrameworkPlatformOverride>true</CodeBrixDisableTargetFrameworkPlatformOverride>
+	</PropertyGroup>
+	<Import Project="../../targetframework-override.props" />
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.WinUI.Graphics2DSK.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.WinUI.Graphics2DSK</RootNamespace>
+
+		<Nullable>enable</Nullable>
+		
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);CROSSRUNTIME</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" PrivateAssets="all" />
+	</ItemGroup>
+	
+
+	<ItemGroup>
+		<!-- Reserved for the add-in's Android and Mobile platform assemblies and their tests (decision P4). Declared
+		     here rather than in a source file so the Windows project in this folder, which compiles every *.cs file
+		     here, stays as it was. -->
+		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics2DSK" />
+		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics2DSK.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics2DSK" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics2DSK.Tests" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+</Project>

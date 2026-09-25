@@ -35,7 +35,7 @@
 	<Import Project="../targetframework-override.props" />
 	
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
 	</ItemGroup>

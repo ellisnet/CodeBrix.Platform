@@ -3,12 +3,22 @@ using System.Numerics;
 using Windows.Foundation;
 using Microsoft.UI.Composition;
 using SkiaSharp;
+using CodeBrix.Platform.UI.Composition.Skia;
 
 namespace CodeBrix.Platform.UI.Graphics; //Was previously: Uno.UI.Graphics
 
+/// <summary>
+/// The Skia canvas visual that <see cref="SKCanvasVisualFactory"/> creates. Its platform state,
+/// <see cref="CodeBrix.Platform.UI.Skia.SKCanvasVisualSkiaPlatform"/>, is registered for this type by the assembly's
+/// <c>SkiaPlatformBootstrap</c> and paints it through <see cref="PaintContent"/>.
+/// </summary>
 internal class SKCanvasVisual(Action<object, Size> renderCallback, Compositor compositor) : SKCanvasVisualBase(renderCallback, compositor)
 {
-	internal override void Paint(in PaintingSession session)
+	/// <summary>
+	/// Draws the render callback's content, clipped to the visual's size and faded by the session's opacity.
+	/// </summary>
+	/// <param name="session">The drawing session to use.</param>
+	internal void PaintContent(in PaintingSession session)
 	{
 		// We save and restore the canvas state ourselves so that the inheritor doesn't accidentally forget to.
 		session.Canvas.Save();
@@ -40,7 +50,4 @@ internal class SKCanvasVisual(Action<object, Size> renderCallback, Compositor co
 
 		session.Canvas.Restore();
 	}
-
-	internal override bool CanPaint() => true;
-	public override void Invalidate() => Compositor.InvalidateRender(this);
 }

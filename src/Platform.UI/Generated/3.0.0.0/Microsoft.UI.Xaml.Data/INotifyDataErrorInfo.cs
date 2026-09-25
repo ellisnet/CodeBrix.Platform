@@ -3,12 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Data
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface INotifyDataErrorInfo
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		bool HasErrors
 		{
 			get;
@@ -17,10 +17,10 @@ namespace Microsoft.UI.Xaml.Data
 		// Forced skipping of method Microsoft.UI.Xaml.Data.INotifyDataErrorInfo.HasErrors.get
 		// Forced skipping of method Microsoft.UI.Xaml.Data.INotifyDataErrorInfo.ErrorsChanged.add
 		// Forced skipping of method Microsoft.UI.Xaml.Data.INotifyDataErrorInfo.ErrorsChanged.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::System.Collections.Generic.IEnumerable<object> GetErrors(string propertyName);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::System.EventHandler<global::Microsoft.UI.Xaml.Data.DataErrorsChangedEventArgs> ErrorsChanged;
 #endif
 	}

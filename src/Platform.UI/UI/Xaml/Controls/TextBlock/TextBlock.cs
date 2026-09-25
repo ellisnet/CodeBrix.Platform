@@ -310,7 +310,7 @@ namespace Microsoft.UI.Xaml.Controls
 		{
 			UpdateInlines(newValue);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (OwningTextBox is null)
 #endif
 			{
@@ -526,7 +526,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 		#region IsTextSelectionEnabled Dependency Property
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
 #endif
 		public bool IsTextSelectionEnabled
@@ -535,7 +535,7 @@ namespace Microsoft.UI.Xaml.Controls
 			set => SetValue(IsTextSelectionEnabledProperty, value);
 		}
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
 #endif
 		public static DependencyProperty IsTextSelectionEnabledProperty { get; } =
@@ -950,7 +950,7 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				var point = e.GetCurrentPoint(that);
 
-#if __SKIA__ // GetCharacterIndexAtPoint returns -1 if point isn't on any char. For pointers, we still want to get the closest char
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // GetCharacterIndexAtPoint returns -1 if point isn't on any char. For pointers, we still want to get the closest char
 				var index = that.GetCharacterIndexAtPoint(point.Position, true);
 #else // TODO: add an option to get the closest char to point
 				var index = that.GetCharacterIndexAtPoint(point.Position);
@@ -1049,7 +1049,7 @@ namespace Microsoft.UI.Xaml.Controls
 			if (that._isPressed && that.IsTextSelectionEnabled && SupportsSelection(e))
 			{
 				var point = e.GetCurrentPoint(that);
-#if __SKIA__ // GetCharacterIndexAtPoint returns -1 if point isn't on any char. For pointers, we still want to get the closest char
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // GetCharacterIndexAtPoint returns -1 if point isn't on any char. For pointers, we still want to get the closest char
 				var index = that.GetCharacterIndexAtPoint(point.Position, true);
 #else // TODO: add an option to get the closest char to point
 				var index = that.GetCharacterIndexAtPoint(point.Position);
@@ -1229,7 +1229,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 
 			return null;
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			return ParsedText.GetHyperlinkAt(e.GetCurrentPoint(this).Position);
 #else
 			return null;
@@ -1249,9 +1249,8 @@ namespace Microsoft.UI.Xaml.Controls
 
 		public override string GetAccessibilityInnerText() => Text;
 
-		// This approximates UWP behavior
-		private protected override double GetActualWidth() => DesiredSize.Width;
-		private protected override double GetActualHeight() => DesiredSize.Height;
+		// ActualWidth/ActualHeight: FrameworkElement's (the RenderSize once laid out, margin excluded), as WinUI reports
+		// them. (Until WPE1-5 TextBlock overrode them with DesiredSize, which includes the Margin.)
 
 		internal override void UpdateThemeBindings(Data.ResourceUpdateReason updateReason)
 		{

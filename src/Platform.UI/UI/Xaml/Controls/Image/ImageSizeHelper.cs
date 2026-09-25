@@ -65,7 +65,7 @@ namespace Microsoft.UI.Xaml.Controls
 			return imageSize;
 		}
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		public static Rect ArrangeSource(this Image image, Size finalSize, Size containerSize)
 		{
 			var child = new Rect(default, containerSize);

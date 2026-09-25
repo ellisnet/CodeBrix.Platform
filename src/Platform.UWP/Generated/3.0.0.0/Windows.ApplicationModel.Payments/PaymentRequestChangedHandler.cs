@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Payments
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public delegate void PaymentRequestChangedHandler(global::Windows.ApplicationModel.Payments.PaymentRequest paymentRequest, global::Windows.ApplicationModel.Payments.PaymentRequestChangedArgs args);
 #endif
 }

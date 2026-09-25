@@ -35,7 +35,7 @@ namespace Windows.UI.ViewManagement
 		/// In CodeBrix Platform this returns the value of <see cref="WinRTFeatureConfiguration.Accessibility.HighContrast"/>.
 		/// The default is false.
 		/// </remarks>
-		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public bool HighContrast => WinRTFeatureConfiguration.Accessibility.HighContrast;
 
 		/// <summary>
@@ -45,7 +45,7 @@ namespace Windows.UI.ViewManagement
 		/// In CodeBrix Platform this returns the value of <see cref="WinRTFeatureConfiguration.Accessibility.HighContrastScheme"/>.
 		/// The default is "High Contrast Black".
 		/// </remarks>
-		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public string HighContrastScheme => WinRTFeatureConfiguration.Accessibility.HighContrastScheme;
 
 		/// <summary>
@@ -54,7 +54,7 @@ namespace Windows.UI.ViewManagement
 		/// <remarks>
 		///	Raised when <see cref="WinRTFeatureConfiguration.Accessibility.HighContrast"/> changes.
 		/// </remarks>
-		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public event TypedEventHandler<AccessibilitySettings, object> HighContrastChanged;
 
 		internal static void OnHighContrastChanged()

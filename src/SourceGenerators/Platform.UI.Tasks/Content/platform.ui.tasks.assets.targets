@@ -130,7 +130,7 @@
 	Populate output groups when building heads
 	-->
 	<Target Name="_CodeBrixAddLibraryAssets"
-			Condition="'$(IsCodeBrixHead)'=='true' or '$(AndroidApplication)'=='true' or '$(ProjectTypeGuids)'!=''"
+			Condition="'$(IsCodeBrixHead)'=='true' or '$(ProjectTypeGuids)'!=''"
 			DependsOnTargets="_CodeBrixFindPackageAssetMarkers"
 			BeforeTargets="$(_CodeBrixAddLibraryAssetsBeforeTargets)">
 
@@ -157,7 +157,7 @@
 	Determines the marker location for project references
 	-->
 	<Target Name="_CodeBrixFindPackageAssetMarkers"
-			Condition="'$(IsCodeBrixHead)'=='true' or '$(AndroidApplication)'=='true' or '$(ProjectTypeGuids)'!=''"
+			Condition="'$(IsCodeBrixHead)'=='true' or '$(ProjectTypeGuids)'!=''"
 			DependsOnTargets="$(_CodeBrixFindPackageAssetMarkersDependsOn)">
 
 		<ItemGroup Condition="'$(ProjectTypeGuids)'!=''">
@@ -198,7 +198,7 @@
 	-->
 	<Target Name="_CodeBrixAddAssetsFilesToCopyLocal"
 			DependsOnTargets="$(_CodeBrixAddAssetsFilesToCopyLocalDependsOn)"
-			Condition="'$(IsCodeBrixHead)'!='true' and '$(AndroidApplication)'!='true' and '$(ProjectTypeGuids)'==''"
+			Condition="'$(IsCodeBrixHead)'!='true' and '$(ProjectTypeGuids)'==''"
 			BeforeTargets="GetCopyToOutputDirectoryItems">
 
 		<ItemGroup>
@@ -229,7 +229,7 @@
 	-->
 	<Target Name="_CodeBrixAddAssetsFilesToPublishDirectory"
 			DependsOnTargets="$(_CodeBrixAddAssetsFilesToPublishDirectoryDependsOn)"
-			Condition="'$(IsCodeBrixHead)'!='true' and '$(AndroidApplication)'!='true' and '$(ProjectTypeGuids)'==''"
+			Condition="'$(IsCodeBrixHead)'!='true' and '$(ProjectTypeGuids)'==''"
 			BeforeTargets="GetCopyToPublishDirectoryItems">
 
 		<ItemGroup>

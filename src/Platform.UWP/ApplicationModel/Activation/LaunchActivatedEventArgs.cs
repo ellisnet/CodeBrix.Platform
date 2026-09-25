@@ -37,7 +37,7 @@ public sealed partial class LaunchActivatedEventArgs : IActivatedEventArgs
 	/// <remarks>
 	/// SplashScreen is not directly supported, exists for interoperability with UWP APIs.
 	/// </remarks>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public SplashScreen SplashScreen { get; } = new SplashScreen();
 
 	/// <summary>
@@ -46,7 +46,7 @@ public sealed partial class LaunchActivatedEventArgs : IActivatedEventArgs
 	/// <remarks>
 	/// The ID defaults to 0 on non-UWP targets.
 	/// </remarks>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public int CurrentlyShownApplicationViewId { get; }
 
 	/// <summary>
@@ -57,7 +57,7 @@ public sealed partial class LaunchActivatedEventArgs : IActivatedEventArgs
 	/// <summary>
 	/// Gets the ID of the tile that was invoked to launch the app.
 	/// </summary>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public string TileId { get; } = "App";
 
 	/// <summary>

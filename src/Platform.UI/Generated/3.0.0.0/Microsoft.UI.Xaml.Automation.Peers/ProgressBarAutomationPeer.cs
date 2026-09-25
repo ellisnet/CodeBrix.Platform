@@ -9,7 +9,7 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 	public partial class ProgressBarAutomationPeer : global::Microsoft.UI.Xaml.Automation.Peers.RangeBaseAutomationPeer
 	{
 #if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public ProgressBarAutomationPeer(global::Microsoft.UI.Xaml.Controls.ProgressBar owner) : base(owner)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Automation.Peers.ProgressBarAutomationPeer", "ProgressBarAutomationPeer.ProgressBarAutomationPeer(ProgressBar owner)");

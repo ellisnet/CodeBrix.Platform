@@ -3,19 +3,19 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Content
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IContentSiteAutomation
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Microsoft.UI.Content.ContentAutomationOptions AutomationOption
 		{
 			get;
 			set;
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		object AutomationProvider
 		{
 			get;
@@ -32,16 +32,16 @@ namespace Microsoft.UI.Content
 		// Forced skipping of method Microsoft.UI.Content.IContentSiteAutomation.ParentAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.IContentSiteAutomation.PreviousSiblingAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.IContentSiteAutomation.PreviousSiblingAutomationProviderRequested.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Content.IContentSiteAutomation, global::Microsoft.UI.Content.ContentSiteAutomationProviderRequestedEventArgs> FragmentRootAutomationProviderRequested;
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Content.IContentSiteAutomation, global::Microsoft.UI.Content.ContentSiteAutomationProviderRequestedEventArgs> NextSiblingAutomationProviderRequested;
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Content.IContentSiteAutomation, global::Microsoft.UI.Content.ContentSiteAutomationProviderRequestedEventArgs> ParentAutomationProviderRequested;
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Content.IContentSiteAutomation, global::Microsoft.UI.Content.ContentSiteAutomationProviderRequestedEventArgs> PreviousSiblingAutomationProviderRequested;
 #endif
 	}

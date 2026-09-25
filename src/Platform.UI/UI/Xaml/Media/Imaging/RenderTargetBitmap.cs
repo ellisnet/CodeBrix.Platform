@@ -91,7 +91,7 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 #endif
 		private int _bufferSize;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private protected override unsafe bool TryOpenSourceAsync(CancellationToken ct, int? targetWidth, int? targetHeight, [NotNullWhen(true)] out Task<ImageData>? asyncImage)
 		{
 			int width = PixelWidth;
@@ -162,7 +162,7 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 					}
 
 					(_bufferSize, PixelWidth, PixelHeight) = RenderAsBgra8_Premul(element!, ref _buffer, new Size(scaledWidth, scaledHeight));
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					InvalidateSource();
 #endif
 				}
@@ -190,7 +190,7 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 					}
 
 					(_bufferSize, PixelWidth, PixelHeight) = RenderAsBgra8_Premul(element!, ref _buffer);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 					InvalidateSource();
 #endif
 				}
@@ -235,7 +235,7 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 			}
 		}
 #else
-		private static void EnsureBuffer(ref UnmanagedArrayOfBytes? buffer, int length)
+		internal static void EnsureBuffer(ref UnmanagedArrayOfBytes? buffer, int length)
 		{
 			if (buffer is null || buffer.Length < length)
 			{

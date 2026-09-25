@@ -4,19 +4,19 @@
 namespace Windows.Media.Playback
 {
 	// This type is deprecated. Consider not implementing it.
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IMediaEnginePlaybackSource
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.Media.Playback.MediaPlaybackItem CurrentItem
 		{
 			get;
 		}
 #endif
 		// Forced skipping of method Windows.Media.Playback.IMediaEnginePlaybackSource.CurrentItem.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void SetPlaybackSource(global::Windows.Media.Playback.IMediaPlaybackSource source);
 #endif
 	}

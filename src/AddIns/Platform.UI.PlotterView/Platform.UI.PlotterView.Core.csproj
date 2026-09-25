@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.PlotterView.Core: the chart control (PlotterControl) and its drawing on an SKCanvas through
+	CodeBrix.Plotter, the input mapping, the tracker layout and the application-font typeface resolver - the shared
+	tree of this folder. It references SkiaSharp (plan rule R7), CodeBrix.Plotter and the framework's Core assemblies,
+	never the framework's Skia assemblies. Two platform contracts: Contracts/IRenderCanvasPlatform.cs (the element that
+	supplies the canvas) and Contracts/ITypefacePlatform.cs (typefaces from the framework's font cache); the Skia
+	project in this folder (Platform.UI.PlotterView.Skia.csproj, assembly CodeBrix.Platform.UI.PlotterView)
+	implements both and carries the package.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.PlotterView.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.PlotterView</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the PlotterView package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<!-- No TextLayout reference (the package dependencies stay as they were): the chart's typefaces come straight
+		     from the platform's font source, the Foundation.Core contract IFontSourcePlatform<SKTypeface> (WPE1 C7) -
+		     the same process-wide typeface cache the text engine uses. -->
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The same packages the Skia project references (it declares them for the package); keep
+		     the Plotter version in step with it. -->
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.252.1250" />
+	</ItemGroup>
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

@@ -46,7 +46,31 @@ namespace Windows.UI.ViewManagement
 		public event TypedEventHandler<UISettings, object> ColorValuesChanged;
 
 #if true
-		public bool AnimationsEnabled => true;
+		// The platform's system animation setting (IAnimationSettingsPlatform), resolved once; a platform that does not
+		// register it (the Skia heads) keeps animations enabled.
+		private static CodeBrix.Platform.Contracts.IAnimationSettingsPlatform _animationSettingsPlatform;
+		private static bool _animationSettingsResolved;
+
+		public bool AnimationsEnabled
+		{
+			get
+			{
+				if (!_animationSettingsResolved)
+				{
+					_animationSettingsPlatform = CodeBrix.Platform.Contracts.PlatformContract.TryResolve<CodeBrix.Platform.Contracts.IAnimationSettingsPlatform>();
+					_animationSettingsResolved = true;
+				}
+
+				return _animationSettingsPlatform?.AnimationsEnabled ?? true;
+			}
+		}
+
+		/// <summary>
+		/// Resolves the platform's <see cref="CodeBrix.Platform.Contracts.IAnimationSettingsPlatform"/> again on the next
+		/// read of <see cref="AnimationsEnabled"/>. A platform bootstrap that registers it after AnimationsEnabled was
+		/// first read calls this.
+		/// </summary>
+		internal static void RefreshAnimationSettingsPlatform() => _animationSettingsResolved = false;
 #endif
 
 		public Color GetColorValue(UIColorType desiredColor)

@@ -31,5 +31,6 @@
 		<InternalsVisibleTo Include="CodeBrix.Platform.UWPSyncGenerator" />
 		<InternalsVisibleTo Include="CodeBrix.Platform.UI.RuntimeTests" />
 		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Toolkit" />
+		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Toolkit.Core" />
 	</ItemGroup>
 </Project>

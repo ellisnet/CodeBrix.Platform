@@ -1,0 +1,85 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+	The host-free ENGINE proof (WPE1 C3; ~/ClaudeHome/mobile-research gap analysis 5.5): each test drives one add-in
+	Core's engine for real - the types a CodeBrix.Mobile app reuses without any XAML - and then asserts, through
+	AppDomain.CurrentDomain.GetAssemblies(), that none of the WinUI assemblies (CodeBrix.Platform.UI.Core,
+	CodeBrix.Platform.UI.Composition.Core, CodeBrix.Platform.Core, CodeBrix.Platform.UI.Dispatching.Core, the XAML and
+	FluentTheme assemblies, any Skia twin) was loaded. Every test shares this process, so one test that loads a WinUI
+	assembly fails the whole project: that is the intended strictness. No test here may create a control.
+	This graph references ONLY engine Cores: never Platform.UI.Core.csproj or a Skia project.
+	-->
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<AssemblyName>CodeBrix.Platform.UI.Engine.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Engine.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The engine Cores under proof. Each one's WinUI references stay metadata-only: the CLR loads a referenced
+		     assembly only when a type from it is needed, which is exactly what EngineIsolation checks. -->
+		<ProjectReference Include="..\AddIns\Platform.AppSettings\Platform.AppSettings.Core.csproj" />
+		<!-- TextLayout (WPE1 C4 + C5): WinUI-free by reference, since it carries its own copy of the text engine. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
+		<!-- TerminalView (WPE1 C6): Engine/TerminalRenderer + Engine/TerminalInputEncoder. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Core.csproj" />
+		<!-- PlotterView (WPE1 C7): Engine/PlotHost. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Core.csproj" />
+		<!-- AdvancedTextEdit (WPE1 C8): the document model, highlighting (adapters), folding (IFoldingHost), CompletionFilter. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Core.csproj" />
+		<!-- Lottie (WPE1 C9): Engine/LottiePlayer (+ ITickSource) and Engine/LottieColorTheme. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.Lottie\Platform.UI.Lottie.Core.csproj" />
+		<!-- AudioPlayer (WPE1 C10): Engine/AudioTransport (+ ITickSource) and the resolver over IAssetLocation. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Core.csproj" />
+		<!-- VideoPlayer (WPE1 C11): the rules and the source resolver over IAssetLocation. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Core.csproj" />
+		<!-- Toolkit (WPE1 C12): Engine/TriPaneLayoutState over TriPaneViewLayoutMath. -->
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" />
+		<!-- CommandBar (WPE1 C14): the icon helpers of its Engine namespace (IconResourceScheme, IconUri, SvgTintCss). -->
+		<ProjectReference Include="..\AddIns\Platform.UI.CommandBar\Platform.UI.CommandBar.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The Lottie proof plays the themed animation the Lottie UIReqs use ... -->
+		<None Include="..\UIReqs\Platform.UI.AddIn.Lottie\Assets\themed.json" Link="Assets\themed.json" CopyToOutputDirectory="PreserveNewest" />
+		<!-- ... and the AudioPlayer proof resolves it as an embedded://./ resource of this (the "application") assembly. -->
+		<EmbeddedResource Include="..\UIReqs\Platform.UI.AddIn.Lottie\Assets\themed.json" LogicalName="CodeBrix.Platform.UI.Engine.Tests.Assets.themed.json" />
+	</ItemGroup>
+
+	<!-- The text engine's Skia and HarfBuzz natives: those come from the head packages in an application, and there is
+	     no head here (as in the TextLayout suite). ICU comes with the TextLayout Core's Unicode packages. -->
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Win32" Version="$(HarfBuzzSharpVersion)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
+	</ItemGroup>
+
+</Project>

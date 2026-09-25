@@ -3,7 +3,7 @@ using System;
 namespace CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
 
 /// <summary>
-/// The <see cref="VideoPlayer"/> element's decisions that are pure arithmetic or pure policy, kept
+/// The <c>VideoPlayer</c> element's decisions that are pure arithmetic or pure policy, kept
 /// apart from the element so they can be exercised without a window.
 /// </summary>
 internal static class VideoPlayerRules

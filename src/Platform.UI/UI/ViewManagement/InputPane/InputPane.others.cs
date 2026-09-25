@@ -1,4 +1,4 @@
-﻿#if !__SKIA__
+﻿#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 #nullable enable
 
 namespace Windows.UI.ViewManagement;

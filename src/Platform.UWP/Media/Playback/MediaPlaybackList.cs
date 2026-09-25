@@ -1,4 +1,4 @@
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using Windows.Foundation.Collections;
 using Windows.Media.Playback;
 

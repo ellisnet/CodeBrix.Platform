@@ -4,13 +4,13 @@
 namespace Microsoft.UI.Xaml.Media.Animation
 {
 	[global::System.AttributeUsageAttribute(global::System.AttributeTargets.Property, Inherited = true, AllowMultiple = false)]
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ConditionallyIndependentlyAnimatableAttribute : global::System.Attribute
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public ConditionallyIndependentlyAnimatableAttribute() : base()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Media.Animation.ConditionallyIndependentlyAnimatableAttribute", "ConditionallyIndependentlyAnimatableAttribute.ConditionallyIndependentlyAnimatableAttribute()");

@@ -3,15 +3,15 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.Windows.ApplicationModel.Resources
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ResourceLoader
 	{
 		// Skipping already declared method Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.ResourceLoader(string)
 		// Forced skipping of method Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.ResourceLoader(string)
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public ResourceLoader(string fileName, string resourceMap)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Windows.ApplicationModel.Resources.ResourceLoader", "ResourceLoader.ResourceLoader(string fileName, string resourceMap)");
@@ -21,15 +21,15 @@ namespace Microsoft.Windows.ApplicationModel.Resources
 		// Skipping already declared method Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.ResourceLoader()
 		// Forced skipping of method Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.ResourceLoader()
 		// Skipping already declared method Microsoft.Windows.ApplicationModel.Resources.ResourceLoader.GetString(string)
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public string GetStringForUri(global::System.Uri resourceUri)
 		{
 			throw new global::System.NotImplementedException("The member string ResourceLoader.GetStringForUri(Uri resourceUri) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static string GetDefaultResourceFilePath()
 		{
 			throw new global::System.NotImplementedException("The member string ResourceLoader.GetDefaultResourceFilePath() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

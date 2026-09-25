@@ -4,13 +4,13 @@
 namespace Windows.Devices.Perception.Provider
 {
 	// This type is deprecated. Consider not implementing it.
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class PerceptionFaceAuthenticationGroup
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::System.Collections.Generic.IReadOnlyList<string> FrameProviderIds
 		{
 			get
@@ -19,8 +19,8 @@ namespace Windows.Devices.Perception.Provider
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public PerceptionFaceAuthenticationGroup(global::System.Collections.Generic.IEnumerable<string> ids, global::Windows.Devices.Perception.Provider.PerceptionStartFaceAuthenticationHandler startHandler, global::Windows.Devices.Perception.Provider.PerceptionStopFaceAuthenticationHandler stopHandler)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Devices.Perception.Provider.PerceptionFaceAuthenticationGroup", "PerceptionFaceAuthenticationGroup.PerceptionFaceAuthenticationGroup(IEnumerable<string> ids, PerceptionStartFaceAuthenticationHandler startHandler, PerceptionStopFaceAuthenticationHandler stopHandler)");

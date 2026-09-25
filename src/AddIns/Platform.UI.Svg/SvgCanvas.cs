@@ -12,32 +12,16 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SKMatrix = SkiaSharp.SKMatrix;
 using SKRect = SkiaSharp.SKRect;
-#if HAS_CODEBRIX_WINUI
 using SkiaSharp.Views.Windows;
 
-#if __SKIA__
-using SkiaCanvas = global::CodeBrix.Platform.WinUI.Graphics2DSK.SKCanvasElement;
-#elif true
-using SkiaCanvas = SkiaSharp.Views.Windows.SKXamlCanvas;
-using SkiaPaintEventArgs = SkiaSharp.Views.Windows.SKPaintSurfaceEventArgs;
-#else
-using SkiaCanvas = SkiaSharp.Views.Windows.SKSwapChainPanel;
-using SkiaPaintEventArgs = SkiaSharp.Views.Windows.SKPaintGLSurfaceEventArgs;
-#endif
-#else
-using SkiaSharp.Views.UWP;
-#if true
-using SkiaCanvas = SkiaSharp.Views.UWP.SKXamlCanvas;
-using SkiaPaintEventArgs = SkiaSharp.Views.UWP.SKPaintSurfaceEventArgs;
-#else
-using SkiaCanvas = SkiaSharp.Views.UWP.SKSwapChainPanel;
-using SkiaPaintEventArgs = SkiaSharp.Views.UWP.SKPaintGLSurfaceEventArgs;
-#endif
-#endif
+//was previously: the base class was chosen per platform - Graphics2DSK's SKCanvasElement on Skia (__SKIA__), an
+//SKXamlCanvas or SKSwapChainPanel elsewhere. Since the Core/Skia split this element is platform-neutral and draws on
+//the Skia-canvas host seam of the SkiaSharp views add-in (SKCanvasHostElement, which behaves as SKCanvasElement did);
+//the platform supplies the canvas behind it.
 
 namespace CodeBrix.Platform.UI.Svg; //Was previously: Uno.UI.Svg
 
-internal partial class SvgCanvas : SkiaCanvas
+internal partial class SvgCanvas : SKCanvasHostElement
 {
 	private readonly SvgImageSource _svgImageSource;
 	private readonly SvgProvider _svgProvider;
@@ -116,21 +100,10 @@ internal partial class SvgCanvas : SkiaCanvas
 		return finalSize;
 	}
 
-#if __SKIA__
-	protected override void RenderOverride(SKCanvas canvas, Size area)
+	protected override void OnPaint(SKCanvas canvas, Size area)
 	{
 		Draw(canvas, (float)area.Width, (float)area.Height);
 	}
-#else
-	protected override void OnPaintSurface(SkiaPaintEventArgs e)
-	{
-		var canvas = e.Surface.Canvas;
-		var scale = (float)GetScaleFactorForLayoutRounding();
-		canvas.SetMatrix(SKMatrix.CreateScale(scale, scale));
-		canvas.Clear(SKColors.Transparent);
-		Draw(canvas, (float)_lastArrangeSize.Width, (float)_lastArrangeSize.Height);
-	}
-#endif
 
 	private void Draw(SKCanvas canvas, float width, float height)
 	{

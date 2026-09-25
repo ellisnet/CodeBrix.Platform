@@ -74,7 +74,7 @@ namespace Microsoft.UI.Xaml.Media
 		{
 			_invalidateRenderHandlers?.Invoke(this, null);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			SynchronizeCompositionBrush();
 #endif
 		}

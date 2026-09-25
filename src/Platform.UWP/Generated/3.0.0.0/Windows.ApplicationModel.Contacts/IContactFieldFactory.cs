@@ -3,18 +3,18 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Contacts
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IContactFieldFactory
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.ApplicationModel.Contacts.ContactField CreateField(string value, global::Windows.ApplicationModel.Contacts.ContactFieldType type);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.ApplicationModel.Contacts.ContactField CreateField(string value, global::Windows.ApplicationModel.Contacts.ContactFieldType type, global::Windows.ApplicationModel.Contacts.ContactFieldCategory category);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.ApplicationModel.Contacts.ContactField CreateField(string name, string value, global::Windows.ApplicationModel.Contacts.ContactFieldType type, global::Windows.ApplicationModel.Contacts.ContactFieldCategory category);
 #endif
 	}

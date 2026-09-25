@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using System;
 using System.Linq;
 using Windows.Foundation;
@@ -12,8 +12,8 @@ using static System.Double;
 using Windows.Phone.Media.Devices;
 using System.Diagnostics;
 
-#if __SKIA__
-using NativePath = Microsoft.UI.Composition.SkiaGeometrySource2D;
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+using NativePath = Windows.Graphics.IGeometrySource2D;
 
 #elif false
 using NativePath = Microsoft.UI.Xaml.Shapes.Shape;
@@ -48,7 +48,7 @@ partial class Shape
 
 		GetStretchMetrics(stretch, strokeThickness, finalSize, pathBounds, out var xScale, out var yScale, out var dX, out var dY, out var stretchedSize);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		Render(path, xScale, yScale, dX, dY);
 #elif false
 		Render(path, stretchedSize, xScale, yScale, dX, dY);

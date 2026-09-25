@@ -47,7 +47,7 @@ namespace Microsoft.UI.Xaml
 	public partial class UIElement : DependencyObject, IXUidProvider
 	{
 		private protected static bool _traceLayoutCycle;
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		private bool _warnedAboutTranslation;
 #endif
 
@@ -82,7 +82,7 @@ namespace Microsoft.UI.Xaml
 		// but it should actually be computed based on clipping vs desired size.
 		internal Point ScrollOffsets { get; private protected set; }
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		// This is the local viewport of the element, i.e. where the element can draw content once clipping has been applied.
 		// This is expressed in local coordinate space.
 		internal Rect Viewport { get; private set; } = Rect.Infinite;
@@ -276,7 +276,7 @@ namespace Microsoft.UI.Xaml
 				{
 					_translation = value;
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 					if (!_warnedAboutTranslation &&
 						(_translation.X != 0 || _translation.Y != 0))
 					{
@@ -561,16 +561,16 @@ namespace Microsoft.UI.Xaml
 				return Matrix3x2.Identity;
 			}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			Matrix3x2 from2To;
 			if (to is null)
 			{
-				from2To = from.Visual.TotalMatrix.ToMatrix3x2();
+				from2To = CodeBrix.Platform.UI.Composition.CompositionMathHelpers.ToMatrix3x2(from.Visual.TotalMatrix);
 			}
 			else
 			{
 				Matrix4x4.Invert(to.Visual.TotalMatrix /* root2To */, out var to2Root);
-				from2To = (from.Visual.TotalMatrix /* root2from */ * to2Root).ToMatrix3x2();
+				from2To = CodeBrix.Platform.UI.Composition.CompositionMathHelpers.ToMatrix3x2(from.Visual.TotalMatrix /* root2from */ * to2Root);
 			}
 
 			if (from.Log().IsEnabled(LogLevel.Trace))
@@ -620,7 +620,7 @@ namespace Microsoft.UI.Xaml
 		}
 #nullable restore
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		/// <summary>
 		/// Applies to the given matrix the transformation needed to convert from parent to local element coordinates space.
 		/// </summary>
@@ -693,7 +693,7 @@ namespace Microsoft.UI.Xaml
 		}
 #endif
 
-#if !__SKIA__ // This is the default implementation, but it can be customized per platform
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__ // This is the default implementation, but it can be customized per platform
 		/// <summary>
 		/// Note: Offsets are only an approximation that does not take into consideration possible transformations
 		///	applied by a 'UIView' between this element and its parent UIElement.
@@ -942,7 +942,7 @@ namespace Microsoft.UI.Xaml
 
 		internal void ApplyClip()
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			// On Skia specifically, we separate the two types of clipping.
 			// First, from Clip DP (handled in this code path)
 			// That clipping propagates to Visual.Clip through ApplyNativeClip.
@@ -970,7 +970,7 @@ namespace Microsoft.UI.Xaml
 #endif
 		}
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		internal Rect GetNativeClippedViewport()
 		{
 			Rect rect;
@@ -1004,18 +1004,18 @@ namespace Microsoft.UI.Xaml
 #endif
 
 		partial void ApplyNativeClip(Rect rect
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			, Transform transform
 #endif
 			);
 
 		private protected virtual void OnViewportUpdated(
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 			Rect viewport
 #endif
 			) // Not "Changed" as it might be the same as previous
 		{
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 			// If not clipped, we consider the viewport as infinite.
 			Viewport = viewport.IsEmpty ? Rect.Infinite : viewport;
 #endif
@@ -1256,7 +1256,7 @@ namespace Microsoft.UI.Xaml
 
 		internal bool GetUseLayoutRounding()
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			return UseLayoutRounding;
 #else
 			return false;
@@ -1265,7 +1265,7 @@ namespace Microsoft.UI.Xaml
 
 		internal double LayoutRound(double value)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			double scaleFactor = GetScaleFactorForLayoutRounding();
 
 			return LayoutRound(value, scaleFactor);
@@ -1276,7 +1276,7 @@ namespace Microsoft.UI.Xaml
 
 		internal Rect LayoutRound(Rect value)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			double scaleFactor = GetScaleFactorForLayoutRounding();
 
 			return new Rect(
@@ -1292,7 +1292,7 @@ namespace Microsoft.UI.Xaml
 
 		internal Thickness LayoutRound(Thickness value)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			double scaleFactor = GetScaleFactorForLayoutRounding();
 
 			return new Thickness(
@@ -1308,7 +1308,7 @@ namespace Microsoft.UI.Xaml
 
 		internal Vector2 LayoutRound(Vector2 value)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			double scaleFactor = GetScaleFactorForLayoutRounding();
 
 			return new Vector2(
@@ -1322,7 +1322,7 @@ namespace Microsoft.UI.Xaml
 
 		internal Size LayoutRound(Size value)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			double scaleFactor = GetScaleFactorForLayoutRounding();
 
 			return new Size(
@@ -1334,7 +1334,7 @@ namespace Microsoft.UI.Xaml
 #endif
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private static double LayoutRound(double value, double scaleFactor)
 		{
 			double returnValue = value;

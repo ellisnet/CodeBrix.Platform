@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using CodeBrix.Audio.Playback;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
 using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
@@ -38,7 +37,7 @@ public static class SoundEffect
 	// Decoded, ready-to-mix audio, keyed by the same source string. Populated on first play rather
 	// than by Preload, because decoding starts the shared output device and Preload historically
 	// did not - an app that preloads and then pins the output format must keep working.
-	private static readonly ConcurrentDictionary<string, SoundEffectClip> _clips = new(StringComparer.Ordinal);
+	private static readonly ConcurrentDictionary<string, IDisposable> _clips = new(StringComparer.Ordinal);
 
 	/// <summary>
 	/// Loads the effect's bytes into the in-memory cache ahead of time, so the first
@@ -72,9 +71,9 @@ public static class SoundEffect
 		try
 		{
 			var clip = _clips.GetOrAdd(source, static key =>
-				SoundEffectClip.Load(_cache.GetOrAdd(key, AudioSourceResolver.ReadAllBytes)));
+				AudioPlatform.Output.LoadSoundEffect(_cache.GetOrAdd(key, AudioSourceResolver.ReadAllBytes)));
 
-			clip.Play((float)Math.Clamp(volume, 0.0, 1.0));
+			AudioPlatform.Output.PlaySoundEffect(clip, (float)Math.Clamp(volume, 0.0, 1.0));
 			return true;
 		}
 		catch (Exception e)
@@ -82,7 +81,7 @@ public static class SoundEffect
 			if (typeof(SoundEffect).Log().IsEnabled(LogLevel.Error))
 			{
 				typeof(SoundEffect).Log().Error(
-					AudioFailureExplanation.Amend($"The sound effect '{source}' could not be played.", source),
+					AudioPlatform.Output.ExplainFailure($"The sound effect '{source}' could not be played.", source),
 					e);
 			}
 			return false;
@@ -114,7 +113,7 @@ public static class SoundEffect
 			buffer.Position = 0;
 
 			// PlayOnce takes over the decoded audio's lifetime and releases it when the sound ends.
-			SoundEffectClip.PlayOnce(buffer, (float)Math.Clamp(volume, 0.0, 1.0));
+			AudioPlatform.Output.PlaySoundEffectOnce(buffer, (float)Math.Clamp(volume, 0.0, 1.0));
 			return true;
 		}
 		catch (Exception e)

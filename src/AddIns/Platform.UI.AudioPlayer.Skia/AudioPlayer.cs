@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
-using CodeBrix.Audio.Playback;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
+using CodeBrix.Platform.UI.AudioPlayer.Skia.Contracts;
+using CodeBrix.Platform.UI.AudioPlayer.Skia.Engine;
 using CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
 
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
@@ -32,20 +31,16 @@ namespace CodeBrix.Platform.UI.AudioPlayer.Skia;
 /// release"). <see cref="Duration"/> / <see cref="DurationSeconds"/> are available as soon as
 /// a source is loaded, so a Slider's Maximum can bind with no converter.
 /// </summary>
+//WPE1 C10: the transport (load, play/pause/stop, clamped and debounced seeking, position polling, looping, volume,
+//the natural end, the failure text) moved into the WinUI-free engine (Engine/AudioTransport, over the platform's
+//IAudioPlayerPlatform and Engine/ITickSource timers); this element wraps it and keeps the XAML half (the dependency
+//properties, the public events, the dispatcher, logging).
 [Bindable]
 public sealed partial class AudioPlayer : FrameworkElement
 {
-	// A Slider drag writes the bound position on every tick of thumb travel; the seek runs
-	// only after the value has been stable for this long, landing one seek per gesture.
-	private static readonly TimeSpan SeekDebounceInterval = TimeSpan.FromMilliseconds(200);
-
-	private readonly AudioFilePlayer _player = new();
-	private DispatcherQueueTimer? _positionTimer;
-	private DispatcherQueueTimer? _seekDebounceTimer;
-	private bool _updatingFromPlayback; // set while playback progress writes the position DPs
+	private readonly IAudioPlayerPlatform _player;
+	private readonly AudioTransport _transport;
 	private bool _syncingPositionPair;  // set while Position and PositionSeconds mirror each other
-	private TimeSpan _pendingSeek;
-	private bool _isSourceLoaded;
 
 	/// <summary>
 	/// Initializes a new audio player control.
@@ -56,6 +51,22 @@ public sealed partial class AudioPlayer : FrameworkElement
 	/// </remarks>
 	public AudioPlayer()
 	{
+		// The audio output is the platform's (decode and device playback); this element keeps the control API and
+		// the playback state.
+		_player = PlatformContract.Create<IAudioPlayerPlatform>(this);
+		_transport = new AudioTransport(
+			_player,
+			() => new DispatcherQueueTickSource(DispatcherQueue.CreateTimer()),
+			action => DispatcherQueue.TryEnqueue(() => action()));
+		_transport.IsPlayingChanged += isPlaying => IsPlaying = isPlaying;
+		_transport.PositionUpdated += position => Position = position;
+		_transport.DurationChanged += duration =>
+		{
+			Duration = duration;
+			DurationSeconds = duration.TotalSeconds;
+		};
+		_transport.PlaybackEnded += () => PlaybackEnded?.Invoke(this, EventArgs.Empty);
+		_transport.Failed += ReportFailure;
 		Unloaded += (_, _) => Pause();
 	}
 
@@ -175,7 +186,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 	/// <summary>Identifies the <see cref="Volume"/> dependency property.</summary>
 	public static readonly DependencyProperty VolumeProperty = DependencyProperty.Register(
 		nameof(Volume), typeof(double), typeof(AudioPlayer),
-		new PropertyMetadata(1.0, (o, e) => ((AudioPlayer)o)._player.Volume = (float)Math.Clamp((double)e.NewValue, 0.0, 1.0)));
+		new PropertyMetadata(1.0, (o, e) => ((AudioPlayer)o)._transport.Volume = (double)e.NewValue));
 
 	/// <summary>Playback volume from 0.0 (silent) to 1.0 (unity gain, the default).</summary>
 	public double Volume
@@ -187,7 +198,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 	/// <summary>Identifies the <see cref="IsLooping"/> dependency property.</summary>
 	public static readonly DependencyProperty IsLoopingProperty = DependencyProperty.Register(
 		nameof(IsLooping), typeof(bool), typeof(AudioPlayer),
-		new PropertyMetadata(false, (o, e) => ((AudioPlayer)o)._player.IsLooping = (bool)e.NewValue));
+		new PropertyMetadata(false, (o, e) => ((AudioPlayer)o)._transport.IsLooping = (bool)e.NewValue));
 
 	/// <summary>When true, playback restarts from the beginning at the end of the file.</summary>
 	public bool IsLooping
@@ -216,59 +227,19 @@ public sealed partial class AudioPlayer : FrameworkElement
 	#region | Transport |
 
 	/// <summary>Starts or resumes playback of the loaded source.</summary>
-	public void Play()
-	{
-		if (!_isSourceLoaded)
-		{
-			return;
-		}
-
-		try
-		{
-			_player.Play();
-		}
-		catch (Exception e)
-		{
-			ReportFailure("Playback could not be started.", e);
-			return;
-		}
-		IsPlaying = true;
-		StartPositionTimer();
-	}
+	public void Play() => _transport.Play();
 
 	/// <summary>Pauses playback, keeping the current position.</summary>
-	public void Pause()
-	{
-		_player.Pause();
-		IsPlaying = false;
-		StopPositionTimer();
-		RefreshPositionFromPlayback();
-	}
+	public void Pause() => _transport.Pause();
 
 	/// <summary>Stops playback and rewinds to the beginning.</summary>
-	public void Stop()
-	{
-		_player.Stop();
-		IsPlaying = false;
-		StopPositionTimer();
-		RefreshPositionFromPlayback();
-	}
+	public void Stop() => _transport.Stop();
 
 	/// <summary>
 	/// Jumps playback to <paramref name="position"/> immediately (no debounce); playback
 	/// continues from there when playing, or the position is remembered when paused.
 	/// </summary>
-	public void Seek(TimeSpan position)
-	{
-		if (!_isSourceLoaded)
-		{
-			return;
-		}
-
-		_seekDebounceTimer?.Stop();
-		_player.Seek(ClampToDuration(position));
-		RefreshPositionFromPlayback();
-	}
+	public void Seek(TimeSpan position) => _transport.Seek(position);
 
 	/// <summary>
 	/// Loads a source from a stream, in any format this player reads (for sources that are neither
@@ -283,7 +254,7 @@ public sealed partial class AudioPlayer : FrameworkElement
 		}
 
 		Source = "";
-		LoadCore(() => _player.Load(stream), "stream");
+		LoadCore(player => player.Load(stream), "stream");
 	}
 
 	#endregion
@@ -299,108 +270,26 @@ public sealed partial class AudioPlayer : FrameworkElement
 		}
 
 		LoadCore(
-			() =>
+			player =>
 			{
 				var (filePath, stream) = AudioSourceResolver.Resolve(newSource);
 				if (filePath is not null)
 				{
-					_player.Load(filePath);
+					player.Load(filePath);
 				}
 				else
 				{
-					_player.Load(stream!);
+					player.Load(stream!);
 				}
 			},
 			newSource);
 	}
 
-	private void LoadCore(Action load, string sourceDescription)
-	{
-		StopPositionTimer();
-		IsPlaying = false;
+	//The transport loads (off the synchronization context), applies the volume and looping, and plays when AutoPlay.
+	private void LoadCore(Action<IAudioPlayerPlatform> load, string sourceDescription) =>
+		_transport.Load(load, sourceDescription, Volume, IsLooping, AutoPlay);
 
-		try
-		{
-			RunOffSynchronizationContext(load);
-		}
-		catch (Exception e)
-		{
-			_isSourceLoaded = false;
-			Duration = TimeSpan.Zero;
-			DurationSeconds = 0.0;
-
-			// The engine's own message for an unregistered codec names the CONTAINER ("format
-			// 'ogg'"), which for an .opus file says neither what it is nor what to do; Amend adds
-			// that where it applies and leaves every other failure untouched.
-			ReportFailure(
-				AudioFailureExplanation.Amend($"The audio source '{sourceDescription}' could not be loaded.", sourceDescription),
-				e);
-			return;
-		}
-
-		_isSourceLoaded = true;
-		_player.Volume = (float)Math.Clamp(Volume, 0.0, 1.0);
-		_player.IsLooping = IsLooping;
-		_player.PlaybackEnded -= OnPlayerPlaybackEnded;
-		_player.PlaybackEnded += OnPlayerPlaybackEnded;
-
-		Duration = _player.Duration;
-		DurationSeconds = _player.Duration.TotalSeconds;
-		RefreshPositionFromPlayback();
-
-		if (AutoPlay)
-		{
-			Play();
-		}
-	}
-
-	/// <summary>
-	/// Runs a source load with no <see cref="SynchronizationContext"/> in scope, then waits for it.
-	/// </summary>
-	/// <remarks>
-	/// The audio metadata layer this control loads through reads its headers asynchronously and then
-	/// blocks on that read from its own synchronous entry point.
-	///
-	/// Loading is cheap and does not depend on file size - the player streams the file in chunks
-	/// rather than reading it into memory, so even a very large WAV opens in a few milliseconds and
-	/// waiting here is not perceptible.
-	/// </remarks>
-	private static void RunOffSynchronizationContext(Action load)
-	{
-		if (SynchronizationContext.Current is null)
-		{
-			load();
-			return;
-		}
-
-		// GetAwaiter().GetResult() rethrows the original exception rather than an AggregateException,
-		// so LoadCore's catch block still sees the real load failure.
-		Task.Run(load).GetAwaiter().GetResult();
-	}
-
-	private void UnloadSource()
-	{
-		StopPositionTimer();
-		IsPlaying = false;
-		_isSourceLoaded = false;
-		_player.Stop();
-		Duration = TimeSpan.Zero;
-		DurationSeconds = 0.0;
-		RefreshPositionFromPlayback();
-	}
-
-	private void OnPlayerPlaybackEnded(object? sender, EventArgs e)
-	{
-		// The engine raises PlaybackEnded on its audio thread; everything here must run on
-		// the UI thread.
-		DispatcherQueue.TryEnqueue(() =>
-		{
-			IsPlaying = false;
-			StopPositionTimer();
-			RefreshPositionFromPlayback();
-			PlaybackEnded?.Invoke(this, EventArgs.Empty);
-		});
-	}
+	private void UnloadSource() => _transport.Unload();
 
 	private void ReportFailure(string message, Exception error)
 	{
@@ -426,9 +315,9 @@ public sealed partial class AudioPlayer : FrameworkElement
 		PositionSeconds = newPosition.TotalSeconds;
 		_syncingPositionPair = false;
 
-		if (!_updatingFromPlayback)
+		if (!_transport.IsUpdatingFromPlayback)
 		{
-			QueueSeek(newPosition);
+			_transport.QueueSeek(newPosition);
 		}
 	}
 
@@ -443,76 +332,13 @@ public sealed partial class AudioPlayer : FrameworkElement
 		Position = TimeSpan.FromSeconds(newSeconds);
 		_syncingPositionPair = false;
 
-		if (!_updatingFromPlayback)
+		if (!_transport.IsUpdatingFromPlayback)
 		{
-			QueueSeek(TimeSpan.FromSeconds(newSeconds));
+			_transport.QueueSeek(TimeSpan.FromSeconds(newSeconds));
 		}
 	}
 
-	private void QueueSeek(TimeSpan position)
-	{
-		if (!_isSourceLoaded)
-		{
-			return;
-		}
-
-		_pendingSeek = position;
-		if (_seekDebounceTimer is null)
-		{
-			_seekDebounceTimer = DispatcherQueue.CreateTimer();
-			_seekDebounceTimer.Interval = SeekDebounceInterval;
-			_seekDebounceTimer.IsRepeating = false;
-			_seekDebounceTimer.Tick += (_, _) =>
-			{
-				if (_isSourceLoaded)
-				{
-					_player.Seek(ClampToDuration(_pendingSeek));
-				}
-			};
-		}
-
-		// Restarting on every write coalesces a whole slider drag into one seek on release.
-		_seekDebounceTimer.Stop();
-		_seekDebounceTimer.Start();
-	}
-
-	private void StartPositionTimer()
-	{
-		if (_positionTimer is null)
-		{
-			_positionTimer = DispatcherQueue.CreateTimer();
-			_positionTimer.Interval = PositionUpdateInterval;
-			_positionTimer.Tick += (_, _) => RefreshPositionFromPlayback();
-		}
-		_positionTimer.Start();
-	}
-
-	private void StopPositionTimer() => _positionTimer?.Stop();
-
-	private void OnPositionUpdateIntervalChanged(TimeSpan newInterval)
-	{
-		if (_positionTimer is not null)
-		{
-			_positionTimer.Interval = newInterval;
-		}
-	}
-
-	private void RefreshPositionFromPlayback()
-	{
-		_updatingFromPlayback = true;
-		Position = _isSourceLoaded ? _player.Position : TimeSpan.Zero;
-		_updatingFromPlayback = false;
-	}
-
-	private TimeSpan ClampToDuration(TimeSpan position)
-	{
-		var duration = _player.Duration;
-		if (position < TimeSpan.Zero)
-		{
-			return TimeSpan.Zero;
-		}
-		return duration > TimeSpan.Zero && position > duration ? duration : position;
-	}
+	private void OnPositionUpdateIntervalChanged(TimeSpan newInterval) => _transport.PositionUpdateInterval = newInterval;
 
 	#endregion
 }

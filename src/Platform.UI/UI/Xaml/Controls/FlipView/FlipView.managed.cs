@@ -1,4 +1,4 @@
-﻿#if __SKIA__
+﻿#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using System;
 using System.Collections;
 using System.Collections.Generic;

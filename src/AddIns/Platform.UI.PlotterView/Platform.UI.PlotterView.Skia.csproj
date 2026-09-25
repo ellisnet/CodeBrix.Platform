@@ -1,4 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.PlotterView: since the Core/Skia split, only the Skia implementations of the add-in's platform
+	contracts (the *.skia.cs files: the canvas supply, the add-in's software RenderCanvas, and the typeface source over
+	the framework text engine's font cache) and the package. The control and its drawing are in
+	CodeBrix.Platform.UI.PlotterView.Core (Platform.UI.PlotterView.Core.csproj), which this package carries beside this
+	assembly.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,7 +27,15 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.PlotterView.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
@@ -34,6 +49,10 @@
 		     measures its own text through SkiaSharp.HarfBuzz, which flows in transitively with the
 		     Plotter package below. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+
+		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
+		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->
+		<ProjectReference Include="Platform.UI.PlotterView.Core.csproj" CodeBrixBundleInPackage="true" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -63,4 +82,5 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="..\AddIn.CorePackaging.targets" />
 </Project>

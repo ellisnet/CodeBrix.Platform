@@ -21,11 +21,11 @@ internal sealed class GifFrameProvider : IFrameProvider
 	private bool _disposed;
 
 	// Note: The Timer will keep holding onto the ImageFrameProvider until stopped (it's a static root).
-	// But we only stop the timer when we dispose ImageFrameProvider from SkiaCompositionSurface finalizer.
-	// The onFrameChanged Action is also holding onto SkiaCompositionSurface.
-	// So, if ImageFrameProvider holds onto onFrameChanged, the SkiaCompositionSurface is never GC'ed.
+	// But we only stop the timer when we dispose ImageFrameProvider from PlatformCompositionSurface finalizer.
+	// The onFrameChanged Action is also holding onto PlatformCompositionSurface.
+	// So, if ImageFrameProvider holds onto onFrameChanged, the PlatformCompositionSurface is never GC'ed.
 	// That's why we make it a WeakReference.
-	// Note that SkiaCompositionSurface keeps an unused private field storing onFrameChanged so that it's not GC'ed early.
+	// Note that PlatformCompositionSurface keeps an unused private field storing onFrameChanged so that it's not GC'ed early.
 	internal GifFrameProvider(SKImage[] images, SKCodecFrameInfo[] frameInfos, long totalDuration, Action onFrameChanged)
 	{
 		_images = images;

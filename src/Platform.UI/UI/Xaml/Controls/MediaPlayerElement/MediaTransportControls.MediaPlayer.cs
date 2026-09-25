@@ -401,7 +401,7 @@ namespace Microsoft.UI.Xaml.Controls
 				_isVolumeRewindRequestedAndAudioIsPlaying = null;
 			}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			//For wasm use the PlaybackRate instead the UpdateTimePositionRate
 			_mediaPlayer.PlaybackRate =
 									_mediaPlayer.PlaybackRate <= 1 ? 2 : /*To stop the Rewind*/
@@ -446,7 +446,7 @@ namespace Microsoft.UI.Xaml.Controls
 				_isVolumeRewindRequestedAndAudioIsPlaying = _mediaPlayer.Volume;
 				_mediaPlayer.Volume = 0;
 			}
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (_mediaPlayer.PlaybackRate != 1)
 			{
 				_mediaPlayer.PlaybackRate = 1;

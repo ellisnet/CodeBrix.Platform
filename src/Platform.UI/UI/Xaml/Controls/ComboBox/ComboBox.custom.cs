@@ -506,7 +506,7 @@ public partial class ComboBox : Selector
 		if (ScrollViewer is { } sv && sv.Presenter is { } presenter)
 		{
 			var offsetXY = element.TransformToVisual(presenter).TransformPoint(
-#if __SKIA__ // Skia correctly doesn't include the offsets in TransformToVisual
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // Skia correctly doesn't include the offsets in TransformToVisual
 				new Point(presenter.HorizontalOffset, presenter.VerticalOffset)
 #else
 				Point.Zero

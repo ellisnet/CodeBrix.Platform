@@ -89,7 +89,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 
 			_lazyFlyout = new Lazy<DatePickerFlyout>(CreateFlyout);
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			_lazyFlyout = new Lazy<DatePickerFlyout>(() =>
 			{
 				// UseNativeStyle has to be inside the lambda because InitPartial is called in the constructor, at which point the user didn't yet had the chance to set UseNativeStyle.
@@ -111,10 +111,14 @@ namespace Microsoft.UI.Xaml.Controls
 
 			void OnPicked(DatePickerFlyout snd, DatePickedEventArgs evt)
 			{
+				var raisedBefore = m_dateChangedRaisedCount;
+
 				SelectedDate = evt.NewDate;
 				Date = evt.NewDate;
 
-				if (evt.NewDate != evt.OldDate)
+				// Setting Date raised DateChanged already (OnDateChanged) unless the picker is still initializing (no
+				// template applied yet) or the Date did not change: raise it here only then, so one pick is one event.
+				if (evt.NewDate != evt.OldDate && m_dateChangedRaisedCount == raisedBefore)
 				{
 					DateChanged?.Invoke(this, new DatePickerValueChangedEventArgs(evt.NewDate, evt.OldDate));
 				}

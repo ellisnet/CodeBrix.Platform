@@ -41,7 +41,7 @@ namespace Microsoft.UI.Xaml.Media
 		partial void InitFromResource(Uri uri)
 		{
 			// TODO: Unify
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			AbsoluteUri = uri;
 #else
 			var path = uri.PathAndQuery.TrimStart("/");

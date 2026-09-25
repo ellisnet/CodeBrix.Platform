@@ -7,6 +7,7 @@ using System.Linq;
 
 using CodeBrix.Platform.UI.AdvancedTextEdit.Document;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Editing;
+using CodeBrix.Platform.UI.AdvancedTextEdit.Engine;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Rendering;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Utils;
 
@@ -16,6 +17,9 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Folding;
 //Transliterated; the weak document listener runs through this port's WeakEventManagerBase shim
 //(same public shape as the WPF weak event manager). The commented-out upstream DemoMode/clip
 //helper (sample-only dead code) was not carried over.
+//WPE1 C8: the manager talks to its views through IFoldingHost (Engine/IFoldingHost; a TextView is
+//wrapped in a TextViewFoldingHost) instead of keeping TextViews, so the folding model runs without
+//the XAML object model (the engine proof in src/Platform.UI.Engine.Tests).
 
 /// <summary>
 /// Stores a list of foldings for a specific TextView and TextDocument.
@@ -24,7 +28,8 @@ public class FoldingManager : IWeakEventListener
 {
 	internal readonly TextDocument document;
 
-	internal readonly List<TextView> textViews = new List<TextView>();
+	/// <summary>The views that show the foldings (a TextView through TextViewFoldingHost).</summary>
+	internal readonly List<IFoldingHost> hosts = new List<IFoldingHost>();
 	readonly TextSegmentCollection<FoldingSection> foldings;
 	bool isFirstUpdate = true;
 
@@ -84,30 +89,65 @@ public class FoldingManager : IWeakEventListener
 	#region Manage TextViews
 	internal void AddToTextView(TextView textView)
 	{
-		if (textView == null || textViews.Contains(textView))
+		if (textView == null || IndexOfTextView(textView) >= 0)
 			throw new ArgumentException();
-		textViews.Add(textView);
+		AddHost(new TextViewFoldingHost(textView));
+	}
+
+	internal void RemoveFromTextView(TextView textView)
+	{
+		int pos = IndexOfTextView(textView);
+		if (pos < 0)
+			throw new ArgumentException();
+		RemoveHostAt(pos);
+	}
+
+	/// <summary>Whether this manager shows its foldings in <paramref name="textView"/>.</summary>
+	internal bool IsShownIn(TextView textView) => IndexOfTextView(textView) >= 0;
+
+	int IndexOfTextView(TextView textView)
+	{
+		for (int i = 0; i < hosts.Count; i++)
+		{
+			if (hosts[i] is TextViewFoldingHost host && host.TextView == textView)
+				return i;
+		}
+		return -1;
+	}
+
+	/// <summary>Adds a view that shows the foldings (the engine entry point; a TextView goes through AddToTextView).</summary>
+	internal void AddHost(IFoldingHost host)
+	{
+		if (host == null || hosts.Contains(host))
+			throw new ArgumentException();
+		hosts.Add(host);
 		foreach (FoldingSection fs in foldings)
 		{
 			if (fs.collapsedSections != null)
 			{
-				Array.Resize(ref fs.collapsedSections, textViews.Count);
+				Array.Resize(ref fs.collapsedSections, hosts.Count);
 				fs.ValidateCollapsedLineSections();
 			}
 		}
 	}
 
-	internal void RemoveFromTextView(TextView textView)
+	/// <summary>Removes a view added with <see cref="AddHost"/>.</summary>
+	internal void RemoveHost(IFoldingHost host)
 	{
-		int pos = textViews.IndexOf(textView);
+		int pos = hosts.IndexOf(host);
 		if (pos < 0)
 			throw new ArgumentException();
-		textViews.RemoveAt(pos);
+		RemoveHostAt(pos);
+	}
+
+	void RemoveHostAt(int pos)
+	{
+		hosts.RemoveAt(pos);
 		foreach (FoldingSection fs in foldings)
 		{
 			if (fs.collapsedSections != null)
 			{
-				var c = new CollapsedLineSection?[textViews.Count];
+				var c = new CollapsedLineSection?[hosts.Count];
 				Array.Copy(fs.collapsedSections, 0, c, 0, pos);
 				fs.collapsedSections[pos]?.Uncollapse();
 				Array.Copy(fs.collapsedSections, pos + 1, c, pos, c.Length - pos);
@@ -118,14 +158,14 @@ public class FoldingManager : IWeakEventListener
 
 	internal void Redraw()
 	{
-		foreach (TextView textView in textViews)
-			textView.Redraw();
+		foreach (IFoldingHost host in hosts)
+			host.Redraw();
 	}
 
 	internal void Redraw(FoldingSection fs)
 	{
-		foreach (TextView textView in textViews)
-			textView.Redraw(fs);
+		foreach (IFoldingHost host in hosts)
+			host.Redraw(fs);
 	}
 	#endregion
 

@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
 
 #if false
 using Java.Util;
 #elif false
 using Foundation;
-#elif __SKIA__
-using Windows.WinRT;
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+using CodeBrix.Platform.Contracts;
 #endif
 
 namespace Windows.System.UserProfile;
@@ -16,42 +15,22 @@ namespace Windows.System.UserProfile;
 public static partial class GlobalizationPreferences
 {
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+	private static IGlobalizationPreferencesPlatform _preferencesPlatform;
+
 	public static IReadOnlyList<string> Languages =>
 #if false
 		new[] { Locale.Default.ToLanguageTag() };
 #elif false
 		NSLocale.PreferredLanguages;
-#elif __SKIA__
-		OperatingSystem.IsWindows() ? GetWinUserLanguageList() : Array.Empty<string>();
+#else
+		PreferencesPlatform.Languages;
 #endif
-#endif
 
-#if __SKIA__
-	private static string[] GetWinUserLanguageList()
-	{
-		if (NativeMethods.EnsureLanguageProfileExists() >= 0)
-		{
-			const char Delimiter = ';';
-			if (NativeMethods.GetUserLanguages(Delimiter, out var handle) >= 0)
-			{
-				var languages = MarshalString.FromAbi(handle).Split(Delimiter);
-				MarshalString.DisposeAbi(handle);
-
-				return languages;
-			}
-		}
-
-		return Array.Empty<string>();
-	}
-
-	private static class NativeMethods
-	{
-		[DllImport("winlangdb.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern int EnsureLanguageProfileExists();
-
-		[DllImport("bcp47langs.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-		public static extern int GetUserLanguages(char Delimiter, out IntPtr UserLanguages);
-	}
+	/// <summary>
+	/// Gets the platform that reports the user's preferred languages, resolved once on first use.
+	/// </summary>
+	private static IGlobalizationPreferencesPlatform PreferencesPlatform =>
+		_preferencesPlatform ??= PlatformContract.Resolve<IGlobalizationPreferencesPlatform>();
 #endif
 }

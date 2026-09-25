@@ -34,7 +34,7 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Editing;
 [Microsoft.UI.Xaml.Data.Bindable]
 public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 {
-	readonly RenderCanvas renderCanvas = new RenderCanvas();
+	readonly FrameworkElement renderCanvas = RenderCanvasSupply.Create();
 
 	/// <summary>
 	/// Creates a new instance of a LineNumberMargin
@@ -43,7 +43,7 @@ public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 	{
 		//was previously: FlowDirection was forced LeftToRight to override property value
 		//inheritance; the canvas paints left-to-right regardless in this port.
-		renderCanvas.Paint += RenderCanvasPaint;
+		RenderCanvasSupply.AddPaintHandler(renderCanvas, RenderCanvasPaint);
 		Children.Add(renderCanvas);
 
 		//was previously: a HitTestCore override accepted clicks on the transparent background.
@@ -81,7 +81,7 @@ public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 
 	static void OnForegroundChanged(DependencyObject dp, DependencyPropertyChangedEventArgs e)
 	{
-		((LineNumberMargin)dp).renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(((LineNumberMargin)dp).renderCanvas);
 	}
 
 	TextRunDescriptor CreateRun(string text)
@@ -112,7 +112,7 @@ public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 	protected override Size ArrangeOverride(Size finalSize)
 	{
 		renderCanvas.Arrange(new Rect(new Point(0, 0), finalSize));
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 		return finalSize;
 	}
 
@@ -159,7 +159,7 @@ public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 		{
 			textArea = null;
 		}
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 	}
 
 	/// <inheritdoc/>
@@ -218,13 +218,13 @@ public partial class LineNumberMargin : AbstractMargin, IWeakEventListener
 		{
 			maxLineNumberLength = newLength;
 			InvalidateMeasure();
-			renderCanvas.Invalidate();
+			RenderCanvasSupply.Invalidate(renderCanvas);
 		}
 	}
 
 	void TextViewVisualLinesChanged(object? sender, EventArgs e)
 	{
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 	}
 
 	AnchorSegment? selectionStart;

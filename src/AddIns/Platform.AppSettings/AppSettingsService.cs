@@ -31,6 +31,8 @@
 //
 
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization.Metadata;
 
 namespace CodeBrix.Platform.AppSettings; //was previously: Doom.Brix.Settings.SettingsService (and MonoDevelop.Core.PropertyService before that)
 
@@ -96,20 +98,47 @@ public static class AppSettingsService
     }
 
     /// <summary>Wraps a setting in a typed <see cref="AppSettingProperty{T}"/> handle.</summary>
+    [RequiresUnreferencedCode(AppSettingsStore.ReflectionSerializationMessage)]
+    [RequiresDynamicCode(AppSettingsStore.ReflectionSerializationMessage)]
     public static AppSettingProperty<T> Wrap<T>(string key, T defaultValue) =>
         AppSettingProperty.Create(key, defaultValue);
+
+    /// <summary>
+    /// Wraps a setting in a typed <see cref="AppSettingProperty{T}"/> handle whose value is serialized with
+    /// <paramref name="jsonTypeInfo"/> (no reflection: the form a trimmed or native AOT application uses).
+    /// </summary>
+    public static AppSettingProperty<T> Wrap<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo) =>
+        AppSettingProperty.Create(key, defaultValue, jsonTypeInfo);
 
     /// <summary>Whether a value is stored for the given key.</summary>
     public static bool HasValue(string key) => Store.HasValue(key);
 
     /// <summary>Returns the stored value for the key, or the given default when not set.</summary>
+    [RequiresUnreferencedCode(AppSettingsStore.ReflectionSerializationMessage)]
+    [RequiresDynamicCode(AppSettingsStore.ReflectionSerializationMessage)]
     public static T Get<T>(string key, T defaultValue) => Store.Get(key, defaultValue);
 
     /// <summary>Returns the stored value for the key, or the type's default when not set.</summary>
+    [RequiresUnreferencedCode(AppSettingsStore.ReflectionSerializationMessage)]
+    [RequiresDynamicCode(AppSettingsStore.ReflectionSerializationMessage)]
     public static T? Get<T>(string key) => Store.Get<T>(key);
 
     /// <summary>Stores a value for the key; a null value removes the key.</summary>
+    [RequiresUnreferencedCode(AppSettingsStore.ReflectionSerializationMessage)]
+    [RequiresDynamicCode(AppSettingsStore.ReflectionSerializationMessage)]
     public static void Set(string key, object? value) => Store.Set(key, value);
+
+    /// <summary>
+    /// Returns the stored value for the key, or the given default when not set; read with
+    /// <paramref name="jsonTypeInfo"/> (no reflection: the form a trimmed or native AOT application uses).
+    /// </summary>
+    public static T Get<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo) => Store.Get(key, defaultValue, jsonTypeInfo);
+
+    /// <summary>
+    /// Stores a value for the key, serialized with <paramref name="jsonTypeInfo"/> (no reflection: the form a trimmed
+    /// or native AOT application uses); a null value removes the key.
+    /// </summary>
+    public static void Set<T>(string key, T? value, JsonTypeInfo<T> jsonTypeInfo) => Store.Set(key, value, jsonTypeInfo);
 
     /// <summary>Registers a handler raised when the given key's value changes.</summary>
     public static void AddSettingHandler(string key, EventHandler<AppSettingChangedEventArgs> handler) =>

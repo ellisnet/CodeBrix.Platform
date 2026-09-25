@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.VideoPlayer.Core: the platform-neutral part of the VideoPlayer add-in - the element's rules
+	(when the render path may change, how a seek is clamped to the media), the video source resolver (file path,
+	file://, http(s)://, ms-appx:///, embedded://) and the MediaFailed event args. It references only the
+	platform-neutral framework Core assemblies: no SkiaSharp and no CodeBrix.VideoPlayback.
+	The VideoPlayer element itself is in the Skia project in this folder (Platform.UI.VideoPlayer.Skia.csproj, assembly
+	CodeBrix.Platform.UI.VideoPlayer.Skia), next to CodeBrix.VideoPlayback decoding and presentation: its public API is
+	made of CodeBrix.VideoPlayback types (CaptionTrack, Chapter, VideoRenderPath, IVideoFrameEffect...) and SkiaSharp
+	types (IVideoLayer.Draw(SKCanvas...), VideoComposingEventArgs.Canvas, CapturePresentedFrame() : SKImage). That
+	project carries the package, with this assembly inside it.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.VideoPlayer.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.VideoPlayer.Skia</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the VideoPlayer package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+	</ItemGroup>
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+</Project>

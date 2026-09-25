@@ -232,7 +232,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 			if (_playbackRateFlyout is { })
 			{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				_playbackRateFlyout.Placement = FlyoutPlacementMode.RightEdgeAlignedTop;
 #else
 				_playbackRateFlyout.Placement = FlyoutPlacementMode.Top;
@@ -974,7 +974,7 @@ namespace Microsoft.UI.Xaml.Controls
 				case var _ when property == IsFullWindowButtonVisibleProperty:
 #if HAS_CODEBRIX // Currently full screen mode is not supported by the control on Skia targets
 					var isVisible =
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 					IsFullWindowButtonVisible;
 #else
 					false;
@@ -1823,7 +1823,7 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 #if HAS_CODEBRIX // Currently full screen mode is not supported by the control on Skia targets
 				var alwaysCollapsed =
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 					false;
 #else
 					true;

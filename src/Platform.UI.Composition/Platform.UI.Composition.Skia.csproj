@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Composition: since the Core/Skia split, the Skia half of the composition assembly. It compiles
+	ONLY the *.skia.cs files (the Skia painting of the Visual tree, brushes, clips and surfaces) and references
+	CodeBrix.Platform.UI.Composition.Core (Platform.UI.Composition.Core.csproj), which holds the composition API.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,12 +25,17 @@
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
 
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.Composition.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
 		<UseCommonOverridePackage>true</UseCommonOverridePackage>
 		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="AssemblyInfo.skia.cs" />
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.skia.cs" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -33,18 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj" Condition="'$(SyncGeneratorRunning)'!='true'" />
-		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" Condition="'$(SyncGeneratorRunning)'=='true'" />
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" Condition="'$(SyncGeneratorRunning)'!='true'" />
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" Condition="'$(SyncGeneratorRunning)'=='true'" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Include="..\Platform.UI\UI\Xaml\CornerRadius.cs" />
-		<Compile Include="..\Platform.UI\UI\Xaml\FullCornerRadius.cs" />
-		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.cs" />
-		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.skia.cs" />
-		<Compile Include="..\Platform.UI\UI\Xaml\Thickness.cs" />
+		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Core.csproj" />
 	</ItemGroup>
 
 </Project>

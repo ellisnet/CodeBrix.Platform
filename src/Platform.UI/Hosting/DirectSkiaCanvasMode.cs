@@ -3,7 +3,7 @@
 namespace CodeBrix.Platform.UI.Hosting; //Was previously: Uno.UI.Hosting
 
 /// <summary>
-/// App-wide switch for the opt-in direct <see cref="SkiaSharp.Views.Windows.SKXamlCanvas"/> present
+/// App-wide switch for the opt-in direct <c>SkiaSharp.Views.Windows.SKXamlCanvas</c> present
 /// path. When enabled, <c>SKXamlCanvas</c> draws each frame straight into its on-screen
 /// <c>WriteableBitmap</c> buffer instead of drawing into an intermediate staging buffer and copying,
 /// removing one full-frame copy per paint.

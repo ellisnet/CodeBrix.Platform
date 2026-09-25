@@ -15,12 +15,6 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location));
 
-			DeleteDirectoryIfExists(@"..\..\..\Platform.UI\Generated\");
-			DeleteDirectoryIfExists(@"..\..\..\Platform.UWP\Generated\");
-			DeleteDirectoryIfExists(@"..\..\..\Platform.Foundation\Generated\");
-			DeleteDirectoryIfExists(@"..\..\..\Platform.UI.Composition\Generated\");
-			DeleteDirectoryIfExists(@"..\..\..\Platform.UI.Dispatching\Generated\");
-
 			if (args.Length == 0)
 			{
 				Console.WriteLine("No mode selected. Supported modes: doc, sync & all.");
@@ -28,6 +22,18 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			}
 
 			var mode = args[0].ToLowerInvariant();
+			if (mode != SyncMode && mode != DocMode && mode != AllMode)
+			{
+				Console.WriteLine($"Unknown mode '{args[0]}'. Supported modes: doc, sync & all.");
+				return;
+			}
+
+			// Only now, with a valid mode: a run with no or a mistyped mode used to wipe every Generated folder first.
+			DeleteDirectoryIfExists(Path.Combine("..", "..", "..", "Platform.UI", "Generated"));
+			DeleteDirectoryIfExists(Path.Combine("..", "..", "..", "Platform.UWP", "Generated"));
+			DeleteDirectoryIfExists(Path.Combine("..", "..", "..", "Platform.Foundation", "Generated"));
+			DeleteDirectoryIfExists(Path.Combine("..", "..", "..", "Platform.UI.Composition", "Generated"));
+			DeleteDirectoryIfExists(Path.Combine("..", "..", "..", "Platform.UI.Dispatching", "Generated"));
 
 			if (mode == SyncMode || mode == AllMode)
 			{

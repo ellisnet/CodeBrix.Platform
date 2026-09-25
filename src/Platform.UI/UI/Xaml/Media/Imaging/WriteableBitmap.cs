@@ -32,21 +32,21 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 
 		public void Invalidate()
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			InvalidateSource();
 #endif
 			InvalidateImageSource();
 		}
 
 		private protected
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			unsafe
 #endif
 			override void OnSetSource()
 		{
 			UpdateBuffer();
 
-#if __SKIA__ // TODO: Other platforms.
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // TODO: Other platforms.
 			DecodeStreamIntoBuffer();
 #endif
 		}

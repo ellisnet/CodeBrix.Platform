@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Composition.Core: the platform-neutral half of the composition API (the Visual tree, brushes,
+	clips, shapes, animations; the shared tree only). No SkiaSharp reference: the Skia half
+	(Platform.UI.Composition.Skia.csproj, assembly CodeBrix.Platform.UI.Composition) paints it.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Composition.Core</AssemblyName>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX_COMPOSITION</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<RootNamespace>CodeBrix.Platform.UI.Composition</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX</DefineConstants>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UWP\Platform.Core.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Include="..\Platform.UI\UI\Xaml\CornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\FullCornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\NonUniformCornerRadius.cs" />
+		<Compile Include="..\Platform.UI\UI\Xaml\Thickness.cs" />
+	</ItemGroup>
+
+</Project>

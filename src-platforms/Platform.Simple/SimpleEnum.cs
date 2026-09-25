@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -11,10 +12,14 @@ namespace CodeBrix.Platform.Simple;
 public interface ISimpleEnumInfo
 {
     string Description { get; }
+
+    // Trimming: not annotated on purpose - an annotated return value on a public property makes every trimmed
+    // application that keeps the info type's properties warn (IL2111). SimpleEnumHelper relies on EnumType being
+    // typeof(TEnum) of a SimpleEnumInfo<TEnum>, whose TEnum is annotated (see CheckDictionaries).
     Type EnumType { get; }
 }
 
-public abstract class SimpleEnumInfo<TEnum> : ISimpleEnumInfo
+public abstract class SimpleEnumInfo<[DynamicallyAccessedMembers(SimpleEnumHelper.EnumTypeMembers)] TEnum> : ISimpleEnumInfo
     where TEnum : Enum
 {
     public TEnum Member { get; }
@@ -29,11 +34,11 @@ public abstract class SimpleEnumInfo<TEnum> : ISimpleEnumInfo
         Member = member;
     }
 
-    protected static TInfo FindInfo<TInfo>(TEnum member)
+    protected static TInfo FindInfo<[DynamicallyAccessedMembers(SimpleEnumHelper.InfoTypeMembers)] TInfo>(TEnum member)
         where TInfo : class, ISimpleEnumInfo =>
         SimpleEnumHelper.FindMemberInfo<TEnum, TInfo>(member);
 
-    protected static Dictionary<TEnum, TInfo> GetDictionary<TInfo>()
+    protected static Dictionary<TEnum, TInfo> GetDictionary<[DynamicallyAccessedMembers(SimpleEnumHelper.InfoTypeMembers)] TInfo>()
         where TInfo : class, ISimpleEnumInfo =>
         SimpleEnumHelper.GetInfoDictionary<TEnum, TInfo>();
 
@@ -47,12 +52,14 @@ public abstract class SimpleEnumInfo<TEnum> : ISimpleEnumInfo
 
 public interface ISimpleEnumInfoAttribute
 {
+    // Trimming: SimpleEnumHelper reads the info type's static properties by reflection.
+    [DynamicallyAccessedMembers(SimpleEnumHelper.InfoTypeMembers)]
     Type InfoType { get; }
     string InfoMemberName { get; }
 }
 
 [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-public sealed class SimpleEnumAttribute<TInfo> : Attribute, ISimpleEnumInfoAttribute
+public sealed class SimpleEnumAttribute<[DynamicallyAccessedMembers(SimpleEnumHelper.InfoTypeMembers)] TInfo> : Attribute, ISimpleEnumInfoAttribute
     where TInfo : class, ISimpleEnumInfo
 {
     public SimpleEnumAttribute(string infoMemberName) =>
@@ -62,6 +69,7 @@ public sealed class SimpleEnumAttribute<TInfo> : Attribute, ISimpleEnumInfoAttri
 
     #region | ISimpleEnumInfoAttribute implementation |
 
+    [DynamicallyAccessedMembers(SimpleEnumHelper.InfoTypeMembers)]
     public Type InfoType => typeof(TInfo);
     public string InfoMemberName { get; }
 
@@ -70,6 +78,18 @@ public sealed class SimpleEnumAttribute<TInfo> : Attribute, ISimpleEnumInfoAttri
 
 public static class SimpleEnumHelper
 {
+    /// <summary>
+    /// What trimming must keep of an enum type: every public member, because its members are looked up by name with
+    /// Type.GetMember (for their SimpleEnumAttribute).
+    /// </summary>
+    internal const DynamicallyAccessedMemberTypes EnumTypeMembers =
+        DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicMethods
+        | DynamicallyAccessedMemberTypes.PublicFields | DynamicallyAccessedMemberTypes.PublicNestedTypes
+        | DynamicallyAccessedMemberTypes.PublicProperties | DynamicallyAccessedMemberTypes.PublicEvents;
+
+    /// <summary>What trimming must keep of an info type: its public (static) properties, the enum's info instances.</summary>
+    internal const DynamicallyAccessedMemberTypes InfoTypeMembers = DynamicallyAccessedMemberTypes.PublicProperties;
+
     // ReSharper disable InconsistentNaming
 
     private static readonly Lock Locker = new();
@@ -82,7 +102,17 @@ public static class SimpleEnumHelper
 
     // ReSharper restore InconsistentNaming
 
-    private static bool CheckDictionaries(Type enumType = null, Type infoType = null)
+    [UnconditionalSuppressMessage("Trimming", "IL2072",
+        Justification = "enumType comes from ISimpleEnumInfo.EnumType only when the caller named no enum type; every info "
+            + "instance is a SimpleEnumInfo<TEnum> whose EnumType is typeof(TEnum), and TEnum is annotated with EnumTypeMembers "
+            + "on that class, so the enum's members are kept whenever such an info exists.")]
+    [UnconditionalSuppressMessage("Trimming", "IL2075",
+        Justification = "enumType comes from ISimpleEnumInfo.EnumType only when the caller named no enum type; every info "
+            + "instance is a SimpleEnumInfo<TEnum> whose EnumType is typeof(TEnum), and TEnum is annotated with EnumTypeMembers "
+            + "on that class, so the enum's members are kept whenever such an info exists.")]
+    private static bool CheckDictionaries(
+        [DynamicallyAccessedMembers(EnumTypeMembers)] Type enumType = null,
+        [DynamicallyAccessedMembers(InfoTypeMembers)] Type infoType = null)
     {
         var dictionariesExist = false;
 
@@ -133,8 +163,11 @@ public static class SimpleEnumHelper
                     }
                     if (enumType == null) { break; }
 
-                    foreach (var member in Enum.GetValues(enumType))
+                    // GetValuesAsUnderlyingType + ToObject: the same members in the same order as Enum.GetValues(Type),
+                    // without creating an array of the enum type at run time (native AOT safe).
+                    foreach (var rawMember in Enum.GetValuesAsUnderlyingType(enumType))
                     {
+                        var member = Enum.ToObject(enumType, rawMember);
                         var memberName = member.ToString();
                         if (memberName != null)
                         {
@@ -198,7 +231,7 @@ public static class SimpleEnumHelper
         return dictionariesExist;
     }
 
-    public static TInfo FindMemberInfo<TInfo>(string memberName)
+    public static TInfo FindMemberInfo<[DynamicallyAccessedMembers(InfoTypeMembers)] TInfo>(string memberName)
         where TInfo : class, ISimpleEnumInfo
     {
         TInfo result = null;
@@ -207,7 +240,7 @@ public static class SimpleEnumHelper
         {
             var infoType = typeof(TInfo);
 
-            if (CheckDictionaries(infoType: infoType)
+            if (CheckDictionaries(null, infoType)
                 && InfoDictionary.TryGetValue(infoType, out var dictionary))
             {
                 if (dictionary.Any(a => a.Key.Equals(memberName.Trim(),
@@ -225,7 +258,7 @@ public static class SimpleEnumHelper
         return result;
     }
 
-    public static TInfo FindMemberInfo<TEnum, TInfo>(TEnum member)
+    public static TInfo FindMemberInfo<[DynamicallyAccessedMembers(EnumTypeMembers)] TEnum, [DynamicallyAccessedMembers(InfoTypeMembers)] TInfo>(TEnum member)
         where TInfo : class, ISimpleEnumInfo
         where TEnum : Enum
     {
@@ -236,7 +269,7 @@ public static class SimpleEnumHelper
         {
             var infoType = typeof(TInfo);
 
-            if (CheckDictionaries(infoType: infoType)
+            if (CheckDictionaries(null, infoType)
                 && InfoDictionary.TryGetValue(infoType, out var dictionary))
             {
                 if (dictionary.Any(a => a.Key.Equals(member.ToString(),
@@ -258,7 +291,7 @@ public static class SimpleEnumHelper
         return result;
     }
 
-    public static Dictionary<TEnum, TInfo> GetInfoDictionary<TEnum, TInfo>()
+    public static Dictionary<TEnum, TInfo> GetInfoDictionary<[DynamicallyAccessedMembers(EnumTypeMembers)] TEnum, [DynamicallyAccessedMembers(InfoTypeMembers)] TInfo>()
         where TInfo : class, ISimpleEnumInfo
         where TEnum : Enum
     {
@@ -270,7 +303,8 @@ public static class SimpleEnumHelper
         if (CheckDictionaries(enumType: enumType, infoType: typeof(TInfo))
             && EnumDictionary.TryGetValue(enumType, out var dictionary))
         {
-            foreach (var member in Enum.GetValues(enumType).Cast<TEnum>())
+            // Same members and order as Enum.GetValues(Type).Cast<TEnum>(), native AOT safe.
+            foreach (var member in Enum.GetValuesAsUnderlyingType(enumType).Cast<object>().Select(raw => (TEnum)Enum.ToObject(enumType, raw)))
             {
                 //Members without a SimpleEnumAttribute are stored with a null info value
                 //  (see CheckDictionaries), so the null check must come before GetType().
@@ -293,7 +327,7 @@ public static class SimpleEnumHelper
         return result;
     }
 
-    public static IList<TInfo> GetPossibleValues<TEnum, TInfo>()
+    public static IList<TInfo> GetPossibleValues<[DynamicallyAccessedMembers(EnumTypeMembers)] TEnum, [DynamicallyAccessedMembers(InfoTypeMembers)] TInfo>()
         where TInfo : class, ISimpleEnumInfo
         where TEnum : Enum =>
         GetInfoDictionary<TEnum, TInfo>()

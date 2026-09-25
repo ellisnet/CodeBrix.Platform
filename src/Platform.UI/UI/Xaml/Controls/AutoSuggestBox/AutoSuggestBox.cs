@@ -441,6 +441,41 @@ namespace Microsoft.UI.Xaml.Controls
 			SubmitSearch(null);
 		}
 
+		/// <summary>
+		/// Raise entry point for a platform handler: the user submitted a query (the native search action, or a chosen
+		/// suggestion). Raises QuerySubmitted with the current text and closes the suggestion list.
+		/// </summary>
+		/// <param name="chosenItem">The chosen suggestion, or <see langword="null"/> for a query of the typed text.</param>
+		internal void SubmitQueryFromPlatform(object chosenItem)
+		{
+			if (_textBox is not null)
+			{
+				SubmitSearch(chosenItem);
+				return;
+			}
+
+			QuerySubmitted?.Invoke(this, new AutoSuggestBoxQuerySubmittedEventArgs(chosenItem, Text));
+
+			IsSuggestionListOpen = false;
+		}
+
+		/// <summary>
+		/// Raise entry point for a platform handler: the native text field's text changed. Sets Text and raises
+		/// TextChanged with <paramref name="reason"/> (a template's inner TextBox, when there is one, raises it itself).
+		/// </summary>
+		/// <param name="text">The new text.</param>
+		/// <param name="reason">Why the text changed.</param>
+		internal void SetTextFromPlatform(string text, AutoSuggestionBoxTextChangeReason reason)
+		{
+			_textChangeReason = reason;
+			Text = text ?? "";
+
+			if (_textBox is null)
+			{
+				OnTextChanged(isUserModifyingText: reason == AutoSuggestionBoxTextChangeReason.UserInput);
+			}
+		}
+
 		private void SubmitSearch(object item)
 		{
 			QuerySubmitted?.Invoke(this, new AutoSuggestBoxQuerySubmittedEventArgs(item, _textBox.Text));

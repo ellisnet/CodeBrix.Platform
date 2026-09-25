@@ -176,7 +176,7 @@ internal abstract partial class BaseWindowImplementation : IWindowImplementation
 		_lastSize = size;
 
 		OnSizeChanged(size);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		XamlRoot?.InvalidateMeasure(); //TODO:MZ: Should notify before or after?
 #endif
 		var windowSizeChanged = new WindowSizeChangedEventArgs(size);

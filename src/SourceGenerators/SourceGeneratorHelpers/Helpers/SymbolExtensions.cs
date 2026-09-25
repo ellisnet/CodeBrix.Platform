@@ -417,7 +417,8 @@ namespace Microsoft.CodeAnalysis
 			return type?.GetFullyQualifiedTypeExcludingGlobal();
 		}
 
-		// forRegisterAttributeDotReplacement is used specifically by NativeCtorsGenerator to generate for the Android/iOS RegisterAttribute
+		// forRegisterAttributeDotReplacement was used only by the removed NativeCtorsGenerator (the Android/iOS RegisterAttribute of the
+		// upstream native heads); no caller passes it any more.
 		// A non-null value means we are generating for RegisterAttribute, and we replace invalid characters with '_'.
 		// The '.' is special cased to be replaced by the value of forRegisterAttributeDotReplacement, whether it's '_' or '/'
 		public static string GetFullMetadataName(this ITypeSymbol symbol, char? forRegisterAttributeDotReplacement = null)

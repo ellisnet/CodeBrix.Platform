@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage.Streams
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Buffer : global::Windows.Storage.Streams.IBuffer
@@ -15,15 +15,15 @@ namespace Windows.Storage.Streams
 		// Forced skipping of method Windows.Storage.Streams.Buffer.Capacity.get
 		// Forced skipping of method Windows.Storage.Streams.Buffer.Length.get
 		// Forced skipping of method Windows.Storage.Streams.Buffer.Length.set
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Windows.Storage.Streams.Buffer CreateCopyFromMemoryBuffer(global::Windows.Foundation.IMemoryBuffer input)
 		{
 			throw new global::System.NotImplementedException("The member Buffer Buffer.CreateCopyFromMemoryBuffer(IMemoryBuffer input) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Windows.Foundation.MemoryBuffer CreateMemoryBufferOverIBuffer(global::Windows.Storage.Streams.IBuffer input)
 		{
 			throw new global::System.NotImplementedException("The member MemoryBuffer Buffer.CreateMemoryBufferOverIBuffer(IBuffer input) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

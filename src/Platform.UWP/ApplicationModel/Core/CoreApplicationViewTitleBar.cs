@@ -4,7 +4,7 @@ using System;
 
 namespace Windows.ApplicationModel.Core
 {
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CoreApplicationViewTitleBar
@@ -13,7 +13,7 @@ namespace Windows.ApplicationModel.Core
 		internal event Action ExtendViewIntoTitleBarChanged;
 #pragma warning restore 67
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[global::CodeBrix.Platform.NotImplemented]
 		public bool ExtendViewIntoTitleBar
 		{

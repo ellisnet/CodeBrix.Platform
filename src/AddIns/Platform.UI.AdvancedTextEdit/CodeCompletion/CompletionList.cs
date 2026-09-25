@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using CodeBrix.Platform.UI.AdvancedTextEdit.Engine;
 
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -23,6 +24,8 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.CodeCompletion;
 //  double-click became DoubleTapped, and EmptyTemplate (a ControlTemplate) became the
 //  EmptyContent element property.
 //- SelectionChanged is a plain .NET event carrying data items (not a re-exposed routed event).
+//- WPE1 C8: the match quality, CamelCase match and ranking moved verbatim into the WinUI-free
+//  Engine/CompletionFilter (generic over the item); this list keeps its state and the list box.
 
 /// <summary>
 /// The completion list control used inside the CompletionWindow; hosts a CompletionListBox.
@@ -399,33 +402,12 @@ public partial class CompletionList : Control
 							query.StartsWith(this.currentText, StringComparison.Ordinal)) ?
 			this.currentList : (IEnumerable<ICompletionData>)this.completionData;
 
-		var matchingItems =
-			from item in listToFilter
-			let quality = GetMatchQuality(item.Text, query)
-			where quality > 0
-			select new { Item = item, Quality = quality };
-
 		// e.g. "DateTimeKind k = (*cc here suggests DateTimeKind*)"
 		ICompletionData? suggestedItem = listBox.SelectedIndex != -1 ? listBox.DataItems[listBox.SelectedIndex] : null;
 
-		List<ICompletionData> listBoxItems = new List<ICompletionData>();
-		int bestIndex = -1;
-		int bestQuality = -1;
-		double bestPriority = 0;
-		int i = 0;
-		foreach (var matchingItem in matchingItems)
-		{
-			double priority = matchingItem.Item == suggestedItem ? double.PositiveInfinity : matchingItem.Item.Priority;
-			int quality = matchingItem.Quality;
-			if (quality > bestQuality || (quality == bestQuality && (priority > bestPriority)))
-			{
-				bestIndex = i;
-				bestPriority = priority;
-				bestQuality = quality;
-			}
-			listBoxItems.Add(matchingItem.Item);
-			i++;
-		}
+		// The matching and ranking are the engine's (Engine/CompletionFilter, WPE1 C8)
+		List<ICompletionData> listBoxItems = CompletionFilter.Filter(listToFilter, item => item.Text, item => item.Priority,
+			query, suggestedItem, out int bestIndex);
 		this.currentList = listBoxItems;
 		RefreshListBoxItems(listBoxItems);
 		SelectIndexCentered(bestIndex);
@@ -441,44 +423,9 @@ public partial class CompletionList : Control
 
 		int suggestedIndex = listBox.SelectedIndex;
 
-		int bestIndex = -1;
-		int bestQuality = -1;
-		double bestPriority = 0;
-		for (int i = 0; i < completionData.Count; ++i)
-		{
-			int quality = GetMatchQuality(completionData[i].Text, query);
-			if (quality < 0)
-				continue;
-
-			double priority = completionData[i].Priority;
-			bool useThisItem;
-			if (bestQuality < quality)
-			{
-				useThisItem = true;
-			}
-			else
-			{
-				if (bestIndex == suggestedIndex)
-				{
-					useThisItem = false;
-				}
-				else if (i == suggestedIndex)
-				{
-					// prefer recommendedItem, regardless of its priority
-					useThisItem = bestQuality == quality;
-				}
-				else
-				{
-					useThisItem = bestQuality == quality && bestPriority < priority;
-				}
-			}
-			if (useThisItem)
-			{
-				bestIndex = i;
-				bestPriority = priority;
-				bestQuality = quality;
-			}
-		}
+		// The matching and ranking are the engine's (Engine/CompletionFilter, WPE1 C8)
+		int bestIndex = CompletionFilter.FindBestMatch(completionData, item => item.Text, item => item.Priority,
+			query, suggestedIndex, IsFiltering);
 		SelectIndexCentered(bestIndex);
 	}
 
@@ -501,75 +448,5 @@ public partial class CompletionList : Control
 				listBox.SelectIndex(bestIndex);
 			}
 		}
-	}
-
-	int GetMatchQuality(string itemText, string query)
-	{
-		if (itemText == null)
-			throw new ArgumentNullException(nameof(itemText), "ICompletionData.Text returned null");
-
-		// Qualities:
-		//  	8 = full match case sensitive
-		// 		7 = full match
-		// 		6 = match start case sensitive
-		//		5 = match start
-		//		4 = match CamelCase when length of query is 1 or 2 characters
-		// 		3 = match substring case sensitive
-		//		2 = match substring
-		//		1 = match CamelCase
-		//		-1 = no match
-		if (query == itemText)
-			return 8;
-		if (string.Equals(itemText, query, StringComparison.InvariantCultureIgnoreCase))
-			return 7;
-
-		if (itemText.StartsWith(query, StringComparison.InvariantCulture))
-			return 6;
-		if (itemText.StartsWith(query, StringComparison.InvariantCultureIgnoreCase))
-			return 5;
-
-		bool? camelCaseMatch = null;
-		if (query.Length <= 2)
-		{
-			camelCaseMatch = CamelCaseMatch(itemText, query);
-			if (camelCaseMatch == true)
-				return 4;
-		}
-
-		// search by substring, if filtering (i.e. new behavior) turned on
-		if (IsFiltering)
-		{
-			if (itemText.IndexOf(query, StringComparison.InvariantCulture) >= 0)
-				return 3;
-			if (itemText.IndexOf(query, StringComparison.InvariantCultureIgnoreCase) >= 0)
-				return 2;
-		}
-
-		if (!camelCaseMatch.HasValue)
-			camelCaseMatch = CamelCaseMatch(itemText, query);
-		if (camelCaseMatch == true)
-			return 1;
-
-		return -1;
-	}
-
-	static bool CamelCaseMatch(string text, string query)
-	{
-		// We take the first letter of the text regardless of whether or not it's upper case so we match
-		// against camelCase text as well as PascalCase text ("cct" matches "camelCaseText")
-		IEnumerable<char> theFirstLetterOfEachWord = text.Take(1).Concat(text.Skip(1).Where(char.IsUpper));
-
-		int i = 0;
-		foreach (char letter in theFirstLetterOfEachWord)
-		{
-			if (i > query.Length - 1)
-				return true;    // return true here for CamelCase partial match ("CQ" matches "CodeQualityAnalysis")
-			if (char.ToUpperInvariant(query[i]) != char.ToUpperInvariant(letter))
-				return false;
-			i++;
-		}
-		if (i >= query.Length)
-			return true;
-		return false;
 	}
 }

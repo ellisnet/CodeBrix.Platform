@@ -1,4 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.AppSettings: since the Core/Skia split, only the CodeBrix.Platform implementation of the
+	add-in's storage contract (the *.skia.cs files: the CodeBrix.Sqlite database, its location, and the whole file
+	lifecycle - backup with retention pruning, quarantine and restore, silent creation, export, import) and the
+	package. The settings API, the JSON values, the change notification and the typed property handles are in
+	CodeBrix.Platform.AppSettings.Core (Platform.AppSettings.Core.csproj), which this package carries beside this
+	assembly.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,12 +28,20 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.AppSettings.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
 		<Deterministic>true</Deterministic>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- The SQLite engine behind settings.sqlite. External to the CodeBrix.Platform family, so
@@ -42,6 +58,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
+		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->
+		<ProjectReference Include="Platform.AppSettings.Core.csproj" CodeBrixBundleInPackage="true" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
 		     same family version as this build (the whole family ships together). This add-in draws
 		     nothing and references no XAML type - the dependency exists so the consumer has the
@@ -50,7 +72,7 @@
 		     Extensions.Logging is PrivateAssets="all" because it has no standalone nuget - its
 		     assembly ships inside the main framework package. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -62,10 +84,12 @@
 
 	<PropertyGroup>
 		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
-		     output and `dotnet pack` puts it in the package's lib folder by itself, so nothing in
-		     the packaging recipe needs to know about it. CS1591 (a public member with no XML
+		     output and `dotnet pack` puts it in the package's lib folder by itself (the Core
+		     assembly's beside it, through ../AddIn.CorePackaging.targets), so nothing in the
+		     packaging recipe needs to know about it. CS1591 (a public member with no XML
 		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="..\AddIn.CorePackaging.targets" />
 </Project>

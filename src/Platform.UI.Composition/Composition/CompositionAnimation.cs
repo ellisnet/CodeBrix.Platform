@@ -54,7 +54,7 @@ public partial class CompositionAnimation
 		set => _target = value ?? throw new ArgumentException();
 	}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	// TODO: This should not be here as it is possible to re-use animations across
 	// CompositionObjects.
 	CompositionObject? _currentCompositionObject;
@@ -62,7 +62,7 @@ public partial class CompositionAnimation
 
 	internal virtual object? Start(ReadOnlySpan<char> propertyName, ReadOnlySpan<char> subPropertyName, CompositionObject compositionObject)
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		_currentCompositionObject = compositionObject;
 		Compositor.RegisterAnimation(this, compositionObject);
 #endif
@@ -73,7 +73,7 @@ public partial class CompositionAnimation
 
 	internal virtual void Stop()
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		if (_currentCompositionObject is not null)
 		{
 			Compositor.UnregisterAnimation(this, _currentCompositionObject);

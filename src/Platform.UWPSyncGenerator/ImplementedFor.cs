@@ -20,7 +20,8 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		UAP = 128,
 		tvOS = 256,
 		Uno = Android | iOS | MacOS | UnitTests | NetStdReference | WASM | Skia | tvOS,
-		Main = Android | iOS | WASM | Skia | MacOS | tvOS,
+		// CodeBrix.Platform's only main flavor is Skia (there are no Android/iOS/macOS/tvOS/WASM flavors).
+		Main = Skia,
 		Mobile = Android | iOS | tvOS,
 		Xamarin = Android | iOS | MacOS | tvOS
 	}

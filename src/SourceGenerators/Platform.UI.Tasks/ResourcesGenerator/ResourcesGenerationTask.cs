@@ -11,8 +11,12 @@ using Windows.ApplicationModel.Resources.Core;
 namespace CodeBrix.Platform.UI.Tasks.ResourcesGenerator; //Was previously: Uno.UI.Tasks.ResourcesGenerator
 
 /// <summary>
-/// Parse Resources.resw files and generate the corresponding Localizable.strings (iOS) and Strings.xml (Android) files.
+/// Parse Resources.resw files and generate the corresponding upri resources.
 /// </summary>
+/// <remarks>
+/// No Android Strings.xml or UIKit Localizable.strings files are generated: this family has no Android-native or
+/// UIKit-native head, and every consumer built on the Core assemblies reads the upri resources.
+/// </remarks>
 public class ResourcesGenerationTask_v0 : Task
 {
 	private const string CommentPattern = @"
@@ -94,18 +98,6 @@ public class ResourcesGenerationTask_v0 : Task
 
 		TraceLog($"{resources.Count} resources found");
 
-		if (Path.GetFileNameWithoutExtension(resource.ItemSpec).Equals("Resources", StringComparison.OrdinalIgnoreCase))
-		{
-			if (TargetPlatform == "android")
-			{
-				yield return GenerateAndroidResources(language, sourceLastWriteTime, resources, comment, resource);
-			}
-			else if (TargetPlatform == "uikit")
-			{
-				yield return GenerateUIKitResources(language, sourceLastWriteTime, resources, comment);
-			}
-		}
-
 		yield return GenerateCodeBrixPRIResources(language, sourceLastWriteTime, resources, comment, resource);
 	}
 
@@ -170,88 +162,6 @@ public class ResourcesGenerationTask_v0 : Task
 				{ "CodeBrixResourceTarget", "CodeBrix" },
 				{ "LogicalName", logicalTargetPath.Replace(Path.DirectorySeparatorChar, '.') },
 				{ "Language", language }
-			}
-		);
-	}
-
-	private ITaskItem GenerateUIKitResources(string language, DateTime sourceLastWriteTime, Dictionary<string, string> resources, string comment)
-	{
-		var logicalTargetPath = Path.Combine($"{language}.lproj", "Localizable.strings"); // this path is required by Xamarin
-		var actualTargetPath = Path.Combine(OutputPath, logicalTargetPath);
-
-		var targetLastWriteTime = new FileInfo(actualTargetPath).LastWriteTimeUtc;
-
-		if (sourceLastWriteTime > targetLastWriteTime)
-		{
-			TraceLog($"Writing resources to {actualTargetPath}");
-
-			iOSResourcesWriter.Write(resources, actualTargetPath, comment);
-		}
-		else
-		{
-			TraceLog($"Skipping unmodified file {actualTargetPath}");
-		}
-
-		return new TaskItem
-		(
-			actualTargetPath,
-			new Dictionary<string, string>()
-			{
-				{ "CodeBrixResourceTarget", "UIKit" },
-				{ "LogicalName", logicalTargetPath }
-			}
-		);
-	}
-
-	private ITaskItem GenerateAndroidResources(string language, DateTime sourceLastWriteTime, Dictionary<string, string> resources, string comment, ITaskItem resource)
-	{
-		string localizedDirectory;
-		if (language == DefaultLanguage)
-		{
-			// Resources targeting the default application language must go in a directory called "values" (no language extension).
-			localizedDirectory = "values";
-		}
-		else
-		{
-			// More info about localized resources file structure and codes on Android:
-			// https://developer.android.com/guide/topics/resources/providing-resources#AlternativeResources
-			var cultureWithRegion = new CultureInfo(language);
-			var languageOnly = cultureWithRegion;
-			while (languageOnly.Parent != CultureInfo.InvariantCulture)
-			{
-				languageOnly = languageOnly.Parent;
-			}
-
-			localizedDirectory = cultureWithRegion.LCID < 255
-				? $"values-{languageOnly.IetfLanguageTag}" // No Region info
-				: $"values-b+{languageOnly.IetfLanguageTag}+{cultureWithRegion.LCID}";
-		}
-
-		// The file name have to be unique, otherwise it could be overwritten by a file with the same named defined directly in the application's head
-		var resourceMapName = Path.GetFileNameWithoutExtension(resource.ItemSpec)?.ToLowerInvariant();
-		var logicalTargetPath = Path.Combine("r", localizedDirectory, $"{resourceMapName}_resw-strings.xml");
-		var actualTargetPath = Path.Combine(OutputPath, logicalTargetPath);
-
-		var targetLastWriteTime = new FileInfo(actualTargetPath).LastWriteTimeUtc;
-
-		if (sourceLastWriteTime > targetLastWriteTime)
-		{
-			TraceLog($"Writing resources to {actualTargetPath}");
-
-			AndroidResourcesWriter.Write(resources, actualTargetPath, comment);
-		}
-		else
-		{
-			TraceLog($"Skipping unmodified file {actualTargetPath}");
-		}
-
-		return new TaskItem
-		(
-			actualTargetPath,
-			new Dictionary<string, string>()
-			{
-				{ "CodeBrixResourceTarget", "Android" },
-				{ "LogicalName", logicalTargetPath }
 			}
 		);
 	}

@@ -39,7 +39,7 @@ public partial struct Thickness : IEquatable<Thickness>
 		Bottom = topBottom;
 	}
 
-#if __SKIA__ && !IS_CODEBRIX_COMPOSITION
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ && !IS_CODEBRIX_COMPOSITION
 	internal CodeBrix.Platform.UI.Composition.Thickness ToCodeBrixCompositionThickness()
 	{
 		return new CodeBrix.Platform.UI.Composition.Thickness(Left, Top, Right, Bottom);

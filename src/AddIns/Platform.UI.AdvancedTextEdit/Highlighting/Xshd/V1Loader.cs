@@ -7,17 +7,18 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Schema;
 
-using Microsoft.UI.Text;
-using Windows.UI;
-using Windows.UI.Text;
+using SkiaSharp;
 
 using CodeBrix.Platform.UI.AdvancedTextEdit.Utils;
+using CodeBrix.Platform.UI.TextLayout;
 
 namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting.Xshd;
 
 //was previously: ICSharpCode.AvalonEdit/Highlighting/Xshd/V1Loader.cs in the AvalonEdit repo (MIT).
 //Color/FontWeight/FontStyle parsing now targets the Windows.UI / Windows.UI.Text types
 //(FontWeights/FontStyle statics and V2Loader's Convert* helpers instead of the WPF converters).
+//WPE1 C8: the parsed values are the neutral storage (numeric weight, TextFontStyle, SKColor brushes),
+//so a V1 file loads without the XAML object model; the values are the same (Bold = 700, Normal = 400).
 //Nullability adaptation: a missing &lt;Begin&gt; element inside a &lt;Span&gt; now throws
 //HighlightingDefinitionInvalidException instead of a NullReferenceException (it is rejected by
 //schema validation anyway on the validating path).
@@ -112,11 +113,11 @@ sealed class V1Loader
 		XshdColor color = new XshdColor();
 		if (element.HasAttribute("bold"))
 		{
-			color.FontWeight = XmlConvert.ToBoolean(element.GetAttribute("bold")) ? FontWeights.Bold : FontWeights.Normal;
+			color.FontWeightValue = XmlConvert.ToBoolean(element.GetAttribute("bold")) ? (ushort)700 : (ushort)400; //FontWeights.Bold / Normal
 		}
 		if (element.HasAttribute("italic"))
 		{
-			color.FontStyle = XmlConvert.ToBoolean(element.GetAttribute("italic")) ? FontStyle.Italic : FontStyle.Normal;
+			color.FontStyleValue = XmlConvert.ToBoolean(element.GetAttribute("italic")) ? TextFontStyle.Italic : TextFontStyle.Normal;
 		}
 		if (element.HasAttribute("color"))
 		{
@@ -157,7 +158,7 @@ sealed class V1Loader
 			int r = Int32.Parse(c.Substring(1 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 			int g = Int32.Parse(c.Substring(3 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 			int b = Int32.Parse(c.Substring(5 + offset, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-			return new SimpleHighlightingBrush(Color.FromArgb((byte)a, (byte)r, (byte)g, (byte)b));
+			return new SimpleHighlightingBrush(new SKColor((byte)r, (byte)g, (byte)b, (byte)a));
 		}
 		else if (c.StartsWith("SystemColors.", StringComparison.Ordinal))
 		{

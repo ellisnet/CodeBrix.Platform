@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.SkiaSharp.Views.Core: the platform-neutral half of the SkiaSharp views add-in. It holds the
+	element API applications and XAML name - SKXamlCanvas, SKSwapChainPanel, their paint event arguments and the
+	bitmap extensions (the vendored shared SkiaSharp sources) - and the Skia-canvas host seam that drawing add-ins
+	build on (Hosting/: an SKCanvas-typed paint callback over the framework's Skia-agnostic SKCanvasVisualBase). It
+	references SkiaSharp and the framework's Core assemblies only, never the framework's Skia assemblies (plan rule
+	R7). How each view presents its pixels on a platform is a per-element contract (Contracts/); the Skia project in
+	this folder (CodeBrix.Platform.SkiaSharp.Views.Skia.csproj, assembly CodeBrix.Platform.SkiaSharp.Views)
+	implements it and is loaded by name through Contracts/PlatformContract.cs.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<!-- CS0109: see the .Skia project - keeps vendored files byte-identical with upstream. -->
+		<NoWarn>$(NoWarn);Uno0001;CS0109</NoWarn>
+		<Deterministic>true</Deterministic>
+
+		<AssemblyName>CodeBrix.Platform.SkiaSharp.Views.Core</AssemblyName>
+		<RootNamespace>SkiaSharp.Views.Windows</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- The same symbols the .Skia project defines for the vendored sources, minus HAS_CODEBRIX_SKIA. -->
+		<DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;WINUI</DefineConstants>
+
+		<!-- See the .Skia project: the version is tied to the vendored SkiaSharp version (the element API lives
+		     here, so the version agreement the add-in's tests measure is measured on this assembly). -->
+		<Version>4.152.0</Version>
+		<PackageVersion>4.152.0</PackageVersion>
+
+		<!-- Ships inside the SkiaSharp.Views package (build/nuget/CodeBrix.Platform.SkiaSharp.Views.nuspec); there
+		     is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications - the platform-neutral element API. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
+		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>
+		<NeutralLanguage>en</NeutralLanguage>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+	</ItemGroup>
+
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

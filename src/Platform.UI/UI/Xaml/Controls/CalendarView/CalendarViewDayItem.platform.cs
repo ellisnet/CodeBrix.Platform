@@ -8,7 +8,7 @@ namespace Microsoft.UI.Xaml.Controls
 	partial class CalendarViewDayItem
 	{
 		// We are not supporting rendering of those density bars yet
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void SetDensityColors(IEnumerable<Color> colors)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.CalendarViewDayItem", "void CalendarViewDayItem.SetDensityColors(IEnumerable<Color> colors)");

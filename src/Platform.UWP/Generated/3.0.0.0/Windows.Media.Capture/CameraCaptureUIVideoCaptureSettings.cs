@@ -3,13 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Capture
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CameraCaptureUIVideoCaptureSettings
 	{
-#if __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__")]
+#if __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.Capture.CameraCaptureUIMaxVideoResolution MaxResolution
 		{
 			get
@@ -22,8 +22,8 @@ namespace Windows.Media.Capture
 			}
 		}
 #endif
-#if __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__")]
+#if __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public float MaxDurationInSeconds
 		{
 			get
@@ -37,8 +37,8 @@ namespace Windows.Media.Capture
 		}
 #endif
 		// Skipping already declared property Format
-#if __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__")]
+#if __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public bool AllowTrimming
 		{
 			get

@@ -28,6 +28,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using CodeBrix.Platform.Foundation.Extensibility;
 using CodeBrix.Platform.Graphics;
 using CodeBrix.Platform.UI.Dispatching;
+using CodeBrix.Platform.WinUI.Graphics3DGL.Contracts;
 using Buffer = Windows.Storage.Streams.Buffer;
 #endif
 
@@ -61,7 +62,7 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	private bool _subclassGlFailed;
 
 	// Set by Invalidate, cleared by Render. Without it the element renders continuously: see
-	// GLVisual.Paint.
+	// OnVisualPainting.
 	private bool _renderRequested;
 
 	// valid if and only if GLCanvasElement was loaded at least once and OpenGL is available on the running platform
@@ -72,6 +73,11 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	private FrameBufferDetails? _details;
 #if WINAPPSDK
 	private IntPtr _pixels;
+#else
+	// Whether the context can read the framebuffer back as BGRA (the WriteableBitmap's layout) directly. Desktop OpenGL
+	// always can; OpenGL ES guarantees only RGBA (BGRA is the optional GL_EXT_read_format_bgra), so without it the picture
+	// is read as RGBA and its red and blue bytes are swapped in place. Decided once per load (QueryBgraReadBack).
+	private bool _readBackBgra = true;
 #endif
 
 	/// <summary>
@@ -254,32 +260,37 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 	public void Invalidate()
 	{
 		// The flag is what makes ONE call here produce exactly ONE call to RenderOverride, which
-		// is what this method's documentation promises. See GLVisual.Paint below.
+		// is what this method's documentation promises. See OnVisualPainting below.
 		_renderRequested = true;
 		Compositor.GetSharedCompositor().InvalidateRender(Visual);
 	}
 
-	private protected override ContainerVisual CreateElementVisual() => new GLVisual(this, Compositor.GetSharedCompositor());
+	// The platform's part of this element (contract IGLCanvasPlatform): its composition visual, whose painting
+	// queues the render the element asked for. Resolved once for the process, on the first element's visual.
+	private static IGLCanvasPlatform? _platform;
 
-	private class GLVisual(GLCanvasElement owner, Compositor compositor) : BorderVisual(compositor)
+	private protected override ContainerVisual CreateElementVisual()
+		=> (_platform ??= PlatformContract.Resolve<IGLCanvasPlatform>()).CreateVisual(this, Compositor.GetSharedCompositor());
+
+	/// <summary>
+	/// Called by the platform's visual each time it paints, before it paints: queues the render
+	/// <see cref="Invalidate"/> asked for, and only that one.
+	/// </summary>
+	/// <remarks>
+	/// ONLY when a render was actually asked for. Enqueuing unconditionally makes the element
+	/// render forever: Render ends with _backBuffer.Invalidate(), which dirties the visual, which
+	/// paints it again, which enqueues another Render - a loop that never settles and that redraws
+	/// the 3D scene hundreds of times a second on an idle screen. It also broke the element's own
+	/// contract, since RenderOverride then ran many times per Invalidate() and many times without
+	/// one. The paint that FOLLOWS the render still happens (that is the same
+	/// _backBuffer.Invalidate()), and it is the one that draws the new bitmap - so the picture
+	/// still reaches the screen, it just stops there instead of going round again.
+	/// </remarks>
+	internal void OnVisualPainting()
 	{
-		internal override void Paint(in PaintingSession session)
+		if (_renderRequested)
 		{
-			// ONLY when a render was actually asked for. Enqueuing unconditionally makes the
-			// element render forever: Render ends with _backBuffer.Invalidate(), which dirties
-			// this visual, which paints it again, which enqueues another Render - a loop that
-			// never settles and that redraws the 3D scene hundreds of times a second on an idle
-			// screen. It also broke the element's own contract, since RenderOverride then ran
-			// many times per Invalidate() and many times without one.
-			// The paint that FOLLOWS the render still happens (that is the same
-			// _backBuffer.Invalidate()), and it is the one that draws the new bitmap - so the
-			// picture still reaches the screen, it just stops there instead of going round again.
-			if (owner._renderRequested)
-			{
-				NativeDispatcher.Main.Enqueue(owner.Render, NativeDispatcherPriority.High);
-			}
-
-			base.Paint(session);
+			NativeDispatcher.Main.Enqueue(Render, NativeDispatcherPriority.High);
 		}
 	}
 #endif
@@ -351,6 +362,9 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 		{
 			using (_nativeOpenGlWrapper.MakeCurrent())
 			{
+#if !WINAPPSDK
+				_readBackBgra = QueryBgraReadBack(_gl);
+#endif
 				UpdateFramebuffer();
 				Init(_gl);
 			}
@@ -556,11 +570,85 @@ public abstract partial class GLCanvasElement : Grid, INativeContext
 #else
 			Buffer.Cast(_backBuffer.PixelBuffer).ApplyActionOnRawBufferPtr(ptr =>
 			{
-				_gl.ReadPixels(0, 0, (uint)RenderSize.Width, (uint)RenderSize.Height, GLEnum.Bgra, GLEnum.UnsignedByte, (void*)ptr);
+				if (_readBackBgra)
+				{
+					_gl.ReadPixels(0, 0, (uint)RenderSize.Width, (uint)RenderSize.Height, GLEnum.Bgra, GLEnum.UnsignedByte, (void*)ptr);
+				}
+				else
+				{
+					_gl.ReadPixels(0, 0, (uint)RenderSize.Width, (uint)RenderSize.Height, GLEnum.Rgba, GLEnum.UnsignedByte, (void*)ptr);
+					SwapRedAndBlue(new Span<byte>((void*)ptr, (int)RenderSize.Width * (int)RenderSize.Height * BytesPerPixel));
+				}
 			});
 			_backBuffer.PixelBuffer.Length = (uint)RenderSize.Width * (uint)RenderSize.Height * BytesPerPixel;
 #endif
 			_backBuffer.Invalidate();
+		}
+	}
+
+#if !WINAPPSDK
+	/// <summary>
+	/// Decides how <see cref="Render"/> reads the picture back on the current context (see <see cref="SupportsBgraReadBack"/>).
+	/// </summary>
+	/// <param name="gl">The API bound to the current context.</param>
+	/// <returns><see langword="true"/> to read BGRA directly; <see langword="false"/> to read RGBA and swap.</returns>
+	private static bool QueryBgraReadBack(GL gl)
+	{
+		var version = gl.GetStringS(StringName.Version);
+		if (!IsOpenGLES(version))
+		{
+			return true;
+		}
+
+		gl.GetInteger(GetPName.NumExtensions, out var count);
+		var extensions = new List<string>(Math.Max(count, 0));
+		for (var i = 0; i < count; i++)
+		{
+			extensions.Add(gl.GetStringS(StringName.Extensions, (uint)i));
+		}
+
+		return SupportsBgraReadBack(version, extensions);
+	}
+#endif
+
+	/// <summary>
+	/// Whether a context with this GL_VERSION string and these extensions can read pixels as GL_BGRA: every desktop
+	/// OpenGL context can (core since 1.2); an OpenGL ES context only with GL_EXT_read_format_bgra. An unknown version
+	/// keeps the BGRA read the element always did.
+	/// </summary>
+	/// <param name="version">The context's GL_VERSION string, or <see langword="null"/> when it could not be read.</param>
+	/// <param name="extensions">The context's extension names.</param>
+	/// <returns><see langword="true"/> when GL_BGRA read-back is supported.</returns>
+	internal static bool SupportsBgraReadBack(string? version, IEnumerable<string?> extensions)
+	{
+		if (!IsOpenGLES(version))
+		{
+			return true;
+		}
+
+		foreach (var extension in extensions)
+		{
+			if (string.Equals(extension, "GL_EXT_read_format_bgra", StringComparison.Ordinal))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static bool IsOpenGLES(string? version)
+		=> version is not null && version.StartsWith("OpenGL ES", StringComparison.Ordinal);
+
+	/// <summary>
+	/// Turns RGBA pixels into BGRA (and back) in place by swapping the first and third byte of every pixel.
+	/// </summary>
+	/// <param name="pixels">Tightly packed 4-byte pixels.</param>
+	internal static void SwapRedAndBlue(Span<byte> pixels)
+	{
+		for (var i = 0; i + 3 < pixels.Length; i += BytesPerPixel)
+		{
+			(pixels[i], pixels[i + 2]) = (pixels[i + 2], pixels[i]);
 		}
 	}
 

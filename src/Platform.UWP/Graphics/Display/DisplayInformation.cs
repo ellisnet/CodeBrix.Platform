@@ -162,7 +162,7 @@ namespace Windows.Graphics.Display
 		}
 #pragma warning restore CS0067
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private void OnDpiChanged() => _dpiChanged?.Invoke(this, null);
 #endif
 

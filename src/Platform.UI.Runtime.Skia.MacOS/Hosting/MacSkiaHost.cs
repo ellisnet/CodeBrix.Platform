@@ -81,8 +81,8 @@ public class MacSkiaHost : SkiaHost, ISkiaApplicationHost
 	{
 		_isDispatcherThread = true;
 
-		CoreDispatcher.DispatchOverride = MacOSDispatcher.DispatchNativeSingle;
-		CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = MacOSDispatcher.DispatchNativeSingle;
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => _isDispatcherThread;
 	}
 
 	// called from native code to ensure NSApplication is fully initialized

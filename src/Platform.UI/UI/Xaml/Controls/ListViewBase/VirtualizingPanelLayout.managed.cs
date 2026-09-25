@@ -323,7 +323,7 @@ namespace Microsoft.UI.Xaml.Controls
 				unappliedDelta = Max(0, unappliedDelta);
 				UpdateLayout(extentAdjustment: sign * -unappliedDelta, isScroll: true);
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				(ItemsControl as ListViewBase)?.TryLoadMoreItems(LastVisibleIndex);
 #endif
 			}

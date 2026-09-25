@@ -46,7 +46,7 @@ public partial class ContentIsland
 	/// <summary>
 	/// Occurs when an automation provider is requested for this ContentIsland.
 	/// </summary>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public event TypedEventHandler<ContentIsland, ContentIslandAutomationProviderRequestedEventArgs> AutomationProviderRequested;
 #pragma warning restore CS0067
 

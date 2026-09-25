@@ -6,18 +6,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Windows.Foundation;
-using Windows.UI.Text;
 using HarfBuzzSharp;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Documents.TextFormatting;
-using Microsoft.UI.Xaml.Media;
 using SkiaSharp;
-using CodeBrix.Platform.Extensions;
-using CodeBrix.Platform.Foundation.Logging;
-using CodeBrix.Platform.UI;
-using CodeBrix.Platform.UI.Xaml.Media;
 using Buffer = HarfBuzzSharp.Buffer;
 using GlyphInfo = HarfBuzzSharp.GlyphInfo;
 
@@ -32,7 +23,15 @@ namespace Microsoft.UI.Xaml.Documents;
 
 // TODO: character spacing
 // TODO: what happens if text has no drawable glyphs but is not empty? Can this happen? The HarfBuzz docs imply that it can't
-internal readonly partial struct UnicodeText : IParsedText
+
+// The shared text engine (WPE1 C5): this file is ONE source compiled into two assemblies - the framework's Skia assembly
+// (CodeBrix.Platform.UI, which lays out every TextBlock and TextBox) and CodeBrix.Platform.UI.TextLayout.Core (which lays
+// out TextLayout, AdvancedTextEdit and TerminalView text), internal in both. It must name NO XAML or WinRT type (not even
+// in a doc comment): the engine's own types are in TextFormatting/TextEngineTypes.skia.cs, the font configuration comes
+// from the platform's font source (FontDetailsCache.Source), and everything XAML-typed - the Inline constructor, the
+// ITextLayout/IParsedText implementation, drawing with brushes, hyperlinks - is in the framework-only partial
+// UnicodeText.Inlines.skia.cs. TextLayout.Core does not reference the XAML assemblies, so a XAML type here fails its build.
+internal readonly partial struct UnicodeText
 {
 	// Measured by hand from WinUI. Oddly enough, it doesn't depend on the font size.
 	private const float TabStopWidth = 48;
@@ -42,51 +41,28 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	// A readonly snapshot of an Inline that is referenced by individual text runs after splitting. It's a class
 	// and not a struct because we don't want to copy the same Inline for each run.
-	private class ReadonlyInlineCopy
+	private partial class ReadonlyInlineCopy
 	{
-		// Null when this copy was built from a TextRunSpec rather than from a XAML Inline, i.e. on the
-		// host-free layout path used by CodeBrix.Platform.UI.TextLayout. Every read of either member
-		// must therefore be null-safe; see Draw() and GetHyperlinkAt().
-		public Inline? Inline { get; }
 		public int StartIndex { get; }
 		public int EndIndex { get; }
 		public string Text { get; }
-		public FlowDirection FlowDirection { get; }
+		public EngineFlowDirection FlowDirection { get; }
 		public FontDetails FontDetails { get; }
 		public double FontSize { get; }
-		public FontWeight FontWeight { get; }
-		public FontStretch FontStretch { get; }
-		public FontStyle FontStyle { get; }
-		public Brush? Foreground { get; }
+		public ushort FontWeight { get; }
+		public EngineFontStretch FontStretch { get; }
+		public EngineFontStyle FontStyle { get; }
 
 		// Set only on the host-free TextRunSpec path (where Foreground can never exist); it lets
 		// DrawToCanvas paint individual runs in their own colour. Null everywhere else.
 		public SKColor? SpecColor { get; }
 
-		public ReadonlyInlineCopy(Inline inline, int startIndex, FlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
-		{
-			CI.Assert(inline is Run or LineBreak);
-			Inline = inline;
-			Text = inline.GetText();
-			Foreground = inline.Foreground;
-			FlowDirection = forceDefaultFlowDirection ? defaultFlowDirection : (inline as Run)?.FlowDirection ?? defaultFlowDirection;
-			FontDetails = inline.FontInfo;
-			FontSize = inline.FontSize;
-			FontWeight = inline.FontWeight;
-			FontStretch = inline.FontStretch;
-			FontStyle = inline.FontStyle;
-			StartIndex = startIndex;
-			EndIndex = startIndex + Text.Length;
-		}
-
 		/// <summary>
-		/// Builds a copy from a host-free <see cref="TextRunSpec"/>. <see cref="Inline"/> and
-		/// <see cref="Foreground"/> are left null.
+		/// Builds a copy from a host-free <see cref="TextRunSpec"/>. The XAML inline and foreground brush (members of the
+		/// framework-only partial) are left null.
 		/// </summary>
-		public ReadonlyInlineCopy(TextRunSpec spec, int startIndex, FlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
+		public ReadonlyInlineCopy(TextRunSpec spec, int startIndex, EngineFlowDirection defaultFlowDirection, bool forceDefaultFlowDirection = false)
 		{
-			Inline = null;
-			Foreground = null;
 			SpecColor = spec.Color;
 			Text = spec.Text;
 			FlowDirection = forceDefaultFlowDirection ? defaultFlowDirection : spec.FlowDirection;
@@ -124,20 +100,16 @@ internal readonly partial struct UnicodeText : IParsedText
 	private record LayoutedLine(float lineHeight, float baselineOffset, int lineIndex, float xAlignmentOffset, float y, int startInText, int endInText, List<LayoutedLineBrokenBidiRun> runs);
 	private record Cluster(int sourceTextStart, int sourceTextEnd, LayoutedLineBrokenBidiRun layoutedRun, int glyphInRunIndexStart, int glyphInRunIndexEnd);
 
-	private static readonly SKPaint _spareDrawPaint = new();
-
-	private readonly Size _size;
-	private readonly TextAlignment _textAlignment;
+	private readonly EngineSize _size;
+	private readonly EngineTextAlignment _textAlignment;
 	private readonly bool _rtl;
 	private readonly List<ReadonlyInlineCopy> _inlines;
 	private readonly List<LayoutedLine> _lines;
 	private readonly Cluster[] _textIndexToGlyph;
-	private readonly Size _desiredSize;
+	private readonly EngineSize _desiredSize;
 	private readonly string _text;
 	private readonly List<int> _wordBoundaries;
 	private readonly FontDetails _defaultFontDetails;
-
-	bool IParsedText.IsBaseDirectionRightToLeft => _rtl;
 
 	// The result of turning the caller's inlines (XAML or host-free) into the engine's own
 	// representation, along with the flow direction and alignment that may have been inferred
@@ -145,8 +117,8 @@ internal readonly partial struct UnicodeText : IParsedText
 	private readonly record struct PreparedInlines(
 		List<ReadonlyInlineCopy> Inlines,
 		string Text,
-		FlowDirection FlowDirection,
-		TextAlignment TextAlignment);
+		EngineFlowDirection FlowDirection,
+		EngineTextAlignment TextAlignment);
 
 	// Everything the constructor needs to assign to its readonly fields. DesiredSizeField and
 	// DesiredSizeOut are deliberately separate: for empty text the constructor has always
@@ -158,67 +130,37 @@ internal readonly partial struct UnicodeText : IParsedText
 		List<ReadonlyInlineCopy> Inlines,
 		List<int> WordBoundaries,
 		string Text,
-		Size DesiredSizeField,
-		Size DesiredSizeOut);
-
-	internal UnicodeText(
-		Size availableSize,
-		Inline[] inlines, // only leaf nodes
-		FontDetails defaultFontDetails, // only used for a final empty line, otherwise the FontDetails are read from the inline
-		int maxLines,
-		float lineHeight,
-		LineStackingStrategy lineStackingStrategy,
-		FlowDirection flowDirection,
-		TextAlignment? textAlignment, // null to determine from text. This will also infer the directionality of the text from the content
-		TextWrapping textWrapping,
-		out Size desiredSize)
-	{
-		CI.Assert(maxLines >= 0);
-		_size = availableSize;
-		_defaultFontDetails = defaultFontDetails;
-
-		var prepared = PrepareFromInlines(inlines, flowDirection, textAlignment);
-		_rtl = prepared.FlowDirection == FlowDirection.RightToLeft;
-		_textAlignment = prepared.TextAlignment;
-
-		var core = ComputeCore(availableSize, prepared, _rtl, defaultFontDetails, maxLines, lineHeight, lineStackingStrategy, textWrapping);
-		_lines = core.Lines;
-		_textIndexToGlyph = core.TextIndexToGlyph;
-		_inlines = core.Inlines;
-		_wordBoundaries = core.WordBoundaries;
-		_text = core.Text;
-		_desiredSize = core.DesiredSizeField;
-		desiredSize = core.DesiredSizeOut;
-	}
+		EngineSize DesiredSizeField,
+		EngineSize DesiredSizeOut);
 
 	/// <summary>
-	/// Builds a layout from host-free run descriptors instead of XAML <see cref="Inline"/> objects.
+	/// Builds a layout from host-free run descriptors instead of XAML inline objects.
 	/// </summary>
 	/// <remarks>
 	/// This is the construction path used by the CodeBrix.Platform.UI.TextLayout add-in. It runs the
-	/// exact same engine as the <see cref="Inline"/>-based constructor; the only difference is that
+	/// exact same engine as the inline-based constructor (framework only); the only difference is that
 	/// the resulting runs carry no inline back-reference and no foreground brush, so the layout can be
 	/// built with no application host present. Because a foreground brush is never available on this
 	/// path, use <see cref="DrawToCanvas"/> rather than the compositor overload.
 	/// </remarks>
 	internal UnicodeText(
-		Size availableSize,
+		EngineSize availableSize,
 		TextRunSpec[] runs,
 		FontDetails defaultFontDetails,
 		int maxLines,
 		float lineHeight,
-		LineStackingStrategy lineStackingStrategy,
-		FlowDirection flowDirection,
-		TextAlignment textAlignment,
-		TextWrapping textWrapping,
-		out Size desiredSize)
+		EngineLineStackingStrategy lineStackingStrategy,
+		EngineFlowDirection flowDirection,
+		EngineTextAlignment textAlignment,
+		EngineTextWrapping textWrapping,
+		out EngineSize desiredSize)
 	{
 		CI.Assert(maxLines >= 0);
 		_size = availableSize;
 		_defaultFontDetails = defaultFontDetails;
 
 		var prepared = PrepareFromRunSpecs(runs, flowDirection, textAlignment);
-		_rtl = prepared.FlowDirection == FlowDirection.RightToLeft;
+		_rtl = prepared.FlowDirection == EngineFlowDirection.RightToLeft;
 		_textAlignment = prepared.TextAlignment;
 
 		var core = ComputeCore(availableSize, prepared, _rtl, defaultFontDetails, maxLines, lineHeight, lineStackingStrategy, textWrapping);
@@ -231,57 +173,7 @@ internal readonly partial struct UnicodeText : IParsedText
 		desiredSize = core.DesiredSizeOut;
 	}
 
-	private static PreparedInlines PrepareFromInlines(Inline[] inlines, FlowDirection flowDirection, TextAlignment? textAlignment)
-	{
-		List<ReadonlyInlineCopy> copies;
-		string text;
-		if (textAlignment is null)
-		{
-			// TODO: can we make this cleaner instead of implicitly assuming that this is a code path coming from TextBox?
-			CI.Assert(inlines.Length == 1);
-			var inline = (Run)inlines[0];
-			var inlineText = inline.GetText();
-			if (inlineText.Length == 0)
-			{
-				flowDirection = inline.FlowDirection;
-			}
-			else
-			{
-				var firstInlineText = inlines[0].GetText();
-				using var _1 = ICU.CreateBiDiAndSetPara(firstInlineText, 0, firstInlineText.Length, UBIDI_DEFAULT_LTR, out var bidi);
-				ICU.GetMethod<ICU.ubidi_getLogicalRun>()(bidi, 0, out _, out var level);
-				CI.Assert(level is UBIDI_LTR or UBIDI_RTL);
-				flowDirection = level is UBIDI_RTL ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
-			}
-			textAlignment = flowDirection is FlowDirection.LeftToRight ? TextAlignment.Left : TextAlignment.Right;
-			var copy = new ReadonlyInlineCopy(inline, 0, flowDirection, true);
-			var length = copy.Text.Length;
-			copies = length == 0 ? [] : [copy];
-			text = copy.Text;
-		}
-		else
-		{
-			copies = new();
-			var lastEnd = 0;
-			var builder = new StringBuilder();
-			foreach (var inline in inlines)
-			{
-				var copy = new ReadonlyInlineCopy(inline, lastEnd, flowDirection);
-				var length = copy.Text.Length;
-				if (length != 0)
-				{
-					copies.Add(copy);
-				}
-				lastEnd = copy.EndIndex;
-				builder.Append(copy.Text);
-			}
-			text = builder.ToString();
-		}
-
-		return new PreparedInlines(copies, text, flowDirection, textAlignment.Value);
-	}
-
-	private static PreparedInlines PrepareFromRunSpecs(TextRunSpec[] runs, FlowDirection flowDirection, TextAlignment textAlignment)
+	private static PreparedInlines PrepareFromRunSpecs(TextRunSpec[] runs, EngineFlowDirection flowDirection, EngineTextAlignment textAlignment)
 	{
 		var copies = new List<ReadonlyInlineCopy>();
 		var lastEnd = 0;
@@ -302,14 +194,14 @@ internal readonly partial struct UnicodeText : IParsedText
 	}
 
 	private static CoreLayout ComputeCore(
-		Size availableSize,
+		EngineSize availableSize,
 		PreparedInlines prepared,
 		bool rtl,
 		FontDetails defaultFontDetails,
 		int maxLines,
 		float lineHeight,
-		LineStackingStrategy lineStackingStrategy,
-		TextWrapping textWrapping)
+		EngineLineStackingStrategy lineStackingStrategy,
+		EngineTextWrapping textWrapping)
 	{
 		var inlines = prepared.Inlines;
 		var text = prepared.Text;
@@ -318,11 +210,11 @@ internal readonly partial struct UnicodeText : IParsedText
 		{
 			// Note: the out-parameter height is non-zero here but the _desiredSize field is left at
 			// default. This asymmetry is long-standing behaviour that callers depend on.
-			var emptySize = new Size(0, GetLineHeightAndBaselineOffset(lineStackingStrategy, lineHeight, defaultFontDetails, true, true).lineHeight);
+			var emptySize = new EngineSize(0, GetLineHeightAndBaselineOffset(lineStackingStrategy, lineHeight, defaultFontDetails, true, true).lineHeight);
 			return new CoreLayout(new(), [], [], new(), "", default, emptySize);
 		}
 
-		var lineWidth = textWrapping == TextWrapping.NoWrap ? float.PositiveInfinity : (float)availableSize.Width;
+		var lineWidth = textWrapping == EngineTextWrapping.NoWrap ? float.PositiveInfinity : (float)availableSize.Width;
 		var unlayoutedLines = SplitTextIntoLines(rtl, inlines, lineWidth, textWrapping);
 		var lines = LayoutLines(unlayoutedLines, prepared.TextAlignment, lineStackingStrategy, lineHeight, (float)availableSize.Width, defaultFontDetails);
 
@@ -336,12 +228,12 @@ internal readonly partial struct UnicodeText : IParsedText
 
 		var desiredHeight = clampedLines.Sum(l => l.lineHeight);
 		var desiredWidth = clampedLines.Max(l => l.runs.Sum(r => r.width));
-		var size = new Size(desiredWidth, desiredHeight);
+		var size = new EngineSize(desiredWidth, desiredHeight);
 		return new CoreLayout(clampedLines, textIndexToGlyph, inlines, wordBoundaries, text, size, size);
 	}
 
 	/// <returns>The runs of each run are sorted according to the visual order.</returns>
-	private static List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> SplitTextIntoLines(bool rtl, List<ReadonlyInlineCopy> inlines, float lineWidth, TextWrapping textWrapping)
+	private static List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> SplitTextIntoLines(bool rtl, List<ReadonlyInlineCopy> inlines, float lineWidth, EngineTextWrapping textWrapping)
 	{
 		var logicallyOrderedRuns = new List<BidiRun>();
 		var logicallyOrderedLineBreakingOpportunities = new List<(int indexInInline, ReadonlyInlineCopy inline)>();
@@ -378,13 +270,15 @@ internal readonly partial struct UnicodeText : IParsedText
 				continue;
 			}
 
-			var lineRuns = new Deque<ShapedLineBrokenBidiRun>();
+			// A plain list rather than the framework's Deque (a XAML-namespace type): prepending a run group with
+			// InsertRange(0, ...) yields exactly the order the deque's AddToFront from the last run to the first did.
+			var lineRuns = new List<ShapedLineBrokenBidiRun>();
 
 			foreach (var (inline, startInInline, endInInline) in GroupByInline(line))
 			{
 				var sameInlineRuns = new List<ShapedLineBrokenBidiRun>();
 
-				using var _ = ICU.CreateBiDiAndSetPara(inline.Text, startInInline, endInInline, (byte)(inline.FlowDirection is FlowDirection.RightToLeft ? 1 : 0), out var bidi);
+				using var _ = ICU.CreateBiDiAndSetPara(inline.Text, startInInline, endInInline, (byte)(inline.FlowDirection is EngineFlowDirection.RightToLeft ? 1 : 0), out var bidi);
 
 				var runCount = ICU.GetMethod<ICU.ubidi_countRuns>()(bidi, out var countRunsErrorCode);
 				ICU.CheckErrorCode<ICU.ubidi_countRuns>(countRunsErrorCode);
@@ -433,26 +327,20 @@ internal readonly partial struct UnicodeText : IParsedText
 				}
 				if (rtl)
 				{
-					for (int i = sameInlineRuns.Count - 1; i >= 0; i--)
-					{
-						lineRuns.AddToFront(sameInlineRuns[i]);
-					}
+					lineRuns.InsertRange(0, sameInlineRuns);
 				}
 				else
 				{
-					for (int i = 0; i < sameInlineRuns.Count; i++)
-					{
-						lineRuns.AddToBack(sameInlineRuns[i]);
-					}
+					lineRuns.AddRange(sameInlineRuns);
 				}
 			}
-			shapedLines.Add((lineRuns.ToList(), line[0].startInInline + line[0].inline.StartIndex, line[^1].endInInline + line[^1].inline.StartIndex));
+			shapedLines.Add((lineRuns, line[0].startInInline + line[0].inline.StartIndex, line[^1].endInInline + line[^1].inline.StartIndex));
 		}
 
 		return shapedLines;
 	}
 
-	private static FontDetails? GetFallbackFont(int codepoint, float fontSize, FontWeight fontWeight, FontStretch fontStretch, FontStyle fontStyle)
+	private static FontDetails? GetFallbackFont(int codepoint, float fontSize, ushort fontWeight, EngineFontStretch fontStretch, EngineFontStyle fontStyle)
 	{
 		// Line-break and other control characters have no visible glyph, so they must never trigger
 		// font fallback. On some hosts (e.g. Linux with the LyX math fonts installed) SKFontManager's
@@ -465,7 +353,7 @@ internal readonly partial struct UnicodeText : IParsedText
 			return null;
 		}
 
-		var symbolsFont = FontDetailsCache.GetFont(FeatureConfiguration.Font.SymbolsFont, fontSize, fontWeight, fontStretch, fontStyle).details;
+		var symbolsFont = FontDetailsCache.GetFont(FontDetailsCache.Source.SymbolsFont, fontSize, fontWeight, fontStretch, fontStyle).details;
 		if (symbolsFont.SKFont.ContainsGlyph(codepoint))
 		{
 			return symbolsFont;
@@ -486,7 +374,7 @@ internal readonly partial struct UnicodeText : IParsedText
 		// only the application's fonts would show. The symbols font above is checked first
 		// and stays exempt: the framework depends on it, so it is present on a real device
 		// exactly as it is here.
-		if (FeatureConfiguration.Font.RestrictToEmbeddedFonts)
+		if (FontDetailsCache.Source.RestrictToEmbeddedFonts)
 		{
 			return null;
 		}
@@ -607,7 +495,7 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	private static List<List<BidiRun>> ApplyLineBreaking(float lineWidth, List<BidiRun> logicallyOrderedRuns,
 		List<(int indexInInline, ReadonlyInlineCopy inline)> logicallyOrderedLineBreakingOpportunities, bool rtl,
-		TextWrapping textWrapping)
+		EngineTextWrapping textWrapping)
 	{
 		var lines = new List<List<BidiRun>>();
 
@@ -624,7 +512,7 @@ internal readonly partial struct UnicodeText : IParsedText
 			if (widthWithoutTrailingSpaces > lineWidth)
 			{
 				// If there was no text wrapping, then everything would fit on the same line
-				CI.Assert(textWrapping is TextWrapping.Wrap or TextWrapping.WrapWholeWords);
+				CI.Assert(textWrapping is EngineTextWrapping.Wrap or EngineTextWrapping.WrapWholeWords);
 
 				if (prevInSameLine is not null)
 				{
@@ -642,7 +530,7 @@ internal readonly partial struct UnicodeText : IParsedText
 				else
 				{
 					// only one "non-line-breakable" sequence is on this line but it still won't fit
-					if (textWrapping is TextWrapping.WrapWholeWords || logicallyOrderedRuns[firstRunIndex].inline.Text[startingIndexInFirstRun] == ' ')
+					if (textWrapping is EngineTextWrapping.WrapWholeWords || logicallyOrderedRuns[firstRunIndex].inline.Text[startingIndexInFirstRun] == ' ')
 					{
 						// WrapWholeWords or nothing but spaces: move to the next line
 						var line = new List<BidiRun>();
@@ -801,7 +689,7 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	private static List<BidiRun> SplitTextIntoLogicallyOrderedBidiRuns(ReadonlyInlineCopy inline)
 	{
-		using var _ = ICU.CreateBiDiAndSetPara(inline.Text, 0, inline.Text.Length, (byte)(inline.FlowDirection == FlowDirection.LeftToRight ? UBIDI_LTR : UBIDI_RTL), out var bidi);
+		using var _ = ICU.CreateBiDiAndSetPara(inline.Text, 0, inline.Text.Length, (byte)(inline.FlowDirection == EngineFlowDirection.LeftToRight ? UBIDI_LTR : UBIDI_RTL), out var bidi);
 
 		var runCount = ICU.GetMethod<ICU.ubidi_countRuns>()(bidi, out int countRunsErrorCode);
 		ICU.CheckErrorCode<ICU.ubidi_countRuns>(countRunsErrorCode);
@@ -864,7 +752,11 @@ internal readonly partial struct UnicodeText : IParsedText
 		return logicallyOrderedRuns;
 	}
 
+	/// <param name="textRun">The text of the run.</param>
+	/// <param name="rtl">Whether the run is right-to-left.</param>
+	/// <param name="fontDetails">The run's font.</param>
 	/// <param name="currentLineWidth">Only used for tab stop width calculation. Null to ignore this case.</param>
+	/// <param name="ignoreTrailingSpaces">Whether trailing spaces are given no width.</param>
 	private static (GlyphInfo info, CodeBrixGlyphPosition position)[] ShapeRun(string textRun, bool rtl, FontDetails fontDetails, float? currentLineWidth, bool ignoreTrailingSpaces)
 	{
 		if (ignoreTrailingSpaces)
@@ -911,7 +803,7 @@ internal readonly partial struct UnicodeText : IParsedText
 	}
 
 	// Static because it is called from the constructor, before any instance field has been assigned.
-	private static List<LayoutedLine> LayoutLines(List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> lines, TextAlignment textAlignment, LineStackingStrategy lineStackingStrategy, float lineHeight, float availableWidth, FontDetails defaultFontDetails)
+	private static List<LayoutedLine> LayoutLines(List<(List<ShapedLineBrokenBidiRun> runs, int startInText, int endInText)> lines, EngineTextAlignment textAlignment, EngineLineStackingStrategy lineStackingStrategy, float lineHeight, float availableWidth, FontDetails defaultFontDetails)
 	{
 		var layoutedLines = new List<LayoutedLine>();
 		float currentLineY = 0;
@@ -957,8 +849,8 @@ internal readonly partial struct UnicodeText : IParsedText
 				var lineWidth = currentLineX;
 				var alignmentOffset = textAlignment switch
 				{
-					TextAlignment.Center when lineWidth <= availableWidth => (availableWidth - lineWidth) / 2,
-					TextAlignment.Right when lineWidth <= availableWidth => availableWidth - lineWidth,
+					EngineTextAlignment.Center when lineWidth <= availableWidth => (availableWidth - lineWidth) / 2,
+					EngineTextAlignment.Right when lineWidth <= availableWidth => availableWidth - lineWidth,
 					_ => 0
 				};
 
@@ -1026,166 +918,21 @@ internal readonly partial struct UnicodeText : IParsedText
 		}
 	}
 
-	public void Draw(in Visual.PaintingSession session, (int index, CompositionBrush brush, float thickness)? caret,
-		(int selectionStart, int selectionEnd, CompositionBrush selectedTextBackgroundBrush, Brush selectedTextForegroundBrush)? selection)
-	{
-		// if selection is out of range, this means that the parent TextBlock/TextBox updated the text and the
-		// selection but a new UnicodeText instance has not been created yet. In that case, skip rendering
-		// the selection this frame and wait to be called again after measuring.
-		(int selectionIndexStart, int selectionIndexEnd, Cluster selectionClusterStart, Cluster selectionClusterEnd, CompositionBrush background, Brush foreground)? selectionDetails = null;
-		if (selection is { } s && s.selectionStart != s.selectionEnd && s.selectionStart <= _text.Length && s.selectionEnd <= _text.Length && _text.Length > 0)
-		{
-			selectionDetails = (s.selectionStart, s.selectionEnd, _textIndexToGlyph[s.selectionStart], _textIndexToGlyph[Math.Min(_textIndexToGlyph.Length - 1, s.selectionEnd)], s.selectedTextBackgroundBrush, s.selectedTextForegroundBrush);
-		}
-
-		for (var index = 0; index < _lines.Count; index++)
-		{
-			var line = _lines[index];
-			var currentLineX = line.xAlignmentOffset;
-			foreach (var run in line.runs)
-			{
-				// Ideally, we would want to get the path of the glyphs and then draw them using CompositionBrush.Paint, but this
-				// does not work for Emojis which don't have a path and instead must be drawn directly with SKCanvas.DrawText
-				// var path = new SKPath();
-				// for (var i = 0; i < run.glyphs.Length; i++)
-				// {
-				// 	var glyph = run.glyphs[i];
-				// 	var p = run.fontDetails.SKFont.GetGlyphPath((ushort)glyph.info.Codepoint);
-				// 	p.Transform(SKMatrix.CreateTranslation(glyph.xPosInRun + glyph.position.XOffset * run.fontDetails.TextScale.textScaleX, glyph.position.YOffset * run.fontDetails.TextScale.textScaleY), p);
-				// 	path.AddPath(p);
-				// }
-				// path.Transform(SKMatrix.CreateTranslation(currentLineX, line.y + line.baselineOffset), path);
-				//
-				// session.Canvas.Save();
-				// session.Canvas.ClipPath(path, antialias: true);
-				// run.inline.Foreground.GetOrCreateCompositionBrush(Compositor.GetSharedCompositor()).Paint(session.Canvas, session.Opacity, path.Bounds);
-				// session.Canvas.Restore();
-
-				using (var textBlobBuilder = new SKTextBlobBuilder())
-				{
-					var glyphs = new ushort[run.glyphs.Length];
-					var positions = new SKPoint[run.glyphs.Length];
-					for (var i = 0; i < run.glyphs.Length; i++)
-					{
-						var glyph = run.glyphs[i];
-						glyphs[i] = (ushort)glyph.info.Codepoint;
-						positions[i] = new SKPoint(glyph.xPosInRun + glyph.position.GlyphPosition.XOffset * run.fontDetails.TextScale.textScaleX, line.y + glyph.position.GlyphPosition.YOffset * run.fontDetails.TextScale.textScaleY);
-					}
-
-					void DrawText(ReadOnlySpan<ushort> glyphs, ReadOnlySpan<SKPoint> positions, Visual.PaintingSession session, Brush? brush)
-					{
-						textBlobBuilder.AddPositionedRun(glyphs, run.fontDetails.SKFont, positions);
-						var blob1 = textBlobBuilder.Build(); // Build resets the blob builder
-						var paint = SetupPaint(brush, session.Opacity);
-						session.Canvas.DrawText(blob1, currentLineX, line.baselineOffset, paint);
-					}
-
-					if (selectionDetails is { } sd && (sd.selectionClusterStart.sourceTextStart < run.endInInline + run.inline.StartIndex && (selection!.Value.selectionEnd == _text.Length || run.startInInline + run.inline.StartIndex < sd.selectionClusterEnd.sourceTextStart)))
-					{
-						int selectionLeft;
-						int selectionRight; // the selection ends to the left of positions[selectionRight].X
-						if (run.rtl)
-						{
-							selectionLeft = sd.selectionClusterEnd.layoutedRun == run && selection!.Value.selectionEnd != _text.Length ? sd.selectionClusterEnd.glyphInRunIndexEnd : 0;
-							selectionRight = sd.selectionClusterStart.layoutedRun == run ? sd.selectionClusterStart.glyphInRunIndexStart + 1 : run.glyphs.Length;
-						}
-						else
-						{
-							selectionLeft = sd.selectionClusterStart.layoutedRun == run ? sd.selectionClusterStart.glyphInRunIndexStart : 0;
-							selectionRight = sd.selectionClusterEnd.layoutedRun == run && selection!.Value.selectionEnd != _text.Length ? sd.selectionClusterEnd.glyphInRunIndexStart : run.glyphs.Length;
-						}
-
-						var leftX = positions[selectionLeft].X;
-						var rightX = positions[selectionRight - 1].X + GlyphWidth(run.glyphs[selectionRight - 1].position, run.fontDetails);
-						var selectionRect = new SKRect(currentLineX + leftX, line.y, currentLineX + rightX, line.y + line.lineHeight);
-						sd.background.Paint(session.Canvas, session.Opacity, selectionRect);
-
-						var glyphsSpan = glyphs.AsSpan();
-						var positionsSpan = positions.AsSpan();
-						if (selectionLeft > 0)
-						{
-							DrawText(glyphsSpan[..selectionLeft], positionsSpan[..selectionLeft], session, run.inline.Foreground);
-						}
-						DrawText(glyphsSpan[selectionLeft..selectionRight], positionsSpan[selectionLeft..selectionRight], session, sd.foreground);
-						if (selectionRight < run.glyphs.Length)
-						{
-							DrawText(glyphsSpan[selectionRight..], positionsSpan[selectionRight..], session, run.inline.Foreground);
-						}
-					}
-					else
-					{
-						DrawText(glyphs, positions, session, run.inline.Foreground);
-					}
-
-					currentLineX += run.width;
-				}
-			}
-		}
-
-		// if the caret index is out of range, this means that the parent TextBlock/TextBox updated the text and the
-		// caret position but a new UnicodeText instance has not been created yet. In that case, skip care rendering
-		// this frame and wait to be called again after measuring.
-		if (caret is { } c && caret.Value.index <= _text.Length)
-		{
-			c.brush.Paint(session.Canvas, session.Opacity, GetCaretRectForIndex(c.index, c.thickness).ToSKRect());
-		}
-	}
-
-	// foreground is null only on the host-free TextRunSpec construction path, where no XAML brush
-	// exists. Reset() leaves the paint opaque black, which is the documented fallback for that path.
-	private static SKPaint SetupPaint(Brush? foreground, float opacity)
-	{
-		var paint = _spareDrawPaint;
-		paint.Reset();
-		paint.IsStroke = false;
-		paint.IsAntialias = true;
-
-		if (foreground is SolidColorBrush scb)
-		{
-			var scbColor = scb.Color;
-			paint.Color = new SKColor(
-				red: scbColor.R,
-				green: scbColor.G,
-				blue: scbColor.B,
-				alpha: (byte)(scbColor.A * scb.Opacity * opacity));
-		}
-		else if (foreground is GradientBrush gb)
-		{
-			var gbColor = gb.FallbackColorWithOpacity;
-			paint.Color = new SKColor(
-				red: gbColor.R,
-				green: gbColor.G,
-				blue: gbColor.B,
-				alpha: (byte)(gbColor.A * opacity));
-		}
-		else if (foreground is XamlCompositionBrushBase xcbb)
-		{
-			var gbColor = xcbb.FallbackColorWithOpacity;
-			paint.Color = new SKColor(
-				red: gbColor.R,
-				green: gbColor.G,
-				blue: gbColor.B,
-				alpha: (byte)(gbColor.A * opacity));
-		}
-
-		return paint;
-	}
-
 	private static float RunWidth((GlyphInfo info, CodeBrixGlyphPosition position)[] glyphs, FontDetails details) => glyphs.Sum(g => GlyphWidth(g.position, details));
 	private static float GlyphWidth(CodeBrixGlyphPosition position, FontDetails details) => position.XAdvance * details.TextScale.textScaleX;
 
-	public Rect GetCaretRectForIndex(int index, float caretThickness)
+	public EngineRect GetCaretRectForIndex(int index, float caretThickness)
 	{
 		if (index == 0 && string.IsNullOrEmpty(_text))
 		{
 			var alignmentOffset = _textAlignment switch
 			{
-				TextAlignment.Left => 0,
-				TextAlignment.Center => _desiredSize.Width / 2,
-				TextAlignment.Right => _desiredSize.Width,
+				EngineTextAlignment.Left => 0,
+				EngineTextAlignment.Center => _desiredSize.Width / 2,
+				EngineTextAlignment.Right => _desiredSize.Width,
 				_ => throw new ArgumentOutOfRangeException()
 			};
-			return new Rect(alignmentOffset, 0, caretThickness, _defaultFontDetails.LineHeight);
+			return new EngineRect(alignmentOffset, 0, caretThickness, _defaultFontDetails.LineHeight);
 		}
 
 		if (index == _text.Length)
@@ -1194,14 +941,14 @@ internal readonly partial struct UnicodeText : IParsedText
 			if (lastLine.runs.Count == 0)
 			{
 				// text ending in newline
-				return new Rect(_rtl ? lastLine.xAlignmentOffset - caretThickness : lastLine.xAlignmentOffset, lastLine.y, caretThickness, lastLine.lineHeight);
+				return new EngineRect(_rtl ? lastLine.xAlignmentOffset - caretThickness : lastLine.xAlignmentOffset, lastLine.y, caretThickness, lastLine.lineHeight);
 			}
 			else
 			{
 				var lastCluster = _textIndexToGlyph[^1];
 				var lastGlyph = lastCluster.layoutedRun.glyphs[lastCluster.glyphInRunIndexEnd - 1];
 				var lastGlyphX = lastGlyph.xPosInRun + lastCluster.layoutedRun.xPosInLine + lastCluster.layoutedRun.line.xAlignmentOffset;
-				return new Rect(lastCluster.layoutedRun.rtl ? lastGlyphX : lastGlyphX + GlyphWidth(lastGlyph.position, lastCluster.layoutedRun.fontDetails) - caretThickness, lastCluster.layoutedRun.line.y, caretThickness, lastCluster.layoutedRun.line.lineHeight);
+				return new EngineRect(lastCluster.layoutedRun.rtl ? lastGlyphX : lastGlyphX + GlyphWidth(lastGlyph.position, lastCluster.layoutedRun.fontDetails) - caretThickness, lastCluster.layoutedRun.line.y, caretThickness, lastCluster.layoutedRun.line.lineHeight);
 			}
 		}
 		else
@@ -1209,7 +956,7 @@ internal readonly partial struct UnicodeText : IParsedText
 			var cluster = _textIndexToGlyph[index];
 			var glyph = cluster.layoutedRun.glyphs[cluster.glyphInRunIndexStart];
 			var glyphX = glyph.xPosInRun + cluster.layoutedRun.xPosInLine + cluster.layoutedRun.line.xAlignmentOffset;
-			var rect = new Rect(cluster.layoutedRun.rtl ? glyphX + GlyphWidth(glyph.position, cluster.layoutedRun.fontDetails) - caretThickness : glyphX, cluster.layoutedRun.line.y, caretThickness, cluster.layoutedRun.line.lineHeight);
+			var rect = new EngineRect(cluster.layoutedRun.rtl ? glyphX + GlyphWidth(glyph.position, cluster.layoutedRun.fontDetails) - caretThickness : glyphX, cluster.layoutedRun.line.y, caretThickness, cluster.layoutedRun.line.lineHeight);
 
 			// When the index is set to be right after a run that runs in the direction of the base direction,
 			// and right at the start of a run that runs opposite to the base direction, the caret should be
@@ -1232,18 +979,18 @@ internal readonly partial struct UnicodeText : IParsedText
 		}
 	}
 
-	public Rect GetRectForIndex(int index)
+	public EngineRect GetRectForIndex(int index)
 	{
 		if (index == 0 && string.IsNullOrEmpty(_text))
 		{
 			var alignmentOffset = _textAlignment switch
 			{
-				TextAlignment.Left => 0,
-				TextAlignment.Center => _desiredSize.Width / 2,
-				TextAlignment.Right => _desiredSize.Width,
+				EngineTextAlignment.Left => 0,
+				EngineTextAlignment.Center => _desiredSize.Width / 2,
+				EngineTextAlignment.Right => _desiredSize.Width,
 				_ => throw new ArgumentOutOfRangeException()
 			};
-			return new Rect(alignmentOffset, 0, 0, _defaultFontDetails.LineHeight);
+			return new EngineRect(alignmentOffset, 0, 0, _defaultFontDetails.LineHeight);
 		}
 
 		index = Math.Min(index, _text.Length);
@@ -1252,8 +999,8 @@ internal readonly partial struct UnicodeText : IParsedText
 		{
 			var lastRect = GetRectForIndex(index - 1);
 			return _rtl ?
-				new Rect(lastRect.Left, lastRect.Y, 0, lastRect.Height) :
-				new Rect(lastRect.Right, lastRect.Y, 0, lastRect.Height);
+				new EngineRect(lastRect.Left, lastRect.Y, 0, lastRect.Height) :
+				new EngineRect(lastRect.Right, lastRect.Y, 0, lastRect.Height);
 		}
 		var cluster = _textIndexToGlyph[index];
 		var glyphs = cluster.layoutedRun.glyphs[cluster.glyphInRunIndexStart..cluster.glyphInRunIndexEnd];
@@ -1262,13 +1009,13 @@ internal readonly partial struct UnicodeText : IParsedText
 		var y = cluster.layoutedRun.line.y;
 		var width = glyphs.Sum(g => GlyphWidth(g.position, cluster.layoutedRun.fontDetails));
 		var height = cluster.layoutedRun.line.lineHeight;
-		return new Rect(x, y, width, height);
+		return new EngineRect(x, y, width, height);
 	}
 
-	public int GetIndexAt(Point p, bool ignoreEndingNewLine, bool extendedSelection) =>
+	public int GetIndexAt(EnginePoint p, bool ignoreEndingNewLine, bool extendedSelection) =>
 		GetIndexAndRunAt(p, ignoreEndingNewLine, extendedSelection).index;
 
-	private (int index, LayoutedLineBrokenBidiRun? run) GetIndexAndRunAt(Point p, bool ignoreEndingNewLine, bool extendedSelection)
+	private (int index, LayoutedLineBrokenBidiRun? run) GetIndexAndRunAt(EnginePoint p, bool ignoreEndingNewLine, bool extendedSelection)
 	{
 		if (_lines.Count == 0)
 		{
@@ -1369,22 +1116,6 @@ internal readonly partial struct UnicodeText : IParsedText
 
 		CI.Assert(false, "This should be unreachable");
 		return (-1, null);
-	}
-
-	public Hyperlink? GetHyperlinkAt(Point point)
-	{
-		var run = GetIndexAndRunAt(point, ignoreEndingNewLine: false, extendedSelection: false).run;
-		DependencyObject? parent = run?.inline.Inline;
-		while (parent is TextElement textElement)
-		{
-			if (parent is Hyperlink h)
-			{
-				return h;
-			}
-			parent = textElement.GetParent() as DependencyObject;
-		}
-
-		return null;
 	}
 
 	public (int start, int length) GetWordAt(int index, bool right)
@@ -1497,13 +1228,13 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	// This method assumes that the FontDetails with the biggest LineHeight is also the one with the biggest SKFontMetrics.Top.
 	// If that assumption is wrong, we will need an additional lazy parameter for the latter.
-	private static (float lineHeight, float baselineOffset) GetLineHeightAndBaselineOffset(LineStackingStrategy lineStackingStrategy, float lineHeight, FontDetails fontDetailsWithMaxHeightInLine, bool isFirstLine, bool isLastLine)
+	private static (float lineHeight, float baselineOffset) GetLineHeightAndBaselineOffset(EngineLineStackingStrategy lineStackingStrategy, float lineHeight, FontDetails fontDetailsWithMaxHeightInLine, bool isFirstLine, bool isLastLine)
 	{
-		if (lineStackingStrategy is LineStackingStrategy.MaxHeight || !(lineHeight > 0))
+		if (lineStackingStrategy is EngineLineStackingStrategy.MaxHeight || !(lineHeight > 0))
 		{
 			return (Math.Max(lineHeight, fontDetailsWithMaxHeightInLine.LineHeight), -fontDetailsWithMaxHeightInLine.SKFontMetrics.Ascent);
 		}
-		else if (lineStackingStrategy is LineStackingStrategy.BaselineToBaseline)
+		else if (lineStackingStrategy is EngineLineStackingStrategy.BaselineToBaseline)
 		{
 			if (isFirstLine)
 			{
@@ -1521,7 +1252,7 @@ internal readonly partial struct UnicodeText : IParsedText
 				}
 			}
 		}
-		else if (lineStackingStrategy is LineStackingStrategy.BlockLineHeight)
+		else if (lineStackingStrategy is EngineLineStackingStrategy.BlockLineHeight)
 		{
 			return (lineHeight, lineHeight - fontDetailsWithMaxHeightInLine.SKFontMetrics.Descent);
 		}

@@ -1,0 +1,72 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.AdvancedTextEdit.Core: the editor - the document model, editing, highlighting, folding,
+	completion, search, snippets and the rendering, which lays text out through the TextLayout add-in's Core and
+	paints it on an SKCanvas - the shared tree of this folder. It references SkiaSharp (plan rule R7), the TextLayout
+	Core and the framework's Core assemblies, never the framework's Skia assemblies. The element that supplies the
+	canvas is the platform contract Contracts/IRenderCanvasPlatform.cs; the Skia project in this folder
+	(Platform.UI.AdvancedTextEdit.Skia.csproj, assembly CodeBrix.Platform.UI.AdvancedTextEdit) implements it and
+	carries the package.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AdvancedTextEdit.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AdvancedTextEdit</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the AdvancedTextEdit package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- SkiaSharp supplies the geometry and drawing types on the public surface (SKCanvas in
+		     background renderers and the render pass, SKRect/SKPoint in layout geometry). Its version
+		     comes from the PackageReference Update entries in src/Directory.Build.targets, so it can
+		     never disagree with the family-wide pin. -->
+		<PackageReference Include="SkiaSharp" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The editor reaches framework internals (typed-character input) through InternalsVisibleTo,
+		     declared in src/Platform.UI/AssemblyInfo.cs, and lays text out through the TextLayout Core. -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Highlighting\Resources\*.xshd" />
+		<EmbeddedResource Include="Highlighting\Resources\*.xsd" />
+	</ItemGroup>
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

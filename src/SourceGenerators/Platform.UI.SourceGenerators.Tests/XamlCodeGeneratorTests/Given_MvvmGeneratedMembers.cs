@@ -273,9 +273,9 @@ public class Given_MvvmGeneratedMembers
 			"MainPage_0e3f323f9a22a3699cbcd4f0217eee4a.cs");
 		test.ExpectedDiagnostics.AddRange(new[]
 		{
-			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 74, 266, 74, 270).WithArguments("TestRepro.MyViewModel", "Name"),
-			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 96, 266, 96, 270).WithArguments("TestRepro.MyViewModel", "Name"),
-			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 118, 266, 118, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 70, 266, 70, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 92, 266, 92, 270).WithArguments("TestRepro.MyViewModel", "Name"),
+			DiagnosticResult.CompilerError("CS1061").WithSpan(generatedMainPage, 114, 266, 114, 270).WithArguments("TestRepro.MyViewModel", "Name"),
 		});
 
 		await test.RunAsync();

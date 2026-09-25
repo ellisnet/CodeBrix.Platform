@@ -1,4 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.TerminalView: since the Core/Skia split, only the canvas supply (the *.skia.cs files: the Skia
+	implementation of the add-in's IRenderCanvasPlatform contract, the add-in's software RenderCanvas) and the package.
+	The control and its drawing are in CodeBrix.Platform.UI.TerminalView.Core (Platform.UI.TerminalView.Core.csproj),
+	which this package carries beside this assembly.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,7 +26,15 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.TerminalView.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<PropertyGroup>
 		<Nullable>enable</Nullable>
@@ -29,12 +43,17 @@
 
 	<ItemGroup>
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
-		     Platform.UI.TextLayout.Skia as CodeBrix.Platform.TextLayout.ApacheLicenseForever, both at
+		     Platform.UI.TextLayout.Core (the whole TextLayout add-in since the text-engine home change)
+		     as CodeBrix.Platform.TextLayout.ApacheLicenseForever, both at
 		     the same family version as this build (the whole family ships together). TextLayout also
 		     carries the CodeBrix.Platform.Unicode/UnicodeMacOs (ICU) dependencies this control needs
 		     for shaping - they flow transitively; do not remove the TextLayout reference. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
+
+		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
+		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->
+		<ProjectReference Include="Platform.UI.TerminalView.Core.csproj" CodeBrixBundleInPackage="true" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -43,7 +62,7 @@
 
 		<!-- The terminal engine. External to the CodeBrix.Platform family, so this reference is
 		     versioned here (not family-locked); bump deliberately. -->
-		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.250.30" />
+		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.262.971" />
 
 		<!-- The default terminal font (ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf).
 		     Declared here so consumers get it without knowing to reference it themselves (the family's
@@ -67,4 +86,5 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="..\AddIn.CorePackaging.targets" />
 </Project>

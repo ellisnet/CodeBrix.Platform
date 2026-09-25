@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.FlexPanel.Core: the whole FlexPanel add-in. It is pure layout on public framework API, so it
+	is Core BY WHOLE (renamed to .Core, no Skia assembly and no shell under the old name). It references only the
+	platform-neutral framework Core assemblies.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.FlexPanel.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.FlexPanel</RootNamespace>
+
+		<!-- This AddIn is packed by the central driver (build/CodeBrix.Platform.Build.csproj, the
+		     _CsprojPackage list), which date-stamps it and drops it in {repo}/nugets/Release with
+		     the rest of the family - so no GeneratePackageOnBuild here. -->
+		<!-- Ships the standard CodeBrix doc set (icon, README, AGENT-README, THIRD-PARTY-NOTICES) as
+		     package content via the ItemGroup below, matching the TextLayout add-in's configuration. -->
+		<PackageIcon>icon-codebrix-128.png</PackageIcon>
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'=='false'">CodeBrix.Platform.FlexPanel.ApacheLicenseForever</PackageId>
+		<Description>A flexible layout panel that arranges its children in wrapping rows or columns, using the same model as CSS flexbox on the web. Supports the familiar flex properties - direction, justify-content, align-items, grow, shrink, and order - so if you know flexbox, you already know this panel. Pure managed layout code, with no native dependencies.</Description>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- The panel uses only public framework API (Panel, DependencyProperty, Measure/Arrange), so it compiles
+		     against the framework's Core assembly and needs no InternalsVisibleTo into the framework. The framework
+		     package (CodeBrix.Platform.ApacheLicenseForever, at the same family version - the whole family ships
+		     together) is carried by Platform.UI.Skia.csproj; CodeBrixPackAs makes it this package's dependency when
+		     packing (see ../AddIn.CorePackaging.targets). -->
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" CodeBrixPackAs="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and `dotnet pack` puts it in the package's lib folder by itself, so nothing in
+		     the packaging recipe needs to know about it. CS1591 (a public member with no XML
+		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<Import Project="..\AddIn.CorePackaging.targets" />
+
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+</Project>

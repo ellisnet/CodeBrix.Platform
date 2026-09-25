@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using CodeBrix.Platform.UI.Lottie.Engine;
 using Windows.UI;
 
 #if HAS_CODEBRIX_WINUI
@@ -9,26 +9,17 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 {
 	partial class ThemableLottieVisualSource
 	{
-		private readonly Dictionary<string, ColorBinding> _colorsBindings
-			= new Dictionary<string, ColorBinding>(2);
-
+		//(The bindings live in the theming engine, Engine/LottieColorTheme, as packed ARGB - WPE1 C9.)
 		public void SetColorThemeProperty(string propertyName, Color? color)
 		{
-			if (_colorsBindings.TryGetValue(propertyName, out var existing))
-			{
-				existing.NextValue = color;
-			}
-			else
-			{
-				_colorsBindings[propertyName] = new ColorBinding { NextValue = color };
-			}
+			_theme.SetColor(propertyName, color is { } c ? LottieColorTheme.ToArgb(c.A, c.R, c.G, c.B) : null);
 
-			if (_currentDocument == null)
+			if (!_theme.HasDocument)
 			{
 				return; // no document to change yet
 			}
 
-			if (ApplyProperties())
+			if (_theme.ApplyProperties())
 			{
 				NotifyCallback();
 			}
@@ -36,9 +27,9 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 
 		public Color? GetColorThemeProperty(string propertyName)
 		{
-			if (_colorsBindings.TryGetValue(propertyName, out var existing))
+			if (_theme.GetColor(propertyName) is { } argb)
 			{
-				return existing.NextValue ?? existing.CurrentValue;
+				return Color.FromArgb(LottieColorTheme.Alpha(argb), LottieColorTheme.Red(argb), LottieColorTheme.Green(argb), LottieColorTheme.Blue(argb));
 			}
 
 			return default;

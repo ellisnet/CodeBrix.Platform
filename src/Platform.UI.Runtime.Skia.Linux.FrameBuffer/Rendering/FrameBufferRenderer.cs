@@ -68,7 +68,7 @@ internal abstract class FrameBufferRenderer
 		_surface?.Canvas.RotateDegrees(degrees);
 		_surface?.Canvas.Clear(SKColors.Transparent);
 
-		ct.OnNativePlatformFrameRequested(_surface?.Canvas, size =>
+		global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested(ct, _surface?.Canvas, size =>
 		{
 			_surface?.Dispose();
 			if (orientation is DisplayOrientations.Portrait or DisplayOrientations.PortraitFlipped)

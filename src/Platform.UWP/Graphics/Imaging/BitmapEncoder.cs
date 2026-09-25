@@ -6,8 +6,6 @@ using Android.Graphics;
 #elif false
 using Foundation;
 using UIKit;
-#elif __SKIA__
-using SkiaSharp;
 #endif
 
 namespace Windows.Graphics.Imaging;
@@ -51,16 +49,6 @@ partial class BitmapEncoder
 		{
 			{JpegEncoderId, AsJPEG},
 			{PngEncoderId, AsPNG},
-		};
-#elif __SKIA__
-	private static readonly IDictionary<Guid, SKEncodedImageFormat> _encoderMap =
-		new Dictionary<Guid, SKEncodedImageFormat>()
-		{
-			{BmpEncoderId, SKEncodedImageFormat.Bmp},
-			{GifEncoderId, SKEncodedImageFormat.Gif},
-			{JpegEncoderId, SKEncodedImageFormat.Jpeg},
-			{PngEncoderId, SKEncodedImageFormat.Png},
-			{HeifEncoderId, SKEncodedImageFormat.Heif},
 		};
 #endif
 }

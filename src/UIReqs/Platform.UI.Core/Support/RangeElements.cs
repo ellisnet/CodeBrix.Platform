@@ -50,6 +50,8 @@ public static class RangeElements
 		ElementFactory.RegisterProperty("IsThumbToolTipEnabled", (element, value) =>
 			Sliding(element, "IsThumbToolTipEnabled").IsThumbToolTipEnabled = ReadBoolean(value));
 		ElementFactory.RegisterProperty("IsIndeterminate", (element, value) => SetIsIndeterminate(element, value));
+		ElementFactory.RegisterProperty("ShowPaused", (element, value) =>
+			ProgressBarOf(element, "ShowPaused").ShowPaused = ReadBoolean(value));
 		ElementFactory.RegisterProperty("IsActive", (element, value) =>
 			Ring(element, "IsActive").IsActive = ReadBoolean(value));
 		ElementFactory.RegisterProperty("ViewportSize", (element, value) =>
@@ -159,6 +161,9 @@ public static class RangeElements
 				throw Unsupported(element, "Maximum");
 		}
 	}
+
+	private static ProgressBar ProgressBarOf(FrameworkElement element, string property)
+		=> element as ProgressBar ?? throw Unsupported(element, property);
 
 	private static void SetIsIndeterminate(FrameworkElement element, string value)
 	{

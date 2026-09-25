@@ -270,7 +270,7 @@ public partial class Border : FrameworkElement
 
 	#region BorderBrush Dependency Property
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 	private Action _borderBrushChanged;
 	private IDisposable _brushChangedSubscription;
 #endif
@@ -300,7 +300,7 @@ public partial class Border : FrameworkElement
 
 	private void OnBorderBrushChanged(Brush oldValue, Brush newValue)
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		this.UpdateBorderBrush();
 #else
 		_brushChangedSubscription?.Dispose();
@@ -352,7 +352,7 @@ public partial class Border : FrameworkElement
 		);
 
 		return element.Background != null
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			|| element.BorderBrush != null
 #endif
 			;

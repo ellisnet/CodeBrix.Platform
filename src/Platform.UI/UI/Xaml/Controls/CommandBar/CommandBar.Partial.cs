@@ -368,7 +368,7 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 
 #if false
-		private static DependencyProperty NavigationCommandProperty = CodeBrix.Platform.UI.ToolkitHelper.GetProperty("CodeBrix.Platform.UI.Toolkit.CommandBarExtensions, CodeBrix.Platform.UI.Toolkit", "NavigationCommand");
+		private static DependencyProperty NavigationCommandProperty = CodeBrix.Platform.UI.ToolkitHelper.GetProperty("CodeBrix.Platform.UI.Toolkit.CommandBarExtensions, CodeBrix.Platform.UI.Toolkit.Core", "NavigationCommand");
 
 		internal override void UpdateThemeBindings(ResourceUpdateReason updateReason)
 		{

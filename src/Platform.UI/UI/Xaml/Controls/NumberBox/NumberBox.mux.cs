@@ -503,46 +503,60 @@ partial class NumberBox
 		}
 	}
 
+	/// <summary>
+	/// Raise entry point for a platform handler (the NumberBox's template, and so its inner TextBox, is suppressed): the
+	/// user committed <paramref name="text"/> in the native field. Parses and validates it exactly as the inner TextBox's
+	/// text is on commit (NumberFormatter, AcceptsExpression, ValidationMode), sets Value, and sets Text to the formatted
+	/// value.
+	/// </summary>
+	/// <param name="text">The native field's text.</param>
+	internal void CommitTextFromPlatform(string text) => ValidateText(text ?? string.Empty);
+
 	private void ValidateInput()
 	{
 		// Validate the content of the inner textbox
 		if (m_textBox != null)
 		{
-			var text = trim(m_textBox.Text);
+			ValidateText(m_textBox.Text);
+		}
+	}
 
-			// Handles empty TextBox case, set text to current value
-			if (string.IsNullOrEmpty(text))
+	private void ValidateText(string rawText)
+	{
+		var text = trim(rawText);
+
+		// Handles empty TextBox case, set text to current value
+		if (string.IsNullOrEmpty(text))
+		{
+			Value = double.NaN;
+		}
+		else
+		{
+			// Setting NumberFormatter to something that isn't an INumberParser will throw an exception, so this should be safe
+			var numberParser = NumberFormatter as INumberParser;
+
+			var value = AcceptsExpression
+				? NumberBoxParser.Compute(text, numberParser)
+				: numberParser.ParseDouble(text);
+
+			if (value == null)
 			{
-				Value = double.NaN;
+				if (ValidationMode == NumberBoxValidationMode.InvalidInputOverwritten)
+				{
+					// Override text to current value
+					UpdateTextToValue();
+				}
 			}
 			else
 			{
-				// Setting NumberFormatter to something that isn't an INumberParser will throw an exception, so this should be safe
-				var numberParser = NumberFormatter as INumberParser;
-
-				var value = AcceptsExpression
-					? NumberBoxParser.Compute(text, numberParser)
-					: numberParser.ParseDouble(text);
-
-				if (value == null)
+				if (value.Value == Value)
 				{
-					if (ValidationMode == NumberBoxValidationMode.InvalidInputOverwritten)
-					{
-						// Override text to current value
-						UpdateTextToValue();
-					}
+					// Even if the value hasn't changed, we still want to update the text (e.g. Value is 3, user types 1 + 2, we want to replace the text with 3)
+					UpdateTextToValue();
 				}
 				else
 				{
-					if (value.Value == Value)
-					{
-						// Even if the value hasn't changed, we still want to update the text (e.g. Value is 3, user types 1 + 2, we want to replace the text with 3)
-						UpdateTextToValue();
-					}
-					else
-					{
-						Value = value.Value;
-					}
+					Value = value.Value;
 				}
 			}
 		}
@@ -661,6 +675,23 @@ partial class NumberBox
 	// Updates TextBox.Text with the formatted Value
 	private void UpdateTextToValue()
 	{
+		// Element handler seam: with no inner TextBox (the template is suppressed by a platform handler), the formatted
+		// value still reaches Text, which the handler shows.
+		if (UIElement.AreHandlersActive && m_textBox == null && Handler is not null)
+		{
+			var formattedText = double.IsNaN(Value) ? "" : NumberFormatter.FormatDouble(m_displayRounder.RoundDouble(Value));
+
+			try
+			{
+				m_textUpdating = true;
+				Text = formattedText;
+			}
+			finally
+			{
+				m_textUpdating = false;
+			}
+		}
+
 		if (m_textBox != null)
 		{
 			string newText = "";

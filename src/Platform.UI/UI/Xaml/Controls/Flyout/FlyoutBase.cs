@@ -357,6 +357,13 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 				{
 					_popup.IsOpen = false;
 				}
+
+				if (_isPresentedByPlatform)
+				{
+					_isPresentedByPlatform = false;
+					CodeBrix.Platform.UI.Contracts.PlatformServices.OverlayPresenter?.HideFlyout(this);
+				}
+
 				IsOpen = false;
 
 				OnClosed();
@@ -507,7 +514,12 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 				return;
 			}
 
-			Open();
+			// Element handler seam, hook H12: the platform presents the flyout instead of Core's popup; Opening (above),
+			// IsOpen, Opened (below), Closing and Closed stay Core's.
+			if (!TryShowWithPlatformPresenter(placementTarget, showOptions))
+			{
+				Open();
+			}
 			IsOpen = true;
 
 			// **************************************************************************************
@@ -526,6 +538,30 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 		}
 
 		partial void UpdatePopupPanelSizePartial();
+
+		// Element handler seam, hook H12: true while the platform's overlay presenter shows this flyout (Core's popup stays closed).
+		private bool _isPresentedByPlatform;
+
+		/// <summary>
+		/// Element handler seam, hook H12: offers the flyout to the platform's overlay presenter, at the point where
+		/// Core would open its popup.
+		/// </summary>
+		/// <param name="placementTarget">The element the flyout is shown for.</param>
+		/// <param name="showOptions">The show options, or <see langword="null"/>.</param>
+		/// <returns><see langword="true"/> when the platform presents the flyout.</returns>
+		private bool TryShowWithPlatformPresenter(FrameworkElement placementTarget, FlyoutShowOptions showOptions)
+		{
+			if (UIElement.AreHandlersActive
+				&& CodeBrix.Platform.UI.Contracts.PlatformServices.OverlayPresenter is { } presenter
+				&& presenter.TryShowFlyout(this, placementTarget, showOptions))
+			{
+				_isPresentedByPlatform = true;
+				AddToOpenFlyouts();
+				return true;
+			}
+
+			return false;
+		}
 
 		private void SetTargetPosition(Point targetPoint)
 		{

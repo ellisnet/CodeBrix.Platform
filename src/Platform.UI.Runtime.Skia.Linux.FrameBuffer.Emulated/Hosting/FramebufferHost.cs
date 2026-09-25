@@ -214,8 +214,8 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 				Dispatch(() => _renderer!.InvalidateRender(), NativeDispatcherPriority.High);
 			}
 
-			Windows.UI.Core.CoreDispatcher.DispatchOverride = Dispatch;
-			Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = Dispatch;
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => _isDispatcherThread;
 
 			// The renderer's constructor is what first hands the frame buffer's size to
 			// the window wrapper, so the panel is resolved before the input loop below

@@ -3,7 +3,7 @@ using System;
 namespace CodeBrix.Platform.UI.VideoPlayer.Skia;
 
 /// <summary>
-/// Event args for <see cref="VideoPlayer.MediaFailed"/>.
+/// Event args for <c>VideoPlayer.MediaFailed</c>.
 /// </summary>
 public sealed class VideoPlayerFailedEventArgs : EventArgs
 {

@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Activation
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	public enum ActivationKind
 	{
 		// Skipping already declared field Windows.ApplicationModel.Activation.ActivationKind.Launch
@@ -46,16 +46,16 @@ namespace Windows.ApplicationModel.Activation
 		// Skipping already declared field Windows.ApplicationModel.Activation.ActivationKind.StartupTask
 		// Skipping already declared field Windows.ApplicationModel.Activation.ActivationKind.CommandLineLaunch
 		// Skipping already declared field Windows.ApplicationModel.Activation.ActivationKind.BarcodeScannerProvider
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		PrintSupportJobUI = 1023,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		PrintSupportSettingsUI = 1024,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		PhoneCallActivation = 1025,
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		VpnForeground = 1026,
 #endif
 	}

@@ -44,9 +44,9 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
 		<PackageReference Include="Reqnroll.xunit.v3" Version="3.3.4" />
-		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -114,7 +114,7 @@
 		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated\Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.csproj" />
 		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI\Platform.UI.Skia.csproj" />
 		<!-- XamlControlsResources: controls have no templates without the Fluent theme. -->
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

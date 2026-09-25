@@ -4,13 +4,13 @@
 namespace Microsoft.UI.Xaml.CustomAttributes
 {
 	[global::System.AttributeUsageAttribute(global::System.AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MUXHasCustomActivationFactoryAttribute : global::System.Attribute
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public MUXHasCustomActivationFactoryAttribute() : base()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.CustomAttributes.MUXHasCustomActivationFactoryAttribute", "MUXHasCustomActivationFactoryAttribute.MUXHasCustomActivationFactoryAttribute()");

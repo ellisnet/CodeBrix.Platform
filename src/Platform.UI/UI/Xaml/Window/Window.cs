@@ -52,7 +52,7 @@ partial class Window
 
 	internal Window(WindowType windowType)
 	{
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		if (_current is null && CoreApplication.IsFullFledgedApp)
 		{
 			windowType = WindowType.CoreWindow;

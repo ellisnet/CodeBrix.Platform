@@ -60,6 +60,6 @@
 		<EmbeddedResource Include="$(MSBuildThisFileDirectory)Assets\libvlc_init_sample.mp4" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="../../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 </Project>

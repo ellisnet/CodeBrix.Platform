@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using System;
 using System.Linq;
 using Windows.Foundation;
@@ -16,8 +16,8 @@ using System.Diagnostics;
 using NativePath = CoreGraphics.CGPath;
 using ObjCRuntime;
 using NativeSingle = System.Runtime.InteropServices.NFloat;
-#elif __SKIA__
-using NativePath = Microsoft.UI.Composition.SkiaGeometrySource2D;
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+using NativePath = Windows.Graphics.IGeometrySource2D;
 using NativeSingle = System.Double;
 
 #elif false

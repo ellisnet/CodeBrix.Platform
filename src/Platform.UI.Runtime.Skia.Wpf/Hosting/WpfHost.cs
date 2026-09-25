@@ -113,8 +113,8 @@ public class WpfHost : SkiaHost, IWpfApplicationHost
 			? DispatcherPriority.Input
 			: DispatcherPriority.Render;
 
-		Windows.UI.Core.CoreDispatcher.DispatchOverride = (d, p) => _dispatcher.BeginInvoke(d, p == CodeBrix.Platform.UI.Dispatching.NativeDispatcherPriority.Idle ? DispatcherPriority.SystemIdle : pumpPriority);
-		Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = _dispatcher.CheckAccess;
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = (d, p) => _dispatcher.BeginInvoke(d, p == CodeBrix.Platform.UI.Dispatching.NativeDispatcherPriority.Idle ? DispatcherPriority.SystemIdle : pumpPriority);
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = _dispatcher.CheckAccess;
 	}
 
 	private void StartApp()

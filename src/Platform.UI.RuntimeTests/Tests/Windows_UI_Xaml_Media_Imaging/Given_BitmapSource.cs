@@ -211,7 +211,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media_Imaging 
 		[PlatformCondition(ConditionMode.Exclude, RuntimeTestPlatforms.NativeIOS)] // https://github.com/unoplatform/uno/issues/9080
 		public async Task When_Uri_Nullified()
 		{
-			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI"))
+			if (!ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.Imaging.RenderTargetBitmap, CodeBrix.Platform.UI.Core"))
 			{
 				Assert.Inconclusive("Taking screenshots is not possible on this target platform.");
 			}

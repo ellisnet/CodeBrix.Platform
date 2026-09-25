@@ -90,6 +90,14 @@ internal static class SymbolMatchingHelpers
 			return true;
 		}
 
+		if (uapSymbol.Kind == SymbolKind.ErrorType)
+		{
+			// The Windows App SDK metadata references the Windows SDK types (e.g. Windows.Graphics.RectInt32)
+			// through the "Windows" union metadata assembly, which is not part of the reference set, so they
+			// are error types whose modifiers (IsSealed, ...) cannot be compared. Match them by full name.
+			return uapSymbol.ToDisplayString() == codebrixSymbol.ToDisplayString();
+		}
+
 		if (uapSymbol.Name == "Transform" && uapSymbol.Kind == SymbolKind.NamedType)
 		{
 			// In Uno, it's abstract to force all derived classes to implement a specific method.

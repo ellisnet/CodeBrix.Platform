@@ -43,7 +43,7 @@ namespace CodeBrix.Platform.UI.XamlHost.Skia.Wpf //Was previously: Uno.UI.XamlHo
 		static CodeBrixXamlHostBase()
 		{
 			//TODO: These lines should be set in a different location, possibly in a more general way (for multi-window support) https://github.com/unoplatform/uno/issues/8978
-			Windows.UI.Core.CoreDispatcher.DispatchOverride = (d, p) =>
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = (d, p) =>
 			{
 				if (global::System.Windows.Application.Current is { } app)
 				{
@@ -55,7 +55,7 @@ namespace CodeBrix.Platform.UI.XamlHost.Skia.Wpf //Was previously: Uno.UI.XamlHo
 				}
 			};
 
-			Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = () =>
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () =>
 			{
 				if (global::System.Windows.Application.Current is { } app)
 				{

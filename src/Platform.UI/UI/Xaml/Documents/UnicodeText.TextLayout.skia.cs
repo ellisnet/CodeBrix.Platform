@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Windows.Foundation;
 using Microsoft.UI.Xaml.Documents.TextFormatting;
 using SkiaSharp;
 
@@ -11,7 +10,7 @@ namespace Microsoft.UI.Xaml.Documents;
 
 /// <summary>
 /// The host-free surface of the layout engine, consumed by the CodeBrix.Platform.UI.TextLayout
-/// add-in.
+/// add-in (its copy of the shared engine, WPE1 C5).
 /// </summary>
 /// <remarks>
 /// Everything here reads the layout the constructor already produced; none of it is used by
@@ -91,9 +90,9 @@ internal readonly partial struct UnicodeText
 	/// rather than a single bounding box. The per-run geometry mirrors what the compositor Draw
 	/// overload paints for a selection, so highlight and text agree exactly.
 	/// </remarks>
-	internal IReadOnlyList<Rect> GetSelectionRects(int start, int length)
+	internal IReadOnlyList<EngineRect> GetSelectionRects(int start, int length)
 	{
-		var rects = new List<Rect>();
+		var rects = new List<EngineRect>();
 		if (length <= 0 || _text.Length == 0 || _textIndexToGlyph.Length == 0)
 		{
 			return rects;
@@ -145,7 +144,7 @@ internal readonly partial struct UnicodeText
 				var lastGlyph = run.glyphs[selectionRight - 1];
 				var rightX = runX + lastGlyph.xPosInRun + GlyphWidth(lastGlyph.position, run.fontDetails);
 
-				rects.Add(new Rect(leftX, line.y, rightX - leftX, line.lineHeight));
+				rects.Add(new EngineRect(leftX, line.y, rightX - leftX, line.lineHeight));
 			}
 		}
 
@@ -206,8 +205,8 @@ internal readonly partial struct UnicodeText
 	/// <param name="origin">Where the layout's top-left corner lands on the canvas.</param>
 	/// <param name="paint">The paint to draw the glyphs with. Its colour and style are honoured.</param>
 	/// <remarks>
-	/// The compositor overload needs a <see cref="Visual.PaintingSession"/>, which only a
-	/// <see cref="Visual"/> can create and which carries an opacity and a root transform. This
+	/// The compositor overload (framework only) needs a painting session, which only a composition
+	/// visual can create and which carries an opacity and a root transform. This
 	/// overload exists so a consumer can paint into any canvas - an offscreen surface, a document
 	/// layer, a bitmap - with no visual tree involved.
 	/// </remarks>

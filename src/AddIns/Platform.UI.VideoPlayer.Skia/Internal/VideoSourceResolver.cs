@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Windows.ApplicationModel;
-using Microsoft.UI.Xaml;
+using CodeBrix.Platform.UI.VideoPlayer.Skia.Contracts;
 
 namespace CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
 
@@ -20,6 +19,12 @@ namespace CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
 /// </remarks>
 internal static class VideoSourceResolver
 {
+	//Where the application's assets are (WPE1 C11: the platform's IAssetLocation instead of the WinRT Package and the
+	//  XAML Application, so the resolver runs without the XAML object model). Resolved once, on first need.
+	private static IAssetLocation? _assets;
+
+	private static IAssetLocation Assets => _assets ??= PlatformContract.Resolve<IAssetLocation>();
+
 	/// <summary>
 	/// Resolves <paramref name="source"/> to either something the playback session can open by
 	/// name - a local file path or an http(s) address - or an open stream (exactly one of the two
@@ -40,7 +45,7 @@ internal static class VideoSourceResolver
 				case "embedded":
 					return (null, OpenEmbeddedResource(uri));
 				case "ms-appx":
-					return (Path.Join(Package.Current.InstalledPath, AssetRelativePath(source)), null);
+					return (Path.Join(Assets.InstalledPath, AssetRelativePath(source)), null);
 				case "file":
 					return (uri.LocalPath, null);
 				case "http":
@@ -86,7 +91,7 @@ internal static class VideoSourceResolver
 	{
 		var assemblyName = uri.Host;
 		var assembly = assemblyName == "."
-			? Application.Current.GetType().Assembly
+			? Assets.ApplicationAssembly
 			: Assembly.Load(assemblyName);
 
 		var resourceName = Uri.UnescapeDataString(uri.AbsolutePath[1..]).Replace("(assembly)", assembly.GetName().Name);

@@ -1,4 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.SkiaSharp.Views: since the Core/Skia split, only the Skia implementations of the add-in's
+	per-element contracts (the *.skia.cs files in Skia/): the SKXamlCanvas surface - the pixel buffer the canvas paints
+	into and presents through a WriteableBitmap in an ImageBrush, which the framework's Skia renderer composites - and
+	SKSwapChainPanel's "not supported on Skia" behaviour. The element API and the Skia-canvas host seam are in
+	CodeBrix.Platform.SkiaSharp.Views.Core (CodeBrix.Platform.SkiaSharp.Views.Core.csproj), which the package carries
+	beside this assembly (build/nuget/CodeBrix.Platform.SkiaSharp.Views.nuspec).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -45,10 +53,14 @@
 		<NeutralLanguage>en</NeutralLanguage>
 	</PropertyGroup>
 
+	<PropertyGroup>
+		<!-- Only the Skia files: the shared tree belongs to CodeBrix.Platform.SkiaSharp.Views.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<!-- Reference-flavor API shells; compiled only by the .Reference flavor of this project -->
-		<Compile Remove="SkiaSharp.Views.Platform.WinUI\**\*.cs" />
-		<None Include="SkiaSharp.Views.Platform.WinUI\**\*.cs" />
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -56,11 +68,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
+		<ProjectReference Include="CodeBrix.Platform.SkiaSharp.Views.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
-
-	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
 
 	<Target Name="_CodeBrixSkiaSharpViewsOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
 

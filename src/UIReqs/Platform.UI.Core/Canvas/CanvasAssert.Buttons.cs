@@ -39,28 +39,19 @@ public static partial class CanvasAssert
 		ArgumentNullException.ThrowIfNull(region);
 
 		var background = Background;
-		var counts = new Dictionary<uint, int>();
-		var representatives = new Dictionary<uint, SKColor>();
+		var mode = new ModeColor();
 
 		foreach (var pixel in region.Pixels())
 		{
-			var composited = ColorMatch.Composite(pixel, background);
-			var key = (uint) ColorMatch.Quantize(composited);
-			counts.TryGetValue(key, out var count);
-			counts[key] = count + 1;
-			if (count == 0)
-			{
-				representatives[key] = composited;
-			}
+			mode.Add(ColorMatch.Composite(pixel, background));
 		}
 
-		if (counts.Count == 0)
+		if (!mode.TryGetMode(out var color, out var count))
 		{
 			return (default, 0.0);
 		}
 
-		var dominant = counts.OrderByDescending(pair => pair.Value).First();
-		return (representatives[dominant.Key], dominant.Value / (double) region.PixelCount);
+		return (color, count / (double) region.PixelCount);
 	}
 
 	/// <summary>

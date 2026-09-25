@@ -158,15 +158,16 @@
 		     family release: a host-free, XAML-free façade over the very same text engine that lays out
 		     every TextBlock in the framework. It exposes shaping, bidi, caret and cluster geometry,
 		     selection rectangles, glyph outline paths, and drawing into an arbitrary SKCanvas, for
-		     consumers that need Pango-class text without a visual tree. -->
-		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		     consumers that need Pango-class text without a visual tree. Core by whole since the
+		     text-engine home change: the Core project packs itself and carries its own copy of the engine. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
 
 		<!-- The FlexPanel AddIn (CodeBrix.Platform.FlexPanel.ApacheLicenseForever) ships with every
 		     family release: a CSS flexbox-style XAML layout panel (Direction / JustifyContent /
 		     AlignItems / AlignContent / Wrap plus the attached Grow, Shrink, Basis, Order and
 		     AlignSelf properties), driven by a managed port of the .NET MAUI FlexLayout engine.
 		     Pure layout - no native dependencies. -->
-		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
 
 		<!-- The AdvancedTextEdit AddIn (CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever)
 		     ships with every family release: a full code/text editor XAML control - rope-backed
@@ -193,10 +194,10 @@
 		     CodeBrix port of OxyPlot) on a Skia surface, with the library's full interaction model
 		     wired in - pan/zoom/tracker/zoom-rectangle/reset from mouse, keyboard and touch
 		     (single-finger pan, two-finger pinch). All chart text resolves through the
-		     application's own fonts via the framework's FontDetailsCache (never system fonts);
-		     the plotting engine comes in as a versioned package dependency. Unlike the text
-		     add-ins there is no TextLayout dependency - the engine shapes its own text through
-		     SkiaSharp.HarfBuzz. -->
+		     application's own fonts via the text engine's FontDetailsCache (never system fonts),
+		     which since the text-engine home change it reaches in the TextLayout AddIn (a package
+		     dependency); the plotting engine comes in as a versioned package dependency and
+		     shapes its own text through SkiaSharp.HarfBuzz. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Skia.csproj" />
 
 		<!-- The AppSettings AddIn (CodeBrix.Platform.AppSettings.ApacheLicenseForever) ships with

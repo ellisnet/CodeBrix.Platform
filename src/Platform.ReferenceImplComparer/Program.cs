@@ -22,8 +22,8 @@ namespace CodeBrix.Platform.ReferenceImplComparer //Was previously: Uno.Referenc
 
 			Console.WriteLine($"Validating package {args[0]}");
 
+			// CodeBrix.Platform packages ship net10.0 only.
 			var referenceTargetFrameworks = new[] {
-				"net9.0",
 				"net10.0"
 			};
 

@@ -23,8 +23,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
-		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.Core.csproj" />
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
 

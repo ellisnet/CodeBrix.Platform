@@ -18,15 +18,16 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 {
 	abstract class Generator
 	{
-		internal const string CSharpLangVersion = "12.0";
+		internal const string CSharpLangVersion = "13.0";
 
+		// CodeBrix.Platform has no Android/iOS/tvOS/WASM flavors: only the unit-test, Skia, reference and Core
+		// flavors are loaded and emitted.
 		private const string UnitTestsDefine = "IS_UNIT_TESTS";
-		private const string AndroidDefine = "__ANDROID__";
-		private const string iOSDefine = "__IOS__";
-		private const string tvOSDefine = "__TVOS__";
 		private const string NetStdReferenceDefine = "__NETSTD_REFERENCE__";
-		private const string WasmDefine = "__WASM__";
 		private const string SkiaDefine = "__SKIA__";
+		// The platform-neutral Core flavor implements exactly what the Skia flavor implements, so it is
+		// emitted wherever SkiaDefine is emitted (appended last so existing lines diff minimally).
+		private const string CoreDefine = "__CODEBRIX_CORE__";
 
 #if HAS_CODEBRIX_WINUI
 		private const string BaseXamlNamespace = "Microsoft.UI.Xaml";
@@ -92,18 +93,18 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			"Microsoft.UI.Xaml.Controls.RadioMenuFlyoutItem",
 		};
 
-		private Compilation _iOSCompilation;
-		private Compilation _tvOSCompilation;
-		private Compilation _androidCompilation;
-		private INamedTypeSymbol _iOSBaseSymbol;
-		private INamedTypeSymbol _tvOSBaseSymbol;
-		private INamedTypeSymbol _androidBaseSymbol;
 		private static Compilation s_referenceCompilation;
 		private Compilation _unitTestsCompilation;
 
 		private Compilation _netstdReferenceCompilation;
-		private Compilation _wasmCompilation;
 		private Compilation _skiaCompilation;
+
+		// The target framework the fork's projects are loaded with (NetCurrent in src/Directory.Build.props).
+		private const string ProjectsTargetFramework = "net10.0";
+
+		// The repository's src folder: the generator runs from src/Platform.UWPSyncGenerator/bin/<Configuration>/
+		// (the current directory is set to that folder).
+		protected static readonly string SourceRoot = Path.Combine("..", "..", "..");
 
 		private ISymbol _dependencyPropertySymbol;
 		protected ISymbol FlagsAttributeSymbol { get; private set; }
@@ -144,24 +145,20 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			Console.WriteLine($"Generating for {baseName} {sourceAssembly}");
 
-			s_referenceCompilation ??= await LoadUWPReferenceProject(@"..\..\..\Platform.UWPSyncGenerator.Reference\references.txt");
+			s_referenceCompilation ??= await LoadUWPReferenceProject(Path.Combine(SourceRoot, "Platform.UWPSyncGenerator.Reference", "references.txt"));
 
 			_dependencyPropertySymbol = s_referenceCompilation.GetTypeByMetadataName(BaseXamlNamespace + ".DependencyProperty");
 
-			var topProject = @"..\..\..\Platform.UI\Platform.UI";
+			var topProject = Path.Combine(SourceRoot, "Platform.UI", "Platform.UI");
 
-			_iOSCompilation = await LoadProject($@"{topProject}.netcoremobile.csproj", "net9.0-ios18.0");
-			_tvOSCompilation = await LoadProject($@"{topProject}.netcoremobile.csproj", "net9.0-tvos18.0");
-			_androidCompilation = await LoadProject($@"{topProject}.netcoremobile.csproj", "net9.0-android");
-			_unitTestsCompilation = await LoadProject($@"{topProject}.Tests.csproj", "net9.0");
+			_unitTestsCompilation = await LoadProject($"{topProject}.Tests.csproj", ProjectsTargetFramework);
 
-			_netstdReferenceCompilation = await LoadProject($@"{topProject}.Reference.csproj", "net9.0");
-			_wasmCompilation = await LoadProject($@"{topProject}.Wasm.csproj", "net9.0");
-			_skiaCompilation = await LoadProject($@"{topProject}.Skia.csproj", "net9.0");
+			// The platform-neutral Core assembly (the shared tree, without the *.skia.cs files) is the fork's
+			// counterpart of the former reference flavor, so it provides the reference symbols.
+			_netstdReferenceCompilation = await LoadProject($"{topProject}.Core.csproj", ProjectsTargetFramework);
 
-			_iOSBaseSymbol = _iOSCompilation.GetTypeByMetadataName("UIKit.UIView");
-			_tvOSBaseSymbol = _tvOSCompilation.GetTypeByMetadataName("UIKit.UIView");
-			_androidBaseSymbol = _androidCompilation.GetTypeByMetadataName("Android.Views.View");
+			// The Skia assembly references the Core assembly, so it sees both the shared tree and the Skia-only types.
+			_skiaCompilation = await LoadProject($"{topProject}.Skia.csproj", ProjectsTargetFramework);
 
 			FlagsAttributeSymbol = s_referenceCompilation.GetTypeByMetadataName("System.FlagsAttribute");
 			UIElementSymbol = s_referenceCompilation.GetTypeByMetadataName(BaseXamlNamespace + ".UIElement");
@@ -237,7 +234,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			var installPath = Environment.GetEnvironmentVariable("VSINSTALLDIR");
 
-			if (string.IsNullOrEmpty(installPath))
+			if (string.IsNullOrEmpty(installPath) && OperatingSystem.IsWindows())
 			{
 				var pi = new System.Diagnostics.ProcessStartInfo(
 					"cmd.exe",
@@ -284,24 +281,24 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			if (type.ContainingAssembly.Name == "Windows.Foundation.FoundationContract")
 			{
-				return @"..\..\..\Platform.Foundation\Generated\2.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.Foundation", "Generated", "2.0.0.0");
 			}
 
 			var containingNamespaceName = type.ContainingNamespace.ToString();
 #if !HAS_CODEBRIX_WINUI
 			if (containingNamespaceName.StartsWith("Windows.UI.Composition", StringComparison.Ordinal))
 			{
-				return @"..\..\..\Platform.UI.Composition\Generated\3.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.UI.Composition", "Generated", "3.0.0.0");
 			}
 #else
 			if (containingNamespaceName.StartsWith("Microsoft.UI.Composition", StringComparison.Ordinal)
 				|| containingNamespaceName.StartsWith("Microsoft.Graphics", StringComparison.Ordinal))
 			{
-				return @"..\..\..\Platform.UI.Composition\Generated\3.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.UI.Composition", "Generated", "3.0.0.0");
 			}
 			else if (containingNamespaceName.StartsWith("Microsoft.UI.Dispatching", StringComparison.Ordinal))
 			{
-				return @"..\..\..\Platform.UI.Dispatching\Generated\3.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.UI.Dispatching", "Generated", "3.0.0.0");
 			}
 #endif
 			else if (containingNamespaceName.StartsWith("Windows.UI.Xaml", StringComparison.Ordinal)
@@ -320,23 +317,19 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 #endif
 			)
 			{
-				return @"..\..\..\Platform.UI\Generated\3.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.UI", "Generated", "3.0.0.0");
 			}
 			else
 			{
-				return @"..\..\..\Platform.UWP\Generated\3.0.0.0";
+				return Path.Combine(SourceRoot, "Platform.UWP", "Generated", "3.0.0.0");
 			}
 		}
 
 		protected class PlatformSymbols<T> where T : ISymbol
 		{
-			public T AndroidSymbol;
-			public T IOSSymbol;
-			public T TvOSSymbol;
 			public T UnitTestsymbol;
 			public T UAPSymbol;
 			public T NetStdReferenceSymbol;
-			public T WasmSymbol;
 			public T SkiaSymbol;
 
 			private ImplementedFor _implementedFor;
@@ -344,37 +337,17 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			public ImplementedFor ImplementedForMain => ImplementedFor & ImplementedFor.Main;
 
 			public PlatformSymbols(
-				T androidType,
-				T iOSType,
-				T tvOSType,
 				T unitTestType,
 				T netStdRerefenceType,
-				T wasmType,
 				T skiaType,
 				T uapType
 			)
 			{
-				this.AndroidSymbol = androidType;
-				this.IOSSymbol = iOSType;
-				this.TvOSSymbol = tvOSType;
 				this.UnitTestsymbol = unitTestType;
 				this.UAPSymbol = uapType;
 				this.NetStdReferenceSymbol = netStdRerefenceType;
-				this.WasmSymbol = wasmType;
 				this.SkiaSymbol = skiaType;
 
-				if (IsImplemented(AndroidSymbol))
-				{
-					_implementedFor |= ImplementedFor.Android;
-				}
-				if (IsImplemented(IOSSymbol))
-				{
-					_implementedFor |= ImplementedFor.iOS;
-				}
-				if (IsImplemented(TvOSSymbol))
-				{
-					_implementedFor |= ImplementedFor.tvOS;
-				}
 				if (IsImplemented(UnitTestsymbol))
 				{
 					_implementedFor |= ImplementedFor.UnitTests;
@@ -383,10 +356,6 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 				{
 					_implementedFor |= ImplementedFor.NetStdReference;
 				}
-				if (IsImplemented(WasmSymbol))
-				{
-					_implementedFor |= ImplementedFor.WASM;
-				}
 				if (IsImplemented(SkiaSymbol))
 				{
 					_implementedFor |= ImplementedFor.Skia;
@@ -394,53 +363,43 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			}
 
 			public bool HasUndefined =>
-				AndroidSymbol == null
-				|| IOSSymbol == null
-				|| TvOSSymbol == null
-				|| UnitTestsymbol == null
+				UnitTestsymbol == null
 				|| NetStdReferenceSymbol == null
-				|| WasmSymbol == null
 				|| SkiaSymbol == null
 				;
 
 			public void AppendIf(IndentedStringBuilder b)
 			{
+				// Only the flavors that lack the symbol are listed; "#if false" when every flavor defines it.
 				var defines = new[] {
-					IsNotDefinedByCodeBrix(AndroidSymbol) ? AndroidDefine : "false",
-					IsNotDefinedByCodeBrix(IOSSymbol) ? iOSDefine : "false",
-					IsNotDefinedByCodeBrix(TvOSSymbol) ? tvOSDefine : "false",
-					IsNotDefinedByCodeBrix(UnitTestsymbol) ? UnitTestsDefine : "false",
-					IsNotDefinedByCodeBrix(WasmSymbol) ? WasmDefine : "false",
-					IsNotDefinedByCodeBrix(SkiaSymbol) ? SkiaDefine : "false",
-					IsNotDefinedByCodeBrix(NetStdReferenceSymbol) ? NetStdReferenceDefine : "false",
-				};
+					IsNotDefinedByCodeBrix(UnitTestsymbol) ? UnitTestsDefine : "",
+					IsNotDefinedByCodeBrix(SkiaSymbol) ? SkiaDefine : "",
+					IsNotDefinedByCodeBrix(NetStdReferenceSymbol) ? NetStdReferenceDefine : "",
+					IsNotDefinedByCodeBrix(SkiaSymbol) ? CoreDefine : "",
+				}.Where(d => d.Length > 0).ToArray();
 
 				using (b.Indent(-b.CurrentLevel))
 				{
-					b.AppendLineInvariant($"#if {defines.JoinBy(" || ")}");
+					b.AppendLineInvariant($"#if {(defines.Length > 0 ? defines.JoinBy(" || ") : "false")}");
 				}
 			}
 
 			public string GenerateNotImplementedList()
 			{
 				// CodeBrix.Platform only supports the Skia desktop targets (+ the reference/unit-test
-				// build flavors). Android/iOS/tvOS/WASM are not supported, so they are intentionally
-				// omitted from emitted [NotImplemented(...)] platform lists.
+				// build flavors).
 				var defines = new[] {
 					IsNotDefinedByCodeBrix(UnitTestsymbol) ? $"\"{UnitTestsDefine}\"" : "",
 					IsNotDefinedByCodeBrix(SkiaSymbol) ? $"\"{SkiaDefine}\"": "",
 					IsNotDefinedByCodeBrix(NetStdReferenceSymbol) ? $"\"{NetStdReferenceDefine}\"" : "",
+					IsNotDefinedByCodeBrix(SkiaSymbol) ? $"\"{CoreDefine}\"" : "",
 				};
 
 				return defines.Where(d => d.Length > 0).JoinBy(", ");
 			}
 
 			public bool IsNotImplementedInAllPlatforms()
-				=> IsNotDefinedByCodeBrix(AndroidSymbol) &&
-					IsNotDefinedByCodeBrix(IOSSymbol) &&
-					IsNotDefinedByCodeBrix(TvOSSymbol) &&
-					IsNotDefinedByCodeBrix(UnitTestsymbol) &&
-					IsNotDefinedByCodeBrix(WasmSymbol) &&
+				=> IsNotDefinedByCodeBrix(UnitTestsymbol) &&
 					IsNotDefinedByCodeBrix(SkiaSymbol) &&
 					IsNotDefinedByCodeBrix(NetStdReferenceSymbol);
 
@@ -459,11 +418,12 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 				{
 					return true;
 				}
-				if (filePath.Contains(@"Generated\3.0.0.0"))
+				var normalizedPath = filePath.Replace('\\', '/');
+				if (normalizedPath.Contains("Generated/3.0.0.0", StringComparison.Ordinal))
 				{
 					return true;
 				}
-				if (filePath.Contains(@"Generated\2.0.0.0"))
+				if (normalizedPath.Contains("Generated/2.0.0.0", StringComparison.Ordinal))
 				{
 					return true;
 				}
@@ -485,12 +445,8 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			var name = uapType.ContainingNamespace + "." + uapType.MetadataName;
 			return new PlatformSymbols<INamedTypeSymbol>(
-				  androidType: _androidCompilation.GetTypeByMetadataName(name),
-				  iOSType: _iOSCompilation.GetTypeByMetadataName(name),
-				  tvOSType: _tvOSCompilation.GetTypeByMetadataName(name),
 				  unitTestType: _unitTestsCompilation.GetTypeByMetadataName(name),
 				  netStdRerefenceType: _netstdReferenceCompilation.GetTypeByMetadataName(name),
-				  wasmType: _wasmCompilation.GetTypeByMetadataName(name),
 				  skiaType: _skiaCompilation.GetTypeByMetadataName(name),
 				  uapType: uapType
 			  );
@@ -498,21 +454,13 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 
 		protected PlatformSymbols<ISymbol> GetAllGetNonGeneratedMembers(PlatformSymbols<INamedTypeSymbol> types, string name, Func<IEnumerable<ISymbol>, ISymbol> filter, ISymbol uapSymbol = null)
 		{
-			var android = GetNonGeneratedMembers(types.AndroidSymbol, name);
-			var ios = GetNonGeneratedMembers(types.IOSSymbol, name);
-			var tvos = GetNonGeneratedMembers(types.TvOSSymbol, name);
 			var unitTests = GetNonGeneratedMembers(types.UnitTestsymbol, name);
 			var netStdReference = GetNonGeneratedMembers(types.NetStdReferenceSymbol, name);
-			var wasm = GetNonGeneratedMembers(types.WasmSymbol, name);
 			var skia = GetNonGeneratedMembers(types.SkiaSymbol, name);
 
 			return new PlatformSymbols<ISymbol>(
-				androidType: filter(android),
-				iOSType: filter(ios),
-				tvOSType: filter(tvos),
 				unitTestType: filter(unitTests),
 				netStdRerefenceType: filter(netStdReference),
-				wasmType: filter(wasm),
 				skiaType: filter(skia),
 				uapType: uapSymbol
 			);
@@ -520,24 +468,16 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 
 		protected PlatformSymbols<IMethodSymbol> GetAllMatchingMethods(PlatformSymbols<INamedTypeSymbol> types, IMethodSymbol method)
 			=> new PlatformSymbols<IMethodSymbol>(
-				androidType: FindMatchingMethod(types.AndroidSymbol, method),
-				iOSType: FindMatchingMethod(types.IOSSymbol, method),
-				tvOSType: FindMatchingMethod(types.TvOSSymbol, method),
 				unitTestType: FindMatchingMethod(types.UnitTestsymbol, method),
 				netStdRerefenceType: FindMatchingMethod(types.NetStdReferenceSymbol, method),
-				wasmType: FindMatchingMethod(types.WasmSymbol, method),
 				skiaType: FindMatchingMethod(types.SkiaSymbol, method),
 				uapType: method
 			);
 
 		protected PlatformSymbols<IPropertySymbol> GetAllMatchingPropertyMember(PlatformSymbols<INamedTypeSymbol> types, IPropertySymbol property)
 			=> new PlatformSymbols<IPropertySymbol>(
-				androidType: GetMatchingPropertyMember(types.AndroidSymbol, property),
-				iOSType: GetMatchingPropertyMember(types.IOSSymbol, property),
-				tvOSType: GetMatchingPropertyMember(types.TvOSSymbol, property),
 				unitTestType: GetMatchingPropertyMember(types.UnitTestsymbol, property),
 				netStdRerefenceType: GetMatchingPropertyMember(types.NetStdReferenceSymbol, property),
-				wasmType: GetMatchingPropertyMember(types.WasmSymbol, property),
 				skiaType: GetMatchingPropertyMember(types.SkiaSymbol, property),
 				uapType: property
 			);
@@ -1720,19 +1660,14 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			var current = symbol
 				?.GetMembers(name)
-				.Where(m => m.Locations.None(l => l.SourceTree?.FilePath?.Contains("\\Generated\\") ?? false)) ?? Array.Empty<ISymbol>();
+				.Where(m => m.Locations.None(l => l.SourceTree?.FilePath?.Replace('\\', '/').Contains("/Generated/", StringComparison.Ordinal) ?? false)) ?? Array.Empty<ISymbol>();
 
 			foreach (var memberSymbol in current)
 			{
 				yield return memberSymbol;
 			}
 
-			if (
-				symbol?.BaseType != null
-				&& !SymbolEqualityComparer.Default.Equals(symbol.BaseType, _iOSBaseSymbol)
-				&& !SymbolEqualityComparer.Default.Equals(symbol.BaseType, _tvOSBaseSymbol)
-				&& !SymbolEqualityComparer.Default.Equals(symbol.BaseType, _androidBaseSymbol)
-			)
+			if (symbol?.BaseType != null)
 			{
 				foreach (var memberSymbol in GetNonGeneratedMembers(symbol.BaseType, name))
 				{
@@ -1771,10 +1706,11 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			compilation = await InnerLoadProject(projectFile, targetFramework);
 			_projects[key] = compilation;
 			var externalCompilationReferences = compilation.ExternalReferences.OfType<CompilationReference>().Select(r => r.Display).ToArray();
-			string[] expectedRefs = ["CodeBrix.Platform.Foundation", "CodeBrix", "CodeBrix.Platform.UI.Composition", "CodeBrix.Platform.UI.Dispatching"];
+			string[] expectedRefs = ["CodeBrix.Platform.Foundation", "CodeBrix.Platform", "CodeBrix.Platform.UI.Composition", "CodeBrix.Platform.UI.Dispatching"];
 			foreach (var expectedRef in expectedRefs)
 			{
-				if (!externalCompilationReferences.Contains(expectedRef))
+				// The Core flavor of each assembly is named "<name>.Core".
+				if (!externalCompilationReferences.Contains(expectedRef) && !externalCompilationReferences.Contains(expectedRef + ".Core"))
 				{
 					// If you hit this, ensure projectFile was restored. If it wasn't and `obj/project.assets.json` is missing,
 					// the target IncludeTransitiveProjectReferences will not be run, and we can end up with missing assemblies.
@@ -1792,8 +1728,16 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 		{
 			var ws = new AdhocWorkspace();
 
+			// references.txt is exported by the Windows-only Platform.UWPSyncGenerator.Reference project; when it is
+			// absent (e.g. on Linux or macOS), the same list is built from the NuGet packages cache.
+			var references = File.Exists(referencesFile)
+				? File.ReadAllLines(referencesFile).Where(r => !string.IsNullOrWhiteSpace(r)).ToArray()
+				: WinRTReferenceList.Build();
+
+			Console.WriteLine($"Using {references.Length} reference files ({(File.Exists(referencesFile) ? referencesFile : "NuGet packages cache")})");
+
 			var p = ws.AddProject("uwpref", LanguageNames.CSharp);
-			p = p.AddMetadataReferences(File.ReadAllLines(referencesFile).Select(reference => MetadataReference.CreateFromFile(reference)));
+			p = p.AddMetadataReferences(references.Select(reference => MetadataReference.CreateFromFile(reference)));
 			return await p.GetCompilationAsync();
 		}
 
@@ -1828,7 +1772,9 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 
 			var ws = MSBuildWorkspace.Create(properties);
 
-			ws.LoadMetadataForReferencedProjects = true;
+			// Referenced projects must be loaded from source (never from a previous build's output): the generator
+			// needs their syntax trees to tell hand-written members from generated stubs.
+			ws.LoadMetadataForReferencedProjects = false;
 
 			// Roslyn 5.x silently ignores OpenProjectAsync's msbuildLogger parameter
 			// (https://github.com/dotnet/roslyn/issues/72202 / discussions/71950), so we

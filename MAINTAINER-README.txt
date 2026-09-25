@@ -81,15 +81,24 @@ REPOSITORY LAYOUT
       Leftover from the upstream build system. The published package version
       does NOT come from it - see PACKAGING AND PUBLISHING.
   src/
-      Platform.UI                          the framework (Platform.UI.Skia.csproj
-                                           and the .Reference variant)
+      Platform.UI                          the framework: Platform.UI.Core.csproj and
+                                           Platform.UI.Skia.csproj (see "CORE AND SKIA
+                                           ASSEMBLIES" below)
       Platform.UWP                         the WinRT / Windows.* API surface
-      Platform.Foundation, .Foundation.Logging
-      Platform.UI.Composition, Platform.UI.Dispatching
-      Platform.UI.FluentTheme, .v1, .v2    control styles
+                                           (Platform.Core.csproj + Platform.Skia.csproj)
+      Platform.UI.Composition, Platform.UI.Dispatching   (a .Core.csproj + a .Skia.csproj each)
+      Platform.Foundation, .Foundation.Logging   (.Core.csproj only - Core by whole)
+      Platform.UI.FluentTheme, .v1, .v2    control styles (.Core.csproj only - Core by whole)
       Platform.UI.Toolkit                  ElevatedView, converters, DiagnosticsOverlay,
-                                           StorageFileHelper (folded into the core package)
-      Platform.UI.Adapter.Microsoft.Extensions.Logging   (folded into the core package)
+                                           StorageFileHelper (folded into the core package;
+                                           .Core.csproj + .Skia.csproj)
+      Platform.UI.Adapter.Microsoft.Extensions.Logging, CodeBrix.Platform.Extensions.Logging
+                                           (folded into the core package; .Core.csproj only)
+      Platform.UI.Core.Tests               the host-free Core suite (Core assemblies only)
+      Platform.UI.Engine.Tests             the host-free engine proof (engine Cores only; no WinUI loads)
+      The *.Tests.csproj files beside a library (Platform.UI.Tests.csproj, ...) are the
+      unit-test FLAVOR of that library (the shared tree compiled with IS_UNIT_TESTS),
+      consumed by Platform.UI.Automated.Tests; they are not test runners.
       Platform.UI.Runtime.Skia             base Skia runtime (SkiaHost, FontFamilyHelper)
       Platform.UI.Runtime.Skia.Win32, .Win32.Support, .Wpf, .X11, .Wayland,
       Platform.UI.Runtime.Skia.Linux.FrameBuffer, .Linux.FrameBuffer.Emulated,
@@ -104,6 +113,104 @@ REPOSITORY LAYOUT
       Common, Common_ViewLibraryProps, Directory.Build.props/.targets,
       *.props override files, PackageCache
       AddIns/                              one folder per add-in (+ *.Tests folders)
+  CORE AND SKIA ASSEMBLIES
+      Every framework library that has Skia code is TWO projects in one folder:
+        <Name>.Core.csproj   AssemblyName <old name>.Core, CodeBrixRuntimeIdentifier=Core.
+                             Compiles the SHARED tree (every unsuffixed file and the
+                             *.crossruntime.cs files), the framework's XAML, string resources
+                             and embedded resources. References only Core projects,
+                             Platform.Xaml and Microsoft packages - never SkiaSharp/HarfBuzz.
+        <Name>.Skia.csproj   the OLD AssemblyName (CodeBrix.Platform.UI, ...), compiles ONLY
+                             the *.skia.cs files (EnableDefaultCompileItems=false) and
+                             references its Core project. It implements the platform
+                             contracts the Core assembly calls (namespaces <root>.Contracts;
+                             implementations in <project>/Skia/*.skia.cs) and registers them
+                             from Skia/SkiaPlatformBootstrap.skia.cs.
+      Pairs: Platform.UI, Platform.UI.Composition, Platform.UWP (CodeBrix.Platform),
+      Platform.UI.Dispatching, Platform.UI.Toolkit. Libraries with no Skia code are Core by
+      WHOLE: renamed to .Core with no shell under the old name (Foundation, the three
+      FluentTheme projects, Foundation.Logging, the logging adapter, Extensions.Logging).
+      The Reference flavor is retired: there are no *.Reference.csproj framework projects and
+      no *.reference.cs files (the add-ins' own Reference projects retire when each add-in
+      splits). A file belongs to Core unless it is named *.skia.cs.
+      BOOTSTRAP: the UI Skia bootstrap first runs the Dispatching, WinRT, Composition and
+      Toolkit Skia bootstraps; SkiaHost (every head's host) and the host-free test suites'
+      DispatcherInitializer call CodeBrix.Platform.UI.Skia.SkiaPlatformBootstrap.
+      EnsureRegistered() first thing, and each bootstrap is also a module initializer.
+      INTERNALSVISIBLETO: a Core assembly's AssemblyInfo.cs carries the union of the grants
+      the pre-split assembly had, its Skia twin, and (by rule) CodeBrix.Android.<Y>,
+      CodeBrix.Mobile.<Y> and their .Tests; the Skia twin's AssemblyInfo.skia.cs keeps the
+      same pre-split grants.
+      A NuGet PackageId can be carried by only one project of a solution: the Skia project
+      of Platform.UI carries the aggregate id (CodeBrix.Platform.ApacheLicenseForever), so a
+      packed project that must depend on the aggregate references Platform.UI.Skia.csproj
+      (or references a Core project with PrivateAssets="all").
+      ADD-INS split the same way (Phase C): <AddIn>.Core.csproj (AssemblyName <old>.Core,
+      Core framework projects only) beside the add-in's .Skia.csproj, which keeps the
+      AssemblyName and PackageId and holds only *.skia.cs; an add-in with no platform code is
+      Core by whole (FlexPanel: CodeBrix.Platform.UI.FlexPanel.Core.dll, no Skia project).
+      An add-in's contracts are in <root>.Contracts, found through its PlatformContract, which
+      loads the add-in's platform assembly by name and runs its module initializer (an app only
+      names Core types, so nothing else would load it). Packing: an add-in csproj that packs
+      imports src/AddIns/AddIn.CorePackaging.targets - CodeBrixBundleInPackage="true" packs
+      its Core project's dll+xml into the SAME package, CodeBrixPackAs="<csproj>" keeps a Core-by-
+      whole add-in's dependency on the framework package id, and the pack takes the Release
+      build's output (NoBuild), so build Release before packing.
+      AppSettings: Core = the settings API, JSON values, change notification and property
+      handles; the database (CodeBrix.Sqlite), its folder and the file lifecycle (backup,
+      quarantine/restore, export, import) are the storage contract IAppSettingsStoragePlatform,
+      so where Android/iOS keep the file is their implementation's concern. AudioPlayer: the
+      Core is CodeBrix.Platform.UI.AudioPlayer.Core.dll (not ".Skia.Core") with AudioPlayer and
+      SoundEffect over two output contracts; MidiPlayer stays in the Skia assembly because its
+      public API is made of CodeBrix.Audio types.
+      SkiaSharp.Views: its Core holds SKXamlCanvas, SKSwapChainPanel and the Skia-canvas host
+      seam the drawing add-ins build on (Hosting/: SKCanvasHost and SKCanvasHostElement, an
+      SKCanvas-typed paint over the framework's SKCanvasVisualBase; a consumer needs the Core's
+      InternalsVisibleTo grant); its Skia assembly holds the views' surfaces (per-element
+      contracts). Graphics2DSK is Core by whole (CodeBrix.Platform.WinUI.Graphics2DSK.Core.dll).
+      Svg: Core = SvgProvider and SvgCanvas (on the seam); the Skia assembly is the
+      [assembly: ApiExtension] registration of SvgProvider. Lottie: Core = the sources, the
+      provider and the Skottie playback; the Skia assembly is the canvas supply
+      (ILottieCanvasPlatform, a Graphics2DSK SKCanvasElement).
+      TextLayout: Core BY WHOLE (CodeBrix.Platform.UI.TextLayout.Core.dll, no Skia assembly):
+      the code API plus its own copy of the text engine. The engine is ONE source
+      (src/Platform.UI/UI/Xaml/Documents: UnicodeText*, TextFormatting/FontDetails*,
+      TextRunSpec, TextEngineTypes, TextGlyphOutline) compiled into the framework's Skia
+      assembly AND link-compiled into TextLayout.Core (see its csproj); those files must name no
+      XAML/WinRT type (the XAML-typed partials UnicodeText.Inlines, FontDetailsCache.Xaml and
+      TextEngineXamlConversions are framework-only). The only platform input is the font
+      source, CodeBrix.Platform.Foundation.Contracts.IFontSourcePlatform<SKTypeface> (Skia:
+      FontSourceSkiaPlatform, one typeface cache for both copies). TextLayout.Core references
+      only Foundation(.Logging).Core, SkiaSharp, HarfBuzz and ICU.
+      AdvancedTextEdit, TerminalView, PlotterView: Core = the control and all its drawing on an
+      SKCanvas; the Skia assembly is the canvas supply (IRenderCanvasPlatform: the add-in's
+      software RenderCanvas, unchanged). PlotterView's typefaces come straight from the
+      platform's font source (IFontSourcePlatform<SKTypeface>, the text engine's typeface
+      cache), so its package does NOT depend on the TextLayout package.
+      Graphics3DGL: Core = GLCanvasElement (CodeBrix.Platform.WinUI.Graphics3DGL.Core.dll, over
+      the managed CodeBrix.Platform.OpenGL binding, whose GL type its API names); the Skia
+      assembly is the element's visual (IGLCanvasPlatform) plus SkiaGLCanvasElement,
+      SkiaGpuContext and OffscreenGLContext (their API is made of SkiaSharp types). Both are in
+      the nuspec, from bin/<project name>/. VideoPlayer: the element stays in the Skia assembly
+      (its API is made of CodeBrix.VideoPlayback and SkiaSharp types); its Core holds the rules,
+      the source resolver and VideoPlayerFailedEventArgs. WebView and MediaPlayer are not split:
+      their Core content (WebView2/CoreWebView2, MediaPlayerElement/MediaPlayer) is the
+      framework's own, and the add-in assemblies are only the per-OS plumbing (WPE, LibVLC).
+      ENGINES (WPE1): inside a Core, the part a non-XAML platform (CodeBrix.Mobile) reuses is
+      an ENGINE - an internal type that names NO XAML/WinRT type in its bases, fields,
+      parameters, returns or static initialisers (SkiaSharp and BCL only), with the control
+      wrapping it. A Core's engine types live in its Engine/ folder (<root namespace>.Engine):
+      TerminalView TerminalRenderer + TerminalInputEncoder; PlotterView PlotHost; Lottie
+      LottiePlayer + LottieColorTheme; AudioPlayer AudioTransport; Toolkit TriPaneLayoutState;
+      CommandBar IconResourceScheme/IconUri/SvgTintCss (the public IconResourceScheme forwards);
+      AdvancedTextEdit keeps its public highlighting types with NEUTRAL storage behind the
+      XAML-typed members (HighlightingColor/XshdColor/SimpleHighlightingBrush; HighlightingBrush
+      .GetColorValue), FoldingManager over Engine/IFoldingHost, Engine/CompletionFilter.
+      Timers reach an engine as its own ITickSource (Lottie, AudioPlayer), the UI thread as a
+      delegate, and asset locations as the IAssetLocation contract (AudioPlayer, VideoPlayer
+      resolvers; Skia: AssetLocationSkiaPlatform). Proof: src/Platform.UI.Engine.Tests drives
+      every engine and asserts that UI.Core, Composition.Core, Platform.Core and
+      Dispatching.Core never load; a XAML type added to an engine path fails it.
   src-platforms/
       CodeBrix.Platforms.slnx; Platform.WinUI, Platform.WPF, Platform.Mobile,
       Platform.Simple - the helper toolkits for Microsoft's own frameworks.
@@ -129,13 +236,22 @@ Build the solution for the OS you are on, then (Windows only) the pack driver:
     dotnet build CodeBrix.Platform.Linux.slnx   -c Release     # Linux
     dotnet build CodeBrix.Platform.Macos.slnx   -c Release     # macOS
 
+Each Skia project references its Core project, so a head (or a test) that
+references Platform.UI.Skia.csproj gets the Core assemblies transitively. The
+Core projects build the framework's XAML and string resources exactly as the
+Skia flavor did (they set CodeBrixUIRuntimeIdentifier=Skia and
+_CodeBrixUnderlyingPlatform=skia), and Platform.UI.Core.csproj keeps the
+string-resource map name CodeBrix.Platform.UI/Resources (a pair of targets in
+that csproj; see its comment).
+
 The samples under samples/CodeBrixPlatform consume the framework FROM SOURCE
 via ProjectReference (each head references its head csproj under src/ plus the
 SourceGenerators project). Because buildTransitive targets do not flow across
 a ProjectReference, the sample heads carry the runtime-replace logic
 themselves; the macOS sample heads import samples/CodeBrixPlatform/
 CodeBrix.MacOSHead.targets for it. A new macOS sample head needs only that one
-import line.
+import line. (Since the Core/Skia split there is no Reference flavor for that
+logic to swap out; it re-adds the same Skia files and is kept inert.)
 
 BUILD FAILS WITH CS2012 (task DLL locked): the solution build may fail with
     error CS2012: Cannot open '...\Platform.XamlMerge.Task\obj\Release\
@@ -287,6 +403,24 @@ folder is created if it is missing, and if it cannot be created or written to
 the run says so in one line and carries on without saving. With the variable
 unset nothing is read, created or written, and the run behaves exactly as it
 does without the feature.
+
+Two saved frame folders can be compared pixel by pixel, e.g. a known-good run
+against the run after a change:
+
+    build/test-scripts/compare-uireqs-frames.sh <baseline-folder> <current-folder>
+
+It runs tools/UIReqsFrameCompare. A frame passes when it is byte-identical or
+decodes to identical pixels; otherwise the report gives the differing-pixel
+count and bounding box and a diff image (red on a faded copy) is written under
+<current-folder>/_diff/. Missing and extra frames are reported. The groups
+listed in build/test-scripts/uireqs-frame-compare.informational depend on
+playback timing, so they are reported but never fail; every other group must
+match exactly. An entry there is a whole group (<Group>) or one feature of a
+group (<Group>/<feature file name without extension>); the feature-level
+entries are the features measured to vary between identical runs (animation,
+drag inertia, GL timing, indeterminate progress), each with a comment saying
+why. Exit code 0 means no differences. Options: --threshold <n>,
+--report <file>, --informational <entry>, and --self-test <baseline-folder>.
 
 COVERAGE. 275 scenarios per orientation at the time of writing: 274 pass and
 one is skipped, the skip being the Harness group's orientation-tagged scenario
@@ -614,10 +748,27 @@ Packing only runs in the Release configuration. Two kinds of package:
     Platform.WinUI.nuspec           -> CodeBrix.Platform.ApacheLicenseForever
                                        (folds in Foundation, WinRT, Dispatching,
                                        Toolkit and the logging adapter; the
-                                       "Simple" helpers come from the folded Toolkit)
+                                       "Simple" helpers come from the folded Toolkit).
+                                       lib/net10.0 carries every *.Core.dll AND the
+                                       Skia assemblies (CodeBrix.Platform.UI.dll, ...);
+                                       codebrix-platform-runtime/net10.0/skia carries
+                                       the same Skia files AND every *.Core.dll
+                                       (byte-identical to lib/): runtime-replace swaps
+                                       EVERY runtime assembly of the package for that
+                                       folder's content, so an assembly shipped only in
+                                       lib/ would be missing from the app's output.
+                                       There are no Reference-flavor files any more.
     Platform.WinUI.Graphics2DSK.nuspec, Platform.WinUI.Graphics3DGL.nuspec,
     Platform.WinUI.Lottie.nuspec, Platform.WinUI.Svg.nuspec,
     CodeBrix.Platform.SkiaSharp.Views.nuspec
+                                       Lottie and Svg: lib/net10.0 carries the add-in's
+                                       *.Core.dll (+pdb) AND its Skia dll (the compile
+                                       references: the Skia dll carries Svg's
+                                       registration attribute and the name Lottie's
+                                       analyzer looks for), and the runtime folder
+                                       carries both too. SkiaSharp.Views ships its Core
+                                       and Skia dll (+pdb) in lib/ only; Graphics2DSK's
+                                       only dll is its .Core.
     The nuspec names a dependency-version TOKEN, never a literal version.
   - CSPROJ-DRIVEN (`dotnet pack <csproj> -p:PackageVersion=$(BuildVersion)`):
     Platform.UI.Runtime.Skia and the seven heads (including the Emulated head),
@@ -745,6 +896,21 @@ the verify step above still matters when packing anywhere the native step is
 skipped. The WebView add-in's macOS download support needs a dylib rebuilt
 from PlatformNativeMac sources dated 2026-07-17 or later.
 
+--- ON LINUX: a VERIFICATION aid only - it never publishes ---
+
+build/test-scripts/pack-linux-local-feed.sh packs the Linux-buildable subset
+of the family into a local folder (usable as a folder feed) with the driver's
+own pack commands and its dependency gate, to check on Linux what a change
+does to the packages. It is not part of the publish recipe above. After a
+Release build of CodeBrix.Platform.Linux.slnx:
+
+    build/test-scripts/pack-linux-local-feed.sh <output-folder> [version]
+
+The Win32, Wpf and macOS head packages are left out; the header of the script
+says why. Linux file names are case-sensitive, so a nuspec <file src> path
+whose letter case differs from the folder on disk (which Windows would not
+notice) stops the script with the path named.
+
 THE EMULATED FRAME-BUFFER HEAD PACKAGE
 (CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever,
 src/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated): a compile-time
@@ -863,6 +1029,40 @@ Other vendored / derived components:
 
 The upstream project's name must not appear in consumer documentation; say
 "the upstream project".
+
+TRIMMING
+========
+  - Trimmable assemblies: every framework Core is IsTrimmable (Foundation.Core,
+    Extensions.Logging.Core and UI.Core with IsAotCompatible); the add-in Cores
+    AdvancedTextEdit, AudioPlayer, CommandBar, FlexPanel, Graphics2DSK,
+    Graphics3DGL, Lottie, PlotterView, SkiaSharp.Views, TerminalView,
+    TextLayout and VideoPlayer, plus Foundation.Logging.Core and the
+    M.E.Logging adapter Core, set IsAotCompatible (implies IsTrimmable and
+    turns on the trim/AOT/single-file analyzers; src has TreatWarningsAsErrors,
+    so a new finding fails the build and is fixed at source). NOT marked yet:
+    AppSettings.Core (reflection-based JSON over the open Get<T>/Set(object)
+    API - a public-surface decision) and Svg.Core (CodeBrix.SkiaSvg's
+    SKSvg.Load is RequiresUnreferencedCode - fixed in that repository). The
+    reason stands in a comment in each csproj.
+  - Embedded linker descriptors: ILLink honors both ILLink.Descriptors.xml and
+    the legacy resource name <AssemblyName>.xml (verified with the .NET 10
+    SDK). Toolkit.Core's descriptor (LinkerDefinition.net6.0.xml) roots its
+    XAML-facing types (the extension classes, FromJsonExtension, TriPaneView,
+    TriPaneViewDivider) behind the feature switch
+    CodeBrix.Platform.UI.Toolkit.RootXamlControls (featuredefault true): the
+    Skia heads and CodeBrix.Android keep them with no setting; a consumer that
+    uses no XAML from Toolkit.Core (a CodeBrix.Mobile app that uses only
+    engines) drops them with
+      <RuntimeHostConfigurationOption Include="CodeBrix.Platform.UI.Toolkit.RootXamlControls" Value="false" Trim="true" />
+    The same RuntimeHostConfigurationOption mechanism carries the framework's
+    own trimming switches (build/nuget/platform.winui.common.targets). The
+    M.E.Logging adapter Core's descriptor roots that whole (small) assembly.
+  - Engine proof: src/Platform.UI.Engine.Tests drives each add-in engine
+    host-free and asserts (EngineIsolation) that no WinUI assembly
+    (UI.Core, Composition.Core, the WinRT Core, Dispatching.Core, Xaml,
+    FluentTheme/Toolkit Cores) and no Skia twin was loaded. It references
+    engine Cores only; an engine test that makes one of them load fails the
+    whole project on purpose.
 
 CODING CONVENTIONS
 ==================

@@ -1,4 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Lottie: since the Core/Skia split, only the canvas supply (the *.skia.cs files: the Skia
+	implementation of the add-in's ILottieCanvasPlatform contract, which draws each frame on a Graphics2DSK
+	SKCanvasElement composited by the framework's Skia renderer) and the package. The sources, the provider and the
+	Skottie playback are in CodeBrix.Platform.UI.Lottie.Core (Platform.UI.Lottie.Core.csproj), which the package carries
+	beside this assembly (build/nuget/Platform.WinUI.Lottie.nuspec).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -16,7 +23,15 @@
 		<Nullable>enable</Nullable>
 
 		<DefineConstants>$(DefineConstants);HAS_SKOTTIE</DefineConstants>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.Lottie.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<ItemGroup>
 
@@ -24,12 +39,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="Platform.UI.Lottie.Core.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
-		<ProjectReference Include="..\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+		<ProjectReference Include="..\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" />
 	</ItemGroup>
-
-	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
 
 	<Target Name="_CodeBrixUILottieOverrideNuget" AfterTargets="AfterBuild" DependsOnTargets="BuiltProjectOutputGroup" Condition="'$(CodeBrixNugetOverrideVersion)'!=''">
 

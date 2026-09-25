@@ -47,6 +47,6 @@
 
 	<ItemGroup><ProjectReference Include="../CodeBrix.Platform.Extensions/CodeBrix.Platform.Extensions.csproj" /></ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 </Project>

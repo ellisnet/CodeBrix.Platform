@@ -201,6 +201,24 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			OnClick();
 		}
 
+		/// <summary>
+		/// Raise entry point for a platform handler: the native control was clicked. Runs the button's own click
+		/// (the Click event and the Command; a ToggleButton toggles, a HyperlinkButton navigates).
+		/// </summary>
+		internal void RaiseClickFromPlatform() => OnClick();
+
+		/// <summary>
+		/// Raise entry point for a platform handler: the native control's pressed state changed.
+		/// </summary>
+		/// <param name="isPressed">Whether the control is pressed.</param>
+		internal void SetPressedFromPlatform(bool isPressed) => IsPressed = isPressed;
+
+		/// <summary>
+		/// Raise entry point for a platform handler: a pointer entered or left the native control.
+		/// </summary>
+		/// <param name="isPointerOver">Whether a pointer is over the control.</param>
+		internal void SetPointerOverFromPlatform(bool isPointerOver) => IsPointerOver = isPointerOver;
+
 #if false
 		private void OnClick(PointerRoutedEventArgs args = null)
 		{

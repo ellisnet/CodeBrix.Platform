@@ -2063,6 +2063,12 @@ namespace Microsoft.UI.Xaml
 				doInternal.OnPropertyChanged2(eventArgs);
 			}
 
+			// Element handler seam, hook H3: one site for every effective value change (local, style, binding, inherited, theme).
+			if (UIElement.AreHandlersActive && actualInstanceAlias is UIElement { Handler: { } elementHandler })
+			{
+				elementHandler.UpdateValue(property);
+			}
+
 			// Raise the changes for the callbacks register through RegisterPropertyChangedCallback.
 			if (propertyDetails.CanRaisePropertyChanged)
 			{

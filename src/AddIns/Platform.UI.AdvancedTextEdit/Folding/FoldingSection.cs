@@ -54,7 +54,7 @@ public sealed class FoldingSection : TextSegment
 		}
 		else
 		{
-			collapsedSections ??= new CollapsedLineSection?[manager.textViews.Count];
+			collapsedSections ??= new CollapsedLineSection?[manager.hosts.Count];
 			// Validate collapsed line sections
 			DocumentLine startLinePlusOne = startLine.NextLine
 				?? throw new System.InvalidOperationException("The folding spans multiple lines, but the start line has no successor.");
@@ -69,7 +69,7 @@ public sealed class FoldingSection : TextSegment
 						Debug.WriteLine("CollapsedLineSection validation - recreate collapsed section from " + startLinePlusOne + " to " + endLine);
 						collapsedSection.Uncollapse();
 					}
-					collapsedSections[i] = manager.textViews[i].CollapseLines(startLinePlusOne, endLine);
+					collapsedSections[i] = manager.hosts[i].CollapseLines(startLinePlusOne, endLine);
 				}
 			}
 		}

@@ -47,13 +47,13 @@ public static class DottedLineMargin
 /// </summary>
 internal sealed partial class DottedLineMarginElement : Panel
 {
-	readonly RenderCanvas renderCanvas = new RenderCanvas();
+	readonly FrameworkElement renderCanvas = RenderCanvasSupply.Create();
 	Brush? stroke;
 
 	public DottedLineMarginElement()
 	{
 		Margin = new Thickness(2, 0, 2, 0);
-		renderCanvas.Paint += RenderCanvasPaint;
+		RenderCanvasSupply.AddPaintHandler(renderCanvas, RenderCanvasPaint);
 		Children.Add(renderCanvas);
 	}
 
@@ -67,7 +67,7 @@ internal sealed partial class DottedLineMarginElement : Panel
 			if (stroke != value)
 			{
 				stroke = value;
-				renderCanvas.Invalidate();
+				RenderCanvasSupply.Invalidate(renderCanvas);
 			}
 		}
 	}
@@ -81,7 +81,7 @@ internal sealed partial class DottedLineMarginElement : Panel
 	protected override Size ArrangeOverride(Size finalSize)
 	{
 		renderCanvas.Arrange(new Rect(new Point(0, 0), finalSize));
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 		return finalSize;
 	}
 

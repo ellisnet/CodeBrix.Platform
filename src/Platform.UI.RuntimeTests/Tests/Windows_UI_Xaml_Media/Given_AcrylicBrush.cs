@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using SkiaSharp;
+using CodeBrix.Platform.UI.Composition.Skia;
 using CodeBrix.Platform.UI.RuntimeTests.Helpers;
 using Windows.Storage;
 
@@ -69,7 +70,9 @@ public class Given_AcrylicBrush
 		using var snapshot = surface.Snapshot();
 
 		var compositor = Compositor.GetSharedCompositor();
-		using var brush = compositor.CreateSurfaceBrush(new SkiaCompositionSurface(snapshot));
+		var skiaSurface = new PlatformCompositionSurface();
+		CompositionSurfaceSkiaPlatform.Of(skiaSurface).SetImage(snapshot);
+		using var brush = compositor.CreateSurfaceBrush(skiaSurface);
 		using var visual = compositor.CreateSpriteVisual();
 		visual.Size = new(200, 200);
 		visual.Brush = brush;

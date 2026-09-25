@@ -18,7 +18,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 	/// </summary>
 	class DocGenerator : Generator
 	{
-		private const string DocPath = @"..\..\..\..\doc\articles";
+		private static readonly string DocPath = Path.Combine("..", "..", "..", "..", "doc", "articles");
 		private const string ImplementedViewsFileName = "implemented-views.md";
 		private const string ImplementedPath = @"./implemented/";
 
@@ -125,7 +125,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 						using (_sb.Section($"{viewName} : {ConstructBaseClassString(view)}"))
 						{
 							// Our usage of obsolete attribte is for all platforms.
-							if (view.AndroidSymbol.GetAttributes().FirstOrDefault(a => a.AttributeClass.Name == "ObsoleteAttribute") is { } obsoleteAttribute)
+							if (view.SkiaSymbol?.GetAttributes().FirstOrDefault(a => a.AttributeClass.Name == "ObsoleteAttribute") is { } obsoleteAttribute)
 							{
 								var message = (string)obsoleteAttribute.ConstructorArguments[0].Value;
 								_sb.AppendParagraph(message);
@@ -381,10 +381,7 @@ namespace CodeBrix.Platform.UWPSyncGenerator //Was previously: Uno.UWPSyncGenera
 			IEnumerable<(INamedTypeSymbol Symbol, ImplementedFor ImplementedFor)> AllSymbols()
 			{
 				yield return (view.UAPSymbol, ImplementedFor.UAP);
-				yield return (view.AndroidSymbol, ImplementedFor.Android);
-				yield return (view.IOSSymbol, ImplementedFor.iOS);
-				yield return (view.TvOSSymbol, ImplementedFor.tvOS);
-				yield return (view.WasmSymbol, ImplementedFor.WASM);
+				yield return (view.SkiaSymbol, ImplementedFor.Skia);
 			}
 		}
 

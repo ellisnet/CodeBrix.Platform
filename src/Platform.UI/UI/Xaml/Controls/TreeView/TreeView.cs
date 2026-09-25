@@ -161,6 +161,30 @@ public partial class TreeView : Control
 		vm.SelectAll();
 	}
 
+	/// <summary>
+	/// Raise entry point for a platform handler: the user invoked <paramref name="item"/> (a node, or an item of
+	/// ItemsSource). Raises ItemInvoked.
+	/// </summary>
+	/// <param name="item">The invoked item.</param>
+	internal void RaiseItemInvokedFromPlatform(object item)
+		=> ItemInvoked?.Invoke(this, new TreeViewItemInvokedEventArgs(item));
+
+	/// <summary>
+	/// Raise entry point for a platform handler: <paramref name="node"/> is expanding in the native tree. Raises
+	/// Expanding (the handler sets the public TreeViewNode.IsExpanded itself).
+	/// </summary>
+	/// <param name="node">The expanding node.</param>
+	internal void RaiseExpandingFromPlatform(TreeViewNode node)
+		=> Expanding?.Invoke(this, new TreeViewExpandingEventArgs(node));
+
+	/// <summary>
+	/// Raise entry point for a platform handler: <paramref name="node"/> collapsed in the native tree. Raises
+	/// Collapsed.
+	/// </summary>
+	/// <param name="node">The collapsed node.</param>
+	internal void RaiseCollapsedFromPlatform(TreeViewNode node)
+		=> Collapsed?.Invoke(this, new TreeViewCollapsedEventArgs(node));
+
 	private void OnItemClick(object sender, ItemClickEventArgs args)
 	{
 		var itemInvokedArgs = new TreeViewItemInvokedEventArgs(args.ClickedItem);

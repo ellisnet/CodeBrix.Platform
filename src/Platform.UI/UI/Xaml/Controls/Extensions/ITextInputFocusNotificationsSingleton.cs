@@ -5,7 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 namespace CodeBrix.Platform.UI.Xaml.Controls.Extensions;
 
 /// <summary>
-/// The control-agnostic sibling of <see cref="ITextBoxNotificationsProviderSingleton"/>:
+/// The control-agnostic sibling of <c>ITextBoxNotificationsProviderSingleton</c>:
 /// the seam a head's software-keyboard controller implements so that CUSTOM
 /// text-entry controls (reporting through <see cref="SoftwareKeyboardFocus"/>)
 /// drive the same keyboard show/hide machinery TextBox does. The caller gates

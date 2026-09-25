@@ -31,7 +31,8 @@ INSTALLATION
 ============
 Package id:   CodeBrix.Platform.Svg.ApacheLicenseForever
 License:      Apache-2.0
-Assembly:     CodeBrix.Platform.UI.Svg.dll
+Assemblies:   CodeBrix.Platform.UI.Svg.Core.dll (SvgProvider, the drawing)
+              CodeBrix.Platform.UI.Svg.dll      (the registration below)
 
     dotnet add package CodeBrix.Platform.Svg.ApacheLicenseForever
 
@@ -43,11 +44,11 @@ NuGet dependencies (pulled automatically):
   - CodeBrix.Platform.ApacheLicenseForever            the core framework
                                                       (SvgImageSource lives here)
   - CodeBrix.SkiaSvg.MitLicenseForever                the SVG parser/renderer
-  - CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever
-  - CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever  the SKCanvasElement the
+  - CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever  the Skia canvas the
                                                       picture is drawn on
+  - CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
 
-HOW IT ACTIVATES: the assembly carries
+HOW IT ACTIVATES: CodeBrix.Platform.UI.Svg.dll carries
 [assembly: ApiExtension(typeof(ISvgProvider), typeof(SvgProvider))]. The XAML
 source generator scans every referenced assembly for that attribute while
 compiling the application and emits the corresponding
@@ -431,7 +432,8 @@ WORKING EXAMPLES ON GITHUB
 QUICK REFERENCE CARD
 ====================
 Package:    CodeBrix.Platform.Svg.ApacheLicenseForever   (reference in .Core)
-Assembly:   CodeBrix.Platform.UI.Svg.dll  (invisible: app code uses core types)
+Assemblies: CodeBrix.Platform.UI.Svg.Core.dll + CodeBrix.Platform.UI.Svg.dll
+            (invisible: app code uses core types)
 Companion:  CodeBrix.SkiaSvg.MitLicenseForever (dependency; the parser)
             https://github.com/ellisnet/CodeBrix.SkiaSvg/blob/main/AGENT-README.txt
 See also:   Lottie animation add-in - src/AddIns/Platform.UI.Lottie/AGENT-README.txt

@@ -42,7 +42,7 @@ public partial class CoreWebView2
 
 	internal IReadOnlyDictionary<string, string> HostToFolderMap { get; }
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	internal void OnLoaded() => (_nativeWebView as ICleanableNativeWebView)?.OnLoaded();
 
 	internal void OnUnloaded() => (_nativeWebView as ICleanableNativeWebView)?.OnUnloaded();

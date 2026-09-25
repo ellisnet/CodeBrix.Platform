@@ -7,13 +7,11 @@ using System.Globalization;
 using System.Xml;
 using System.Xml.Schema;
 
-using Microsoft.UI;
-using Microsoft.UI.Text;
-using Microsoft.UI.Xaml.Media;
-using Windows.UI;
-using Windows.UI.Text;
+using SkiaSharp;
 
+using CodeBrix.Platform.UI.AdvancedTextEdit.Engine;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Utils;
+using CodeBrix.Platform.UI.TextLayout;
 
 namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting.Xshd;
 
@@ -23,6 +21,8 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting.Xshd;
 //instances are replaced by the static Convert* helpers below (same accepted inputs: #hex or named
 //colors, WPF font-weight names or a 1-999 number, and normal/italic/oblique). System-color
 //references resolve through the port's fixed system-color table (see SystemColorHighlightingBrush).
+//WPE1 C8: the parsed values are the neutral storage (numeric weight, TextFontStyle, a FontFamilyValue,
+//SKColor brushes), so an xshd file loads without the XAML object model; strings and results unchanged.
 
 /// <summary>
 /// Loads .xshd files, version 2.0.
@@ -342,11 +342,11 @@ static class V2Loader
 		IXmlLineInfo? position = reader as IXmlLineInfo;
 		color.Foreground = ParseColor(position, reader.GetAttribute("foreground"));
 		color.Background = ParseColor(position, reader.GetAttribute("background"));
-		color.FontWeight = ParseFontWeight(reader.GetAttribute("fontWeight"));
-		color.FontStyle = ParseFontStyle(reader.GetAttribute("fontStyle"));
+		color.FontWeightValue = ParseFontWeight(reader.GetAttribute("fontWeight"));
+		color.FontStyleValue = ParseFontStyle(reader.GetAttribute("fontStyle"));
 		color.Underline = reader.GetBoolAttribute("underline");
 		color.Strikethrough = reader.GetBoolAttribute("strikethrough");
-		color.FontFamily = ParseFontFamily(position, reader.GetAttribute("fontFamily"));
+		color.FontFamilyValue = ParseFontFamily(position, reader.GetAttribute("fontFamily"));
 		color.FontSize = ParseFontSize(position, reader.GetAttribute("fontSize"));
 		return color;
 	}
@@ -375,11 +375,12 @@ static class V2Loader
 			: (int?)null;
 	}
 
-	static FontFamily? ParseFontFamily(IXmlLineInfo? lineInfo, string? family)
+	static FontFamilyValue? ParseFontFamily(IXmlLineInfo? lineInfo, string? family)
 	{
 		if (!string.IsNullOrEmpty(family))
 		{
-			return new FontFamily(family);
+			//The neutral family (WPE1 C8): the FontFamily itself is created when the public property asks for it
+			return FontFamilyValue.FromName(family);
 		}
 		else
 		{
@@ -400,7 +401,7 @@ static class V2Loader
 		return new SystemColorHighlightingBrush(shortName);
 	}
 
-	static HighlightingBrush? FixedColorHighlightingBrush(Color? color)
+	static HighlightingBrush? FixedColorHighlightingBrush(SKColor? color)
 	{
 		if (color == null)
 		{
@@ -409,7 +410,7 @@ static class V2Loader
 		return new SimpleHighlightingBrush(color.Value);
 	}
 
-	static FontWeight? ParseFontWeight(string? fontWeight)
+	static ushort? ParseFontWeight(string? fontWeight)
 	{
 		if (string.IsNullOrEmpty(fontWeight))
 		{
@@ -418,7 +419,7 @@ static class V2Loader
 		return ConvertFontWeight(fontWeight);
 	}
 
-	static FontStyle? ParseFontStyle(string? fontStyle)
+	static TextFontStyle? ParseFontStyle(string? fontStyle)
 	{
 		if (string.IsNullOrEmpty(fontStyle))
 		{
@@ -432,119 +433,46 @@ static class V2Loader
 	//was previously: the WPF ColorConverter/FontWeightConverter/FontStyleConverter instances used
 	//by this loader and by SaveXshdVisitor. Re-expressed as static conversion methods over the
 	//mapped types, accepting the same invariant strings the WPF converters accepted.
+	//WPE1 C8: over the neutral storage (Engine/HighlightingValues), with the same strings and results.
 
 	/// <summary>
 	/// Converts an invariant color string (#AARRGGBB, #RRGGBB or a well-known color name) to a color.
 	/// </summary>
-	internal static Color ConvertColor(string color)
+	internal static SKColor ConvertColor(string color)
 	{
-		return Colors.Parse(color);
+		return HighlightingValues.ParseColor(color);
 	}
 
 	/// <summary>
-	/// Converts an invariant font-weight string (a well-known weight name, or a number 1-999) to a font weight.
+	/// Converts an invariant font-weight string (a well-known weight name, or a number 1-999) to a numeric font weight.
 	/// </summary>
-	internal static FontWeight ConvertFontWeight(string fontWeight)
+	internal static ushort ConvertFontWeight(string fontWeight)
 	{
-		switch (fontWeight.ToLowerInvariant())
-		{
-			case "thin":
-				return FontWeights.Thin;
-			case "extralight":
-			case "ultralight":
-				return FontWeights.ExtraLight;
-			case "light":
-				return FontWeights.Light;
-			case "semilight":
-				return FontWeights.SemiLight;
-			case "normal":
-			case "regular":
-				return FontWeights.Normal;
-			case "medium":
-				return FontWeights.Medium;
-			case "semibold":
-			case "demibold":
-				return FontWeights.SemiBold;
-			case "bold":
-				return FontWeights.Bold;
-			case "extrabold":
-			case "ultrabold":
-				return FontWeights.ExtraBold;
-			case "black":
-			case "heavy":
-				return FontWeights.Black;
-			case "extrablack":
-			case "ultrablack":
-				return FontWeights.ExtraBlack;
-			default:
-				int numericWeight;
-				if (int.TryParse(fontWeight, NumberStyles.Integer, CultureInfo.InvariantCulture, out numericWeight)
-					&& numericWeight >= 1 && numericWeight <= 999)
-				{
-					return new FontWeight((ushort)numericWeight);
-				}
-				throw new FormatException("'" + fontWeight + "' is not a valid font weight.");
-		}
+		return HighlightingValues.ParseFontWeight(fontWeight);
 	}
 
 	/// <summary>
-	/// Converts a font weight back to its invariant string form (a well-known weight name, or a number).
+	/// Converts a numeric font weight back to its invariant string form (a well-known weight name, or a number).
 	/// </summary>
-	internal static string ConvertFontWeightToString(FontWeight fontWeight)
+	internal static string ConvertFontWeightToString(ushort fontWeight)
 	{
-		switch (fontWeight.Weight)
-		{
-			case 100:
-				return "Thin";
-			case 200:
-				return "ExtraLight";
-			case 300:
-				return "Light";
-			case 350:
-				return "SemiLight";
-			case 400:
-				return "Normal";
-			case 500:
-				return "Medium";
-			case 600:
-				return "SemiBold";
-			case 700:
-				return "Bold";
-			case 800:
-				return "ExtraBold";
-			case 900:
-				return "Black";
-			case 950:
-				return "ExtraBlack";
-			default:
-				return fontWeight.Weight.ToString(CultureInfo.InvariantCulture);
-		}
+		return HighlightingValues.FontWeightToString(fontWeight);
 	}
 
 	/// <summary>
 	/// Converts an invariant font-style string (normal, italic or oblique) to a font style.
 	/// </summary>
-	internal static FontStyle ConvertFontStyle(string fontStyle)
+	internal static TextFontStyle ConvertFontStyle(string fontStyle)
 	{
-		switch (fontStyle.ToLowerInvariant())
-		{
-			case "normal":
-				return FontStyle.Normal;
-			case "italic":
-				return FontStyle.Italic;
-			case "oblique":
-				return FontStyle.Oblique;
-			default:
-				throw new FormatException("'" + fontStyle + "' is not a valid font style.");
-		}
+		return HighlightingValues.ParseFontStyle(fontStyle);
 	}
 
 	/// <summary>
 	/// Converts a font style back to its invariant string form.
 	/// </summary>
-	internal static string ConvertFontStyleToString(FontStyle fontStyle)
+	internal static string ConvertFontStyleToString(TextFontStyle fontStyle)
 	{
-		return fontStyle.ToString();
+		return HighlightingValues.FontStyleToString(fontStyle);
 	}
 	#endregion
 }

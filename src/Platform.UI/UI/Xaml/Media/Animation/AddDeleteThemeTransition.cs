@@ -4,7 +4,7 @@ namespace Microsoft.UI.Xaml.Media.Animation;
 
 public partial class AddDeleteThemeTransition : global::Microsoft.UI.Xaml.Media.Animation.Transition
 {
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public AddDeleteThemeTransition()
 	{
 		global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented(

@@ -1,0 +1,115 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Core: the platform-neutral half of the framework's UI assembly. It compiles the shared tree
+	(every unsuffixed file and the *.crossruntime.cs files; *.skia.cs and the other flavor files are excluded by
+	src/Platform.CrossTargetting.targets because CodeBrixRuntimeIdentifier is Core), the framework's own XAML, its
+	string resources and its embedded resources. It references no SkiaSharp/HarfBuzz package: the Skia half
+	(Platform.UI.Skia.csproj, assembly CodeBrix.Platform.UI) implements the platform contracts Core calls.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<DefineConstants>$(DefineConstants);ENABLE_LEGACY_TEMPLATED_PARENT_SUPPORT</DefineConstants>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);IS_CODEBRIX;IS_CODEBRIX_UI_PROJECT</DefineConstants>
+		<CodeBrixDisableAnalyzersForSamples>true</CodeBrixDisableAnalyzersForSamples>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+		<RootNamespace>CodeBrix.Platform.UI</RootNamespace>
+		<AssemblyName>CodeBrix.Platform.UI.Core</AssemblyName>
+		<IsAotCompatible>true</IsAotCompatible>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<!-- The framework's own XAML is generated exactly as it was for the Skia flavor (XamarinProjectType=skia),
+		     and its string resources are converted as they were for Skia (see WP0.2 item 1). -->
+		<CodeBrixUIRuntimeIdentifier>Skia</CodeBrixUIRuntimeIdentifier>
+		<_CodeBrixUnderlyingPlatform>skia</_CodeBrixUnderlyingPlatform>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+		<CodeBrixXamlResourcesUpriTrimming>true</CodeBrixXamlResourcesUpriTrimming>
+
+		<!-- Not packed on its own: the aggregate package (Platform.WinUI.nuspec) carries this assembly. It carries NO
+		     PackageId: two projects of one solution cannot share one (NuGet restore rejects it), and the Skia twin
+		     (Platform.UI.Skia.csproj) keeps the aggregate id, so a packed project must reference the Skia twin (or
+		     reference this one with PrivateAssets="all") to depend on the aggregate package. -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.xaml" Exclude="bin\**\*.xaml;obj\**\*.xaml;" Visible="False" />
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UWP\Platform.Core.csproj" />
+		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Core.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\SourceGenerators\System.Xaml\Platform.Xaml.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="$(PlatformItemsBasePath)UI\Xaml\Controls\ProgressRing\*.json" />
+		<EmbeddedResource Include="Resources\NoiseAsset256x256.png" />
+		<PRIResource Include="$(PlatformItemsBasePath)**\*.resw" />
+	</ItemGroup>
+
+	<!--
+	The framework's string resources keep the resource-map name "CodeBrix.Platform.UI/Resources" that the framework
+	code looks them up by (ResourceAccessor, ColorHelper, StorageProvider). The resource generation task names the map
+	after $(AssemblyName), so the assembly name is set to the framework's library name while that one task runs and
+	restored right after it (before the upri linker substitutions, which must name this assembly). These two targets
+	are declared before the Platform.UI.Tasks.targets import on purpose: that keeps the restore first among the
+	targets that run after CodeBrixResourcesGeneration.
+	-->
+	<PropertyGroup>
+		<_CodeBrixCoreResourceMapLibraryName>CodeBrix.Platform.UI</_CodeBrixCoreResourceMapLibraryName>
+	</PropertyGroup>
+	<Target Name="_CodeBrixCoreUseResourceMapLibraryName" BeforeTargets="CodeBrixResourcesGeneration">
+		<PropertyGroup>
+			<_CodeBrixCoreAssemblyName>$(AssemblyName)</_CodeBrixCoreAssemblyName>
+			<AssemblyName>$(_CodeBrixCoreResourceMapLibraryName)</AssemblyName>
+		</PropertyGroup>
+	</Target>
+	<Target Name="_CodeBrixCoreRestoreAssemblyName" AfterTargets="CodeBrixResourcesGeneration">
+		<PropertyGroup>
+			<AssemblyName>$(_CodeBrixCoreAssemblyName)</AssemblyName>
+		</PropertyGroup>
+	</Target>
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<PageExclusions>$(PlatformItemsBasePath)Themes\WinUI\Resources\**\*.xaml</PageExclusions>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+	<Import Project="MixinGeneration.targets" />
+	<Import Project="XamlMerge.targets" />
+
+	<ItemGroup Condition="'$(DocsGeneration)'==''">
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.SourceGenerators\Platform.UI.SourceGenerators.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+			<UndefineProperties>TargetFramework</UndefineProperties>
+		</ProjectReference>
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.SourceGenerators.Internal\Platform.UI.SourceGenerators.Internal.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<OutputItemType>Analyzer</OutputItemType>
+		</ProjectReference>
+		<ProjectReference Include="..\SourceGenerators\Platform.UI.Tasks\Platform.UI.Tasks.csproj">
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<SkipGetTargetFrameworkProperties>true</SkipGetTargetFrameworkProperties>
+			<UndefineProperties>TargetFramework</UndefineProperties>
+		</ProjectReference>
+	</ItemGroup>
+
+</Project>

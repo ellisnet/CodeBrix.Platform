@@ -130,7 +130,7 @@ internal sealed class WaylandVulkanRenderer : IWaylandRenderer
 
 				var canvas = _sized ? _vulkanContext.CachedSkSurface?.Canvas : null;
 				canvas?.Clear(_background);
-				_ = ((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(canvas, size =>
+				_ = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!, canvas, size =>
 				{
 					Resize((int)size.Width, (int)size.Height);
 					deviceLock ??= _vulkanContext.Device.Lock();

@@ -4,21 +4,21 @@
 namespace Windows.Media.Protection.PlayReady
 {
 	// This type is deprecated. Consider not implementing it.
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface INDStreamParserNotifier
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void OnContentIDReceived(global::Windows.Media.Protection.PlayReady.INDLicenseFetchDescriptor licenseFetchDescriptor);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void OnMediaStreamDescriptorCreated(global::System.Collections.Generic.IList<global::Windows.Media.Core.AudioStreamDescriptor> audioStreamDescriptors, global::System.Collections.Generic.IList<global::Windows.Media.Core.VideoStreamDescriptor> videoStreamDescriptors);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void OnSampleParsed(uint streamID, global::Windows.Media.Protection.PlayReady.NDMediaStreamType streamType, global::Windows.Media.Core.MediaStreamSample streamSample, long pts, global::Windows.Media.Protection.PlayReady.NDClosedCaptionFormat ccFormat, byte[] ccDataBytes);
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		void OnBeginSetupDecryptor(global::Windows.Media.Core.IMediaStreamDescriptor descriptor, global::System.Guid keyID, byte[] proBytes);
 #endif
 	}

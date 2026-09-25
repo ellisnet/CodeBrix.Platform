@@ -8,7 +8,7 @@ using Windows.Foundation;
 
 namespace Windows.Graphics.Interop.Direct2D;
 
-internal static partial class D2D1Helpers
+internal static class D2D1Helpers
 {
 	public static SKPathFillType ToSkia(this D2D1FillMode mode) => mode is D2D1FillMode.Alternate ? SKPathFillType.EvenOdd : SKPathFillType.Winding;
 

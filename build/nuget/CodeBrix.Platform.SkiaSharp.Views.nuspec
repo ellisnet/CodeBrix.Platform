@@ -34,7 +34,11 @@
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
-		<!-- The real (Skia) implementation ships directly in lib; no reference/codebrix-platform-runtime split. -->
+		<!-- Both assemblies ship directly in lib; no codebrix-platform-runtime split. The Core assembly carries the
+		     element API (SKXamlCanvas, SKSwapChainPanel) and the Skia-canvas host seam; the Skia assembly carries the
+		     Skia implementations of the views' platform surfaces. -->
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Core\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Core\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.Core.pdb" target="lib\net10.0" />
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.dll" target="lib\net10.0" />
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.pdb" target="lib\net10.0" />
 	</files>

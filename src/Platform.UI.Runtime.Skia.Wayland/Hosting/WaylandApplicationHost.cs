@@ -59,7 +59,7 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 
 		ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => LinuxSystemThemeHelper.Instance);
 
-		CompositionTarget.FrameRenderingOptions = (true, true);
+		global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.FrameRenderingOptions = (true, true);
 	}
 
 	public WaylandApplicationHost(Func<Application> appBuilder, int renderFrameRate = 60)
@@ -79,8 +79,8 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 		{
 			_isDispatcherThread = true;
 		});
-		CoreDispatcher.DispatchOverride = (a, p) => _eventLoop.Schedule(a);
-		CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = (a, p) => _eventLoop.Schedule(a);
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => _isDispatcherThread;
 	}
 
 	internal static int RenderFrameRate { get; private set; }

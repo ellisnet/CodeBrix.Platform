@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Toolkit: since the Core/Skia split, only the Skia implementation of IElevationPlatform (the
+	*.skia.cs files). The toolkit's controls, helpers and XAML are in CodeBrix.Platform.UI.Toolkit.Core
+	(Platform.UI.Toolkit.Core.csproj).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -16,56 +21,24 @@
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
 
-		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.Toolkit.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<EnableAutomaticXamlPageInclusion>false</EnableAutomaticXamlPageInclusion>
 
 		<UseCommonOverridePackage>true</UseCommonOverridePackage>
 		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleCommand.cs" Link="Simple\SimpleCommand.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleDialog.cs" Link="Simple\SimpleDialog.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleEnum.cs" Link="Simple\SimpleEnum.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleMessaging.cs" Link="Simple\SimpleMessaging.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleOsInfo.cs" Link="Simple\SimpleOsInfo.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleServiceResolver.cs" Link="Simple\SimpleServiceResolver.cs" />
-		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleViewModel.cs" Link="Simple\SimpleViewModel.cs" />
-		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
-	</ItemGroup>
-
-	<PropertyGroup>
-		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="LinkerDefinition.net6.0.xml">
-			<LogicalName>$(AssemblyName).xml</LogicalName>
-		</EmbeddedResource>
-	</ItemGroup>
-
-	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
-
-	<ItemGroup>
-		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj">
-		</ProjectReference>
-		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj">
-		</ProjectReference>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj">
-		</ProjectReference>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Simple\" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
-    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" />
 	</ItemGroup>
 
 	<!-- Override existing target, this project cannot be published -->
 	<Target Name="Publish" />
-
-	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
 
 </Project>

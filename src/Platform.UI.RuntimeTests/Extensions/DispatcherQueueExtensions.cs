@@ -24,7 +24,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Extensions //Was previously: Uno.UI.
 		/// <summary>
 		/// Indicates whether or not <see cref="DispatcherQueue.HasThreadAccess"/> is available.
 		/// </summary>
-		private static readonly bool IsHasThreadAccessPropertyAvailable = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue, CodeBrix.Platform", "HasThreadAccess");
+		private static readonly bool IsHasThreadAccessPropertyAvailable = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue, CodeBrix.Platform.Core", "HasThreadAccess");
 
 		/// <summary>
 		/// Invokes a given function on the target <see cref="DispatcherQueue"/> and returns a

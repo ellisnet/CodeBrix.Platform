@@ -10,6 +10,7 @@
 		<_ShouldUseNoPlatformOverride Condition="
 			$(MSBuildProjectFile.EndsWith('.Skia.csproj'))
 			OR $(MSBuildProjectFile.EndsWith('.Reference.csproj'))
+			OR $(MSBuildProjectFile.EndsWith('.Core.csproj'))
 			OR '$(CodeBrixDisableTargetFrameworkPlatformOverride)' == 'true'
 		">true</_ShouldUseNoPlatformOverride>
 	</PropertyGroup>

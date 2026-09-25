@@ -305,7 +305,7 @@ internal partial class InputManager
 
 			TraceHandling(originalSource);
 
-#if __SKIA__ // Currently, only Skia supports interaction tracker.
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // Currently, only Skia supports interaction tracker.
 			Visual? currentVisual = originalSource.Visual;
 			while (currentVisual is not null)
 			{

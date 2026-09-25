@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using System;
 using System.Threading.Tasks;
 using CodeBrix.Platform.Foundation.Logging;

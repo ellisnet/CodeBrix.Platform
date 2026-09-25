@@ -60,8 +60,16 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 		[Required]
 		public Microsoft.Build.Framework.ITaskItem[]? ReferencePath { get; set; }
 
+		/// <summary>
+		/// The application's trimming feature switches (RuntimeHostConfigurationOption items with Trim="true"; the item
+		/// spec is the switch name, metadata Value its value). Every linker pass gets them, as the final ILLink run does.
+		/// </summary>
+		public Microsoft.Build.Framework.ITaskItem[] FeatureSwitches { get; set; } = [];
+
 		[Output]
 		public Microsoft.Build.Framework.ITaskItem[]? OutputFeatures { get; set; }
+
+		private string _featureSwitchArguments = "";
 
 		public override bool Execute()
 		{
@@ -69,6 +77,8 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 
 			BuildReferences();
 			OutputPath = AlignPath(OutputPath);
+			_featureSwitchArguments = LinkerFeatureSwitches.Format(
+				(FeatureSwitches ?? []).Select(s => (s.ItemSpec, s.GetMetadata("Value"))));
 
 			var pass1Path = Path.Combine(OutputPath, "pass1");
 
@@ -162,6 +172,8 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 				$"-out {outputPath}",
 				rootDescriptors,
 				referencedAssemblies,
+				// The application's own feature switches first, then the hint features of this pass.
+				_featureSwitchArguments,
 				features,
 			};
 
@@ -383,39 +395,7 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 			}
 
 			string RewriteReferencePath(string referencePath, string codebrixUIPackageBasePath, string codebrixRuntimeIdentifier)
-			{
-				var separator = Path.DirectorySeparatorChar;
-				codebrixRuntimeIdentifier = codebrixRuntimeIdentifier.ToLowerInvariant();
-
-				var runtimeTargetFramework =
-					new Version(TargetFrameworkVersion) >= new Version("9.0")
-					? "net9.0"
-					: "netstandard2.0";
-
-				var isCodeBrixRuntimeEnabled = (codebrixRuntimeIdentifier == "skia" || codebrixRuntimeIdentifier == "webassembly") &&
-						referencePath.StartsWith(codebrixUIPackageBasePath, StringComparison.Ordinal);
-
-				if (isCodeBrixRuntimeEnabled)
-				{
-					var originalFolderPath = $"lib{separator}{runtimeTargetFramework}";
-					var preCodeBrix46FolderPart = $"codebrix-platform-runtime{separator}{codebrixRuntimeIdentifier}";
-					var postCodeBrix46FolderPathPart = $"codebrix-platform-runtime{separator}{runtimeTargetFramework}{separator}{codebrixRuntimeIdentifier}";
-
-					var post46Path = referencePath.Replace(originalFolderPath, postCodeBrix46FolderPathPart);
-					var pre46Path = referencePath.Replace(originalFolderPath, preCodeBrix46FolderPart);
-
-					if (File.Exists(post46Path))
-					{
-						return post46Path;
-					}
-					else if (File.Exists(pre46Path))
-					{
-						return pre46Path;
-					}
-				}
-
-				return referencePath;
-			}
+				=> RuntimeReferencePathRewriter.Rewrite(referencePath, codebrixUIPackageBasePath, codebrixRuntimeIdentifier, TargetFrameworkVersion, File.Exists);
 		}
 
 		private static bool HasConcreteAssemblyForReferenceAssembly(ITaskItem other, ITaskItem referenceAssembly)

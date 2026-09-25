@@ -28,8 +28,8 @@ using CoreGraphics;
 using ObjCRuntime;
 #endif
 
-#if __SKIA__
-using CodeBrix.Platform.UI.Composition.Composition;
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+using CodeBrix.Platform.UI.Toolkit.Contracts;
 #endif
 
 namespace CodeBrix.Platform.UI.Toolkit //Was previously: Uno.UI.Toolkit
@@ -57,6 +57,15 @@ namespace CodeBrix.Platform.UI.Toolkit //Was previously: Uno.UI.Toolkit
 			);
 
 		private static readonly Color ElevationColor = Color.FromArgb(64, 0, 0, 0);
+
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+		private static IElevationPlatform _elevationPlatform;
+
+		/// <summary>
+		/// Gets the platform that renders elevation shadows, resolved once on first use.
+		/// </summary>
+		private static IElevationPlatform ElevationPlatform => _elevationPlatform ??= PlatformContract.Resolve<IElevationPlatform>();
+#endif
 
 		private static void OnElevationChanged(DependencyObject dependencyObject,
 			DependencyPropertyChangedEventArgs args)
@@ -125,20 +134,10 @@ namespace CodeBrix.Platform.UI.Toolkit //Was previously: Uno.UI.Toolkit
 					uiElement.UnsetCssClasses("noclip");
 				}
 			}
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (element is UIElement uiElement)
 			{
-				var visual = uiElement.Visual;
-				const float x = 0.28f;
-				const float y = 0.92f * 0.5f;
-				const float blur = 0.18f;
-
-				var dx = (float)elevation * x;
-				var dy = (float)elevation * y;
-				var sigmaX = (float)(blur * elevation);
-				var sigmaY = (float)(blur * elevation);
-				var shadow = new ShadowState(dx, dy, sigmaX, sigmaY, shadowColor);
-				visual.ShadowState = shadow;
+				ElevationPlatform.SetElevation(uiElement, elevation, shadowColor);
 			}
 #elif (WINAPPSDK || WINDOWS_UWP || NETCOREAPP) && !HAS_CODEBRIX
 			if (element is UIElement uiElement)

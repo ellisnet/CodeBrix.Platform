@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<linker>
+  <!--
+  Trimming (WPE1 C1, updated for the text-engine home change, WPE1 C5): this assembly carries its own copy of the text
+  engine; the one thing it needs from the platform is the engine's font source (IFontSourcePlatform), which the
+  framework's Skia assembly CodeBrix.Platform.UI registers from its platform bootstrap. A Skia application keeps that
+  assembly and runs its bootstrap anyway; a head-less consumer that names only TextLayoutEngine does not reference it by
+  type, and the resolution loads it by name (Contracts/PlatformContract.cs). These roots keep the bootstrap and the font
+  source for that case, but only when the feature switch CodeBrix.Platform.RootSkiaPlatformAssemblies is on (the
+  default, so every Skia head keeps them with no setting). A consumer without the Skia assemblies (CodeBrix.Android,
+  CodeBrix.Mobile) turns it off, which also avoids the IL2007 "could not resolve assembly" warning:
+      <RuntimeHostConfigurationOption Include="CodeBrix.Platform.RootSkiaPlatformAssemblies" Value="false" Trim="true" />
+  (The former whole-assembly root of the Skia twin CodeBrix.Platform.UI.TextLayout is gone with the twin.)
+  -->
+  <assembly fullname="CodeBrix.Platform.UI" feature="CodeBrix.Platform.RootSkiaPlatformAssemblies" featurevalue="true" featuredefault="true">
+    <type fullname="CodeBrix.Platform.UI.Skia.SkiaPlatformBootstrap" preserve="all" />
+    <type fullname="CodeBrix.Platform.UI.Skia.FontSourceSkiaPlatform" preserve="all" />
+  </assembly>
+</linker>

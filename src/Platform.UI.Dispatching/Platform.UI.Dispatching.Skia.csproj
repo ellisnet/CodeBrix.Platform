@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Dispatching: since the Core/Skia split, the native pump only (DispatcherPumpSkiaPlatform, the
+	*.skia.cs files). DispatcherQueue and the queue machinery are in CodeBrix.Platform.UI.Dispatching.Core
+	(Platform.UI.Dispatching.Core.csproj).
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,17 +25,20 @@
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
 
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.Dispatching.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
 		<UseCommonOverridePackage>true</UseCommonOverridePackage>
 		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
-		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.csproj" />
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Generated\3.0.0.0\" />
+		<ProjectReference Include="..\Platform.UI.Dispatching\Platform.UI.Dispatching.Core.csproj" />
 	</ItemGroup>
 
 </Project>

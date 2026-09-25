@@ -29,7 +29,7 @@
 		     directly, and the first thing that needs it is the engine's own teardown - which fails
 		     to load, from inside a catch block, with a message about an assembly nobody mentioned.
 		     Referencing it here puts it beside the test executable. -->
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

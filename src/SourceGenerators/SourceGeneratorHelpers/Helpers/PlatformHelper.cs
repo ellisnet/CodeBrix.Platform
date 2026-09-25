@@ -19,17 +19,15 @@ namespace CodeBrix.Platform.UI.SourceGenerators.Helpers //Was previously: Uno.UI
 				&& !isWindowsRuntimeApplicationOutput;
 		}
 
-		public static bool IsAndroid(GeneratorExecutionContext context)
-			=> context.GetMSBuildPropertyValue("AndroidApplication")?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
-
-		public static bool IsIOS(GeneratorExecutionContext context)
-			=> context.GetMSBuildPropertyValue("RuntimeIdentifier") is { Length: > 0 } rid
-				&& rid.StartsWith("ios", StringComparison.OrdinalIgnoreCase);
-
 		public static bool IsCodeBrixHead(GeneratorExecutionContext context)
 			=> context.GetMSBuildPropertyValue("IsCodeBrixHead")?.Equals("true", StringComparison.OrdinalIgnoreCase) ?? false;
 
+		/// <remarks>
+		/// An application is a project with <c>IsCodeBrixHead=true</c>. The Android-app flag
+		/// (<c>AndroidApplication</c>) is deliberately not consulted: this family has no Android-native head,
+		/// and an Android application built on the Core assemblies marks itself with <c>IsCodeBrixHead</c>.
+		/// </remarks>
 		public static bool IsApplication(GeneratorExecutionContext context)
-			=> IsAndroid(context) || IsCodeBrixHead(context);
+			=> IsCodeBrixHead(context);
 	}
 }

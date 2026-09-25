@@ -108,8 +108,11 @@ namespace CodeBrix.Platform.UI.Xaml.Core //Was previously: Uno.UI.Xaml.Core
 					root.UpdateLayout();
 				}
 
-#if __SKIA__
-				(root.XamlRoot?.Content?.Visual.CompositionTarget as CompositionTarget)?.OnRenderFrameOpportunity();
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+				if (root.XamlRoot is { } xamlRoot)
+				{
+					CodeBrix.Platform.UI.Contracts.PlatformServices.Rendering.OnRenderFrameOpportunity(xamlRoot);
+				}
 #endif
 			}
 		}

@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Toolkit.Core: the toolkit's controls and helpers (the shared tree, its XAML, and the seven
+	linked Platform.Simple files). The Skia half (Platform.UI.Toolkit.Skia.csproj, assembly
+	CodeBrix.Platform.UI.Toolkit) implements IElevationPlatform only.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Toolkit.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Toolkit</RootNamespace>
+		<DefaultLanguage>en-US</DefaultLanguage>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<!-- The toolkit's XAML is generated exactly as it was for the Skia flavor (XamarinProjectType=skia). -->
+		<CodeBrixUIRuntimeIdentifier>Skia</CodeBrixUIRuntimeIdentifier>
+		<_CodeBrixUnderlyingPlatform>skia</_CodeBrixUnderlyingPlatform>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<CodeBrixXamlResourcesTrimming>true</CodeBrixXamlResourcesTrimming>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>CodeBrix.Platform.UI</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleCommand.cs" Link="Simple\SimpleCommand.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleDialog.cs" Link="Simple\SimpleDialog.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleEnum.cs" Link="Simple\SimpleEnum.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleMessaging.cs" Link="Simple\SimpleMessaging.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleOsInfo.cs" Link="Simple\SimpleOsInfo.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleServiceResolver.cs" Link="Simple\SimpleServiceResolver.cs" />
+		<Compile Include="..\..\src-platforms\Platform.Simple\SimpleViewModel.cs" Link="Simple\SimpleViewModel.cs" />
+		<Compile Include="..\Platform.UI\Behaviors\VisibleBoundsPadding.cs" Link="VisibleBoundsPadding.cs" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<CodeBrixUIMSBuildTasksPath>$(MSBuildThisFileDirectory)..\SourceGenerators\Platform.UI.Tasks\bin\$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="LinkerDefinition.net6.0.xml">
+			<LogicalName>$(AssemblyName).xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<Import Project="..\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Core.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Simple\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
+	</ItemGroup>
+
+	<!-- Override existing target, this project cannot be published -->
+	<Target Name="Publish" />
+
+	<Import Project="..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+
+	<!-- Trimmable and AOT-compatible (WPE1-5, Jeremy's ruling E): the trim findings of the linked src-platforms/Platform.Simple
+	     sources are fixed there with annotations (SimpleEnum: DynamicallyAccessedMembers + GetValuesAsUnderlyingType;
+	     SimpleServiceResolver.AutoRegisterServices: RequiresUnreferencedCode; SimpleViewModel: DynamicallyAccessedMembers
+	     on the type). IsAotCompatible implies IsTrimmable and turns on the trim, AOT and single-file analyzers. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+</Project>

@@ -22,7 +22,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -35,7 +35,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -48,7 +48,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -62,7 +62,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -78,7 +78,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -95,7 +95,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		[TestMethod]
@@ -109,7 +109,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 			};
 
 			Run run = new() { Text = GetText(expected) };
-			AssertSegmentsMatch(expected, run.Segments);
+			AssertSegmentsMatch(expected, run.GetSegments());
 		}
 
 		private static string GetText(ExpectedSegment[] expectedSegments) => string.Concat(expectedSegments.Select(s => s.Text));

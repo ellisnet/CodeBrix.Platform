@@ -6,19 +6,19 @@ namespace Windows.ApplicationModel;
 
 partial class PackageId
 {
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public ProcessorArchitecture Architecture => ProcessorArchitecture.Unknown;
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public string PublisherId => "Unknown";
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public string ResourceId => "Unknown";
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public string Author => "Unknown";
 
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public string ProductId => "Unknown";
 
 #if true
@@ -37,7 +37,7 @@ partial class PackageId
 	public PackageVersion Version { get; internal set; } = new PackageVersion(Assembly.GetExecutingAssembly().GetVersionNumber());
 #endif
 
-#if !__SKIA__ && !__CROSSRUNTIME__
+#if !__CROSSRUNTIME__
 	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 	public string Publisher { get; internal set; } = "Unknown";
 #endif

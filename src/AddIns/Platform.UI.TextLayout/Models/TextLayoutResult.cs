@@ -2,9 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using Microsoft.UI.Xaml.Documents;
+using CodeBrix.Platform.UI.TextLayout.Contracts;
 using SkiaSharp;
-using Windows.Foundation;
 
 namespace CodeBrix.Platform.UI.TextLayout;
 
@@ -29,13 +28,14 @@ namespace CodeBrix.Platform.UI.TextLayout;
 /// </remarks>
 public sealed class TextLayoutResult : IDisposable
 {
-	private readonly UnicodeText _layout;
+	// The engine's layout (Contracts/IEngineLayout; a wrapper over this assembly's copy of the shared text engine).
+	private readonly IEngineLayout _layout;
 	private readonly SKSize _size;
 
-	internal TextLayoutResult(UnicodeText layout, Size desiredSize)
+	internal TextLayoutResult(IEngineLayout layout, SKSize desiredSize)
 	{
 		_layout = layout;
-		_size = new SKSize((float)desiredSize.Width, (float)desiredSize.Height);
+		_size = desiredSize;
 	}
 
 	/// <summary>The text this layout covers - every run's text, concatenated in order.</summary>
@@ -63,7 +63,7 @@ public sealed class TextLayoutResult : IDisposable
 	public SKRect GetCaretRect(int textIndex, float caretThickness = 1f)
 	{
 		ValidateIndexInclusive(textIndex);
-		return ToSKRect(_layout.GetCaretRectForIndex(textIndex, caretThickness));
+		return _layout.GetCaretRectForIndex(textIndex, caretThickness);
 	}
 
 	/// <summary>
@@ -75,7 +75,7 @@ public sealed class TextLayoutResult : IDisposable
 	public SKRect GetRectForIndex(int textIndex)
 	{
 		ValidateIndexInclusive(textIndex);
-		return ToSKRect(_layout.GetRectForIndex(textIndex));
+		return _layout.GetRectForIndex(textIndex);
 	}
 
 	/// <summary>
@@ -84,7 +84,7 @@ public sealed class TextLayoutResult : IDisposable
 	/// <param name="point">A point in layout coordinates.</param>
 	/// <returns>The text index, or -1 when the point falls outside the text.</returns>
 	public int GetIndexAt(SKPoint point) =>
-		_layout.GetIndexAt(new Point(point.X, point.Y), ignoreEndingNewLine: false, extendedSelection: false);
+		_layout.GetIndexAt(point, ignoreEndingNewLine: false, extendedSelection: false);
 
 	/// <summary>
 	/// The text index nearest to a point, clamped into the text rather than returning -1.
@@ -96,7 +96,7 @@ public sealed class TextLayoutResult : IDisposable
 	/// to the closest caret position instead of failing.
 	/// </remarks>
 	public int GetNearestIndexAt(SKPoint point) =>
-		_layout.GetIndexAt(new Point(point.X, point.Y), ignoreEndingNewLine: false, extendedSelection: true);
+		_layout.GetIndexAt(point, ignoreEndingNewLine: false, extendedSelection: true);
 
 	/// <summary>
 	/// Which line a text index falls on.
@@ -158,14 +158,7 @@ public sealed class TextLayoutResult : IDisposable
 	/// </remarks>
 	public IReadOnlyList<SKRect> GetSelectionRects(int start, int length)
 	{
-		var rects = _layout.GetSelectionRects(start, length);
-		var result = new List<SKRect>(rects.Count);
-		foreach (var rect in rects)
-		{
-			result.Add(ToSKRect(rect));
-		}
-
-		return result;
+		return _layout.GetSelectionRects(start, length);
 	}
 
 	/// <summary>
@@ -189,14 +182,7 @@ public sealed class TextLayoutResult : IDisposable
 	/// </remarks>
 	public IReadOnlyList<GlyphOutline> GetGlyphOutlines()
 	{
-		var engineOutlines = _layout.GetGlyphOutlines();
-		var result = new List<GlyphOutline>(engineOutlines.Count);
-		foreach (var outline in engineOutlines)
-		{
-			result.Add(new GlyphOutline(outline.GlyphId, outline.Path, outline.Origin, outline.Advance, outline.Font));
-		}
-
-		return result;
+		return _layout.GetGlyphOutlines();
 	}
 
 	/// <summary>
@@ -222,7 +208,7 @@ public sealed class TextLayoutResult : IDisposable
 			throw new ArgumentNullException(nameof(paint));
 		}
 
-		_layout.DrawToCanvas(canvas, origin, paint);
+		_layout.Draw(canvas, origin, paint);
 	}
 
 	/// <summary>
@@ -253,7 +239,4 @@ public sealed class TextLayoutResult : IDisposable
 				$"Text index must be between 0 and {Text.Length} inclusive.");
 		}
 	}
-
-	private static SKRect ToSKRect(Rect rect) =>
-		new((float)rect.Left, (float)rect.Top, (float)rect.Right, (float)rect.Bottom);
 }

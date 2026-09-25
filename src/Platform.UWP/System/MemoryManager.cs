@@ -7,7 +7,7 @@ namespace Windows.System;
 public partial class MemoryManager
 {
 	internal static bool IsAvailable { get; private set; }
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		= true;
 #endif
 

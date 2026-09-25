@@ -20,7 +20,7 @@
 		<!-- The add-in whose requirements these are. It ships no XAML type at all: it is a layout
 		     engine that hands back geometry and paints onto a Skia canvas, so it needs nothing
 		     registered and nothing initialised - the engine initialises itself on its first call. -->
-		<ProjectReference Include="..\..\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Skia.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" />
 
 		<!-- The painting surface the scenarios look at. The engine draws onto an SKCanvas, and this
 		     is the family's element that owns one: the software present path (a pinned staging

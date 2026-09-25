@@ -4,7 +4,7 @@ namespace Microsoft.UI.Xaml.Shapes
 {
 	public partial class Rectangle : Shape
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		/// <inheritdoc />
 		protected override Size MeasureOverride(Size availableSize)
 			=> MeasureRelativeShape(availableSize);

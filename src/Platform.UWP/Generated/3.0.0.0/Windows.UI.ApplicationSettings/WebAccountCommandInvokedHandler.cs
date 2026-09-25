@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.UI.ApplicationSettings
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public delegate void WebAccountCommandInvokedHandler(global::Windows.UI.ApplicationSettings.WebAccountCommand command, global::Windows.UI.ApplicationSettings.WebAccountInvokedArgs args);
 #endif
 }

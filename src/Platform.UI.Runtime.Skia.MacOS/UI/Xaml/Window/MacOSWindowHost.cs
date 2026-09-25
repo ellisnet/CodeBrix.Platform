@@ -105,7 +105,7 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 		// we can't cache anything since the texture will be different on next calls
 		GRBackendRenderTarget? target = null;
 		SKSurface? surface = null;
-		var nativeElementClipPath = ((CompositionTarget)RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(null, size =>
+		var nativeElementClipPath = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)RootElement!.Visual.CompositionTarget!, null, size =>
 		{
 			target = new GRBackendRenderTarget((int)size.Width, (int)size.Height, new GRMtlTextureInfo(texture));
 			surface = SKSurface.Create(_context, target, GRSurfaceOrigin.TopLeft, SKColorType.Rgba8888);
@@ -149,7 +149,7 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 			}
 		}
 
-		var nativeElementClipPath = ((CompositionTarget)RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(null, size =>
+		var nativeElementClipPath = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)RootElement!.Visual.CompositionTarget!, null, size =>
 		{
 			_bitmap?.Dispose();
 			_surface?.Dispose();

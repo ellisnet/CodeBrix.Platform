@@ -65,28 +65,29 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
     <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 
     <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
          in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
          CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
          Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
          Referenced here in Core so both heads inherit them. -->
-    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
   </ItemGroup>
 
   <!--
     CodeBrix.Platform add-ins, each formerly a separate NuGet:
-      Graphics2DSK    <- CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever  (Crossruntime variant)
-      SkiaSharp.Views <- CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever  (Skia-only; no ref split)
-      Lottie          <- CodeBrix.Platform.Lottie.ApacheLicenseForever        (Skia variant)
-      Svg             <- CodeBrix.Platform.Svg.ApacheLicenseForever           (Skia variant)
-    Skia variants match the repo's own from-source build. The external packages these
+      Graphics2DSK    <- CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever  (Core by whole)
+      SkiaSharp.Views <- CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever  (Skia project; brings its Core)
+      Lottie          <- CodeBrix.Platform.Lottie.ApacheLicenseForever        (Skia project; brings its Core)
+      Svg             <- CodeBrix.Platform.Svg.ApacheLicenseForever           (Skia project; brings its Core)
+    Each package carries a Core and a Skia assembly; the Skia projects reference their Core
+    projects, so this graph matches what the packages deliver. The external packages these
     depend on (SkiaSharp.Skottie, CodeBrix.SkiaSvg) remain PackageReferences above.
   -->
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+    <ProjectReference Include="..\..\..\..\src\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" />
     <ProjectReference Include="..\..\..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Skia.csproj" />
     <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.Lottie\Platform.UI.Lottie.Skia.csproj" />
     <ProjectReference Include="..\..\..\..\src\AddIns\Platform.UI.Svg\Platform.UI.Svg.Skia.csproj" />

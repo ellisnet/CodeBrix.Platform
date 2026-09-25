@@ -17,7 +17,8 @@ public partial class CompositionTarget : ICompositionTarget
 	internal CompositionTarget(ContentRoot contentRoot)
 	{
 		ContentRoot = contentRoot;
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+		_platform = CodeBrix.Platform.UI.Contracts.PlatformServices.Rendering.CreateCompositionTargetPlatform(this);
 		_targets.Add(this, null);
 		var xamlRoot = ContentRoot.GetOrCreateXamlRoot();
 		xamlRoot.Changed += (_, _) => UpdateXamlRootBounds();

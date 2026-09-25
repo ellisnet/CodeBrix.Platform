@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Svg.Core: the SVG add-in's platform-neutral half - SvgProvider (the framework's ISvgProvider for
+	SvgImageSource: CodeBrix.SkiaSvg parsing, CSS theming, rasterisation) and the element that draws the parsed picture
+	(SvgCanvas, on the Skia-canvas host seam of the SkiaSharp views add-in). It references SkiaSharp, CodeBrix.SkiaSvg,
+	the SkiaSharp views Core and the framework's Core assemblies, never the framework's Skia assemblies (plan rule R7).
+	The Skia project in this folder (Platform.UI.Svg.Skia.csproj, assembly CodeBrix.Platform.UI.Svg) is the composition
+	hookup: it registers SvgProvider as the framework's ISvgProvider, and carries the package's PackageId.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override.props" />
+
+	<PropertyGroup>
+		<Deterministic>true</Deterministic>
+		<Nullable>enable</Nullable>
+
+		<AssemblyName>CodeBrix.Platform.UI.Svg.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Svg</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the Svg package (build/nuget/Platform.WinUI.Svg.nuspec); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.252.363" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Core.csproj" />
+	</ItemGroup>
+
+	<!-- NOT marked trimmable/AOT-compatible yet (WPE1 C1, 2026-09-24): SvgProvider calls CodeBrix.SkiaSvg's SKSvg.Load,
+	     which that library annotates RequiresUnreferencedCode (IL2026). The fix belongs in CodeBrix.SkiaSvg (another
+	     repository); see WPE1-1_REPORT.md, TRIMMABILITY. -->
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

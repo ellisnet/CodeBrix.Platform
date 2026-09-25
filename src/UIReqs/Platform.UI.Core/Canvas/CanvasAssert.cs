@@ -124,8 +124,7 @@ public static partial class CanvasAssert
 		ArgumentNullException.ThrowIfNull(region);
 
 		var background = Background;
-		var counts = new Dictionary<uint, int>();
-		var representatives = new Dictionary<uint, SKColor>();
+		var mode = new ModeColor();
 
 		foreach (var pixel in region.Pixels())
 		{
@@ -134,25 +133,10 @@ public static partial class CanvasAssert
 				continue;
 			}
 
-			var composited = ColorMatch.Composite(pixel, background);
-			var key = (uint) ColorMatch.Quantize(composited);
-			counts.TryGetValue(key, out var count);
-			counts[key] = count + 1;
-			if (count == 0)
-			{
-				representatives[key] = composited;
-			}
+			mode.Add(ColorMatch.Composite(pixel, background));
 		}
 
-		if (counts.Count == 0)
-		{
-			color = default;
-			return false;
-		}
-
-		var mode = counts.OrderByDescending(pair => pair.Value).First().Key;
-		color = representatives[mode];
-		return true;
+		return mode.TryGetMode(out color, out _);
 	}
 
 	/// <summary>What share of two regions' pixels differ from each other.</summary>

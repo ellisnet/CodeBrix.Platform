@@ -23,7 +23,7 @@ internal enum ImageDataKind
 	/// </summary>
 	ByteArray,
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 	/// <summary>
 	/// Skia composition surface.
 	/// </summary>

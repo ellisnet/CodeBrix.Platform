@@ -1,4 +1,3 @@
-using System.Globalization;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 
@@ -20,16 +19,13 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// does, and it is equally harmless because the <c>color</c> property affects only artwork that
 /// asked for <c>currentColor</c>.
 /// </para>
+/// <para>
+/// WPE1 C14: the composing itself is the Engine's (Engine/SvgTintCss, over red/green/blue); these XAML-typed overloads
+/// are its adapter.
+/// </para>
 /// </remarks>
 internal static class SvgTintCss
 {
-	/// <summary>The colours <see cref="IconTintMode.ReplaceBlackAndWhite"/> treats as "no colour of
-	/// its own", written the six ways an SVG file spells them.</summary>
-	private static readonly string[] MonochromeLiterals =
-	[
-		"#000000", "#000", "black", "#ffffff", "#FFFFFF", "#fff", "#FFF", "white"
-	];
-
 	/// <summary>
 	/// Composes the stylesheet for one tint, or null when nothing should be applied.
 	/// </summary>
@@ -55,35 +51,11 @@ internal static class SvgTintCss
 	/// <returns>A CSS snippet, or null when <paramref name="mode"/> is
 	/// <see cref="IconTintMode.None"/>.</returns>
 	internal static string? Compose(Color tint, IconTintMode mode)
-	{
-		if (mode == IconTintMode.None)
-		{
-			return null;
-		}
-
-		var colour = ToCssColor(tint);
-		var css = $"* {{ color: {colour}; }}";
-
-		if (mode == IconTintMode.ReplaceBlackAndWhite)
-		{
-			css += $" {SelectorFor("fill")} {{ fill: {colour}; }}"
-				+ $" {SelectorFor("stroke")} {{ stroke: {colour}; }}";
-		}
-
-		return css;
-	}
+		=> Engine.SvgTintCss.Compose(tint.R, tint.G, tint.B, mode);
 
 	/// <summary>Writes one colour the way CSS spells it.</summary>
 	/// <param name="colour">The colour to write.</param>
 	/// <returns>A six-digit hexadecimal colour, for example <c>#2266DD</c>.</returns>
 	internal static string ToCssColor(Color colour)
-		=> string.Create(
-			CultureInfo.InvariantCulture,
-			$"#{colour.R:X2}{colour.G:X2}{colour.B:X2}");
-
-	/// <summary>The attribute selector matching every monochrome value of one attribute.</summary>
-	/// <param name="attribute">Either <c>fill</c> or <c>stroke</c>.</param>
-	/// <returns>A comma-separated attribute selector.</returns>
-	private static string SelectorFor(string attribute)
-		=> string.Join(",", System.Array.ConvertAll(MonochromeLiterals, v => $"[{attribute}=\"{v}\"]"));
+		=> Engine.SvgTintCss.ToCssColor(colour.R, colour.G, colour.B);
 }

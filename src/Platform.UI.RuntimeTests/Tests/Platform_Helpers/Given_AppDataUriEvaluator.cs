@@ -224,7 +224,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Platform_Helpers //Was previou
 		[TestMethod]
 		public void When_NonExistent_Method_Check()
 		{
-			Assert.IsFalse(ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition", "IDontExist"));
+			Assert.IsFalse(ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition.Core", "IDontExist"));
 		}
 	}
 }

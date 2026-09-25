@@ -100,13 +100,13 @@ namespace CodeBrix.Platform.UI.Extensions //Was previously: Uno.UI.Extensions
 				.Append(uiElement.IsMeasureDirtyPathDisabled ? " MEASURE_DIRTY_PATH_DISABLED" : "")
 				.Append(uiElement.IsMeasureDirtyPath ? " MEASURE_DIRTY_PATH" : "")
 				.Append(uiElement.IsMeasureDirty ? " MEASURE_DIRTY" : "")
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				.Append(!uiElement.IsFirstMeasureDone ? " NEVER_MEASURED" : "")
 #endif
 				.Append(uiElement.IsArrangeDirtyPathDisabled ? " ARRANGE_DIRTY_PATH_DISABLED" : "")
 				.Append(uiElement.IsArrangeDirtyPath ? " ARRANGE_DIRTY_PATH" : "")
 				.Append(uiElement.IsArrangeDirty ? " ARRANGE_DIRTY" : "")
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				.Append(!uiElement.IsFirstArrangeDone ? " NEVER_ARRANGED" : "")
 #endif
 				;

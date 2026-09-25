@@ -24,6 +24,6 @@ public partial class AnalyticsVersionInfo
 	/// <remarks>
 	/// Needs to be parsable long number.
 	/// </remarks>
-	[NotImplemented("__SKIA__")]
+	[NotImplemented("__SKIA__", "__CODEBRIX_CORE__")]
 	public string DeviceFamilyVersion { get; private set; } = "0";
 }

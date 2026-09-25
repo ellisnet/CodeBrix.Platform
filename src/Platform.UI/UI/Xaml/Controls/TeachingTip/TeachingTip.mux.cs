@@ -974,7 +974,7 @@ public partial class TeachingTip : ContentControl
 					popup.IsOpen = true;
 					if (SharedHelpers.IsAnimationsEnabled()
 #if HAS_CODEBRIX // Uno specific: Make sure we skip animation when the required API is not supported
-						&& ApiInformation.IsTypePresent("Microsoft.UI.Composition.CompositionScopedBatch, CodeBrix.Platform.UI.Composition")
+						&& ApiInformation.IsTypePresent("Microsoft.UI.Composition.CompositionScopedBatch, CodeBrix.Platform.UI.Composition.Core")
 #endif
 						)
 					{
@@ -1493,7 +1493,7 @@ public partial class TeachingTip : ContentControl
 			// Contract animation
 			if (SharedHelpers.IsAnimationsEnabled()
 #if HAS_CODEBRIX // Uno specific: Make sure we skip animation when the required API is not supported
-				&& ApiInformation.IsTypePresent("Microsoft.UI.Composition.CompositionScopedBatch, CodeBrix.Platform.UI.Composition")
+				&& ApiInformation.IsTypePresent("Microsoft.UI.Composition.CompositionScopedBatch, CodeBrix.Platform.UI.Composition.Core")
 #endif
 				)
 			{
@@ -1693,7 +1693,7 @@ public partial class TeachingTip : ContentControl
 	private void CreateExpandAnimation()
 	{
 		// TODO: Uno specific - CompositionEasingFunction and related types not supported yet.
-		if (!ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition", "CreateCubicBezierEasingFunction"))
+		if (!ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition.Core", "CreateCubicBezierEasingFunction"))
 		{
 			return;
 		}
@@ -1756,7 +1756,7 @@ public partial class TeachingTip : ContentControl
 	private void CreateContractAnimation()
 	{
 		// TODO: Uno specific - CompositionEasingFunction and related types not supported yet.
-		if (!ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition", "CreateCubicBezierEasingFunction"))
+		if (!ApiInformation.IsMethodPresent("Microsoft.UI.Composition.Compositor, CodeBrix.Platform.UI.Composition.Core", "CreateCubicBezierEasingFunction"))
 		{
 			return;
 		}

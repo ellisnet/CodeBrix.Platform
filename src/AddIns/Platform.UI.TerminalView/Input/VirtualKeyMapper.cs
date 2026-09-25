@@ -1,5 +1,6 @@
 #nullable enable
 
+using CodeBrix.Platform.UI.TerminalView.Engine;
 using CodeBrix.Terminal.Engine;
 using Windows.System;
 
@@ -12,10 +13,43 @@ namespace CodeBrix.Platform.UI.TerminalView.Input;
 
 /// <summary>
 /// Maps WinUI <see cref="VirtualKey"/> values onto the engine's neutral
-/// <see cref="TerminalKey"/> for <see cref="TerminalKeyEncoder"/>.
+/// <see cref="TerminalKey"/> for <see cref="TerminalKeyEncoder"/>, and onto the
+/// engine's <see cref="TerminalModifierKey"/> for the add-in's key encoder
+/// (<see cref="TerminalInputEncoder"/>, WPE1 C6).
 /// </summary>
 internal static class VirtualKeyMapper
 {
+    /// <summary>
+    /// Maps a key onto the modifier it is (either side of Shift/Control/Alt,
+    /// Caps Lock), or <see cref="TerminalModifierKey.None"/> for any other key.
+    /// </summary>
+    public static TerminalModifierKey ToModifierKey(VirtualKey key)
+    {
+        switch (key)
+        {
+            case VirtualKey.Shift:
+            case VirtualKey.LeftShift:
+            case VirtualKey.RightShift:
+                return TerminalModifierKey.Shift;
+
+            case VirtualKey.Control:
+            case VirtualKey.LeftControl:
+            case VirtualKey.RightControl:
+                return TerminalModifierKey.Control;
+
+            case VirtualKey.Menu:
+            case VirtualKey.LeftMenu:
+            case VirtualKey.RightMenu:
+                return TerminalModifierKey.Alt;
+
+            case VirtualKey.CapitalLock:
+                return TerminalModifierKey.CapsLock;
+
+            default:
+                return TerminalModifierKey.None;
+        }
+    }
+
     /// <summary>
     /// Maps a key, returning <see cref="TerminalKey.None"/> for keys the
     /// encoder has no mapping for (bare modifiers, unmapped function keys).

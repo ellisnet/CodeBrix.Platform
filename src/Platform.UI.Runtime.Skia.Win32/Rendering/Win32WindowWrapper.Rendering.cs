@@ -60,7 +60,7 @@ internal partial class Win32WindowWrapper
 		_rendering = true;
 		try
 		{
-			var nativeElementClipPath = ((CompositionTarget)((IXamlRootHost)this).RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(_surface?.Canvas, size =>
+			var nativeElementClipPath = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)((IXamlRootHost)this).RootElement!.Visual.CompositionTarget!, _surface?.Canvas, size =>
 			{
 				_surface?.Dispose();
 				_surface = _renderer.UpdateSize((int)size.Width, (int)size.Height);

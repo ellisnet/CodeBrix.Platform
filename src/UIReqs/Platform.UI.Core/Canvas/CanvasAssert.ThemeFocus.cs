@@ -58,8 +58,7 @@ public static partial class CanvasAssert
 	{
 		ArgumentNullException.ThrowIfNull(region);
 
-		var counts = new Dictionary<uint, int>();
-		var representatives = new Dictionary<uint, SKColor>();
+		var mode = new ModeColor();
 
 		foreach (var pixel in region.Pixels())
 		{
@@ -68,25 +67,10 @@ public static partial class CanvasAssert
 				continue;
 			}
 
-			var composited = ColorMatch.Composite(pixel, surface);
-			var key = (uint) ColorMatch.Quantize(composited);
-			counts.TryGetValue(key, out var count);
-			counts[key] = count + 1;
-			if (count == 0)
-			{
-				representatives[key] = composited;
-			}
+			mode.Add(ColorMatch.Composite(pixel, surface));
 		}
 
-		if (counts.Count == 0)
-		{
-			color = default;
-			return false;
-		}
-
-		var mode = counts.OrderByDescending(pair => pair.Value).First().Key;
-		color = representatives[mode];
-		return true;
+		return mode.TryGetMode(out color, out _);
 	}
 
 	/// <summary>Asserts what colour a region's ink is when the region carries its own fill.</summary>

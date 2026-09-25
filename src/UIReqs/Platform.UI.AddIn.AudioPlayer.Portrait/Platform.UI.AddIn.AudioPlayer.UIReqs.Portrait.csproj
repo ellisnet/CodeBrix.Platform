@@ -22,7 +22,7 @@
 		     fails is throw FileNotFoundException instead of raising MediaFailed. Referencing it here
 		     puts the assembly beside the tests; it is a test-graph reference and nothing ships from
 		     it. -->
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 </Project>

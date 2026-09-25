@@ -4,20 +4,20 @@
 namespace Microsoft.UI.Xaml.CustomAttributes
 {
 	[global::System.AttributeUsageAttribute(global::System.AttributeTargets.Property | global::System.AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MUXPropertyTypeAttribute : global::System.Attribute
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public MUXPropertyTypeAttribute() : base()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.CustomAttributes.MUXPropertyTypeAttribute", "MUXPropertyTypeAttribute.MUXPropertyTypeAttribute()");
 		}
 #endif
 		// Forced skipping of method Microsoft.UI.Xaml.CustomAttributes.MUXPropertyTypeAttribute.MUXPropertyTypeAttribute()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		public string value;
 #endif
 	}

@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.CommandBar.Core: the tool bar controls, their automation peers, the ToolIconSource model
+	(glyph, raster and SVG icon sources, the icon cache, the cb-res:// resource scheme) and the default styles
+	(Themes/Generic.xaml) - the shared tree of this folder. It references only the platform-neutral framework Core
+	assemblies. The one platform service it needs - building the rasterised image of an SVG icon - is the contract
+	Contracts/IIconRasterizationPlatform.cs; the Skia project in this folder (Platform.UI.CommandBar.Skia.csproj,
+	assembly CodeBrix.Platform.UI.CommandBar) implements it through the Svg add-in and carries the package.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.CommandBar.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.CommandBar</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<!-- The default styles are generated exactly as they were for the Skia flavor (XamarinProjectType=skia). -->
+		<CodeBrixUIRuntimeIdentifier>Skia</CodeBrixUIRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the CommandBar package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+	</ItemGroup>
+
+	<!-- Default styles. Themes/Generic.xaml is picked up as a <Page> automatically
+	     (src/Directory.Build.props sets EnableAutomaticXamlPageInclusion), and this import is what
+	     runs the XAML source generator over it so the dictionary is compiled into the assembly and
+	     found by DefaultStyleKey. Same arrangement as src/Platform.UI.Toolkit, the in-repo
+	     precedent for a library that ships its own control styles. -->
+	<Import Project="..\..\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

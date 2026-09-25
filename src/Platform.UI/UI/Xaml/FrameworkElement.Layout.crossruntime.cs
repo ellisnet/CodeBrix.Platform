@@ -17,6 +17,7 @@ using Microsoft.UI.Xaml.Controls;
 using CodeBrix.Platform.UI.Xaml.Core;
 using CodeBrix.Platform.UI.Xaml.Core.Scaling;
 using CodeBrix.Platform.UI.Extensions;
+using ElementHandlerCapabilities = CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities;
 
 //CodeBrix warning-cleanup 2026-07-10: unused private fields retained (not removed); CA1823 suppressed file-wide.
 #pragma warning disable CA1823
@@ -214,6 +215,14 @@ namespace Microsoft.UI.Xaml
 
 		internal void InvokeApplyTemplate(out bool addedVisuals)
 		{
+			// Element handler seam, hook H5: a handler that owns the visuals gets no template materialized.
+			if (AreHandlersActive && HasHandlerCapability(ElementHandlerCapabilities.OwnsVisuals))
+			{
+				addedVisuals = false;
+				ReportTemplateSuppressedToHandler(GetTemplate());
+				return;
+			}
+
 			ApplyTemplate(out addedVisuals);
 
 			var pControl = this as Control;
@@ -332,7 +341,10 @@ namespace Microsoft.UI.Xaml
 			//	frameworkAvailableSize = availableSize;
 			//}
 
-			var desiredSize = MeasureOverride(frameworkAvailableSize);
+			// Element handler seam, hook H7 (measure): a natively measured element asks its handler instead of MeasureOverride.
+			var desiredSize = AreHandlersActive && TryGetHandlerWith(ElementHandlerCapabilities.MeasuresNatively, out var measuringHandler)
+				? measuringHandler.Measure(frameworkAvailableSize)
+				: MeasureOverride(frameworkAvailableSize);
 
 			// We need to round now since we save the values off, and use them to determine
 			// if a layout clip will be applied.
@@ -668,7 +680,11 @@ namespace Microsoft.UI.Xaml
 				}
 			}
 
-			innerInkSize = ArrangeOverride(arrangeSize);
+			// Element handler seam, hook H7 (arrange): a natively measured element is not arranged by ArrangeOverride; it
+			// takes the size Core arranged it to, and its handler places it below (after ArrangeNative).
+			innerInkSize = AreHandlersActive && HasHandlerCapability(ElementHandlerCapabilities.MeasuresNatively)
+				? arrangeSize
+				: ArrangeOverride(arrangeSize);
 
 			// Here we use un-clipped InkSize because element does not know that it is
 			// clipped by layout system and it shoudl have as much space to render as
@@ -811,6 +827,12 @@ namespace Microsoft.UI.Xaml
 			var clippedFrame = GetClipRect(needsClipBounds, visualOffset, finalRect, new Size(maxWidth, maxHeight), margin);
 			ArrangeNative(visualOffset, clippedFrame);
 
+			// Element handler seam, hook H7 (every handler): the arranged rectangle, relative to the visual parent.
+			if (AreHandlersActive && Handler is { } arrangedHandler)
+			{
+				arrangedHandler.Arrange(new Rect(visualOffset, RenderSize));
+			}
+
 			if (_traceLayoutCycle && this.Log().IsEnabled(LogLevel.Warning))
 			{
 				this.Log().LogWarning($"[LayoutCycleTracing] Arranged {this},{this.GetDebugName()}: {clippedFrame}.");
@@ -935,7 +957,7 @@ namespace Microsoft.UI.Xaml
 #endif
 						)
 					{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 						clipRect.X += visualOffset.X;
 						clipRect.Y += visualOffset.Y;
 #elif false
@@ -972,7 +994,7 @@ namespace Microsoft.UI.Xaml
 				throw new InvalidOperationException($"{FormatDebugName()}: Invalid frame size {newRect}. No dimension should be NaN or negative value.");
 			}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			// clippedFrame here is the one calculated by FrameworkElement.GetClipRect
 			// which propagates to ContainerVisual.LayoutClip.
 			// The UIElement.Clip public property isn't considered here on Skia because

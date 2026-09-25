@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 
 namespace CodeBrix.Platform.UI.CommandBar;
@@ -31,14 +29,15 @@ namespace CodeBrix.Platform.UI.CommandBar;
 /// asking the runtime to load it. An assembly that is neither - one loaded into a custom context,
 /// say - can be handed over once with <see cref="RegisterAssembly"/>.
 /// </para>
+/// <para>
+/// WPE1 C14: the implementation lives in the add-in's Engine namespace (Engine/IconResourceScheme, no XAML type);
+/// this public class forwards to it, unchanged in shape.
+/// </para>
 /// </remarks>
 public static class IconResourceScheme
 {
 	/// <summary>The URI scheme itself: <c>cb-res</c>.</summary>
-	public const string Scheme = "cb-res";
-
-	private static readonly ConcurrentDictionary<string, Assembly> _registered =
-		new(StringComparer.OrdinalIgnoreCase);
+	public const string Scheme = Engine.IconResourceScheme.Scheme;
 
 	/// <summary>
 	/// Registers an assembly so its embedded icons resolve by simple name.
@@ -49,19 +48,7 @@ public static class IconResourceScheme
 	/// assembly twice is harmless.
 	/// </remarks>
 	/// <exception cref="ArgumentNullException"><paramref name="assembly"/> is null.</exception>
-	public static void RegisterAssembly(Assembly assembly)
-	{
-		if (assembly is null)
-		{
-			throw new ArgumentNullException(nameof(assembly));
-		}
-
-		var name = assembly.GetName().Name;
-		if (!string.IsNullOrEmpty(name))
-		{
-			_registered[name] = assembly;
-		}
-	}
+	public static void RegisterAssembly(Assembly assembly) => Engine.IconResourceScheme.RegisterAssembly(assembly);
 
 	/// <summary>
 	/// Builds the URI naming one embedded resource.
@@ -72,28 +59,12 @@ public static class IconResourceScheme
 	/// <returns>A <c>cb-res://</c> URI.</returns>
 	/// <exception cref="ArgumentNullException"><paramref name="assembly"/> or
 	/// <paramref name="resourceName"/> is null.</exception>
-	public static Uri Create(Assembly assembly, string resourceName)
-	{
-		if (assembly is null)
-		{
-			throw new ArgumentNullException(nameof(assembly));
-		}
-
-		if (resourceName is null)
-		{
-			throw new ArgumentNullException(nameof(resourceName));
-		}
-
-		RegisterAssembly(assembly);
-		return new Uri($"{Scheme}://{assembly.GetName().Name}/{Uri.EscapeDataString(resourceName)}");
-	}
+	public static Uri Create(Assembly assembly, string resourceName) => Engine.IconResourceScheme.Create(assembly, resourceName);
 
 	/// <summary>Whether <paramref name="uri"/> names an embedded resource.</summary>
 	/// <param name="uri">The URI to test; null is not.</param>
 	/// <returns>True when the URI uses this scheme.</returns>
-	public static bool IsResourceUri(Uri? uri)
-		=> uri is { IsAbsoluteUri: true }
-			&& string.Equals(uri.Scheme, Scheme, StringComparison.OrdinalIgnoreCase);
+	public static bool IsResourceUri(Uri? uri) => Engine.IconResourceScheme.IsResourceUri(uri);
 
 	/// <summary>
 	/// Opens the resource a <c>cb-res://</c> URI names.
@@ -101,76 +72,5 @@ public static class IconResourceScheme
 	/// <param name="uri">The resource URI.</param>
 	/// <param name="stream">The resource's bytes, which the caller disposes.</param>
 	/// <returns>True when the assembly and the resource were both found.</returns>
-	public static bool TryOpen(Uri? uri, [NotNullWhen(true)] out Stream? stream)
-	{
-		stream = null;
-
-		if (!IsResourceUri(uri))
-		{
-			return false;
-		}
-
-		var assemblyName = uri!.Host;
-		var resourceName = Uri.UnescapeDataString(uri.AbsolutePath).TrimStart('/');
-
-		if (string.IsNullOrEmpty(assemblyName) || string.IsNullOrEmpty(resourceName))
-		{
-			return false;
-		}
-
-		if (FindAssembly(assemblyName) is not { } assembly)
-		{
-			return false;
-		}
-
-		stream = assembly.GetManifestResourceStream(resourceName);
-		if (stream is not null)
-		{
-			return true;
-		}
-
-		//An SDK-style project prefixes a resource with the root namespace and its folder path, so
-		//the terse form in the URI is matched as a suffix - but only when it is unambiguous.
-		var suffix = "." + resourceName;
-		var matches = assembly.GetManifestResourceNames()
-			.Where(name => name.EndsWith(suffix, StringComparison.Ordinal))
-			.ToArray();
-
-		if (matches.Length == 1)
-		{
-			stream = assembly.GetManifestResourceStream(matches[0]);
-		}
-
-		return stream is not null;
-	}
-
-	private static Assembly? FindAssembly(string simpleName)
-	{
-		if (_registered.TryGetValue(simpleName, out var registered))
-		{
-			return registered;
-		}
-
-		var loaded = AppDomain.CurrentDomain.GetAssemblies()
-			.FirstOrDefault(a => string.Equals(a.GetName().Name, simpleName, StringComparison.OrdinalIgnoreCase));
-
-		if (loaded is not null)
-		{
-			_registered[simpleName] = loaded;
-			return loaded;
-		}
-
-		try
-		{
-			var byName = Assembly.Load(new AssemblyName(simpleName));
-			_registered[simpleName] = byName;
-			return byName;
-		}
-		catch (Exception)
-		{
-			//An icon that names an assembly this process does not have is a missing icon, not a
-			//crash: the element shows nothing and the application keeps running.
-			return null;
-		}
-	}
+	public static bool TryOpen(Uri? uri, [NotNullWhen(true)] out Stream? stream) => Engine.IconResourceScheme.TryOpen(uri, out stream);
 }

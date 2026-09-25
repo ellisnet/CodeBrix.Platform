@@ -114,6 +114,18 @@ namespace Microsoft.UI.Xaml.Controls
 				)
 			);
 
+		/// <summary>
+		/// Raise entry point for a platform handler: the user edited the native password field. Runs the text-input path
+		/// (the password follows the text), which raises PasswordChanged.
+		/// </summary>
+		/// <param name="password">The native field's new password.</param>
+		/// <returns>The effective Password (coerced by MaxLength, for example); the handler writes it back when it differs.</returns>
+		internal string ApplyPasswordFromPlatform(string password)
+		{
+			ProcessTextInput(password ?? string.Empty);
+			return Password;
+		}
+
 		private void OnPasswordChanged(DependencyPropertyChangedEventArgs e)
 		{
 			SetValue(TextProperty, (string)e.NewValue);

@@ -35,13 +35,9 @@ namespace CodeBrix.Platform.UI.SourceGenerators.DependencyObject //Was previousl
 
 			private readonly GeneratorExecutionContext _context;
 			private readonly INamedTypeSymbol? _dependencyObjectSymbol;
-			private readonly INamedTypeSymbol? _codebrixViewgroupSymbol;
 			private readonly INamedTypeSymbol? _iosViewSymbol;
 			private readonly INamedTypeSymbol? _macosViewSymbol;
 			private readonly INamedTypeSymbol? _androidViewSymbol;
-			private readonly INamedTypeSymbol? _javaObjectSymbol;
-			private readonly INamedTypeSymbol? _androidActivitySymbol;
-			private readonly INamedTypeSymbol? _androidFragmentSymbol;
 			private readonly INamedTypeSymbol? _bindableAttributeSymbol;
 			private readonly INamedTypeSymbol? _iFrameworkElementSymbol;
 			private readonly INamedTypeSymbol? _frameworkElementSymbol;
@@ -55,13 +51,9 @@ namespace CodeBrix.Platform.UI.SourceGenerators.DependencyObject //Was previousl
 				var comp = context.Compilation;
 
 				_dependencyObjectSymbol = comp.GetTypeByMetadataName(XamlConstants.Types.DependencyObject);
-				_codebrixViewgroupSymbol = comp.GetTypeByMetadataName("CodeBrix.Platform.UI.CodeBrixViewGroup");
 				_iosViewSymbol = comp.GetTypeByMetadataName("UIKit.UIView");
 				_macosViewSymbol = comp.GetTypeByMetadataName("AppKit.NSView");
 				_androidViewSymbol = comp.GetTypeByMetadataName("Android.Views.View");
-				_javaObjectSymbol = comp.GetTypeByMetadataName("Java.Lang.Object");
-				_androidActivitySymbol = comp.GetTypeByMetadataName("Android.App.Activity");
-				_androidFragmentSymbol = comp.GetTypeByMetadataName("AndroidX.Fragment.App.Fragment");
 				_bindableAttributeSymbol = comp.GetTypeByMetadataName("Microsoft.UI.Xaml.Data.BindableAttribute");
 				_iFrameworkElementSymbol = comp.GetTypeByMetadataName(XamlConstants.Types.IFrameworkElement);
 				_frameworkElementSymbol = comp.GetTypeByMetadataName("Microsoft.UI.Xaml.FrameworkElement");
@@ -194,16 +186,12 @@ using CodeBrix.Platform.Diagnostics.Eventing;
 
 				WriteToStringOverride(typeSymbol, builder);
 
-				WriteAndroidEqualityOverride(typeSymbol, builder);
+				// No Android-view members (OnAttachedToWindow, binder details, Java equality) and no UIKit-view members
+				// (MovedToWindow, WillMoveToSuperview) are generated: this family has no Android-native or UIKit-native
+				// head, where UIElement derived from Android.Views.View or UIKit.UIView.
 
-				WriteAndroidBinderDetails(typeSymbol, builder);
-
-				WriteAndroidAttachedToWindow(typeSymbol, builder);
-
-				WriteAttachToWindow(typeSymbol, builder);
 				WriteViewDidMoveToWindow(typeSymbol, builder);
 
-				WriteiOSMoveToSuperView(typeSymbol, builder);
 				WriteMacOSViewWillMoveToSuperview(typeSymbol, builder);
 
 				WriteDispose(typeSymbol, builder);
@@ -219,34 +207,6 @@ using CodeBrix.Platform.Diagnostics.Eventing;
 				if (hasNoToString)
 				{
 					builder.AppendIndented(@"public override string ToString() => GetType().FullName;");
-				}
-			}
-
-			private void WriteiOSMoveToSuperView(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
-			{
-				var isiosView = typeSymbol.Is(_iosViewSymbol);
-				var hasNoWillMoveToSuperviewMethod = typeSymbol
-					.GetMethodsWithName("WillMoveToSuperview")
-					.None(m => IsNotDependencyObjectGeneratorSourceFile(m));
-
-				var overridesWillMoveToSuperview = isiosView && hasNoWillMoveToSuperviewMethod;
-
-				if (overridesWillMoveToSuperview)
-				{
-					builder.AppendMultiLineIndented(@"
-public override void WillMoveToSuperview(UIKit.UIView newsuper)
-{
-	base.WillMoveToSuperview(newsuper);
-
-	WillMoveToSuperviewPartial(newsuper);
-}
-
-partial void WillMoveToSuperviewPartial(UIKit.UIView newsuper);
-					");
-				}
-				else
-				{
-					builder.AppendIndented($"// Skipped _iosViewSymbol: {typeSymbol.Is(_iosViewSymbol)}, hasNoWillMoveToSuperviewMethod: {hasNoWillMoveToSuperviewMethod}");
 				}
 			}
 
@@ -276,130 +236,6 @@ partial void WillMoveToSuperviewPartial(AppKit.NSView newsuper);
 				{
 					builder.AppendIndented($"// Skipped _macosViewSymbol: {typeSymbol.Is(_macosViewSymbol)}, hasNoViewWillMoveToSuperviewMethod: {hasNoWillMoveToSuperviewMethod}");
 					builder.AppendLine();
-				}
-			}
-
-			private void WriteAndroidAttachedToWindow(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
-			{
-				var isAndroidView = typeSymbol.Is(_androidViewSymbol);
-				var isAndroidActivity = typeSymbol.Is(_androidActivitySymbol);
-				var isAndroidFragment = typeSymbol.Is(_androidFragmentSymbol);
-				var isCodeBrixViewGroup = typeSymbol.Is(_codebrixViewgroupSymbol);
-				var implementsIFrameworkElement = typeSymbol.Interfaces.Any(t => SymbolEqualityComparer.Default.Equals(t, _iFrameworkElementSymbol));
-				var hasOverridesAttachedToWindowAndroid = isAndroidView &&
-					typeSymbol
-					.GetMethodsWithName("OnAttachedToWindow")
-					.None(m => IsNotDependencyObjectGeneratorSourceFile(m));
-
-				if (isAndroidView || isAndroidActivity || isAndroidFragment)
-				{
-					builder.AppendMultiLineIndented($@"
-#if {hasOverridesAttachedToWindowAndroid} //Is Android view (that doesn't already override OnAttachedToWindow)
-
-#if {isCodeBrixViewGroup} //Is CodeBrixViewGroup
-					// Both methods below are implementation of abstract methods
-					// which are called from onAttachedToWindow in Java.
-
-					protected override void OnNativeLoaded()
-					{{
-						BinderAttachedToWindow();
-					}}
-
-					protected override void OnNativeUnloaded()
-					{{
-						BinderDetachedFromWindow();
-					}}
-#else //Not CodeBrixViewGroup
-					protected override void OnAttachedToWindow()
-					{{
-						base.OnAttachedToWindow();
-						__Store.Parent = base.Parent;
-#if {implementsIFrameworkElement} //Is IFrameworkElement
-						OnLoading();
-						OnLoaded();
-#endif
-						BinderAttachedToWindow();
-					}}
-
-
-					protected override void OnDetachedFromWindow()
-					{{
-						base.OnDetachedFromWindow();
-#if {implementsIFrameworkElement} //Is IFrameworkElement
-						OnUnloaded();
-#endif
-					if(base.Parent == null)
-					{{
-						__Store.Parent = null;
-					}}
-
-						BinderDetachedFromWindow();
-					}}
-#endif // IsCodeBrixViewGroup
-#endif // OverridesAttachedToWindow
-
-					private void BinderAttachedToWindow()
-					{{
-						OnAttachedToWindowPartial();
-					}}
-
-
-					private void BinderDetachedFromWindow()
-					{{
-						OnDetachedFromWindowPartial();
-					}}
-
-					/// <summary>
-					/// A method called when the control is attached to the Window (equivalent of Loaded)
-					/// </summary>
-					partial void OnAttachedToWindowPartial();
-
-					/// <summary>
-					/// A method called when the control is attached to the Window (equivalent of Unloaded)
-					/// </summary>
-					partial void OnDetachedFromWindowPartial();
-				");
-				}
-			}
-
-			private void WriteAttachToWindow(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
-			{
-				var hasOverridesAttachedToWindowiOS = typeSymbol.Is(_iosViewSymbol) &&
-									typeSymbol
-									.GetMethodsWithName("MovedToWindow")
-									.None(m => IsNotDependencyObjectGeneratorSourceFile(m));
-
-				if (hasOverridesAttachedToWindowiOS)
-				{
-					builder.AppendMultiLineIndented($@"
-public override void MovedToWindow()
-{{
-	base.MovedToWindow();
-
-	if(Window != null)
-	{{
-		OnAttachedToWindowPartial();
-	}}
-	else
-	{{
-		OnDetachedFromWindowPartial();
-	}}
-}}
-
-/// <summary>
-/// A method called when the control is attached to the Window (equivalent of Loaded)
-/// </summary>
-partial void OnAttachedToWindowPartial();
-
-/// <summary>
-/// A method called when the control is attached to the Window (equivalent of Unloaded)
-/// </summary>
-partial void OnDetachedFromWindowPartial();
-					");
-				}
-				else
-				{
-					builder.AppendIndented($@"// hasOverridesAttachedToWindowiOS=false");
 				}
 			}
 
@@ -448,21 +284,6 @@ partial void OnDetachedFromWindowPartial();
 			private static bool IsNotDependencyObjectGeneratorSourceFile(IMethodSymbol m)
 			{
 				return !m.Locations.FirstOrDefault()?.SourceTree?.FilePath.Contains(nameof(DependencyObjectGenerator)) ?? true;
-			}
-
-			private void WriteAndroidBinderDetails(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
-			{
-				var hasBinderDetails = typeSymbol.Is(_androidViewSymbol);
-
-				if (hasBinderDetails)
-				{
-					builder.AppendMultiLineIndented($@"
-public BinderDetails GetBinderDetail()
-{{
-	return null;
-}}
-					");
-				}
 			}
 
 			private static void WriteInitializer(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
@@ -523,7 +344,7 @@ global::CodeBrix.Platform.UI.DataBinding.ManagedWeakReference IWeakReferenceProv
 
 			private void WriteDispose(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
 			{
-				var hasDispose = typeSymbol.Is(_iosViewSymbol) || typeSymbol.Is(_macosViewSymbol);
+				var hasDispose = typeSymbol.Is(_macosViewSymbol);
 
 				if (hasDispose)
 				{
@@ -717,37 +538,6 @@ public void ResumeBindings()
 public void SuspendBindings() =>
 	__Store.SuspendBindings();
 				");
-			}
-
-			private void WriteAndroidEqualityOverride(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder)
-			{
-				var hasEqualityOverride = typeSymbol
-					.GetMethodsWithName("Equals")
-					.None(m => IsNotDependencyObjectGeneratorSourceFile(m))
-					&& (typeSymbol.BaseType?.GetMethodsWithName("Equals").None(m => m.IsSealed) ?? true);
-
-				if (hasEqualityOverride && typeSymbol.Is(_androidViewSymbol))
-				{
-					builder.AppendMultiLineIndented($@"
-public override int GetHashCode()
-{{
-	// For the the current kind of type, we do not need to call back
-	// to android for the GetHashCode implementation. The .NET proxy hash is
-	// enough. This way, we do not get to pay the price of the interop to get
-	// this value.
-	return RuntimeHelpers.GetHashCode(this);
-}}
-
-public override bool Equals(object other)
-{{
-	// For the the current kind of type, we do not need to call back
-	// to android for the Equals implementation. We assume that proxies are
-	// one-to-one mapping with native instances, making the reference comparison
-	// of proxies enough to do the job.
-	return RuntimeHelpers.ReferenceEquals(this, other);
-}}
-					");
-				}
 			}
 
 			private void GenerateDependencyObjectImplementation(INamedTypeSymbol typeSymbol, IndentedStringBuilder builder, bool hasDispatcherQueue)

@@ -3,14 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Interop
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IBindableObservableVector : global::Microsoft.UI.Xaml.Interop.IBindableVector, global::Microsoft.UI.Xaml.Interop.IBindableIterable
 	{
 		// Forced skipping of method Microsoft.UI.Xaml.Interop.IBindableObservableVector.VectorChanged.add
 		// Forced skipping of method Microsoft.UI.Xaml.Interop.IBindableObservableVector.VectorChanged.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Microsoft.UI.Xaml.Interop.BindableVectorChangedEventHandler VectorChanged;
 #endif
 	}

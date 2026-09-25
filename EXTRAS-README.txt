@@ -496,7 +496,7 @@ it too is copied to the output rather than embedded.
 
 DEVELOPER TOOLS (tools/)
 ========================
-Neither tool is packed into any NuGet package.
+None of these tools is packed into any NuGet package.
 
 WaylandBindingsGenerator
 ------------------------
@@ -528,6 +528,18 @@ MAKELANGID arithmetic used to turn a primary-language / sub-language pair into
 the language ids the tool's Languages enum uses (for example en-US = 0x409).
 Its output is what populates the framework's WinUI string resource tables; it
 is run by hand, rarely, when those resources are refreshed.
+
+UIReqsFrameCompare
+------------------
+    tools/UIReqsFrameCompare    (run through build/test-scripts/compare-uireqs-frames.sh)
+
+Compares two folders of saved UIReqs frames (CODEBRIX_UIREQS_FRAME_SAVE)
+pixel by pixel and reports every frame that differs, is missing, or is extra,
+with a diff image per differing frame. It uses SkiaSharp at the family's
+locked version, read from src/Directory.Build.targets. The groups listed in
+build/test-scripts/uireqs-frame-compare.informational (whole groups, or single
+features as <Group>/<feature>) are reported but never fail the comparison. --self-test <baseline-folder> checks the tool itself.
+See the UIReqs part of MAINTAINER-README.txt's TESTING section.
 
 ================================================================================
 
@@ -592,6 +604,11 @@ SamplesAppArtifactPath to be set, run the test host under xvfb-run on Linux,
 and use UITEST_RUNTIME_TEST_GROUP, CODEBRIX_TESTS_FAILED_LIST,
 UITEST_RUNTIME_TESTS_FILTER and TEST_RESULTS_FILE to shard a run and to re-run
 only the previous run's failures (through Platform.NUnitTransformTool).
+
+Two scripts serve this repository's own Linux checks: compare-uireqs-frames.sh
+runs the UIReqs frame comparison (tools/UIReqsFrameCompare), and
+pack-linux-local-feed.sh packs the Linux-buildable packages into a local
+folder for verification - it never publishes (see MAINTAINER-README.txt).
 
 Several scripts in this folder are inherited from the upstream project's CI
 and target things this repository does not build: the Android and iOS UI-test

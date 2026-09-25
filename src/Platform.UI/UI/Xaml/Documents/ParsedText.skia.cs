@@ -6,6 +6,7 @@ using System.Linq;
 using Windows.Foundation;
 using Windows.UI.Text;
 using Microsoft.UI.Composition;
+using CodeBrix.Platform.UI.Composition.Skia;
 using Microsoft.UI.Xaml.Documents.TextFormatting;
 using Microsoft.UI.Xaml.Media;
 using SkiaSharp;
@@ -90,7 +91,7 @@ internal readonly struct ParsedText : IParsedText
 			{
 				float characterSpacing = (float)run.FontSize * run.CharacterSpacing / 1000;
 
-				foreach (var segment in run.Segments)
+				foreach (var segment in run.GetSegments())
 				{
 					// TODO: After bidi is implemented, consider that adjacent segments may not have a word break or new line between them but may just
 					// switch direction and thus must appear together without wrapping. We don't need to worry about this for now since every segment
@@ -213,7 +214,7 @@ internal readonly struct ParsedText : IParsedText
 						// the spaces fit as the remainder of the spaces will just not render.
 						// This is most definitely not perfect, as it won't catch cases of having more empty inlines
 						// after, but it should be good enough for the majority of cases.
-						if (inlines[^1] == run && run.Segments[^1] == segment && start == segment.LeadingSpaces && segment.LeadingSpaces == segment.Glyphs.Count)
+						if (inlines[^1] == run && run.GetSegments()[^1] == segment && start == segment.LeadingSpaces && segment.LeadingSpaces == segment.Glyphs.Count)
 						{
 							continue;
 						}
@@ -338,7 +339,7 @@ internal readonly struct ParsedText : IParsedText
 
 	#region IParsedText
 
-	public void Draw(in Visual.PaintingSession session,
+	public void Draw(in PaintingSession session,
 		(int index, CompositionBrush brush, float thickness)? caret,
 		(int selectionStart, int selectionEnd, CompositionBrush selectedTextBackgroundBrush, Brush selectedTextForegroundBrush)? selection)
 	{
@@ -348,7 +349,7 @@ internal readonly struct ParsedText : IParsedText
 			if (caret is not null)
 			{
 				var caretRect = new SKRect(0, 0, caret.Value.thickness, _defaultLineHeight);
-				caret.Value.brush.Paint(session.Canvas, session.Opacity, caretRect);
+				CompositionBrushSkiaPlatform.Of(caret.Value.brush).Paint(session.Canvas, session.Opacity, caretRect);
 			}
 
 			return;
@@ -387,7 +388,7 @@ internal readonly struct ParsedText : IParsedText
 
 				var segment = segmentSpan.Segment;
 				var inline = segment.Inline;
-				var fontInfo = segment.FallbackFont ?? inline.FontInfo;
+				var fontInfo = segment.FallbackFont ?? inline.GetFontInfo();
 
 				var paint = _spareDrawPaint;
 
@@ -792,7 +793,7 @@ internal readonly struct ParsedText : IParsedText
 			if (Math.Abs(left - right) > 0.01)
 			{
 				var rect = new SKRect(left, y - line.Height, right, y);
-				brush.Paint(canvas, opacity, rect);
+				CompositionBrushSkiaPlatform.Of(brush).Paint(canvas, opacity, rect);
 			}
 		}
 	}
@@ -948,7 +949,7 @@ internal readonly struct ParsedText : IParsedText
 			if (caretLocation != float.MinValue)
 			{
 				var caretRect = new SKRect(caretLocation, y - line.Height, caretLocation + caretThickness, y);
-				caretBrush.Paint(canvas, opacity, caretRect);
+				CompositionBrushSkiaPlatform.Of(caretBrush).Paint(canvas, opacity, caretRect);
 			}
 		}
 	}

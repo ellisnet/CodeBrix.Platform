@@ -52,7 +52,6 @@
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'==''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
@@ -60,7 +59,6 @@
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.ResourcesGenerationTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory"/>
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriFeaturesGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory"/>
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.ResourcesGenerator.UpriSubstitutionsGeneratorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
-	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.Assets.RetargetAssets_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector.RuntimeAssetsSelectorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.RuntimeAssetsValidator.RuntimeAssetsValidatorTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
 	<UsingTask Condition="'$(_IsCodeBrixUISolution)'!=''" AssemblyFile="$(CodeBrixUIMSBuildTasksPath)\CodeBrix.Platform.UI.Tasks.v0.dll" TaskName="CodeBrix.Platform.UI.Tasks.HotReloadInfo.HotReloadInfoTask_v0" Runtime="NET" Architecture="$(CodeBrixNetTaskHostArchitecture)" TaskFactory="TaskHostFactory" />
@@ -83,8 +81,12 @@
 		-->
 		<AssignTargetPathsDependsOn>$(AssignTargetPathsDependsOn);AssignLinkMetadata</AssignTargetPathsDependsOn>
 
-		<_CodeBrixUnderlyingPlatform Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">android</_CodeBrixUnderlyingPlatform>
-		<_CodeBrixUnderlyingPlatform Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios' OR $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst' OR $([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tvos'">uikit</_CodeBrixUnderlyingPlatform>
+		<!--
+		An Android, iOS, tvOS or Mac Catalyst target framework is not an underlying platform of its own: this family has
+		no Android-native or UIKit-native head, so resw files are not turned into Android string resources or UIKit
+		Localizable.strings files, and assets are not retargeted to drawables or bundle resources. Such a consumer
+		gets the Core path (upri resources; skia when CodeBrixRuntimeIdentifier=Skia).
+		-->
 		<_CodeBrixUnderlyingPlatform Condition="'$(CodeBrixRuntimeIdentifier)'=='WebAssembly'">wasm</_CodeBrixUnderlyingPlatform>
 		<_CodeBrixUnderlyingPlatform Condition="'$(_CodeBrixUnderlyingPlatform)'=='' AND '$(CodeBrixRuntimeIdentifier)'=='Skia'">skia</_CodeBrixUnderlyingPlatform>
 	</PropertyGroup>
@@ -92,8 +94,8 @@
 	<!--
 	  This task transforms all the Content files and PRIResources into resources files compatible for each platform.
 
-	  Note: For Apple UIKit and Android, it must be run early in the build process, but no publicly stable target is available
-	  to inject CodeBrix.Platform properly. Failing to add this task early enough makes X.A and X.I miss the generated resource files.
+	  Note: it must be run early in the build process, but no publicly stable target is available
+	  to inject CodeBrix.Platform properly.
 	-->
 	<Target Name="CodeBrixResourcesGeneration"
 				BeforeTargets="_GetLibraryImports;PrepareForBuild;_CheckForContent;_CollectBundleResources;_ComputeAndroidResourcePaths"
@@ -108,7 +110,7 @@
 
 			<!-- Determine CodeBrixHead (with xamarin heads detection) -->
 			<_IsCodeBrixHead>false</_IsCodeBrixHead>
-			<_IsCodeBrixHead Condition="'$(IsCodeBrixHead)'=='true' or '$(AndroidApplication)'=='true' or '$(ProjectTypeGuids)'!=''">true</_IsCodeBrixHead>
+			<_IsCodeBrixHead Condition="'$(IsCodeBrixHead)'=='true' or '$(ProjectTypeGuids)'!=''">true</_IsCodeBrixHead>
 		</PropertyGroup>
 
 		<ItemGroup>
@@ -151,11 +153,6 @@
 							ItemName="GeneratedFiles" />
 		</ResourcesGenerationTask_v0>
 		<ItemGroup>
-			<BundleResource Condition="'%(GeneratedFiles.CodeBrixResourceTarget)' =='UIKit'" Include="@(GeneratedFiles)" />
-			<_CodeBrixAndroidResources Condition="'%(GeneratedFiles.CodeBrixResourceTarget)' =='Android'" Include="@(GeneratedFiles)" />
-			<LibraryResourceDirectories Condition="'@(_CodeBrixAndroidResources->Count ())' != '0' " Include="$(_ResourceOutputPath)\r">
-				<StampFile>$(_ResourceStampFile)</StampFile>
-			</LibraryResourceDirectories>
 			<EmbeddedResource Condition="'%(GeneratedFiles.CodeBrixResourceTarget)' =='CodeBrix'" Include="@(GeneratedFiles)" />
 
 			<!-- Clear temporary group -->
@@ -176,63 +173,11 @@
 		</ItemGroup>
 	</Target>
 
-	<!-- 
-		The CodeBrixAssetsGeneration must be run at design time as well, as it 
-		interacts with the `.R` generation on android. If not run, temporary
-		resource files may be deleted incorrectly by design time builds.
+	<!--
+		There is no asset retargeting (the former CodeBrixAssetsGeneration target and RetargetAssets task): it moved
+		Content assets into Android drawables or UIKit bundle resources for the upstream native heads, and this family
+		has neither. Every consumer loads its assets by their ms-appx path from the output folder.
 	-->
-	<Target Name="CodeBrixAssetsGeneration"
-				BeforeTargets="_GetLibraryImports;_CheckForContent;_CollectBundleResources;_CompileAppManifest;_ComputeAndroidResourcePaths"
-				DependsOnTargets="ResolveProjectReferences;GetCopyToOutputDirectoryItems;_CodeBrixLangSetup"
-				Condition="
-				'$(BuildingInsideCodeBrixSourceGenerator)' == ''
-				and ('$(IsCodeBrixHead)'=='true'
-					or '$(AndroidApplication)'=='true'
-					or '$(ProjectTypeGuids)'!='')">
-		<!-- Assets -->
-		<PropertyGroup>
-			<UseHighDPIResources Condition="'$(UseHighDPIResources)'==''">True</UseHighDPIResources>
-
-			<_CodeBrixIosAppManifest>$(AppBundleManifest)</_CodeBrixIosAppManifest>
-
-			<!-- Required for older Xamarin versions -->
-			<_CodeBrixIosAppManifest Condition="'$(_CodeBrixIosAppManifest)'==''">$(_AppManifest)</_CodeBrixIosAppManifest>
-		</PropertyGroup>
-
-		<RetargetAssets_v0 UseHighDPIResources="$(UseHighDPIResources)"
-							TargetPlatform="$(_CodeBrixUnderlyingPlatform)"
-							DefaultLanguage="$(DefaultLanguage)"
-							IntermediateOutputPath="$(IntermediateOutputPath)"
-							ContentItems="@(ContentWithTargetPath);@(_SourceItemsToCopyToOutputDirectory)"
-							AndroidAssetsPrefix="$(MonoAndroidAssetsPrefix)"
-							IosAppManifest="$(_CodeBrixIosAppManifest)"
-							Condition="'$(_CodeBrixUnderlyingPlatform)'!=''">
-			<Output TaskParameter="Assets"
-							ItemName="Assets" />
-			<Output TaskParameter="RetargetedAssets"
-							ItemName="RetargetedAssets" />
-			<Output TaskParameter="PartialAppManifests"
-							ItemName="PartialAppManifest" />
-		</RetargetAssets_v0>
-		<ItemGroup>
-			<Content Remove="@(Assets)" />
-		</ItemGroup>
-		<ItemGroup Condition="'$(_CodeBrixUnderlyingPlatform)'=='uikit'">
-			<BundleResource Condition="'%(RetargetedAssets.AssetType)' == 'image'" Include="@(RetargetedAssets)" />
-			<BundleResource Condition="'%(RetargetedAssets.AssetType)' == 'generic'" Include="@(RetargetedAssets)" />
-
-			<FileWrites Condition="'%(RetargetedAssets.AssetType)' == 'image'" Include="@(RetargetedAssets)" />
-			<FileWrites Condition="'%(RetargetedAssets.AssetType)' == 'generic'" Include="@(RetargetedAssets)" />
-		</ItemGroup>
-		<ItemGroup Condition="'$(_CodeBrixUnderlyingPlatform)'=='android'">
-			<AndroidResource Condition="'%(RetargetedAssets.AssetType)' =='image'" Include="@(RetargetedAssets)" />
-			<AndroidAsset Condition="'%(RetargetedAssets.AssetType)' =='generic'" Include="@(RetargetedAssets)" />
-
-			<!-- Ensure files are tracked properly for incremental build and clean targets -->
-			<FileWrites Condition="'%(RetargetedAssets.AssetType)' =='image'" Include="@(RetargetedAssets)" />
-			<FileWrites Condition="'%(RetargetedAssets.AssetType)' =='generic'" Include="@(RetargetedAssets)" />
-		</ItemGroup>
-	</Target>
 
 	<!--
 	  Upri Resources Trimming
@@ -375,7 +320,8 @@
 			<_CodeBrixUIPackageBasePath
 				Condition="
 					'%(CodeBrixRuntimeEnabledPackage.Identity)'=='CodeBrix.Platform.UI'
-					or '%(CodeBrixRuntimeEnabledPackage.Identity)'=='CodeBrix.Platform.WinUI'"
+					or '%(CodeBrixRuntimeEnabledPackage.Identity)'=='CodeBrix.Platform.WinUI'
+					or '%(CodeBrixRuntimeEnabledPackage.Identity)'=='CodeBrix.Platform.ApacheLicenseForever'"
 				>%(CodeBrixRuntimeEnabledPackage.PackageBasePath)</_CodeBrixUIPackageBasePath>
 
 			<!-- .NET 10 RC2+ path structure: tools/net/illink.dll -->
@@ -396,6 +342,7 @@
 			ReferencePath="@(_CodeBrixLinkerHintsPass1AssembliesForReferencePaths)"
 			ILLinkerPath="$(_CodeBrixLinkerHintGeneratorILLinkerPath)"
 			TrimmerRootDescriptor="@(TrimmerRootDescriptor)"
+			FeatureSwitches="@(RuntimeHostConfigurationOption->WithMetadataValue('Trim','true'))"
 			TargetFramework="$(TargetFramework)"
 			TargetFrameworkVersion="$(TargetFrameworkVersion.Substring(1))"
 			CodeBrixUIPackageBasePath="$(_CodeBrixUIPackageBasePath)"
@@ -411,20 +358,6 @@
 			-->
 			<_TrimmerFeatureSettings Include="@(_LinkerHintOutputFeatures)" Trim="true" />
 		</ItemGroup>
-	</Target>
-
-	<Target Name="_CodeBrixLinkerAndroidUITestSupport"
-			Condition="'$(IsCodeBrixHead)'=='true' and '$(TargetPlatformIdentifier)'=='android' and '$(IsUiAutomationMappingEnabled)'!='true'"
-			BeforeTargets="PrepareForILLink">
-
-		<ItemGroup>
-			<RuntimeHostConfigurationOption Include="AndroidUITestSupport" Value="false" Trim="true" />
-		</ItemGroup>
-
-		<PropertyGroup>
-			<_ExtraTrimmerArgs>--link-attributes "$(MSBuildThisFileDirectory)Descriptors/Platform.UI.LinkAttributes.Android.xml" $(_ExtraTrimmerArgs)</_ExtraTrimmerArgs>
-		</PropertyGroup>
-
 	</Target>
 
 	<!-- Warn when the task is executed in devenv.exe: https://github.com/dotnet/project-system/issues/4494 -->

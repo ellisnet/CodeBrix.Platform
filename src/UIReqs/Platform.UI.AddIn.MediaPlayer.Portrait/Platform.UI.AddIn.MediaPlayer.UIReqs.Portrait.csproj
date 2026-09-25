@@ -17,7 +17,7 @@
 		<ProjectReference Include="..\..\AddIns\Platform.UI.MediaPlayer.Skia\Platform.UI.MediaPlayer.Skia.csproj" />
 		<!-- The add-in's logging assembly does not flow through the reference above - see the
 		     Landscape project's comment. -->
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 </Project>

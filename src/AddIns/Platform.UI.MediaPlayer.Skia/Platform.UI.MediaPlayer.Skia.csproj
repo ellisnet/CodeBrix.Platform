@@ -40,7 +40,7 @@
 		     PrivateAssets="all" because it has no standalone nuget - its assembly ships inside the main
 		     framework package. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>

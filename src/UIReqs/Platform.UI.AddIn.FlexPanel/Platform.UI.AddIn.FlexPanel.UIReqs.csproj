@@ -19,7 +19,7 @@
 
 		<!-- The add-in whose requirements these are. It needs nothing registered and nothing
 		     initialised: it is pure managed layout code over the framework's Panel. -->
-		<ProjectReference Include="..\..\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
 	</ItemGroup>
 
 </Project>

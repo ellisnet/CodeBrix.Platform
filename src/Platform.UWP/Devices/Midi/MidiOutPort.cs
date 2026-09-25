@@ -1,4 +1,4 @@
-﻿#if !IS_UNIT_TESTS && !__SKIA__ && !__NETSTD_REFERENCE__
+﻿#if !IS_UNIT_TESTS && !__CROSSRUNTIME__
 using System;
 using CodeBrix.Platform.Devices.Enumeration.Internal;
 using Windows.Foundation;

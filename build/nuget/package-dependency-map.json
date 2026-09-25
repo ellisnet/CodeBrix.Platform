@@ -84,37 +84,33 @@
 	// lookup — ordinary NuGet semantics for "deliberately does not flow".
 	// --------------------------------------------------------------------
 	"projectPackages": {
-		"src/Platform.UI/Platform.UI.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI/Platform.UI.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/Platform.UI/Platform.UI.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.Composition/Platform.UI.Composition.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.Composition/Platform.UI.Composition.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/Platform.UI.Composition/Platform.UI.Composition.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.Foundation/Platform.Foundation.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.Foundation/Platform.Foundation.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.Foundation/Platform.Foundation.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UWP/Platform.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.Foundation/Platform.Foundation.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UWP/Platform.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/Platform.UWP/Platform.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Reference.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Skia.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.Foundation.Logging/Platform.Foundation.Logging.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj": "CodeBrix.Platform.ApacheLicenseForever",
-		"src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.Foundation.Logging/Platform.Foundation.Logging.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
+		"src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 		"src/SourceGenerators/System.Xaml/Platform.Xaml.csproj": "CodeBrix.Platform.ApacheLicenseForever",
 
-		"src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Reference.csproj": "CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever",
+		"src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Core.csproj": "CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever",
 		"src/AddIns/CodeBrix.Platform.SkiaSharp.Views/CodeBrix.Platform.SkiaSharp.Views.Skia.csproj": "CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever",
-		"src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Crossruntime.csproj": "CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever",
+		"src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Core.csproj": "CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever",
+		"src/AddIns/Platform.WinUI.Graphics3DGL/Platform.WinUI.Graphics3DGL.Core.csproj": "CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever",
 		"src/AddIns/Platform.WinUI.Graphics3DGL/Platform.WinUI.Graphics3DGL.csproj": "CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever",
-		"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj": "CodeBrix.Platform.Lottie.ApacheLicenseForever",
+		"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Core.csproj": "CodeBrix.Platform.Lottie.ApacheLicenseForever",
 		"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj": "CodeBrix.Platform.Lottie.ApacheLicenseForever",
-		"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Reference.csproj": "CodeBrix.Platform.Svg.ApacheLicenseForever",
+		"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Core.csproj": "CodeBrix.Platform.Svg.ApacheLicenseForever",
 		"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj": "CodeBrix.Platform.Svg.ApacheLicenseForever"
 	},
 
@@ -123,27 +119,23 @@
 			"packageId": "CodeBrix.Platform.ApacheLicenseForever",
 			"nuspec": "Platform.WinUI.nuspec",
 			"projects": [
-				"src/Platform.UI/Platform.UI.Reference.csproj",
+				"src/Platform.UI/Platform.UI.Core.csproj",
 				"src/Platform.UI/Platform.UI.Skia.csproj",
-				"src/Platform.UI.Composition/Platform.UI.Composition.Reference.csproj",
+				"src/Platform.UI.Composition/Platform.UI.Composition.Core.csproj",
 				"src/Platform.UI.Composition/Platform.UI.Composition.Skia.csproj",
-				"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj",
-				"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj",
-				"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Reference.csproj",
-				"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Skia.csproj",
-				"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Reference.csproj",
-				"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Skia.csproj",
-				"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj",
+				"src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj",
+				"src/Platform.UI.FluentTheme.v1/Platform.UI.FluentTheme.v1.Core.csproj",
+				"src/Platform.UI.FluentTheme.v2/Platform.UI.FluentTheme.v2.Core.csproj",
+				"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Core.csproj",
 				"src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj",
-				"src/Platform.Foundation/Platform.Foundation.Reference.csproj",
-				"src/Platform.Foundation/Platform.Foundation.Skia.csproj",
-				"src/Platform.UWP/Platform.Reference.csproj",
+				"src/Platform.Foundation/Platform.Foundation.Core.csproj",
+				"src/Platform.UWP/Platform.Core.csproj",
 				"src/Platform.UWP/Platform.Skia.csproj",
-				"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Reference.csproj",
+				"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Core.csproj",
 				"src/Platform.UI.Dispatching/Platform.UI.Dispatching.Skia.csproj",
-				"src/Platform.Foundation.Logging/Platform.Foundation.Logging.csproj",
-				"src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj",
-				"src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj",
+				"src/Platform.Foundation.Logging/Platform.Foundation.Logging.Core.csproj",
+				"src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj",
+				"src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj",
 				"src/SourceGenerators/System.Xaml/Platform.Xaml.csproj"
 			],
 			// Fonts.Fluent is not a PackageReference of any packed project; the core package
@@ -167,7 +159,7 @@
 			"packageId": "CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever",
 			"nuspec": "Platform.WinUI.Graphics2DSK.nuspec",
 			"projects": [
-				"src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Crossruntime.csproj"
+				"src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Core.csproj"
 			],
 			"allowedExtraDependencies": [],
 			"allowedMissingDependencies": []
@@ -176,6 +168,7 @@
 			"packageId": "CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever",
 			"nuspec": "Platform.WinUI.Graphics3DGL.nuspec",
 			"projects": [
+				"src/AddIns/Platform.WinUI.Graphics3DGL/Platform.WinUI.Graphics3DGL.Core.csproj",
 				"src/AddIns/Platform.WinUI.Graphics3DGL/Platform.WinUI.Graphics3DGL.csproj"
 			],
 			"allowedExtraDependencies": [],
@@ -185,7 +178,7 @@
 			"packageId": "CodeBrix.Platform.Lottie.ApacheLicenseForever",
 			"nuspec": "Platform.WinUI.Lottie.nuspec",
 			"projects": [
-				"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Reference.csproj",
+				"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Core.csproj",
 				"src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Skia.csproj"
 			],
 			// Nothing to allow: every dependency this nuspec declares is now backed either by a
@@ -197,7 +190,7 @@
 			"packageId": "CodeBrix.Platform.Svg.ApacheLicenseForever",
 			"nuspec": "Platform.WinUI.Svg.nuspec",
 			"projects": [
-				"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Reference.csproj",
+				"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Core.csproj",
 				"src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj"
 			],
 			// Same ProjectReference-sourced pair as Lottie, above.

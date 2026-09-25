@@ -45,7 +45,7 @@ public partial class SvgImageSource : ImageSource
 
 	private void Initialize()
 	{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		InitSvgProvider();
 #endif
 		InitPartial();

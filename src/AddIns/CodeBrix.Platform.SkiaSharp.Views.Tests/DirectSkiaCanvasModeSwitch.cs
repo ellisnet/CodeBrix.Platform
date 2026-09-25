@@ -56,13 +56,22 @@ internal static class DirectSkiaCanvasModeSwitch
 
 	/// <summary>The canvas's staging pixel array, which the direct path must never allocate.</summary>
 	/// <param name="canvas">The canvas to look inside.</param>
+	/// <remarks>
+	/// Since the Core/Skia split the present path - and so the staging array - lives in the canvas's platform
+	/// surface (the Skia assembly's SKXamlCanvasSkiaPlatform), which the canvas keeps in its private
+	/// <c>_platform</c> field; the array is still that surface's private <c>pixels</c> field.
+	/// </remarks>
 	internal static byte[]? StagingPixels(this SKXamlCanvas canvas)
 	{
-		var field = typeof(SKXamlCanvas).GetField("pixels", BindingFlags.NonPublic | BindingFlags.Instance)
+		var surface = typeof(SKXamlCanvas).GetField("_platform", BindingFlags.NonPublic | BindingFlags.Instance)?.GetValue(canvas)
 			?? throw new InvalidOperationException(
-				"SKXamlCanvas no longer has a private `pixels` staging array. The test project's "
-				+ "direct-mode assertions need updating to match the add-in.");
-		return (byte[]?)field.GetValue(canvas);
+				"SKXamlCanvas no longer keeps its platform surface in a private `_platform` field. The test "
+				+ "project's direct-mode assertions need updating to match the add-in.");
+		var field = surface.GetType().GetField("pixels", BindingFlags.NonPublic | BindingFlags.Instance)
+			?? throw new InvalidOperationException(
+				"The SKXamlCanvas platform surface no longer has a private `pixels` staging array. The test "
+				+ "project's direct-mode assertions need updating to match the add-in.");
+		return (byte[]?)field.GetValue(surface);
 	}
 }
 

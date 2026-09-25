@@ -1,0 +1,63 @@
+<Project>
+	<!--
+	Packaging of a split add-in (the Core/Skia split: a platform-neutral <name>.Core.dll, and where the add-in has
+	platform code, a Skia <name>.dll). The package keeps its id, its dependencies and its version token; only the
+	assemblies inside it change, and there is never a ".Core" package.
+
+	Import this file at the END of an add-in csproj that packs (before the SDK targets run, which is where a
+	csproj's own <Import> lands). It changes NOTHING in a normal build. While `dotnet pack` runs (the pack driver
+	build/CodeBrix.Platform.Build.csproj and build/test-scripts/pack-linux-local-feed.sh both call `dotnet pack`,
+	which sets _IsPacking=true for the restore and the pack) it does three things:
+
+	1. CodeBrixBundleInPackage="true" on a ProjectReference (the add-in's Skia project referencing its own Core
+	   project): the reference becomes PrivateAssets="all" - so it is not written as a package dependency on a
+	   package that does not exist - and the Core project's dll and IntelliSense xml are packed into lib/<tfm>/
+	   beside this project's own. In a normal build it stays an ordinary reference, so every in-repo consumer (the
+	   tests, the UIReqs hosts, the from-source samples) gets the Core assembly transitively.
+
+	2. CodeBrixPackAs="<path of another csproj>" on a ProjectReference (a Core project whose PACKAGE is carried by
+	   that other project - Platform.UI.Core.csproj's package id belongs to Platform.UI.Skia.csproj): the reference
+	   becomes PrivateAssets="all" and the named project is added as a reference for the pack's restore, so the
+	   package depends on the right id. NuGet allows one project per package id in a restore graph, which is why a
+	   Core project cannot carry the aggregate id itself. This is what a Core-by-whole add-in (no Skia project)
+	   uses to keep its dependency on the framework package.
+
+	3. NoBuild: the pack takes the output of the Release build that precedes it (the driver builds before it packs;
+	   the Linux pack script requires a Release solution build). The extra reference of point 2 never reaches the
+	   compiler, and the packed dll is the tested dll, byte for byte.
+	-->
+
+	<PropertyGroup Condition="'$(_IsPacking)' == 'true'">
+		<NoBuild>true</NoBuild>
+		<TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);_CodeBrixBundleCoreOutputs</TargetsForTfmSpecificBuildOutput>
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(_IsPacking)' == 'true'">
+		<_CodeBrixPackAsProject Include="@(ProjectReference->'%(CodeBrixPackAs)')" />
+		<ProjectReference Update="@(ProjectReference)">
+			<PrivateAssets Condition="'%(ProjectReference.CodeBrixBundleInPackage)' == 'true' or '%(ProjectReference.CodeBrixPackAs)' != ''">all</PrivateAssets>
+		</ProjectReference>
+		<ProjectReference Include="@(_CodeBrixPackAsProject)" />
+	</ItemGroup>
+
+	<!-- Point 1: the bundled Core project's dll (+ its IntelliSense xml) go into this package's lib/<tfm>/. -->
+	<Target Name="_CodeBrixBundleCoreOutputs" Returns="@(BuildOutputInPackage)">
+		<ItemGroup>
+			<_CodeBrixBundledProject Include="@(ProjectReference)" Condition="'%(ProjectReference.CodeBrixBundleInPackage)' == 'true'" />
+		</ItemGroup>
+
+		<MSBuild Projects="@(_CodeBrixBundledProject)"
+				 Targets="GetTargetPath"
+				 Properties="TargetFramework=$(TargetFramework)"
+				 Condition="'@(_CodeBrixBundledProject)' != ''">
+			<Output TaskParameter="TargetOutputs" ItemName="_CodeBrixBundledAssembly" />
+		</MSBuild>
+
+		<ItemGroup>
+			<BuildOutputInPackage Include="@(_CodeBrixBundledAssembly)" />
+			<BuildOutputInPackage Include="@(_CodeBrixBundledAssembly->'%(RootDir)%(Directory)%(Filename).xml')"
+								  Condition="Exists('%(RootDir)%(Directory)%(Filename).xml')" />
+		</ItemGroup>
+	</Target>
+
+</Project>

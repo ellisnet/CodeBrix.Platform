@@ -27,7 +27,7 @@
 		     project reference into a test run, and the presenter logs through it (the once-per-
 		     process processor-effects warning and the line that says why the graphics path was not
 		     taken). The add-in's own .Tests csproj names it for exactly this reason. -->
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

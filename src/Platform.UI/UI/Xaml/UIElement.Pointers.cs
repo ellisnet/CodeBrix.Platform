@@ -1026,7 +1026,10 @@ namespace Microsoft.UI.Xaml
 				return handledInManaged; // always false, as the 'pressed' event was mute
 			}
 
-			if (!_isGestureCompleted && IsGestureRecognizerCreated)
+			if (!_isGestureCompleted && IsGestureRecognizerCreated
+				// Element handler seam, hook H9: the platform consumes the input of an element whose handler owns it, so the
+				// managed recognizer must not also produce Tapped/DoubleTapped/RightTapped/Holding for the same tap.
+				&& !(AreHandlersActive && HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.OwnsInput)))
 			{
 				// We need to process only events that are bubbling natively to this control,
 				// if they are bubbling in managed it means that they were handled by a child control,
@@ -1325,7 +1328,7 @@ namespace Microsoft.UI.Xaml
 
 			if (isOver) // Entered
 			{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				if (!wasOver)
 				{
 					// Currently works on Wasm Skia only.

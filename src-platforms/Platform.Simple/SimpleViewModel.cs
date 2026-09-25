@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -34,9 +35,13 @@ using System.Windows;
 
 namespace CodeBrix.Platform.Simple;
 
+// Trimming: the view model reads its own public properties by reflection (GetType().GetProperties(), for the
+// AffectsProperties / AffectsCommands attributes), so every derived view model keeps its public properties.
 #if (WIN_UI || HAS_CODEBRIX || MAUI)
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public abstract class SimpleViewModel : IXamlRootGetter, INotifyPropertyChanged, IDisposable
 #else
+[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicProperties)]
 public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
 #endif
 {

@@ -150,7 +150,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Media //Was pr
 				context.LineTo(new Point(10, 10), isStroked: true, isSmoothJoin: true);
 			}
 
-			var skPath = streamGeometry.GetSKPath();
+			var skPath = CodeBrix.Platform.UI.Skia.GeometrySkiaPlatform.GetSKPath(streamGeometry);
 			skPath.FillType.Should().Be(SKPathFillType.EvenOdd);
 		}
 #endif

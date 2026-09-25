@@ -1,4 +1,4 @@
-﻿#if __SKIA__
+﻿#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 #nullable enable
 
 using System;
@@ -14,12 +14,17 @@ namespace Microsoft.UI.Xaml.Media.Imaging;
 
 partial class SvgImageSource
 {
-	private const string SvgPackageName =
-#if HAS_CODEBRIX_WINUI
-		"CodeBrix.Platform.WinUI.Svg";
-#else
-		"CodeBrix.Platform.UI.Svg";
-#endif
+	// The published package id of the Svg add-in (the names this line used to print, CodeBrix.Platform.WinUI.Svg /
+	// CodeBrix.Platform.UI.Svg, are not packages).
+	private const string SvgPackageName = "CodeBrix.Platform.Svg.ApacheLicenseForever";
+
+	private static int _svgPackageMissingReports;
+
+	/// <summary>
+	/// Gets how many times this process reported that no SVG provider is registered (at most once: the report is not
+	/// repeated per image).
+	/// </summary>
+	internal static int SvgPackageMissingReports => Volatile.Read(ref _svgPackageMissingReports);
 
 	private Task<ImageData>? _currentOpenTask;
 
@@ -85,9 +90,16 @@ partial class SvgImageSource
 
 	private void LogSvgPackageError()
 	{
-		if (this.Log().IsEnabled(LogLevel.Error))
+		// Once per process, as a warning: an app without the Svg add-in (or a platform whose Svg flavor is not
+		// registered yet) used to get one ERROR per SvgImageSource, naming a package that does not exist.
+		if (Interlocked.Exchange(ref _svgPackageMissingReports, 1) != 0)
 		{
-			this.Log().LogError($"To use SVG on this platform, make sure to install the {SvgPackageName} package.");
+			return;
+		}
+
+		if (this.Log().IsEnabled(LogLevel.Warning))
+		{
+			this.Log().LogWarning($"SvgImageSource: no SVG provider is registered, SVG images stay empty. To use SVG on this platform, install the {SvgPackageName} package.");
 		}
 	}
 }

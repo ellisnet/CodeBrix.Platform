@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage.Streams
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IDataWriter
@@ -37,7 +37,7 @@ namespace Windows.Storage.Streams
 		// Skipping already declared method Windows.Storage.Streams.IDataWriter.StoreAsync()
 		// Skipping already declared method Windows.Storage.Streams.IDataWriter.FlushAsync()
 		// Skipping already declared method Windows.Storage.Streams.IDataWriter.DetachBuffer()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.Storage.Streams.IOutputStream DetachStream();
 #endif
 	}

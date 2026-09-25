@@ -9,7 +9,7 @@ namespace Windows.ApplicationModel.DataTransfer
 		private static object _syncLock = new object();
 		private static EventHandler<object> _contentChanged;
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		public static void Flush()
 		{
 			// Do nothing, data available automatically even after application closes.
@@ -44,7 +44,7 @@ namespace Windows.ApplicationModel.DataTransfer
 			}
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		private static void OnContentChanged()
 		{
 			_contentChanged?.Invoke(null, null);

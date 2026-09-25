@@ -25,7 +25,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_System //Was previousl
 
 		private void EnsureApiAvailable(string propertyName)
 		{
-			if (!Windows.Foundation.Metadata.ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform", propertyName))
+			if (!Windows.Foundation.Metadata.ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform.Core", propertyName))
 			{
 				Assert.Inconclusive($"The Api {propertyName} is not implemented");
 			}

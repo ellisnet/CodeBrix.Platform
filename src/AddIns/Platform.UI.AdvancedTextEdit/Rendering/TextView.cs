@@ -59,7 +59,7 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Rendering;
 public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 {
 	#region Constructor
-	readonly RenderCanvas renderCanvas = new RenderCanvas();
+	readonly FrameworkElement renderCanvas = RenderCanvasSupply.Create();
 	readonly ObserveAddRemoveCollection<VisualLineElementGenerator> elementGenerators;
 	readonly ObserveAddRemoveCollection<IVisualLineTransformer> lineTransformers;
 	readonly ObserveAddRemoveCollection<IBackgroundRenderer> backgroundRenderers;
@@ -84,7 +84,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 
 		//was previously: the layer collection was populated here (InsertLayer(textLayer, ...));
 		//the port draws everything in one paint pass on this child canvas (child 0).
-		renderCanvas.Paint += RenderCanvasPaint;
+		RenderCanvasSupply.AddPaintHandler(renderCanvas, RenderCanvasPaint);
 		Children.Add(renderCanvas);
 
 		//was previously: a HitTestCore override accepted clicks even where the text area draws no
@@ -637,7 +637,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 	//a layer is a draw phase on the render canvas here, so a repaint is the exact equivalent.
 	public void InvalidateLayer(KnownLayer knownLayer)
 	{
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 	}
 
 	/// <summary>
@@ -1041,7 +1041,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 
 		if (document == null || allVisualLines.Count == 0)
 		{
-			renderCanvas.Invalidate();
+			RenderCanvasSupply.Invalidate(renderCanvas);
 			return finalSize;
 		}
 
@@ -1080,7 +1080,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 		//was previously: InvalidateCursorIfMouseWithinTextView() re-evaluated the mouse cursor
 		//shape; per-element cursor shaping is not part of this port.
 
-		renderCanvas.Invalidate();
+		RenderCanvasSupply.Invalidate(renderCanvas);
 		return finalSize;
 	}
 	#endregion
@@ -1112,7 +1112,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 	/// </summary>
 	internal double RenderScale
 	{
-		get { return renderCanvas.Scale; }
+		get { return RenderCanvasSupply.GetScale(renderCanvas); }
 	}
 
 	//was previously: split across TextView.OnRender (background renderers + merged element
@@ -1290,7 +1290,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 			ApplyScrollOffset(offset, scrollOffsetY);
 			// Horizontal scrolling repositions inline objects and repaints; the visual lines stay valid.
 			InvalidateArrange();
-			renderCanvas.Invalidate();
+			RenderCanvasSupply.Invalidate(renderCanvas);
 		}
 	}
 
@@ -1329,7 +1329,7 @@ public partial class TextView : Panel, ITextEditorComponent, IWeakEventListener
 			else
 			{
 				InvalidateArrange();
-				renderCanvas.Invalidate();
+				RenderCanvasSupply.Invalidate(renderCanvas);
 			}
 		}
 	}

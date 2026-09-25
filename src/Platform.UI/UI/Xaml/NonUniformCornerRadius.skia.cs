@@ -6,13 +6,17 @@ namespace CodeBrix.Platform.UI.Composition; //Was previously: Uno.UI.Composition
 namespace Microsoft.UI.Xaml;
 #endif
 
-partial record struct NonUniformCornerRadius
+/// <summary>
+/// Skia conversions of <see cref="NonUniformCornerRadius"/>. (An extension class rather than a partial of the struct, so
+/// the platform-neutral struct carries no Skia type.)
+/// </summary>
+internal static class NonUniformCornerRadiusSkiaExtensions
 {
-	unsafe internal void GetRadii(SKPoint* radiiStore)
+	unsafe internal static void GetRadii(this in NonUniformCornerRadius radius, SKPoint* radiiStore)
 	{
-		*(radiiStore++) = new(TopLeft.X, TopLeft.Y);
-		*(radiiStore++) = new(TopRight.X, TopRight.Y);
-		*(radiiStore++) = new(BottomRight.X, BottomRight.Y);
-		*radiiStore = new(BottomLeft.X, BottomLeft.Y);
+		*(radiiStore++) = new(radius.TopLeft.X, radius.TopLeft.Y);
+		*(radiiStore++) = new(radius.TopRight.X, radius.TopRight.Y);
+		*(radiiStore++) = new(radius.BottomRight.X, radius.BottomRight.Y);
+		*radiiStore = new(radius.BottomLeft.X, radius.BottomLeft.Y);
 	}
 }

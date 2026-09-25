@@ -80,7 +80,7 @@ public sealed class FoldingElementGenerator : VisualLineElementGenerator, ITextV
 		base.StartGeneration(context);
 		if (foldingManager != null)
 		{
-			if (!foldingManager.textViews.Contains(context.TextView))
+			if (!foldingManager.IsShownIn(context.TextView))
 				throw new ArgumentException("Invalid TextView");
 			if (context.Document != foldingManager.document)
 				throw new ArgumentException("Invalid document");

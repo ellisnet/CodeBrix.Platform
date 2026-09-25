@@ -169,7 +169,7 @@ namespace Microsoft.UI.Composition
 				}
 
 				_parent = value;
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				SetMatrixDirty();
 				SetAsNativeHostVisual(value?.IsNativeHostVisual ?? false, inherited: true);
 #endif
@@ -185,7 +185,7 @@ namespace Microsoft.UI.Composition
 		private protected override void OnPropertyChangedCore(string? propertyName, bool isSubPropertyChange)
 		{
 			Compositor.InvalidateRender(this);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (propertyName == nameof(Opacity))
 			{
 				RecursiveInvalidate(this);

@@ -103,6 +103,12 @@ public sealed partial class XamlRoot
 		if (newRoot is not null)
 		{
 			element.SetVisualTree(newRoot.VisualTree);
+
+			// A parentless Popup opened before its XamlRoot was set is shown now that it has one.
+			if (element is Microsoft.UI.Xaml.Controls.Primitives.Popup popup)
+			{
+				popup.OnXamlRootAssigned();
+			}
 		}
 	}
 

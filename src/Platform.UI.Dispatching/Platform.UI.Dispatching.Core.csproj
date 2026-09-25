@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.Dispatching.Core: DispatcherQueue and the queue machinery (the shared tree only). The native
+	pump that drives the queue is the Skia half (Platform.UI.Dispatching.Skia.csproj, assembly
+	CodeBrix.Platform.UI.Dispatching), reached through IDispatcherPumpPlatform.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Dispatching.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Dispatching</RootNamespace>
+		<DefineConstants>$(DefineConstants);XAMARIN;IS_CODEBRIX;IS_CODEBRIX_UI_DISPATCHING_PROJECT</DefineConstants>
+
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<Deterministic>true</Deterministic>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<UpToDateCheckInput Include="**\*.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\Platform.Foundation.Logging\Platform.Foundation.Logging.Core.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InputPointerSource : global::Microsoft.UI.Input.InputObject
@@ -33,8 +33,8 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerWheelChanged.add
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerWheelChanged.remove
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.Cursor.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Input.InputPointerSource GetForIsland(global::Microsoft.UI.Content.ContentIsland island)
 		{
 			throw new global::System.NotImplementedException("The member InputPointerSource InputPointerSource.GetForIsland(ContentIsland island) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

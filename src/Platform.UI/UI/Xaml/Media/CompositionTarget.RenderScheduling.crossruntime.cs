@@ -1,0 +1,277 @@
+#if !__NETSTD_REFERENCE__
+#nullable enable
+using System;
+using System.Diagnostics;
+using System.Threading;
+using Windows.Foundation;
+using CodeBrix.Platform.Foundation.Logging;
+using CodeBrix.Platform.UI.Composition;
+using CodeBrix.Platform.UI.Contracts;
+using CodeBrix.Platform.UI.Dispatching;
+using CodeBrix.Platform.UI.Helpers;
+using CodeBrix.Platform.UI.Hosting;
+
+namespace Microsoft.UI.Xaml.Media;
+
+public partial class CompositionTarget
+{
+	//                      +---------+            +-------------------------------------------+                                                                                   +---------------+ +-----------------------------+        +-------------------+
+	//                      | Visual  |            | CompositionTargetNotNecessarilyOnUIThread |                                                                                   | IXamlRootHost | | CompositionTargetOnUIThread |        | NativeDispatcher  |
+	//                      +---------+            +-------------------------------------------+                                                                                   +---------------+ +-----------------------------+        +-------------------+
+	// ------------------------\ |                                       |                                                                                                                 |                        |                                 |
+	// | some property changes |-|                                       |                                                                                                                 |                        |                                 |
+	// |-----------------------| |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           | RequestNewFrame                       |                                                                                                                 |                        |                                 |
+	//                           |-------------------------------------->|                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       | InvalidateRender (the native platform will later call us back likely on the next monitor VSync)                 |                        |                                 |
+	//                           |                                       |---------------------------------------------------------------------------------------------------------------->|                        |                                 |
+	// ------------------------\ |                                       |                                                                                                                 |                        |                                 |
+	// | some property changes |-|                                       |                                                                                                                 |                        |                                 |
+	// |-----------------------| |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           | RequestNewFrame                       |                                                                                                                 |                        |                                 |
+	//                           |-------------------------------------->|                                                                                                                 |                        |                                 |
+	//                           |        -----------------------------\ |                                                                                                                 |                        |                                 |
+	//                           |        | RequestNewFrame is ignored |-|                                                                                                                 |                        |                                 |
+	//                           |        |----------------------------| |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           | RequestNewFrame                       |                                                                                                                 |                        |                                 |
+	//                           |-------------------------------------->|                                                                                                                 |                        |                                 |
+	//                           |        -----------------------------\ |                                                                                                                 |                        |                                 |
+	//                           |        | RequestNewFrame is ignored |-|                                                                                                                 |                        |                                 |
+	//                           |        |----------------------------| |                                                                                                                 |                        |                                 |
+	//                           |                                       |                           ------------------------------------------------------------------------------------\ |                        |                                 |
+	//                           |                                       |                           | native platform render callback in response to the previous InvalidateRender call |-|                        |                                 |
+	//                           |                                       |                           |-----------------------------------------------------------------------------------| |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                  OnNativePlatformFrameRequested |                        |                                 |
+	//                           |                                       |<----------------------------------------------------------------------------------------------------------------|                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       | Draw the pixels from the last SKPicture and returns native element clip path pair generated in Render()         |                        |                                 |
+	//                           |                                       |---------------------------------------------------------------------------------------------------------------->|                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       | EnqueueRender (the NativeDispatcher will call us back when it thinks it's the best time to do so)               |                        |                                 |
+	//                           |                                       |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------->|
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |           EnqueueRenderCallback |
+	//                           |                                       |                                                                                                                 |                        |<--------------------------------|
+	//                           |                                       |                                                                                                                 |           -----------\ |                                 |
+	//                           |                                       |                                                                                                                 |           | Render() |-|                                 |
+	//                           |                                       |                                                                                                                 |           |----------| |                                 |
+	// ------------------------\ |                                       |                                                                                                                 |                        |                                 |
+	// | some property changes |-|                                       |                                                                                                                 |                        |                                 |
+	// |-----------------------| |                                       |                                                                                                                 |                        |                                 |
+	//             ------------\ |                                       |                                                                                                                 |                        |                                 |
+	//             | Repeat... |-|                                       |                                                                                                                 |                        |                                 |
+	//             |-----------| |                                       |                                                                                                                 |                        |                                 |
+	//                           |                                       |                                                                                                                 |                        |                                 |
+	private readonly object _renderingStateGate = new();
+
+	private bool _renderRequested; // only set or read under _renderingStateGate
+	private bool _renderedAheadOfTime; // only set or read under _renderingStateGate
+	private bool _renderRequestedAfterAheadOfTimePaint; // only set or read under _renderingStateGate
+	private bool _shouldEnqueueRenderOnNextNativePlatformFrameRequested = true; // only set from the UI thread, only reset from the rendering/gpu thread
+
+	private bool RenderRequested
+	{
+		get => _renderRequested;
+		set
+		{
+			_renderRequested = value;
+			this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()} {nameof(_renderRequested)} = {_renderRequested}");
+		}
+	}
+
+	void ICompositionTarget.RequestNewFrame()
+	{
+		var shouldEnqueue = false;
+		lock (_renderingStateGate)
+		{
+			LogRenderState();
+			AssertRenderStateMachine();
+			if (!_renderedAheadOfTime && !RenderRequested)
+			{
+				RenderRequested = true;
+				shouldEnqueue = true;
+			}
+			else if (_renderedAheadOfTime)
+			{
+				_renderRequestedAfterAheadOfTimePaint = true;
+			}
+			AssertRenderStateMachine();
+			LogRenderState();
+		}
+
+		if (shouldEnqueue)
+		{
+			if (ContentRoot.XamlRoot is { } xamlRoot && XamlRootMap.GetHostForRoot(xamlRoot) is { } host)
+			{
+				host.InvalidateRender();
+			}
+			this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(ICompositionTarget.RequestNewFrame)} invalidated render");
+		}
+		else
+		{
+			this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(ICompositionTarget.RequestNewFrame)} found no need to invalidate render.");
+		}
+	}
+
+	private void EnqueueRenderCallback()
+	{
+		this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(EnqueueRenderCallback)}");
+		NativeDispatcher.CheckThreadAccess();
+
+		Interlocked.Exchange(ref _shouldEnqueueRenderOnNextNativePlatformFrameRequested, true);
+
+		lock (_renderingStateGate)
+		{
+			LogRenderState();
+			AssertRenderStateMachine();
+			if (_renderedAheadOfTime)
+			{
+				_renderedAheadOfTime = false;
+				if (_renderRequestedAfterAheadOfTimePaint)
+				{
+					_renderRequestedAfterAheadOfTimePaint = false;
+					this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(EnqueueRenderCallback)}: rendered ahead of time and got a new frame request since. Doing nothing this tick and rescheduling another tick");
+					((ICompositionTarget)this).RequestNewFrame();
+				}
+				else
+				{
+					this.LogTrace()?.Trace($"{nameof(EnqueueRenderCallback)}: rendered ahead of time and no new frame was requested since.");
+				}
+			}
+			else if (RenderRequested)
+			{
+				lock (_renderingStateGate)
+				{
+					RenderRequested = false;
+				}
+				this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: Draw fired from {nameof(EnqueueRenderCallback)}");
+				Render();
+			}
+			AssertRenderStateMachine();
+			LogRenderState();
+		}
+	}
+
+	/// <summary>
+	/// This method is called from each platform's rendering logic in response to the native windowing/composition
+	/// engine's signal requesting the CodeBrix app to draw something _right now_, usually synced to the refresh rate
+	/// of the screen (e.g. Android's IRenderer.OnDrawFrame). This class does not assume that this method will only
+	/// be called once per <see cref="IXamlRootHost.InvalidateRender"/> call, but the contract allows any number
+	/// of repeated calls, even if no new invalidations are requested.
+	/// </summary>
+	/// <remarks>
+	/// This is the platform-neutral half of the request: it schedules the next render on the UI thread. The platform
+	/// then draws the last recorded frame (on Skia, <c>CompositionTargetSkiaPlatform.Draw</c>).
+	/// </remarks>
+	internal void OnNativePlatformFrameRequested()
+	{
+		this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(OnNativePlatformFrameRequested)}");
+
+		if (Interlocked.Exchange(ref _shouldEnqueueRenderOnNextNativePlatformFrameRequested, false))
+		{
+			NativeDispatcher.Main.EnqueueRender(this, EnqueueRenderCallback);
+		}
+	}
+
+	/// <summary>
+	/// Records the tree now if a render is pending - including the case the regular scheduling defers by one more native
+	/// frame: a frame was recorded ahead of time (<see cref="OnRenderFrameOpportunity"/>) and the tree changed after it,
+	/// which the next render callback only answers by requesting another native frame. For a test target that must
+	/// capture exactly the current tree (the emulated frame buffer's frame handshake); no production head calls it.
+	/// UI thread only. The state machine ends as after an ahead-of-time render with no request since.
+	/// </summary>
+	internal void RenderPendingFrameNow()
+	{
+		NativeDispatcher.CheckThreadAccess();
+
+		if (!_platform!.CanRecordFrame())
+		{
+			return;
+		}
+
+		var shouldRender = false;
+		lock (_renderingStateGate)
+		{
+			if (RenderRequested && !_renderedAheadOfTime)
+			{
+				// Exactly OnRenderFrameOpportunity's early render.
+				RenderRequested = false;
+				_renderedAheadOfTime = true;
+				shouldRender = true;
+			}
+			else if (_renderedAheadOfTime && _renderRequestedAfterAheadOfTimePaint)
+			{
+				// The deferred case: record the change now instead of one native frame later.
+				_renderRequestedAfterAheadOfTimePaint = false;
+				shouldRender = true;
+			}
+
+			AssertRenderStateMachine();
+		}
+
+		if (shouldRender)
+		{
+			this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(RenderPendingFrameNow)}: recording the pending frame");
+			Render();
+		}
+	}
+
+	internal void OnRenderFrameOpportunity()
+	{
+		// If we get an opportunity to get call Render earlier than EnqueuePaintCallback, then we do that
+		// but skip the Render call in the next EnqueuePaintCallback so that overall we're still keeping
+		// the rate of Render calls the same.
+		NativeDispatcher.CheckThreadAccess();
+
+		if (_platform!.CanRecordFrame())
+		{
+			var shouldRender = false;
+			lock (_renderingStateGate)
+			{
+				LogRenderState();
+				AssertRenderStateMachine();
+				if (RenderRequested && !_renderedAheadOfTime)
+				{
+					RenderRequested = false;
+					_renderedAheadOfTime = true;
+					shouldRender = true;
+				}
+				AssertRenderStateMachine();
+				LogRenderState();
+			}
+
+			if (shouldRender)
+			{
+				this.LogTrace()?.Trace($"CompositionTarget#{GetHashCode()}: {nameof(OnRenderFrameOpportunity)}: Calling Draw early ");
+				Render();
+			}
+		}
+	}
+
+	[Conditional("DEBUG")]
+	private void AssertRenderStateMachine()
+	{
+		lock (_renderingStateGate)
+		{
+			Debug.Assert(!_renderRequestedAfterAheadOfTimePaint || _renderedAheadOfTime);
+			Debug.Assert(!_renderedAheadOfTime || !RenderRequested);
+		}
+	}
+
+	private void LogRenderState()
+	{
+		if (this.Log().IsEnabled(LogLevel.Trace))
+		{
+			lock (_renderingStateGate)
+			{
+				this.Log().Trace($"CompositionTarget#{GetHashCode()}: Render state machine: {nameof(_renderRequested)} = {_renderRequested}, {nameof(_renderedAheadOfTime)} = {_renderedAheadOfTime}, {nameof(_renderRequestedAfterAheadOfTimePaint)}={_renderRequestedAfterAheadOfTimePaint}");
+			}
+		}
+	}
+}
+#endif

@@ -23,7 +23,7 @@ class FrameworkTemplatePoolDefaultPlatformProvider : IFrameworkTemplatePoolPlatf
 	static FrameworkTemplatePoolDefaultPlatformProvider()
 	{
 		_canUseMemoryManager =
-			ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform", "AppMemoryUsage")
+			ApiInformation.IsPropertyPresent("Windows.System.MemoryManager, CodeBrix.Platform.Core", "AppMemoryUsage")
 			&& MemoryManager.AppMemoryUsage > 0;
 	}
 

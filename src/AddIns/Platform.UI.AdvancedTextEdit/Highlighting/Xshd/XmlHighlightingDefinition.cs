@@ -224,7 +224,7 @@ sealed class XmlHighlightingDefinition : IHighlightingDefinition
 			{
 				c = def.colorDict[color.Name];
 			}
-			else if (color.Foreground == null && color.Background == null && color.Underline == null && color.FontStyle == null && color.FontWeight == null)
+			else if (color.Foreground == null && color.Background == null && color.Underline == null && color.FontStyleValue == null && color.FontWeightValue == null)
 			{
 				return null;
 			}
@@ -238,9 +238,10 @@ sealed class XmlHighlightingDefinition : IHighlightingDefinition
 			c.Background = color.Background;
 			c.Underline = color.Underline;
 			c.Strikethrough = color.Strikethrough;
-			c.FontStyle = color.FontStyle;
-			c.FontWeight = color.FontWeight;
-			c.FontFamily = color.FontFamily;
+			//The neutral storage (WPE1 C8): no XAML type is created while a definition loads
+			c.FontStyleValue = color.FontStyleValue;
+			c.FontWeightValue = color.FontWeightValue;
+			c.FontFamilyValue = color.FontFamilyValue;
 			c.FontSize = color.FontSize;
 			return c;
 		}

@@ -17,7 +17,10 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			var ownerType = Type.GetType(ownerTypeName, throwOnError: false);
 			if (ownerType == null)
 			{
-				ownerType = Type.GetType(ownerTypeName + ",CodeBrix.Platform.UI.Toolkit");
+				// Since the Core/Skia split the toolkit's types live in CodeBrix.Platform.UI.Toolkit.Core; the pre-split
+				// assembly name is kept as a fallback.
+				ownerType = Type.GetType(ownerTypeName + ",CodeBrix.Platform.UI.Toolkit.Core", throwOnError: false)
+					?? Type.GetType(ownerTypeName + ",CodeBrix.Platform.UI.Toolkit");
 			}
 			var dp = DependencyProperty.GetProperty(ownerType, propertyName);
 			return dp;

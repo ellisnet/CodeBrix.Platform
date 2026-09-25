@@ -2,11 +2,6 @@
 
 #if HAS_SKOTTIE
 
-// SkiaSharp.Views.Uno uses the underlying canvas for hardware acceleration.
-#if !__SKIA__
-#define USE_HARDWARE_ACCELERATION
-#endif
-
 using System;
 using System.Threading;
 using Windows.Foundation;
@@ -22,10 +17,9 @@ using SkiaSharp.SceneGraph;
 using Microsoft.UI.Xaml.Media;
 using System.Text;
 using System.IO;
-
-#if __SKIA__
-using CodeBrix.Platform.WinUI.Graphics2DSK;
-#endif
+using CodeBrix.Platform.UI.Lottie.Contracts;
+using CodeBrix.Platform.UI.Lottie.Engine;
+using CodeBrix.Platform.UI.Lottie.Internal;
 
 #if HAS_CODEBRIX_WINUI
 using SkiaSharp.Views.Windows;
@@ -41,41 +35,56 @@ namespace CommunityToolkit.WinUI.Lottie
 namespace Microsoft.Toolkit.Uwp.UI.Lottie
 #endif
 {
+	//was previously: the render surface was chosen per platform at compile time - a Graphics2DSK SKCanvasElement
+	//subclass on Skia (__SKIA__), an SKSwapChainPanel (USE_HARDWARE_ACCELERATION, defined when not __SKIA__) or an
+	//SKXamlCanvas elsewhere. Since the Core/Skia split the platform supplies it through ILottieCanvasPlatform (on Skia:
+	//Skia/LottieCanvasSkiaPlatform.skia.cs, the same SKCanvasElement subclass), and the frame is drawn here through the
+	//SKCanvas-typed callback of the Skia-canvas host seam (SKCanvasHost.ToPlatformCallback).
+	//WPE1 C9: the play state, the frame clock, the frame timer and the rendering moved into the WinUI-free engine
+	//(Engine/LottiePlayer, driven by an Engine/ITickSource - here Internal/DispatcherQueueTickSource); this source
+	//wraps it and keeps the XAML half (the player, its dependency properties, the render surface, the JSON loading).
 	partial class LottieVisualSourceBase
 	{
-		private UIElement? _renderSurface;
-		private SkiaSharp.Skottie.Animation? _animation;
+		//The platform's canvas supply, resolved once for the process.
+		private static ILottieCanvasPlatform? _canvasPlatform;
 
+		private static ILottieCanvasPlatform CanvasPlatform => _canvasPlatform ??= PlatformContract.Resolve<ILottieCanvasPlatform>();
+
+		private UIElement? _renderSurface;
+		private Action<object, Size>? _renderCallback;
 
 		private bool _wasPlaying;
-		private DispatcherQueueTimer? _timer;
-		private object _gate = new();
-
-#if USE_HARDWARE_ACCELERATION
-		private SKSwapChainPanel? _hardwareCanvas;
-#elif __SKIA__
-		private SKCanvasElement? _skCanvasElement;
-#else
-		private SKXamlCanvas? _softwareCanvas;
-#endif
 
 		private Uri? _lastSource;
-		private PlayState? _playState;
 
-		private record PlayState(double FromProgress, double ToProgress, bool Looped)
-		{
-			public TimeSpan GetFromProgressUsingDuration(TimeSpan duration)
-				=> TimeSpan.FromSeconds(duration.TotalSeconds * FromProgress);
+		//The engine (created on first use: a source can exist before any player uses it).
+		private LottiePlayer? _engine;
 
-			public TimeSpan GetToProgressUsingDuration(TimeSpan duration)
-				=> TimeSpan.FromSeconds(duration.TotalSeconds * ToProgress);
-		}
+		private LottiePlayer Engine => _engine ??= CreateEngine();
 
-		private Stopwatch _stopwatch = new Stopwatch();
-		private TimeSpan? _progress;
+		private SkiaSharp.Skottie.Animation? CurrentAnimation => _engine?.Animation;
 
-		private InvalidationController? _invalidationController;
 		private readonly SerialDisposable _animationDataSubscription = new SerialDisposable();
+
+		private LottiePlayer CreateEngine()
+		{
+			var engine = new LottiePlayer(
+				DispatcherQueueTickSource.ForCurrentThread,
+				action =>
+				{
+					if (Dispatcher.HasThreadAccess)
+					{
+						action();
+					}
+					else
+					{
+						_ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, () => action());
+					}
+				});
+			engine.InvalidateRequested += Invalidate;
+			engine.IsPlayingChanged += SetIsPlaying;
+			return engine;
+		}
 
 		async Task InnerUpdate(CancellationToken ct)
 		{
@@ -107,27 +116,19 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 							{
 								try
 								{
-									var stream = new MemoryStream(Encoding.UTF8.GetBytes(updatedJson));
+									//Decoded (and sought to its start) by the engine; throws when Skottie cannot load it
+									var animation = LottiePlayer.CreateAnimation(updatedJson);
 
-									if (SkiaSharp.Skottie.Animation.TryCreate(stream, out var animation))
+									if (this.Log().IsEnabled(LogLevel.Debug))
 									{
-										animation.Seek(0);
-
-										if (this.Log().IsEnabled(LogLevel.Debug))
-										{
-											this.Log().Debug($"Version: {animation.Version} Duration: {animation.Duration} Fps:{animation.Fps} InPoint: {animation.InPoint} OutPoint: {animation.OutPoint}");
-										}
-									}
-									else
-									{
-										throw new InvalidOperationException("Failed to load animation.");
+										this.Log().Debug($"Version: {animation.Version} Duration: {animation.Duration} Fps:{animation.Fps} InPoint: {animation.InPoint} OutPoint: {animation.OutPoint}");
 									}
 
 									SetAnimation(animation);
 
-									if (_playState != null)
+									if (Engine.PlayState is { } playState)
 									{
-										var (fromProgress, toProgress, looped) = _playState;
+										var (fromProgress, toProgress, looped) = playState;
 										Play(fromProgress, toProgress, looped);
 									}
 								}
@@ -146,9 +147,9 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 						player.InvalidateMeasure();
 						player.InvalidateArrange();
 
-						if (_playState != null)
+						if (Engine.PlayState is { } playState)
 						{
-							var (fromProgress, toProgress, looped) = _playState;
+							var (fromProgress, toProgress, looped) = playState;
 							Play(fromProgress, toProgress, looped);
 						}
 						else if (player.AutoPlay)
@@ -158,7 +159,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 
 					}
 
-					if (_animation == null)
+					if (CurrentAnimation == null)
 					{
 						return;
 					}
@@ -179,24 +180,16 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 
 		private void SetAnimation(SkiaSharp.Skottie.Animation animation)
 		{
-			if (!ReferenceEquals(_animation, animation))
+			if (!ReferenceEquals(CurrentAnimation, animation))
 			{
-#if false
-				_renderSurface?.RemoveFromSuperview();
-#elif __SKIA__
 				_player?.RemoveChild(_renderSurface);
-#endif
 			}
 
 			_renderSurface = BuildRenderSurface();
 
-#if false
-			_player?.Add(_renderSurface);
-#elif __SKIA__
 			_player?.AddChild(_renderSurface);
-#endif
 
-			_animation = animation;
+			Engine.Animation = animation;
 
 			// The player learns that it has something to play HERE, where the decoded animation
 			// actually arrives - not at the end of the update pass that asked for it. That pass
@@ -216,7 +209,7 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 		/// </summary>
 		private void PublishAnimationState()
 		{
-			if (_player is not { } player || _animation is not { } animation)
+			if (_player is not { } player || CurrentAnimation is not { } animation)
 			{
 				return;
 			}
@@ -230,75 +223,13 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 		{
 			ClearRenderSurface();
 
-#if USE_HARDWARE_ACCELERATION
-			_hardwareCanvas = new();
-			_hardwareCanvas.PaintSurface += OnHardwareCanvas_PaintSurface;
-
-#if false
-			AdjustHardwareCanvasOpacity();
-#endif
-			return _hardwareCanvas;
-#elif __SKIA__
-			_skCanvasElement = new LottieSKCanvasElement(this);
-			return _skCanvasElement;
-#else
-			_softwareCanvas = new();
-			_softwareCanvas.PaintSurface += OnSoftwareCanvas_PaintSurface;
-
-#if false
-			_softwareCanvas.Opaque = false;
-#endif
-			return _softwareCanvas;
-#endif
+			return CanvasPlatform.CreateRenderSurface(_renderCallback ??= SKCanvasHost.ToPlatformCallback(OnRenderOverride));
 		}
-
-#if false
-		private void AdjustHardwareCanvasOpacity()
-		{
-			if (_hardwareCanvas != null)
-			{
-				static void UpdateTransparency(object s, object e)
-				{
-					if (s is SKSwapChainPanel swapChainPanel)
-					{
-
-						// The SKGLTextureView is opaque by default, so we poke at the tree
-						// to change the opacity of the first view of the SKSwapChainPanel
-						// to make it transparent.
-#if false
-						if (swapChainPanel.ChildCount == 1
-							&& swapChainPanel.GetChildAt(0) is Android.Views.TextureView texture)
-						{
-							texture.SetOpaque(false);
-						}
-#elif false
-						if (swapChainPanel.Subviews.Length == 1
-							&& swapChainPanel.Subviews[0] is GLKit.GLKView texture)
-						{
-							texture.Opaque = false;
-						}
-#endif
-					}
-				}
-
-				_hardwareCanvas.Loaded += UpdateTransparency;
-			}
-		}
-#endif
 
 		private void ClearRenderSurface()
 		{
-#if USE_HARDWARE_ACCELERATION
-			if (_hardwareCanvas != null)
-			{
-				_hardwareCanvas.PaintSurface -= OnHardwareCanvas_PaintSurface;
-			}
-#elif !__SKIA__
-			if (_softwareCanvas != null)
-			{
-				_softwareCanvas.PaintSurface -= OnSoftwareCanvas_PaintSurface;
-			}
-#endif
+			//Nothing to release: the platform's surface holds no subscription of this source (the render callback is
+			//owned by the surface, which the player drops in SetAnimation).
 		}
 
 		private void OnSoftwareCanvas_PaintSurface(object? sender, SKPaintSurfaceEventArgs e)
@@ -311,57 +242,26 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 			Render(e.Surface.Canvas, e.Surface.Canvas.LocalClipBounds.Size, saveRestoreAndCleanCanvas: true);
 		}
 
-#if __SKIA__
 		private void OnRenderOverride(SKCanvas canvas, Size area)
 		{
 			Render(canvas, area.ToSKSize(), saveRestoreAndCleanCanvas: false);
 		}
-#endif
 
 		private void Render(SKCanvas canvas, SKSize localSize, bool saveRestoreAndCleanCanvas)
 		{
-			lock (_gate)
+			if (_player is not { } player || _engine is not { } engine)
 			{
-				var animation = _animation;
-				if (animation is null || _player is null)
-				{
-					return;
-				}
-
-				if (_invalidationController is null)
-				{
-					_invalidationController = new SkiaSharp.SceneGraph.InvalidationController();
-					_invalidationController.Begin();
-				}
-
-				var frameTime = GetFrameTime();
-
-				var scale = ImageSizeHelper.BuildScale(_player.Stretch, localSize.ToSize(), animation.Size.ToSize());
-				var scaledSize = new Windows.Foundation.Size(animation.Size.Width * scale.x, animation.Size.Height * scale.y);
-
-				var x = (localSize.Width - scaledSize.Width) / 2;
-				var y = (localSize.Height - scaledSize.Height) / 2;
-
-				animation.SeekFrameTime(frameTime, _invalidationController);
-
-				if (saveRestoreAndCleanCanvas)
-				{
-					canvas.Save();
-					canvas.Clear(GetBackgroundColor());
-				}
-
-				canvas.Translate((float)x, (float)y);
-				canvas.Scale((float)(scaledSize.Width / animation.Size.Width), (float)(scaledSize.Height / animation.Size.Height));
-
-				animation.Render(canvas, new SKRect(0, 0, animation.Size.Width, animation.Size.Height));
-
-				if (saveRestoreAndCleanCanvas)
-				{
-					canvas.Restore();
-				}
-
-				_invalidationController.Reset();
+				return;
 			}
+
+			//The engine renders the frame; the player supplies the stretch, the speed and (for a surface of its own)
+			//the background it clears to.
+			engine.Render(
+				canvas,
+				localSize,
+				(LottieStretch)(int)player.Stretch,
+				player.PlaybackRate,
+				saveRestoreAndCleanCanvas ? GetBackgroundColor() : null);
 		}
 
 		private SKColor GetBackgroundColor()
@@ -374,129 +274,23 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 			return SKColors.Transparent;
 		}
 
-		private TimeSpan GetFrameTime()
-		{
-			if (_animation is null || _timer is null || !(_playState is { } playState) || _player is null)
-			{
-				return _progress ?? TimeSpan.Zero;
-			}
-
-			var frameTime = TimeSpan.FromSeconds((_stopwatch.Elapsed + playState.GetFromProgressUsingDuration(_animation.Duration)).TotalSeconds * _player.PlaybackRate);
-
-			if (frameTime > playState.GetToProgressUsingDuration(_animation.Duration))
-			{
-				if (playState.Looped)
-				{
-					_stopwatch.Restart();
-					_invalidationController?.End();
-					_invalidationController?.Begin();
-				}
-				else
-				{
-					// Free the animation at the "to" progress value - at the END OF THE SEGMENT,
-					// not at the overshoot of whichever tick happened to cross it. The two are
-					// not the same: a tick lands when it lands, so keeping the overshoot left
-					// the stopped animation resting on a frame that depended on how busy the
-					// thread had been, and this frame is the one that then stays on screen.
-					var segmentEnd = playState.GetToProgressUsingDuration(_animation.Duration);
-					_progress = segmentEnd;
-					frameTime = segmentEnd;
-
-					Stop();
-				}
-			}
-
-			return frameTime;
-		}
-
-		public void Play(double fromProgress, double toProgress, bool looped)
-		{
-
-			if (_animation != null)
-			{
-				if (_stopwatch.IsRunning)
-				{
-					Stop();
-				}
-
-				_playState = new(fromProgress, toProgress, looped);
-
-				_progress = null;
-
-				_timer = Windows.System.DispatcherQueue.GetForCurrentThread().CreateTimer();
-				_timer.Tick += (s, e) => Invalidate();
-
-				_timer.Interval = TimeSpan.FromSeconds(Math.Max(1 / 120d, 1 / _animation.Fps));
-				_timer.Start();
-				_stopwatch.Restart();
-
-				SetIsPlaying(true);
-			}
-			else
-			{
-				_playState = new(fromProgress, toProgress, looped);
-			}
-		}
+		public void Play(double fromProgress, double toProgress, bool looped) => Engine.Play(fromProgress, toProgress, looped);
 
 		private void Invalidate()
 		{
-#if USE_HARDWARE_ACCELERATION
-			_hardwareCanvas?.Invalidate();
-#elif __SKIA__
-			_skCanvasElement?.Invalidate();
-#else
-			_softwareCanvas?.Invalidate();
-#endif
-		}
-
-		public void Stop()
-		{
-			void DoStop()
+			if (_renderSurface is { } renderSurface)
 			{
-				_playState = null;
-				SetIsPlaying(false);
-				_timer?.Stop();
-				_stopwatch.Stop();
-				_invalidationController?.End();
-			}
-
-			if (Dispatcher.HasThreadAccess)
-			{
-				DoStop();
-			}
-			else
-			{
-				_ = Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Normal, DoStop);
+				CanvasPlatform.Invalidate(renderSurface);
 			}
 		}
 
-		public void Pause()
-		{
-			_timer?.Stop();
-			_stopwatch.Stop();
+		public void Stop() => Engine.Stop();
 
-			SetIsPlaying(false);
-		}
+		public void Pause() => Engine.Pause();
 
-		public void Resume()
-		{
-			_stopwatch.Start();
-			_timer?.Start();
+		public void Resume() => Engine.Resume();
 
-			SetIsPlaying(true);
-		}
-
-		public void SetProgress(double progress)
-		{
-			var clampedProgress = Math.Max(0, Math.Min(1, progress));
-
-			if (_animation != null)
-			{
-				Stop();
-				_progress = TimeSpan.FromSeconds(_animation.Duration.TotalSeconds * clampedProgress);
-				Invalidate();
-			}
-		}
+		public void SetProgress(double progress) => Engine.SetProgress(progress);
 
 		public void Load()
 		{
@@ -517,16 +311,9 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 		}
 
 		private Size CompositionSize
-			=> _animation?.Size is { } size
+			=> CurrentAnimation?.Size is { } size
 				? new Size(size.Width, size.Height)
 				: default;
-
-#if __SKIA__
-		private partial class LottieSKCanvasElement(LottieVisualSourceBase owner) : SKCanvasElement
-		{
-			protected override void RenderOverride(SKCanvas canvas, Size area) => owner.OnRenderOverride(canvas, area);
-		}
-#endif
 	}
 }
 #endif

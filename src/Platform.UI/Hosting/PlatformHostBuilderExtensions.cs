@@ -27,7 +27,7 @@ public static class CodeBrixPlatformHostBuilderExtensions
 	}
 
 	/// <summary>
-	/// Opts the whole application into the direct <see cref="SkiaSharp.Views.Windows.SKXamlCanvas"/>
+	/// Opts the whole application into the direct <c>SkiaSharp.Views.Windows.SKXamlCanvas</c>
 	/// present path: <c>SKXamlCanvas</c> draws each frame straight into its on-screen
 	/// <c>WriteableBitmap</c> buffer instead of drawing into an intermediate staging buffer and
 	/// copying, removing one full-frame copy per paint. - EXPERIMENTAL

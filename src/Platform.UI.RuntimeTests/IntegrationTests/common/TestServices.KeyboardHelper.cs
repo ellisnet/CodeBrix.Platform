@@ -129,7 +129,7 @@ namespace Private.Infrastructure
 				{"GamePadMenu",                 VirtualKey.GamepadMenu},
 			};
 
-			private static bool TargetSupportsPreviewKeyEvents() => ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.UIElement, CodeBrix.Platform.UI", "PreviewKeyDownEvent");
+			private static bool TargetSupportsPreviewKeyEvents() => ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.UIElement, CodeBrix.Platform.UI.Core", "PreviewKeyDownEvent");
 
 			public static async Task PressKeySequence(string keys, UIElement element = null)
 			{

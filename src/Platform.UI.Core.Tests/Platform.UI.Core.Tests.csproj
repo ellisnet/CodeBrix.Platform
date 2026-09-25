@@ -1,0 +1,211 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!--
+	The host-free Core proof (plan gate G6): this suite references ONLY the platform-neutral Core assemblies
+	(CodeBrix.Platform.UI.Core and what it references - no Skia assembly, no SkiaSharp/HarfBuzz package), builds
+	XAML elements, a Page with bindings and styles, navigates a Frame, and asserts that no SkiaSharp assembly was
+	loaded into the process. It is the readiness proof for a non-Skia platform (CodeBrix.Android, CodeBrix.Mobile):
+	whatever platform contract the Core path needs, a test double registers here, as such a platform would.
+	-->
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<AssemblyName>CodeBrix.Platform.UI.Core.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.Core.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The Core assemblies only. Nothing in this graph references a Skia project. -->
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Core.csproj" />
+		<!-- The add-ins' Core assemblies (Phase C), each proven host-free by AddInCoreTests. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.UI.CommandBar\Platform.UI.CommandBar.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.AppSettings\Platform.AppSettings.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Core.csproj" />
+	</ItemGroup>
+
+	<!-- The Skia-canvas add-ins' Core assemblies (plan rule R7: they reference SkiaSharp, but no Skia assembly of the
+	     platform). They are built first but NOT referenced - neither their assemblies nor their packages - so this
+	     graph stays free of SkiaSharp; AddInCoreTests reads each one's metadata from the path given below. -->
+	<ItemGroup>
+		<ProjectReference Include="..\AddIns\CodeBrix.Platform.SkiaSharp.Views\CodeBrix.Platform.SkiaSharp.Views.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.Svg\Platform.UI.Svg.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.Lottie\Platform.UI.Lottie.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.TextLayout\Platform.UI.TextLayout.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.AdvancedTextEdit\Platform.UI.AdvancedTextEdit.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.TerminalView\Platform.UI.TerminalView.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\AddIns\Platform.UI.PlotterView\Platform.UI.PlotterView.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.SkiaSharp.Views.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/CodeBrix.Platform.SkiaSharp.Views/bin/CodeBrix.Platform.SkiaSharp.Views.Core/$(Configuration)/net10.0/CodeBrix.Platform.SkiaSharp.Views.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.WinUI.Graphics2DSK.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.WinUI.Graphics2DSK/bin/Platform.WinUI.Graphics2DSK.Core/$(Configuration)/net10.0/CodeBrix.Platform.WinUI.Graphics2DSK.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.Svg.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.Svg/bin/Platform.UI.Svg.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Svg.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.Lottie.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.Lottie/bin/Platform.UI.Lottie.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Lottie.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.TextLayout.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.TextLayout/bin/Platform.UI.TextLayout.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.TextLayout.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.AdvancedTextEdit.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.AdvancedTextEdit/bin/Platform.UI.AdvancedTextEdit.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.AdvancedTextEdit.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.TerminalView.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.TerminalView/bin/Platform.UI.TerminalView.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.TerminalView.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>R7Core:CodeBrix.Platform.UI.PlotterView.Core</_Parameter1>
+			<_Parameter2>$(MSBuildThisFileDirectory)../AddIns/Platform.UI.PlotterView/bin/Platform.UI.PlotterView.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.PlotterView.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+	<!-- Phase D (G6, WPD D2): EVERY Core assembly the family produces - the framework's twelve and the add-ins' fourteen -
+	     is read by CoreAssemblyReferenceTests from the path below ("Core" = must be Skia-free; "R7" = a Skia-canvas add-in
+	     Core, which may reference SkiaSharp/HarfBuzzSharp). The five Cores not already in this graph are built first but
+	     NOT referenced, like the R7 Cores above, so the graph and the loaded-assembly assertions are unchanged. -->
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\Platform.UI.FluentTheme.v1\Platform.UI.FluentTheme.v1.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\Platform.UI.FluentTheme.v2\Platform.UI.FluentTheme.v2.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+		<ProjectReference Include="..\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" ReferenceOutputAssembly="false" ExcludeAssets="all" Private="false" />
+
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI/bin/Platform.UI.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Composition.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.Composition/bin/Platform.UI.Composition.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Composition.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UWP/bin/Platform.Core/$(Configuration)/net10.0/CodeBrix.Platform.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Dispatching.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.Dispatching/bin/Platform.UI.Dispatching.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Dispatching.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Toolkit.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.Toolkit/bin/Platform.UI.Toolkit.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Toolkit.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.Foundation.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.Foundation/bin/Platform.Foundation.Core/$(Configuration)/net10.0/CodeBrix.Platform.Foundation.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.Foundation.Logging.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.Foundation.Logging/bin/Platform.Foundation.Logging.Core/$(Configuration)/net10.0/CodeBrix.Platform.Foundation.Logging.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.FluentTheme.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.FluentTheme/bin/Platform.UI.FluentTheme.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.FluentTheme.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.FluentTheme.v1.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.FluentTheme.v1/bin/Platform.UI.FluentTheme.v1.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.FluentTheme.v1.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.FluentTheme.v2.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.FluentTheme.v2/bin/Platform.UI.FluentTheme.v2.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.FluentTheme.v2.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../Platform.UI.Adapter.Microsoft.Extensions.Logging/bin/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.Extensions.Logging.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../CodeBrix.Platform.Extensions.Logging/bin/$(Configuration)/net10.0/CodeBrix.Platform.Extensions.Logging.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.FlexPanel.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.FlexPanel/bin/$(Configuration)/net10.0/CodeBrix.Platform.UI.FlexPanel.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.CommandBar.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.CommandBar/bin/Platform.UI.CommandBar.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.CommandBar.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.AppSettings.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.AppSettings/bin/Platform.AppSettings.Core/$(Configuration)/net10.0/CodeBrix.Platform.AppSettings.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.AudioPlayer.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.AudioPlayer.Skia/bin/Platform.UI.AudioPlayer.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.AudioPlayer.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.WinUI.Graphics3DGL.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.WinUI.Graphics3DGL/bin/Platform.WinUI.Graphics3DGL.Core/$(Configuration)/net10.0/CodeBrix.Platform.WinUI.Graphics3DGL.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.VideoPlayer.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.VideoPlayer.Skia/bin/Platform.UI.VideoPlayer.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.VideoPlayer.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.SkiaSharp.Views.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/CodeBrix.Platform.SkiaSharp.Views/bin/CodeBrix.Platform.SkiaSharp.Views.Core/$(Configuration)/net10.0/CodeBrix.Platform.SkiaSharp.Views.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.WinUI.Graphics2DSK.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.WinUI.Graphics2DSK/bin/Platform.WinUI.Graphics2DSK.Core/$(Configuration)/net10.0/CodeBrix.Platform.WinUI.Graphics2DSK.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Svg.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.Svg/bin/Platform.UI.Svg.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Svg.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.Lottie.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.Lottie/bin/Platform.UI.Lottie.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.Lottie.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.TextLayout.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.TextLayout/bin/Platform.UI.TextLayout.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.TextLayout.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.AdvancedTextEdit.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.AdvancedTextEdit/bin/Platform.UI.AdvancedTextEdit.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.AdvancedTextEdit.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.TerminalView.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.TerminalView/bin/Platform.UI.TerminalView.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.TerminalView.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.PlotterView.Core</_Parameter1>
+			<_Parameter2>R7|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.PlotterView/bin/Platform.UI.PlotterView.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.PlotterView.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+	</ItemGroup>
+
+</Project>

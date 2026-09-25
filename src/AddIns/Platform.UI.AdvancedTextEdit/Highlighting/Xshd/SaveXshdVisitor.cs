@@ -126,13 +126,13 @@ public sealed class SaveXshdVisitor : IXshdVisitor
 		{
 			writer.WriteAttributeString("background", color.Background.ToString());
 		}
-		if (color.FontWeight != null)
+		if (color.FontWeightValue != null)
 		{
-			writer.WriteAttributeString("fontWeight", V2Loader.ConvertFontWeightToString(color.FontWeight.Value).ToLowerInvariant());
+			writer.WriteAttributeString("fontWeight", V2Loader.ConvertFontWeightToString(color.FontWeightValue.Value).ToLowerInvariant());
 		}
-		if (color.FontStyle != null)
+		if (color.FontStyleValue != null)
 		{
-			writer.WriteAttributeString("fontStyle", V2Loader.ConvertFontStyleToString(color.FontStyle.Value).ToLowerInvariant());
+			writer.WriteAttributeString("fontStyle", V2Loader.ConvertFontStyleToString(color.FontStyleValue.Value).ToLowerInvariant());
 		}
 	}
 

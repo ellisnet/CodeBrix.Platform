@@ -243,8 +243,8 @@ namespace CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer //Was previously: 
 				Dispatch(() => _renderer.InvalidateRender(), NativeDispatcherPriority.High);
 			}
 
-			Windows.UI.Core.CoreDispatcher.DispatchOverride = Dispatch;
-			Windows.UI.Core.CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = Dispatch;
+			global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => _isDispatcherThread;
 
 			FrameBufferInputProvider.Instance.Initialize();
 

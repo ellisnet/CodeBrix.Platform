@@ -14,11 +14,6 @@ using Path = UIKit.UIBezierPath;
 using ObjCRuntime;
 #elif false
 using Android.Graphics;
-#elif __SKIA__
-using Microsoft.UI.Composition;
-using Path = SkiaSharp.SKPath;
-using SkiaSharp;
-using CodeBrix.Platform.UI.UI.Xaml.Media;
 #else
 using Path = System.Object;
 #endif
@@ -42,13 +37,11 @@ namespace CodeBrix.Platform.Media //Was previously: Uno.Media
 			bezierPath = bezierPath_;
 		}
 
-#if __SKIA__
-		internal override SKPath GetSKPath()
-		{
-			bezierPath.FillType = FillRule.ToSkiaFillType();
-			return bezierPath;
-		}
-#endif
+		/// <summary>
+		/// Gets the platform path the last closed <see cref="StreamGeometryContext"/> built (see
+		/// <see cref="CodeBrix.Platform.UI.Contracts.IGeometryPathBuilder.Snapshot"/>).
+		/// </summary>
+		internal Path PlatformPath => bezierPath;
 
 #if false
 		public override UIImage ToNativeImage()

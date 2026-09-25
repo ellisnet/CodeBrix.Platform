@@ -97,7 +97,7 @@ public partial class X11ApplicationHost : SkiaHost, ISkiaApplicationHost, IDispo
 			}
 		}
 
-		CompositionTarget.FrameRenderingOptions = (true, true);
+		global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.FrameRenderingOptions = (true, true);
 	}
 
 	public X11ApplicationHost(Func<Application> appBuilder, int renderFrameRate = 60) : this(appBuilder, renderFrameRate, false)
@@ -126,8 +126,8 @@ public partial class X11ApplicationHost : SkiaHost, ISkiaApplicationHost, IDispo
 		{
 			_isDispatcherThread = true;
 		});
-		CoreDispatcher.DispatchOverride = (a, p) => _eventLoop.Schedule(a);
-		CoreDispatcher.HasThreadAccessOverride = () => _isDispatcherThread;
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = (a, p) => _eventLoop.Schedule(a);
+		global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => _isDispatcherThread;
 	}
 
 	internal static int RenderFrameRate { get; private set; }

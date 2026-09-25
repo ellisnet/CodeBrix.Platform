@@ -2,10 +2,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 
 using Microsoft.UI.Xaml.Media;
+using SkiaSharp;
 using Windows.UI;
 
+using CodeBrix.Platform.UI.AdvancedTextEdit.Engine;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Rendering;
 
 namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting;
@@ -17,6 +21,9 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting;
 //the brush instance is simply never mutated. SystemColorHighlightingBrush no longer reflects over
 //the WPF System.Windows.SystemColors class; it resolves the color name from a fixed internal table
 //of common system-color names instead (this framework has no live system-color broker).
+//WPE1 C8 (the adapters form, decision D-M4): the built-in brushes STORE a neutral colour (SKColor)
+//and create their XAML brush on first GetBrush; GetColorValue (internal) is the neutral read the
+//highlighting engine and a CodeBrix.Mobile editor use. The public members are unchanged adapters.
 
 /// <summary>
 /// A brush used for syntax highlighting. Can retrieve a real brush on-demand.
@@ -45,6 +52,27 @@ public abstract class HighlightingBrush
 			return null;
 		}
 	}
+
+	/// <summary>
+	/// The neutral colour of the brush (WPE1 C8): what <see cref="GetColor"/> returns for a null context, as an
+	/// <see cref="SKColor"/>. The built-in brushes answer from their neutral storage, with no XAML type involved; any
+	/// other brush answers through its <see cref="GetColor"/> (and so needs the XAML object model).
+	/// </summary>
+	/// <returns>The colour, or null when the brush has no single colour.</returns>
+	internal virtual SKColor? GetColorValue() => GetColorValueThroughXaml();
+
+	[MethodImpl(MethodImplOptions.NoInlining)] //keeps the WinRT Color out of callers that never get here
+	SKColor? GetColorValueThroughXaml()
+	{
+		Color? color = GetColor(null);
+		return color is { } c ? new SKColor(c.R, c.G, c.B, c.A) : null;
+	}
+
+	/// <summary>The WinRT colour of a neutral colour (the XAML-side adapters).</summary>
+	internal static Color ToWinRTColor(SKColor color) => Color.FromArgb(color.Alpha, color.Red, color.Green, color.Blue);
+
+	/// <summary>The neutral colour of a WinRT colour (the XAML-side adapters).</summary>
+	internal static SKColor ToSKColor(Color color) => new SKColor(color.R, color.G, color.B, color.A);
 }
 
 /// <summary>
@@ -52,34 +80,47 @@ public abstract class HighlightingBrush
 /// </summary>
 public sealed class SimpleHighlightingBrush : HighlightingBrush
 {
-	readonly SolidColorBrush brush;
-
-	internal SimpleHighlightingBrush(SolidColorBrush brush)
-	{
-		//was previously: called brush.Freeze(); this framework's brushes have no Freeze(), so the
-		//brush is treated as immutable by convention (it is never handed out for mutation).
-		this.brush = brush;
-	}
+	//The neutral storage (WPE1 C8); the SolidColorBrush is created on the first GetBrush and then always returned.
+	readonly SKColor color;
+	object? brush;
 
 	/// <summary>
 	/// Creates a new HighlightingBrush with the specified color.
 	/// </summary>
-	public SimpleHighlightingBrush(Color color) : this(new SolidColorBrush(color))
+	public SimpleHighlightingBrush(Color color) : this(ToSKColor(color))
 	{
+	}
+
+	/// <summary>Creates a brush of a neutral colour (the highlighting engine's constructor: xshd loading).</summary>
+	internal SimpleHighlightingBrush(SKColor color)
+	{
+		this.color = color;
 	}
 
 	/// <inheritdoc/>
 	public override Brush GetBrush(ITextRunConstructionContext? context)
 	{
-		return brush;
+		//was previously: the brush was created (and frozen) in the constructor; this framework's brushes have no
+		//Freeze(), so the brush is treated as immutable by convention (it is never handed out for mutation).
+		object? existing = Volatile.Read(ref brush);
+		if (existing == null)
+		{
+			existing = new SolidColorBrush(ToWinRTColor(color));
+			existing = Interlocked.CompareExchange(ref brush, existing, null) ?? existing;
+		}
+		return (Brush)existing;
 	}
+
+	/// <inheritdoc/>
+	internal override SKColor? GetColorValue() => color;
 
 	/// <inheritdoc/>
 	public override string ToString()
 	{
 		//was previously: brush.ToString(); the WPF SolidColorBrush stringified to its color code, but
-		//this framework's SolidColorBrush.ToString() does not, so the color is stringified directly.
-		return brush.Color.ToString();
+		//this framework's SolidColorBrush.ToString() does not, so the color is stringified directly
+		//(as Windows.UI.Color.ToString() does: "#AARRGGBB").
+		return HighlightingValues.ToColorString(color);
 	}
 
 	/// <inheritdoc/>
@@ -90,13 +131,14 @@ public sealed class SimpleHighlightingBrush : HighlightingBrush
 		{
 			return false;
 		}
-		return this.brush.Color.Equals(other.brush.Color);
+		return this.color == other.color;
 	}
 
 	/// <inheritdoc/>
 	public override int GetHashCode()
 	{
-		return brush.Color.GetHashCode();
+		//Windows.UI.Color's hash: the packed ARGB value, which is exactly what SKColor holds
+		return unchecked((int)(uint)color);
 	}
 }
 
@@ -110,23 +152,24 @@ sealed class SystemColorHighlightingBrush : HighlightingBrush
 	//port resolves the name from this fixed table of common system-color names (Windows light-theme
 	//default values). No built-in highlighting definition references a system color; this type only
 	//serves user-supplied definitions that use the "SystemColors.<Name>" syntax.
-	static readonly Dictionary<string, Color> knownColors = new Dictionary<string, Color>(StringComparer.Ordinal) {
-		{ "ActiveCaptionText", Color.FromArgb(0xFF, 0x00, 0x00, 0x00) },
-		{ "Control", Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0) },
-		{ "ControlText", Color.FromArgb(0xFF, 0x00, 0x00, 0x00) },
-		{ "GrayText", Color.FromArgb(0xFF, 0x6D, 0x6D, 0x6D) },
-		{ "Highlight", Color.FromArgb(0xFF, 0x00, 0x78, 0xD7) },
-		{ "HighlightText", Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF) },
-		{ "Info", Color.FromArgb(0xFF, 0xFF, 0xFF, 0xE1) },
-		{ "InfoText", Color.FromArgb(0xFF, 0x00, 0x00, 0x00) },
-		{ "Menu", Color.FromArgb(0xFF, 0xF0, 0xF0, 0xF0) },
-		{ "MenuText", Color.FromArgb(0xFF, 0x00, 0x00, 0x00) },
-		{ "Window", Color.FromArgb(0xFF, 0xFF, 0xFF, 0xFF) },
-		{ "WindowText", Color.FromArgb(0xFF, 0x00, 0x00, 0x00) },
+	//(Neutral colours since WPE1 C8: the table is read by the highlighting engine with no XAML type involved.)
+	static readonly Dictionary<string, SKColor> knownColors = new Dictionary<string, SKColor>(StringComparer.Ordinal) {
+		{ "ActiveCaptionText", new SKColor(0x00, 0x00, 0x00, 0xFF) },
+		{ "Control", new SKColor(0xF0, 0xF0, 0xF0, 0xFF) },
+		{ "ControlText", new SKColor(0x00, 0x00, 0x00, 0xFF) },
+		{ "GrayText", new SKColor(0x6D, 0x6D, 0x6D, 0xFF) },
+		{ "Highlight", new SKColor(0x00, 0x78, 0xD7, 0xFF) },
+		{ "HighlightText", new SKColor(0xFF, 0xFF, 0xFF, 0xFF) },
+		{ "Info", new SKColor(0xFF, 0xFF, 0xE1, 0xFF) },
+		{ "InfoText", new SKColor(0x00, 0x00, 0x00, 0xFF) },
+		{ "Menu", new SKColor(0xF0, 0xF0, 0xF0, 0xFF) },
+		{ "MenuText", new SKColor(0x00, 0x00, 0x00, 0xFF) },
+		{ "Window", new SKColor(0xFF, 0xFF, 0xFF, 0xFF) },
+		{ "WindowText", new SKColor(0x00, 0x00, 0x00, 0xFF) },
 	};
 
 	readonly string name;
-	SolidColorBrush? brush;
+	object? brush;
 
 	/// <summary>
 	/// Gets whether the specified system-color name (without the "SystemColors." prefix)
@@ -148,8 +191,10 @@ sealed class SystemColorHighlightingBrush : HighlightingBrush
 
 	public override Brush GetBrush(ITextRunConstructionContext? context)
 	{
-		return brush ??= new SolidColorBrush(knownColors[name]);
+		return (Brush)(brush ??= new SolidColorBrush(ToWinRTColor(knownColors[name])));
 	}
+
+	internal override SKColor? GetColorValue() => knownColors[name];
 
 	public override string ToString()
 	{

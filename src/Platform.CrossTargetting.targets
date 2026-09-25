@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<IsCrossruntime>false</IsCrossruntime>
-		<IsCrossruntime Condition="'$(CodeBrixRuntimeIdentifier)'=='Skia' or '$(CodeBrixRuntimeIdentifier)'=='WebAssembly' or '$(CodeBrixRuntimeIdentifier)'=='Reference'">true</IsCrossruntime>
+		<IsCrossruntime Condition="'$(CodeBrixRuntimeIdentifier)'=='Skia' or '$(CodeBrixRuntimeIdentifier)'=='WebAssembly' or '$(CodeBrixRuntimeIdentifier)'=='Reference' or '$(CodeBrixRuntimeIdentifier)'=='Core'">true</IsCrossruntime>
 	</PropertyGroup>
 	<ItemGroup>
 		<AndroidResource Include="Resources\**\*.xml" Condition="$(IsAndroid)" />
@@ -47,6 +47,8 @@
 	<!--
   List of known constants:
   - __SKIA__: Used when building for the Skia backend
+  - __CODEBRIX_CORE__: Used when building the platform-neutral Core assemblies (CodeBrixRuntimeIdentifier 'Core'):
+						the Skia set of constants minus __SKIA__. Code under this constant must not use SkiaSharp.
   - __WASM__: Used when building for the WebAssembly backend
   - CODEBRIX_REFERENCE_API: Used when the Reference API is used (it's true for Skia, Wasm, and Reference).
   - __CROSSRUNTIME__: Currently have the same semantics as CODEBRIX_REFERENCE_API
@@ -76,6 +78,14 @@
 
 	<PropertyGroup Condition="'$(CodeBrixRuntimeIdentifier)'=='Skia'">
 		<DefineConstants>$(DefineConstants);__SKIA__;SUPPORTS_RTL;CODEBRIX_SUPPORTS_NATIVEHOST;CODEBRIX_HAS_ENHANCED_LIFECYCLE</DefineConstants>
+		<DefineConstants>$(DefineConstants);CODEBRIX_HAS_MANAGED_POINTERS;CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER;HAS_INPUT_INJECTOR</DefineConstants>
+		<DefineConstants>$(DefineConstants);HAS_COMPOSITION_API;CODEBRIX_HAS_BORDER_VISUAL</DefineConstants>
+		<DefineConstants>$(DefineConstants);HAS_RENDER_TARGET_BITMAP</DefineConstants>
+	</PropertyGroup>
+
+	<!-- The platform-neutral Core flavor: exactly the Skia set minus __SKIA__, plus __CODEBRIX_CORE__ -->
+	<PropertyGroup Condition="'$(CodeBrixRuntimeIdentifier)'=='Core'">
+		<DefineConstants>$(DefineConstants);__CODEBRIX_CORE__;SUPPORTS_RTL;CODEBRIX_SUPPORTS_NATIVEHOST;CODEBRIX_HAS_ENHANCED_LIFECYCLE</DefineConstants>
 		<DefineConstants>$(DefineConstants);CODEBRIX_HAS_MANAGED_POINTERS;CODEBRIX_HAS_MANAGED_SCROLL_PRESENTER;HAS_INPUT_INJECTOR</DefineConstants>
 		<DefineConstants>$(DefineConstants);HAS_COMPOSITION_API;CODEBRIX_HAS_BORDER_VISUAL</DefineConstants>
 		<DefineConstants>$(DefineConstants);HAS_RENDER_TARGET_BITMAP</DefineConstants>

@@ -13,8 +13,8 @@ using Windows.UI.Core;
 
 namespace Microsoft.UI.Xaml.Controls;
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
+[CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 #endif
 public partial class WebView : Control, IWebView
 {

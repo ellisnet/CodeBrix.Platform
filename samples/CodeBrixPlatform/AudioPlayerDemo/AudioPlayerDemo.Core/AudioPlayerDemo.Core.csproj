@@ -32,7 +32,7 @@
          packages, so an app that wants them references one and calls ModestSynth.Register() once at
          start-up, BEFORE any instrument is loaded (see App.xaml.cs). The demo's own instrument uses
          neither, so the call is here to show the shape rather than because this demo needs it. -->
-    <PackageReference Include="CodeBrix.Audio.ModestSynth.MitLicenseForever" Version="1.0.250.60" />
+    <PackageReference Include="CodeBrix.Audio.ModestSynth.MitLicenseForever" Version="1.0.264.1197" />
 
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package
@@ -54,15 +54,15 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\..\src\Platform.UI\Platform.UI.Skia.csproj" />
     <ProjectReference Include="..\..\..\..\src\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 
     <!-- Folded-in logging assemblies the aggregate package bundled as loose DLLs; they are
          in no transitive ProjectReference path. Used by App.xaml.cs InitializeLogging:
          CodeBrix.Platform.Extensions.LogExtensionPoint (singleton, lives only in
          Extensions.Logging) and the Microsoft.Extensions.Logging adapter (LoggingAdapter).
          Referenced here in Core so all heads inherit them. -->
-    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" />
-    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="..\..\..\..\src\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+    <ProjectReference Include="..\..\..\..\src\Platform.UI.Adapter.Microsoft.Extensions.Logging\Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
 
     <!-- The AudioPlayer AddIn, normally consumed as the
          CodeBrix.Platform.AudioPlayer.ApacheLicenseForever NuGet; referenced from source here.

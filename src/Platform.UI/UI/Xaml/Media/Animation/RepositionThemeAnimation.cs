@@ -1,6 +1,6 @@
 ﻿namespace Microsoft.UI.Xaml.Media.Animation;
 
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __CROSSRUNTIME__
 [global::CodeBrix.Platform.NotImplemented]
 #endif
 public partial class RepositionThemeAnimation : Timeline, ITimeline

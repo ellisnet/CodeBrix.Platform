@@ -48,6 +48,13 @@ namespace Microsoft.UI.Xaml
 		/// </summary>
 		private readonly static PropertyCacheEntry _searchPropertyCacheEntry = new();
 
+		/// <summary>
+		/// Guards <see cref="_getPropertyCache"/> and <see cref="_searchPropertyCacheEntry"/>: two threads that build
+		/// elements at once (host-free tests, a background thread creating XAML objects) used to corrupt the cache
+		/// ("SR.Argument_AddingDuplicate__" from its Add). Never held while a property lookup runs type initializers.
+		/// </summary>
+		private readonly static object _getPropertyCacheGate = new();
+
 
 		private readonly static FrameworkPropertiesForTypeDictionary _getInheritedPropertiesForType = new FrameworkPropertiesForTypeDictionary();
 
@@ -361,11 +368,31 @@ namespace Microsoft.UI.Xaml
 				throw new InvalidOperationException("The dependency property system should not be accessed from non UI thread.");
 			}
 
-			_searchPropertyCacheEntry.Update(type, name);
-
-			if (!_getPropertyCache.TryGetValue(_searchPropertyCacheEntry, out var result))
+			lock (_getPropertyCacheGate)
 			{
-				_getPropertyCache.Add(_searchPropertyCacheEntry.Clone(), result = InternalGetProperty(type, name));
+				_searchPropertyCacheEntry.Update(type, name);
+
+				if (_getPropertyCache.TryGetValue(_searchPropertyCacheEntry, out var cached))
+				{
+					return cached;
+				}
+			}
+
+			// Outside the lock: the lookup may run type initializers, which register properties (and so take the lock
+			// in ResetGetPropertyCache, possibly on another thread waiting for a type initializer this thread runs).
+			var result = InternalGetProperty(type, name);
+
+			lock (_getPropertyCacheGate)
+			{
+				_searchPropertyCacheEntry.Update(type, name);
+
+				if (_getPropertyCache.TryGetValue(_searchPropertyCacheEntry, out var cachedMeanwhile))
+				{
+					// Another thread (or a nested lookup run by a type initializer) cached it first.
+					return cachedMeanwhile;
+				}
+
+				_getPropertyCache.Add(_searchPropertyCacheEntry.Clone(), result);
 			}
 
 			return result;
@@ -383,11 +410,14 @@ namespace Microsoft.UI.Xaml
 
 		private static void ResetGetPropertyCache(Type ownerType, string name)
 		{
-			if (_getPropertyCache.Count != 0)
+			lock (_getPropertyCacheGate)
 			{
-				_searchPropertyCacheEntry.Update(ownerType, name);
+				if (_getPropertyCache.Count != 0)
+				{
+					_searchPropertyCacheEntry.Update(ownerType, name);
 
-				_getPropertyCache.Remove(_searchPropertyCacheEntry);
+					_getPropertyCache.Remove(_searchPropertyCacheEntry);
+				}
 			}
 		}
 

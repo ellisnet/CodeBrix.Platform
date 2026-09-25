@@ -16,7 +16,7 @@ namespace Microsoft.UI.Xaml.Shapes
 	{
 		private const double DefaultStrokeThicknessWhenNoStrokeDefined = 0.0;
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		private Action _brushChanged;
 		private Action _strokeBrushChanged;
 		private IDisposable _brushChangedSubscription;
@@ -59,7 +59,7 @@ namespace Microsoft.UI.Xaml.Shapes
 
 		private void OnFillChanged(Brush oldValue, Brush newValue)
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			// On Skia, OnFillBrushChanged will call GetOrCreateCompositionBrush and assign this to _shape.FillBrush
 			// In this case, we don't really want to listen to brush changes as the Brush is responsible for synchronizing its internal composition brush
 			OnFillBrushChanged();
@@ -96,7 +96,7 @@ namespace Microsoft.UI.Xaml.Shapes
 				InvalidateMeasure();
 			}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			// On Skia, OnStrokeBrushChanged will call GetOrCreateCompositionBrush and assign this to _shape.StrokeBrush
 			// In this case, we don't really want to listen to brush changes as the Brush is responsible for synchronizing its internal composition brush
 			OnStrokeBrushChanged();
@@ -106,6 +106,25 @@ namespace Microsoft.UI.Xaml.Shapes
 #endif
 		}
 
+		#endregion
+
+		#region StrokeMiterLimit Dependency Property
+		// Declared here (not in Generated/) for its WinUI default of 10: the generated stub registered default(double) = 0,
+		// which a renderer that honours the limit (CodeBrix.Android's shape views) turns into a bevel at every corner. The
+		// Skia renderer does not read it yet, so it stays marked NotImplemented for the Skia/Core flavors, as before.
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
+		public double StrokeMiterLimit
+		{
+			get => (double)this.GetValue(StrokeMiterLimitProperty);
+			set => this.SetValue(StrokeMiterLimitProperty, value);
+		}
+
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
+		public static DependencyProperty StrokeMiterLimitProperty { get; } = DependencyProperty.Register(
+			nameof(StrokeMiterLimit),
+			typeof(double),
+			typeof(Shape),
+			new FrameworkPropertyMetadata(10.0d));
 		#endregion
 
 		#region StrokeThickness Dependency Property
@@ -174,7 +193,7 @@ namespace Microsoft.UI.Xaml.Shapes
 		// Do not invoke base.IsViewHit(): We don't have to have de FrameworkElement.Background to be hit testable!
 		internal override bool IsViewHit()
 			=> Fill != null
-#if __SKIA__ // we only add this condition for Skia and Wasm because these are the only platforms with proper hit-testing support for shapes. If we add it for other platforms, we get a different but still inaccurate behaviour, so we prefer to keep the behaviour as is.
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // we only add this condition for Skia and Wasm because these are the only platforms with proper hit-testing support for shapes. If we add it for other platforms, we get a different but still inaccurate behaviour, so we prefer to keep the behaviour as is.
 				// TODO: Verify if this should also consider StrokeThickness (likely it should)
 				|| Stroke != null
 #endif

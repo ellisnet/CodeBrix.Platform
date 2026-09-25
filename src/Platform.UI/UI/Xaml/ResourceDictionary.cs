@@ -160,7 +160,7 @@ namespace Microsoft.UI.Xaml
 		public bool Remove(object key)
 		{
 			var keyToRemove = new ResourceKey(key);
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (_values.TryGetValue(keyToRemove, out var value))
 			{
 				_values.Remove(keyToRemove);

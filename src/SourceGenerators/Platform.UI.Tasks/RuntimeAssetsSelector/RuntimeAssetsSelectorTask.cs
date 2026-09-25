@@ -75,7 +75,9 @@ namespace CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector //Was previously: Uno
 		{
 			try
 			{
-				if (CodeBrixRuntimeIdentifier == "reference")
+				// "core" (the platform-neutral Core flavor) is handled like "reference": a library build
+				// that references the framework directly, so no runtime assets are selected.
+				if (CodeBrixRuntimeIdentifier is "reference" or "core")
 				{
 					return true;
 				}
@@ -480,7 +482,7 @@ namespace CodeBrix.Platform.UI.Tasks.RuntimeAssetsSelector //Was previously: Uno
 									if (File.Exists(adjustedPath))
 									{
 										var originalAssembly = AssemblyDefinition.ReadAssembly(identityNormalized);
-										if (!originalAssembly.MainModule.AssemblyReferences.Any(m => m.Name == "CodeBrix.Platform.UI"))
+										if (!originalAssembly.MainModule.AssemblyReferences.Any(m => m.Name is "CodeBrix.Platform.UI" or "CodeBrix.Platform.UI.Core"))
 										{
 											// We only need to retarget packages that are explicitly referencing Uno.UI
 											// Other packages that are referencing Uno to access WinRT APIs do not need

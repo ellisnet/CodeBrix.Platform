@@ -1,0 +1,68 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.AppSettings.Core: the settings API (AppSettingsService, AppSettingsStore), the JSON values,
+	the change notification (AppSettingChangedEventArgs, per-key handlers), the typed property handles
+	(AppSettingProperty) and the logging service - the shared tree of this folder. It references only the
+	platform-neutral framework Core assemblies and no database engine. Where the settings database lives and
+	everything that happens to that file (CodeBrix.Sqlite, backup and pruning, quarantine and restore, silent
+	creation, export, import) is the storage contract Contracts/IAppSettingsStoragePlatform.cs; the Skia project in
+	this folder (Platform.AppSettings.csproj, assembly CodeBrix.Platform.AppSettings) implements it and carries the
+	package.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.AppSettings.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.AppSettings</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the AppSettings package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- ILogger/ILoggerFactory, which AppSettingLoggingService forwards through (the package
+		     dependency itself is declared by the Skia project, which packs). -->
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- ApiExtensibility, the registry the storage contract is resolved from. -->
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<!-- LogExtensionPoint, which AppSettingLoggingService forwards to. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+	</ItemGroup>
+	<!-- Trimmable and AOT-compatible (WPE1-5, Jeremy's ruling F): the reflection-based members (Get<T>(key...),
+	     Set(key, object), Wrap<T>, AppSettingProperty.Create<T>) carry RequiresUnreferencedCode/RequiresDynamicCode, and
+	     every one has a JsonTypeInfo<T> overload that serializes without reflection; the store's own value (the
+	     auto-backup retention) uses a source-generated context. IsAotCompatible implies IsTrimmable and turns on the trim,
+	     AOT and single-file analyzers. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+	<!-- Roots the Skia twin in trimmed Skia apps (WPE1 C1); see the comment in the file. -->
+	<ItemGroup>
+		<EmbeddedResource Include="ILLink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+</Project>

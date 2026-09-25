@@ -29,7 +29,9 @@
 		<file src="..\..\src\AddIns\Platform.WinUI.Graphics2DSK\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
-        <file src="..\..\src\AddIns\Platform.WinUI.Graphics2DSK\bin\Platform.WinUI.Graphics2DSK.Crossruntime\Release\net10.0\CodeBrix.Platform.WinUI.Graphics2DSK.*" target="lib\net10.0" />
+        <!-- Core by whole since the Core/Skia split (CodeBrix.Platform.WinUI.Graphics2DSK.Core, formerly
+             CodeBrix.Platform.WinUI.Graphics2DSK from the Crossruntime project). -->
+        <file src="..\..\src\AddIns\Platform.WinUI.Graphics2DSK\bin\Platform.WinUI.Graphics2DSK.Core\Release\net10.0\CodeBrix.Platform.WinUI.Graphics2DSK.Core.*" target="lib\net10.0" />
 
 	</files>
 

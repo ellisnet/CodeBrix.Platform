@@ -36,6 +36,7 @@
 
 		<references>
 			<group targetFramework="net10.0">
+				<reference file="CodeBrix.Platform.UI.Lottie.Core.dll" />
 				<reference file="CodeBrix.Platform.UI.Lottie.dll" />
 			</group>
 			<!-- For UAP (UWP), the reference to Microsoft.Toolkit.Uwp.UI.Lottie will be added manually -->
@@ -46,12 +47,20 @@
 		<file src="..\..\README.md" target="/" />
 		<file src="..\..\src\AddIns\Platform.UI.Lottie\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
-		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Reference\Release\net10.0\CodeBrix.Platform.UI.Lottie.dll" target="lib\net10.0" />
+		<!-- Compile-time assemblies: the Core assembly (the sources, the provider, the playback) and the Skia assembly
+		     (the canvas supply; it has no public types, and CodeBrix.Platform's analyzer looks for its name). -->
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Core\Release\net10.0\CodeBrix.Platform.UI.Lottie.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Core\Release\net10.0\CodeBrix.Platform.UI.Lottie.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Skia\Release\net10.0\CodeBrix.Platform.UI.Lottie.dll" target="lib\net10.0" />
 
 		<!-- Build targets (renamed to <PackageId>.targets so NuGet auto-imports it). -->
 		<file src="..\..\src\AddIns\Platform.UI.Lottie\buildTransitive\Platform.WinUI.Lottie.targets" target="buildTransitive\CodeBrix.Platform.Lottie.ApacheLicenseForever.targets" />
 
 		<!-- net10.0 Skia -->
-		<file src="..\..\src\AddIns\Platform.UI.Lottie\Bin\Platform.UI.Lottie.Skia\Release\net10.0\CodeBrix.Platform.UI.Lottie.*" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Skia\Release\net10.0\CodeBrix.Platform.UI.Lottie.*" exclude="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Skia\Release\net10.0\CodeBrix.Platform.UI.Lottie.Core.*" target="codebrix-platform-runtime\net10.0\skia" />
+		<!-- The runtime selection replaces the package's copy-local assemblies with this folder's, so the Core
+		     assembly must be here too. -->
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Core\Release\net10.0\CodeBrix.Platform.UI.Lottie.Core.dll" target="codebrix-platform-runtime\net10.0\skia" />
+		<file src="..\..\src\AddIns\Platform.UI.Lottie\bin\Platform.UI.Lottie.Core\Release\net10.0\CodeBrix.Platform.UI.Lottie.Core.pdb" target="codebrix-platform-runtime\net10.0\skia" />
 	</files>
 </package>

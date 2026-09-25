@@ -15,10 +15,10 @@ public class Given_Grid
 		{
 			ExpectedDiagnostics =
 			{
-				// CodeBrix.Platform.UI.SourceGenerators\Uno.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator\Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs(115,5): error CS1912: Duplicate initialization of member 'ColumnDefinitions'
-				DiagnosticResult.CompilerError("CS1912").WithSpan(Path.Combine("CodeBrix.Platform.UI.SourceGenerators","CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator","Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs"), 115, 5, 115, 22).WithArguments("ColumnDefinitions"),
-				// CodeBrix.Platform.UI.SourceGenerators\Uno.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator\Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs(149,5): error CS1912: Duplicate initialization of member 'RowDefinitions'
-				DiagnosticResult.CompilerError("CS1912").WithSpan(Path.Combine("CodeBrix.Platform.UI.SourceGenerators","CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator","Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs"), 149, 5, 149, 19).WithArguments("RowDefinitions"),
+				// CodeBrix.Platform.UI.SourceGenerators\Uno.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator\Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs(113,5): error CS1912: Duplicate initialization of member 'ColumnDefinitions'
+				DiagnosticResult.CompilerError("CS1912").WithSpan(Path.Combine("CodeBrix.Platform.UI.SourceGenerators","CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator","Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs"), 111, 5, 111, 22).WithArguments("ColumnDefinitions"),
+				// CodeBrix.Platform.UI.SourceGenerators\Uno.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator\Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs(147,5): error CS1912: Duplicate initialization of member 'RowDefinitions'
+				DiagnosticResult.CompilerError("CS1912").WithSpan(Path.Combine("CodeBrix.Platform.UI.SourceGenerators","CodeBrix.Platform.UI.SourceGenerators.XamlGenerator.XamlCodeGenerator","Grid_Uses_Both_Syntaxes_5d0366ecb133af4c31f7d61373b58fb4.cs"), 145, 5, 145, 19).WithArguments("RowDefinitions"),
 			},
 		};
 

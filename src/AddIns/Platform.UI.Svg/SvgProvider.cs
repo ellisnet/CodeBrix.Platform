@@ -198,7 +198,7 @@ public partial class SvgProvider : ISvgProvider
 #endif
 
 	public object? TryGetLoadedDataAsPictureAsync()
-#if __SKIA__
+#if !__NETSTD_REFERENCE__
 		=> _skSvg?.Picture;
 #else
 		=> null;

@@ -65,7 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
 		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
 
 		<!-- We remove Unit tests imported from MUX on UAP as they are usualy heavily relying on internal classes.-->
@@ -87,7 +87,7 @@
 	<!-- CodeBrix.Platform fork: Given_HtmlElementAttribute.Wasm.cs Compile removed (WASM-only test file deleted). -->
 	<ItemGroup>
 		<ProjectReference Include="../CodeBrix.Platform.Extensions/CodeBrix.Platform.Extensions.csproj" />
-		<ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+		<ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
 	</ItemGroup>
 
 	<!-- CodeBrix.Platform fork: this project references only MSTest.TestFramework (the

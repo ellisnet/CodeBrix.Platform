@@ -2,14 +2,16 @@
 
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
+using SkiaSharp;
 using Windows.UI.Text;
 
-using CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting.Xshd;
+using CodeBrix.Platform.UI.AdvancedTextEdit.Engine;
 using CodeBrix.Platform.UI.AdvancedTextEdit.Utils;
+using CodeBrix.Platform.UI.TextLayout;
 
 namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting;
 
@@ -19,6 +21,11 @@ namespace CodeBrix.Platform.UI.AdvancedTextEdit.Highlighting;
 //dropped; it is dead on modern .NET. ToCss() stringifies the font weight through the port's own
 //name table (V2Loader.ConvertFontWeightToString) because Windows.UI.Text.FontWeight has no
 //name-producing ToString(); the produced CSS is unchanged for all standard weights.
+//WPE1 C8 (the adapters form, decision D-M4): the STORAGE is neutral - the numeric weight, the
+//style as TextLayout's TextFontStyle (same values as Windows.UI.Text.FontStyle), the family as a
+//FontFamilyValue (name + the FontFamily instance created on demand) - so loading a definition and
+//highlighting a document never needs the XAML object model. The public XAML-typed properties are
+//adapters over that storage; equality, hashing, ToCss and MergeWith give the same results as before.
 
 /// <summary>
 /// A highlighting color is a set of font properties and foreground and background color.
@@ -28,10 +35,10 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 	internal static readonly HighlightingColor Empty = FreezableHelper.FreezeAndReturn(new HighlightingColor());
 
 	string? name;
-	FontFamily? fontFamily = null;
+	FontFamilyValue? fontFamily = null;
 	int? fontSize;
-	FontWeight? fontWeight;
-	FontStyle? fontStyle;
+	ushort? fontWeight;
+	TextFontStyle? fontStyle;
 	bool? underline;
 	bool? strikethrough;
 	HighlightingBrush? foreground;
@@ -64,6 +71,23 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 	{
 		get
 		{
+			return (FontFamily?)fontFamily?.GetOrCreateInstance(CreateFontFamily);
+		}
+		set
+		{
+			if (frozen)
+			{
+				throw new InvalidOperationException();
+			}
+			fontFamily = FromFontFamily(value);
+		}
+	}
+
+	/// <summary>The font family, neutral (WPE1 C8): its name and the FontFamily instance created on demand.</summary>
+	internal FontFamilyValue? FontFamilyValue
+	{
+		get
+		{
 			return fontFamily;
 		}
 		set
@@ -75,6 +99,18 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 			fontFamily = value;
 		}
 	}
+
+	/// <summary>The neutral value of a FontFamily (the public setters' adapter).</summary>
+	internal static FontFamilyValue? FromFontFamily(FontFamily? value) =>
+		value == null ? null : Engine.FontFamilyValue.FromInstance(value, value.Source, value.GetHashCode());
+
+	/// <summary>Creates the FontFamily of a neutral family name (the public getters' adapter).</summary>
+	internal static object CreateFontFamily(string name) => new FontFamily(name);
+
+	/// <summary>FontFamily equality through the instances (the adapter <see cref="Engine.FontFamilyValue.AreEqual"/> uses for a symbol-font name).</summary>
+	[MethodImpl(MethodImplOptions.NoInlining)]
+	internal static bool FontFamilyInstancesEqual(FontFamilyValue a, FontFamilyValue b) =>
+		object.Equals(a.GetOrCreateInstance(CreateFontFamily), b.GetOrCreateInstance(CreateFontFamily));
 
 	/// <summary>
 	/// Gets/sets the font size. Null if the highlighting color does not change the font style.
@@ -102,6 +138,23 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 	{
 		get
 		{
+			return fontWeight is ushort weight ? new FontWeight(weight) : null;
+		}
+		set
+		{
+			if (frozen)
+			{
+				throw new InvalidOperationException();
+			}
+			fontWeight = value?.Weight;
+		}
+	}
+
+	/// <summary>The font weight, neutral (WPE1 C8): the numeric weight, or null.</summary>
+	internal ushort? FontWeightValue
+	{
+		get
+		{
 			return fontWeight;
 		}
 		set
@@ -118,6 +171,23 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 	/// Gets/sets the font style. Null if the highlighting color does not change the font style.
 	/// </summary>
 	public FontStyle? FontStyle
+	{
+		get
+		{
+			return fontStyle is TextFontStyle style ? (FontStyle)(int)style : null;
+		}
+		set
+		{
+			if (frozen)
+			{
+				throw new InvalidOperationException();
+			}
+			fontStyle = value is FontStyle style ? (TextFontStyle)(int)style : null;
+		}
+	}
+
+	/// <summary>The font style, neutral (WPE1 C8): TextLayout's style (the same values as the WinUI FontStyle), or null.</summary>
+	internal TextFontStyle? FontStyleValue
 	{
 		get
 		{
@@ -222,32 +292,33 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 	public virtual string ToCss()
 	{
 		StringBuilder b = new StringBuilder();
+		//Neutral since WPE1 C8: the brushes' GetColorValue is GetColor(null) as an SKColor
 		if (Foreground != null)
 		{
-			Color? c = Foreground.GetColor(null);
+			SKColor? c = Foreground.GetColorValue();
 			if (c != null)
 			{
-				b.AppendFormat(CultureInfo.InvariantCulture, "color: #{0:x2}{1:x2}{2:x2}; ", c.Value.R, c.Value.G, c.Value.B);
+				b.AppendFormat(CultureInfo.InvariantCulture, "color: #{0:x2}{1:x2}{2:x2}; ", c.Value.Red, c.Value.Green, c.Value.Blue);
 			}
 		}
 		if (Background != null)
 		{
-			Color? c = Background.GetColor(null);
+			SKColor? c = Background.GetColorValue();
 			if (c != null)
 			{
-				b.AppendFormat(CultureInfo.InvariantCulture, "background-color: #{0:x2}{1:x2}{2:x2}; ", c.Value.R, c.Value.G, c.Value.B);
+				b.AppendFormat(CultureInfo.InvariantCulture, "background-color: #{0:x2}{1:x2}{2:x2}; ", c.Value.Red, c.Value.Green, c.Value.Blue);
 			}
 		}
-		if (FontWeight != null)
+		if (fontWeight != null)
 		{
 			b.Append("font-weight: ");
-			b.Append(V2Loader.ConvertFontWeightToString(FontWeight.Value).ToLowerInvariant());
+			b.Append(HighlightingValues.FontWeightToString(fontWeight.Value).ToLowerInvariant());
 			b.Append("; ");
 		}
-		if (FontStyle != null)
+		if (fontStyle != null)
 		{
 			b.Append("font-style: ");
-			b.Append(FontStyle.Value.ToString().ToLowerInvariant());
+			b.Append(HighlightingValues.FontStyleToString(fontStyle.Value).ToLowerInvariant());
 			b.Append("; ");
 		}
 		if (Underline != null)
@@ -324,7 +395,8 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 		return this.name == other.name && this.fontWeight == other.fontWeight
 			&& this.fontStyle == other.fontStyle && this.underline == other.underline && this.strikethrough == other.strikethrough
 			&& object.Equals(this.foreground, other.foreground) && object.Equals(this.background, other.background)
-			&& object.Equals(this.fontFamily, other.fontFamily) && object.Equals(this.FontSize, other.FontSize);
+			&& Engine.FontFamilyValue.AreEqual(this.fontFamily, other.fontFamily, FontFamilyInstancesEqual)
+			&& object.Equals(this.FontSize, other.FontSize);
 	}
 
 	/// <inheritdoc/>
@@ -349,7 +421,7 @@ public class HighlightingColor : IFreezable, ICloneable, IEquatable<Highlighting
 			}
 			if (fontFamily != null)
 			{
-				hashCode += 1000000123 * fontFamily.GetHashCode();
+				hashCode += 1000000123 * fontFamily.HashCode;
 			}
 			if (fontSize != null)
 			{

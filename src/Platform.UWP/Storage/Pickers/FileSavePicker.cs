@@ -44,7 +44,7 @@ namespace Windows.Storage.Pickers
 			set => _settingsIdentifier = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
-#if __SKIA__ || __NETSTD_REFERENCE__
+#if __CROSSRUNTIME__
 		/// <summary>
 		/// Gets or sets the default file name extension that the fileSavePicker gives to files to be saved.
 		/// </summary>
@@ -70,7 +70,7 @@ namespace Windows.Storage.Pickers
 			set => _commitButtonText = value ?? throw new ArgumentNullException(nameof(value));
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		public FileSavePicker()
 		{
 			InitializePlatform();

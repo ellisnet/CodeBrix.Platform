@@ -16,10 +16,8 @@ internal static partial class CodeBrixAssemblyHelper
 				"Platform.UI",
 				"CodeBrix.Platform.UI.dll",
 				[
-					// On CI the test assemblies set must be first, as it contains all dependent assemblies
+					// The unit-test flavor: one assembly per library (the Skia/Reference flavors no longer hold the whole API since the Core/Skia split)
 					"Platform.UI.Tests",
-					"Platform.UI.Skia",
-					"Platform.UI.Reference",
 				],
 				[TFMPrevious, TFMCurrent]
 			)),
@@ -27,10 +25,8 @@ internal static partial class CodeBrixAssemblyHelper
 				"Platform.UWP",
 				"CodeBrix.Platform.dll",
 				[
-					// On CI the test assemblies set must be first, as it contains all dependent assemblies
+					// The unit-test flavor: one assembly per library (the Skia/Reference flavors no longer hold the whole API since the Core/Skia split)
 					"Platform.Tests",
-					"Platform.Skia",
-					"Platform.Reference",
 				],
 				[TFMPrevious, TFMCurrent]
 			)),
@@ -38,10 +34,8 @@ internal static partial class CodeBrixAssemblyHelper
 				"Platform.Foundation",
 				"CodeBrix.Platform.Foundation.dll",
 				[
-					// On CI the test assemblies set must be first, as it contains all dependent assemblies
+					// The unit-test flavor: one assembly per library (the Skia/Reference flavors no longer hold the whole API since the Core/Skia split)
 					"Platform.Foundation.Tests",
-					"Platform.Foundation.Skia",
-					"Platform.Foundation.Reference",
 				],
 				[TFMPrevious, TFMCurrent]
 			)),
@@ -49,10 +43,8 @@ internal static partial class CodeBrixAssemblyHelper
 				"Platform.UI.Composition",
 				"CodeBrix.Platform.UI.Composition.dll",
 				[
-					// On CI the test assemblies set must be first, as it contains all dependent assemblies
+					// The unit-test flavor: one assembly per library (the Skia/Reference flavors no longer hold the whole API since the Core/Skia split)
 					"Platform.UI.Composition.Tests",
-					"Platform.UI.Composition.Skia",
-					"Platform.UI.Composition.Reference",
 				],
 				[TFMPrevious, TFMCurrent]
 			)),
@@ -60,10 +52,8 @@ internal static partial class CodeBrixAssemblyHelper
 				"Platform.UI.Toolkit",
 				"CodeBrix.Platform.UI.Toolkit.dll",
 				[
-					// On CI the test assemblies set must be first, as it contains all dependent assemblies
+					// The unit-test flavor: one assembly per library (the Skia/Reference flavors no longer hold the whole API since the Core/Skia split)
 					"Platform.UI.Toolkit.Tests",
-					"Platform.UI.Toolkit.Skia",
-					"Platform.UI.Toolkit.Reference",
 				],
 				[TFMPrevious, TFMCurrent]
 			)),

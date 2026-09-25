@@ -33,8 +33,6 @@ using static Microsoft.UI.Xaml.Controls._Tracing;
 namespace Microsoft.UI.Xaml.Controls.Primitives;
 
 [ContentProperty(Name = "Content")]
-#if !__SKIA__
-#endif
 public partial class ScrollPresenter : FrameworkElement, IScrollAnchorProvider, IScrollPresenter
 {
 	// Change to 'true' to turn on debugging outputs in Output window

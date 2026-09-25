@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<!-- Dev-only console tool: compares two folders of saved UIReqs frames (a baseline and a current
+	     run, both written with CODEBRIX_UIREQS_FRAME_SAVE) pixel by pixel. NOT packed into any NuGet.
+	     Usage (from the repo root):
+	         build/test-scripts/compare-uireqs-frames.sh <baseline-folder> <current-folder> [options]
+	     which runs this project with the default informational groups
+	     (build/test-scripts/uireqs-frame-compare.informational). -->
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<IsPackable>false</IsPackable>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+	</PropertyGroup>
+
+	<!-- The family's locked SkiaSharp version, read from the ONE place it is declared
+	     (src/Directory.Build.targets, $(SkiaSharpVersion)), so this tool can never drift from it. -->
+	<PropertyGroup>
+		<_FamilyBuildTargets>$(MSBuildThisFileDirectory)..\..\src\Directory.Build.targets</_FamilyBuildTargets>
+		<FamilySkiaSharpVersion>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(_FamilyBuildTargets)')), '&lt;SkiaSharpVersion&gt;([^&lt;]+)&lt;/SkiaSharpVersion&gt;').Groups[1].Value)</FamilySkiaSharpVersion>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="SkiaSharp" Version="$(FamilySkiaSharpVersion)" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="$(FamilySkiaSharpVersion)" />
+	</ItemGroup>
+
+	<Target Name="_CheckFamilySkiaSharpVersion" BeforeTargets="CollectPackageReferences;Restore;_GenerateRestoreProjectSpec">
+		<Error Condition="'$(FamilySkiaSharpVersion)'==''"
+			   Text="Could not read SkiaSharpVersion from $(_FamilyBuildTargets)." />
+	</Target>
+
+</Project>

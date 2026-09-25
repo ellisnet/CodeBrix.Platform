@@ -77,7 +77,7 @@ partial class TimePicker
 		TimePickerFlyout flyout;
 #if false
 		flyout = useNativeStyle ? new NativeTimePickerFlyout() : new TimePickerFlyout();
-#elif __SKIA__
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		if (useNativeStyle && ApiExtensibility.CreateInstance<ISkiaNativeTimePickerProviderExtension>(null, out var instance))
 		{
 			flyout = instance.CreateNativeTimePickerFlyout();

@@ -3,21 +3,23 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CodeBrix.Platform.UI;
-using Microsoft.UI.Xaml.Documents.TextFormatting;
+using CodeBrix.Platform.Foundation.Contracts;
+using CodeBrix.Platform.UI.PlotterView.Contracts;
 using SkiaSharp;
-using Windows.UI.Text;
 
 namespace CodeBrix.Platform.UI.PlotterView.Rendering;
 
 /// <summary>
 /// Resolves the font families a <see cref="CodeBrix.Plotter.PlotModel"/> names into typefaces
-/// from the application's OWN fonts, through the same machinery the rest of the framework's
-/// text uses (<see cref="FontDetailsCache"/>, reached via InternalsVisibleTo). Never the
+/// from the application's OWN fonts, through the same typeface cache the rest of the
+/// framework's text uses: the platform's font source
+/// (<see cref="IFontSourcePlatform{TTypeface}"/>, the Foundation.Core contract the shared text
+/// engine resolves its typefaces through; WPE1 C7 - no TextLayout dependency). Never the
 /// host's fonts: a family name that is not an application font URI - including the plot
 /// library's built-in "Segoe UI" default - resolves to the control's plot font instead, which
 /// itself defaults to the application's default font
-/// (<see cref="FeatureConfiguration.Font.DefaultTextFontFamily"/>).
+/// (<see cref="IFontSourcePlatform{TTypeface}.DefaultTextFontFamily"/>). Part of the chart
+/// engine (Engine/PlotHost): it names no XAML type.
 /// </summary>
 /// <remarks>
 /// Font loads are asynchronous. A family still loading resolves to the framework's interim
@@ -29,6 +31,13 @@ namespace CodeBrix.Platform.UI.PlotterView.Rendering;
 /// </remarks>
 internal sealed class AppFontTypefaceResolver
 {
+    //FontStretch.Normal and FontStyle.Normal (the values the text engine passes for them): the chart asks for upright,
+    //  normal-width faces only, as it always did.
+    private const int NormalStretch = 5;
+    private const int NormalStyle = 0;
+
+    private static IFontSourcePlatform<SKTypeface>? _source;
+
     private readonly Dictionary<(string Family, ushort Weight), SKTypeface> _resolved = new();
     private readonly HashSet<(string Family, ushort Weight)> _pendingLoads = new();
 
@@ -65,14 +74,11 @@ internal sealed class AppFontTypefaceResolver
             return cached;
         }
 
-        //The font size is nominal: FontDetailsCache memoizes per size, but only the typeface
-        //  is taken from the result, so a single fixed size keeps that cache small.
-        var (details, loadedTask) = FontDetailsCache.GetFont(
-            family, 12f, new FontWeight(weightValue), FontStretch.Normal, FontStyle.Normal);
+        //Resolved through the platform's font source; pendingLoad is null when the family is already loaded.
+        var typeface = GetTypeface(family, weightValue, out var pendingLoad);
 
-        if (loadedTask.IsCompleted)
+        if (pendingLoad is null)
         {
-            var typeface = loadedTask.Result.SKFont.Typeface;
             _resolved[key] = typeface;
             return typeface;
         }
@@ -82,12 +88,12 @@ internal sealed class AppFontTypefaceResolver
         //  the interim face until the control clears it in response to FontLoaded).
         if (_pendingLoads.Add(key))
         {
-            loadedTask.ContinueWith(
+            pendingLoad.ContinueWith(
                 _ => FontLoaded?.Invoke(),
                 TaskScheduler.Default);
         }
 
-        return details.SKFont.Typeface;
+        return typeface;
     }
 
     /// <summary>
@@ -100,6 +106,33 @@ internal sealed class AppFontTypefaceResolver
         _pendingLoads.Clear();
     }
 
+    /// <summary>The platform's font source, resolved once for the process (Contracts/PlatformContract.ResolveFontSource).</summary>
+    private static IFontSourcePlatform<SKTypeface> Source => _source ??= PlatformContract.ResolveFontSource();
+
+    //The text engine's typeface selection (FontDetailsCache.GetFont), minus the sized font the chart never used: the
+    //  font source's typeface for the family, or - while it is still loading, or when it cannot be found - the engine's
+    //  interim face (the loaded embedded default, else the default family, else the host default). pendingLoad is the
+    //  load to wait for, null when the family's own typeface (or its final fallback) is in hand.
+    private static SKTypeface GetTypeface(string fontFamily, ushort weight, out Task? pendingLoad)
+    {
+        var source = Source;
+        if (string.Equals(fontFamily, "XamlAutoFontFamily", StringComparison.OrdinalIgnoreCase))
+        {
+            fontFamily = source.DefaultTextFontFamily;
+        }
+
+        var typefaceTask = source.GetTypefaceAsync(fontFamily, weight, NormalStretch, NormalStyle);
+        var canChange = !typefaceTask.IsCompleted; //read once: it could complete in between
+        var typeface = !canChange ? typefaceTask.Result : null;
+        pendingLoad = canChange ? typefaceTask : null;
+
+        return typeface
+            ?? source.GetLoadedEmbeddedDefaultTypeface(weight, NormalStretch, NormalStyle)
+            ?? SKTypeface.FromFamilyName(source.DefaultTextFontFamily, (SKFontStyleWeight)weight, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright)
+            ?? SKTypeface.FromFamilyName(null, (SKFontStyleWeight)weight, SKFontStyleWidth.Normal, SKFontStyleSlant.Upright)
+            ?? SKTypeface.FromFamilyName(null);
+    }
+
     private string SelectFamily(string fontFamily)
     {
         //An application font URI passes through as-is; any bare family name (or nothing)
@@ -110,6 +143,6 @@ internal sealed class AppFontTypefaceResolver
             return fontFamily;
         }
 
-        return PlotFontFamily ?? FeatureConfiguration.Font.DefaultTextFontFamily;
+        return PlotFontFamily ?? Source.DefaultTextFontFamily;
     }
 }

@@ -5,13 +5,13 @@ using CodeBrix.Platform.Extensions;
 
 namespace Windows.Security.Credentials;
 
-[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 // This class is ** NOT ** sealed in order to allow projects for which the security limit described bellow is not
 // really a concern (for instance if they are only storing an OAuth token) to inherit and provide they own
 // implementation of 'IPersister'.
 partial class PasswordVault
 {
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public PasswordVault()
 	{
 #if true

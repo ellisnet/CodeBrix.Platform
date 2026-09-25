@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Capture
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public delegate void MediaCaptureFailedEventHandler(global::Windows.Media.Capture.MediaCapture sender, global::Windows.Media.Capture.MediaCaptureFailedEventArgs errorEventArgs);
 #endif
 }

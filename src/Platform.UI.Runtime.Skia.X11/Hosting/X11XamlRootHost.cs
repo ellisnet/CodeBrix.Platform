@@ -706,7 +706,7 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		{
 			if (_renderer is not null)
 			{
-				_renderer.SetBackgroundColor(brush.Color);
+				_renderer.SetBackgroundColor(Microsoft.UI.Composition.SkiaExtensions.ToSKColor(brush.Color));
 			}
 		}
 		else if (_window.Background is not null)

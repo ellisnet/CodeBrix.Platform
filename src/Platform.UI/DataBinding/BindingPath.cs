@@ -150,7 +150,11 @@ namespace CodeBrix.Platform.UI.DataBinding //Was previously: Uno.UI.DataBinding
 		{
 			foreach (BindingItem item in GetPathItems())
 			{
-				if (item.PropertyType == typeof(Brush) || item.PropertyType == typeof(GeneralTransform))
+				// The value decides, not the declared property type: a path the XAML generator writes namespace-qualified
+				// ("(Microsoft.UI.Xaml.Shapes:Shape.Fill)", as every template storyboard has it) has no resolvable
+				// PropertyType, and animating it through the shared brush changed a theme resource for every element using
+				// it (a paused ProgressBar left AccentFillColorDefaultBrush in its caution colour).
+				if (item.PropertyType == typeof(Brush) || item.PropertyType == typeof(GeneralTransform) || item.Value is Brush or GeneralTransform)
 				{
 					if (item.Value is IShareableDependencyObject shareable && !shareable.IsClone && item.DataContext is DependencyObject owner)
 					{
@@ -159,6 +163,56 @@ namespace CodeBrix.Platform.UI.DataBinding //Was previously: Uno.UI.DataBinding
 						item.Value = clone;
 						break;
 					}
+				}
+			}
+		}
+
+		private BindingItem? _setterClonedItem;
+
+		/// <summary>
+		/// The VisualState Setter form of <see cref="CloneShareableObjectsInPath"/>: when the path runs THROUGH a brush or
+		/// transform to a property of it ("X.(Shape.Fill).(SolidColorBrush.Color)"), the element gets its own copy of that
+		/// object (at Animations precedence) before the setter writes the leaf, so the setter never writes a shared theme
+		/// resource (the ProgressBar's UpdatingError state wrote AccentFillColorDefaultBrush). The last segment is never
+		/// cloned (a setter that replaces the whole brush needs no copy). <see cref="RestoreShareableObjectsInPath"/> removes
+		/// the copy again when the setter is cleared, so the element goes back to the shared object (and its theme updates).
+		/// </summary>
+		internal void CloneShareableObjectsInPathForSetter()
+		{
+			if (_setterClonedItem is not null)
+			{
+				return;
+			}
+
+			BindingItem? previous = null;
+			foreach (BindingItem item in GetPathItems())
+			{
+				if (previous is not null
+					&& (previous.PropertyType == typeof(Brush) || previous.PropertyType == typeof(GeneralTransform) || previous.Value is Brush or GeneralTransform)
+					&& previous.Value is IShareableDependencyObject { IsClone: false } shareable
+					&& previous.DataContext is DependencyObject)
+				{
+					previous.Value = shareable.Clone();
+					_setterClonedItem = previous;
+					return;
+				}
+
+				previous = item;
+			}
+		}
+
+		/// <summary>
+		/// Undoes <see cref="CloneShareableObjectsInPathForSetter"/>: clears the copy the element was given, so the property
+		/// shows the shared object again. Does nothing when no copy was made.
+		/// </summary>
+		internal void RestoreShareableObjectsInPath()
+		{
+			if (_setterClonedItem is { } item)
+			{
+				_setterClonedItem = null;
+				if (!_disposed)
+				{
+					item.ClearValue();
 				}
 			}
 		}

@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -70,11 +71,16 @@ public class SimpleServiceResolver : ISimpleServiceResolver
                     services.AddSingleton<ISimpleServiceResolver>((svc) => this);
                 }
 
-                services.AutoRegisterServices([Assembly.GetExecutingAssembly()]);
+                AutoRegisterServicesOfThisAssembly(services);
                 services.AddSimpleMessaging();
             })
             .Build();
     }
+
+    [UnconditionalSuppressMessage("Trimming", "IL2026",
+        Justification = "Scans the assembly these sources are compiled into. The toolkit libraries (CodeBrix.Platform.UI.Toolkit.Core and the WinUI/WPF/Mobile toolkits) declare no IAutoRegisterServices implementation, so trimming cannot remove one the scan would find; an application that compiles these sources into its own assembly and implements IAutoRegisterServices there keeps those types itself.")]
+    private static void AutoRegisterServicesOfThisAssembly(IServiceCollection services) =>
+        services.AutoRegisterServices([Assembly.GetExecutingAssembly()]);
 
     private SimpleServiceResolver(IHost host)
     {
@@ -117,6 +123,9 @@ public static class SimpleServiceExtensions
     public static bool IsRegistered<TService>(this IServiceCollection services) =>
         IsRegistered(services, typeof(TService));
 
+    // Trimming: scans the given assemblies for IAutoRegisterServices types and creates them by reflection, so a trimmed
+    // application must keep those types itself (or register its services explicitly).
+    [RequiresUnreferencedCode("AutoRegisterServices finds IAutoRegisterServices implementations with Assembly.GetTypes and creates them with Activator.CreateInstance; trimming may remove them. Register the services explicitly in a trimmed application.")]
     public static IServiceCollection AutoRegisterServices(this IServiceCollection services, IList<Assembly> fromAssemblies)
     {
         if (services != null && fromAssemblies != null)
@@ -148,6 +157,7 @@ public static class SimpleServiceExtensions
         return services;
     }
 
+    [RequiresUnreferencedCode("AutoRegisterServices finds IAutoRegisterServices implementations with Assembly.GetTypes and creates them with Activator.CreateInstance; trimming may remove them. Register the services explicitly in a trimmed application.")]
     public static IServiceCollection AutoRegisterServices(this IServiceCollection services, IList<Type> fromAssembliesContainingTypes) =>
         AutoRegisterServices(services, fromAssembliesContainingTypes?.Select(s => s.Assembly).ToList());
 

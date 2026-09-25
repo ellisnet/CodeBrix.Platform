@@ -401,13 +401,22 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			public static bool PreventLightDismissOnWindowDeactivated { get; set; }
 
+			private static bool? _constrainByVisibleBounds;
+
 			/// <summary>
 			/// By default, popups are constrained by the visible bounds on native renderer, but unconstrained on Skia renderer.
 			/// </summary>
-			public static bool ConstrainByVisibleBounds { get; set; }
-#if !__SKIA__
-				= true;
-#endif
+			public static bool ConstrainByVisibleBounds
+			{
+				get => _constrainByVisibleBounds ?? ConstrainByVisibleBoundsPlatformDefault;
+				set => _constrainByVisibleBounds = value;
+			}
+
+			/// <summary>
+			/// The value of <see cref="ConstrainByVisibleBounds"/> until the application sets it: <see langword="true"/>
+			/// (native renderers) unless the platform bootstrap overrides it (the Skia renderer sets <see langword="false"/>).
+			/// </summary>
+			internal static bool ConstrainByVisibleBoundsPlatformDefault { get; set; } = true;
 		}
 
 		public static class ProgressRing
@@ -474,14 +483,23 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 
 		public static class Frame
 		{
+			private static bool? _useWinUIBehavior;
+
 			/// <summary>
 			/// On non-Skia targets, Frame pools page instances to improve performance by default.
 			/// To follow the WinUI behavior, set this to true. Skia uses WinUI behavior by default.
 			/// </summary>
-			public static bool UseWinUIBehavior { get; set; }
-#if __SKIA__
-				= true;
-#endif
+			public static bool UseWinUIBehavior
+			{
+				get => _useWinUIBehavior ?? UseWinUIBehaviorPlatformDefault;
+				set => _useWinUIBehavior = value;
+			}
+
+			/// <summary>
+			/// The value of <see cref="UseWinUIBehavior"/> until the application sets it: <see langword="false"/> unless the
+			/// platform bootstrap overrides it (the Skia renderer sets <see langword="true"/>).
+			/// </summary>
+			internal static bool UseWinUIBehaviorPlatformDefault { get; set; }
 		}
 
 		public static class PointerRoutedEventArgs
@@ -671,10 +689,19 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 
 		public static class ToolTip
 		{
-			public static bool UseToolTips { get; set; }
-#if __SKIA__
-				= true;
-#endif
+			private static bool? _useToolTips;
+
+			public static bool UseToolTips
+			{
+				get => _useToolTips ?? UseToolTipsPlatformDefault;
+				set => _useToolTips = value;
+			}
+
+			/// <summary>
+			/// The value of <see cref="UseToolTips"/> until the application sets it: <see langword="false"/> unless the
+			/// platform bootstrap overrides it (the Skia renderer sets <see langword="true"/>).
+			/// </summary>
+			internal static bool UseToolTipsPlatformDefault { get; set; }
 
 			public static int ShowDelay { get; set; } = 1000;
 
@@ -999,7 +1026,7 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			public static bool EnableVisualSubtreeSkippingOptimization
 			{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				get => Visual.EnablePictureCollapsingOptimization;
 				set => Visual.EnablePictureCollapsingOptimization = value;
 #else
@@ -1015,7 +1042,7 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			public static int VisualSubtreeSkippingOptimizationCleanFramesThreshold
 			{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				get => Visual.PictureCollapsingOptimizationFrameThreshold;
 				set => Visual.PictureCollapsingOptimizationFrameThreshold = value;
 #else
@@ -1030,7 +1057,7 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			public static int VisualSubtreeSkippingOptimizationVisualCountThreshold
 			{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				get => Visual.PictureCollapsingOptimizationVisualCountThreshold;
 				set => Visual.PictureCollapsingOptimizationVisualCountThreshold = value;
 #else

@@ -175,7 +175,7 @@ internal partial class OpenGLWpfRenderer : IWpfRenderer
 		WindowsRenderingNativeMethods.wglMakeCurrent(_hdc, _glContext);
 #pragma warning restore CA1806 // Do not ignore method results
 
-		var nativeElementClipPath = ((Microsoft.UI.Xaml.Media.CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(_surface?.Canvas, size =>
+		var nativeElementClipPath = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((Microsoft.UI.Xaml.Media.CompositionTarget)_host.RootElement!.Visual.CompositionTarget!, _surface?.Canvas, size =>
 		{
 			// create or update the dimensions
 			_renderTarget?.Dispose();

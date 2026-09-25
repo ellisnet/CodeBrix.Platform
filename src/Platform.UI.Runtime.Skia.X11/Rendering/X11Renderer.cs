@@ -48,7 +48,7 @@ internal abstract class X11Renderer : IDisposable
 		MakeCurrent();
 
 		_surface?.Canvas.Clear(_background);
-		var nativeElementClipPath = ((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!).OnNativePlatformFrameRequested(_surface?.Canvas, size =>
+		var nativeElementClipPath = global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested((CompositionTarget)_host.RootElement!.Visual.CompositionTarget!, _surface?.Canvas, size =>
 		{
 			_surface?.Dispose();
 			_surface = UpdateSize((int)size.Width, (int)size.Height);

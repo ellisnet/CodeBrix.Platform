@@ -3,14 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IDynamicAnimatedVisualSource : global::Microsoft.UI.Xaml.Controls.IAnimatedVisualSource
 	{
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.IDynamicAnimatedVisualSource.AnimatedVisualInvalidated.add
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.IDynamicAnimatedVisualSource.AnimatedVisualInvalidated.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Microsoft.UI.Xaml.Controls.IDynamicAnimatedVisualSource, object> AnimatedVisualInvalidated;
 #endif
 	}

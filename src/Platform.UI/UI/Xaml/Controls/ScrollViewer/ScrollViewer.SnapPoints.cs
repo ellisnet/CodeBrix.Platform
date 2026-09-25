@@ -49,7 +49,7 @@ namespace Microsoft.UI.Xaml.Controls
 				verticalOffset = vOffset;
 			}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			(horizontalOffset, verticalOffset) = ClampOffsetsToFocusedTextBox(horizontalOffset, verticalOffset);
 #endif
 		}
@@ -64,7 +64,7 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 
 		internal partial bool ShouldSnapToTouchTextBox();
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		internal partial bool ShouldSnapToTouchTextBox() => false;
 #endif
 

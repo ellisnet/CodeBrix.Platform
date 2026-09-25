@@ -54,16 +54,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" />
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\Platform.UWP\Platform.Reference.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Core.csproj" />
 		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Skia.csproj" />
 		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" />
-		<ProjectReference Include="..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Crossruntime.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics2DSK\Platform.WinUI.Graphics2DSK.Core.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup>

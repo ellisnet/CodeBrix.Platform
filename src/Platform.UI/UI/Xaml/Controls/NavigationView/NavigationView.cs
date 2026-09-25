@@ -2041,6 +2041,46 @@ public partial class NavigationView : ContentControl
 		templateSettings.SmallerPaneToggleButtonWidth = Math.Max(0.0, newButtonWidths - 8);
 	}
 
+	/// <summary>
+	/// Raise entry point for a platform handler: the native back button was clicked. Raises BackRequested.
+	/// </summary>
+	internal void RaiseBackRequestedFromPlatform() => OnBackButtonClicked(this, new RoutedEventArgs(this));
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the user invoked <paramref name="item"/> in the native navigation UI
+	/// (a menu item, a MenuItemsSource item, or the settings item). Raises ItemInvoked, as the template's items do.
+	/// </summary>
+	/// <param name="item">The invoked item (its data item, or the NavigationViewItem).</param>
+	/// <param name="isSettings">Whether the settings item was invoked.</param>
+	internal void RaiseItemInvokedFromPlatform(object item, bool isSettings) => RaiseItemInvoked(item, isSettings);
+
+	/// <summary>
+	/// Raise entry point for a platform handler (the template's SplitView, which raises the pane events, is suppressed):
+	/// the native pane starts opening. Raises PaneOpening.
+	/// </summary>
+	internal void RaisePaneOpeningFromPlatform() => OnSplitViewPaneOpening(this, null);
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native pane finished opening. Raises PaneOpened.
+	/// </summary>
+	internal void RaisePaneOpenedFromPlatform() => OnSplitViewPaneOpened(this, null);
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native pane is about to close. Raises PaneClosing.
+	/// </summary>
+	/// <returns><see langword="true"/> when an application handler cancelled the close (the native pane must stay open).</returns>
+	internal bool RaisePaneClosingFromPlatform()
+	{
+		var eventArgs = new NavigationViewPaneClosingEventArgs();
+		PaneClosing?.Invoke(this, eventArgs);
+		return eventArgs.Cancel;
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native pane finished closing. Raises PaneClosed.
+	/// </summary>
+	internal void RaisePaneClosedFromPlatform() => OnSplitViewPaneClosed(this, null);
+
 	private void OnBackButtonClicked(object sender, RoutedEventArgs args)
 	{
 		var eventArgs = new NavigationViewBackRequestedEventArgs();

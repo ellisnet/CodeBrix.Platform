@@ -1221,6 +1221,13 @@ namespace Microsoft.UI.Xaml
 			// Pass updated params to children.
 			DependencyObject_EnterImpl(@params);
 
+			// Element handler seam, hook H1: the element is live now and its children have not entered yet, so a parent's
+			// handler connects before its children's. Elements entering as resources (depth int.MinValue) get no handler.
+			if (AreHandlersActive && @params.IsLive && depth != int.MinValue)
+			{
+				ConnectElementHandler();
+			}
+
 			//// Extends EnterImpl to the ContextFlyout
 			//FlyoutBase pFlyoutBase = this.ContextFlyout;
 			//if (pFlyoutBase is not null)
@@ -1890,6 +1897,12 @@ namespace Microsoft.UI.Xaml
 			foreach (var child in _children)
 			{
 				child.Leave(@params);
+			}
+
+			// Element handler seam, hook H2: the children left (and disconnected) first.
+			if (AreHandlersActive && @params.IsLive)
+			{
+				DisconnectElementHandler();
 			}
 
 			// If this object has a managed peer, it needs to process Leave as well.

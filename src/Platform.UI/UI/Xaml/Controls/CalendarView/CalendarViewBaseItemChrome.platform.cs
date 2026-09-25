@@ -46,7 +46,7 @@ namespace Microsoft.UI.Xaml.Controls
 			UpdateChromeIfNeeded(finalBounds);
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		/// <inheritdoc />
 		internal override void OnArrangeVisual(Rect rect, Rect? clip)
 		{

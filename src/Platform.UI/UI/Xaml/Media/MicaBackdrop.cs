@@ -5,7 +5,7 @@ namespace Microsoft.UI.Xaml.Media;
 
 public partial class MicaBackdrop : SystemBackdrop
 {
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public MicaBackdrop()
 	{
 	}

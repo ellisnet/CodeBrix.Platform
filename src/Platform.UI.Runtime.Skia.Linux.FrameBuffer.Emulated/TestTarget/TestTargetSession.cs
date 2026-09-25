@@ -498,7 +498,19 @@ public sealed class TestTargetSession
 			var queue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
 			if (queue is null
 				|| !queue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low,
-					() => drained.TrySetResult()))
+					() =>
+					{
+						// A frame recorded AHEAD OF TIME (CoreServices' tick) followed by a change is recorded by the
+						// compositor only after ONE MORE native frame, so the pass after this drain could draw the
+						// picture from before the change - a capture racing a paint (the stale frames of the
+						// WPH1/WPG1/WPE1-5 flakes). Record whatever is pending now, so the next pass draws the current tree.
+						if (((CodeBrix.Platform.UI.Hosting.IXamlRootHost?)_host)?.RootElement?.Visual.CompositionTarget is Microsoft.UI.Xaml.Media.CompositionTarget target)
+						{
+							target.RenderPendingFrameNow();
+						}
+
+						drained.TrySetResult();
+					}))
 			{
 				drained.TrySetResult();
 			}

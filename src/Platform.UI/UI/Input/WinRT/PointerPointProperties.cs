@@ -234,11 +234,11 @@ namespace Windows.UI.Input
 		public PointerUpdateKind PointerUpdateKind { get; internal set; }
 
 		// Supported only on MacOS
-		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public float XTilt { get; internal set; }
 
 		// Supported only on MacOS
-		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+		[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public float YTilt { get; internal set; }
 
 		public int MouseWheelDelta { get; internal set; }

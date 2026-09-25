@@ -16,6 +16,12 @@ namespace Microsoft.UI.Xaml.Controls
 		{
 			get
 			{
+				if (ItemsHostHandler is { } host)
+				{
+					// Hook H14: the platform list knows what it shows (OwnsItemsHost).
+					return host.LastVisibleIndex == -1 ? 0 : host.LastVisibleIndex - host.FirstVisibleIndex + 1;
+				}
+
 				if (VirtualizingPanel is null)
 				{
 					return 0;
@@ -35,6 +41,12 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private void AddItems(int firstItem, int count, int section)
 		{
+			if (ItemsHostHandler is not null)
+			{
+				// Hook H14: the items host is told through ItemsControl.UpdateItems (OwnsItemsHost).
+				return;
+			}
+
 			if (VirtualizingPanel != null)
 			{
 				VirtualizingPanel.GetLayouter().AddItems(firstItem, count, section);
@@ -47,6 +59,12 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private void RemoveItems(int firstItem, int count, int section)
 		{
+			if (ItemsHostHandler is not null)
+			{
+				// Hook H14: the items host is told through ItemsControl.UpdateItems (OwnsItemsHost).
+				return;
+			}
+
 			if (VirtualizingPanel != null)
 			{
 				VirtualizingPanel.GetLayouter().RemoveItems(firstItem, count, section);
@@ -76,6 +94,13 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private void TryLoadMoreItems()
 		{
+			if (ItemsHostHandler is { } host)
+			{
+				// Hook H14 (OwnsItemsHost); a host that scrolls calls the internal TryLoadMoreItems(int) itself.
+				TryLoadMoreItems(host.LastVisibleIndex);
+				return;
+			}
+
 			if (VirtualizingPanel.GetLayouter() is { } layouter)
 			{
 				TryLoadMoreItems(layouter.LastVisibleIndex);
@@ -86,6 +111,15 @@ namespace Microsoft.UI.Xaml.Controls
 
 		public void ScrollIntoView(object item, ScrollIntoViewAlignment alignment)
 		{
+			if (ItemsHostHandler is not null && Handler is { } handler)
+			{
+				// Hook H15: the platform list scrolls (OwnsItemsHost); Core's ScrollViewer does not.
+				handler.Invoke(
+					CodeBrix.Platform.UI.Contracts.ElementHandlerCommands.ScrollIntoView,
+					new CodeBrix.Platform.UI.Contracts.ScrollIntoViewRequest(item, IndexFromItem(item), alignment));
+				return;
+			}
+
 			if (ContainerFromItem(item) is UIElement element)
 			{
 				// The container we want to jump to is already materialized, so just jump to it.
@@ -103,7 +137,7 @@ namespace Microsoft.UI.Xaml.Controls
 			if (ScrollViewer is { } sv && sv.Presenter is { } presenter)
 			{
 				var offsetXY = element.TransformToVisual(presenter).TransformPoint(
-#if __SKIA__ // Skia correctly doesn't include the offsets in TransformToVisual
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ // Skia correctly doesn't include the offsets in TransformToVisual
 					new Point(presenter.HorizontalOffset, presenter.VerticalOffset)
 #else
 					Point.Zero

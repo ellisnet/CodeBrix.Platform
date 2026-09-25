@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage.Streams
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class DataWriter : global::Windows.Storage.Streams.IDataWriter, global::System.IDisposable
@@ -41,8 +41,8 @@ namespace Windows.Storage.Streams
 		// Skipping already declared method Windows.Storage.Streams.DataWriter.StoreAsync()
 		// Skipping already declared method Windows.Storage.Streams.DataWriter.FlushAsync()
 		// Skipping already declared method Windows.Storage.Streams.DataWriter.DetachBuffer()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Storage.Streams.IOutputStream DetachStream()
 		{
 			throw new global::System.NotImplementedException("The member IOutputStream DataWriter.DetachStream() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

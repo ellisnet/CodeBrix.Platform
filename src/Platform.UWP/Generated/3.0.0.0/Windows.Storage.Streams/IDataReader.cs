@@ -3,13 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage.Streams
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface IDataReader
 	{
 		// Skipping already declared property ByteOrder
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.Storage.Streams.InputStreamOptions InputStreamOptions
 		{
 			get;
@@ -41,11 +41,11 @@ namespace Windows.Storage.Streams
 		// Skipping already declared method Windows.Storage.Streams.IDataReader.ReadString(uint)
 		// Skipping already declared method Windows.Storage.Streams.IDataReader.ReadDateTime()
 		// Skipping already declared method Windows.Storage.Streams.IDataReader.ReadTimeSpan()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.Storage.Streams.DataReaderLoadOperation LoadAsync(uint count);
 #endif
 		// Skipping already declared method Windows.Storage.Streams.IDataReader.DetachBuffer()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		global::Windows.Storage.Streams.IInputStream DetachStream();
 #endif
 	}

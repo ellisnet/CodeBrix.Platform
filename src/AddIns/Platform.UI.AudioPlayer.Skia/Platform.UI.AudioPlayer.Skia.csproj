@@ -1,4 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.AudioPlayer.Skia: since the Core/Skia split, the CodeBrix.Platform implementation of the
+	add-in's audio output contracts (the *.skia.cs files, over CodeBrix.Audio: device playback, sound-effect voices,
+	the Opus failure explanation), MidiPlayer (its public API names CodeBrix.Audio types - MpeMode, MpeZoneInfo,
+	DecentSamplerControl, MidiMessageObserver... - so it lives with the CodeBrix.Audio dependency), and the package.
+	The AudioPlayer element's control API and playback state, SoundEffect and the source resolver are in
+	CodeBrix.Platform.UI.AudioPlayer.Core (Platform.UI.AudioPlayer.Core.csproj), which this package carries beside
+	this assembly.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -20,6 +29,9 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.UI.AudioPlayer.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -27,17 +39,26 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<!-- The audio engine: CodeBrix.Audio (WAV/MP3/Ogg Vorbis/FLAC reading, and the SoundFont, SFZ and
 		     Decent Sampler synthesizers behind MidiPlayer) + CodeBrix.Audio.Engine (device playback via the
 		     bundled codebrix_miniaudio native backend) ship in this one package. -->
-		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.250.60" />
+		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.264.1197" />
+
+		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
+		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->
+		<ProjectReference Include="Platform.UI.AudioPlayer.Core.csproj" CodeBrixBundleInPackage="true" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the
 		     same family version as this build (the whole family ships together). Extensions.Logging is
 		     PrivateAssets="all" because it has no standalone nuget - its assembly ships inside the main
 		     framework package. -->
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
-		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -49,10 +70,12 @@
 
 	<PropertyGroup>
 		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
-		     output and `dotnet pack` puts it in the package's lib folder by itself, so nothing in
-		     the packaging recipe needs to know about it. CS1591 (a public member with no XML
+		     output and `dotnet pack` puts it in the package's lib folder by itself (the Core
+		     assembly's beside it, through ../AddIn.CorePackaging.targets), so nothing in the
+		     packaging recipe needs to know about it. CS1591 (a public member with no XML
 		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
+	<Import Project="..\AddIn.CorePackaging.targets" />
 </Project>

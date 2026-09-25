@@ -165,7 +165,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 		{
 			if (s_IsXamlCompositionBrushBaseAvailable_isAvailable == null)
 			{
-				s_IsXamlCompositionBrushBaseAvailable_isAvailable = IsRS3OrHigher() || ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.XamlCompositionBrushBase, CodeBrix.Platform.UI");
+				s_IsXamlCompositionBrushBaseAvailable_isAvailable = IsRS3OrHigher() || ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.XamlCompositionBrushBase, CodeBrix.Platform.UI.Core");
 			}
 
 			// On RS3 we know XamlCompositionBrushBase was always present, so short circuit the check there.
@@ -218,7 +218,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_isFlyoutShowOptionsAvailable =
 					IsSystemDll() ||
 					Is19H1OrHigher() ||
-					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Primitives.FlyoutShowOptions, CodeBrix.Platform.UI");
+					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Primitives.FlyoutShowOptions, CodeBrix.Platform.UI.Core");
 			}
 			return s_isFlyoutShowOptionsAvailable.Value;
 		}
@@ -233,7 +233,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_areInteractionTrackerPointerWheelRedirectionModesAvailable =
 					IsSystemDll() ||
 					IsRS5OrHigher() ||
-					(IsRS4OrHigher() && ApiInformation.IsEnumNamedValuePresent("Microsoft.UI.Composition.Interactions.VisualInteractionSourceRedirectionMode, CodeBrix.Platform.UI.Composition", "PointerWheelOnly"));
+					(IsRS4OrHigher() && ApiInformation.IsEnumNamedValuePresent("Microsoft.UI.Composition.Interactions.VisualInteractionSourceRedirectionMode, CodeBrix.Platform.UI.Composition.Core", "PointerWheelOnly"));
 			}
 
 			return s_areInteractionTrackerPointerWheelRedirectionModesAvailable.Value;
@@ -247,7 +247,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_isScrollViewerReduceViewportForCoreInputViewOcclusionsAvailable =
 					IsSystemDll() ||
 					Is19H1OrHigher() ||
-					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ScrollViewer, CodeBrix.Platform.UI", "ReduceViewportForCoreInputViewOcclusions");
+					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ScrollViewer, CodeBrix.Platform.UI.Core", "ReduceViewportForCoreInputViewOcclusions");
 			}
 			return s_isScrollViewerReduceViewportForCoreInputViewOcclusionsAvailable.Value;
 		}
@@ -260,7 +260,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_isScrollContentPresenterSizesContentToTemplatedParentAvailable =
 					IsSystemDll() ||
 					Is19H1OrHigher() ||
-					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ScrollContentPresenter, CodeBrix.Platform.UI", "SizesContentToTemplatedParent");
+					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ScrollContentPresenter, CodeBrix.Platform.UI.Core", "SizesContentToTemplatedParent");
 			}
 			return s_isScrollContentPresenterSizesContentToTemplatedParentAvailable.Value;
 		}
@@ -272,7 +272,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 			{
 				s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable =
 					IsRS4OrHigher() ||
-					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.BringIntoViewOptions, CodeBrix.Platform.UI", "VerticalAlignmentRatio");
+					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.BringIntoViewOptions, CodeBrix.Platform.UI.Core", "VerticalAlignmentRatio");
 			}
 			return s_isBringIntoViewOptionsVerticalAlignmentRatioAvailable.Value;
 		}
@@ -295,7 +295,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 			{
 				s_isDisplayRegionGetForCurrentViewAvailable =
 					Is19H1OrHigher() ||
-					ApiInformation.IsMethodPresent("Windows.ApplicationModel.Core.DisplayRegion, CodeBrix.Platform", "GetForCurrentView");
+					ApiInformation.IsMethodPresent("Windows.ApplicationModel.Core.DisplayRegion, CodeBrix.Platform.Core", "GetForCurrentView");
 			}
 			return s_isDisplayRegionGetForCurrentViewAvailable.Value;
 		}
@@ -316,7 +316,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_IsIconSourceElementAvailable_isAvailable =
 					IsSystemDll() ||
 					Is19H1OrHigher() ||
-					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Controls.IconSourceElement, CodeBrix.Platform.UI");
+					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Controls.IconSourceElement, CodeBrix.Platform.UI.Core");
 			}
 			return s_IsIconSourceElementAvailable_isAvailable.Value;
 		}
@@ -329,8 +329,8 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_IsStandardUICommandAvailable_isAvailable =
 					IsSystemDll() ||
 					Is19H1OrHigher() ||
-					(ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Input.XamlUICommand, CodeBrix.Platform.UI") &&
-						ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Input.StandardUICommand, CodeBrix.Platform.UI"));
+					(ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Input.XamlUICommand, CodeBrix.Platform.UI.Core") &&
+						ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Input.StandardUICommand, CodeBrix.Platform.UI.Core"));
 			}
 			return s_IsStandardUICommandAvailable_isAvailable.Value;
 		}
@@ -343,7 +343,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_IsXamlRootAvailable =
 				   IsSystemDll() ||
 				   IsVanadiumOrHigher() ||
-				   ApiInformation.IsTypePresent("Microsoft.UI.Xaml.XamlRoot, CodeBrix.Platform.UI");
+				   ApiInformation.IsTypePresent("Microsoft.UI.Xaml.XamlRoot, CodeBrix.Platform.UI.Core");
 
 			}
 			return s_IsXamlRootAvailable.Value;
@@ -358,7 +358,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_isThemeShadowAvailable =
 					(IsSystemDll() ||
 					IsVanadiumOrHigher()) &&
-					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.ThemeShadow, CodeBrix.Platform.UI");
+					ApiInformation.IsTypePresent("Microsoft.UI.Xaml.Media.ThemeShadow, CodeBrix.Platform.UI.Core");
 			}
 			return s_isThemeShadowAvailable.Value;
 		}
@@ -371,7 +371,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 				s_IsIsLoadedAvailable =
 					IsSystemDll() ||
 					IsRS5OrHigher() ||
-					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.FrameworkElement, CodeBrix.Platform.UI", "IsLoaded");
+					ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.FrameworkElement, CodeBrix.Platform.UI.Core", "IsLoaded");
 			}
 			return s_IsIsLoadedAvailable.Value;
 		}
@@ -723,7 +723,7 @@ namespace CodeBrix.Platform.UI.Helpers.WinUI //Was previously: Uno.UI.Helpers.Wi
 					bitmapIcon.Foreground = bitmapIconSource.Foreground;
 				}
 
-				if (IsSystemDll() || ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.BitmapIcon, CodeBrix.Platform.UI", "ShowAsMonochrome"))
+				if (IsSystemDll() || ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.BitmapIcon, CodeBrix.Platform.UI.Core", "ShowAsMonochrome"))
 				{
 					bitmapIcon.ShowAsMonochrome = bitmapIconSource.ShowAsMonochrome;
 				}

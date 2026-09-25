@@ -3,12 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Core
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface ISingleSelectMediaTrackList
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		int SelectedIndex
 		{
 			get;
@@ -19,7 +19,7 @@ namespace Windows.Media.Core
 		// Forced skipping of method Windows.Media.Core.ISingleSelectMediaTrackList.SelectedIndexChanged.remove
 		// Forced skipping of method Windows.Media.Core.ISingleSelectMediaTrackList.SelectedIndex.set
 		// Forced skipping of method Windows.Media.Core.ISingleSelectMediaTrackList.SelectedIndex.get
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Core.ISingleSelectMediaTrackList, object> SelectedIndexChanged;
 #endif
 	}

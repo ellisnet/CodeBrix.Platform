@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Automation.Peers
 {
-#if false || false || false || false || false || false || false
+#if false || false || false || false || false || false || false || false
 	public enum AutomationControlType
 	{
 		// Skipping already declared field Microsoft.UI.Xaml.Automation.Peers.AutomationControlType.Button
@@ -47,7 +47,7 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 		// Skipping already declared field Microsoft.UI.Xaml.Automation.Peers.AutomationControlType.Separator
 		// Skipping already declared field Microsoft.UI.Xaml.Automation.Peers.AutomationControlType.SemanticZoom
 		// Skipping already declared field Microsoft.UI.Xaml.Automation.Peers.AutomationControlType.AppBar
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		FlipView = 41,
 #endif
 	}

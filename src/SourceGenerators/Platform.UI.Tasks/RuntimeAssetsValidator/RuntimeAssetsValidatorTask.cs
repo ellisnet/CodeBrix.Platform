@@ -29,7 +29,9 @@ public class RuntimeAssetsValidatorTask_v0 : Microsoft.Build.Utilities.Task
 
 		try
 		{
-			if (CodeBrixRuntimeIdentifier == "reference")
+			// "core" (the platform-neutral Core flavor) is validated like "reference": it is a library
+			// build that references the framework by project/reference assembly, not by runtime assets.
+			if (CodeBrixRuntimeIdentifier is "reference" or "core")
 			{
 				return true;
 			}
@@ -38,7 +40,7 @@ public class RuntimeAssetsValidatorTask_v0 : Microsoft.Build.Utilities.Task
 			{
 				var originalAssembly = AssemblyDefinition.ReadAssembly(assembly.GetMetadata("FullPath"));
 
-				if (!originalAssembly.MainModule.AssemblyReferences.Any(m => m.Name == "CodeBrix.Platform.UI"))
+				if (!originalAssembly.MainModule.AssemblyReferences.Any(m => m.Name is "CodeBrix.Platform.UI" or "CodeBrix.Platform.UI.Core"))
 				{
 					// We only need to validate assemblies that reference Uno.UI, because this is the only layer
 					// that is replaced for the Skia UI layer

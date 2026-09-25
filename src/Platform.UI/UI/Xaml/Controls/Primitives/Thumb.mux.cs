@@ -395,6 +395,50 @@ public sealed partial class Thumb
 		}
 	}
 
+	/// <summary>
+	/// Raise entry point for a platform handler: a native drag of the thumb started. The thumb becomes IsDragging and
+	/// raises DragStarted with a zero origin (the deltas that follow are relative).
+	/// </summary>
+	internal void RaiseDragStartedFromPlatform()
+	{
+		m_origin = m_previousPosition = default;
+		IsDragging = true;
+		RaiseDragStarted();
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native drag moved by (<paramref name="horizontalChange"/>,
+	/// <paramref name="verticalChange"/>) since the previous delta. Ignored when no drag is in progress.
+	/// </summary>
+	/// <param name="horizontalChange">The horizontal change, in DIPs.</param>
+	/// <param name="verticalChange">The vertical change, in DIPs.</param>
+	internal void RaiseDragDeltaFromPlatform(double horizontalChange, double verticalChange)
+	{
+		if (!IsDragging)
+		{
+			return;
+		}
+
+		RaiseDragDelta(horizontalChange, verticalChange);
+		m_previousPosition = new Point(m_previousPosition.X + horizontalChange, m_previousPosition.Y + verticalChange);
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler: the native drag ended. The thumb stops IsDragging and raises
+	/// DragCompleted with the total change. Ignored when no drag is in progress.
+	/// </summary>
+	/// <param name="isCanceled">Whether the drag was cancelled.</param>
+	internal void RaiseDragCompletedFromPlatform(bool isCanceled)
+	{
+		if (!IsDragging)
+		{
+			return;
+		}
+
+		IsDragging = false;
+		RaiseDragCompleted(isCanceled);
+	}
+
 	private void RaiseDragStarted()
 	{
 		// Create the args

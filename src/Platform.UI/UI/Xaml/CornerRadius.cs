@@ -49,7 +49,7 @@ public partial struct CornerRadius : IEquatable<CornerRadius>
 		BottomRight = bottomRight;
 	}
 
-#if __SKIA__ && !IS_CODEBRIX_COMPOSITION
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__ && !IS_CODEBRIX_COMPOSITION
 	internal CodeBrix.Platform.UI.Composition.CornerRadius ToCodeBrixCompositionCornerRadius()
 	{
 		return new CodeBrix.Platform.UI.Composition.CornerRadius(TopLeft, TopRight, BottomRight, BottomLeft);

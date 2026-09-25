@@ -42,7 +42,7 @@ namespace Windows.ApplicationModel
 		[CodeBrix.Platform.NotImplemented]
 		public bool IsFramework => false;
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[CodeBrix.Platform.NotImplemented]
 		public string Description => "";
 #endif
@@ -58,7 +58,7 @@ namespace Windows.ApplicationModel
 		public global::System.Uri Logo => default;
 #endif
 
-#if !__SKIA__
+#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 		[CodeBrix.Platform.NotImplemented]
 		public string PublisherDisplayName => "";
 #endif

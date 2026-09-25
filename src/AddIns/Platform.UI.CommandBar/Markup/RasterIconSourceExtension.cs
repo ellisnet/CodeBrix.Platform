@@ -40,8 +40,8 @@ public sealed class RasterIconSourceExtension : MarkupExtension
 	internal RasterIconSource CreateSource()
 		=> new()
 		{
-			Source = IconUri.Parse(Source),
-			Dark = IconUri.Parse(Dark),
+			Source = Engine.IconUri.Parse(Source),
+			Dark = Engine.IconUri.Parse(Dark),
 			Tint = Tint,
 			Size = Size,
 		};

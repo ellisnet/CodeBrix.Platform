@@ -9,11 +9,12 @@
 		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
 
-		<!-- The add-in is a Skia-flavour assembly (it project-references Platform.UI.Skia), so the
-		     test project binds the Skia flavour too, matching the TextLayout add-in's test setup.
-		     The suite itself is host-free: it drives the internal flex engine with plain Item
-		     trees (via InternalsVisibleTo), the same model as the original xamarin/flex C tests -
-		     no rendering, no natives, no application host. -->
+		<!-- The add-in is Core by whole (CodeBrix.Platform.UI.FlexPanel.Core, compiled against the
+		     framework's Core assemblies); the test project also references Platform.UI.Skia, so the
+		     suite runs on the same framework assemblies an application does, matching the TextLayout
+		     add-in's test setup. The suite itself is host-free: it drives the internal flex engine
+		     with plain Item trees (via InternalsVisibleTo), the same model as the original
+		     xamarin/flex C tests - no rendering, no natives, no application host. -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 
 		<AssemblyName>CodeBrix.Platform.UI.FlexPanel.Tests</AssemblyName>
@@ -23,8 +24,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.0" />
-		<PackageReference Include="xunit.v3" Version="4.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
 

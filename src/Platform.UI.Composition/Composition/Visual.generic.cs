@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-#if !__SKIA__ && !NETFRAMEWORK
+#if (IS_UNIT_TESTS || __NETSTD_REFERENCE__) && !NETFRAMEWORK
 using System.Numerics;
 using System;
 

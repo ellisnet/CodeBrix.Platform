@@ -463,8 +463,44 @@ namespace Microsoft.UI.Xaml.Controls
 		/// If the default style for the current type has a Template property,
 		/// we know that the IsContentPresenterBypassEnabled will be false once the style has been set.
 		/// Return false in this case, even if the Template is null.
+		/// <para>
+		/// Element handler seam, hook H6: the bypass is also enabled when the attached platform handler hosts the content
+		/// (<see cref="CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.HostsContent"/>).
+		/// </para>
 		/// </remarks>
-		internal bool IsContentPresenterBypassEnabled => Template == null && !HasDefaultTemplate(GetDefaultStyleKey());
+		internal bool IsContentPresenterBypassEnabled =>
+			(Template == null && !HasDefaultTemplate(GetDefaultStyleKey()))
+			|| (AreHandlersActive && HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.HostsContent));
+
+		/// <summary>
+		/// Re-evaluates the content bypass when the attached handler starts or stops hosting the content: the content
+		/// is hosted as the ContentTemplateRoot now, or the root the bypass created is dropped so that the template (when
+		/// the handler no longer owns the visuals) presents the content again.
+		/// </summary>
+		/// <param name="previous">The capabilities Core used until now.</param>
+		/// <param name="current">The new capabilities.</param>
+		internal override void OnHandlerCapabilitiesChanged(
+			CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities previous,
+			CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities current)
+		{
+			base.OnHandlerCapabilitiesChanged(previous, current);
+
+			const CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities hostsContent = CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.HostsContent;
+			if (((previous ^ current) & hostsContent) == 0)
+			{
+				return;
+			}
+
+			_dataTemplateUsedLastUpdate = null;
+			if (IsContentPresenterBypassEnabled)
+			{
+				SetUpdateTemplate();
+			}
+			else if (ContentTemplateRoot is not null)
+			{
+				ContentTemplateRoot = null;
+			}
+		}
 
 		/// <summary>
 		/// Gets whether the default style for the given type sets a non-null Template.

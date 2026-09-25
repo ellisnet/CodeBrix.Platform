@@ -163,6 +163,10 @@ namespace Microsoft.UI.Xaml
 			{
 				RefreshBindingPath();
 
+				// A target path through a brush (".(Shape.Fill).(SolidColorBrush.Color)") must not write the shared theme
+				// brush: the element gets its own copy until the setter is cleared (as animations do, BindingPath).
+				path.CloneShareableObjectsInPathForSetter();
+
 				if (ThemeResourceKey.HasValue && ResourceResolver.ApplyVisualStateSetter(ThemeResourceKey.Value, ThemeResourceContext, path, DependencyPropertyValuePrecedences.Animations, ResourceBindingUpdateReason))
 				{
 					// Applied as theme binding, no need to do more
@@ -264,6 +268,7 @@ namespace Microsoft.UI.Xaml
 		internal void ClearValue()
 		{
 			_bindingPath?.ClearValue();
+			_bindingPath?.RestoreShareableObjectsInPath();
 		}
 
 		private string DebuggerDisplay => $"Property={Property?.Name ?? "<null>"},Target={Target?.Target?.ToString() ?? Target?.TargetName ?? "<null>"},Value={Value?.ToString() ?? "<null>"}";

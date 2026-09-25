@@ -9,6 +9,7 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using SkiaSharp;
+using CodeBrix.Platform.UI.Composition.Skia;
 using CodeBrix.Platform.UI.Xaml.Core;
 using static CodeBrix.Platform.UI.Helpers.SkiaRenderHelper;
 
@@ -33,11 +34,11 @@ internal static class SkiaRenderHelper
 
 	internal static (IntPtr picture, SKPath nativeClipPath, List<Visual> nativeVisualsInZOrder) RecordPictureAndReturnPath(float width, float height, ContainerVisual rootVisual, bool invertPath)
 	{
-		var canvas = _recorder.BeginRecording(Visual.InfiniteClipRect);
+		var canvas = _recorder.BeginRecording(VisualSkiaPlatform.InfiniteClipRect);
 		using var _ = new SKAutoCanvasRestore(canvas, true);
 		canvas.Clear(SKColors.Transparent);
 
-		rootVisual.Compositor.RenderRootVisual(canvas, rootVisual);
+		CompositorSkiaPlatform.RenderRootVisual(rootVisual.Compositor, canvas, rootVisual);
 
 		var (path, nativeVisualsInZOrder) = !ContentPresenter.HasNativeElements() ?
 			(!invertPath ? _emptyClipPath : GetOrUpdateInvertedClippingPath(width, height), _emptyList) :
@@ -91,7 +92,7 @@ internal static class SkiaRenderHelper
 		}
 
 		var nativeVisualsInZOrder = new List<Visual>();
-		rootVisual.GetNativeViewPathAndZOrder(parentClipPath, clipPath, nativeVisualsInZOrder);
+		VisualSkiaPlatform.Of(rootVisual).GetNativeViewPathAndZOrder(parentClipPath, clipPath, nativeVisualsInZOrder);
 
 		if (!invertPath)
 		{

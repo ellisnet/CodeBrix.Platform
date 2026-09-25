@@ -1,4 +1,4 @@
-﻿#if __SKIA__
+﻿#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 using Windows.Media.Core;
 
 namespace Windows.Media.Playback

@@ -1,25 +1,18 @@
 using Windows.Foundation;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml.Media;
+using CodeBrix.Platform.UI.Contracts;
+using CodeBrix.Platform.UI.Composition.Skia;
 
 namespace Microsoft.UI.Xaml.Documents;
 
-internal interface IParsedText
+/// <summary>
+/// A laid-out block of text as the Skia text engine produces it: the platform-neutral queries of
+/// <see cref="ITextLayout"/>, plus drawing onto a Skia painting session.
+/// </summary>
+internal interface IParsedText : ITextLayout
 {
-	void Draw(in Visual.PaintingSession session,
+	void Draw(in PaintingSession session,
 		(int index, CompositionBrush brush, float thickness)? caret, // null to skip drawing a caret
 		(int selectionStart, int selectionEnd, CompositionBrush selectedTextBackgroundBrush, Brush selectedTextForegroundBrush)? selection); // null to skip drawing a selection
-
-	Rect GetRectForIndex(int adjustedIndex);
-
-	int GetIndexAt(Point p, bool ignoreEndingNewLine, bool extendedSelection);
-
-	Hyperlink GetHyperlinkAt(Point point);
-
-	/// <param name="right">when on a word boundary, decides whether to return the left or the right word</param>
-	(int start, int length) GetWordAt(int index, bool right);
-
-	internal (int start, int length, bool firstLine, bool lastLine, int lineIndex) GetLineAt(int index);
-
-	bool IsBaseDirectionRightToLeft { get; }
 }

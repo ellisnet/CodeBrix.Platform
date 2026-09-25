@@ -971,7 +971,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 			_isTemplateApplied = _presenter != null;
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			if (_presenter != null && ForceChangeToCurrentView)
 			{
 				_presenter.ForceChangeToCurrentView = ForceChangeToCurrentView;

@@ -73,7 +73,7 @@ namespace CodeBrix.Platform.UI.Dispatching //Was previously: Uno.UI.Dispatching
 			}
 		}
 
-#if __SKIA__ || IS_UNIT_TESTS
+#if !__NETSTD_REFERENCE__
 		private static void DispatchItems()
 		{
 			// Currently, we have a singleton NativeDispatcher.

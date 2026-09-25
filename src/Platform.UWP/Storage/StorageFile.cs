@@ -47,6 +47,19 @@ namespace Windows.Storage
 			Implementation.InitOwner(this);
 		}
 
+		/// <summary>
+		/// Creates a file over a platform-provided implementation: the entry point a platform uses to hand out files that
+		/// are not paths on the local file system, such as a document a system picker returned as a content URI (the
+		/// Skia heads' own pickers keep returning local files).
+		/// </summary>
+		/// <param name="implementation">The platform's implementation of the file: its name, content type, streams and
+		/// operations (<see cref="ImplementationBase"/> is the provider contract; <see cref="ImplementationBase.Path"/> is
+		/// whatever identifies the item on that platform, such as the URI).</param>
+		/// <returns>A new <see cref="StorageFile"/> backed by <paramref name="implementation"/>.</returns>
+		/// <remarks>Implementers: Android, Mobile. Platform (Skia): not used. Reached through InternalsVisibleTo.</remarks>
+		internal static StorageFile FromImplementation(ImplementationBase implementation)
+			=> new StorageFile(implementation ?? throw new ArgumentNullException(nameof(implementation)));
+
 		internal ImplementationBase Implementation { get; }
 
 		/// <summary>

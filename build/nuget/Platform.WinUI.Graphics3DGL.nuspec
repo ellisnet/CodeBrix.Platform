@@ -16,7 +16,7 @@
 		<repository type="git" url="https://github.com/ellisnet/CodeBrix.Platform.git" branch="$branch$" commit="$commitid$" />
 		<dependencies>
 			<group targetFramework="net10.0">
-				<!-- This add-in's assembly binds CodeBrix.Platform.UI and
+				<!-- This add-in's assemblies bind CodeBrix.Platform.UI (and its Core) and
 				     CodeBrix.Platform.Extensions.Logging, both of which ship in the core package;
 				     stamped with the shared family version at pack time. -->
 				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
@@ -35,8 +35,14 @@
 		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\AGENT-README.txt" target="/" />
 		<file src="..\..\THIRD-PARTY-NOTICES.txt" target="/" />
 
-		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.dll" target="lib\net10.0" />
-		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.pdb" target="lib\net10.0" />
+		<!-- The Core/Skia split: GLCanvasElement is in CodeBrix.Platform.WinUI.Graphics3DGL.Core (Platform.WinUI.Graphics3DGL.Core.csproj),
+		     the GPU-Skia half and the platform's part of the element in CodeBrix.Platform.WinUI.Graphics3DGL (the Skia project).
+		     Both projects of the folder build into bin\<project name>\ (src/Directory.Build.props, _AdjustedOutputProjects).
+		     The Core dll is taken from the Core project's own output. -->
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Platform.WinUI.Graphics3DGL.Core\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.Core.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Platform.WinUI.Graphics3DGL.Core\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Platform.WinUI.Graphics3DGL\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.dll" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\Platform.WinUI.Graphics3DGL\bin\Platform.WinUI.Graphics3DGL\Release\net10.0\CodeBrix.Platform.WinUI.Graphics3DGL.pdb" target="lib\net10.0" />
 
 		<!-- macOS ANGLE dylibs (BSD 3-Clause; THIRD-PARTY-NOTICES Part E, item 22).
 		     Fetched by the project's GetAngle target during build. -->

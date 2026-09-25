@@ -441,7 +441,7 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 				return false;
 			}
 
-			if (parseContext.AssemblyName == "CodeBrix.Platform.UI")
+			if (parseContext.AssemblyName is "CodeBrix.Platform.UI" or "CodeBrix.Platform.UI.Core")
 			{
 				return false;
 			}

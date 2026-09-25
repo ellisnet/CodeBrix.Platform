@@ -50,3 +50,19 @@ Scenario: An indeterminate ProgressBar keeps repainting its track
 	And the ProgressBar "loading" is left running for 700 milliseconds
 	And the frame is captured as "second"
 	Then the region of "loading" in frame "second" differs from frame "first"
+
+Scenario: A paused ProgressBar that goes away leaves the accent colour as it was
+	Given the application shows a ProgressBar named "paused" with:
+		| Property   | Value |
+		| Width      | 400   |
+		| Value      | 40    |
+		| ShowPaused | True  |
+	And the panel is left alone for 500 milliseconds
+	And the frame is captured as "paused"
+	Then the region of "paused" in frame "paused" does not contain "Accent"
+	Given the application shows a ProgressBar named "loading" with:
+		| Property | Value |
+		| Width    | 400   |
+		| Value    | 40    |
+	When the frame is captured
+	Then the ProgressBar "loading" is painted 40 percent of the way across in "Accent", within 2 pixels

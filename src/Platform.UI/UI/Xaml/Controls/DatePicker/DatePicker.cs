@@ -132,6 +132,10 @@ namespace Microsoft.UI.Xaml.Controls
 
 		bool m_isInitializing;
 
+		// Counts the DateChanged events OnDateChanged raised, so that a pick from the flyout raises DateChanged once: the
+		// Date it sets raises it already whenever the template is applied (see OnPicked in DatePicker.Flyout.cs).
+		int m_dateChangedRaisedCount;
+
 		// Specifies if we have a valid year range to generate dates. We do not have a valid range if our minimum year is
 		// greater than our maximum year.
 		bool m_hasValidYearRange;
@@ -1230,6 +1234,7 @@ namespace Microsoft.UI.Xaml.Controls
 			DatePickerValueChangedEventArgs valueChangedEventArgs = new DatePickerValueChangedEventArgs(newValue, oldValue);
 
 			// Raise event
+			m_dateChangedRaisedCount++;
 			DateChanged?.Invoke(this, valueChangedEventArgs);
 
 			DatePickerSelectedValueChangedEventArgs selectedValueChangedEventArgs = new DatePickerSelectedValueChangedEventArgs();

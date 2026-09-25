@@ -122,7 +122,7 @@ internal class EmulatedRenderer
 		_surface.Canvas.RotateDegrees(degrees);
 		_surface.Canvas.Clear(SKColors.Transparent);
 
-		ct.OnNativePlatformFrameRequested(_surface.Canvas, size =>
+		global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested(ct, _surface.Canvas, size =>
 		{
 			// The device never resizes, so the compositor can only ever ask
 			// for the application's space — the fixed resolution, transposed

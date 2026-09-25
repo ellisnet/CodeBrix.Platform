@@ -46,7 +46,7 @@ namespace Microsoft.UI.Xaml.Controls
 		public bool CanHorizontallyScroll
 		{
 			get => _canHorizontallyScroll
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			|| _forceChangeToCurrentView
 #endif
 			;
@@ -57,7 +57,7 @@ namespace Microsoft.UI.Xaml.Controls
 		public bool CanVerticallyScroll
 		{
 			get => _canVerticallyScroll
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			|| _forceChangeToCurrentView
 #endif
 			;
@@ -111,7 +111,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 		partial void InitializePartial()
 		{
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			Visual.Clip = Visual.Compositor.CreateInsetClip(0, 0, 0, 0);
 #endif
 		}
@@ -303,6 +303,14 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private void Update(UIElement view, double horizontalOffset, double verticalOffset, double zoom, ScrollOptions options)
 		{
+			// Element handler seam, hook H10 (presenter): when the ScrollViewer's handler owns scrolling the platform view
+			// scrolls; the presenter keeps its offsets and reports them, but does not translate the content visual.
+			if (AreHandlersActive && Scroller is { } owner && owner.HasHandlerCapability(CodeBrix.Platform.UI.Contracts.ElementHandlerCapabilities.OwnsScrolling))
+			{
+				Updated(horizontalOffset, verticalOffset, options.IsIntermediate);
+				return;
+			}
+
 			var target = new Vector2((float)-horizontalOffset, (float)-verticalOffset);
 			var visual = view.Visual;
 

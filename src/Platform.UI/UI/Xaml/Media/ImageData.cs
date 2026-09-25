@@ -41,10 +41,10 @@ internal partial struct ImageData
 		Kind = ImageDataKind.NativeImage;
 		NativeImage = uiImage ?? throw new ArgumentNullException(nameof(uiImage));
 	}
-#elif __SKIA__
-	public static ImageData FromCompositionSurface(SkiaCompositionSurface compositionSurface) => new(compositionSurface);
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+	public static ImageData FromCompositionSurface(PlatformCompositionSurface compositionSurface) => new(compositionSurface);
 
-	private ImageData(SkiaCompositionSurface compositionSurface)
+	private ImageData(PlatformCompositionSurface compositionSurface)
 	{
 		Kind = ImageDataKind.CompositionSurface;
 		CompositionSurface = compositionSurface;
@@ -98,8 +98,8 @@ internal partial struct ImageData
 
 #if false
 	public _UIImage? NativeImage { get; } = null;
-#elif __SKIA__
-	public SkiaCompositionSurface? CompositionSurface { get; } = null;
+#elif __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
+	public PlatformCompositionSurface? CompositionSurface { get; } = null;
 #elif false
 	internal ImageSource? Source { get; } = null;
 
@@ -117,7 +117,7 @@ internal partial struct ImageData
 #if false
 			ImageDataKind.NativeImage => $"Native UIImage: {NativeImage}",
 #endif
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			ImageDataKind.CompositionSurface => $"CompositionSurface: {CompositionSurface}",
 #endif
 #if false

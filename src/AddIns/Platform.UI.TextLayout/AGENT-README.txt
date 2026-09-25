@@ -45,7 +45,7 @@ Package id:   CodeBrix.Platform.TextLayout.ApacheLicenseForever
 
 NuGet dependencies (all flow in automatically):
   - CodeBrix.Platform.ApacheLicenseForever                 the framework (the
-                                                           engine lives here)
+                                                           font source)
   - SkiaSharp, SkiaSharp.HarfBuzz, HarfBuzzSharp           geometry types and
                                                            shaping
   - CodeBrix.Platform.Unicode.ApacheLicenseForever         ICU natives for

@@ -14,10 +14,10 @@
 	<Import Project="../../targetframework-override.props" />
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.UWP\Platform.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Reference.csproj" />
-		<ProjectReference Include="..\..\Platform.UI.Toolkit\Platform.UI.Toolkit.Reference.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.Foundation\Platform.Foundation.Core.csproj" />
+		<ProjectReference Include="..\..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" />
 	</ItemGroup>
 
 	<Import Project="..\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />

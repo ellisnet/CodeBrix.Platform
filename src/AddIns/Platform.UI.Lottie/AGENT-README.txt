@@ -39,7 +39,9 @@ INSTALLATION
 ============
 Package id:   CodeBrix.Platform.Lottie.ApacheLicenseForever
 License:      Apache-2.0
-Assembly:     CodeBrix.Platform.UI.Lottie.dll
+Assemblies:   CodeBrix.Platform.UI.Lottie.Core.dll (the sources, the provider,
+                                                 the playback)
+              CodeBrix.Platform.UI.Lottie.dll      (the Skia canvas supply)
 
     dotnet add package CodeBrix.Platform.Lottie.ApacheLicenseForever
 
@@ -54,8 +56,9 @@ NuGet dependencies (pulled automatically):
                                                       animation is drawn on
   - SkiaSharp.Skottie                                 the Lottie decoder
 
-HOW IT ACTIVATES: the assembly carries an [assembly: ApiExtension(...)]
-registration for ILottieVisualSourceProvider. The XAML source generator scans
+HOW IT ACTIVATES: CodeBrix.Platform.UI.Lottie.Core.dll carries an
+[assembly: ApiExtension(...)] registration for ILottieVisualSourceProvider.
+The XAML source generator scans
 every referenced assembly for that attribute while compiling the application
 and emits the ApiExtensibility.Register(...) call into the generated App code,
 so the mere reference wires the core's ProgressRing to this package. The
@@ -590,7 +593,7 @@ WORKING EXAMPLES ON GITHUB
 QUICK REFERENCE CARD
 ====================
 Package:    CodeBrix.Platform.Lottie.ApacheLicenseForever   (reference in .Core)
-Assembly:   CodeBrix.Platform.UI.Lottie.dll
+Assemblies: CodeBrix.Platform.UI.Lottie.Core.dll + CodeBrix.Platform.UI.Lottie.dll
 XAML:       xmlns:lottie="using:CommunityToolkit.WinUI.Lottie"
 Companion:  CodeBrix.SkiaSvg / CodeBrix.Platform.Svg for static SVG images
             (see src/AddIns/Platform.UI.Svg/AGENT-README.txt in this repo)

@@ -518,7 +518,7 @@ namespace Microsoft.UI.Xaml.Media
 			if (element.RenderTransform is { } tr)
 				TRACE($"- renderTransform: {tr.ToMatrix(element.RenderTransformOrigin, element.ActualSize.ToSize())}");
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			var elementToRoot = UIElement.GetTransform(element, null);
 
 			// The maximum region where the current element and its children might draw themselves
@@ -573,7 +573,7 @@ namespace Microsoft.UI.Xaml.Media
 			TRACE($"- rendering (rel to element): {renderingBounds.ToDebugString()}");
 #endif
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 			var testPosition = position;
 #else
 			var testPosition = posRelToElement;
@@ -608,7 +608,7 @@ namespace Microsoft.UI.Xaml.Media
 			// Once Canvas.ZIndex renders correctly elsewhere, remove the conditional OrderBy
 			// https://github.com/unoplatform/uno/issues/325
 			using var child = children
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				// On Skia and Wasm, we can get concrete data structure (MaterializableList in this case) instead of IEnumerable<T>.
 				// It has an efficient "ReverseEnumerator". This will also avoid the boxing allocations of the enumerator when it's a struct.
 				.GetReverseSortedEnumerator(UIElementToCanvasZIndex);
@@ -694,7 +694,7 @@ namespace Microsoft.UI.Xaml.Media
 			if (elementHitTestVisibility == HitTestability.Visible
 				&& renderingBounds.Contains(testPosition)
 				// TODO: Those HitTest should be provided by the `getVisibility`. SearchDownForTopMostElementAt is NOT about hit-testing (even if derived from and used by)
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				&& element.HitTest(elementToRoot.Inverse().Transform(testPosition))
 #elif false
 				&& element.HitTest(testPosition)
@@ -735,7 +735,7 @@ namespace Microsoft.UI.Xaml.Media
 			// Once Canvas.ZIndex renders correctly elsewhere, remove the conditional OrderBy
 			// https://github.com/unoplatform/uno/issues/325
 			using var enumerator = GetManagedVisualChildren(root)
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 				// On Skia and Wasm, we can get concrete data structure (MaterializableList in this case) instead of IEnumerable<T>.
 				// It has an efficient "ReverseEnumerator". This will also avoid the boxing allocations of the enumerator when it's a struct.
 				.GetReverseSortedEnumerator(UIElementToCanvasZIndex);
@@ -767,7 +767,7 @@ namespace Microsoft.UI.Xaml.Media
 			return root;
 		}
 
-#if __SKIA__
+#if __CROSSRUNTIME__ && !__NETSTD_REFERENCE__
 		// This is used with MaterializableList.GetReverseSortedEnumerator
 		private static int UIElementToCanvasZIndex(UIElement element)
 			=> element.Visual.ZIndex; // Equivalent to GetValue(Canvas.ZIndexProperty) on skia

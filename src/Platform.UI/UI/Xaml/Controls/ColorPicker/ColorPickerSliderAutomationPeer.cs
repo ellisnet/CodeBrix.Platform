@@ -77,7 +77,7 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 
 		public void RaisePropertyChangedEvent(Color oldColor, Color newColor, int oldValue, int newValue)
 		{
-			if (ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Automation.ValuePatternIdentifiers, CodeBrix.Platform.UI", nameof(ValuePatternIdentifiers.ValueProperty)))
+			if (ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Automation.ValuePatternIdentifiers, CodeBrix.Platform.UI.Core", nameof(ValuePatternIdentifiers.ValueProperty)))
 			{
 				string oldValueString = GetValueString(oldColor, oldValue);
 				string newValueString = GetValueString(newColor, newValue);

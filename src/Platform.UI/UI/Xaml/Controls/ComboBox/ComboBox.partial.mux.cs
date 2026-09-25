@@ -666,12 +666,17 @@ partial class ComboBox
 			var isEditable = IsEditable;
 			if (isEditable)
 			{
+				// An editable ComboBox accepts custom values whether or not its template (and with it the editable
+				// TextBox part SetupEditableMode needs) exists: a platform handler that owns the visuals commits text
+				// through RaiseTextSubmittedFromPlatform with no template at all. SetupEditableMode sets it again.
+				SetAllowCustomValues(true /*allow*/);
 				SetupEditableMode();
 				CreateEditableContentPresenterTextBlock();
 			}
 			else
 			{
 				DisableEditableMode();
+				SetAllowCustomValues(false /*allow*/);
 			}
 		}
 		else if (args.Property == SelectedItemProperty)
@@ -2934,6 +2939,40 @@ partial class ComboBox
 	private void ResetSearchString()
 	{
 		m_searchString = "";
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler of an editable ComboBox: the user committed <paramref name="text"/> in the
+	/// native field and it is not one of the items the handler matched itself. Raises TextSubmitted and, when no handler
+	/// handled it, selects the exactly matching item or keeps the text as the custom value (the path the template's
+	/// editable TextBox takes on commit).
+	/// </summary>
+	/// <param name="text">The committed text.</param>
+	/// <returns><see langword="true"/> when an application handler handled TextSubmitted.</returns>
+	internal bool RaiseTextSubmittedFromPlatform(string text)
+	{
+		if (!IsSearchStringValid(text))
+		{
+			return false;
+		}
+
+		var isHandled = RaiseTextSubmittedEvent(text);
+		if (!isHandled)
+		{
+			m_searchString = text;
+			var foundIndex = SearchItemSourceIndex(' ', false /*startSearchFromCurrentIndex*/, true /*searchExactMatch*/);
+			if (foundIndex != -1)
+			{
+				m_customValueRef = null;
+				SelectedIndex = foundIndex;
+			}
+			else
+			{
+				SelectedItem = text;
+			}
+		}
+
+		return isHandled;
 	}
 
 	private bool RaiseTextSubmittedEvent(string text)

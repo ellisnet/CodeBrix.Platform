@@ -1,4 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform: since the Core/Skia split, the Skia half of the WinRT API surface. It compiles ONLY the *.skia.cs
+	files (the Skia implementations of the WinRT platform contracts, the OS launcher extensions) and references
+	CodeBrix.Platform.Core (Platform.Core.csproj), which holds the API surface.
+	-->
 	<PropertyGroup>
 		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
 	</PropertyGroup>
@@ -17,37 +22,25 @@
 
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
-		
+
+		<!-- Only the Skia files: the shared tree belongs to Platform.Core.csproj. -->
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+
 		<UseCommonOverridePackage>true</UseCommonOverridePackage>
 		<CommonOverridePackageId>codebrix.platform.winrt</CommonOverridePackageId>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="**\*.skia.cs" Exclude="bin\**;obj\**" />
+		<UpToDateCheckInput Include="**\*.skia.cs" Exclude="bin\**\*.cs;obj\**\*.cs;" Visible="False" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="SkiaSharp" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" />
-		<ProjectReference Include="..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" />
-	</ItemGroup>
-	
-	<ItemGroup>
-		<Compile Include="..\Platform.UI\UI\Input\WinRT\*.cs" />
-		<Compile Include="..\Platform.UI\UI\Colors.cs" />
-		<Compile Include="..\Platform.UI\UI\ColorHelper.cs" />
-		<Compile Include="..\Platform.UI\UI\Text\FontWeights.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="ApplicationModel\Core\CoreApplication.Reference.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PRIResource Include="Storage\Pickers\Strings\**\*.resw" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Storage\Pickers\Strings\en\" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Core.csproj" />
 	</ItemGroup>
 
 </Project>

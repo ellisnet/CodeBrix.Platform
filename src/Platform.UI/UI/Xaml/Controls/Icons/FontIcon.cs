@@ -138,7 +138,7 @@ public partial class FontIcon : IconElement, IThemeChangeAware
 	/// <summary>
 	/// Gets or sets whether automatic text enlargement, to reflect the system text size setting, is enabled.
 	/// </summary>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public bool IsTextScaleFactorEnabled
 	{
 		get => (bool)this.GetValue(IsTextScaleFactorEnabledProperty);
@@ -148,7 +148,7 @@ public partial class FontIcon : IconElement, IThemeChangeAware
 	/// <summary>
 	/// Identifies the IsTextScaleFactorEnabled dependency property.
 	/// </summary>
-	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__")]
+	[NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 	public static DependencyProperty IsTextScaleFactorEnabledProperty { get; } =
 		DependencyProperty.Register(
 			nameof(IsTextScaleFactorEnabled),

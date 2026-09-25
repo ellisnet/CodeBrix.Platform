@@ -57,6 +57,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<!-- The linker-hint generator's reference-path mapping is a pure function; it is compiled in here (rather than
+		     referencing the MSBuild task assembly) so Given_RuntimeReferencePathRewriter can fence it. -->
+		<Compile Include="..\Platform.UI.Tasks\LinkerHintsGenerator\RuntimeReferencePathRewriter.cs" Link="LinkerHintsGeneratorTests\RuntimeReferencePathRewriter.cs" />
+		<Compile Include="..\Platform.UI.Tasks\LinkerHintsGenerator\LinkerFeatureSwitches.cs" Link="LinkerHintsGeneratorTests\LinkerFeatureSwitches.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Remove="XamlCodeGeneratorTests\Out\**\*.cs" />
 		<EmbeddedResource Include="XamlCodeGeneratorTests\Out\**\*.cs" Condition="'$(CODEBRIX_UWP_BUILD)'=='false'" />
 	</ItemGroup>

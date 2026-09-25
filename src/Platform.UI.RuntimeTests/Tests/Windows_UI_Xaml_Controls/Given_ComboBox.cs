@@ -122,7 +122,7 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Controls //Was
 		[TestMethod]
 		public async Task When_IsEditable_False_Changes_To_True()
 		{
-			if (!ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ComboBox, CodeBrix.Platform.UI", "IsEditable"))
+			if (!ApiInformation.IsPropertyPresent("Microsoft.UI.Xaml.Controls.ComboBox, CodeBrix.Platform.UI.Core", "IsEditable"))
 			{
 				Assert.Inconclusive();
 			}
