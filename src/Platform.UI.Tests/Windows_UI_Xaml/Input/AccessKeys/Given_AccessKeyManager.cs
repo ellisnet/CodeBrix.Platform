@@ -561,6 +561,58 @@ public class Given_AccessKeyManager
 		Assert.IsTrue(stillInDisplayMode, "a menu keeps its mnemonics live after an unmatched letter");
 	}
 
+	[TestMethod]
+	public void When_A_Menu_Opened_By_Its_Access_Key_Closes_Then_Display_Mode_Ends()
+	{
+		//Arrange - Alt+F opens File and keeps access-key mode alive inside the menu
+		var host = AddHost(out var root);
+		var menuBarItem = new MenuBarItem { Title = "File", AccessKey = "F" };
+		menuBarItem.Items.Add(new MenuFlyoutItem { Text = "Print", AccessKey = "P" });
+		var menuBar = new MenuBar();
+		menuBar.Items.Add(menuBarItem);
+		host.Children.Add(menuBar);
+		host.Measure(new Size(400, 200));
+		host.Arrange(new Rect(0, 0, 400, 200));
+		AccessKeyManager.TryProcessKey(root, VirtualKey.F, VirtualKeyModifiers.Menu, true);
+		var displayModeWhileOpen = AccessKeyManager.IsDisplayModeEnabled;
+
+		//Act - the menu closes some other way than an access key (an item invoked with Enter, a click)
+		menuBarItem.Invoke();
+		host.Dispatcher.ProcessEvents(Windows.UI.Core.CoreProcessEventsOption.ProcessAllIfPresent);
+
+		//Assert
+		Assert.IsTrue(displayModeWhileOpen);
+		Assert.IsFalse(menuBarItem.IsFlyoutOpen());
+		Assert.IsFalse(AccessKeyManager.IsDisplayModeEnabled, "display mode must not outlive the menu it followed");
+	}
+
+	[TestMethod]
+	public void When_A_Menu_Closed_Other_Than_By_Access_Key_Then_Alt_Letter_Opens_It_Again()
+	{
+		//Arrange
+		var host = AddHost(out var root);
+		var invoked = 0;
+		var menuBarItem = new MenuBarItem { Title = "File", AccessKey = "F" };
+		menuBarItem.Items.Add(new MenuFlyoutItem { Text = "Print", AccessKey = "P" });
+		menuBarItem.AccessKeyInvoked += (_, _) => invoked++;
+		var menuBar = new MenuBar();
+		menuBar.Items.Add(menuBarItem);
+		host.Children.Add(menuBar);
+		host.Measure(new Size(400, 200));
+		host.Arrange(new Rect(0, 0, 400, 200));
+		AccessKeyManager.TryProcessKey(root, VirtualKey.F, VirtualKeyModifiers.Menu, true);
+		menuBarItem.Invoke();
+		host.Dispatcher.ProcessEvents(Windows.UI.Core.CoreProcessEventsOption.ProcessAllIfPresent);
+
+		//Act
+		var handled = AccessKeyManager.TryProcessKey(root, VirtualKey.F, VirtualKeyModifiers.Menu, true);
+
+		//Assert
+		Assert.IsTrue(handled);
+		Assert.AreEqual(2, invoked, "Alt+F must reach File again, not be looked up in the closed menu");
+		Assert.IsTrue(menuBarItem.IsFlyoutOpen());
+	}
+
 	private static Grid AddHost(out XamlRoot root)
 	{
 		var app = UnitTestsApp.App.EnsureApplication();

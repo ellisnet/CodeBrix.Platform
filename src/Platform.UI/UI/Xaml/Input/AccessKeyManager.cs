@@ -34,6 +34,11 @@ public partial class AccessKeyManager
 	private static XamlRoot? _displayModeRoot;
 	private static UIElement? _displayModeScope;
 	private static bool _displayModeScopeIsPopup;
+
+	// The open popup (a menu, a flyout) that roots the display-mode scope, when the scope is a popup.
+	// Display mode ends when it closes - however it closes (an item invoked with Enter or a click, light
+	// dismiss, code) - so it never lingers on a scope that no longer exists.
+	private static Popup? _displayModeScopePopup;
 	private static bool _isMenuKeyPressPending;
 
 	/// <summary>
@@ -76,6 +81,12 @@ public partial class AccessKeyManager
 		_displayModeScope = scope;
 		_displayModeScopeIsPopup = isPopupScope;
 
+		if (isPopupScope && XamlRoot.VisualTree.PopupRoot?.GetTopmostPopup(PopupRoot.PopupFilter.All) is { } scopePopup)
+		{
+			_displayModeScopePopup = scopePopup;
+			scopePopup.Closed += OnDisplayModeScopePopupClosed;
+		}
+
 		var args = new AccessKeyDisplayRequestedEventArgs { PressedKeys = string.Empty };
 		foreach (var element in GetScopedElements(XamlRoot, scope))
 		{
@@ -103,6 +114,7 @@ public partial class AccessKeyManager
 		_displayModeRoot = null;
 		_displayModeScope = null;
 		_displayModeScopeIsPopup = false;
+		DetachDisplayModeScopePopup();
 
 		if (root is not null)
 		{
@@ -115,6 +127,27 @@ public partial class AccessKeyManager
 
 		IsDisplayModeEnabledChanged?.Invoke(null!, null!);
 	}
+
+	private static void OnDisplayModeScopePopupClosed(object? sender, object e)
+	{
+		if (ReferenceEquals(sender, _displayModeScopePopup))
+		{
+			ExitDisplayMode();
+		}
+	}
+
+	private static void DetachDisplayModeScopePopup()
+	{
+		if (_displayModeScopePopup is { } popup)
+		{
+			popup.Closed -= OnDisplayModeScopePopupClosed;
+			_displayModeScopePopup = null;
+		}
+	}
+
+	// True when display mode is on for a popup scope whose popup has closed (a missed Closed event, say).
+	private static bool IsDisplayModeScopeStale() =>
+		_isDisplayModeEnabled && _displayModeScopeIsPopup && _displayModeScopePopup is { IsOpen: false };
 
 	/// <summary>
 	/// Called by <see cref="UIElement.AccessKeyProperty"/> when an element's access key changes.
@@ -164,6 +197,12 @@ public partial class AccessKeyManager
 		if (root is null)
 		{
 			return false;
+		}
+
+		if (IsDisplayModeScopeStale())
+		{
+			// Never resolve keys against a menu that is gone: that swallowed Alt+letter for good.
+			ExitDisplayMode();
 		}
 
 		if (!isDown)
@@ -438,6 +477,7 @@ public partial class AccessKeyManager
 		_displayModeRoot = null;
 		_displayModeScope = null;
 		_displayModeScopeIsPopup = false;
+		DetachDisplayModeScopePopup();
 		_isMenuKeyPressPending = false;
 		AreKeyTipsEnabled = false;
 		IsDisplayModeEnabledChanged = null;

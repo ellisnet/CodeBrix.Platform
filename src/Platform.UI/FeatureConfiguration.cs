@@ -410,6 +410,24 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 #endif
 		}
 
+		public static class MenuFlyoutItem
+		{
+			/// <summary>
+			/// Gets or sets whether a <see cref="Microsoft.UI.Xaml.Controls.MenuFlyoutItem"/> that has
+			/// <see cref="Microsoft.UI.Xaml.UIElement.KeyboardAccelerators"/> but no
+			/// <see cref="Microsoft.UI.Xaml.Controls.MenuFlyoutItem.KeyboardAcceleratorTextOverride"/>
+			/// automatically shows its accelerator text (for example "Ctrl+S", built from its first
+			/// keyboard accelerator) at the right-hand side of the item, as WinUI does.
+			/// </summary>
+			/// <remarks>
+			/// Opt-in: the default is <c>false</c>, so existing menus keep their current appearance.
+			/// Set it once at startup (before any menu is shown). An explicitly set
+			/// <see cref="Microsoft.UI.Xaml.Controls.MenuFlyoutItem.KeyboardAcceleratorTextOverride"/>
+			/// is always shown, whatever this value is.
+			/// </remarks>
+			public static bool ShowKeyboardAcceleratorText { get; set; }
+		}
+
 		public static class ProgressRing
 		{
 			public static Uri ProgressRingAsset { get; set; } = new Uri("embedded://CodeBrix.Platform.UI/CodeBrix.Platform.UI.UI.Xaml.Controls.ProgressRing.ProgressRingIntdeterminate.json");

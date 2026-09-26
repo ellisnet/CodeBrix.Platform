@@ -27,6 +27,9 @@ namespace Microsoft.UI.Xaml.Controls
 		private MenuBarItemFlyout m_flyout;
 		private Button m_button;
 		private bool m_isFlyoutOpen;
+		private Control m_subscribedPresenter;
+		private KeyEventHandler m_presenterKeyDownHandler;
+		private bool m_isClosingByEscape;
 
 #pragma warning disable CS0649 // Field is never assigned to, and will always have its default value null
 		private DependencyObject m_passThroughElement;
@@ -193,11 +196,51 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				ShowMenuFlyout();
 			}
+			else if (key == VirtualKey.Escape
+				&& !m_isFlyoutOpen
+				&& m_menuBar != null
+				&& IsFromThisTitle(args.OriginalSource))
+			{
+				// CodeBrix (classic Windows menus): Escape on a menu title with no menu open leaves the menu
+				// bar - focus goes back to where it was before the menus were entered. (An Escape that closes
+				// an open menu comes from the menu's presenter, not from the title, and only closes it.)
+				if (m_menuBar.LeaveMenuBar())
+				{
+					args.Handled = true;
+				}
+			}
+		}
+
+		private bool IsFromThisTitle(object originalSource)
+		{
+			for (var element = originalSource as DependencyObject; element != null; element = VisualTreeHelper.GetParent(element))
+			{
+				if (ReferenceEquals(element, this))
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 		private void OnPresenterKeyDown(object sender, KeyRoutedEventArgs args)
 		{
 			var key = args.Key;
+			if (key == VirtualKey.Escape)
+			{
+				// CodeBrix: the presenter closes the menu itself; remember why, so the title is then focused
+				// visibly (OnFlyoutClosed) and a second Escape can leave the menu bar.
+				m_isClosingByEscape = true;
+				return;
+			}
+
+			if (args.Handled)
+			{
+				// e.g. Right that opened a submenu of the focused item
+				return;
+			}
+
 			if (key == VirtualKey.Right)
 			{
 				if (FlowDirection == FlowDirection.RightToLeft)
@@ -208,6 +251,10 @@ namespace Microsoft.UI.Xaml.Controls
 				{
 					OpenFlyoutFrom(FlyoutLocation.Right);
 				}
+
+				// CodeBrix: the key has done its job (the neighbouring menu is open and focused); left
+				// unhandled it bubbled on and moved focus back out of the menu just opened, closing it.
+				args.Handled = true;
 			}
 			else if (key == VirtualKey.Left)
 			{
@@ -219,6 +266,8 @@ namespace Microsoft.UI.Xaml.Controls
 				{
 					OpenFlyoutFrom(FlyoutLocation.Left);
 				}
+
+				args.Handled = true;
 			}
 		}
 
@@ -270,13 +319,27 @@ namespace Microsoft.UI.Xaml.Controls
 					m_flyout.ShowAt(m_button, new Point(0, height));
 				}
 
-				if (m_flyout?.m_presenter != null)
+				// CodeBrix: subscribe to a presenter once. This ran on every open, so after a menu had been
+				// opened twice one Right/Left moved two menus at a time.
+				if (m_flyout?.m_presenter is { } presenter && !ReferenceEquals(presenter, m_subscribedPresenter))
 				{
-					m_flyout.m_presenter.KeyDown += OnPresenterKeyDown;
+					if (m_subscribedPresenter is not null)
+					{
+						m_subscribedPresenter.RemoveHandler(UIElement.KeyDownEvent, m_presenterKeyDownHandler);
+					}
+
+					// handledEventsToo: the presenter marks the Escape that closes it handled
+					m_presenterKeyDownHandler ??= new KeyEventHandler(OnPresenterKeyDown);
+					presenter.AddHandler(UIElement.KeyDownEvent, m_presenterKeyDownHandler, true);
+					m_subscribedPresenter = presenter;
 
 					_activeDisposables.Add(() =>
 					{
-						m_flyout.m_presenter.KeyDown -= OnPresenterKeyDown;
+						presenter.RemoveHandler(UIElement.KeyDownEvent, m_presenterKeyDownHandler);
+						if (ReferenceEquals(m_subscribedPresenter, presenter))
+						{
+							m_subscribedPresenter = null;
+						}
 					});
 				}
 			}
@@ -316,6 +379,32 @@ namespace Microsoft.UI.Xaml.Controls
 			return m_isFlyoutOpen;
 		}
 
+		/// <summary>
+		/// True when this item's menu is really open (asks the flyout itself, not the open flag, which
+		/// only a Closed event clears).
+		/// </summary>
+		internal bool IsMenuReallyOpen() => m_flyout is { IsOpen: true };
+
+		/// <summary>
+		/// CodeBrix: with the item's menu closed, clears any highlight the title still shows - the open flag
+		/// and "Selected" look left behind by a Closed event that never came, or a stale PointerOver /
+		/// Pressed look. The next pointer move over the title restores a real PointerOver.
+		/// </summary>
+		internal void ResetHighlight()
+		{
+			if (IsMenuReallyOpen())
+			{
+				return;
+			}
+
+			m_isFlyoutOpen = false;
+			m_isClosingByEscape = false;
+			if (m_button != null)
+			{
+				VisualStateManager.GoToState(this, "Normal", false);
+			}
+		}
+
 		public void Invoke()
 		{
 			if (IsFlyoutOpen())
@@ -339,10 +428,46 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 
 			UpdateVisualStates();
+
+			if (!m_isClosingByEscape)
+			{
+				// CodeBrix (classic Windows menus): a menu that closed because an item ran (Enter, a click) or its
+				// title was clicked hands keyboard focus back to its title, invisibly, where it would stay - keys
+				// then go to the menu bar instead of, say, a game surface. Running a command ends the menus, so
+				// leave the menu bar - but only if focus really is on this title: a menu closed by moving to the
+				// next one, by a click elsewhere, or by a dialog the command opened has put focus there already.
+				DispatcherQueue?.TryEnqueue(() =>
+				{
+					if (!m_isFlyoutOpen &&
+						m_menuBar != null &&
+						XamlRoot != null &&
+						IsFromThisTitle(FocusManager.GetFocusedElement(XamlRoot)) &&
+						FocusState != FocusState.Keyboard)
+					{
+						m_menuBar.LeaveMenuBar();
+					}
+				});
+			}
+
+			if (m_isClosingByEscape)
+			{
+				// CodeBrix (classic Windows menus): after Escape closes a menu its title stays visibly
+				// highlighted - keyboard focus, which draws the focus rectangle - and a second Escape leaves
+				// the menu bar. Deferred so it lands after the popup has handed focus back.
+				m_isClosingByEscape = false;
+				DispatcherQueue?.TryEnqueue(() =>
+				{
+					if (!m_isFlyoutOpen)
+					{
+						Focus(FocusState.Keyboard);
+					}
+				});
+			}
 		}
 
 		void OnFlyoutOpening(object sender, object args)
 		{
+			m_isClosingByEscape = false;
 			Focus(FocusState.Pointer);
 
 			m_isFlyoutOpen = true;

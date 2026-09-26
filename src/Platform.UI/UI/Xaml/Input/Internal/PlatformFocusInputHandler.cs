@@ -31,6 +31,18 @@ internal class CodeBrixFocusInputHandler
 			return;
 		}
 
+		HandleKeyDown(e);
+
+		if (!e.Handled && e.OriginalKey == VirtualKey.Escape)
+		{
+			// CodeBrix: an Escape nothing used (no focused element, no keyboard accelerator) with no menu open
+			// clears any menu-bar highlight and takes focus off the menu bar (see MenuBar.OnUnhandledEscape).
+			e.Handled = Microsoft.UI.Xaml.Controls.MenuBar.OnUnhandledEscape(_rootElement.XamlRoot);
+		}
+	}
+
+	private void HandleKeyDown(KeyRoutedEventArgs e)
+	{
 		bool isShiftDown = e.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Shift);
 
 		if (e.OriginalKey == VirtualKey.Tab)
@@ -71,6 +83,17 @@ internal class CodeBrixFocusInputHandler
 				modifiers,
 				liveAccelerators
 			);
+
+			// Menu items of a closed menu are not in the visual tree, so their accelerators are not in the
+			// live list above; the loaded menu bars offer them here, so a menu shortcut (e.g. Ctrl+S on
+			// File > Save) works wherever focus is - unless the focused element handled the key first.
+			if (!e.Handled)
+			{
+				e.Handled = Microsoft.UI.Xaml.Controls.MenuBar.TryInvokeMenuItemAccelerator(
+					_rootElement.XamlRoot,
+					e.OriginalKey,
+					modifiers);
+			}
 		}
 	}
 

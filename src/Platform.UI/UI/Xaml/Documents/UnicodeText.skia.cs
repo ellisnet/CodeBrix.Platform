@@ -1117,6 +1117,8 @@ internal readonly partial struct UnicodeText : IParsedText
 						DrawText(glyphs, positions, session, run.inline.Foreground);
 					}
 
+					DrawDecorations(session, run, currentLineX, line);
+
 					currentLineX += run.width;
 				}
 			}
@@ -1133,6 +1135,42 @@ internal readonly partial struct UnicodeText : IParsedText
 
 	// foreground is null only on the host-free TextRunSpec construction path, where no XAML brush
 	// exists. Reset() leaves the paint opaque black, which is the documented fallback for that path.
+	// Draws the Underline / Strikethrough line of a run whose inline carries TextDecorations (set on
+	// the Run itself, or inherited from an Underline span or the TextBlock). Host-free TextRunSpec
+	// runs have no inline and so never carry decorations.
+	private static void DrawDecorations(in Visual.PaintingSession session, LayoutedLineBrokenBidiRun run, float x, LayoutedLine line)
+	{
+		if (run.inline.Inline is not { } inline || run.width <= 0)
+		{
+			return;
+		}
+
+		var decorations = inline.TextDecorations;
+		if ((decorations & (TextDecorations.Underline | TextDecorations.Strikethrough)) == 0)
+		{
+			return;
+		}
+
+		var metrics = run.fontDetails.SKFontMetrics;
+		var fontSize = run.fontDetails.SKFontSize;
+		var baselineY = line.y + line.baselineOffset;
+		var paint = SetupPaint(run.inline.Foreground, session.Opacity);
+
+		if ((decorations & TextDecorations.Underline) != 0)
+		{
+			var thickness = Math.Max(1f, metrics.UnderlineThickness ?? fontSize / 14f);
+			var y = baselineY + (metrics.UnderlinePosition ?? fontSize / 10f);
+			session.Canvas.DrawRect(new SKRect(x, y, x + run.width, y + thickness), paint);
+		}
+
+		if ((decorations & TextDecorations.Strikethrough) != 0)
+		{
+			var thickness = Math.Max(1f, metrics.StrikeoutThickness ?? fontSize / 14f);
+			var y = baselineY + (metrics.StrikeoutPosition ?? fontSize / -3.5f);
+			session.Canvas.DrawRect(new SKRect(x, y - thickness / 2, x + run.width, y + thickness / 2), paint);
+		}
+	}
+
 	private static SKPaint SetupPaint(Brush? foreground, float opacity)
 	{
 		var paint = _spareDrawPaint;
