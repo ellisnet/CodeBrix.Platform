@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.UI.ViewManagement;
 using CodeBrix.Platform.Foundation.Logging;
@@ -120,8 +119,8 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		};
 
 		_applicationView = ApplicationView.GetForWindowId(winUIWindow.AppWindow.Id);
-		CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBarChanged += UpdateWindowPropertiesFromCoreApplication;
-		winUIWindow.AppWindow.TitleBar.ExtendsContentIntoTitleBarChanged += ExtendContentIntoTitleBar;
+		// WPE1-13: ExtendsContentIntoTitleBar / ExtendViewIntoTitleBar no longer remove the decorations on X11 (see
+		// X11WindowWrapper), so this host does not listen for them any more.
 
 		Initialize();
 
@@ -146,8 +145,6 @@ internal partial class X11XamlRootHost : IXamlRootHost
 			{
 				XamlRootMap.Unregister(xamlRoot);
 				_windowToHost.Remove(winUIWindow, out var _);
-				CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBarChanged -= UpdateWindowPropertiesFromCoreApplication;
-				winUIWindow.AppWindow.TitleBar.ExtendsContentIntoTitleBarChanged -= ExtendContentIntoTitleBar;
 				windowBackgroundDisposable.Dispose();
 				_renderTimer.Dispose();
 				_renderer?.Dispose();
@@ -159,15 +156,6 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		=> _windowToHost.TryGetValue(window, out var host) ? host : null;
 
 	public Task Closed { get; }
-
-	internal void UpdateWindowPropertiesFromCoreApplication()
-	{
-		var coreApplicationView = CoreApplication.GetCurrentView();
-
-		ExtendContentIntoTitleBar(coreApplicationView.TitleBar.ExtendViewIntoTitleBar);
-	}
-
-	internal void ExtendContentIntoTitleBar(bool extend) => X11Helper.SetMotifWMDecorations(RootX11Window, !extend, 0xFF);
 
 	private void UpdateWindowPropertiesFromPackage()
 	{

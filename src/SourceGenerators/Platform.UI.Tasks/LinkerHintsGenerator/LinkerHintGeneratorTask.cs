@@ -250,6 +250,9 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 				}
 			}
 
+			// The generated BindableMetadataProviders stay enabled in every pass and in the final trim (D10, WPE1-11).
+			LinkerHintBindableMetadata.EnableProviders(features);
+
 			return features;
 		}
 
@@ -282,7 +285,8 @@ namespace CodeBrix.Platform.UI.Tasks.LinkerHintsGenerator //Was previously: Uno.
 
 			var hints = FindAvailableLinkerHints(assemblySearchList);
 
-			var output = string.Join(" ", hints.Select(h => $"--feature {h} false"));
+			// Every hint starts false except the BindableMetadataProvider ones (D10, WPE1-11: LinkerHintBindableMetadata).
+			var output = string.Join(" ", hints.Select(h => $"--feature {h} {LinkerHintBindableMetadata.InitialValue(h)}"));
 
 			assemblySearchList.ForEach(a => a.Dispose());
 

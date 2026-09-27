@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.Web.WebView2.Core
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CoreWebView2
@@ -689,7 +689,7 @@ namespace Microsoft.Web.WebView2.Core
 			}
 		}
 #endif
-		// Skipping already declared event DownloadStarting
+		// Skipping already declared event Microsoft.Web.WebView2.Core.CoreWebView2.DownloadStarting
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public event global::Windows.Foundation.TypedEventHandler<global::Microsoft.Web.WebView2.Core.CoreWebView2, global::Microsoft.Web.WebView2.Core.CoreWebView2FrameCreatedEventArgs> FrameCreated

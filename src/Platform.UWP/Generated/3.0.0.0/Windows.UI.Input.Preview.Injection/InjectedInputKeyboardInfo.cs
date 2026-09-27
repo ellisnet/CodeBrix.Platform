@@ -3,60 +3,15 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.UI.Input.Preview.Injection
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InjectedInputKeyboardInfo
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public ushort VirtualKey
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort InjectedInputKeyboardInfo.VirtualKey is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo", "ushort InjectedInputKeyboardInfo.VirtualKey");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public ushort ScanCode
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort InjectedInputKeyboardInfo.ScanCode is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo", "ushort InjectedInputKeyboardInfo.ScanCode");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.UI.Input.Preview.Injection.InjectedInputKeyOptions KeyOptions
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member InjectedInputKeyOptions InjectedInputKeyboardInfo.KeyOptions is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo", "InjectedInputKeyOptions InjectedInputKeyboardInfo.KeyOptions");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public InjectedInputKeyboardInfo()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo", "InjectedInputKeyboardInfo.InjectedInputKeyboardInfo()");
-		}
-#endif
+		// Skipping already declared property VirtualKey
+		// Skipping already declared property ScanCode
+		// Skipping already declared property KeyOptions
+		// Skipping already declared method Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo.InjectedInputKeyboardInfo()
 		// Forced skipping of method Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo.InjectedInputKeyboardInfo()
 		// Forced skipping of method Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo.KeyOptions.get
 		// Forced skipping of method Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo.KeyOptions.set

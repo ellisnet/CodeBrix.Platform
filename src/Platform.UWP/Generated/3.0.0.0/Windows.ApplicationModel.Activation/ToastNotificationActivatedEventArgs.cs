@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Activation
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ToastNotificationActivatedEventArgs : global::Windows.ApplicationModel.Activation.IToastNotificationActivatedEventArgs, global::Windows.ApplicationModel.Activation.IActivatedEventArgs, global::Windows.ApplicationModel.Activation.IActivatedEventArgsWithUser, global::Windows.ApplicationModel.Activation.IApplicationViewActivatedEventArgs

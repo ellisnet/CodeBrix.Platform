@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Haptics
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class SimpleHapticsController
@@ -18,8 +18,8 @@ namespace Windows.Devices.Haptics
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool IsIntensitySupported
 		{
 			get
@@ -28,8 +28,8 @@ namespace Windows.Devices.Haptics
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool IsPlayCountSupported
 		{
 			get
@@ -38,8 +38,8 @@ namespace Windows.Devices.Haptics
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool IsPlayDurationSupported
 		{
 			get
@@ -48,8 +48,8 @@ namespace Windows.Devices.Haptics
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool IsReplayPauseIntervalSupported
 		{
 			get
@@ -58,8 +58,8 @@ namespace Windows.Devices.Haptics
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::System.Collections.Generic.IReadOnlyList<global::Windows.Devices.Haptics.SimpleHapticsControllerFeedback> SupportedFeedback
 		{
 			get
@@ -81,8 +81,8 @@ namespace Windows.Devices.Haptics
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Devices.Haptics.SimpleHapticsController", "void SimpleHapticsController.StopFeedback()");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void SendHapticFeedback(global::Windows.Devices.Haptics.SimpleHapticsControllerFeedback feedback)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Devices.Haptics.SimpleHapticsController", "void SimpleHapticsController.SendHapticFeedback(SimpleHapticsControllerFeedback feedback)");

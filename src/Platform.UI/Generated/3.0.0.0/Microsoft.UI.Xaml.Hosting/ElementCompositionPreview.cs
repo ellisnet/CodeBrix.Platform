@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Hosting
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ElementCompositionPreview
@@ -38,8 +38,8 @@ namespace Microsoft.UI.Xaml.Hosting
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Hosting.ElementCompositionPreview", "void ElementCompositionPreview.SetImplicitHideAnimation(UIElement element, ICompositionAnimationBase animation)");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static void SetIsTranslationEnabled(global::Microsoft.UI.Xaml.UIElement element, bool value)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Hosting.ElementCompositionPreview", "void ElementCompositionPreview.SetIsTranslationEnabled(UIElement element, bool value)");

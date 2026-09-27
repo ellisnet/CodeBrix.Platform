@@ -4,7 +4,7 @@
 namespace Windows.Foundation.Metadata
 {
 	[global::System.AttributeUsageAttribute(global::System.AttributeTargets.Class, Inherited = true, AllowMultiple = false)]
-#if false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class GCPressureAttribute : global::System.Attribute

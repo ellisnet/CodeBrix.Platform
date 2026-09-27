@@ -3,41 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Activation
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ProtocolActivatedEventArgs : global::Windows.ApplicationModel.Activation.IProtocolActivatedEventArgs, global::Windows.ApplicationModel.Activation.IActivatedEventArgs, global::Windows.ApplicationModel.Activation.IProtocolActivatedEventArgsWithCallerPackageFamilyNameAndData, global::Windows.ApplicationModel.Activation.IApplicationViewActivatedEventArgs, global::Windows.ApplicationModel.Activation.IViewSwitcherProvider, global::Windows.ApplicationModel.Activation.IActivatedEventArgsWithUser
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public global::Windows.ApplicationModel.Activation.ActivationKind Kind
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ActivationKind ProtocolActivatedEventArgs.Kind is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public global::Windows.ApplicationModel.Activation.ApplicationExecutionState PreviousExecutionState
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ApplicationExecutionState ProtocolActivatedEventArgs.PreviousExecutionState is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public global::Windows.ApplicationModel.Activation.SplashScreen SplashScreen
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member SplashScreen ProtocolActivatedEventArgs.SplashScreen is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property Kind
+		// Skipping already declared property PreviousExecutionState
+		// Skipping already declared property SplashScreen
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.System.User User
@@ -48,26 +21,8 @@ namespace Windows.ApplicationModel.Activation
 			}
 		}
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public int CurrentlyShownApplicationViewId
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int ProtocolActivatedEventArgs.CurrentlyShownApplicationViewId is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public global::System.Uri Uri
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member Uri ProtocolActivatedEventArgs.Uri is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property CurrentlyShownApplicationViewId
+		// Skipping already declared property Uri
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public string CallerPackageFamilyName

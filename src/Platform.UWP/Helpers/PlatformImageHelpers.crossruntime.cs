@@ -16,14 +16,31 @@ internal static partial class PlatformImageHelpers
 	internal static Task<string> GetScaledPath(Uri uri, ResolutionScale? scaleOverride)
 	{
 		var path = uri.PathAndQuery;
-		if (uri.Host is { Length: > 0 } host)
+		if (uri.Host is { Length: > 0 })
 		{
+			// WPE1-14: the host as written when that path exists under the installed folder, else lower-cased as before
+			// (with a registered package-files platform the path below is only the cache key).
+			var host = ApplicationPackageFiles.Platform is null
+				? InstalledPackagePath.ResolveHost(uri, Package.Current.InstalledPath, path)
+				: uri.Host;
 			path = host + "/" + path.TrimStart('/');
 		}
 
 		// Avoid querying filesystem if we already seen this file
 		if (_scaledBitmapCache.TryGetValue(path, out var result))
 		{
+			return Task.FromResult(result);
+		}
+
+		// WPE1-13: with a registered package-files platform the scale variants are probed in the package and the
+		// result is an ms-appx URI (opened through the same platform); unregistered, a file path, as before.
+		if (ApplicationPackageFiles.Platform is { } packageFiles)
+		{
+#pragma warning disable RS0030 // Do not use banned APIs // same as the file-path branch below
+			var scale = (int)(scaleOverride ?? DisplayInformation.GetForCurrentView().ResolutionScale);
+#pragma warning restore RS0030
+			result = ApplicationPackageFiles.ToUriString(ApplicationPackageFiles.FindScaledPath(packageFiles, ApplicationPackageFiles.GetRelativePath(uri), scale, KnownScales));
+			_scaledBitmapCache[path] = result;
 			return Task.FromResult(result);
 		}
 

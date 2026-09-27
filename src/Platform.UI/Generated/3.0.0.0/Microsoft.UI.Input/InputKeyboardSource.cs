@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InputKeyboardSource : global::Microsoft.UI.Input.InputObject
@@ -12,24 +12,24 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.CharacterReceived.add
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.CharacterReceived.remove
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.ContextMenuKey.add
+		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.ContextMenuKey.remove
+		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.KeyDown.add
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.VirtualKeyStates GetCurrentKeyState(global::Windows.System.VirtualKey virtualKey)
+		public global::Microsoft.UI.Input.VirtualKeyStates GetKeyState(global::Windows.System.VirtualKey virtualKey)
 		{
-			throw new global::System.NotImplementedException("The member VirtualKeyStates InputKeyboardSource.GetCurrentKeyState(VirtualKey virtualKey) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
+			throw new global::System.NotImplementedException("The member VirtualKeyStates InputKeyboardSource.GetKeyState(VirtualKey virtualKey) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.KeyDown.add
-		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.ContextMenuKey.remove
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.KeyUp.add
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.KeyUp.remove
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.SystemKeyDown.add
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.SystemKeyDown.remove
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.VirtualKeyStates GetKeyState(global::Windows.System.VirtualKey virtualKey)
+		public global::Microsoft.UI.Input.VirtualKeyStates GetCurrentKeyState(global::Windows.System.VirtualKey virtualKey)
 		{
-			throw new global::System.NotImplementedException("The member VirtualKeyStates InputKeyboardSource.GetKeyState(VirtualKey virtualKey) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
+			throw new global::System.NotImplementedException("The member VirtualKeyStates InputKeyboardSource.GetCurrentKeyState(VirtualKey virtualKey) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
 		// Forced skipping of method Microsoft.UI.Input.InputKeyboardSource.SystemKeyUp.remove

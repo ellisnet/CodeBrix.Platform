@@ -3,8 +3,8 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Graphics.Imaging
 {
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 #endif
 	public partial class SoftwareBitmap : global::System.IDisposable
 	{
@@ -36,8 +36,8 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Graphics.Imaging.BitmapAlphaMode BitmapAlphaMode
 		{
 			get
@@ -46,8 +46,8 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Graphics.Imaging.BitmapPixelFormat BitmapPixelFormat
 		{
 			get
@@ -56,8 +56,8 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool IsReadOnly
 		{
 			get
@@ -66,8 +66,8 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public int PixelHeight
 		{
 			get
@@ -76,8 +76,8 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public int PixelWidth
 		{
 			get
@@ -86,16 +86,16 @@ namespace Windows.Graphics.Imaging
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public SoftwareBitmap(global::Windows.Graphics.Imaging.BitmapPixelFormat format, int width, int height)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Graphics.Imaging.SoftwareBitmap", "SoftwareBitmap.SoftwareBitmap(BitmapPixelFormat format, int width, int height)");
 		}
 #endif
 		// Forced skipping of method Windows.Graphics.Imaging.SoftwareBitmap.SoftwareBitmap(Windows.Graphics.Imaging.BitmapPixelFormat, int, int)
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public SoftwareBitmap(global::Windows.Graphics.Imaging.BitmapPixelFormat format, int width, int height, global::Windows.Graphics.Imaging.BitmapAlphaMode alpha)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Graphics.Imaging.SoftwareBitmap", "SoftwareBitmap.SoftwareBitmap(BitmapPixelFormat format, int width, int height, BitmapAlphaMode alpha)");
@@ -118,8 +118,8 @@ namespace Windows.Graphics.Imaging
 			throw new global::System.NotImplementedException("The member BitmapBuffer SoftwareBitmap.LockBuffer(BitmapBufferAccessMode mode) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void CopyTo(global::Windows.Graphics.Imaging.SoftwareBitmap bitmap)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Graphics.Imaging.SoftwareBitmap", "void SoftwareBitmap.CopyTo(SoftwareBitmap bitmap)");
@@ -139,22 +139,22 @@ namespace Windows.Graphics.Imaging
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Graphics.Imaging.SoftwareBitmap", "void SoftwareBitmap.CopyToBuffer(IBuffer buffer)");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Graphics.Imaging.SoftwareBitmap GetReadOnlyView()
 		{
 			throw new global::System.NotImplementedException("The member SoftwareBitmap SoftwareBitmap.GetReadOnlyView() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void Dispose()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Graphics.Imaging.SoftwareBitmap", "void SoftwareBitmap.Dispose()");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Windows.Graphics.Imaging.SoftwareBitmap Copy(global::Windows.Graphics.Imaging.SoftwareBitmap source)
 		{
 			throw new global::System.NotImplementedException("The member SoftwareBitmap SoftwareBitmap.Copy(SoftwareBitmap source) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
@@ -174,15 +174,15 @@ namespace Windows.Graphics.Imaging
 			throw new global::System.NotImplementedException("The member SoftwareBitmap SoftwareBitmap.Convert(SoftwareBitmap source, BitmapPixelFormat format, BitmapAlphaMode alpha) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Windows.Graphics.Imaging.SoftwareBitmap CreateCopyFromBuffer(global::Windows.Storage.Streams.IBuffer source, global::Windows.Graphics.Imaging.BitmapPixelFormat format, int width, int height)
 		{
 			throw new global::System.NotImplementedException("The member SoftwareBitmap SoftwareBitmap.CreateCopyFromBuffer(IBuffer source, BitmapPixelFormat format, int width, int height) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Windows.Graphics.Imaging.SoftwareBitmap CreateCopyFromBuffer(global::Windows.Storage.Streams.IBuffer source, global::Windows.Graphics.Imaging.BitmapPixelFormat format, int width, int height, global::Windows.Graphics.Imaging.BitmapAlphaMode alpha)
 		{
 			throw new global::System.NotImplementedException("The member SoftwareBitmap SoftwareBitmap.CreateCopyFromBuffer(IBuffer source, BitmapPixelFormat format, int width, int height, BitmapAlphaMode alpha) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

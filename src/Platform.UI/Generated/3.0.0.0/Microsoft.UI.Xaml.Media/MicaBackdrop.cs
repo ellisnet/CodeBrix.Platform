@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Media
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MicaBackdrop : global::Microsoft.UI.Xaml.Media.SystemBackdrop
@@ -30,13 +30,7 @@ namespace Microsoft.UI.Xaml.Media
 			typeof(global::Microsoft.UI.Xaml.Media.MicaBackdrop),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Composition.SystemBackdrops.MicaKind)));
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public MicaBackdrop() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Media.MicaBackdrop", "MicaBackdrop.MicaBackdrop()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Media.MicaBackdrop.MicaBackdrop()
 		// Forced skipping of method Microsoft.UI.Xaml.Media.MicaBackdrop.MicaBackdrop()
 		// Forced skipping of method Microsoft.UI.Xaml.Media.MicaBackdrop.Kind.get
 		// Forced skipping of method Microsoft.UI.Xaml.Media.MicaBackdrop.Kind.set

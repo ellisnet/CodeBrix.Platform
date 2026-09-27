@@ -3,18 +3,19 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InputPointerSource : global::Microsoft.UI.Input.InputObject
 	{
 		// Skipping already declared property Cursor
 		// Skipping already declared property DeviceKinds
-		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerEntered.add
-		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.DeviceKinds.get
-		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerCaptureLost.add
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerCaptureLost.remove
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.Cursor.set
+		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.DeviceKinds.get
+		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerCaptureLost.add
+		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.Cursor.get
+		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerEntered.add
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerEntered.remove
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerExited.add
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerExited.remove
@@ -32,7 +33,6 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerRoutedTo.remove
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerWheelChanged.add
 		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.PointerWheelChanged.remove
-		// Forced skipping of method Microsoft.UI.Input.InputPointerSource.Cursor.get
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Input.InputPointerSource GetForIsland(global::Microsoft.UI.Content.ContentIsland island)

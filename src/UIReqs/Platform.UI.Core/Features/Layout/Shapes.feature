@@ -106,3 +106,33 @@ Scenario: Changing a shape's Fill repaints it in the new colour
 	Then the region of "box" is uniformly "Blue"
 	And the region of "box" does not contain "Red"
 	And the region of "box" in frame "blue" differs from frame "red"
+
+Scenario: A Path whose Data is an EllipseGeometry fills the ellipse and leaves its corners empty
+	Given the application shows a Path named "oval" whose Data is an EllipseGeometry centred at 150,100 with radii 150 and 100 filled "Red"
+	When the frame is captured
+	Then "oval" is 300 by 200 device pixels
+	And the corner pixels of "oval" are the panel background
+	And the region of "oval" contains at least 60 percent "Red"
+	And the top half of the region of "oval" contains at least 60 percent "Red"
+
+Scenario: A Path whose Data is a LineGeometry draws the line in its Stroke
+	Given the application shows a Path named "rule" whose Data is a LineGeometry from 0,10 to 300,10 stroked "Red" 10 thick
+	When the frame is captured
+	Then the region of "rule" has ink
+	And the ink color of "rule" is "Red"
+
+Scenario: Changing the radius of a Path's EllipseGeometry redraws the Path
+	Given the application shows a Path named "oval" whose Data is an EllipseGeometry centred at 150,100 with radii 50 and 100 filled "Red"
+	When the frame is captured as "narrow"
+	And the RadiusX of the geometry of the Path "oval" is set to "150"
+	And the frame is captured as "wide"
+	Then "oval" is 300 by 200 device pixels
+	And the region of "oval" in frame "wide" holds more ink than in frame "narrow"
+
+Scenario: Changing the end point of a Path's LineGeometry redraws the Path
+	Given the application shows a Path named "rule" whose Data is a LineGeometry from 0,10 to 100,10 stroked "Red" 10 thick
+	When the frame is captured as "short"
+	And the EndPoint of the geometry of the Path "rule" is set to "300,10"
+	And the frame is captured as "long"
+	Then the region of "rule" in frame "long" holds more ink than in frame "short"
+	And the ink color of "rule" is "Red"

@@ -67,6 +67,13 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 		private readonly RoslynMetadataHelper _metadataHelper;
 
 		/// <summary>
+		/// WPE1-13 (FIXLIST [WPE1-11] x:Uid): the name of the resource map this project's string resources are generated
+		/// into - $(CodeBrixResourceMapLibraryName) when the project sets it (CodeBrix.Platform.UI.Core keeps the framework's
+		/// map name "CodeBrix.Platform.UI"), else the assembly name - so the x:Uid resource paths name the map that exists.
+		/// </summary>
+		private readonly string _resourceMapLibraryName;
+
+		/// <summary>
 		/// If set, code generated from XAML will be annotated with the source method and line # in XamlFileGenerator, for easier debugging.
 		/// </summary>
 		private readonly bool _shouldAnnotateGeneratedXaml;
@@ -260,6 +267,10 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 				.ToDictionary(p => p.Key, p => p.SelectMany(x => x.Value.Safe()).ToArray());
 
 			_defaultNamespace = context.GetMSBuildPropertyValue("RootNamespace");
+
+			_resourceMapLibraryName = context.GetMSBuildPropertyValue("CodeBrixResourceMapLibraryName") is { Length: > 0 } resourceMapLibraryName
+				? resourceMapLibraryName
+				: _metadataHelper.AssemblyName;
 
 			_isWasm = context.GetMSBuildPropertyValue("DefineConstantsProperty")?.Contains("__WASM__") ?? false;
 			_isDesignTimeBuild = Helpers.DesignTimeHelper.IsDesignTime(context);
@@ -618,7 +629,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 		{
 			var localResources = BuildLocalResourceDetails(ct);
 
-			var collection = new ResourceDetailsCollection(_metadataHelper.AssemblyName);
+			var collection = new ResourceDetailsCollection(_resourceMapLibraryName);
 
 			collection.AddRange(localResources);
 
@@ -635,7 +646,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 					try
 					{
 						var sourceText = file.File.GetText(ct)!;
-						var cachedFileKey = new ResourceCacheKey(file.Identity, sourceText.GetChecksum());
+						var cachedFileKey = new ResourceCacheKey(_resourceMapLibraryName, file.Identity, sourceText.GetChecksum());
 						var resourceFileName = Path.GetFileNameWithoutExtension(file.Identity);
 
 						if (_cachedResources.TryGetValue(cachedFileKey, out var cachedResource))
@@ -656,7 +667,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 						// Per this documentation, /root/data should be more performant than //data
 						var keys = doc.SelectNodes("/root/data")
 							?.Cast<XmlElement>()
-							.Select(node => new ResourceDetails(_metadataHelper.AssemblyName, resourceFileName, node.GetAttribute("name")))
+							.Select(node => new ResourceDetails(_resourceMapLibraryName, resourceFileName, node.GetAttribute("name")))
 							.ToArray() ?? Array.Empty<ResourceDetails>();
 						_cachedResources[cachedFileKey] = new CachedResource(DateTimeOffset.Now, keys);
 						return keys;

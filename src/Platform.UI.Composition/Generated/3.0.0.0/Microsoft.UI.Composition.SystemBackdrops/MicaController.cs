@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Composition.SystemBackdrops
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MicaController : global::Microsoft.UI.Composition.SystemBackdrops.ISystemBackdropController, global::System.IDisposable, global::Microsoft.UI.Composition.SystemBackdrops.ISystemBackdropControllerWithTargets, global::Microsoft.UI.IClosableNotifier

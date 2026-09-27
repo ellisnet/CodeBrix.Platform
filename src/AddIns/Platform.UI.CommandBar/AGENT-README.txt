@@ -341,8 +341,10 @@ ICONS
         {cb:RasterIconSource Source=..., Dark=..., Tint=..., Size=...}
         They are named after what they RETURN - a source - which is also what
         leaves <cb:SvgIcon /> and <cb:RasterIcon /> free to be the elements.
-        A relative path is read as ms-appx:///; an absolute URI is taken as
-        written. Use the full object syntax when you need to BIND a value.
+        A relative path is read as ms-appx:///; so is a path with ONE leading
+        slash ("/Assets/open.svg" = ms-appx:///Assets/open.svg, on every OS);
+        an absolute URI is taken as written. Use the full object syntax when
+        you need to BIND a value.
 
     enum IconTintMode
         CurrentColorOnly     (default) recolours only artwork that asked for

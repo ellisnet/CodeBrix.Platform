@@ -3,18 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.UI.Input.Preview.Injection
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InputInjector
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public void InjectKeyboardInput(global::System.Collections.Generic.IEnumerable<global::Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo> input)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Input.Preview.Injection.InputInjector", "void InputInjector.InjectKeyboardInput(IEnumerable<InjectedInputKeyboardInfo> input)");
-		}
-#endif
+		// Skipping already declared method Windows.UI.Input.Preview.Injection.InputInjector.InjectKeyboardInput(System.Collections.Generic.IEnumerable<Windows.UI.Input.Preview.Injection.InjectedInputKeyboardInfo>)
 		// Skipping already declared method Windows.UI.Input.Preview.Injection.InputInjector.InjectMouseInput(System.Collections.Generic.IEnumerable<Windows.UI.Input.Preview.Injection.InjectedInputMouseInfo>)
 		// Skipping already declared method Windows.UI.Input.Preview.Injection.InputInjector.InitializeTouchInjection(Windows.UI.Input.Preview.Injection.InjectedInputVisualizationMode)
 		// Skipping already declared method Windows.UI.Input.Preview.Injection.InputInjector.InjectTouchInput(System.Collections.Generic.IEnumerable<Windows.UI.Input.Preview.Injection.InjectedInputTouchInfo>)

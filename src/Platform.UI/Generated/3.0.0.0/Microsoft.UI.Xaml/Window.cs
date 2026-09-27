@@ -3,24 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Window
 	{
-#if false
-		public string Title
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member string Window.Title is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Window", "string Window.Title");
-			}
-		}
-#endif
+		// Skipping already declared property Title
 		// Skipping already declared property ExtendsContentIntoTitleBar
 		// Skipping already declared property Content
 		// Skipping already declared property Bounds

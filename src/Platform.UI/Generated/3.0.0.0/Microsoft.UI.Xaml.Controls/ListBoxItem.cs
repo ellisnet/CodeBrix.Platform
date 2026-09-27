@@ -3,18 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ListBoxItem : global::Microsoft.UI.Xaml.Controls.Primitives.SelectorItem
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public ListBoxItem() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.ListBoxItem", "ListBoxItem.ListBoxItem()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.ListBoxItem.ListBoxItem()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ListBoxItem.ListBoxItem()
 	}
 }

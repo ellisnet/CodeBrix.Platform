@@ -121,6 +121,9 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 			}
 		}
 
+		/// <summary>The known .scale-NNN qualifiers, ascending (WPE1-13: shared with the package-file probe).</summary>
+		internal static int[] ScaleQualifiers => KnownScales;
+
 		private static readonly int[] KnownScales =
 		{
 			(int)ResolutionScale.Scale100Percent,
@@ -157,9 +160,10 @@ namespace Microsoft.UI.Xaml.Media.Imaging
 				// so we need to resolve the appropriate asset here, with the scale-XYZ qualifier if available.
 
 				var path = uri.PathAndQuery;
-				if (uri.Host is { Length: > 0 } host)
+				if (uri.Host is { Length: > 0 })
 				{
-					path = host + "/" + path.TrimStart('/');
+					// WPE1-14: the host as written when that path exists, else lower-cased as before.
+					path = InstalledPackagePath.ResolveHost(uri, Package.Current.InstalledPath, path) + "/" + path.TrimStart('/');
 				}
 
 				return new Uri(GetScaledPath(path, scaleOverride));

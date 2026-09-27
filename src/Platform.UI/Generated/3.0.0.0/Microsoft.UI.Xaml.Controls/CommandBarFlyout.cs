@@ -8,47 +8,10 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 	public partial class CommandBarFlyout : global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Collections.IObservableVector<global::Microsoft.UI.Xaml.Controls.ICommandBarElement> PrimaryCommands
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member IObservableVector<ICommandBarElement> CommandBarFlyout.PrimaryCommands is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Collections.IObservableVector<global::Microsoft.UI.Xaml.Controls.ICommandBarElement> SecondaryCommands
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member IObservableVector<ICommandBarElement> CommandBarFlyout.SecondaryCommands is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public bool AlwaysExpanded
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool CommandBarFlyout.AlwaysExpanded is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.CommandBarFlyout", "bool CommandBarFlyout.AlwaysExpanded");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public CommandBarFlyout() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.CommandBarFlyout", "CommandBarFlyout.CommandBarFlyout()");
-		}
-#endif
+		// Skipping already declared property PrimaryCommands
+		// Skipping already declared property SecondaryCommands
+		// Skipping already declared property AlwaysExpanded
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.CommandBarFlyout.CommandBarFlyout()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.CommandBarFlyout.CommandBarFlyout()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.CommandBarFlyout.PrimaryCommands.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.CommandBarFlyout.SecondaryCommands.get

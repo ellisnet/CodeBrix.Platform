@@ -3,25 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls.Primitives
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class FlyoutShowOptions
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowMode ShowMode
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member FlyoutShowMode FlyoutShowOptions.ShowMode is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowOptions", "FlyoutShowMode FlyoutShowOptions.ShowMode");
-			}
-		}
-#endif
+		// Skipping already declared property ShowMode
 		// Skipping already declared property Position
 		// Skipping already declared property Placement
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

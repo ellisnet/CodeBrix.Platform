@@ -8,13 +8,7 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 	public partial class TextCommandBarFlyout : global::Microsoft.UI.Xaml.Controls.CommandBarFlyout
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public TextCommandBarFlyout() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextCommandBarFlyout", "TextCommandBarFlyout.TextCommandBarFlyout()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.TextCommandBarFlyout.TextCommandBarFlyout()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextCommandBarFlyout.TextCommandBarFlyout()
 	}
 }

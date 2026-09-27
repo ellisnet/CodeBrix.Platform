@@ -57,6 +57,53 @@ public class IconMarkupExtensionTests
 	}
 
 	[Fact]
+	public void a_path_with_one_leading_slash_is_read_as_an_application_asset_on_every_os()
+	{
+		//Arrange
+		var svg = new SvgIconSourceExtension { Source = "/Assets/open.svg", Dark = "/Assets/open-dark.svg" };
+		var raster = new RasterIconSourceExtension { Source = " /Assets/open.png " };
+
+		//Act
+		var svgSource = svg.CreateSource();
+		var rasterSource = raster.CreateSource();
+
+		//Assert
+		//Decision D1 (WPE1-11): on Linux and macOS Uri.TryCreate reads "/Assets/open.svg" as file:///Assets/open.svg;
+		//a rooted icon path means the application package, as it always did on Windows.
+		svgSource.Source.Should().Be(new Uri("ms-appx:///Assets/open.svg"));
+		svgSource.Dark.Should().Be(new Uri("ms-appx:///Assets/open-dark.svg"));
+		rasterSource.Source.Should().Be(new Uri("ms-appx:///Assets/open.png"));
+		svgSource.Source!.IsFile.Should().BeFalse();
+	}
+
+	[Fact]
+	public void a_path_with_one_leading_slash_and_the_same_path_without_it_name_the_same_asset()
+	{
+		//Act
+		var rooted = new SvgIconSourceExtension { Source = "/Icons/save.svg" }.CreateSource();
+		var relative = new SvgIconSourceExtension { Source = "Icons/save.svg" }.CreateSource();
+
+		//Assert
+		rooted.Source.Should().Be(relative.Source);
+		rooted.Source.Should().Be(new Uri("ms-appx:///Icons/save.svg"));
+	}
+
+	[Fact]
+	public void a_path_with_two_leading_slashes_is_not_an_application_asset()
+	{
+		//Arrange
+		var extension = new RasterIconSourceExtension { Source = "//server/share/open.png" };
+
+		//Act
+		var source = extension.CreateSource();
+
+		//Assert
+		//A UNC path is still taken as written (the D1 rule is for ONE leading slash only).
+		source.Source!.Scheme.Should().NotBe("ms-appx");
+		source.Source.IsUnc.Should().BeTrue();
+	}
+
+	[Fact]
 	public void an_absolute_uri_is_taken_exactly_as_written()
 	{
 		//Arrange

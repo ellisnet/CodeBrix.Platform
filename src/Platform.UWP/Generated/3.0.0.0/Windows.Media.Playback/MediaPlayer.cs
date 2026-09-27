@@ -3,59 +3,19 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Playback
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MediaPlayer : global::System.IDisposable
 	{
 		// Skipping already declared property Volume
 		// Skipping already declared property Position
-#if false
-		public double PlaybackRate
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double MediaPlayer.PlaybackRate is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "double MediaPlayer.PlaybackRate");
-			}
-		}
-#endif
-#if false
-		public bool IsLoopingEnabled
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool MediaPlayer.IsLoopingEnabled is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "bool MediaPlayer.IsLoopingEnabled");
-			}
-		}
-#endif
+		// Skipping already declared property PlaybackRate
+		// Skipping already declared property IsLoopingEnabled
 		// Skipping already declared property IsMuted
 		// Skipping already declared property AutoPlay
-#if false
-		public global::Windows.Media.Playback.MediaPlayerState CurrentState
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MediaPlayerState MediaPlayer.CurrentState is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public global::System.TimeSpan NaturalDuration
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member TimeSpan MediaPlayer.NaturalDuration is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property CurrentState
+		// Skipping already declared property NaturalDuration
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.Playback.PlaybackMediaMarkerSequence PlaybackMediaMarkers
@@ -66,68 +26,12 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false
-		public bool IsProtected
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool MediaPlayer.IsProtected is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public double BufferingProgress
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double MediaPlayer.BufferingProgress is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public bool CanPause
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool MediaPlayer.CanPause is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public bool CanSeek
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool MediaPlayer.CanSeek is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public global::Windows.Media.Playback.MediaPlayerAudioDeviceType AudioDeviceType
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MediaPlayerAudioDeviceType MediaPlayer.AudioDeviceType is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "MediaPlayerAudioDeviceType MediaPlayer.AudioDeviceType");
-			}
-		}
-#endif
-#if false
-		public global::Windows.Media.Playback.MediaPlayerAudioCategory AudioCategory
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MediaPlayerAudioCategory MediaPlayer.AudioCategory is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "MediaPlayerAudioCategory MediaPlayer.AudioCategory");
-			}
-		}
-#endif
+		// Skipping already declared property IsProtected
+		// Skipping already declared property BufferingProgress
+		// Skipping already declared property CanPause
+		// Skipping already declared property CanSeek
+		// Skipping already declared property AudioDeviceType
+		// Skipping already declared property AudioCategory
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.SystemMediaTransportControls SystemMediaTransportControls
@@ -138,19 +42,7 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false
-		public global::System.TimeSpan TimelineControllerPositionOffset
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member TimeSpan MediaPlayer.TimelineControllerPositionOffset is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "TimeSpan MediaPlayer.TimelineControllerPositionOffset");
-			}
-		}
-#endif
+		// Skipping already declared property TimelineControllerPositionOffset
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.MediaTimelineController TimelineController
@@ -179,19 +71,7 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false
-		public bool RealTimePlayback
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool MediaPlayer.RealTimePlayback is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "bool MediaPlayer.RealTimePlayback");
-			}
-		}
-#endif
+		// Skipping already declared property RealTimePlayback
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Devices.Enumeration.DeviceInformation AudioDevice
@@ -206,19 +86,7 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false
-		public double AudioBalance
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double MediaPlayer.AudioBalance is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "double MediaPlayer.AudioBalance");
-			}
-		}
-#endif
+		// Skipping already declared property AudioBalance
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.Playback.MediaPlaybackCommandManager CommandManager
@@ -322,32 +190,12 @@ namespace Windows.Media.Playback
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.BufferingEnded.remove
 		// Skipping already declared method Windows.Media.Playback.MediaPlayer.Play()
 		// Skipping already declared method Windows.Media.Playback.MediaPlayer.Pause()
-#if false
-		public void SetUriSource(global::System.Uri value)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.SetUriSource(Uri value)");
-		}
-#endif
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.SetUriSource(System.Uri)
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.ProtectionManager.get
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.ProtectionManager.set
-#if false
-		public void SetFileSource(global::Windows.Storage.IStorageFile file)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.SetFileSource(IStorageFile file)");
-		}
-#endif
-#if false
-		public void SetStreamSource(global::Windows.Storage.Streams.IRandomAccessStream stream)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.SetStreamSource(IRandomAccessStream stream)");
-		}
-#endif
-#if false
-		public void SetMediaSource(global::Windows.Media.Core.IMediaSource source)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.SetMediaSource(IMediaSource source)");
-		}
-#endif
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.SetFileSource(Windows.Storage.IStorageFile)
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.SetStreamSource(Windows.Storage.Streams.IRandomAccessStream)
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.SetMediaSource(Windows.Media.Core.IMediaSource)
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.Source.get
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.Source.set
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.SystemMediaTransportControls.get
@@ -389,18 +237,8 @@ namespace Windows.Media.Playback
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.TimelineControllerPositionOffset.get
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.TimelineControllerPositionOffset.set
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.PlaybackSession.get
-#if false
-		public void StepForwardOneFrame()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.StepForwardOneFrame()");
-		}
-#endif
-#if false
-		public void StepBackwardOneFrame()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.StepBackwardOneFrame()");
-		}
-#endif
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.StepForwardOneFrame()
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.StepBackwardOneFrame()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Media.Casting.CastingSource GetAsCastingSource()
@@ -408,12 +246,7 @@ namespace Windows.Media.Playback
 			throw new global::System.NotImplementedException("The member CastingSource MediaPlayer.GetAsCastingSource() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		public void SetSurfaceSize(global::Windows.Foundation.Size size)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "void MediaPlayer.SetSurfaceSize(Size size)");
-		}
-#endif
+		// Skipping already declared method Windows.Media.Playback.MediaPlayer.SetSurfaceSize(Windows.Foundation.Size)
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.GetSurface(Windows.UI.Composition.Compositor)
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
@@ -464,104 +297,20 @@ namespace Windows.Media.Playback
 		}
 #endif
 		// Forced skipping of method Windows.Media.Playback.MediaPlayer.AudioStateMonitor.get
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, object> BufferingEnded
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.BufferingEnded");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.BufferingEnded");
-			}
-		}
-#endif
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, object> BufferingStarted
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.BufferingStarted");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.BufferingStarted");
-			}
-		}
-#endif
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, object> CurrentStateChanged
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.CurrentStateChanged");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.CurrentStateChanged");
-			}
-		}
-#endif
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.BufferingEnded
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.BufferingStarted
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.CurrentStateChanged
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.MediaEnded
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.MediaFailed
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.MediaOpened
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, global::Windows.Media.Playback.MediaPlayerRateChangedEventArgs> MediaPlayerRateChanged
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, MediaPlayerRateChangedEventArgs> MediaPlayer.MediaPlayerRateChanged");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, MediaPlayerRateChangedEventArgs> MediaPlayer.MediaPlayerRateChanged");
-			}
-		}
-#endif
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, global::Windows.Media.Playback.PlaybackMediaMarkerReachedEventArgs> PlaybackMediaMarkerReached
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, PlaybackMediaMarkerReachedEventArgs> MediaPlayer.PlaybackMediaMarkerReached");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, PlaybackMediaMarkerReachedEventArgs> MediaPlayer.PlaybackMediaMarkerReached");
-			}
-		}
-#endif
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.MediaPlayerRateChanged
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.PlaybackMediaMarkerReached
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.SeekCompleted
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.VolumeChanged
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.IsMutedChanged
 		// Skipping already declared event Windows.Media.Playback.MediaPlayer.SourceChanged
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, object> VideoFrameAvailable
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.VideoFrameAvailable");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.VideoFrameAvailable");
-			}
-		}
-#endif
-#if false
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Media.Playback.MediaPlayer, object> SubtitleFrameChanged
-		{
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.SubtitleFrameChanged");
-			}
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlayer", "event TypedEventHandler<MediaPlayer, object> MediaPlayer.SubtitleFrameChanged");
-			}
-		}
-#endif
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.VideoFrameAvailable
+		// Skipping already declared event Windows.Media.Playback.MediaPlayer.SubtitleFrameChanged
 		// Processing: System.IDisposable
 	}
 }

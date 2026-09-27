@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class GestureRecognizer
@@ -230,7 +230,7 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.AutoProcessInertia.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.CrossSlideExact.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.CrossSlideExact.set
-		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaTranslationDeceleration.get
+		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.ManipulationExact.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.CrossSlideHorizontally.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.CrossSlideThresholds.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.CrossSlideThresholds.set
@@ -250,12 +250,12 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaRotationAngle.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaRotationDeceleration.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaRotationDeceleration.set
-		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.AutoProcessInertia.get
+		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaTranslationDeceleration.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaTranslationDeceleration.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaTranslationDisplacement.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.InertiaTranslationDisplacement.set
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.ManipulationExact.get
-		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.ManipulationExact.set
+		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.AutoProcessInertia.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.MouseWheelParameters.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.ShowGestureFeedback.get
 		// Forced skipping of method Microsoft.UI.Input.GestureRecognizer.ShowGestureFeedback.set

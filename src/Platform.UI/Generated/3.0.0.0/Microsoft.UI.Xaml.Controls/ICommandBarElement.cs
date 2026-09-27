@@ -3,25 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial interface ICommandBarElement
 	{
-#if false
-		int DynamicOverflowOrder
-		{
-			get;
-			set;
-		}
-#endif
+		// Skipping already declared property DynamicOverflowOrder
 		// Skipping already declared property IsCompact
-#if false
-		bool IsInOverflow
-		{
-			get;
-		}
-#endif
+		// Skipping already declared property IsInOverflow
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ICommandBarElement.IsCompact.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ICommandBarElement.IsCompact.set
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ICommandBarElement.IsInOverflow.get

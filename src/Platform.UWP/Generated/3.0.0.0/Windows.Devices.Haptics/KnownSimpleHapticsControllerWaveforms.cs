@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Haptics
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public static partial class KnownSimpleHapticsControllerWaveforms
@@ -13,106 +13,16 @@ namespace Windows.Devices.Haptics
 		// Skipping already declared property Press
 		// Skipping already declared property Release
 		// Skipping already declared property RumbleContinuous
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort BrushContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.BrushContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort ChiselMarkerContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.ChiselMarkerContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort EraserContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.EraserContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort Error
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.Error is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort GalaxyPenContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.GalaxyPenContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort Hover
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.Hover is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort InkContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.InkContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort MarkerContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.MarkerContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort PencilContinuous
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.PencilContinuous is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static ushort Success
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ushort KnownSimpleHapticsControllerWaveforms.Success is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property BrushContinuous
+		// Skipping already declared property ChiselMarkerContinuous
+		// Skipping already declared property EraserContinuous
+		// Skipping already declared property Error
+		// Skipping already declared property GalaxyPenContinuous
+		// Skipping already declared property Hover
+		// Skipping already declared property InkContinuous
+		// Skipping already declared property MarkerContinuous
+		// Skipping already declared property PencilContinuous
+		// Skipping already declared property Success
 		// Forced skipping of method Windows.Devices.Haptics.KnownSimpleHapticsControllerWaveforms.BrushContinuous.get
 		// Forced skipping of method Windows.Devices.Haptics.KnownSimpleHapticsControllerWaveforms.ChiselMarkerContinuous.get
 		// Forced skipping of method Windows.Devices.Haptics.KnownSimpleHapticsControllerWaveforms.EraserContinuous.get

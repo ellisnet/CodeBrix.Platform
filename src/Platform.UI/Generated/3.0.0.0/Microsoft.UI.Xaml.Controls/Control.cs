@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Control : global::Microsoft.UI.Xaml.FrameworkElement
@@ -64,20 +64,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::System.Uri DefaultStyleResourceUri
-		{
-			get
-			{
-				return (global::System.Uri)this.GetValue(DefaultStyleResourceUriProperty);
-			}
-			set
-			{
-				this.SetValue(DefaultStyleResourceUriProperty, value);
-			}
-		}
-#endif
+		// Skipping already declared property DefaultStyleResourceUri
 		// Skipping already declared property CornerRadius
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
@@ -119,14 +106,7 @@ namespace Microsoft.UI.Xaml.Controls
 			typeof(global::Microsoft.UI.Xaml.Controls.Control),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(object)));
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty DefaultStyleResourceUriProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(DefaultStyleResourceUri), typeof(global::System.Uri),
-			typeof(global::Microsoft.UI.Xaml.Controls.Control),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::System.Uri)));
-#endif
+		// Skipping already declared property DefaultStyleResourceUriProperty
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty ElementSoundModeProperty { get; } =
@@ -254,15 +234,15 @@ namespace Microsoft.UI.Xaml.Controls
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.Control.OnManipulationCompleted(Microsoft.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs)
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.Control.OnKeyUp(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs)
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.Control.OnKeyDown(Microsoft.UI.Xaml.Input.KeyRoutedEventArgs)
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		protected virtual void OnPreviewKeyDown(global::Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.Control", "void Control.OnPreviewKeyDown(KeyRoutedEventArgs e)");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		protected virtual void OnPreviewKeyUp(global::Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.Control", "void Control.OnPreviewKeyUp(KeyRoutedEventArgs e)");

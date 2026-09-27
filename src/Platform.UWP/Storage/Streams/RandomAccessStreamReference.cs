@@ -30,6 +30,12 @@ namespace Windows.Storage.Streams
 
 				if (uri.IsLocalResource())
 				{
+					// WPE1-13: a registered package-files platform serves ms-appx files as streams.
+					if (ApplicationPackageFiles.Platform is not null)
+					{
+						return await (await StorageFile.GetFileFromApplicationUriAsync(uri)).OpenReadAsync();
+					}
+
 					var convertedPath =
 						Path.Combine(Package.Current.InstalledPath,
 							uri.PathAndQuery.TrimStart('/').Replace('/', Path.DirectorySeparatorChar)

@@ -8,55 +8,10 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 	public partial class TabViewExternalTornOutTabsDroppingEventArgs
 	{
-#if false
-		internal TabViewExternalTornOutTabsDroppingEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public bool AllowDrop
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool TabViewExternalTornOutTabsDroppingEventArgs.AllowDrop is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TabViewExternalTornOutTabsDroppingEventArgs", "bool TabViewExternalTornOutTabsDroppingEventArgs.AllowDrop");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int DropIndex
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int TabViewExternalTornOutTabsDroppingEventArgs.DropIndex is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public object[] Items
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member object[] TabViewExternalTornOutTabsDroppingEventArgs.Items is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.UIElement[] Tabs
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member UIElement[] TabViewExternalTornOutTabsDroppingEventArgs.Tabs is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property AllowDrop
+		// Skipping already declared property DropIndex
+		// Skipping already declared property Items
+		// Skipping already declared property Tabs
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewExternalTornOutTabsDroppingEventArgs.Items.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewExternalTornOutTabsDroppingEventArgs.Tabs.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewExternalTornOutTabsDroppingEventArgs.DropIndex.get

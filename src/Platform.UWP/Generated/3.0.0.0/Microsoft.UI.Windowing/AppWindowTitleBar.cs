@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Windowing
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class AppWindowTitleBar
@@ -191,16 +191,7 @@ namespace Microsoft.UI.Windowing
 			}
 		}
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int Height
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int AppWindowTitleBar.Height is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property Height
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public int LeftInset
@@ -221,20 +212,7 @@ namespace Microsoft.UI.Windowing
 			}
 		}
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Windowing.TitleBarHeightOption PreferredHeightOption
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member TitleBarHeightOption AppWindowTitleBar.PreferredHeightOption is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.AppWindowTitleBar", "TitleBarHeightOption AppWindowTitleBar.PreferredHeightOption");
-			}
-		}
-#endif
+		// Skipping already declared property PreferredHeightOption
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Microsoft.UI.Windowing.TitleBarTheme PreferredTheme
@@ -280,20 +258,8 @@ namespace Microsoft.UI.Windowing
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.InactiveForegroundColor.set
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.LeftInset.get
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.RightInset.get
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public void ResetToDefault()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.AppWindowTitleBar", "void AppWindowTitleBar.ResetToDefault()");
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public void SetDragRectangles(global::Windows.Graphics.RectInt32[] value)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.AppWindowTitleBar", "void AppWindowTitleBar.SetDragRectangles(RectInt32[] value)");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Windowing.AppWindowTitleBar.ResetToDefault()
+		// Skipping already declared method Microsoft.UI.Windowing.AppWindowTitleBar.SetDragRectangles(Windows.Graphics.RectInt32[])
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.PreferredHeightOption.get
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.PreferredHeightOption.set
 		// Forced skipping of method Microsoft.UI.Windowing.AppWindowTitleBar.PreferredTheme.get

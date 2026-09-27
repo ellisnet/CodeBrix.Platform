@@ -3,12 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Automation.Peers
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class MenuFlyoutItemAutomationPeer : global::Microsoft.UI.Xaml.Automation.Peers.FrameworkElementAutomationPeer, global::Microsoft.UI.Xaml.Automation.Provider.IInvokeProvider
 	{
 		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.MenuFlyoutItemAutomationPeer(Microsoft.UI.Xaml.Controls.MenuFlyoutItem)
+		// Forced skipping of method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.MenuFlyoutItemAutomationPeer(Microsoft.UI.Xaml.Controls.MenuFlyoutItem)
 		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.MenuFlyoutItemAutomationPeer.Invoke()
 		// Processing: Microsoft.UI.Xaml.Automation.Provider.IInvokeProvider
 	}

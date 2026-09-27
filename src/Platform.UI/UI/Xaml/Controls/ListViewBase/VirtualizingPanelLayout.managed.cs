@@ -300,8 +300,18 @@ namespace Microsoft.UI.Xaml.Controls
 
 				// Set the seed start to use the approximate position of
 				// the line based on the average line height.
-				var index = (int)(ScrollOffset / _averageLineHeight);
-				SetDynamicSeed(CodeBrix.Platform.UI.IndexPath.FromRowSection(index - 1, 0), index * _averageLineHeight);
+				if (_showsGroupHeaders)
+				{
+					var (groupedSeed, groupedStart) = GroupLayoutAdjusted
+						? EstimateAdjustedGroupedSeed(ScrollOffset)
+						: EstimateGroupedSeed(ScrollOffset);
+					SetDynamicSeed(groupedSeed, groupedStart);
+				}
+				else
+				{
+					var index = (int)(ScrollOffset / _averageLineHeight);
+					SetDynamicSeed(CodeBrix.Platform.UI.IndexPath.FromRowSection(index - 1, 0), index * _averageLineHeight);
+				}
 			}
 
 			while (unappliedDelta > 0)
@@ -388,6 +398,7 @@ namespace Microsoft.UI.Xaml.Controls
 				return new Size(0, 0);
 			}
 
+			UpdateGroupHeaderState();
 			ViewportSize = ScrollViewer?.ViewportMeasureSize ?? default;
 			if (this.Log().IsEnabled(LogLevel.Debug))
 			{
@@ -442,6 +453,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private void ArrangeElements(Size finalSize, Size adjustedVisibleWindow)
 		{
+			var groupLayoutAdjusted = GroupLayoutAdjusted;
 			foreach (var line in _materializedLines)
 			{
 				var indexAdjustment = -1;
@@ -451,8 +463,19 @@ namespace Microsoft.UI.Xaml.Controls
 
 					var bounds = GetBoundsForElement(item.container);
 					var arrangedBounds = GetElementArrangeBounds(line.FirstItemFlat + indexAdjustment, bounds, adjustedVisibleWindow, finalSize);
+					if (groupLayoutAdjusted)
+					{
+						// GroupPadding / adjacent headers: the stretch stops at the group's end side.
+						arrangedBounds = AdjustGroupedArrangeBounds(bounds, arrangedBounds, line.IsHeader && AdjacentGroupHeaders);
+					}
+
 					item.container.Arrange(arrangedBounds);
 				}
+			}
+
+			if (_showsGroupHeaders || _stickyHeader is not null)
+			{
+				ArrangeStickyHeader(finalSize, adjustedVisibleWindow);
 			}
 		}
 
@@ -471,6 +494,12 @@ namespace Microsoft.UI.Xaml.Controls
 			UnfillLayout(extentAdjustment ?? 0);
 			FillLayout(extentAdjustment ?? 0);
 			SetDynamicSeed(null, null);
+
+			if (GroupLayoutAdjusted)
+			{
+				// GroupPadding / adjacent headers: lines added backward were placed from an estimate.
+				NormalizeGroupedLines();
+			}
 
 			CorrectForEstimationErrors();
 
@@ -497,6 +526,11 @@ namespace Microsoft.UI.Xaml.Controls
 
 			Generator.ClearScrappedViews();
 			Generator.UpdateVisibilities();
+
+			if (_headerScrap.Count > 0 || _headerPool.Count > 0)
+			{
+				ClearScrappedHeaders();
+			}
 
 			OwnerPanel.ShouldInterceptInvalidate = false;
 		}
@@ -596,6 +630,12 @@ namespace Microsoft.UI.Xaml.Controls
 		/// <param name="clearContainer">cleanup the container when an associated item is removed</param>
 		private void RecycleLine(Line line, bool clearContainer)
 		{
+			if (line.IsHeader)
+			{
+				RecycleHeader((ContentControl)line.FirstView, clearContainer);
+				return;
+			}
+
 			for (int i = 0; i < line.Items.Length; i++)
 			{
 				Generator.RecycleViewForItem(line.Items[i].container, line.FirstItemFlat + i, clearContainer);
@@ -607,6 +647,12 @@ namespace Microsoft.UI.Xaml.Controls
 		/// </summary>
 		private void ScrapLine(Line line)
 		{
+			if (line.IsHeader)
+			{
+				_headerScrap[line.Section] = (ContentControl)line.FirstView;
+				return;
+			}
+
 			for (int i = 0; i < line.Items.Length; i++)
 			{
 				Generator.ScrapViewForItem(line.Items[i].container, line.FirstItemFlat + i);
@@ -623,9 +669,10 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				var neededCorrection = 0d;
 				var start = GetMeasuredStart(firstLine.FirstView);
-				if (firstLine.FirstItemFlat == 0)
+				if (IsFirstElementLine(firstLine))
 				{
-					neededCorrection = -start;
+					// The first element starts the list (grouped with a GroupPadding: after the first group's leading padding).
+					neededCorrection = (GroupLayoutAdjusted ? GroupPaddingExtentStart : 0) - start;
 				}
 				else if (start < PositionOfFirstElement)
 				{
@@ -780,6 +827,11 @@ namespace Microsoft.UI.Xaml.Controls
 				this.Log().LogDebug($"{GetMethodTag()} Begin");
 			}
 
+			if (_showsGroupHeaders)
+			{
+				return GroupLayoutAdjusted ? EstimateAdjustedGroupedPanelExtent() : EstimateGroupedPanelExtent();
+			}
+
 			// Estimate remaining extent based on current average line height and remaining unmaterialized items
 			var lastIndexPath = GetLastMaterializedIndexPath();
 			if (lastIndexPath == null)
@@ -804,20 +856,32 @@ namespace Microsoft.UI.Xaml.Controls
 			return estimatedExtent;
 		}
 
-		private void UpdateAverageLineHeight() =>
+		private void UpdateAverageLineHeight()
+		{
+			if (_showsGroupHeaders)
+			{
+				UpdateGroupedAverageExtents();
+				return;
+			}
+
 			_averageLineHeight = _materializedLines.Count > 0
 				? _materializedLines.Select(l => GetMeasuredExtent(l.FirstView)).Average()
 				: 0;
+		}
 
 		private double CalculatePanelMeasureBreadth() =>
 #if false
 			GetBreadth(XamlParent?.ScrollViewer.ScrollBarSize ?? default) +
 #endif
-			_materializedLines.Select(l => GetDesiredBreadth(l.FirstView)).MaxOrDefault();
+			GroupLayoutAdjusted
+				? GetGroupedBreadth(arranged: false)
+				: _materializedLines.Select(l => GetDesiredBreadth(l.FirstView)).MaxOrDefault();
 
 		private double CalculatePanelArrangeBreadth() => ShouldMeasuredBreadthStretch
 			? AvailableBreadth
-			: _materializedLines.Select(l => GetActualBreadth(l.FirstView)).MaxOrDefault();
+			: GroupLayoutAdjusted
+				? GetGroupedBreadth(arranged: true)
+				: _materializedLines.Select(l => GetActualBreadth(l.FirstView)).MaxOrDefault();
 
 		internal void AddItems(int firstItem, int count, int section)
 		{
@@ -857,6 +921,12 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 
 			ClearLines(clearContainer: true);
+
+			if (ItemsControl?.ShowsGroupHeaders != true && (_headerPool.Count > 0 || _headerScrap.Count > 0 || _stickyHeader is not null))
+			{
+				// The list no longer shows group headers: drop the header containers kept for reuse.
+				DiscardHeaderContainers();
+			}
 
 			UpdateCompleted();
 			Generator.ClearIdCache();
@@ -933,6 +1003,17 @@ namespace Microsoft.UI.Xaml.Controls
 		/// </summary>
 		private protected virtual CodeBrix.Platform.UI.IndexPath? GetDynamicSeedIndex(CodeBrix.Platform.UI.IndexPath? firstVisibleItem)
 		{
+			if (_showsGroupHeaders)
+			{
+				// Grouped: the element (header or item) before the first realized one, in the grouped order.
+				if (firstVisibleItem is null || GetLastGroupedElement() is not { } lastElement || firstVisibleItem.Value > lastElement)
+				{
+					return null;
+				}
+
+				return GetNextUnmaterializedItem(Backward, firstVisibleItem);
+			}
+
 			var lastItem = ItemsControl?.GetLastItem();
 			if (lastItem == null ||
 				(firstVisibleItem != null && firstVisibleItem.Value > lastItem.Value)
@@ -951,11 +1032,22 @@ namespace Microsoft.UI.Xaml.Controls
 
 		internal CodeBrix.Platform.UI.IndexPath GetFirstVisibleIndexPath()
 		{
+			if (_showsGroupHeaders)
+			{
+				// Header lines are not items.
+				return GetFirstItemLine()?.FirstItem ?? CodeBrix.Platform.UI.IndexPath.NotFound;
+			}
+
 			return GetFirstMaterializedLine()?.FirstItem ?? CodeBrix.Platform.UI.IndexPath.NotFound;
 		}
 
 		private CodeBrix.Platform.UI.IndexPath GetLastVisibleIndexPath()
 		{
+			if (_showsGroupHeaders)
+			{
+				return GetLastItemLine()?.LastItem ?? CodeBrix.Platform.UI.IndexPath.NotFound;
+			}
+
 			return GetLastMaterializedLine()?.LastItem ?? CodeBrix.Platform.UI.IndexPath.NotFound;
 		}
 
@@ -969,7 +1061,15 @@ namespace Microsoft.UI.Xaml.Controls
 		private void AddLine(GeneratorDirection fillDirection, CodeBrix.Platform.UI.IndexPath nextVisibleItem)
 		{
 			var extentOffset = fillDirection == Backward ? GetContentStart() : GetContentEnd();
-			var line = CreateLine(fillDirection, extentOffset, AvailableBreadth, nextVisibleItem);
+			var line = _showsGroupHeaders && nextVisibleItem.Row == -1
+				? CreateHeaderLine(fillDirection, extentOffset, nextVisibleItem.Section)
+				: CreateLine(fillDirection, extentOffset, AvailableBreadth, nextVisibleItem);
+
+			if (GroupLayoutAdjusted)
+			{
+				// GroupPadding / adjacent headers: the line takes its place in its group.
+				PlaceNewGroupedLine(line, fillDirection, extentOffset);
+			}
 
 			if (fillDirection == Backward)
 			{
@@ -1066,6 +1166,12 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private double? GetItemsEnd()
 		{
+			if (GetLastMaterializedLine() is { IsHeader: true } lastHeader && GroupLayoutAdjusted && AdjacentGroupHeaders)
+			{
+				// An adjacent header's items start level with it, so the list is filled from its start on.
+				return GetMeasuredStart(lastHeader.FirstView);
+			}
+
 			var lastView = GetLastMaterializedLine()?.LastView;
 			if (lastView != null)
 			{
@@ -1258,6 +1364,7 @@ namespace Microsoft.UI.Xaml.Controls
 
 		internal void ScrollIntoView(object item, ScrollIntoViewAlignment alignment = ScrollIntoViewAlignment.Default)
 		{
+			UpdateGroupHeaderState();
 			var index = ItemsControl?.IndexFromItem(item) ?? -1;
 
 			ScrollIntoViewCore(index, alignment);
@@ -1268,6 +1375,16 @@ namespace Microsoft.UI.Xaml.Controls
 			if (index == -1) { return; }
 
 			var path = CodeBrix.Platform.UI.IndexPath.FromRowSection(index, 0);
+			if (_showsGroupHeaders)
+			{
+				// Grouped: the item's (row, group) path; the flat index alone is not a path.
+				if (ItemsControl?.GetIndexPathFromIndex(index) is not { } groupedPath)
+				{
+					return;
+				}
+
+				path = groupedPath;
+			}
 
 			if (_pendingCollectionChanges.Any(x =>
 				x.Action == NotifyCollectionChangedAction.Add &&
@@ -1292,8 +1409,18 @@ namespace Microsoft.UI.Xaml.Controls
 			if (FindViewByIndexPath(path) is not { } targetView)
 			{
 				// skip to an estimate offset of where the target could be
-				adjustedOffset = index * _averageLineHeight;
-				SetDynamicSeed(CodeBrix.Platform.UI.IndexPath.FromRowSection(index - 1, 0), adjustedOffset);
+				if (_showsGroupHeaders)
+				{
+					// The first item of a group is realized after its header.
+					var firstElement = path.Row == 0 ? CodeBrix.Platform.UI.IndexPath.FromRowSection(-1, path.Section) : path;
+					adjustedOffset = GroupLayoutAdjusted ? EstimateAdjustedGroupedStart(firstElement) : EstimateGroupedStart(firstElement);
+					SetDynamicSeed(GetNextGroupedElement(firstElement, Backward), adjustedOffset);
+				}
+				else
+				{
+					adjustedOffset = index * _averageLineHeight;
+					SetDynamicSeed(CodeBrix.Platform.UI.IndexPath.FromRowSection(index - 1, 0), adjustedOffset);
+				}
 				UpdateLayout(adjustedOffset - initialOffset, isScroll: true);
 
 				// scroll forward or backward as needed
@@ -1314,6 +1441,20 @@ namespace Microsoft.UI.Xaml.Controls
 
 			var start = GetMeasuredStart(targetView);
 			var end = GetMeasuredEnd(targetView);
+
+			if (_showsGroupHeaders)
+			{
+				if (path.Row == 0 && FindHeaderLine(path.Section) is { } headerLine)
+				{
+					// The first item of a group comes into view with its header.
+					start = GetMeasuredStart(headerLine.FirstView);
+				}
+				else
+				{
+					// A sticky header covers the top of the viewport: the item must show below it.
+					start -= GetStickyHeaderExtent(path);
+				}
+			}
 
 			// if the item is already fully within viewport AND we didn't need to scroll, then we are done here.
 			if (ViewportStart <= start && end <= ViewportEnd) { return; }
@@ -1387,6 +1528,12 @@ namespace Microsoft.UI.Xaml.Controls
 			public CodeBrix.Platform.UI.IndexPath LastItem { get; }
 			public int FirstItemFlat { get; }
 
+			/// <summary>True for the line of a group header (its one element is the header container).</summary>
+			public bool IsHeader { get; }
+
+			/// <summary>The display group of a header line (item lines: the group of their first item).</summary>
+			public int Section { get; }
+
 			public FrameworkElement FirstView => Items[0].container;
 			public FrameworkElement LastView => Items[Items.Length - 1].container;
 
@@ -1401,6 +1548,18 @@ namespace Microsoft.UI.Xaml.Controls
 				FirstItem = items[0].index;
 				LastItem = items.Last().index;
 				FirstItemFlat = firstItemFlat;
+				Section = FirstItem.Section;
+			}
+
+			/// <summary>Creates the line of the header of a display group; its index is (-1, group).</summary>
+			public Line(int section, FrameworkElement header)
+			{
+				Items = new[] { (header, CodeBrix.Platform.UI.IndexPath.FromRowSection(-1, section)) };
+				FirstItem = Items[0].index;
+				LastItem = Items[0].index;
+				FirstItemFlat = -1;
+				IsHeader = true;
+				Section = section;
 			}
 
 			public bool Contains(CodeBrix.Platform.UI.IndexPath index)

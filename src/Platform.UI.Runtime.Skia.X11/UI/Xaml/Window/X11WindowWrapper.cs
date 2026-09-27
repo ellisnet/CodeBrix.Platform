@@ -92,11 +92,9 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 		}
 	}
 
-	public override void ExtendContentIntoTitleBar(bool extend)
-	{
-		base.ExtendContentIntoTitleBar(extend);
-		_host.ExtendContentIntoTitleBar(extend);
-	}
+	// WPE1-13 (option b, Jeremy's GO 2026-09-26): ExtendsContentIntoTitleBar keeps the window manager's decorations on
+	// X11, as on macOS - the head has no caption buttons or drag regions of its own to replace them with. The base
+	// implementation (a no-op) applies; the Motif-hint removal this override used to do is gone.
 
 	private void OnWindowClosing()
 	{

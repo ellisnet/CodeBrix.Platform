@@ -93,5 +93,62 @@ namespace Microsoft.UI.Xaml.Controls
 			containers = Enumerable.Empty<DependencyObject>();
 			return false;
 		}
+
+		// ---------------------------------------------------------------- group headers (WPE1-8)
+
+		/// <summary>
+		/// Entry point for an items host: whether the list shows group headers (a grouped items source AND a GroupStyle).
+		/// When false the host shows the flat items only (a grouped source without a GroupStyle shows no headers).
+		/// </summary>
+		internal bool ItemsHostShowsGroupHeaders => ShowsGroupHeaders;
+
+		/// <summary>Entry point for an items host: the number of displayed groups (0 when the list shows no group headers).</summary>
+		/// <returns>The number of displayed groups (empty groups excluded when GroupStyle.HidesIfEmpty is true).</returns>
+		internal int GetItemsHostGroupCount() => ShowsGroupHeaders ? NumberOfDisplayGroups : 0;
+
+		/// <summary>
+		/// Entry point for an items host: the displayed group at <paramref name="displayGroupIndex"/> - its first flat item
+		/// index, its item count and its group object. The host draws the group's header before the item at FirstIndex (an
+		/// empty group: a header with no items).
+		/// </summary>
+		/// <param name="displayGroupIndex">The display index of the group (0 .. <see cref="GetItemsHostGroupCount"/> - 1).</param>
+		/// <returns>The group.</returns>
+		internal ItemsHostGroup GetItemsHostGroup(int displayGroupIndex)
+		{
+			var group = GetGroupAtDisplaySection(displayGroupIndex);
+			var firstIndex = GetIndexFromIndexPath(CodeBrix.Platform.UI.IndexPath.FromRowSection(0, displayGroupIndex));
+			return new ItemsHostGroup(firstIndex, group?.GroupItems?.Count ?? 0, group?.Group);
+		}
+
+		/// <summary>
+		/// Entry point for an items host: creates the header container of a displayed group (ListViewHeaderItem for a
+		/// ListView, GridViewHeaderItem for a GridView) and prepares it the way Core's own panels do (Content/DataContext =
+		/// the group, GroupStyle.HeaderTemplate / HeaderTemplateSelector / HeaderContainerStyle).
+		/// </summary>
+		/// <param name="displayGroupIndex">The display index of the group.</param>
+		/// <returns>The prepared header container.</returns>
+		internal DependencyObject CreateGroupHeaderContainerForItemsHost(int displayGroupIndex)
+			=> CreateGroupHeaderContainer(displayGroupIndex);
+
+		/// <summary>Entry point for an items host: re-binds a recycled header container to another displayed group.</summary>
+		/// <param name="container">A header container from <see cref="CreateGroupHeaderContainerForItemsHost"/>.</param>
+		/// <param name="displayGroupIndex">The display index of the group it now shows.</param>
+		internal void PrepareGroupHeaderContainerForItemsHost(DependencyObject container, int displayGroupIndex)
+		{
+			if (container is ContentControl header)
+			{
+				PrepareGroupHeaderContainer(header, displayGroupIndex);
+			}
+		}
+
+		/// <summary>Entry point for an items host: the header container no longer shows a group (scrolled out, or the groups changed).</summary>
+		/// <param name="container">A header container from <see cref="CreateGroupHeaderContainerForItemsHost"/>.</param>
+		internal void ReleaseGroupHeaderContainerFromItemsHost(DependencyObject container)
+		{
+			if (container is ContentControl header)
+			{
+				ClearGroupHeaderContainer(header);
+			}
+		}
 	}
 }

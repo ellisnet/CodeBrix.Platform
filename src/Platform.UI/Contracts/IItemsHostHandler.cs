@@ -29,6 +29,10 @@ internal interface IItemsHostHandler
 	/// index from the container). Core calls it for ContainerFromIndex / ContainerFromItem / IndexFromContainer,
 	/// selection updates and index repair after a collection change, so it must be cheap and must not realize anything.
 	/// </summary>
+	/// <remarks>
+	/// Item containers only: a host that draws group headers (ItemsControl.ItemsHostShowsGroupHeaders,
+	/// CreateGroupHeaderContainerForItemsHost) does not report its header containers here.
+	/// </remarks>
 	/// <returns>The realized containers (never <see langword="null"/>).</returns>
 	IEnumerable<DependencyObject> GetMaterializedContainers();
 

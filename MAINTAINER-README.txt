@@ -1057,6 +1057,21 @@ TRIMMING
     The same RuntimeHostConfigurationOption mechanism carries the framework's
     own trimming switches (build/nuget/platform.winui.common.targets). The
     M.E.Logging adapter Core's descriptor roots that whole (small) assembly.
+  - XAML resource trimming (CodeBrixXamlResourcesTrimming=true in an app's
+    head csproj, with PublishTrimmed; opt-in, off by default): the
+    linker-hint passes (LinkerHintGeneratorTask, Platform.UI.Tasks.targets)
+    trim the app repeatedly to find which XAML types survive, and the final
+    trim drops the default styles and the generated bindable metadata of the
+    types that did not. The generated BindableMetadataProvider hints are ON
+    in every pass and in the final trim (decision D10, WPE1-11:
+    LinkerHintBindableMetadata.cs); they used to stay off, which compiled the
+    app's bindable metadata away and trimmed navigated pages' constructors
+    (MissingMethodException from Frame.Navigate at startup). A page must be
+    named with typeof(...) somewhere (Frame.Navigate(typeof(MainPage)) is
+    enough); a page reached only by a type-name string is trimmed. Verify a
+    change here by publishing the template app trimmed in this mode and
+    starting it (frame buffer and X11): MainPage must load. Fence:
+    SourceGenerators.Tests Given_LinkerHintBindableMetadata.
   - Engine proof: src/Platform.UI.Engine.Tests drives each add-in engine
     host-free and asserts (EngineIsolation) that no WinUI assembly
     (UI.Core, Composition.Core, the WinRT Core, Dispatching.Core, Xaml,
@@ -1106,6 +1121,28 @@ CODING CONVENTIONS
     one is a packaging change.
   - Root doc filenames use dashes (CODEBRIX-PLATFORM-README.md,
     NOT-IMPLEMENTED.md, THIRD-PARTY-NOTICES.txt).
+  - The Generated/3.0.0.0 folders (Platform.UI, Platform.UWP,
+    Platform.Foundation, Platform.UI.Composition, Platform.UI.Dispatching) are
+    the OUTPUT of the API sync generator (src/Platform.UWPSyncGenerator, "sync"
+    mode) and are never edited by hand: a regeneration rewrites every file. To
+    implement a generated member, declare it (same public signature) in a
+    hand-written partial outside Generated/ and regenerate; the generator then
+    writes "// Skipping already declared ..." in place of the stub. A type
+    that gets a hand-written part loses the generated type-level
+    [NotImplemented] marker and internal constructor, so declare those in the
+    hand-written part if they must stay. Members the generator's metadata lacks
+    (it compares against Windows SDK 10.0.22000 contracts and Windows App SDK
+    1.8) must live in hand-written files too, or a regeneration deletes them
+    (example: src/Platform.UWP/UI/Notifications/ToastNotificationMode.cs).
+    The generator runs on Linux: build it (Debug), restore
+    src/Platform.UI/Platform.UI.Core.csproj, .Skia.csproj and .Tests.csproj,
+    then run "dotnet CodeBrix.Platform.UWPSyncGenerator.dll sync" from its
+    bin/Debug folder (a few minutes, CPU-heavy). Its reference metadata comes
+    from the NuGet cache (the packages listed in
+    src/Platform.UWPSyncGenerator/Helpers/WinRTReferenceList.cs, fetched with a
+    PackageDownload-only project); it writes nothing outside Generated/. Diff
+    the result before keeping it: anything beyond format normalization means a
+    hand edit or a hand-written member was missed.
 
 NOTES
 =====
@@ -1130,3 +1167,13 @@ NOTES
   - templates/TemplateApp.zip is the scaffold CodeBrix.Develop's "New
     CodeBrix.Platform Application" uses; keep it in step with the reference
     structure documented in AGENT-README.txt.
+  - ProgressRing animations (decision D3, WPE1-11): the default
+    FeatureConfiguration.ProgressRing URIs name the Core assembly
+    (embedded://CodeBrix.Platform.UI.Core/...). The Skia assembly
+    CodeBrix.Platform.UI still embeds the same two .json files (the
+    EmbeddedResource item in src/Platform.UI/Platform.UI.Skia.csproj) so an
+    app that set the old embedded://CodeBrix.Platform.UI/... URIs keeps
+    working for ONE release. Remove that item after the first nuget.org
+    release that carries the Core split (the first family version published
+    after 1.0.254.167): the copy ships in that release and is gone from the
+    one after it.

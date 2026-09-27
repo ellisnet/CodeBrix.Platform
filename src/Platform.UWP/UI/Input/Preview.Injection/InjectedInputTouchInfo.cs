@@ -19,7 +19,7 @@ public partial class InjectedInputTouchInfo
 
 	public InjectedInputRectangle Contact { get; set; }
 
-	internal PointerEventArgs ToEventArgs(InjectedInputState state)
+	internal PointerEventArgs ToEventArgs(InjectedInputState state, VirtualKeyModifiers modifiers = VirtualKeyModifiers.None)
 	{
 		var point = PointerInfo.ToPointerPoint(state);
 
@@ -38,6 +38,6 @@ public partial class InjectedInputTouchInfo
 			point.Properties.ContactRect = new Rect(Contact.Left, Contact.Top, Contact.Right - Contact.Left, Contact.Bottom - Contact.Top);
 		}
 
-		return new PointerEventArgs(point, VirtualKeyModifiers.None);
+		return new PointerEventArgs(point, modifiers);
 	}
 }

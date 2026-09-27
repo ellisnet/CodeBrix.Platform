@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Globalization.NumberFormatting
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class PercentFormatter : global::Windows.Globalization.NumberFormatting.INumberFormatterOptions, global::Windows.Globalization.NumberFormatting.INumberFormatter, global::Windows.Globalization.NumberFormatting.INumberFormatter2, global::Windows.Globalization.NumberFormatting.INumberParser, global::Windows.Globalization.NumberFormatting.ISignificantDigitsOption, global::Windows.Globalization.NumberFormatting.INumberRounderOption, global::Windows.Globalization.NumberFormatting.ISignedZeroOption

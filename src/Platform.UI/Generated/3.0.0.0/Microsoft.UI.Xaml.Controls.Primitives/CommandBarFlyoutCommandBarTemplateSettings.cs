@@ -8,211 +8,26 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 #endif
 	public partial class CommandBarFlyoutCommandBarTemplateSettings : global::Microsoft.UI.Xaml.DependencyObject
 	{
-#if false
-		internal CommandBarFlyoutCommandBarTemplateSettings()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double CloseAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.CloseAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Rect ContentClipRect
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member Rect CommandBarFlyoutCommandBarTemplateSettings.ContentClipRect is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double CurrentWidth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.CurrentWidth is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandDownAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandDownAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandDownAnimationHoldPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandDownAnimationHoldPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandDownAnimationStartPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandDownAnimationStartPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandDownOverflowVerticalPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandDownOverflowVerticalPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandUpAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandUpAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandUpAnimationHoldPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandUpAnimationHoldPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandUpAnimationStartPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandUpAnimationStartPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandUpOverflowVerticalPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandUpOverflowVerticalPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double ExpandedWidth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.ExpandedWidth is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double OpenAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.OpenAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double OpenAnimationStartPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.OpenAnimationStartPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Rect OverflowContentClipRect
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member Rect CommandBarFlyoutCommandBarTemplateSettings.OverflowContentClipRect is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double WidthExpansionAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.WidthExpansionAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double WidthExpansionAnimationStartPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.WidthExpansionAnimationStartPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double WidthExpansionDelta
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.WidthExpansionDelta is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double WidthExpansionMoreButtonAnimationEndPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.WidthExpansionMoreButtonAnimationEndPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double WidthExpansionMoreButtonAnimationStartPosition
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CommandBarFlyoutCommandBarTemplateSettings.WidthExpansionMoreButtonAnimationStartPosition is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property CloseAnimationEndPosition
+		// Skipping already declared property ContentClipRect
+		// Skipping already declared property CurrentWidth
+		// Skipping already declared property ExpandDownAnimationEndPosition
+		// Skipping already declared property ExpandDownAnimationHoldPosition
+		// Skipping already declared property ExpandDownAnimationStartPosition
+		// Skipping already declared property ExpandDownOverflowVerticalPosition
+		// Skipping already declared property ExpandUpAnimationEndPosition
+		// Skipping already declared property ExpandUpAnimationHoldPosition
+		// Skipping already declared property ExpandUpAnimationStartPosition
+		// Skipping already declared property ExpandUpOverflowVerticalPosition
+		// Skipping already declared property ExpandedWidth
+		// Skipping already declared property OpenAnimationEndPosition
+		// Skipping already declared property OpenAnimationStartPosition
+		// Skipping already declared property OverflowContentClipRect
+		// Skipping already declared property WidthExpansionAnimationEndPosition
+		// Skipping already declared property WidthExpansionAnimationStartPosition
+		// Skipping already declared property WidthExpansionDelta
+		// Skipping already declared property WidthExpansionMoreButtonAnimationEndPosition
+		// Skipping already declared property WidthExpansionMoreButtonAnimationStartPosition
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarTemplateSettings.OpenAnimationStartPosition.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarTemplateSettings.OpenAnimationEndPosition.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarTemplateSettings.CloseAnimationEndPosition.get

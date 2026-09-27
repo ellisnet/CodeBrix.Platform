@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class TextBox
@@ -135,8 +135,8 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool CanRedo
 		{
 			get
@@ -145,8 +145,8 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public bool CanUndo
 		{
 			get
@@ -174,16 +174,16 @@ namespace Microsoft.UI.Xaml.Controls
 			typeof(global::Microsoft.UI.Xaml.Controls.TextBox),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(bool)));
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty CanRedoProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(CanRedo), typeof(bool),
 			typeof(global::Microsoft.UI.Xaml.Controls.TextBox),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(bool)));
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty CanUndoProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(CanUndo), typeof(bool),
@@ -361,15 +361,15 @@ namespace Microsoft.UI.Xaml.Controls
 			throw new global::System.NotImplementedException("The member IAsyncOperation<IReadOnlyList<string>> TextBox.GetLinguisticAlternativesAsync() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void Undo()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextBox", "void TextBox.Undo()");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void Redo()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextBox", "void TextBox.Redo()");
@@ -378,8 +378,8 @@ namespace Microsoft.UI.Xaml.Controls
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.TextBox.PasteFromClipboard()
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.TextBox.CopySelectionToClipboard()
 		// Skipping already declared method Microsoft.UI.Xaml.Controls.TextBox.CutSelectionToClipboard()
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void ClearUndoRedoHistory()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextBox", "void TextBox.ClearUndoRedoHistory()");
@@ -485,7 +485,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public event global::Microsoft.UI.Xaml.Controls.TextControlPasteEventHandler Paste
 		{
@@ -502,6 +502,7 @@ namespace Microsoft.UI.Xaml.Controls
 		}
 #endif
 		// Skipping already declared event Microsoft.UI.Xaml.Controls.TextBox.SelectionChanged
+		// Skipping already declared event Microsoft.UI.Xaml.Controls.TextBox.SelectionChanging
 		// Skipping already declared event Microsoft.UI.Xaml.Controls.TextBox.TextChanged
 		// Skipping already declared event Microsoft.UI.Xaml.Controls.TextBox.TextChanging
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

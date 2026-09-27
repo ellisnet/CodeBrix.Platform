@@ -65,6 +65,11 @@ namespace Microsoft.UI.Content
 			}
 		}
 #endif
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.View.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.AppWindowId.set
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayId.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayId.set
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayScale.set
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void NotifySettingChanged(string setting)
@@ -72,12 +77,7 @@ namespace Microsoft.UI.Content
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Content.ContentSiteEnvironment", "void ContentSiteEnvironment.NotifySettingChanged(string setting)");
 		}
 #endif
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayId.get
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayId.set
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.View.get
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.AppWindowId.set
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayScale.get
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.DisplayScale.set
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironment.AppWindowId.get
 	}
 }

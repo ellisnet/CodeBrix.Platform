@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Content
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ContentIsland : global::System.IDisposable, global::Microsoft.UI.IClosableNotifier, global::Microsoft.UI.Composition.ICompositionSupportsSystemBackdrop

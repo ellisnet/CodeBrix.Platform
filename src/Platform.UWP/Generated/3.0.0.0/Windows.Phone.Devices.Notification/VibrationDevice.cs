@@ -3,17 +3,17 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Phone.Devices.Notification
 {
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || false || __CODEBRIX_CORE__
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__CODEBRIX_CORE__")]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class VibrationDevice
 	{
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || false || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		internal VibrationDevice()
 		{
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void Vibrate(global::System.TimeSpan duration)
 		{
@@ -27,7 +27,7 @@ namespace Windows.Phone.Devices.Notification
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Phone.Devices.Notification.VibrationDevice", "void VibrationDevice.Cancel()");
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Windows.Phone.Devices.Notification.VibrationDevice GetDefault()
 		{

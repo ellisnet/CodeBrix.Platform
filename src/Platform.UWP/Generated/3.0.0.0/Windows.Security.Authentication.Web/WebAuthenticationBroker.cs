@@ -4,6 +4,7 @@
 namespace Windows.Security.Authentication.Web
 {
 #if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public static partial class WebAuthenticationBroker
 	{
@@ -42,23 +43,8 @@ namespace Windows.Security.Authentication.Web
 			throw new global::System.NotImplementedException("The member IAsyncOperation<WebAuthenticationResult> WebAuthenticationBroker.AuthenticateSilentlyAsync(Uri requestUri, WebAuthenticationOptions options) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		public static global::Windows.Foundation.IAsyncOperation<global::Windows.Security.Authentication.Web.WebAuthenticationResult> AuthenticateAsync(global::Windows.Security.Authentication.Web.WebAuthenticationOptions options, global::System.Uri requestUri, global::System.Uri callbackUri)
-		{
-			throw new global::System.NotImplementedException("The member IAsyncOperation<WebAuthenticationResult> WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions options, Uri requestUri, Uri callbackUri) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
-#if false
-		public static global::Windows.Foundation.IAsyncOperation<global::Windows.Security.Authentication.Web.WebAuthenticationResult> AuthenticateAsync(global::Windows.Security.Authentication.Web.WebAuthenticationOptions options, global::System.Uri requestUri)
-		{
-			throw new global::System.NotImplementedException("The member IAsyncOperation<WebAuthenticationResult> WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions options, Uri requestUri) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
-#if false
-		public static global::System.Uri GetCurrentApplicationCallbackUri()
-		{
-			throw new global::System.NotImplementedException("The member Uri WebAuthenticationBroker.GetCurrentApplicationCallbackUri() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
+		// Skipping already declared method Windows.Security.Authentication.Web.WebAuthenticationBroker.AuthenticateAsync(Windows.Security.Authentication.Web.WebAuthenticationOptions, System.Uri, System.Uri)
+		// Skipping already declared method Windows.Security.Authentication.Web.WebAuthenticationBroker.AuthenticateAsync(Windows.Security.Authentication.Web.WebAuthenticationOptions, System.Uri)
+		// Skipping already declared method Windows.Security.Authentication.Web.WebAuthenticationBroker.GetCurrentApplicationCallbackUri()
 	}
 }

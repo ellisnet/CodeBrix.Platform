@@ -47,6 +47,13 @@ public class CodeBrixMissingAssemblyAnalyzer : DiagnosticAnalyzer
 				return;
 			}
 
+			// An Android head renders ProgressRing natively (its Lottie add-in has another assembly name), so the Skia
+			// Lottie package this rule asks for is meaningless there.
+			if (IsAndroidBuild(context.Options.AnalyzerConfigOptionsProvider.GlobalOptions))
+			{
+				return;
+			}
+
 			context.RegisterOperationAction(context =>
 			{
 				var objectCreation = (IObjectCreationOperation)context.Operation;
@@ -63,5 +70,21 @@ public class CodeBrixMissingAssemblyAnalyzer : DiagnosticAnalyzer
 				}
 			}, OperationKind.ObjectCreation);
 		});
+	}
+
+	/// <summary>
+	/// True when the compilation targets Android: the MSBuild property TargetPlatformIdentifier is "android", or (when
+	/// that property is not visible to the compiler) the TargetFramework carries the "-android" platform suffix.
+	/// </summary>
+	internal static bool IsAndroidBuild(AnalyzerConfigOptions globalOptions)
+	{
+		if (globalOptions.TryGetValue("build_property.TargetPlatformIdentifier", out var platform)
+			&& platform.Equals("android", StringComparison.OrdinalIgnoreCase))
+		{
+			return true;
+		}
+
+		return globalOptions.TryGetValue("build_property.TargetFramework", out var targetFramework)
+			&& targetFramework.IndexOf("-android", StringComparison.OrdinalIgnoreCase) >= 0;
 	}
 }

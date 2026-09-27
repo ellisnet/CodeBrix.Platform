@@ -263,6 +263,33 @@ public sealed partial class TriPaneView : Control
 	/// </summary>
 	internal void UpdateState() => State.UpdateState();
 
+	/// <summary>
+	/// Gets or sets the platform's override of the pane layout this control DISPLAYS (WPE1-13; see
+	/// <see cref="ITriPaneDisplayOverride"/>): an adaptive form shows fewer panes without writing the application's
+	/// percent or IsMinimized properties. <see langword="null"/> (the default, and always on CodeBrix.Platform) displays
+	/// the application's weights. Setting it runs a state pass.
+	/// </summary>
+	internal ITriPaneDisplayOverride? DisplayOverride
+	{
+		get => State.DisplayOverride;
+		set => State.DisplayOverride = value;
+	}
+
+	/// <summary>
+	/// Runs a state pass after the answer of the <see cref="DisplayOverride"/> changed (WPE1-13), e.g. when the window
+	/// moved to another size class.
+	/// </summary>
+	internal void RefreshDisplayOverride() => State.UpdateState();
+
+	/// <summary>
+	/// Gets the side or stack divider of the applied template (WPE1-13), for a platform that drives it through its
+	/// <c>RaiseDrag*FromPlatform</c> entry points; <see langword="null"/> before the template is applied.
+	/// </summary>
+	/// <param name="kind">Which divider.</param>
+	/// <returns>The divider, or <see langword="null"/>.</returns>
+	internal TriPaneViewDivider? GetDivider(TriPaneViewDividerKind kind)
+		=> kind == TriPaneViewDividerKind.Side ? _sideDivider : _stackDivider;
+
 	private static void AttachDivider(
 		TriPaneViewDivider? divider,
 		DragStartedEventHandler started,

@@ -86,6 +86,10 @@
 
 		<CompilerVisibleProperty Include="UseWPF" />
 		<CompilerVisibleProperty Include="IsCodeBrixHead" />
+		<!-- The Uno0007 analyzer (PlatformMissingAssemblyAnalyzer) stays silent in an Android build. -->
+		<CompilerVisibleProperty Include="TargetPlatformIdentifier" />
+		<!-- The resource-map name the x:Uid resource paths use (default: the assembly name; CodeBrix.Platform.UI.Core sets it). -->
+		<CompilerVisibleProperty Include="CodeBrixResourceMapLibraryName" />
 		<CompilerVisibleProperty Include="CodeBrixRemoteControlPort" />
 		<CompilerVisibleProperty Include="CodeBrixRemoteControlHost" />
 		<CompilerVisibleProperty Include="CodeBrixRemoteControlProcessorsPath" />

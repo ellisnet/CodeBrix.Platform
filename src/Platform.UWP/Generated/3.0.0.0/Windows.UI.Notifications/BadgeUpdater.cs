@@ -4,26 +4,12 @@
 namespace Windows.UI.Notifications
 {
 #if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class BadgeUpdater
 	{
-#if false
-		internal BadgeUpdater()
-		{
-		}
-#endif
-#if false
-		public void Update(global::Windows.UI.Notifications.BadgeNotification notification)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Notifications.BadgeUpdater", "void BadgeUpdater.Update(BadgeNotification notification)");
-		}
-#endif
-#if false
-		public void Clear()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Notifications.BadgeUpdater", "void BadgeUpdater.Clear()");
-		}
-#endif
+		// Skipping already declared method Windows.UI.Notifications.BadgeUpdater.Update(Windows.UI.Notifications.BadgeNotification)
+		// Skipping already declared method Windows.UI.Notifications.BadgeUpdater.Clear()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void StartPeriodicUpdate(global::System.Uri badgeContent, global::Windows.UI.Notifications.PeriodicUpdateRecurrence requestedInterval)

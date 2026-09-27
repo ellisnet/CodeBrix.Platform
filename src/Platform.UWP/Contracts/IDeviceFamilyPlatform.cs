@@ -8,9 +8,11 @@ namespace CodeBrix.Platform.Contracts;
 /// Implementers: Android, Mobile. Platform (Skia): not registered - the family stays
 /// <see cref="System.Environment.OSVersion"/>.Platform ("Unix" on Linux and macOS, "Win32NT" on Windows), as before.
 /// <para>
-/// OPTIONAL contract: read once, when AnalyticsInfo creates its AnalyticsVersionInfo (lazily, on the first read of
-/// AnalyticsInfo.VersionInfo), through <see cref="CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility"/>. The
-/// platform bootstrap registers it before that first read. Suggested values: "Android" (CodeBrix.Android), "Apple"
+/// OPTIONAL contract, resolved through <see cref="CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility"/> on EVERY
+/// read of AnalyticsVersionInfo.DeviceFamily (WPE1-11): while it is registered, DeviceFamily is live -
+/// "&lt;OperatingSystemFamily&gt;.&lt;AnalyticsInfo.DeviceForm&gt;" at the time of the read, so it follows the window
+/// between size classes. Keep the getter cheap. When it is not registered, DeviceFamily is composed once, when
+/// AnalyticsInfo creates its AnalyticsVersionInfo, as before. Suggested values: "Android" (CodeBrix.Android), "Apple"
 /// or the Apple OS name (CodeBrix.Mobile).
 /// </para>
 /// </remarks>

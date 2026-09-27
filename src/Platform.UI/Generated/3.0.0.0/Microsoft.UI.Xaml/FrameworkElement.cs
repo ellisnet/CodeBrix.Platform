@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class FrameworkElement
@@ -19,7 +19,7 @@ namespace Microsoft.UI.Xaml
 		// Skipping already declared property MinHeight
 		// Skipping already declared property MaxWidth
 		// Skipping already declared property MaxHeight
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Microsoft.UI.Xaml.Thickness Margin
 		{
@@ -115,7 +115,7 @@ namespace Microsoft.UI.Xaml
 			typeof(global::Microsoft.UI.Xaml.FrameworkElement),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(string)));
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty MarginProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
@@ -127,8 +127,8 @@ namespace Microsoft.UI.Xaml
 		// Skipping already declared property MaxWidthProperty
 		// Skipping already declared property MinHeightProperty
 		// Skipping already declared property MinWidthProperty
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty NameProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(Name), typeof(string),
@@ -259,7 +259,7 @@ namespace Microsoft.UI.Xaml
 		// Skipping already declared event Microsoft.UI.Xaml.FrameworkElement.LayoutUpdated
 		// Skipping already declared event Microsoft.UI.Xaml.FrameworkElement.Loaded
 		// Skipping already declared event Microsoft.UI.Xaml.FrameworkElement.Loading
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public event global::Microsoft.UI.Xaml.SizeChangedEventHandler SizeChanged
 		{

@@ -70,6 +70,51 @@ internal static class PlatformContract
 			+ "The platform bootstrap must run before it is used.");
 	}
 
+	private static bool _optionalBootstrapsRun;
+
+	/// <summary>
+	/// Returns the tick-source factory an animation source gives its engine (WPE1-13): the registered
+	/// <see cref="ILottieTickSourcePlatform"/>'s, or <paramref name="fallback"/> when the platform registers none.
+	/// </summary>
+	/// <param name="fallback">The built-in factory (on CodeBrix.Platform: the dispatcher-queue timer of the calling thread).</param>
+	/// <returns>The factory to hand the engine.</returns>
+	/// <remarks>When the contract is not registered, the platform assemblies' bootstraps run once per process (they may
+	/// simply not have run yet) and the lookup is repeated; after that an unregistered contract costs one registry lookup.</remarks>
+	internal static Func<Engine.ITickSource> SelectTickSourceFactory(Func<Engine.ITickSource> fallback)
+	{
+		if (TryResolveOptional<ILottieTickSourcePlatform>() is { } platform)
+		{
+			return platform.CreateTickSource;
+		}
+
+		return fallback;
+	}
+
+	/// <summary>
+	/// Returns the registered implementation of an OPTIONAL platform contract, or <see langword="null"/>; the platform
+	/// bootstraps run at most once per process to find it.
+	/// </summary>
+	/// <typeparam name="TContract">The contract interface.</typeparam>
+	/// <returns>The implementation, or <see langword="null"/>.</returns>
+	internal static TContract? TryResolveOptional<TContract>()
+		where TContract : class
+	{
+		if (ApiExtensibility.CreateInstance<TContract>(typeof(TContract), out var implementation))
+		{
+			return implementation;
+		}
+
+		if (_optionalBootstrapsRun)
+		{
+			return null;
+		}
+
+		_optionalBootstrapsRun = true;
+		RunPlatformBootstraps();
+
+		return ApiExtensibility.CreateInstance<TContract>(typeof(TContract), out implementation) ? implementation : null;
+	}
+
 	private static void RunPlatformBootstraps()
 	{
 		foreach (var name in PlatformAssemblyNames)

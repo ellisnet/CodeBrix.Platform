@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class PasswordBox
@@ -53,19 +53,7 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 		// Skipping already declared property PlaceholderText
 		// Skipping already declared property PasswordRevealMode
-#if false
-		public string PasswordChar
-		{
-			get
-			{
-				return (string)this.GetValue(PasswordCharProperty);
-			}
-			set
-			{
-				this.SetValue(PasswordCharProperty, value);
-			}
-		}
-#endif
+		// Skipping already declared property PasswordChar
 		// Skipping already declared property Password
 		// Skipping already declared property MaxLength
 		// Skipping already declared property IsPasswordRevealButtonEnabled
@@ -97,13 +85,7 @@ namespace Microsoft.UI.Xaml.Controls
 		// Skipping already declared property InputScopeProperty
 		// Skipping already declared property IsPasswordRevealButtonEnabledProperty
 		// Skipping already declared property MaxLengthProperty
-#if false
-		public static global::Microsoft.UI.Xaml.DependencyProperty PasswordCharProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(PasswordChar), typeof(string),
-			typeof(global::Microsoft.UI.Xaml.Controls.PasswordBox),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(string)));
-#endif
+		// Skipping already declared property PasswordCharProperty
 		// Skipping already declared property PasswordProperty
 		// Skipping already declared property PasswordRevealModeProperty
 		// Skipping already declared property PlaceholderTextProperty
@@ -221,7 +203,7 @@ namespace Microsoft.UI.Xaml.Controls
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public event global::Microsoft.UI.Xaml.Controls.TextControlPasteEventHandler Paste
 		{

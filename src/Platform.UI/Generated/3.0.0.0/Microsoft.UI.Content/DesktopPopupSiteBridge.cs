@@ -141,7 +141,7 @@ namespace Microsoft.UI.Content
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.ParentAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.ParentAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.PreviousSiblingAutomationProviderRequested.add
-		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.AutomationProvider.get
+		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.FrameworkClosed.remove
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.DispatcherQueue.get
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.LayoutDirectionOverride.get
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.LayoutDirectionOverride.set
@@ -225,10 +225,10 @@ namespace Microsoft.UI.Content
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.Closed.add
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.Closed.remove
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.FrameworkClosed.add
-		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.FrameworkClosed.remove
+		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.IsEnabled.get
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.AutomationOption.get
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.AutomationOption.set
-		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.IsEnabled.get
+		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.AutomationProvider.get
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.FragmentRootAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.DesktopPopupSiteBridge.FragmentRootAutomationProviderRequested.remove
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

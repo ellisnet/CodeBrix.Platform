@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class TextBlock
@@ -80,8 +80,8 @@ namespace Microsoft.UI.Xaml.Controls
 		// Skipping already declared property TextDecorations
 		// Skipping already declared property TextAlignment
 		// Skipping already declared property Text
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Microsoft.UI.Xaml.Media.SolidColorBrush SelectionHighlightColor
 		{
 			get
@@ -146,8 +146,8 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 		// Skipping already declared property Inlines
 		// Skipping already declared property IsTextTrimmed
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public string SelectedText
 		{
 			get
@@ -234,8 +234,8 @@ namespace Microsoft.UI.Xaml.Controls
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.OpticalMarginAlignment)));
 #endif
 		// Skipping already declared property PaddingProperty
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty SelectedTextProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(SelectedText), typeof(string),
@@ -250,8 +250,8 @@ namespace Microsoft.UI.Xaml.Controls
 			typeof(global::Microsoft.UI.Xaml.Controls.TextBlock),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase)));
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty SelectionHighlightColorProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(SelectionHighlightColor), typeof(global::Microsoft.UI.Xaml.Media.SolidColorBrush),
@@ -346,8 +346,8 @@ namespace Microsoft.UI.Xaml.Controls
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBlock.ContextMenuOpening.remove
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBlock.IsTextTrimmedChanged.add
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBlock.IsTextTrimmedChanged.remove
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void SelectAll()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextBlock", "void TextBlock.SelectAll()");
@@ -367,8 +367,8 @@ namespace Microsoft.UI.Xaml.Controls
 			throw new global::System.NotImplementedException("The member CompositionBrush TextBlock.GetAlphaMask() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void CopySelectionToClipboard()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TextBlock", "void TextBlock.CopySelectionToClipboard()");

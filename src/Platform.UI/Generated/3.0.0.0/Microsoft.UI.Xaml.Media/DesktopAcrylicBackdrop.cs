@@ -3,18 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Media
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class DesktopAcrylicBackdrop : global::Microsoft.UI.Xaml.Media.SystemBackdrop
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public DesktopAcrylicBackdrop() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop", "DesktopAcrylicBackdrop.DesktopAcrylicBackdrop()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop.DesktopAcrylicBackdrop()
 		// Forced skipping of method Microsoft.UI.Xaml.Media.DesktopAcrylicBackdrop.DesktopAcrylicBackdrop()
 	}
 }

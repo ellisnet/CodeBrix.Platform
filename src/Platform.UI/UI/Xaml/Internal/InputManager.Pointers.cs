@@ -52,6 +52,9 @@ partial class InputManager
 
 	void IInputInjectorTarget.InjectPointerRemoved(PointerEventArgs args) => InjectPointerRemoved(args);
 	partial void InjectPointerRemoved(PointerEventArgs args);
+
+	void IInputInjectorTarget.InjectKey(KeyEventArgs args, bool isDown) => InjectKey(args, isDown);
+	partial void InjectKey(KeyEventArgs args, bool isDown);
 	#endregion
 
 	internal partial class PointerManager

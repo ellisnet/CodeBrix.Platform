@@ -90,7 +90,8 @@ namespace Microsoft.UI.Xaml.Controls
 			Refresh();
 		}
 
-		private ContentControl ContainerFromGroupIndex(int groupIndex) => throw new NotImplementedException();
+		private ContentControl ContainerFromGroupIndex(int groupIndex)
+			=> VirtualizingPanel?.GetLayouter()?.GetRealizedGroupHeader(groupIndex) ?? GetRealizedGroupHeader(groupIndex);
 
 		private void TryLoadMoreItems()
 		{
@@ -117,6 +118,13 @@ namespace Microsoft.UI.Xaml.Controls
 				handler.Invoke(
 					CodeBrix.Platform.UI.Contracts.ElementHandlerCommands.ScrollIntoView,
 					new CodeBrix.Platform.UI.Contracts.ScrollIntoViewRequest(item, IndexFromItem(item), alignment));
+				return;
+			}
+
+			if (ShowsGroupHeaders && VirtualizingPanel?.GetLayouter() is { } groupedLayouter)
+			{
+				// Group headers (and a sticky header) take room in the list: the layout places the item.
+				groupedLayouter.ScrollIntoView(item, alignment);
 				return;
 			}
 

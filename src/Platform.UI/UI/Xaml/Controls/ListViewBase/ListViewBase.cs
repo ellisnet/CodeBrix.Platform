@@ -772,7 +772,9 @@ namespace Microsoft.UI.Xaml.Controls
 
 		internal override void OnItemsSourceSingleCollectionChanged(object sender, NotifyCollectionChangedEventArgs args, int section)
 		{
-			if (RefreshOnCollectionChanged)
+			// A list showing group headers in a virtualizing panel re-realizes on an item change: the incremental path's
+			// index bookkeeping is flat-index only and does not know the group headers.
+			if (RefreshOnCollectionChanged || (ShowsGroupHeaders && VirtualizingPanel is not null))
 			{
 				completeRefresh();
 				return;
@@ -1058,6 +1060,10 @@ namespace Microsoft.UI.Xaml.Controls
 			if (groupContainer != null)
 			{
 				groupContainer.DataContext = group.Group;
+				if (ShowsGroupHeaders)
+				{
+					groupContainer.Content = group.Group;
+				}
 			}
 		}
 

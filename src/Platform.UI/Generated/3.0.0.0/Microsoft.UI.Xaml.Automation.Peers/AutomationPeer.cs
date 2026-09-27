@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Automation.Peers
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class AutomationPeer : global::Microsoft.UI.Xaml.DependencyObject
@@ -80,13 +80,7 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 			throw new global::System.NotImplementedException("The member int AutomationPeer.GetCulture() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public void RaiseNotificationEvent(global::Microsoft.UI.Xaml.Automation.Peers.AutomationNotificationKind notificationKind, global::Microsoft.UI.Xaml.Automation.Peers.AutomationNotificationProcessing notificationProcessing, string displayString, string activityId)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Automation.Peers.AutomationPeer", "void AutomationPeer.RaiseNotificationEvent(AutomationNotificationKind notificationKind, AutomationNotificationProcessing notificationProcessing, string displayString, string activityId)");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.AutomationPeer.RaiseNotificationEvent(Microsoft.UI.Xaml.Automation.Peers.AutomationNotificationKind, Microsoft.UI.Xaml.Automation.Peers.AutomationNotificationProcessing, string, string)
 		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.AutomationPeer.GetHeadingLevel()
 		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.AutomationPeer.IsDialog()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

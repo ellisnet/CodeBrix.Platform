@@ -6,12 +6,8 @@ namespace Windows.UI.Notifications
 #if false
 	public enum BadgeTemplateType
 	{
-#if false
-		BadgeGlyph = 0,
-#endif
-#if false
-		BadgeNumber = 1,
-#endif
+		// Skipping already declared field Windows.UI.Notifications.BadgeTemplateType.BadgeGlyph
+		// Skipping already declared field Windows.UI.Notifications.BadgeTemplateType.BadgeNumber
 	}
 #endif
 }

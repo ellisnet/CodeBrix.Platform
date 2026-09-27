@@ -21,14 +21,30 @@ internal partial class XamlCodeGeneration
 		_cachedResources.Remove(kvp => DateTimeOffset.Now - kvp.Value.LastTimeUsed > _cacheEntryLifetime);
 	}
 
+	/// <summary>
+	/// Identifies one parsed resource file in <see cref="_cachedResources"/>.
+	/// </summary>
+	/// <remarks>
+	/// The cache is static, so it is shared by every compilation the compiler server runs, and the cached
+	/// <see cref="ResourceDetails"/> carry the name of the assembly that parsed the file
+	/// (<see cref="ResourceDetails.Assembly"/>, which decides <c>ResourceDetailsCollection.HasLocalResources</c>,
+	/// i.e. the generated <c>CodeBrixHasLocalizationResources</c> attribute, and the x:Uid resource paths).
+	/// Two projects that compile the SAME resw file under different assembly names (CodeBrix.Platform.UI.Core
+	/// and the unit-test flavour CodeBrix.Platform.UI) must therefore never share an entry: the assembly name is
+	/// part of the key. Without it, whichever project compiled first decided the attribute for the other.
+	/// WPE1-13: the name the details carry, and so the key, is the RESOURCE MAP name
+	/// (<c>_resourceMapLibraryName</c>: $(CodeBrixResourceMapLibraryName), else the assembly name).
+	/// </remarks>
 	private struct ResourceCacheKey : IEquatable<ResourceCacheKey>
 	{
-		public ResourceCacheKey(string file, ImmutableArray<byte> checksum)
+		public ResourceCacheKey(string assemblyName, string file, ImmutableArray<byte> checksum)
 		{
+			AssemblyName = assemblyName;
 			File = file;
 			Checksum = checksum;
 		}
 
+		public string AssemblyName { get; }
 		public string File { get; }
 		public ImmutableArray<byte> Checksum { get; }
 
@@ -36,11 +52,12 @@ internal partial class XamlCodeGeneration
 			=> obj is ResourceCacheKey key && Equals(key);
 
 		public bool Equals(ResourceCacheKey other)
-			=> File == other.File && ByteSequenceComparer.Equals(Checksum, other.Checksum);
+			=> AssemblyName == other.AssemblyName && File == other.File && ByteSequenceComparer.Equals(Checksum, other.Checksum);
 
 		public override int GetHashCode()
 		{
 			var hashCode = 682997901;
+			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(AssemblyName);
 			hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(File);
 			hashCode = hashCode * -1521134295 + ByteSequenceComparer.GetHashCode(Checksum);
 			return hashCode;

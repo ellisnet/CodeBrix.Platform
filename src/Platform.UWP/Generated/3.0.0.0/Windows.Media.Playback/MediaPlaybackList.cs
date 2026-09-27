@@ -3,8 +3,8 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Playback
 {
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 #endif
 	public partial class MediaPlaybackList : global::Windows.Media.Playback.IMediaPlaybackSource
 	{
@@ -56,8 +56,8 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Foundation.Collections.IObservableVector<global::Windows.Media.Playback.MediaPlaybackItem> Items
 		{
 			get
@@ -118,8 +118,8 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public MediaPlaybackList()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlaybackList", "MediaPlaybackList.MediaPlaybackList()");

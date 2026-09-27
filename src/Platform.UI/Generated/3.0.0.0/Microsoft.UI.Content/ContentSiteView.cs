@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Content
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ContentSiteView
@@ -162,7 +162,7 @@ namespace Microsoft.UI.Content
 			}
 		}
 #endif
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ActualSize.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ParentScale.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ClientSize.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.CoordinateConverter.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.DispatcherQueue.get
@@ -172,8 +172,8 @@ namespace Microsoft.UI.Content
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.IsSiteVisible.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.LayoutDirection.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.OverrideScale.get
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ParentScale.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.RasterizationScale.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ActualSize.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.RequestedSize.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.ShouldApplyRasterizationScale.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteView.LocalToClientTransformMatrix.get

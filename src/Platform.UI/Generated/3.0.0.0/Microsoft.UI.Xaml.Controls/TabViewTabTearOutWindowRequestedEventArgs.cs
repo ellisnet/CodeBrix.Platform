@@ -8,45 +8,9 @@ namespace Microsoft.UI.Xaml.Controls
 #endif
 	public partial class TabViewTabTearOutWindowRequestedEventArgs
 	{
-#if false
-		internal TabViewTabTearOutWindowRequestedEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.WindowId NewWindowId
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member WindowId TabViewTabTearOutWindowRequestedEventArgs.NewWindowId is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.TabViewTabTearOutWindowRequestedEventArgs", "WindowId TabViewTabTearOutWindowRequestedEventArgs.NewWindowId");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public object[] Items
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member object[] TabViewTabTearOutWindowRequestedEventArgs.Items is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.UIElement[] Tabs
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member UIElement[] TabViewTabTearOutWindowRequestedEventArgs.Tabs is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property NewWindowId
+		// Skipping already declared property Items
+		// Skipping already declared property Tabs
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutWindowRequestedEventArgs.Items.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutWindowRequestedEventArgs.Tabs.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutWindowRequestedEventArgs.NewWindowId.get

@@ -166,7 +166,8 @@ internal static class IconAssetLocator
 			var relative = Uri.UnescapeDataString(uri.AbsolutePath).TrimStart('/');
 			try
 			{
-				return Path.Combine(Package.Current.InstalledPath, uri.Host, relative);
+				var installedPath = Package.Current.InstalledPath;
+				return Path.Combine(installedPath, ResolveHostFolder(uri, installedPath, relative), relative);
 			}
 			catch (Exception)
 			{
@@ -176,6 +177,55 @@ internal static class IconAssetLocator
 		}
 
 		return null;
+	}
+
+	/// <summary>
+	/// The folder name an ms-appx URI's host (a library's folder) maps to (WPE1-14): <see cref="Uri.Host"/> is
+	/// lower-cased, so the host AS WRITTEN is used when the path it names exists (or, when neither casing names an
+	/// existing file - the scale probe looks for siblings - when only the written-case folder exists); otherwise the
+	/// lower-cased host, as before. The same rule as the framework's own ms-appx reader.
+	/// </summary>
+	/// <param name="uri">An absolute ms-appx URI.</param>
+	/// <param name="installedPath">The installed folder.</param>
+	/// <param name="relative">The path after the host.</param>
+	/// <returns>The host folder name; empty when the URI has no host.</returns>
+	internal static string ResolveHostFolder(Uri uri, string installedPath, string relative)
+	{
+		var host = uri.Host;
+		var written = host;
+		var text = uri.OriginalString;
+		var start = text.IndexOf("://", StringComparison.Ordinal);
+		if (host.Length > 0 && start >= 0)
+		{
+			start += 3;
+			var end = text.IndexOfAny(['/', '?', '#', '\\'], start);
+			var candidate = end < 0 ? text.Substring(start) : text.Substring(start, end - start);
+			if (string.Equals(candidate, host, StringComparison.OrdinalIgnoreCase))
+			{
+				written = candidate;
+			}
+		}
+
+		if (string.Equals(written, host, StringComparison.Ordinal) || string.IsNullOrEmpty(installedPath))
+		{
+			return host;
+		}
+
+		if (Exists(Path.Combine(installedPath, written, relative)))
+		{
+			return written;
+		}
+
+		if (Exists(Path.Combine(installedPath, host, relative)))
+		{
+			return host;
+		}
+
+		return Directory.Exists(Path.Combine(installedPath, written)) && !Directory.Exists(Path.Combine(installedPath, host))
+			? written
+			: host;
+
+		static bool Exists(string path) => File.Exists(path) || Directory.Exists(path);
 	}
 
 	/// <summary>

@@ -421,8 +421,14 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 
 		public static class ProgressRing
 		{
-			public static Uri ProgressRingAsset { get; set; } = new Uri("embedded://CodeBrix.Platform.UI/CodeBrix.Platform.UI.UI.Xaml.Controls.ProgressRing.ProgressRingIntdeterminate.json");
-			public static Uri DeterminateProgressRingAsset { get; set; } = new Uri("embedded://CodeBrix.Platform.UI/CodeBrix.Platform.UI.UI.Xaml.Controls.ProgressRing.ProgressRingDeterminate.json");
+			// Decision D3 (WPE1-11): the default animations are the copies embedded in the platform-neutral Core assembly
+			// (CodeBrix.Platform.UI.Core embeds UI/Xaml/Controls/ProgressRing/*.json under the same manifest names), so a
+			// ProgressRing finds its animation on every platform, not only where the Skia assembly is loaded. The Skia
+			// assembly (CodeBrix.Platform.UI) keeps its own copies for ONE release, so an application that set the
+			// pre-split URIs (embedded://CodeBrix.Platform.UI/...) explicitly keeps working; see Platform.UI.Skia.csproj
+			// and MAINTAINER-README.txt for when that copy goes.
+			public static Uri ProgressRingAsset { get; set; } = new Uri("embedded://CodeBrix.Platform.UI.Core/CodeBrix.Platform.UI.UI.Xaml.Controls.ProgressRing.ProgressRingIntdeterminate.json");
+			public static Uri DeterminateProgressRingAsset { get; set; } = new Uri("embedded://CodeBrix.Platform.UI.Core/CodeBrix.Platform.UI.UI.Xaml.Controls.ProgressRing.ProgressRingDeterminate.json");
 		}
 
 		public static class ListViewBase

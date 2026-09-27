@@ -228,6 +228,12 @@ namespace Microsoft.UI.Xaml.Controls
 		/// </summary>
 		private protected CodeBrix.Platform.UI.IndexPath? GetNextUnmaterializedItem(GeneratorDirection fillDirection, CodeBrix.Platform.UI.IndexPath? currentMaterializedItem)
 		{
+			if (_showsGroupHeaders)
+			{
+				// Group headers: header, items, header, items... (an empty group shown by GroupStyle is a header alone).
+				return GetNextGroupedElement(currentMaterializedItem, fillDirection);
+			}
+
 			var direction = fillDirection == GeneratorDirection.Forward ? 1 : -1;
 			var index = XamlParent?.GetNextItemIndex(currentMaterializedItem, direction);
 

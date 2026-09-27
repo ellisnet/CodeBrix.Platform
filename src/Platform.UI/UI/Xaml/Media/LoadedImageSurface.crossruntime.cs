@@ -67,13 +67,28 @@ namespace Microsoft.UI.Xaml.Media
 						{
 							var path = uri.PathAndQuery;
 
-							if (uri.Host is { Length: > 0 } host)
+							if (uri.Host is { Length: > 0 })
 							{
+								// WPE1-14: the host as written when that path exists, else lower-cased as before.
+								var host = ApplicationPackageFiles.Platform is null
+									? InstalledPackagePath.ResolveHost(uri, global::Windows.ApplicationModel.Package.Current.InstalledPath, path)
+									: uri.Host;
 								path = host + "/" + path.TrimStart('/');
 							}
 
-							var filePath = BitmapImage.GetScaledPath(path);
-							stream = File.OpenRead(filePath);
+							if (ApplicationPackageFiles.Platform is { } packageFiles)
+							{
+								// WPE1-13: the package's files are streams on this platform (Android's APK assets).
+								var scale = (int)DisplayInformation.GetForCurrentView().ResolutionScale;
+								stream = ApplicationPackageFiles.OpenSeekable(
+									packageFiles,
+									ApplicationPackageFiles.FindScaledPath(packageFiles, ApplicationPackageFiles.GetRelativePath(uri), scale, BitmapImage.ScaleQualifiers));
+							}
+							else
+							{
+								var filePath = BitmapImage.GetScaledPath(path);
+								stream = File.OpenRead(filePath);
+							}
 						}
 						else if (uri.Scheme.Equals("ms-appdata", StringComparison.OrdinalIgnoreCase) && uri.IsFile)
 						{

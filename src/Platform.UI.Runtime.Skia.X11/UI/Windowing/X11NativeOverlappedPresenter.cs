@@ -75,22 +75,53 @@ internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrappe
 
 	public void Restore(bool activateWindow)
 	{
-		// https://stackoverflow.com/a/30256233
+		// WPE1-14: Restore used to only raise the window (https://stackoverflow.com/a/30256233), so a maximized window
+		// stayed maximized and a minimized one stayed iconified on EWMH window managers (Cinnamon/Muffin, for one).
+		// Like the Win32 head's SW_SHOWNORMAL it now leaves both states: the maximized atoms are removed through a
+		// _NET_WM_STATE request and an iconified window is mapped again and activated (_NET_ACTIVE_WINDOW).
 		using var lockDiposable = X11Helper.XLock(x11Window.Display);
 
-		var shouldActivate = activateWindow;
-		shouldActivate |= GetWMState().Contains(X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE_HIDDEN));
-		if (!shouldActivate)
+		var display = x11Window.Display;
+		var state = GetWMState();
+		XWindowAttributes attributes = default;
+		_ = XLib.XGetWindowAttributes(display, x11Window.Window, ref attributes);
+
+		var plan = X11WindowStateRules.PlanRestore(
+			wasShown: wrapper.WasShown,
+			mapState: attributes.map_state,
+			hidden: state.Contains(X11Helper.GetAtom(display, X11Helper._NET_WM_STATE_HIDDEN)),
+			maximized: state.Contains(X11Helper.GetAtom(display, X11Helper._NET_WM_STATE_MAXIMIZED_HORZ))
+				|| state.Contains(X11Helper.GetAtom(display, X11Helper._NET_WM_STATE_MAXIMIZED_VERT)),
+			activateWindow: activateWindow);
+
+		if ((plan & X11RestoreActions.Unmaximize) != 0)
 		{
-			XWindowAttributes attributes = default;
-			_ = XLib.XGetWindowAttributes(x11Window.Display, x11Window.Window, ref attributes);
-			shouldActivate = attributes.map_state == MapState.IsUnmapped;
+			X11Helper.SetWMHints(
+				x11Window,
+				X11Helper.GetAtom(display, X11Helper._NET_WM_STATE),
+				0, // _NET_WM_STATE_REMOVE
+				X11Helper.GetAtom(display, X11Helper._NET_WM_STATE_MAXIMIZED_HORZ),
+				X11Helper.GetAtom(display, X11Helper._NET_WM_STATE_MAXIMIZED_VERT));
 		}
 
-		if (shouldActivate)
+		if ((plan & X11RestoreActions.Deiconify) != 0)
+		{
+			// ICCCM: mapping an iconic window asks the window manager to make it normal again; EWMH: a
+			// _NET_ACTIVE_WINDOW request (source indication 1 = an application) also un-minimizes it.
+			_ = XLib.XMapWindow(display, x11Window.Window);
+			X11Helper.SetWMHints(
+				x11Window,
+				X11Helper.GetAtom(display, X11Helper._NET_ACTIVE_WINDOW),
+				1,
+				X11Helper.CurrentTime);
+		}
+
+		if ((plan & X11RestoreActions.Activate) != 0)
 		{
 			wrapper.Activate();
 		}
+
+		_ = XLib.XFlush(display);
 	}
 
 	public OverlappedPresenterState State
@@ -103,19 +134,7 @@ internal class X11NativeOverlappedPresenter(X11Window x11Window, X11WindowWrappe
 			var maximizedHorizontal = X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE_MAXIMIZED_HORZ);
 			var maximizedVertical = X11Helper.GetAtom(x11Window.Display, X11Helper._NET_WM_STATE_MAXIMIZED_VERT);
 
-			foreach (var atom in GetWMState())
-			{
-				if (atom == minimized)
-				{
-					return OverlappedPresenterState.Minimized;
-				}
-				else if (atom == maximizedHorizontal || atom == maximizedVertical) // maybe should we require both to be considered "maximized"?
-				{
-					return OverlappedPresenterState.Maximized;
-				}
-			}
-
-			return OverlappedPresenterState.Restored;
+			return X11WindowStateRules.ToPresenterState(GetWMState(), minimized, maximizedHorizontal, maximizedVertical);
 		}
 	}
 
@@ -215,4 +234,83 @@ internal static class X11WindowStateRules
 	/// <returns>True when the missing property is expected rather than a fault.</returns>
 	internal static bool IsMissingWMStateExpected(MapState mapState)
 		=> mapState == MapState.IsUnmapped;
+
+	/// <summary>
+	/// Maps the atoms of a window's <c>_NET_WM_STATE</c> to the presenter state (WPE1-14). Hidden wins over maximized
+	/// wherever it appears in the list: a maximized window that is minimized keeps its maximized atoms, and the old
+	/// first-atom-wins loop reported such a window as Maximized when the window manager listed those atoms first.
+	/// </summary>
+	/// <param name="atoms">The atoms of the window's <c>_NET_WM_STATE</c>.</param>
+	/// <param name="hidden">The <c>_NET_WM_STATE_HIDDEN</c> atom.</param>
+	/// <param name="maximizedHorizontal">The <c>_NET_WM_STATE_MAXIMIZED_HORZ</c> atom.</param>
+	/// <param name="maximizedVertical">The <c>_NET_WM_STATE_MAXIMIZED_VERT</c> atom.</param>
+	/// <returns>Minimized, Maximized or Restored.</returns>
+	internal static OverlappedPresenterState ToPresenterState(IntPtr[] atoms, IntPtr hidden, IntPtr maximizedHorizontal, IntPtr maximizedVertical)
+	{
+		if (Array.IndexOf(atoms, hidden) >= 0)
+		{
+			return OverlappedPresenterState.Minimized;
+		}
+
+		// Either axis counts, as before (a window maximized in one direction only is still reported Maximized).
+		return Array.IndexOf(atoms, maximizedHorizontal) >= 0 || Array.IndexOf(atoms, maximizedVertical) >= 0
+			? OverlappedPresenterState.Maximized
+			: OverlappedPresenterState.Restored;
+	}
+
+	/// <summary>
+	/// Decides what <see cref="X11NativeOverlappedPresenter.Restore"/> must ask of the window manager (WPE1-14).
+	/// </summary>
+	/// <param name="wasShown">Whether the window has been shown; before that, only the old raise happens.</param>
+	/// <param name="mapState">The window's <c>map_state</c>.</param>
+	/// <param name="hidden">Whether <c>_NET_WM_STATE</c> holds <c>_NET_WM_STATE_HIDDEN</c>.</param>
+	/// <param name="maximized">Whether <c>_NET_WM_STATE</c> holds either maximized atom.</param>
+	/// <param name="activateWindow">The caller's activateWindow argument.</param>
+	/// <returns>The actions to take.</returns>
+	internal static X11RestoreActions PlanRestore(bool wasShown, MapState mapState, bool hidden, bool maximized, bool activateWindow)
+	{
+		var actions = X11RestoreActions.None;
+
+		if (!wasShown)
+		{
+			// SetNative runs Restore(false) on every launch before the first map: nothing to leave, and mapping the
+			// window here would show it before the application does. Kept exactly as before (a harmless raise).
+			return activateWindow || hidden || mapState == MapState.IsUnmapped ? X11RestoreActions.Activate : actions;
+		}
+
+		if (maximized)
+		{
+			actions |= X11RestoreActions.Unmaximize;
+		}
+
+		if (hidden || mapState == MapState.IsUnmapped)
+		{
+			actions |= X11RestoreActions.Deiconify | X11RestoreActions.Activate;
+		}
+		else if (activateWindow)
+		{
+			actions |= X11RestoreActions.Activate;
+		}
+
+		return actions;
+	}
+}
+
+/// <summary>
+/// What <see cref="X11NativeOverlappedPresenter.Restore"/> asks of the window manager (WPE1-14).
+/// </summary>
+[Flags]
+internal enum X11RestoreActions
+{
+	/// <summary>Nothing to do.</summary>
+	None = 0,
+
+	/// <summary>Remove the maximized atoms from <c>_NET_WM_STATE</c>.</summary>
+	Unmaximize = 1,
+
+	/// <summary>Map the iconified window again and ask for it with <c>_NET_ACTIVE_WINDOW</c>.</summary>
+	Deiconify = 2,
+
+	/// <summary>Raise the window (the wrapper's Activate).</summary>
+	Activate = 4,
 }

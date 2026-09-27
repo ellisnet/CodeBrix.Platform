@@ -87,6 +87,103 @@ public class ToolkitEngineTests
 		EngineIsolation.AssertNoWinUILoaded("Toolkit (TriPaneLayoutState)");
 	}
 
+	// WPE1-13 (f; AP7_TriPaneView_REPORT D-P7B-TP-4): a platform's display override changes what is LAID OUT - a hidden
+	// region shows minimized with a restore grip whose tap goes to the platform - and never writes the application's
+	// weights or minimized flags.
+	[Fact]
+	public void When_A_Display_Override_Hides_A_Pane_Then_The_Layout_Follows_And_The_Application_Weights_Do_Not()
+	{
+		//Arrange
+		var host = new TestHost();
+		var state = host.State;
+		state.UpdateState();
+		var displayOverride = new TestDisplayOverride { HideSide = true, HideLower = true };
+		var writesBefore = host.Writes;
+
+		//Act: the override hides the side pane and the lower pane (a Compact form)
+		state.DisplayOverride = displayOverride;
+		var hidden = host.Layout;
+		var flagsWhileHidden = host.Flags;
+
+		//A drag on the hidden side pane's grip does not move it
+		state.StartDividerDrag(TriPaneViewDividerKind.Side, 0, 900);
+		state.UpdateDividerDrag(TriPaneViewDividerKind.Side, 200);
+		var reportDragOnGrip = state.CompleteDividerDrag(TriPaneViewDividerKind.Side, 200, canceled: false);
+		var restoreRequestsAfterDrag = displayOverride.Requests.Count;
+
+		//A tap on the stack divider's grip asks the platform to show the lower pane; the platform switches panes
+		state.StartDividerDrag(TriPaneViewDividerKind.Stack, 600, 0);
+		var reportTap = state.CompleteDividerDrag(TriPaneViewDividerKind.Stack, 1, canceled: false);
+		var switched = host.Layout;
+
+		//The override goes away (an Expanded window): the application's layout is displayed again
+		state.DisplayOverride = null;
+		var restored = host.Layout;
+
+		//Assert
+		hidden.SideWeight.Should().Be(0d);
+		hidden.StackWeight.Should().Be(100d);
+		hidden.LowerWeight.Should().Be(0d);
+		hidden.UpperWeight.Should().Be(100d);
+		hidden.IsSideGripVisible.Should().BeTrue();
+		hidden.IsSideGripTowardStart.Should().BeTrue();
+		hidden.IsStackGripVisible.Should().BeTrue();
+		hidden.IsStackGripTowardStart.Should().BeFalse();
+		flagsWhileHidden.Should().Be((false, false, false, false));
+
+		reportDragOnGrip.Should().BeFalse();
+		restoreRequestsAfterDrag.Should().Be(0);
+		host.SidePanePercent.Should().Be(33.3);
+
+		reportTap.Should().BeFalse(); // the application's weights did not change: nothing to report
+		displayOverride.Requests.Should().Equal(TriPaneViewRegion.Lower);
+		switched.LowerWeight.Should().Be(100d);
+		switched.UpperWeight.Should().Be(0d);
+		switched.IsStackGripVisible.Should().BeTrue();
+		switched.IsStackGripTowardStart.Should().BeTrue();
+
+		restored.SideWeight.Should().BeApproximately(33.3, 1e-9);
+		restored.LowerWeight.Should().Be(50d);
+		restored.IsSideGripVisible.Should().BeFalse();
+		restored.IsStackGripVisible.Should().BeFalse();
+
+		host.Writes.Should().Be(writesBefore); // no percent property was written at any point
+		(host.SidePanePercent, host.StackPercent, host.UpperPanePercent, host.LowerPanePercent).Should().Be((33.3, 66.7, 50d, 50d));
+		host.Flags.Should().Be((false, false, false, false));
+
+		EngineIsolation.AssertNoWinUILoaded("Toolkit (TriPaneLayoutState display override)");
+	}
+
+	/// <summary>A Compact-like form: hides the side pane and one stacked pane; a grip tap switches the stacked pane.</summary>
+	private sealed class TestDisplayOverride : ITriPaneDisplayOverride
+	{
+		internal bool HideSide { get; set; }
+
+		internal bool HideLower { get; set; }
+
+		internal List<TriPaneViewRegion> Requests { get; } = new();
+
+		public TriPaneDisplayWeights GetDisplayWeights(TriPaneDisplayWeights applicationWeights)
+			=> applicationWeights with
+			{
+				Side = HideSide ? 0d : applicationWeights.Side,
+				Upper = HideLower ? applicationWeights.Upper : 0d,
+				Lower = HideLower ? 0d : applicationWeights.Lower,
+			};
+
+		public bool RestoreRequested(TriPaneViewRegion region)
+		{
+			Requests.Add(region);
+			if (region == TriPaneViewRegion.Lower)
+			{
+				HideLower = false;
+				return true;
+			}
+
+			return false;
+		}
+	}
+
 	/// <summary>A host with the weights in plain fields; writing a weight runs the engine's weight-change pass, as the control's property callback does.</summary>
 	private sealed class TestHost : ITriPaneLayoutHost
 	{
@@ -105,13 +202,15 @@ public class ToolkitEngineTests
 
 		internal int Passes { get; private set; }
 
-		public double SidePanePercent { get => _side; set { _side = value; State.OnWeightChanged(); } }
+		internal int Writes { get; private set; }
 
-		public double StackPercent { get => _stack; set { _stack = value; State.OnWeightChanged(); } }
+		public double SidePanePercent { get => _side; set { _side = value; Writes++; State.OnWeightChanged(); } }
 
-		public double UpperPanePercent { get => _upper; set { _upper = value; State.OnWeightChanged(); } }
+		public double StackPercent { get => _stack; set { _stack = value; Writes++; State.OnWeightChanged(); } }
 
-		public double LowerPanePercent { get => _lower; set { _lower = value; State.OnWeightChanged(); } }
+		public double UpperPanePercent { get => _upper; set { _upper = value; Writes++; State.OnWeightChanged(); } }
+
+		public double LowerPanePercent { get => _lower; set { _lower = value; Writes++; State.OnWeightChanged(); } }
 
 		public TriPaneViewSidePanePlacement SidePanePlacement => TriPaneViewSidePanePlacement.Left;
 

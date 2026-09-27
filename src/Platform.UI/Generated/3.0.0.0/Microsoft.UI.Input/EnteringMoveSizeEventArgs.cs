@@ -8,45 +8,9 @@ namespace Microsoft.UI.Input
 #endif
 	public partial class EnteringMoveSizeEventArgs
 	{
-#if false
-		internal EnteringMoveSizeEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.WindowId MoveSizeWindowId
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member WindowId EnteringMoveSizeEventArgs.MoveSizeWindowId is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Input.EnteringMoveSizeEventArgs", "WindowId EnteringMoveSizeEventArgs.MoveSizeWindowId");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.MoveSizeOperation MoveSizeOperation
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MoveSizeOperation EnteringMoveSizeEventArgs.MoveSizeOperation is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Graphics.PointInt32 PointerScreenPoint
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member PointInt32 EnteringMoveSizeEventArgs.PointerScreenPoint is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property MoveSizeWindowId
+		// Skipping already declared property MoveSizeOperation
+		// Skipping already declared property PointerScreenPoint
 		// Forced skipping of method Microsoft.UI.Input.EnteringMoveSizeEventArgs.MoveSizeWindowId.get
 		// Forced skipping of method Microsoft.UI.Input.EnteringMoveSizeEventArgs.MoveSizeOperation.get
 		// Forced skipping of method Microsoft.UI.Input.EnteringMoveSizeEventArgs.PointerScreenPoint.get

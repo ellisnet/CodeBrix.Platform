@@ -3,84 +3,18 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Media
 {
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class EllipseGeometry : global::Microsoft.UI.Xaml.Media.Geometry
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double RadiusY
-		{
-			get
-			{
-				return (double)this.GetValue(RadiusYProperty);
-			}
-			set
-			{
-				this.SetValue(RadiusYProperty, value);
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public double RadiusX
-		{
-			get
-			{
-				return (double)this.GetValue(RadiusXProperty);
-			}
-			set
-			{
-				this.SetValue(RadiusXProperty, value);
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Point Center
-		{
-			get
-			{
-				return (global::Windows.Foundation.Point)this.GetValue(CenterProperty);
-			}
-			set
-			{
-				this.SetValue(CenterProperty, value);
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty CenterProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(Center), typeof(global::Windows.Foundation.Point),
-			typeof(global::Microsoft.UI.Xaml.Media.EllipseGeometry),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Windows.Foundation.Point)));
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty RadiusXProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(RadiusX), typeof(double),
-			typeof(global::Microsoft.UI.Xaml.Media.EllipseGeometry),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(double)));
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty RadiusYProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(RadiusY), typeof(double),
-			typeof(global::Microsoft.UI.Xaml.Media.EllipseGeometry),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(double)));
-#endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
-		public EllipseGeometry()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Media.EllipseGeometry", "EllipseGeometry.EllipseGeometry()");
-		}
-#endif
+		// Skipping already declared property RadiusY
+		// Skipping already declared property RadiusX
+		// Skipping already declared property Center
+		// Skipping already declared property CenterProperty
+		// Skipping already declared property RadiusXProperty
+		// Skipping already declared property RadiusYProperty
+		// Skipping already declared method Microsoft.UI.Xaml.Media.EllipseGeometry.EllipseGeometry()
 		// Forced skipping of method Microsoft.UI.Xaml.Media.EllipseGeometry.EllipseGeometry()
 		// Forced skipping of method Microsoft.UI.Xaml.Media.EllipseGeometry.Center.get
 		// Forced skipping of method Microsoft.UI.Xaml.Media.EllipseGeometry.Center.set

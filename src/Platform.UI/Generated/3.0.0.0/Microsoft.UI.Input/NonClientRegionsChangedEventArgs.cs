@@ -8,21 +8,7 @@ namespace Microsoft.UI.Input
 #endif
 	public partial class NonClientRegionsChangedEventArgs
 	{
-#if false
-		internal NonClientRegionsChangedEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.NonClientRegionKind[] ChangedRegions
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member NonClientRegionKind[] NonClientRegionsChangedEventArgs.ChangedRegions is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property ChangedRegions
 		// Forced skipping of method Microsoft.UI.Input.NonClientRegionsChangedEventArgs.ChangedRegions.get
 	}
 }

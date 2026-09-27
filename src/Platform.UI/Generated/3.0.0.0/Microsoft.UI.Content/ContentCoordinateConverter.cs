@@ -15,13 +15,6 @@ namespace Microsoft.UI.Content
 #endif
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Graphics.PointInt32[] ConvertLocalToScreen(global::Windows.Foundation.Point[] localPoints, global::Microsoft.UI.Content.ContentCoordinateRoundingMode roundingMode)
-		{
-			throw new global::System.NotImplementedException("The member PointInt32[] ContentCoordinateConverter.ConvertLocalToScreen(Point[] localPoints, ContentCoordinateRoundingMode roundingMode) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Graphics.PointInt32[] ConvertLocalToScreen(global::Windows.Foundation.Point[] localPoints)
 		{
 			throw new global::System.NotImplementedException("The member PointInt32[] ContentCoordinateConverter.ConvertLocalToScreen(Point[] localPoints) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
@@ -32,6 +25,13 @@ namespace Microsoft.UI.Content
 		public global::Windows.Graphics.PointInt32 ConvertLocalToScreen(global::Windows.Foundation.Point localPoint)
 		{
 			throw new global::System.NotImplementedException("The member PointInt32 ContentCoordinateConverter.ConvertLocalToScreen(Point localPoint) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
+		}
+#endif
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
+		public global::Windows.Graphics.PointInt32[] ConvertLocalToScreen(global::Windows.Foundation.Point[] localPoints, global::Microsoft.UI.Content.ContentCoordinateRoundingMode roundingMode)
+		{
+			throw new global::System.NotImplementedException("The member PointInt32[] ContentCoordinateConverter.ConvertLocalToScreen(Point[] localPoints, ContentCoordinateRoundingMode roundingMode) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

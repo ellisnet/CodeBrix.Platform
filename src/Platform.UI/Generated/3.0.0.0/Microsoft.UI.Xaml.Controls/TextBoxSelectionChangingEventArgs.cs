@@ -3,8 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
+#if false
+	[global::CodeBrix.Platform.NotImplemented]
+#endif
 	public partial class TextBoxSelectionChangingEventArgs
 	{
+		// Skipping already declared property Cancel
+		// Skipping already declared property SelectionLength
+		// Skipping already declared property SelectionStart
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBoxSelectionChangingEventArgs.SelectionStart.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBoxSelectionChangingEventArgs.SelectionLength.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TextBoxSelectionChangingEventArgs.Cancel.get

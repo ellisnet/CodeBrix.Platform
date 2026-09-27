@@ -3,16 +3,15 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.Web.WebView2.Core
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CoreWebView2DownloadStartingEventArgs
 	{
-		// Skipping already declared property DownloadOperation
-		// Skipping already declared property Cancel
 		// Skipping already declared property ResultFilePath
 		// Skipping already declared property Handled
-		// Skipping already declared method GetDeferral
+		// Skipping already declared property Cancel
+		// Skipping already declared property DownloadOperation
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.DownloadOperation.get
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.Cancel.get
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.Cancel.set
@@ -20,5 +19,6 @@ namespace Microsoft.Web.WebView2.Core
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.ResultFilePath.set
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.Handled.get
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.Handled.set
+		// Skipping already declared method Microsoft.Web.WebView2.Core.CoreWebView2DownloadStartingEventArgs.GetDeferral()
 	}
 }

@@ -564,7 +564,8 @@ public sealed partial class MainPage : Page
             var window = App.MainWindowInstance;
             await Task.Delay(2000);
 
-            // Hide the native decorations; an external screenshot verifies visually.
+            // On X11 and Wayland the native decorations STAY (ExtendsContentIntoTitleBar does not remove them on
+            // Linux, as on macOS); an external check (xprop _NET_FRAME_EXTENTS / a screenshot) verifies it.
             window.ExtendsContentIntoTitleBar = true;
             Log("CHROMETEST: ExtendsContentIntoTitleBar=true (screenshot window now)");
             await Task.Delay(4000);
@@ -573,8 +574,12 @@ public sealed partial class MainPage : Page
             window.ExtendsContentIntoTitleBar = false;
             await Task.Delay(1500);
 
+            var appWindow = window.AppWindow;
+            var restoredSize = appWindow.Size;
+
             CurrentPresenter?.Maximize();
             await Task.Delay(1500);
+            var maximizedSize = appWindow.Size;
             Check("chrome-maximize-state", CurrentPresenter?.State == Microsoft.UI.Windowing.OverlappedPresenterState.Maximized,
                 $"State={CurrentPresenter?.State} size={XamlRoot?.Size.Width:0}x{XamlRoot?.Size.Height:0}");
 
@@ -582,6 +587,32 @@ public sealed partial class MainPage : Page
             await Task.Delay(1500);
             Check("chrome-restore-state", CurrentPresenter?.State == Microsoft.UI.Windowing.OverlappedPresenterState.Restored,
                 $"State={CurrentPresenter?.State} size={XamlRoot?.Size.Width:0}x{XamlRoot?.Size.Height:0}");
+            Check("chrome-restore-size", appWindow.Size.Width < maximizedSize.Width || appWindow.Size.Height < maximizedSize.Height,
+                $"restored={appWindow.Size.Width}x{appWindow.Size.Height} maximized={maximizedSize.Width}x{maximizedSize.Height} before={restoredSize.Width}x{restoredSize.Height}");
+
+            // Minimize, then Restore: the window must come back on screen and report Restored.
+            CurrentPresenter?.Minimize();
+            await Task.Delay(1500);
+            Check("chrome-minimize-state", CurrentPresenter?.State == Microsoft.UI.Windowing.OverlappedPresenterState.Minimized,
+                $"State={CurrentPresenter?.State} visible={appWindow.IsVisible}");
+
+            CurrentPresenter?.Restore();
+            await Task.Delay(1500);
+            Check("chrome-minimize-restore-state", CurrentPresenter?.State == Microsoft.UI.Windowing.OverlappedPresenterState.Restored && appWindow.IsVisible,
+                $"State={CurrentPresenter?.State} visible={appWindow.IsVisible}");
+
+            // Full screen, then back to the overlapped presenter: the window must leave full screen, Restored.
+            appWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.FullScreen);
+            await Task.Delay(1500);
+            var fullScreenSize = appWindow.Size;
+            Check("chrome-fullscreen-kind", appWindow.Presenter.Kind == Microsoft.UI.Windowing.AppWindowPresenterKind.FullScreen,
+                $"Kind={appWindow.Presenter.Kind} size={fullScreenSize.Width}x{fullScreenSize.Height}");
+
+            appWindow.SetPresenter(Microsoft.UI.Windowing.AppWindowPresenterKind.Overlapped);
+            await Task.Delay(1500);
+            Check("chrome-fullscreen-restore-state", CurrentPresenter?.State == Microsoft.UI.Windowing.OverlappedPresenterState.Restored
+                && (appWindow.Size.Width < fullScreenSize.Width || appWindow.Size.Height < fullScreenSize.Height),
+                $"State={CurrentPresenter?.State} size={appWindow.Size.Width}x{appWindow.Size.Height} fullscreen={fullScreenSize.Width}x{fullScreenSize.Height}");
 
             window.Activate();
             await Task.Delay(750);

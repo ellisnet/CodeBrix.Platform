@@ -56,9 +56,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<!-- The default FeatureConfiguration.ProgressRing asset URIs name this assembly
-		     (embedded://CodeBrix.Platform.UI/...), so the two animations stay embedded here with their pre-split
-		     manifest names; Platform.UI.Core.csproj embeds the same files for a Core-only consumer. -->
+		<!-- Kept for ONE release (decision D3, WPE1-11): the FeatureConfiguration.ProgressRing default asset URIs now
+		     name the Core assembly (embedded://CodeBrix.Platform.UI.Core/...), which embeds the same two animations.
+		     These copies stay, with their pre-split manifest names, only so an application that set the old
+		     embedded://CodeBrix.Platform.UI/... URIs explicitly keeps working. REMOVE this item after the first
+		     nuget.org release that carries the Core split (the first family version published after 1.0.254.167):
+		     it ships in that release and is gone from the one after it (MAINTAINER-README.txt, MAINTENANCE FACTS). -->
 		<EmbeddedResource Include="$(PlatformItemsBasePath)UI\Xaml\Controls\ProgressRing\*.json" />
 	</ItemGroup>
 

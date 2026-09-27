@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Windowing
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class OverlappedPresenter : global::Microsoft.UI.Windowing.AppWindowPresenter
@@ -16,62 +16,10 @@ namespace Microsoft.UI.Windowing
 		// Skipping already declared property HasBorder
 		// Skipping already declared property HasTitleBar
 		// Skipping already declared property State
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int? PreferredMinimumWidth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int? OverlappedPresenter.PreferredMinimumWidth is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.OverlappedPresenter", "int? OverlappedPresenter.PreferredMinimumWidth");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int? PreferredMinimumHeight
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int? OverlappedPresenter.PreferredMinimumHeight is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.OverlappedPresenter", "int? OverlappedPresenter.PreferredMinimumHeight");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int? PreferredMaximumWidth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int? OverlappedPresenter.PreferredMaximumWidth is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.OverlappedPresenter", "int? OverlappedPresenter.PreferredMaximumWidth");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public int? PreferredMaximumHeight
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member int? OverlappedPresenter.PreferredMaximumHeight is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-			set
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.OverlappedPresenter", "int? OverlappedPresenter.PreferredMaximumHeight");
-			}
-		}
-#endif
+		// Skipping already declared property PreferredMinimumWidth
+		// Skipping already declared property PreferredMinimumHeight
+		// Skipping already declared property PreferredMaximumWidth
+		// Skipping already declared property PreferredMaximumHeight
 		// Skipping already declared property RequestedStartupState
 		// Forced skipping of method Microsoft.UI.Windowing.OverlappedPresenter.IsMaximizable.set
 		// Forced skipping of method Microsoft.UI.Windowing.OverlappedPresenter.HasTitleBar.get

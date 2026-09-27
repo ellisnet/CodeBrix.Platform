@@ -134,7 +134,7 @@ public class CoreAssemblyReferenceTests
 		return (name, references);
 	}
 
-	private static Dictionary<string, (bool IsR7, string Path)> CoreAssemblyEntries() =>
+	internal static Dictionary<string, (bool IsR7, string Path)> CoreAssemblyEntries() =>
 		typeof(CoreAssemblyReferenceTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
 			.Where(a => a.Key.StartsWith("CoreAssembly:", StringComparison.Ordinal))
 			.ToDictionary(

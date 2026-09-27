@@ -165,8 +165,8 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			TimeSpan delay; // delay to apply the 'state'
 			bool pause; // should we force a pause after applying the 'state'
 			if (manipulationUpdate == ManipulationUpdateKind.Clicked
-				&& _currentState != CommonStates.PressedSelected
-				&& _currentState != CommonStates.Pressed)
+				&& _currentState != MapCommonVisualState(CommonStates.PressedSelected, isEnabled: true, isSelected: true)
+				&& _currentState != MapCommonVisualState(CommonStates.Pressed, isEnabled: true, isSelected: false))
 			{
 				// When clicked (i.e. pointer released), but not yet in pressed state, we force to go immediately in pressed state
 				// Then we let the standard go to state process (i.e. with delay handling) reach the final expected state.
@@ -297,8 +297,18 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 				}
 			}
 
-			return state;
+			return MapCommonVisualState(state, isEnabled, isSelected);
 		}
+
+		/// <summary>
+		/// Maps a common visual state name to the name the container's template uses (a ListBoxItem, as WinUI's, names
+		/// its selected-and-over state "SelectedPointerOver"); the base keeps the name.
+		/// </summary>
+		/// <param name="state">The state, as named in <see cref="CommonStates"/>.</param>
+		/// <param name="isEnabled">Whether the item is enabled.</param>
+		/// <param name="isSelected">Whether the item is selected.</param>
+		/// <returns>The state name to go to.</returns>
+		private protected virtual string MapCommonVisualState(string state, bool isEnabled, bool isSelected) => state;
 
 		internal override void PrepareForRecycle()
 		{

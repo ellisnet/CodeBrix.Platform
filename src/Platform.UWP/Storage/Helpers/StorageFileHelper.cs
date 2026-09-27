@@ -18,7 +18,11 @@ internal partial class StorageFileHelper
 	/// </summary>
 	/// <param name="fileName">relative file path</param>
 	/// <returns>A task that will complete with a result of true if the file exists, otherwise with a result of false.</returns>
-	public static async Task<bool> ExistsInPackage(string fileName) => await FileExistsInPackage(fileName);
+	public static async Task<bool> ExistsInPackage(string fileName)
+		// WPE1-13: a registered package-files platform answers for the package (Android's APK assets).
+		=> CodeBrix.Platform.Helpers.ApplicationPackageFiles.Platform is { } packageFiles
+			? packageFiles.FileExists(CodeBrix.Platform.Helpers.ApplicationPackageFiles.NormalizeRelativePath(fileName))
+			: await FileExistsInPackage(fileName);
 
 #if IS_UNIT_TESTS || __NETSTD_REFERENCE__
 	private static Task<bool> FileExistsInPackage(string fileName)

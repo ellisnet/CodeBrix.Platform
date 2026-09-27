@@ -8,31 +8,8 @@ namespace Microsoft.UI.Input
 #endif
 	public partial class NonClientCaptionTappedEventArgs
 	{
-#if false
-		internal NonClientCaptionTappedEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Point Point
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member Point NonClientCaptionTappedEventArgs.Point is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.PointerDeviceType PointerDeviceType
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member PointerDeviceType NonClientCaptionTappedEventArgs.PointerDeviceType is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property Point
+		// Skipping already declared property PointerDeviceType
 		// Forced skipping of method Microsoft.UI.Input.NonClientCaptionTappedEventArgs.Point.get
 		// Forced skipping of method Microsoft.UI.Input.NonClientCaptionTappedEventArgs.PointerDeviceType.get
 	}

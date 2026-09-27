@@ -85,9 +85,10 @@ public class SkiaMediaPlayerExtension : IMediaPlayerExtension
 			{
 				var filePath = uri.PathAndQuery;
 
-				if (uri.Host is { Length: > 0 } host)
+				if (uri.Host is { Length: > 0 })
 				{
-					filePath = host + "/" + filePath.TrimStart('/');
+					// WPE1-14: the host as written when that path exists, else lower-cased as before.
+					filePath = InstalledPackagePath.ResolveHost(uri, Windows.ApplicationModel.Package.Current.InstalledPath, filePath) + "/" + filePath.TrimStart('/');
 				}
 
 				VlcPlayer.Media = new CodeBrix.Platform.MediaPlayerCore.Media(_vlc, new Uri(Path.Combine(Windows.ApplicationModel.Package.Current.InstalledPath, filePath.TrimStart('/'))));

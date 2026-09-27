@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Media
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CompositionTarget
@@ -31,7 +31,7 @@ namespace Microsoft.UI.Xaml.Media
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static event global::System.EventHandler<object> Rendering
 		{

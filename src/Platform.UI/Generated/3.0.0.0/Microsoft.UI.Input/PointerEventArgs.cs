@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class PointerEventArgs
@@ -15,7 +15,7 @@ namespace Microsoft.UI.Input
 		// Forced skipping of method Microsoft.UI.Input.PointerEventArgs.Handled.get
 		// Forced skipping of method Microsoft.UI.Input.PointerEventArgs.Handled.set
 		// Forced skipping of method Microsoft.UI.Input.PointerEventArgs.KeyModifiers.get
-		// Skipping already declared method Microsoft.UI.Input.PointerEventArgs.GetIntermediateTransformedPoints(Microsoft.UI.Input.IPointerPointTransform)
 		// Forced skipping of method Microsoft.UI.Input.PointerEventArgs.CurrentPoint.get
+		// Skipping already declared method Microsoft.UI.Input.PointerEventArgs.GetIntermediateTransformedPoints(Microsoft.UI.Input.IPointerPointTransform)
 	}
 }

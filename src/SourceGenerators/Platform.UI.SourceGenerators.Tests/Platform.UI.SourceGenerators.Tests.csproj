@@ -61,6 +61,7 @@
 		     referencing the MSBuild task assembly) so Given_RuntimeReferencePathRewriter can fence it. -->
 		<Compile Include="..\Platform.UI.Tasks\LinkerHintsGenerator\RuntimeReferencePathRewriter.cs" Link="LinkerHintsGeneratorTests\RuntimeReferencePathRewriter.cs" />
 		<Compile Include="..\Platform.UI.Tasks\LinkerHintsGenerator\LinkerFeatureSwitches.cs" Link="LinkerHintsGeneratorTests\LinkerFeatureSwitches.cs" />
+		<Compile Include="..\Platform.UI.Tasks\LinkerHintsGenerator\LinkerHintBindableMetadata.cs" Link="LinkerHintsGeneratorTests\LinkerHintBindableMetadata.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

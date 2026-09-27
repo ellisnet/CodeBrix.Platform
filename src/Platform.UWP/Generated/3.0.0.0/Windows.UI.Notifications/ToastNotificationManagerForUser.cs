@@ -3,16 +3,11 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.UI.Notifications
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ToastNotificationManagerForUser
 	{
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		internal ToastNotificationManagerForUser()
-		{
-		}
-#endif
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.UI.Notifications.ToastNotificationHistory History
@@ -30,16 +25,6 @@ namespace Windows.UI.Notifications
 			get
 			{
 				throw new global::System.NotImplementedException("The member User ToastNotificationManagerForUser.User is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.UI.Notifications.ToastNotificationMode NotificationMode
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member ToastNotificationMode ToastNotificationManagerForUser.NotificationMode is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 			}
 		}
 #endif
@@ -85,25 +70,6 @@ namespace Windows.UI.Notifications
 		public global::Windows.UI.Notifications.ToastCollectionManager GetToastCollectionManager(string appId)
 		{
 			throw new global::System.NotImplementedException("The member ToastCollectionManager ToastNotificationManagerForUser.GetToastCollectionManager(string appId) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
-		// Forced skipping of method Windows.UI.Notifications.ToastNotificationManagerForUser.NotificationMode.get
-		// Forced skipping of method Windows.UI.Notifications.ToastNotificationManagerForUser.NotificationModeChanged.add
-		// Forced skipping of method Windows.UI.Notifications.ToastNotificationManagerForUser.NotificationModeChanged.remove
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public event global::Windows.Foundation.TypedEventHandler<global::Windows.UI.Notifications.ToastNotificationManagerForUser, object> NotificationModeChanged
-		{
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-			add
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Notifications.ToastNotificationManagerForUser", "event TypedEventHandler<ToastNotificationManagerForUser, object> ToastNotificationManagerForUser.NotificationModeChanged");
-			}
-			[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-			remove
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Notifications.ToastNotificationManagerForUser", "event TypedEventHandler<ToastNotificationManagerForUser, object> ToastNotificationManagerForUser.NotificationModeChanged");
-			}
 		}
 #endif
 	}

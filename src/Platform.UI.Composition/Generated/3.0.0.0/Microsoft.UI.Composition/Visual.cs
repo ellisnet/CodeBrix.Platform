@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Composition
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Visual : global::Microsoft.UI.Composition.CompositionObject
@@ -19,8 +19,8 @@ namespace Microsoft.UI.Composition
 		// Skipping already declared property Offset
 		// Skipping already declared property IsVisible
 		// Skipping already declared property CompositeMode
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Microsoft.UI.Composition.CompositionClip Clip
 		{
 			get
@@ -62,8 +62,8 @@ namespace Microsoft.UI.Composition
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::System.Numerics.Vector2 AnchorPoint
 		{
 			get

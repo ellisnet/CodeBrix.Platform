@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Gaming.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Gamepad : global::Windows.Gaming.Input.IGameController, global::Windows.Gaming.Input.IGameControllerBatteryInfo
@@ -52,7 +52,7 @@ namespace Windows.Gaming.Input
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::System.Collections.Generic.IReadOnlyList<global::Windows.Gaming.Input.Gamepad> Gamepads
 		{
@@ -64,7 +64,7 @@ namespace Windows.Gaming.Input
 #endif
 		// Forced skipping of method Windows.Gaming.Input.Gamepad.Vibration.get
 		// Forced skipping of method Windows.Gaming.Input.Gamepad.Vibration.set
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public global::Windows.Gaming.Input.GamepadReading GetCurrentReading()
 		{
@@ -154,7 +154,7 @@ namespace Windows.Gaming.Input
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static event global::System.EventHandler<global::Windows.Gaming.Input.Gamepad> GamepadAdded
 		{
@@ -170,7 +170,7 @@ namespace Windows.Gaming.Input
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static event global::System.EventHandler<global::Windows.Gaming.Input.Gamepad> GamepadRemoved
 		{

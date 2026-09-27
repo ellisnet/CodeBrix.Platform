@@ -4,6 +4,7 @@
 
 using CodeBrix.Platform.UI.Xaml;
 using CodeBrix.Platform.UI.Xaml.Core;
+using CodeBrix.Platform.UI.Extensions;
 
 namespace Microsoft.UI.Xaml.Input;
 
@@ -17,6 +18,15 @@ internal class KeyboardAcceleratorCollection : DependencyObjectCollection<Keyboa
 		_parentVisualTreeListener = new ParentVisualTreeListener(this);
 		_parentVisualTreeListener.ParentLoaded += (s, e) => Enter(null, new EnterParams(true));
 		_parentVisualTreeListener.ParentUnloaded += (s, e) => Leave(null, new LeaveParams(true));
+
+		// The listener reports a parent that is ALREADY loaded from its own constructor, before the handlers above
+		// exist: a collection created for a live element (KeyboardAccelerators first read from code once the element
+		// is loaded) would otherwise never enter the content root's live accelerators, and its accelerators would
+		// never be invoked. WinUI enters a collection that is set on a live element at once.
+		if (this.FindFirstParent<FrameworkElement>() is { IsLoaded: true })
+		{
+			Enter(null, new EnterParams(true));
+		}
 	}
 #endif
 

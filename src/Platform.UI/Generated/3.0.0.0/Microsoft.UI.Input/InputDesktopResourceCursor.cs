@@ -3,15 +3,15 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class InputDesktopResourceCursor : global::Microsoft.UI.Input.InputCursor
 	{
 		// Skipping already declared property ModuleName
 		// Skipping already declared property ResourceId
-		// Forced skipping of method Microsoft.UI.Input.InputDesktopResourceCursor.ResourceId.get
 		// Forced skipping of method Microsoft.UI.Input.InputDesktopResourceCursor.ModuleName.get
+		// Forced skipping of method Microsoft.UI.Input.InputDesktopResourceCursor.ResourceId.get
 		// Skipping already declared method Microsoft.UI.Input.InputDesktopResourceCursor.Create(uint)
 		// Skipping already declared method Microsoft.UI.Input.InputDesktopResourceCursor.CreateFromModule(string, uint)
 	}

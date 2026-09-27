@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Media
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class LoadedImageSurface : global::System.IDisposable, global::Microsoft.UI.Composition.ICompositionSurface
@@ -16,36 +16,36 @@ namespace Microsoft.UI.Xaml.Media
 		// Forced skipping of method Microsoft.UI.Xaml.Media.LoadedImageSurface.NaturalSize.get
 		// Forced skipping of method Microsoft.UI.Xaml.Media.LoadedImageSurface.LoadCompleted.add
 		// Forced skipping of method Microsoft.UI.Xaml.Media.LoadedImageSurface.LoadCompleted.remove
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void Dispose()
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Media.LoadedImageSurface", "void LoadedImageSurface.Dispose()");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.Media.LoadedImageSurface StartLoadFromUri(global::System.Uri uri, global::Windows.Foundation.Size desiredMaxSize)
 		{
 			throw new global::System.NotImplementedException("The member LoadedImageSurface LoadedImageSurface.StartLoadFromUri(Uri uri, Size desiredMaxSize) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.Media.LoadedImageSurface StartLoadFromUri(global::System.Uri uri)
 		{
 			throw new global::System.NotImplementedException("The member LoadedImageSurface LoadedImageSurface.StartLoadFromUri(Uri uri) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.Media.LoadedImageSurface StartLoadFromStream(global::Windows.Storage.Streams.IRandomAccessStream stream, global::Windows.Foundation.Size desiredMaxSize)
 		{
 			throw new global::System.NotImplementedException("The member LoadedImageSurface LoadedImageSurface.StartLoadFromStream(IRandomAccessStream stream, Size desiredMaxSize) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.Media.LoadedImageSurface StartLoadFromStream(global::Windows.Storage.Streams.IRandomAccessStream stream)
 		{
 			throw new global::System.NotImplementedException("The member LoadedImageSurface LoadedImageSurface.StartLoadFromStream(IRandomAccessStream stream) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

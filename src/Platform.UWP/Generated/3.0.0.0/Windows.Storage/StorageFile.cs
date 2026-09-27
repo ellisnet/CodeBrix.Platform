@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class StorageFile : global::Windows.Storage.IStorageFile, global::Windows.Storage.Streams.IInputStreamReference, global::Windows.Storage.Streams.IRandomAccessStreamReference, global::Windows.Storage.IStorageItem, global::Windows.Storage.IStorageItemProperties, global::Windows.Storage.IStorageItemProperties2, global::Windows.Storage.IStorageItem2, global::Windows.Storage.IStorageItemPropertiesWithProvider, global::Windows.Storage.IStorageFilePropertiesWithAvailability, global::Windows.Storage.IStorageFile2

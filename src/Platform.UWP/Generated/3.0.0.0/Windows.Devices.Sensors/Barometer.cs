@@ -4,14 +4,10 @@
 namespace Windows.Devices.Sensors
 {
 #if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Barometer
 	{
-#if false
-		internal Barometer()
-		{
-		}
-#endif
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public uint ReportInterval
@@ -111,12 +107,7 @@ namespace Windows.Devices.Sensors
 			throw new global::System.NotImplementedException("The member string Barometer.GetDeviceSelector() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		public static global::Windows.Devices.Sensors.Barometer GetDefault()
-		{
-			throw new global::System.NotImplementedException("The member Barometer Barometer.GetDefault() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
+		// Skipping already declared method Windows.Devices.Sensors.Barometer.GetDefault()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public event global::Windows.Foundation.TypedEventHandler<global::Windows.Devices.Sensors.Barometer, global::Windows.Devices.Sensors.BarometerReadingChangedEventArgs> ReadingChanged

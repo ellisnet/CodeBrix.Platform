@@ -1166,6 +1166,11 @@ shipped inside a referenced package:
     global::CodeBrix.Platform.UI.FeatureConfiguration.Font.DefaultTextFontFamily =
         "ms-appx:///CodeBrix.Platform.Fonts.OpenSans/Fonts/OpenSans.ttf";
 
+The two-slash form "ms-appx://<LibraryName>/<path>" (the library's folder as
+the URI's host) looks for the folder with the casing written in the URI, which
+matters on a case-sensitive Linux file system; when that path does not exist,
+the all-lower-case folder name is tried, as before.
+
 Fonts your app ships itself are addressed as "ms-appx:///Assets/Fonts/x.ttf"
 (a Content item in .Core). To avoid a re-layout when a font arrives late,
 preload it (namespace CodeBrix.Platform.UI.Xaml.Media):
@@ -1653,6 +1658,75 @@ AccessKeyManager.AreKeyTipsEnabled has no visual effect for the same reason.
 To open a menu from your own code, call MenuBarItem.Invoke() - it toggles the
 item's flyout with the menu bar's own placement and arrow-key wiring.
 
+INJECTED INPUT. InputInjector.TryCreate() (call it on the UI thread) injects
+mouse, touch and keyboard input into the application's own window, as in WinUI.
+InjectKeyboardInput delivers each key exactly as a key of the real keyboard:
+the focused element's PreviewKeyDown/KeyDown/PreviewKeyUp/KeyUp, Tab and arrow
+focus moves, access keys, KeyboardAccelerators, and the character the key types
+into a TextBox. VirtualKey keys type what a US keyboard types (Shift and Caps
+Lock applied; nothing while Control, Alt or a Windows key is held); use
+InjectedInputKeyOptions.Unicode (the character in ScanCode) for any other text,
+and InjectedInputKeyOptions.ScanCode for set-1 scan codes. A modifier injected
+down stays down until it is injected up, and also applies to injected mouse and
+touch input. Keys are delivered synchronously on the calling thread.
+KnownSimpleHapticsControllerWaveforms returns the HID haptics usage values
+(Click 0x1003 ... GalaxyPenContinuous 0x1011), as WinUI does.
+
+LISTBOX. ListBox and ListBoxItem work as in WinUI: SelectionMode Single (the
+default), Multiple (each tap or Space toggles an item) and Extended (a tap
+selects one item, Shift+tap / Shift+arrow extends from the anchor, Control+tap
+toggles, Control+arrow moves only the focus, Control+A selects all);
+SingleSelectionFollowsFocus (default true); SelectedItems; SelectAll();
+ScrollIntoView(item); the arrow keys, Home, End, PageUp and PageDown. The
+default ListBoxItem template has WinUI's visual states (Selected,
+SelectedPointerOver, SelectedPressed, ...). The default items panel is a
+StackPanel (it stands in for VirtualizingStackPanel, which is not implemented),
+so a ListBox realizes every item: use a ListView for long lists.
+
+TITLEBAR. The WinUI 3 TitleBar control works: Title, Subtitle, IconSource,
+IsBackButtonVisible, IsBackButtonEnabled, IsPaneToggleButtonVisible,
+LeftHeader, Content, RightHeader, BackRequested and PaneToggleRequested, with
+WinUI's default template (32 pixels tall, 48 with a header or content). Its
+default style comes with XamlControlsResources. It is an ordinary element: it
+draws where you put it, and a window that does not use it looks exactly as
+before - nothing draws a second title bar. As in WinUI, a TitleBar with a Title
+also sets the window's title (AppWindow.Title), and gives the previous title
+back when it leaves the visual tree. To put it in the window's title-bar area,
+do what WinUI does:
+
+    ExtendsContentIntoTitleBar = true;   // in the Window
+    SetTitleBar(AppTitleBar);            // the TitleBar, placed at the top of the content
+
+How far that goes depends on the head. Win32 and the WPF host remove the
+native title bar and the window chrome draws the caption buttons (minimize,
+maximize, close) over the top right; the TitleBar keeps its right end clear of
+them. On Win32 the TitleBar also marks its buttons, headers and interactive
+content as click-through regions of the draggable caption. The macOS, X11,
+Wayland and frame-buffer heads do not extend content into a title bar: there
+ExtendsContentIntoTitleBar changes nothing about the window - the native title
+bar and its window buttons stay (macOS, X11, Wayland), and the TitleBar lays
+out as a normal element at the top of your content, under the native title
+bar. The same code therefore runs everywhere; only Windows gets the combined
+title bar.
+
+GROUPED LISTS. A ListView or GridView bound to a grouped collection view
+(CollectionViewSource with IsSourceGrouped) shows group headers when it has a
+GroupStyle, as in WinUI. Its ItemsStackPanel honours GroupHeaderPlacement
+(Left puts each header beside its group, level with the group's first item)
+and GroupPadding (space around every group), and AreStickyGroupHeadersEnabled
+(with Top placement):
+
+    <ListView.ItemsPanel>
+        <ItemsPanelTemplate>
+            <ItemsStackPanel GroupHeaderPlacement="Left" GroupPadding="12,8,12,8" />
+        </ItemsPanelTemplate>
+    </ListView.ItemsPanel>
+
+A GridView's default items panel (a wrap panel standing in for ItemsWrapGrid,
+which is not implemented) heads each group with its header above the group and
+has no placement or padding options; give the GridView an ItemsStackPanel for
+them.
+
 COMMAND BARS work on the Skia heads, written exactly as in WinUI: CommandBar
 with PrimaryCommands and SecondaryCommands, AppBarButton, AppBarToggleButton,
 AppBarSeparator and AppBarElementContainer, DefaultLabelPosition
@@ -1747,8 +1821,9 @@ LINUX (native Wayland):
   - Working, at parity with the X11 head: flyout-based controls (ComboBox
     dropdowns, MenuFlyout, ToolTip, dialogs), rich clipboard (text, HTML, PNG
     images, file lists, custom formats - copy AND paste), fractional
-    (non-integer) display scaling, custom title bars
-    (ExtendsContentIntoTitleBar), and window activation (xdg-activation;
+    (non-integer) display scaling, the window's title-bar handling
+    (ExtendsContentIntoTitleBar keeps the native decorations, as on X11), and
+    window activation (xdg-activation;
     compositor focus policy applies). ACCEPTING drag-and-drop from other
     applications is implemented but may not work on some compositors - see the
     "Drag & drop MAY NOT WORK" note under WHAT THIS PACKAGE DOES NOT DO.
@@ -2159,6 +2234,44 @@ WHAT THIS PACKAGE DOES NOT DO
     but a subset are not backed by an implementation and throw a "not
     implemented" exception that names the member. See
     https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md
+  - These whole TYPES are not implemented anywhere, and the build tells you:
+    code (or XAML) that uses one of them, or any of its members, gets warning
+    Uno0001 - an ERROR under TreatWarningsAsErrors. Do not use them (the Uno0001
+    text names the type; pick an implemented alternative), or, if the call is
+    guarded and deliberate, suppress Uno0001 at that line:
+      Microsoft.UI.Xaml.Controls: ItemsWrapGrid (use ItemsStackPanel or
+        WrapPanel; GridView's own default panel needs nothing from you)
+      Microsoft.UI.Xaml.Controls.Primitives: GridViewItemPresenter,
+        ListViewItemPresenter (the item templates use ListViewItem /
+        GridViewItem's own ContentPresenter template; do not re-template items
+        with these presenters)
+      Windows.ApplicationModel.Appointments: AppointmentManager, AppointmentStore
+      Windows.ApplicationModel.Background: BackgroundTaskDeferral
+      Windows.ApplicationModel.Calls: PhoneCallHistoryEntryReader,
+        PhoneCallHistoryManager, PhoneCallHistoryStore, PhoneCallManager
+      Windows.ApplicationModel.Chat: ChatMessageManager
+      Windows.Data.Pdf: PdfDocument, PdfPage, PdfPageDimensions,
+        PdfPageRenderOptions
+      Windows.Devices.Geolocation: Geolocator
+      Windows.Devices.Midi: IMidiOutPort
+      Windows.Devices.Power: Battery, BatteryReport
+      Windows.Devices.Radios: Radio
+      Windows.Devices.Sensors: HingeAngleReading,
+        HingeAngleSensorReadingChangedEventArgs
+      Windows.Gaming.Input: IGameController
+      Windows.Media.SpeechRecognition: SpeechRecognitionResult, SpeechRecognizer
+      Windows.Networking: HostName
+      Windows.Networking.Connectivity: ConnectionCost, IPInformation
+      Windows.Phone.Devices.Notification: VibrationDevice
+      Windows.Services.Maps: MapLocationFinder
+      Windows.Storage: KnownFolders
+      Windows.System.Display: DisplayRequest
+      Windows.UI.StartScreen: JumpListItem
+      Windows.UI.ViewManagement: StatusBar
+  - ListPickerFlyoutPresenter and PickerFlyoutPresenter stay not implemented,
+    deliberately: they are the internal presenters of ListPickerFlyout and
+    PickerFlyout, and an application never builds or styles one itself. Use a
+    Flyout holding a ListView (or a ComboBox) for a picker.
   - Not implemented on any Skia head: IME (composed CJK / dead-key) text input;
     initiating drag-and-drop (accepting drops works on X11/Windows/macOS, and on
     Wayland subject to the compositor); access-key KEY TIPS (access keys

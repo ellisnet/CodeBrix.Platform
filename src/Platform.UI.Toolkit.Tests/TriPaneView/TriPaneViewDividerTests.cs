@@ -210,4 +210,120 @@ public class TriPaneViewDividerTests
 		raisedCount.Should().Be(1);
 		divider.IsDragging.Should().BeFalse();
 	}
+
+	// WPE1-13 (e): platform drag entry points like Thumb's. FIXLIST [AP7-B TriPaneView]: before them, a platform-driven
+	// gesture after a Core pointer drag reported the pointer drag's travel in DragCompleted.
+
+	[TestMethod]
+	public void A_platform_drag_after_a_pointer_drag_reports_only_its_own_travel()
+	{
+		//Arrange: the state a Core pointer drag of +120 leaves behind
+		var divider = new TriPaneViewDivider();
+		typeof(TriPaneViewDivider).GetField("_origin", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+			.SetValue(divider, new Windows.Foundation.Point(10d, 0d));
+		typeof(TriPaneViewDivider).GetField("_previousPosition", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+			.SetValue(divider, new Windows.Foundation.Point(130d, 0d));
+		DragStartedEventArgs started = null;
+		var deltas = new System.Collections.Generic.List<double>();
+		DragCompletedEventArgs completed = null;
+		divider.DragStarted += (_, e) => started = e;
+		divider.DragDelta += (_, e) => deltas.Add(e.HorizontalChange);
+		divider.DragCompleted += (_, e) => completed = e;
+
+		//Act
+		divider.RaiseDragStartedFromPlatform();
+		var draggingAfterStart = divider.IsDragging;
+		divider.RaiseDragDeltaFromPlatform(10d, 0d);
+		divider.RaiseDragDeltaFromPlatform(-4d, 2d);
+		divider.RaiseDragCompletedFromPlatform(false);
+
+		//Assert
+		draggingAfterStart.Should().BeTrue();
+		started.Should().NotBeNull();
+		started.HorizontalOffset.Should().Be(0d);
+		deltas.Should().Equal(10d, -4d);
+		completed.Should().NotBeNull();
+		completed.HorizontalChange.Should().Be(6d);
+		completed.VerticalChange.Should().Be(2d);
+		completed.Canceled.Should().BeFalse();
+		divider.IsDragging.Should().BeFalse();
+	}
+
+	[TestMethod]
+	public void A_platform_tap_reports_zero_travel_after_an_earlier_platform_drag()
+	{
+		//Arrange
+		var divider = new TriPaneViewDivider();
+		var travels = new System.Collections.Generic.List<double>();
+		divider.DragCompleted += (_, e) => travels.Add(e.HorizontalChange);
+		divider.RaiseDragStartedFromPlatform();
+		divider.RaiseDragDeltaFromPlatform(120d, 0d);
+		divider.RaiseDragCompletedFromPlatform(false);
+
+		//Act: a tap (no movement)
+		divider.RaiseDragStartedFromPlatform();
+		divider.RaiseDragCompletedFromPlatform(false);
+
+		//Assert
+		travels.Should().Equal(120d, 0d);
+	}
+
+	[TestMethod]
+	public void Platform_deltas_and_completion_without_a_started_drag_are_ignored()
+	{
+		//Arrange
+		var divider = new TriPaneViewDivider();
+		var raised = 0;
+		divider.DragDelta += (_, _) => raised++;
+		divider.DragCompleted += (_, _) => raised++;
+
+		//Act
+		divider.RaiseDragDeltaFromPlatform(5d, 0d);
+		divider.RaiseDragCompletedFromPlatform(false);
+
+		//Assert
+		raised.Should().Be(0);
+		divider.IsDragging.Should().BeFalse();
+	}
+
+	[TestMethod]
+	public void A_platform_drag_start_is_ignored_on_a_disabled_divider_or_during_a_drag()
+	{
+		//Arrange
+		var disabled = new TriPaneViewDivider { IsEnabled = false };
+		var dragging = new TriPaneViewDivider();
+		dragging.RaiseDragStartedFromPlatform();
+		var started = 0;
+		disabled.DragStarted += (_, _) => started++;
+		dragging.DragStarted += (_, _) => started++;
+
+		//Act
+		disabled.RaiseDragStartedFromPlatform();
+		dragging.RaiseDragStartedFromPlatform();
+
+		//Assert
+		started.Should().Be(0);
+		disabled.IsDragging.Should().BeFalse();
+		dragging.IsDragging.Should().BeTrue();
+	}
+
+	[TestMethod]
+	public void A_cancelled_platform_drag_completes_as_cancelled()
+	{
+		//Arrange
+		var divider = new TriPaneViewDivider();
+		DragCompletedEventArgs completed = null;
+		divider.DragCompleted += (_, e) => completed = e;
+		divider.RaiseDragStartedFromPlatform();
+		divider.RaiseDragDeltaFromPlatform(0d, 30d);
+
+		//Act
+		divider.RaiseDragCompletedFromPlatform(true);
+
+		//Assert
+		completed.Should().NotBeNull();
+		completed.Canceled.Should().BeTrue();
+		completed.VerticalChange.Should().Be(30d);
+		divider.IsDragging.Should().BeFalse();
+	}
 }

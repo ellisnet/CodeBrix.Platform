@@ -8,28 +8,9 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 #endif
 	public static partial class CommandBarFlyoutCommandBarAutomationProperties
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty ControlTypeProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.RegisterAttached(
-			"ControlType", typeof(global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType),
-			typeof(global::Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarAutomationProperties),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType)));
-#endif
+		// Skipping already declared property ControlTypeProperty
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarAutomationProperties.ControlTypeProperty.get
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType GetControlType(global::Microsoft.UI.Xaml.UIElement element)
-		{
-			return (global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType)element.GetValue(ControlTypeProperty);
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static void SetControlType(global::Microsoft.UI.Xaml.UIElement element, global::Microsoft.UI.Xaml.Automation.Peers.AutomationControlType value)
-		{
-			element.SetValue(ControlTypeProperty, value);
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarAutomationProperties.GetControlType(Microsoft.UI.Xaml.UIElement)
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarAutomationProperties.SetControlType(Microsoft.UI.Xaml.UIElement, Microsoft.UI.Xaml.Automation.Peers.AutomationControlType)
 	}
 }

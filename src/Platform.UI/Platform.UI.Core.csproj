@@ -67,6 +67,8 @@
 	-->
 	<PropertyGroup>
 		<_CodeBrixCoreResourceMapLibraryName>CodeBrix.Platform.UI</_CodeBrixCoreResourceMapLibraryName>
+		<!-- WPE1-13: the XAML generator's x:Uid resource paths name the same map (default there: the assembly name). -->
+		<CodeBrixResourceMapLibraryName>$(_CodeBrixCoreResourceMapLibraryName)</CodeBrixResourceMapLibraryName>
 	</PropertyGroup>
 	<Target Name="_CodeBrixCoreUseResourceMapLibraryName" BeforeTargets="CodeBrixResourcesGeneration">
 		<PropertyGroup>

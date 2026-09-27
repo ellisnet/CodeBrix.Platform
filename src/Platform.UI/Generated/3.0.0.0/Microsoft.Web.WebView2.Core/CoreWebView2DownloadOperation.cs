@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.Web.WebView2.Core
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class CoreWebView2DownloadOperation
@@ -34,10 +34,7 @@ namespace Microsoft.Web.WebView2.Core
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.EstimatedEndTimeChanged.remove
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.StateChanged.add
 		// Forced skipping of method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.StateChanged.remove
-		// Skipping already declared method Cancel
-		// Skipping already declared event BytesReceivedChanged
-		// Skipping already declared event EstimatedEndTimeChanged
-		// Skipping already declared event StateChanged
+		// Skipping already declared method Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.Cancel()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void Pause()
@@ -52,5 +49,8 @@ namespace Microsoft.Web.WebView2.Core
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation", "void CoreWebView2DownloadOperation.Resume()");
 		}
 #endif
+		// Skipping already declared event Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.BytesReceivedChanged
+		// Skipping already declared event Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.EstimatedEndTimeChanged
+		// Skipping already declared event Microsoft.Web.WebView2.Core.CoreWebView2DownloadOperation.StateChanged
 	}
 }

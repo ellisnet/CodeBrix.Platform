@@ -43,8 +43,8 @@ namespace Microsoft.UI.Content
 			}
 		}
 #endif
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironmentView.DisplayScale.get
-		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironmentView.DisplayId.get
 		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironmentView.AppWindowId.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironmentView.DisplayId.get
+		// Forced skipping of method Microsoft.UI.Content.ContentSiteEnvironmentView.DisplayScale.get
 	}
 }

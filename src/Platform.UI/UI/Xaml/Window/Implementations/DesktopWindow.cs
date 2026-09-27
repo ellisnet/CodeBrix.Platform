@@ -66,4 +66,8 @@ internal class DesktopWindow : BaseWindowImplementation
 	{
 		_windowChrome?.SetTitleBar(titleBar);
 	}
+
+	/// <summary>The width of the caption buttons the window chrome draws, or 0 (see <see cref="Window.GetCaptionButtonsInset"/>).</summary>
+	/// <returns>The width of the caption buttons, or 0.</returns>
+	internal double GetCaptionButtonsInset() => _windowChrome?.GetCaptionButtonsInset() ?? 0;
 }

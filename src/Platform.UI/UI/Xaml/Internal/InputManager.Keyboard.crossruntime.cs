@@ -21,6 +21,8 @@ partial class InputManager
 
 	partial void InitializeKeyboard(object host) => Keyboard.Init(host);
 
+	partial void InjectKey(KeyEventArgs args, bool isDown) => Keyboard.InjectKey(args, isDown);
+
 	internal sealed class KeyboardManager
 	{
 		private readonly InputManager _inputManager;
@@ -97,6 +99,19 @@ partial class InputManager
 			}
 
 			args.Handled = routedArgs.Handled;
+		}
+
+		/// <summary>
+		/// Delivers a key injected by <see cref="Windows.UI.Input.Preview.Injection.InputInjector"/> along the path of a
+		/// real key: the CoreWindow's KeyDown / KeyUp first (as it subscribes to the keyboard source first), then the
+		/// XAML key path (access keys, Preview and bubbling key events of the focused element, accelerators).
+		/// </summary>
+		/// <param name="args">The key, as a keyboard source raises it.</param>
+		/// <param name="down"><see langword="true"/> for a press, <see langword="false"/> for a release.</param>
+		internal void InjectKey(KeyEventArgs args, bool down)
+		{
+			CoreWindow.GetForCurrentThreadSafe()?.RaiseInjectedKey(args, down);
+			OnKey(args, down);
 		}
 
 		/// <summary>

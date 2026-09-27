@@ -3,17 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial struct MouseDelta
 	{
 		// Forced skipping of method Windows.Devices.Input.MouseDelta.MouseDelta()
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		public int X;
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		public int Y;
-#endif
+		// Skipping already declared field Windows.Devices.Input.MouseDelta.X
+		// Skipping already declared field Windows.Devices.Input.MouseDelta.Y
 	}
 }

@@ -3,8 +3,8 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Media.Playback
 {
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 #endif
 	public partial class MediaPlaybackItem : global::Windows.Media.Playback.IMediaPlaybackSource
 	{
@@ -18,8 +18,8 @@ namespace Windows.Media.Playback
 			}
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Media.Core.MediaSource Source
 		{
 			get
@@ -146,8 +146,8 @@ namespace Windows.Media.Playback
 		}
 #endif
 		// Forced skipping of method Windows.Media.Playback.MediaPlaybackItem.MediaPlaybackItem(Windows.Media.Core.MediaSource, System.TimeSpan, System.TimeSpan)
-#if false || false || false || IS_UNIT_TESTS || false || false || __NETSTD_REFERENCE__ || false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public MediaPlaybackItem(global::Windows.Media.Core.MediaSource source)
 		{
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.Media.Playback.MediaPlaybackItem", "MediaPlaybackItem.MediaPlaybackItem(MediaSource source)");

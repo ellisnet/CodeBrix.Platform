@@ -159,15 +159,15 @@ namespace Microsoft.UI.Content
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.FrameworkClosed.add
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.FrameworkClosed.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.AutomationOption.get
-		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.PreviousSiblingAutomationProviderRequested.add
+		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ParentAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.AutomationProvider.get
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.FragmentRootAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.FragmentRootAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.NextSiblingAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.NextSiblingAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ParentAutomationProviderRequested.add
-		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ParentAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ActualSize.get
+		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.PreviousSiblingAutomationProviderRequested.add
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.PreviousSiblingAutomationProviderRequested.remove
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ProcessesKeyboardInput.get
 		// Forced skipping of method Microsoft.UI.Content.ChildSiteLink.ProcessesKeyboardInput.set

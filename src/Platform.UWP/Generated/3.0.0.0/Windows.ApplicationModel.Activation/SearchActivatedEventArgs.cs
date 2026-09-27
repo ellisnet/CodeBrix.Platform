@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.ApplicationModel.Activation
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class SearchActivatedEventArgs : global::Windows.ApplicationModel.Activation.ISearchActivatedEventArgs, global::Windows.ApplicationModel.Activation.IActivatedEventArgs, global::Windows.ApplicationModel.Activation.IApplicationViewActivatedEventArgs, global::Windows.ApplicationModel.Activation.ISearchActivatedEventArgsWithLinguisticDetails, global::Windows.ApplicationModel.Activation.IViewSwitcherProvider, global::Windows.ApplicationModel.Activation.IActivatedEventArgsWithUser

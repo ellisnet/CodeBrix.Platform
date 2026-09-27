@@ -30,6 +30,14 @@ internal sealed class TriPaneLayoutState
 	private bool _isBatchUpdating;
 	private int _stateVersion;
 
+	//WPE1-13: the platform's override of the DISPLAYED layout (ITriPaneDisplayOverride), and which regions the last state
+	//pass showed minimized only because of it (the application's weight is open).
+	private ITriPaneDisplayOverride? _displayOverride;
+	private bool _isSideHiddenByOverride;
+	private bool _isStackHiddenByOverride;
+	private bool _isUpperHiddenByOverride;
+	private bool _isLowerHiddenByOverride;
+
 	private double _dragStartSidePercent;
 	private double _dragStartStackPercent;
 	private double _dragStartUpperPercent;
@@ -70,6 +78,20 @@ internal sealed class TriPaneLayoutState
 
 	/// <summary>Whether a stack-divider drag is in progress.</summary>
 	internal bool IsStackDragActive => _isStackDragActive;
+
+	/// <summary>
+	/// Gets or sets the platform's override of the displayed layout (WPE1-13; <see cref="ITriPaneDisplayOverride"/>), or
+	/// <see langword="null"/> to display the application's weights. Setting it runs a state pass.
+	/// </summary>
+	internal ITriPaneDisplayOverride? DisplayOverride
+	{
+		get => _displayOverride;
+		set
+		{
+			_displayOverride = value;
+			UpdateState();
+		}
+	}
 
 	/// <summary>A weight change from outside (a property set): runs a state pass unless a batch update is running.</summary>
 	internal void OnWeightChanged() => UpdateState();
@@ -189,6 +211,12 @@ internal sealed class TriPaneLayoutState
 
 			_sideDragTotalDelta += moved;
 
+			//WPE1-13: the grip of a region the display override hides is a tap target only.
+			if (_isSideHiddenByOverride || _isStackHiddenByOverride)
+			{
+				return;
+			}
+
 			if (_sideDragHasMoved || !TriPaneViewLayoutMath.IsTap(_sideDragTotalDelta))
 			{
 				_sideDragHasMoved = true;
@@ -203,6 +231,12 @@ internal sealed class TriPaneLayoutState
 			}
 
 			_stackDragTotalDelta += moved;
+
+			//WPE1-13: the grip of a region the display override hides is a tap target only.
+			if (_isUpperHiddenByOverride || _isLowerHiddenByOverride)
+			{
+				return;
+			}
 
 			if (_stackDragHasMoved || !TriPaneViewLayoutMath.IsTap(_stackDragTotalDelta))
 			{
@@ -340,6 +374,26 @@ internal sealed class TriPaneLayoutState
 			return;
 		}
 
+		//WPE1-13: a platform's display override changes what is LAID OUT, never the application's weights or the
+		//minimized flags published above.
+		if (_displayOverride is { } displayOverride)
+		{
+			var display = displayOverride.GetDisplayWeights(
+				new TriPaneDisplayWeights(_host.SidePanePercent, _host.StackPercent, _host.UpperPanePercent, _host.LowerPanePercent));
+
+			var (displaySide, displayStack) = TriPaneViewLayoutMath.NormalizePair(display.Side, display.Stack);
+			var (displayUpper, displayLower) = TriPaneViewLayoutMath.NormalizePair(display.Upper, display.Lower);
+
+			_isSideHiddenByOverride = TriPaneViewLayoutMath.IsMinimized(displaySide) && !isSideMinimized;
+			_isStackHiddenByOverride = TriPaneViewLayoutMath.IsMinimized(displayStack) && !isStackMinimized;
+			_isUpperHiddenByOverride = TriPaneViewLayoutMath.IsMinimized(displayUpper) && !isUpperWeightZero;
+			_isLowerHiddenByOverride = TriPaneViewLayoutMath.IsMinimized(displayLower) && !isLowerWeightZero;
+
+			_host.ApplyLayout(ComputeLayout(displaySide, displayStack, displayUpper, displayLower));
+			return;
+		}
+
+		_isSideHiddenByOverride = _isStackHiddenByOverride = _isUpperHiddenByOverride = _isLowerHiddenByOverride = false;
 		_host.ApplyLayout(ComputeLayout(sideWeight, stackWeight, upperWeight, lowerWeight));
 	}
 
@@ -494,6 +548,14 @@ internal sealed class TriPaneLayoutState
 	private bool RestoreFromGrip(TriPaneViewDividerKind kind)
 	{
 		var mode = _host.RestoreGripMode;
+
+		//WPE1-13: the grip of a region only the display override hides belongs to the platform.
+		if (_displayOverride is { } displayOverride
+			&& HiddenByOverride(kind) is { } hiddenRegion
+			&& TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, TriPaneViewMinimizeCause.Drag))
+		{
+			return displayOverride.RestoreRequested(hiddenRegion);
+		}
 		var (sideWeight, stackWeight) = TriPaneViewLayoutMath.NormalizePair(_host.SidePanePercent, _host.StackPercent);
 		var (upperWeight, lowerWeight) = TriPaneViewLayoutMath.NormalizePair(_host.UpperPanePercent, _host.LowerPanePercent);
 
@@ -545,6 +607,17 @@ internal sealed class TriPaneLayoutState
 	}
 
 	/// <summary>
+	/// The region on <paramref name="kind"/>'s axis that the last state pass showed minimized only because of the display
+	/// override (WPE1-13), or <see langword="null"/>.
+	/// </summary>
+	/// <param name="kind">The divider.</param>
+	/// <returns>The hidden region, or <see langword="null"/>.</returns>
+	private TriPaneViewRegion? HiddenByOverride(TriPaneViewDividerKind kind)
+		=> kind == TriPaneViewDividerKind.Side
+			? _isSideHiddenByOverride ? TriPaneViewRegion.Side : _isStackHiddenByOverride ? TriPaneViewRegion.Stack : (TriPaneViewRegion?)null
+			: _isUpperHiddenByOverride ? TriPaneViewRegion.Upper : _isLowerHiddenByOverride ? TriPaneViewRegion.Lower : (TriPaneViewRegion?)null;
+
+	/// <summary>
 	/// Works out what the layout shows for a set of effective weights: which dividers are visible, which act as restore
 	/// grips (by the minimize causes and the grip mode) and which way their chevrons point.
 	/// </summary>
@@ -563,12 +636,12 @@ internal sealed class TriPaneLayoutState
 
 		if (isSideMinimized)
 		{
-			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_sideCause));
+			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, _isSideHiddenByOverride ? TriPaneViewMinimizeCause.Drag : CauseOrDefault(_sideCause));
 			isSideGripTowardStart = isPlacedLeft;
 		}
 		else if (isStackMinimized)
 		{
-			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_stackCause));
+			isSideGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, _isStackHiddenByOverride ? TriPaneViewMinimizeCause.Drag : CauseOrDefault(_stackCause));
 			isSideGripTowardStart = !isPlacedLeft;
 		}
 
@@ -581,12 +654,12 @@ internal sealed class TriPaneLayoutState
 		{
 			if (isUpperWeightZero)
 			{
-				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_upperCause));
+				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, _isUpperHiddenByOverride ? TriPaneViewMinimizeCause.Drag : CauseOrDefault(_upperCause));
 				isStackGripTowardStart = true;
 			}
 			else if (isLowerWeightZero)
 			{
-				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, CauseOrDefault(_lowerCause));
+				isStackGripVisible = TriPaneViewLayoutMath.IsRestoreGripVisible(mode, true, _isLowerHiddenByOverride ? TriPaneViewMinimizeCause.Drag : CauseOrDefault(_lowerCause));
 			}
 		}
 

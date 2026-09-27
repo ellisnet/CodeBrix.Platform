@@ -3,12 +3,12 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Networking.Connectivity
 {
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 #endif
 	public partial class ConnectionProfile
 	{
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		internal ConnectionProfile()
 		{
 		}
@@ -104,7 +104,7 @@ namespace Windows.Networking.Connectivity
 		}
 #endif
 		// Forced skipping of method Windows.Networking.Connectivity.ConnectionProfile.ProfileName.get
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Networking.Connectivity.NetworkConnectivityLevel GetNetworkConnectivityLevel()
 		{

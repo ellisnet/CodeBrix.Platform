@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
+using CodeBrix.Platform.Foundation.Extensibility;
+using CodeBrix.Platform.UI.Lottie.Contracts;
 using CodeBrix.Platform.UI.Lottie.Engine;
 using SilverAssertions;
 using SkiaSharp;
@@ -122,6 +124,74 @@ public class LottieEngineTests
 		LottiePlayer.BuildScale(LottieStretch.Uniform, double.PositiveInfinity, 50, 100, 100).Should().Be((0.5d, 0.5d));
 
 		EngineIsolation.AssertNoWinUILoaded("Lottie (stretch)");
+	}
+
+	// WPE1-13 (b): a platform-registered ILottieTickSourcePlatform supplies the engine's frame timers; unregistered,
+	// the source's own factory (on CodeBrix.Platform the dispatcher-queue timer) is used, as before.
+	[Fact]
+	public void When_A_Platform_Registers_A_Tick_Source_Then_The_Engine_Is_Driven_By_It_And_Otherwise_By_The_Fallback()
+	{
+		//Arrange
+		var fallbackCreated = 0;
+		Func<ITickSource> fallback = () =>
+		{
+			fallbackCreated++;
+			return new TestTickSource();
+		};
+		var platform = new TestTickSourcePlatform();
+		RegisterTickSourcePlatform();
+		using var bitmap = new SKBitmap(100, 100);
+		using var canvas = new SKCanvas(bitmap);
+
+		//Act
+		_tickSourcePlatform = null; // registered builder answers "not registered"
+		var unregistered = PlatformContract.SelectTickSourceFactory(fallback);
+		_tickSourcePlatform = platform;
+		var registered = PlatformContract.SelectTickSourceFactory(fallback);
+		var player = new LottiePlayer(registered, action => action());
+		var invalidations = 0;
+		player.InvalidateRequested += () => invalidations++;
+		player.Animation = LottiePlayer.CreateAnimation(ThemedJson);
+		player.Play(0, 1, looped: true);
+		var created = platform.Created.ToArray();
+		created[0].RaiseTick();
+		_tickSourcePlatform = null;
+
+		//Assert
+		unregistered.Should().BeSameAs(fallback);
+		registered.Should().NotBeSameAs(fallback);
+		fallbackCreated.Should().Be(0);
+		created.Should().HaveCount(1);
+		created[0].IsRunning.Should().BeTrue();
+		created[0].Interval.Should().Be(TimeSpan.FromSeconds(1 / 30d));
+		invalidations.Should().BeGreaterThanOrEqualTo(1);
+
+		EngineIsolation.AssertNoWinUILoaded("Lottie (platform tick source)");
+	}
+
+	private static ILottieTickSourcePlatform? _tickSourcePlatform;
+	private static bool _tickSourcePlatformRegistered;
+
+	private static void RegisterTickSourcePlatform()
+	{
+		if (!_tickSourcePlatformRegistered)
+		{
+			// A builder that returns null means "not registered" to the registry.
+			ApiExtensibility.Register(typeof(ILottieTickSourcePlatform), _ => _tickSourcePlatform!);
+			_tickSourcePlatformRegistered = true;
+		}
+	}
+
+	private sealed class TestTickSourcePlatform : ILottieTickSourcePlatform
+	{
+		internal List<TestTickSource> Created { get; } = new();
+
+		public ITickSource CreateTickSource()
+		{
+			var source = new TestTickSource();
+			Created.Add(source);
+			return source;
+		}
 	}
 
 	private sealed class TestTickSource : ITickSource

@@ -24,8 +24,8 @@ namespace Microsoft.UI.Input
 		}
 #endif
 		// Forced skipping of method Microsoft.UI.Input.InputActivationListener.InputActivationChanged.remove
-		// Forced skipping of method Microsoft.UI.Input.InputActivationListener.InputActivationChanged.add
 		// Forced skipping of method Microsoft.UI.Input.InputActivationListener.State.get
+		// Forced skipping of method Microsoft.UI.Input.InputActivationListener.InputActivationChanged.add
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Input.InputActivationListener GetForIsland(global::Microsoft.UI.Content.ContentIsland island)

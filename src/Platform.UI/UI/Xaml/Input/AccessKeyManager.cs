@@ -36,6 +36,12 @@ public partial class AccessKeyManager
 	private static bool _displayModeScopeIsPopup;
 	private static bool _isMenuKeyPressPending;
 
+	// No public constructor, as in WinUI (the generated file used to declare this one; the sync generator no longer
+	// emits it now that the type is hand-written).
+	internal AccessKeyManager()
+	{
+	}
+
 	/// <summary>
 	/// Gets a value that indicates whether access-key display mode is active.
 	/// </summary>

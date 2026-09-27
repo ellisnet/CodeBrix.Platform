@@ -3,26 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls.Primitives
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class FlyoutBase : global::Microsoft.UI.Xaml.DependencyObject
 	{
 		// Skipping already declared property XamlRoot
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowMode ShowMode
-		{
-			get
-			{
-				return (global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowMode)this.GetValue(ShowModeProperty);
-			}
-			set
-			{
-				this.SetValue(ShowModeProperty, value);
-			}
-		}
-#endif
+		// Skipping already declared property ShowMode
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public bool ShouldConstrainToRootBounds
@@ -145,14 +132,7 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			typeof(global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(bool)));
 #endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty ShowModeProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(ShowMode), typeof(global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowMode),
-			typeof(global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutBase),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.Controls.Primitives.FlyoutShowMode)));
-#endif
+		// Skipping already declared property ShowModeProperty
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty TargetProperty { get; } =

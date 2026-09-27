@@ -31,6 +31,7 @@ public partial class InputInjector
 		=> _inputManager is not null ? new InputInjector(_inputManager) : null;
 
 	private readonly InjectedInputState _mouse = new(PointerDeviceType.Mouse);
+	private readonly InjectedKeyboardState _keyboard = new();
 	private (InjectedInputState state, bool isAdded)? _touch;
 
 	/// <summary>
@@ -40,9 +41,45 @@ public partial class InputInjector
 
 	private readonly IInputInjectorTarget _target;
 
-	private InputInjector(IInputInjectorTarget target)
+	/// <summary>
+	/// Gets the keys this injector holds down (the modifiers they add to injected keyboard, mouse and touch input).
+	/// </summary>
+	internal InjectedKeyboardState Keyboard => _keyboard;
+
+	// Internal (not private) so that host-free tests can inject into a target of their own.
+	internal InputInjector(IInputInjectorTarget target)
 	{
 		_target = target;
+	}
+
+	/// <summary>
+	/// Injects keyboard input. Each key goes to the target's keyboard path exactly as a key of the real keyboard does:
+	/// the key events of the focused element (with the tunneling Preview events), access keys, keyboard accelerators,
+	/// and the character the key types.
+	/// </summary>
+	/// <param name="input">The keys, pressed and released in order.</param>
+	/// <remarks>
+	/// Like the pointer injection, the keys are delivered synchronously, on the calling (UI) thread. The modifier keys
+	/// injected as down stay down until they are injected as up, and apply to the injected mouse and touch input too.
+	/// </remarks>
+	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+	public void InjectKeyboardInput(IEnumerable<InjectedInputKeyboardInfo> input)
+	{
+		ArgumentNullException.ThrowIfNull(input);
+
+		foreach (var info in input)
+		{
+			if (info is null)
+			{
+				continue;
+			}
+
+			var args = _keyboard.Apply(info, out var isDown);
+			if (args is not null)
+			{
+				_target.InjectKey(args, isDown);
+			}
+		}
 	}
 
 	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
@@ -84,7 +121,7 @@ public partial class InputInjector
 		var touch = _touch!.Value.state;
 		foreach (var info in input)
 		{
-			var args = info.ToEventArgs(touch);
+			var args = info.ToEventArgs(touch, _keyboard.HeldModifiers);
 
 			if (_touch is { isAdded: false })
 			{
@@ -115,7 +152,7 @@ public partial class InputInjector
 		var touch = _touch!.Value.state;
 		foreach (var info in input)
 		{
-			var args = info.ToEventArgs(touch);
+			var args = info.ToEventArgs(touch, _keyboard.HeldModifiers);
 
 			if (_touch is { isAdded: false })
 			{
@@ -150,7 +187,7 @@ public partial class InputInjector
 				_mouse.StartNewSequence();
 			}
 
-			var args = info.ToEventArgs(_mouse!, VirtualKeyModifiers.None);
+			var args = info.ToEventArgs(_mouse!, _keyboard.HeldModifiers);
 			_mouse!.Update(args);
 
 			_target.InjectPointerUpdated(args);
@@ -167,7 +204,7 @@ public partial class InputInjector
 				_mouse.StartNewSequence();
 			}
 
-			var args = info.ToEventArgs(_mouse!, VirtualKeyModifiers.None);
+			var args = info.ToEventArgs(_mouse!, _keyboard.HeldModifiers);
 			_mouse!.Update(args);
 
 			_target.InjectPointerUpdated(args);

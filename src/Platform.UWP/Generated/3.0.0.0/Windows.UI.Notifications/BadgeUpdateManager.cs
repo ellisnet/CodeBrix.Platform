@@ -4,6 +4,7 @@
 namespace Windows.UI.Notifications
 {
 #if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public static partial class BadgeUpdateManager
 	{
@@ -14,12 +15,7 @@ namespace Windows.UI.Notifications
 			throw new global::System.NotImplementedException("The member BadgeUpdateManagerForUser BadgeUpdateManager.GetForUser(User user) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		public static global::Windows.UI.Notifications.BadgeUpdater CreateBadgeUpdaterForApplication()
-		{
-			throw new global::System.NotImplementedException("The member BadgeUpdater BadgeUpdateManager.CreateBadgeUpdaterForApplication() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
+		// Skipping already declared method Windows.UI.Notifications.BadgeUpdateManager.CreateBadgeUpdaterForApplication()
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public static global::Windows.UI.Notifications.BadgeUpdater CreateBadgeUpdaterForApplication(string applicationId)
@@ -34,11 +30,6 @@ namespace Windows.UI.Notifications
 			throw new global::System.NotImplementedException("The member BadgeUpdater BadgeUpdateManager.CreateBadgeUpdaterForSecondaryTile(string tileId) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false
-		public static global::Windows.Data.Xml.Dom.XmlDocument GetTemplateContent(global::Windows.UI.Notifications.BadgeTemplateType type)
-		{
-			throw new global::System.NotImplementedException("The member XmlDocument BadgeUpdateManager.GetTemplateContent(BadgeTemplateType type) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-		}
-#endif
+		// Skipping already declared method Windows.UI.Notifications.BadgeUpdateManager.GetTemplateContent(Windows.UI.Notifications.BadgeTemplateType)
 	}
 }

@@ -311,6 +311,14 @@ partial class Window
 		set => AppWindow.TitleBar.ExtendsContentIntoTitleBar = value;
 	}
 
+	/// <summary>
+	/// The breadth (in effective pixels) the caption buttons the window chrome draws take at the end of the title-bar area,
+	/// or 0 when it draws none (the content is not extended into the title bar, or the window has no chrome of its own).
+	/// A TitleBar control keeps its content clear of them.
+	/// </summary>
+	/// <returns>The width of the caption buttons, or 0.</returns>
+	internal double GetCaptionButtonsInset() => (_windowImplementation as DesktopWindow)?.GetCaptionButtonsInset() ?? 0;
+
 	internal Brush? Background
 	{
 		get => _background;

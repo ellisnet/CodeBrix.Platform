@@ -3,12 +3,16 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
-	public enum TabViewTearOutRequestedEventArgs
+#if false
+	[global::CodeBrix.Platform.NotImplemented]
+#endif
+	public partial class TabViewTabTearOutRequestedEventArgs
 	{
+		// Skipping already declared property Items
+		// Skipping already declared property NewWindowId
+		// Skipping already declared property Tabs
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutRequestedEventArgs.Items.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutRequestedEventArgs.Tabs.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.TabViewTabTearOutRequestedEventArgs.NewWindowId.get
 	}
-#endif
 }

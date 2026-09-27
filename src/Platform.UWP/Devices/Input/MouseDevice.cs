@@ -13,6 +13,12 @@ namespace Windows.Devices.Input
 		private TypedEventHandler<MouseDevice, MouseEventArgs>? _mouseMoved;
 		private ICodeBrixRelativePointerSource? _activeSource;
 
+		// No public constructor, as in WinRT: use GetForCurrentView (the generated file used to declare this one; the
+		// sync generator no longer emits it now that the type is hand-written).
+		internal MouseDevice()
+		{
+		}
+
 		public static MouseDevice GetForCurrentView()
 		{
 			lock (_gate)

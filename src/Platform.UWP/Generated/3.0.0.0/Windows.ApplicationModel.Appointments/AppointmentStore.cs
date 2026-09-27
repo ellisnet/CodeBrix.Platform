@@ -4,7 +4,7 @@
 namespace Windows.ApplicationModel.Appointments
 {
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class AppointmentStore
 	{

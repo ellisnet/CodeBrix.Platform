@@ -107,6 +107,89 @@ public class CloseTheDoorTests
 		family.Should().Be($"{Environment.OSVersion.Platform}.{AnalyticsInfo.DeviceForm}");
 	}
 
+	// WPE1-11 (FIXLIST [AP1.11], Jeremy's GO 2026-09-26): with a registered IDeviceFamilyPlatform, DeviceFamily is read
+	// live, so a docked phone that moves to another size class reports its current form; unregistered, it is unchanged.
+
+	[Fact]
+	public void When_The_Registered_Platform_Names_Another_Family_Between_Reads_Then_DeviceFamily_Follows()
+	{
+		//Arrange
+		var platform = new FakeDeviceFamily("Android");
+		UseDeviceFamily(platform);
+
+		try
+		{
+			var info = new AnalyticsVersionInfo();
+			var first = info.DeviceFamily;
+
+			//Act
+			platform.OperatingSystemFamily = "Apple";
+			var second = info.DeviceFamily;
+
+			//Assert
+			first.Should().Be($"Android.{AnalyticsInfo.DeviceForm}");
+			second.Should().Be($"Apple.{AnalyticsInfo.DeviceForm}");
+		}
+		finally
+		{
+			UseDeviceFamily(null);
+		}
+	}
+
+	[Fact]
+	public void When_The_Device_Form_Changes_Between_Reads_Then_The_Shared_VersionInfo_Reports_The_Current_Form()
+	{
+		//Arrange
+		UseDeviceFamily(new FakeDeviceFamily("Android"));
+		TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Mobile;
+
+		try
+		{
+			var compact = AnalyticsInfo.VersionInfo.DeviceFamily;
+
+			//Act
+			TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Desktop;
+			var expanded = AnalyticsInfo.VersionInfo.DeviceFamily;
+			TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Tablet;
+			var medium = AnalyticsInfo.VersionInfo.DeviceFamily;
+
+			//Assert
+			compact.Should().Be("Android.Mobile");
+			expanded.Should().Be("Android.Desktop");
+			medium.Should().Be("Android.Tablet");
+		}
+		finally
+		{
+			TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Unknown;
+			UseDeviceFamily(null);
+		}
+	}
+
+	[Fact]
+	public void When_No_Device_Family_Platform_Is_Registered_Then_DeviceFamily_Keeps_The_Value_Composed_At_Creation()
+	{
+		//Arrange
+		UseDeviceFamily(null);
+		TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Mobile;
+
+		try
+		{
+			var info = new AnalyticsVersionInfo();
+
+			//Act
+			TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Desktop;
+			var family = info.DeviceFamily;
+
+			//Assert
+			family.Should().Be($"{Environment.OSVersion.Platform}.Mobile");
+			info.DeviceFamily.Should().Be(family);
+		}
+		finally
+		{
+			TestPlatform.DeviceForm.Form = Windows.System.Profile.Internal.CodeBrixDeviceForm.Unknown;
+		}
+	}
+
 	private static void UseDeviceFamily(FakeDeviceFamily? platform)
 	{
 		if (!_deviceFamilyRegistered)
@@ -121,7 +204,7 @@ public class CloseTheDoorTests
 
 	private sealed class FakeDeviceFamily(string family) : IDeviceFamilyPlatform
 	{
-		public string OperatingSystemFamily { get; } = family;
+		public string OperatingSystemFamily { get; set; } = family;
 	}
 
 	// ---------------------------------------------------------------- TextBlock.ActualWidth / ActualHeight (AP2)

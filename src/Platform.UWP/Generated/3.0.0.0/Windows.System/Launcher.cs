@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.System
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public static partial class Launcher
@@ -149,8 +149,8 @@ namespace Windows.System
 			throw new global::System.NotImplementedException("The member IAsyncOperation<bool> Launcher.LaunchUriAsync(Uri uri, LauncherOptions options, ValueSet inputData) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Windows.Foundation.IAsyncOperation<global::Windows.System.LaunchQuerySupportStatus> QueryUriSupportAsync(global::System.Uri uri, global::Windows.System.LaunchQuerySupportType launchQuerySupportType)
 		{
 			throw new global::System.NotImplementedException("The member IAsyncOperation<LaunchQuerySupportStatus> Launcher.QueryUriSupportAsync(Uri uri, LaunchQuerySupportType launchQuerySupportType) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

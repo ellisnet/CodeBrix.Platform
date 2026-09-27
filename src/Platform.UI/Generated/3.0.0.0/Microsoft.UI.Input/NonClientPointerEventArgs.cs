@@ -8,51 +8,10 @@ namespace Microsoft.UI.Input
 #endif
 	public partial class NonClientPointerEventArgs
 	{
-#if false
-		internal NonClientPointerEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public bool IsPointInRegion
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member bool NonClientPointerEventArgs.IsPointInRegion is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Foundation.Point Point
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member Point NonClientPointerEventArgs.Point is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.PointerDeviceType PointerDeviceType
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member PointerDeviceType NonClientPointerEventArgs.PointerDeviceType is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.NonClientRegionKind RegionKind
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member NonClientRegionKind NonClientPointerEventArgs.RegionKind is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property IsPointInRegion
+		// Skipping already declared property Point
+		// Skipping already declared property PointerDeviceType
+		// Skipping already declared property RegionKind
 		// Forced skipping of method Microsoft.UI.Input.NonClientPointerEventArgs.PointerDeviceType.get
 		// Forced skipping of method Microsoft.UI.Input.NonClientPointerEventArgs.Point.get
 		// Forced skipping of method Microsoft.UI.Input.NonClientPointerEventArgs.RegionKind.get

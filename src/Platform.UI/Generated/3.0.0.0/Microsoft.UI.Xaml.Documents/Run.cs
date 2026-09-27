@@ -3,14 +3,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Documents
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class Run : global::Microsoft.UI.Xaml.Documents.Inline
 	{
 		// Skipping already declared property Text
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Microsoft.UI.Xaml.FlowDirection FlowDirection
 		{
 			get
@@ -23,8 +23,8 @@ namespace Microsoft.UI.Xaml.Documents
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Microsoft.UI.Xaml.DependencyProperty FlowDirectionProperty { get; } =
 		Microsoft.UI.Xaml.DependencyProperty.Register(
 			nameof(FlowDirection), typeof(global::Microsoft.UI.Xaml.FlowDirection),

@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Networking.Connectivity
 {
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 	[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 #endif
 	public static partial class NetworkInformation
@@ -15,14 +15,14 @@ namespace Windows.Networking.Connectivity
 			throw new global::System.NotImplementedException("The member IAsyncOperation<IReadOnlyList<ConnectionProfile>> NetworkInformation.FindConnectionProfilesAsync(ConnectionProfileFilter pProfileFilter) is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::System.Collections.Generic.IReadOnlyList<global::Windows.Networking.Connectivity.ConnectionProfile> GetConnectionProfiles()
 		{
 			throw new global::System.NotImplementedException("The member IReadOnlyList<ConnectionProfile> NetworkInformation.GetConnectionProfiles() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static global::Windows.Networking.Connectivity.ConnectionProfile GetInternetConnectionProfile()
 		{
@@ -59,7 +59,7 @@ namespace Windows.Networking.Connectivity
 #endif
 		// Forced skipping of method Windows.Networking.Connectivity.NetworkInformation.NetworkStatusChanged.add
 		// Forced skipping of method Windows.Networking.Connectivity.NetworkInformation.NetworkStatusChanged.remove
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public static event global::Windows.Networking.Connectivity.NetworkStatusChangedEventHandler NetworkStatusChanged
 		{

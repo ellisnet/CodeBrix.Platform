@@ -68,8 +68,10 @@ namespace Microsoft.Toolkit.Uwp.UI.Lottie
 
 		private LottiePlayer CreateEngine()
 		{
+			//WPE1-13: a platform with its own frame clock registers ILottieTickSourcePlatform (Android: Choreographer);
+			//otherwise the dispatcher-queue timer of the calling thread, as before.
 			var engine = new LottiePlayer(
-				DispatcherQueueTickSource.ForCurrentThread,
+				PlatformContract.SelectTickSourceFactory(DispatcherQueueTickSource.ForCurrentThread),
 				action =>
 				{
 					if (Dispatcher.HasThreadAccess)

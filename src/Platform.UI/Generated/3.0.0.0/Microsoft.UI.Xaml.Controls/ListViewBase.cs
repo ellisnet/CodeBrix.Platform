@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class ListViewBase : global::Microsoft.UI.Xaml.Controls.ISemanticZoomInformation
@@ -261,7 +261,7 @@ namespace Microsoft.UI.Xaml.Controls
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ListViewBase.ChoosingItemContainer.remove
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ListViewBase.ChoosingGroupHeaderContainer.add
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.ListViewBase.ChoosingGroupHeaderContainer.remove
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void ScrollIntoView(object item)
 		{
@@ -282,7 +282,7 @@ namespace Microsoft.UI.Xaml.Controls
 			throw new global::System.NotImplementedException("The member IAsyncOperation<LoadMoreItemsResult> ListViewBase.LoadMoreItemsAsync() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
 		}
 #endif
-#if false || false || false || IS_UNIT_TESTS || false || false || false || false
+#if IS_UNIT_TESTS
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public void ScrollIntoView(object item, global::Microsoft.UI.Xaml.Controls.ScrollIntoViewAlignment alignment)
 		{

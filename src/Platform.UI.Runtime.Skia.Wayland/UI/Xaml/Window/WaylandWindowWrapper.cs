@@ -82,14 +82,10 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 		connection.Flush();
 	}
 
-	public override void ExtendContentIntoTitleBar(bool extend)
-	{
-		base.ExtendContentIntoTitleBar(extend);
-
-		// Same shape as the X11 head (motif hints toggle): hide the native decorations so
-		// the XAML content (and any custom title bar) owns the full window surface.
-		_host.ShellSurface?.SetDecorationsVisible(!extend);
-	}
+	// WPE1-13 (option b, Jeremy's GO 2026-09-26): ExtendsContentIntoTitleBar keeps the compositor's (or libdecor's)
+	// decorations on Wayland, as on X11 and macOS - the head has no caption buttons or drag regions of its own to
+	// replace them with. The base implementation (a no-op) applies; SetDecorationsVisible(false) is no longer called for
+	// it (the presenter's HasBorder / HasTitleBar still control the decorations).
 
 	protected override void CloseCore()
 	{

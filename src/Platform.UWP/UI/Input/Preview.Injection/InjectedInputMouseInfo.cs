@@ -101,7 +101,7 @@ public partial class InjectedInputMouseInfo
 
 		properties.PointerUpdateKind = update;
 
-		var timestampInMicroseconds = state.Timestamp + TimeOffsetInMilliseconds * 1000;
+		var timestampInMicroseconds = state.GetNextTimestamp(TimeOffsetInMilliseconds, isNewSequence: false);
 		var point = new PointerPoint(
 			state.FrameId + TimeOffsetInMilliseconds,
 			timestampInMicroseconds,

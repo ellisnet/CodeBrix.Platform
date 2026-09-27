@@ -36,4 +36,22 @@ public partial class CoreWindow
 	}
 
 	internal ICodeBrixKeyboardInputSource? KeyboardSource => _keyboardSource;
+
+	/// <summary>
+	/// Raises <see cref="KeyDown"/> or <see cref="KeyUp"/> for a key injected by
+	/// <see cref="Windows.UI.Input.Preview.Injection.InputInjector"/>, as the keyboard source does for a real key.
+	/// </summary>
+	/// <param name="args">The key.</param>
+	/// <param name="down"><see langword="true"/> for a press, <see langword="false"/> for a release.</param>
+	internal void RaiseInjectedKey(KeyEventArgs args, bool down)
+	{
+		if (down)
+		{
+			KeyDown?.Invoke(this, args);
+		}
+		else
+		{
+			KeyUp?.Invoke(this, args);
+		}
+	}
 }

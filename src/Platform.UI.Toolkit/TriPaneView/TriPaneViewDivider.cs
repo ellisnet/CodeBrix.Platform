@@ -368,6 +368,69 @@ public sealed partial class TriPaneViewDivider : Control
 	}
 
 	/// <summary>
+	/// Raise entry point for a platform handler (WPE1-13, as <see cref="Thumb"/>'s): a native drag of the divider
+	/// started. The divider becomes <see cref="IsDragging"/> and raises <see cref="DragStarted"/> with a zero origin; the
+	/// deltas that follow are relative and <see cref="DragCompleted"/> carries their sum, never the travel of an earlier
+	/// pointer drag. Ignored while a drag is already in progress or when the divider is disabled.
+	/// </summary>
+	internal void RaiseDragStartedFromPlatform()
+	{
+		if (IsDragging || !IsEnabled)
+		{
+			return;
+		}
+
+		_origin = _previousPosition = default;
+		_transformToOrigin = null; // a Core pointer move during the platform's drag is not part of it
+		SetValue(IsDraggingProperty, true);
+
+		try
+		{
+			RaiseDragStarted();
+		}
+		catch
+		{
+			CancelDrag();
+			throw;
+		}
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler (WPE1-13): the native drag moved by (<paramref name="horizontalChange"/>,
+	/// <paramref name="verticalChange"/>) since the previous delta. Ignored when no drag is in progress.
+	/// </summary>
+	/// <param name="horizontalChange">The horizontal change, in DIPs.</param>
+	/// <param name="verticalChange">The vertical change, in DIPs.</param>
+	internal void RaiseDragDeltaFromPlatform(double horizontalChange, double verticalChange)
+	{
+		if (!IsDragging)
+		{
+			return;
+		}
+
+		_previousPosition = new Point(_previousPosition.X + horizontalChange, _previousPosition.Y + verticalChange);
+		RaiseDragDelta(horizontalChange, verticalChange);
+	}
+
+	/// <summary>
+	/// Raise entry point for a platform handler (WPE1-13): the native drag ended. The divider stops
+	/// <see cref="IsDragging"/> and raises <see cref="DragCompleted"/> with the total change since
+	/// <see cref="RaiseDragStartedFromPlatform"/>. Ignored when no drag is in progress.
+	/// </summary>
+	/// <param name="isCanceled">Whether the drag was cancelled.</param>
+	internal void RaiseDragCompletedFromPlatform(bool isCanceled)
+	{
+		if (!IsDragging)
+		{
+			return;
+		}
+
+		SetValue(IsDraggingProperty, false);
+		ReleaseCapturedPointer();
+		RaiseDragCompleted(isCanceled);
+	}
+
+	/// <summary>
 	/// Raises <see cref="DragStarted"/> from the divider's current drag origin.
 	/// </summary>
 	internal void RaiseDragStarted() => DragStarted?.Invoke(this, new DragStartedEventArgs(_origin.X, _origin.Y));

@@ -4,6 +4,7 @@
 namespace Windows.UI.Notifications
 {
 #if false
+	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class BadgeNotification
 	{
@@ -21,21 +22,8 @@ namespace Windows.UI.Notifications
 			}
 		}
 #endif
-#if false
-		public global::Windows.Data.Xml.Dom.XmlDocument Content
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member XmlDocument BadgeNotification.Content is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		public BadgeNotification(global::Windows.Data.Xml.Dom.XmlDocument content)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.UI.Notifications.BadgeNotification", "BadgeNotification.BadgeNotification(XmlDocument content)");
-		}
-#endif
+		// Skipping already declared property Content
+		// Skipping already declared method Windows.UI.Notifications.BadgeNotification.BadgeNotification(Windows.Data.Xml.Dom.XmlDocument)
 		// Forced skipping of method Windows.UI.Notifications.BadgeNotification.BadgeNotification(Windows.Data.Xml.Dom.XmlDocument)
 		// Forced skipping of method Windows.UI.Notifications.BadgeNotification.Content.get
 		// Forced skipping of method Windows.UI.Notifications.BadgeNotification.ExpirationTime.set

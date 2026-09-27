@@ -8,45 +8,10 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 #endif
 	public partial class CommandBarFlyoutCommandBar : global::Microsoft.UI.Xaml.Controls.CommandBar
 	{
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBarTemplateSettings FlyoutTemplateSettings
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member CommandBarFlyoutCommandBarTemplateSettings CommandBarFlyoutCommandBar.FlyoutTemplateSettings is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Xaml.Media.SystemBackdrop SystemBackdrop
-		{
-			get
-			{
-				return (global::Microsoft.UI.Xaml.Media.SystemBackdrop)this.GetValue(SystemBackdropProperty);
-			}
-			set
-			{
-				this.SetValue(SystemBackdropProperty, value);
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public static global::Microsoft.UI.Xaml.DependencyProperty SystemBackdropProperty { get; } =
-		Microsoft.UI.Xaml.DependencyProperty.Register(
-			nameof(SystemBackdrop), typeof(global::Microsoft.UI.Xaml.Media.SystemBackdrop),
-			typeof(global::Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar),
-			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.Media.SystemBackdrop)));
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public CommandBarFlyoutCommandBar() : base()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar", "CommandBarFlyoutCommandBar.CommandBarFlyoutCommandBar()");
-		}
-#endif
+		// Skipping already declared property FlyoutTemplateSettings
+		// Skipping already declared property SystemBackdrop
+		// Skipping already declared property SystemBackdropProperty
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar.CommandBarFlyoutCommandBar()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar.CommandBarFlyoutCommandBar()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar.FlyoutTemplateSettings.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.Primitives.CommandBarFlyoutCommandBar.SystemBackdrop.get

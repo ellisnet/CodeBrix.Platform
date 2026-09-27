@@ -3,16 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class AccessKeyManager
 	{
-		internal AccessKeyManager()
-		{
-		}
-		// Skipping already declared property AccessKeyManager.AreKeyTipsEnabled
-		// Skipping already declared property AccessKeyManager.IsDisplayModeEnabled
+		// Skipping already declared property AreKeyTipsEnabled
+		// Skipping already declared property IsDisplayModeEnabled
 		// Skipping already declared method Microsoft.UI.Xaml.Input.AccessKeyManager.EnterDisplayMode(Microsoft.UI.Xaml.XamlRoot)
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.IsDisplayModeEnabled.get
 		// Forced skipping of method Microsoft.UI.Xaml.Input.AccessKeyManager.AreKeyTipsEnabled.get

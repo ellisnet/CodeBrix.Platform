@@ -21,8 +21,11 @@
 
 	// --------------------------------------------------------------------
 	// HARD GUARDRAIL: CodeBrix.Platform.SkiaSharp.Views is never inspected.
-	// That package is special and is published only very rarely; nothing about its content
-	// or its build may change. It would pass this gate, but "would pass" is not a guarantee —
+	// That package is special: it is versioned with the SkiaSharp it wraps (hard-coded in its
+	// nuspec, not the family version) and published only rarely, when its content changes
+	// (e.g. the Core split added CodeBrix.Platform.SkiaSharp.Views.Core.dll). Each republish
+	// bumps its nuspec version AND the literal SkiaSharp.Views dependency lines in the Svg and
+	// Lottie nuspecs together. It would pass this gate, but "would pass" is not a guarantee —
 	// excluded, it can never be the reason a build fails.
 	// --------------------------------------------------------------------
 	"excludedPackages": [

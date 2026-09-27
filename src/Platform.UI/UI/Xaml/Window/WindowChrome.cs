@@ -375,6 +375,11 @@ internal sealed partial class WindowChrome : ContentControl
 		};
 	}
 
+	/// <summary>The width of the caption buttons (minimize, maximize, close) while they are shown, else 0.</summary>
+	/// <returns>The width of the caption buttons, or 0.</returns>
+	internal double GetCaptionButtonsInset() =>
+		CaptionVisibility == Visibility.Visible && m_tpTitleBarMinMaxCloseContainerPart is { } container ? container.ActualWidth : 0;
+
 	public Visibility CaptionVisibility
 	{
 		get => (Visibility)GetValue(CaptionVisibilityProperty);

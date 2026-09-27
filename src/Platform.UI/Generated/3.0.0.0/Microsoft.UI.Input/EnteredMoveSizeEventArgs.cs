@@ -8,31 +8,8 @@ namespace Microsoft.UI.Input
 #endif
 	public partial class EnteredMoveSizeEventArgs
 	{
-#if false
-		internal EnteredMoveSizeEventArgs()
-		{
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Microsoft.UI.Input.MoveSizeOperation MoveSizeOperation
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MoveSizeOperation EnteredMoveSizeEventArgs.MoveSizeOperation is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if false
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public global::Windows.Graphics.PointInt32 PointerScreenPoint
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member PointInt32 EnteredMoveSizeEventArgs.PointerScreenPoint is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property MoveSizeOperation
+		// Skipping already declared property PointerScreenPoint
 		// Forced skipping of method Microsoft.UI.Input.EnteredMoveSizeEventArgs.PointerScreenPoint.get
 		// Forced skipping of method Microsoft.UI.Input.EnteredMoveSizeEventArgs.MoveSizeOperation.get
 	}

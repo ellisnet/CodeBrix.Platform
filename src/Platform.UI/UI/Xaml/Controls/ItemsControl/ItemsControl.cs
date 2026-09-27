@@ -85,6 +85,7 @@ namespace Microsoft.UI.Xaml.Controls
 			InitializePartial();
 
 			_items.VectorChanged += OnItemsVectorChanged;
+			ObserveGroupStyle();
 		}
 
 		private void OnItemsVectorChanged(IObservableVector<object> sender, IVectorChangedEventArgs e)
@@ -1042,6 +1043,20 @@ namespace Microsoft.UI.Xaml.Controls
 				return;
 			}
 
+			if (UsesGroupItems)
+			{
+				// A grouped source with a GroupStyle in a non-virtualizing panel: one GroupItem per group.
+				UpdateGroupItems();
+				RequestLayoutPartial();
+				return;
+			}
+
+			if (_groupItemsRealized)
+			{
+				// Grouping ended (no GroupStyle any more, or an ungrouped source): the panel holds items again.
+				DismantleGroupItems();
+			}
+
 			object LocalCreateContainer(int index)
 			{
 				var container = GetContainerForIndex(index);
@@ -1602,7 +1617,16 @@ namespace Microsoft.UI.Xaml.Controls
 				return hostContainers;
 			}
 
-			return ItemsPanelRoot?.Children.OfType<DependencyObject>() ?? Enumerable.Empty<DependencyObject>();
+			if (_groupItemsRealized && ItemsPanelRoot is { } groupedPanel)
+			{
+				// The item containers live inside the GroupItems.
+				return GetGroupItemContainers(groupedPanel);
+			}
+
+			var children = ItemsPanelRoot?.Children.OfType<DependencyObject>() ?? Enumerable.Empty<DependencyObject>();
+
+			// Group header containers a virtualizing panel realized between the items are not item containers.
+			return ShowsGroupHeaders ? children.Where(child => !IsGroupHeaderContainer(child)) : children;
 		}
 
 		internal object GetDisplayItemFromIndexPath(CodeBrix.Platform.UI.IndexPath indexPath)

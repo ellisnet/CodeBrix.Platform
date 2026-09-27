@@ -9,6 +9,8 @@ namespace CodeBrix.Platform.UI.Lottie.Engine;
 /// names no dispatcher type; on CodeBrix.Platform the source classes pass one backed by a DispatcherQueueTimer
 /// (Internal/DispatcherQueueTickSource), and a CodeBrix.Mobile view passes one backed by its own platform timer.
 /// </summary>
+/// <remarks>Implementers: Platform (Skia) (Internal/DispatcherQueueTickSource), Android, Mobile. WPE1-13: a platform
+/// hands the animation sources its own tick sources by registering Contracts/ILottieTickSourcePlatform.</remarks>
 internal interface ITickSource
 {
 	/// <summary>The time between ticks.</summary>

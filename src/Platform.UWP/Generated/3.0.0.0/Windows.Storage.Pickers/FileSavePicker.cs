@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Storage.Pickers
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class FileSavePicker
@@ -13,7 +13,7 @@ namespace Windows.Storage.Pickers
 		// Skipping already declared property SuggestedFileName
 		// Skipping already declared property SettingsIdentifier
 #if IS_UNIT_TESTS
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public string DefaultFileExtension
 		{
 			get
@@ -87,8 +87,8 @@ namespace Windows.Storage.Pickers
 		// Forced skipping of method Windows.Storage.Pickers.FileSavePicker.SuggestedSaveFile.set
 		// Forced skipping of method Windows.Storage.Pickers.FileSavePicker.SuggestedFileName.get
 		// Forced skipping of method Windows.Storage.Pickers.FileSavePicker.SuggestedFileName.set
-#if IS_UNIT_TESTS || __NETSTD_REFERENCE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__NETSTD_REFERENCE__")]
+#if IS_UNIT_TESTS
+		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS")]
 		public global::Windows.Foundation.IAsyncOperation<global::Windows.Storage.StorageFile> PickSaveFileAsync()
 		{
 			throw new global::System.NotImplementedException("The member IAsyncOperation<StorageFile> FileSavePicker.PickSaveFileAsync() is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");

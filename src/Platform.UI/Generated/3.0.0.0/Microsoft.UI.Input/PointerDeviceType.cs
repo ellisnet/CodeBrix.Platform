@@ -3,15 +3,13 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Input
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	public enum PointerDeviceType
 	{
 		// Skipping already declared field Microsoft.UI.Input.PointerDeviceType.Touch
 		// Skipping already declared field Microsoft.UI.Input.PointerDeviceType.Pen
 		// Skipping already declared field Microsoft.UI.Input.PointerDeviceType.Mouse
-#if false
-		Touchpad = 3,
-#endif
+		// Skipping already declared field Microsoft.UI.Input.PointerDeviceType.Touchpad
 	}
 #endif
 }

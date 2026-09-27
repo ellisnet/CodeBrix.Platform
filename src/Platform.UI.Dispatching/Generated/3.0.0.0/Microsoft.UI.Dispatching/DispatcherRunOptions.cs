@@ -3,8 +3,8 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Dispatching
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	[global::System.FlagsAttribute]
+#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 	public enum DispatcherRunOptions : uint
 	{
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__

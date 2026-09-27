@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls.Primitives
 {
-#if false || false || false || false || false || false || false || false
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class OrientedVirtualizingPanel : global::Microsoft.UI.Xaml.Controls.VirtualizingPanel, global::Microsoft.UI.Xaml.Controls.Primitives.IScrollSnapPointsInfo, global::Microsoft.UI.Xaml.Controls.IInsertionPanel

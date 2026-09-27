@@ -56,8 +56,25 @@ internal static class TestPlatform
 			var applicationData = new TemporaryApplicationDataPlatform();
 			ApiExtensibility.Register(typeof(CodeBrix.Platform.Contracts.IApplicationDataPlatform), _ => applicationData);
 
+			// The device form a platform reports (WPE1-11, the live DeviceFamily fences). It starts Unknown - what
+			// AnalyticsInfo.DeviceForm is with no extension at all - so every other test sees the value it saw before.
+			ApiExtensibility.Register(typeof(Windows.System.Profile.Internal.IAnalyticsInfoExtension), _ => DeviceForm);
+
 			_registered = true;
 		}
+	}
+
+	/// <summary>The device form this test platform reports; a test may change it and must put it back.</summary>
+	internal static TestAnalyticsInfo DeviceForm { get; } = new();
+
+	/// <summary>A platform's device form (AnalyticsInfo.DeviceForm), settable by a test.</summary>
+	internal sealed class TestAnalyticsInfo : Windows.System.Profile.Internal.IAnalyticsInfoExtension
+	{
+		/// <summary>The form reported now.</summary>
+		public Windows.System.Profile.Internal.CodeBrixDeviceForm Form { get; set; } = Windows.System.Profile.Internal.CodeBrixDeviceForm.Unknown;
+
+		/// <inheritdoc />
+		public Windows.System.Profile.Internal.CodeBrixDeviceForm GetDeviceForm() => Form;
 	}
 
 	/// <summary>Application data folders under a per-process temporary folder (nothing is written by the tests).</summary>

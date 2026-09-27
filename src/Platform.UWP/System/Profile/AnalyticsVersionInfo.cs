@@ -14,9 +14,33 @@ public partial class AnalyticsVersionInfo
 	partial void Initialize();
 
 	/// <summary>
+	/// Lets the platform compute <see cref="DeviceFamily"/> at the time it is read (it leaves the value alone when it
+	/// has nothing live to say, and the value composed when this instance was created is returned).
+	/// </summary>
+	/// <param name="deviceFamily">The value composed at creation; replaced by the live value when there is one.</param>
+	partial void GetLiveDeviceFamily(ref string deviceFamily);
+
+	private string _deviceFamily = $"{Environment.OSVersion.Platform}.Desktop";
+
+	/// <summary>
 	/// Gets a string that represents the type of device the application is running on.
 	/// </summary>
-	public string DeviceFamily { get; private set; } = $"{Environment.OSVersion.Platform}.Desktop";
+	/// <remarks>
+	/// When the platform registered IDeviceFamilyPlatform (CodeBrix.Android, CodeBrix.Mobile) it is read on EVERY access,
+	/// "&lt;family&gt;.&lt;current AnalyticsInfo.DeviceForm&gt;", so it follows the window between size classes (a
+	/// docked phone). Otherwise (the Skia heads) it is the value composed once, when AnalyticsInfo.VersionInfo was
+	/// created, as before.
+	/// </remarks>
+	public string DeviceFamily
+	{
+		get
+		{
+			var deviceFamily = _deviceFamily;
+			GetLiveDeviceFamily(ref deviceFamily);
+			return deviceFamily;
+		}
+		private set => _deviceFamily = value;
+	}
 
 	/// <summary>
 	/// Gets the version within the device family.

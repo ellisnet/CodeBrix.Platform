@@ -3,7 +3,7 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Microsoft.UI.Xaml.Controls
 {
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
+#if false
 	[global::CodeBrix.Platform.NotImplemented]
 #endif
 	public partial class VirtualizingStackPanel : global::Microsoft.UI.Xaml.Controls.Primitives.OrientedVirtualizingPanel
@@ -68,13 +68,7 @@ namespace Microsoft.UI.Xaml.Controls
 			typeof(global::Microsoft.UI.Xaml.Controls.VirtualizingStackPanel),
 			new Microsoft.UI.Xaml.FrameworkPropertyMetadata(default(global::Microsoft.UI.Xaml.Controls.VirtualizationMode)));
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public VirtualizingStackPanel()
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Controls.VirtualizingStackPanel", "VirtualizingStackPanel.VirtualizingStackPanel()");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Controls.VirtualizingStackPanel.VirtualizingStackPanel()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.VirtualizingStackPanel.VirtualizingStackPanel()
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.VirtualizingStackPanel.AreScrollSnapPointsRegular.get
 		// Forced skipping of method Microsoft.UI.Xaml.Controls.VirtualizingStackPanel.AreScrollSnapPointsRegular.set
