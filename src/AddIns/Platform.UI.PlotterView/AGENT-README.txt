@@ -20,7 +20,8 @@ The library's FULL interaction model is wired in out of the box:
   - tracker:  left-click shows a data-point tracker (Ctrl+left for free
               tracking)
   - reset:    double-middle-click, or the A / Home keys
-  - touch:    single-finger pan, two-finger pinch zoom
+  - touch:    drag pans, pinch zooms about the pinch centre, tap/hold
+              shows the data-point tracker
 Every one of those bindings can be rebound or removed through the Controller
 property, which takes a CodeBrix.Plotter PlotController.
 
@@ -268,7 +269,8 @@ The stock commands are static properties of CodeBrix.Plotter.PlotCommands:
 PanAt, PanLeft/Right/Up/Down (+ ...Fine variants), ZoomRectangle, ZoomWheel,
 ZoomWheelFine, ZoomIn/ZoomOut (+ ...At and ...Fine variants), Track,
 SnapTrack, PointsOnlyTrack, HoverTrack, HoverSnapTrack,
-HoverPointsOnlyTrack, PanZoomByTouch, SnapTrackTouch, PointsOnlyTrackTouch,
+HoverPointsOnlyTrack, PanZoomTrackByTouch (the default touch binding),
+PanZoomByTouch, SnapTrackTouch, PointsOnlyTrackTouch,
 Reset, ResetAt, CopyCode.
 
 One-line rebinding - pan with the LEFT button and leave everything else
@@ -585,7 +587,8 @@ QUICK REFERENCE CARD
 
     Stock gestures:  right-drag pan | wheel zoom | middle-drag zoom box |
                      left-click track | double-middle / A / Home reset |
-                     arrows pan | + and - zoom | touch pan + pinch
+                     arrows pan | + and - zoom | touch drag pan +
+                     pinch zoom (about the pinch centre) + tap/hold track
     Rebind:          var c = new PlotController(); c.UnbindAll();
                      c.BindMouseDown(PlotterMouseButton.Left, PlotCommands.PanAt);
                      Plotter.Controller = c;

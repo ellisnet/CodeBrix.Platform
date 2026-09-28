@@ -302,6 +302,54 @@ public sealed class TerminalViewSteps
 				"A drag runs from one cell to a later one, so it ends further right than it started.");
 		}
 
+		await DragAlongRowAsync(from, to, to, row, name).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Drags one finger along a row of cells like the plain drag step, but lifts it further right
+	/// than the last cell it moved through: the finger moves one step per cell as far as one cell,
+	/// then comes up in a later one with no move in between. A touch can do this (its lift is
+	/// reported where the finger left the glass), which is why the selection must run to the cell
+	/// the finger LIFTS in, not the one it last moved to.
+	/// </summary>
+	/// <param name="from">The column the finger goes down in.</param>
+	/// <param name="lastMove">The column of the last move before the lift.</param>
+	/// <param name="release">The column it lifts in (further right than the last move).</param>
+	/// <param name="row">The row it runs along, counting from the top of the grid.</param>
+	/// <param name="name">The Gherkin name of the terminal.</param>
+	/// <returns>A task that completes once the whole gesture has been delivered.</returns>
+	[When("a finger drags from cell {int} as far as cell {int} and lifts in cell {int} along row {int} of {string}")]
+	public async Task When_a_finger_drags_from_cell_as_far_as_cell_and_lifts_in_cell_along_row_of(
+		int from, int lastMove, int release, int row, string name)
+	{
+		if (lastMove <= from)
+		{
+			throw new ArgumentOutOfRangeException(nameof(lastMove), lastMove,
+				"A drag runs from one cell to a later one, so its last move is further right than it started.");
+		}
+
+		if (release <= lastMove)
+		{
+			throw new ArgumentOutOfRangeException(nameof(release), release,
+				"This gesture lifts the finger beyond its last move, so it lifts further right than that.");
+		}
+
+		await DragAlongRowAsync(from, lastMove, release, row, name).ConfigureAwait(false);
+	}
+
+	/// <summary>
+	/// Delivers a one-finger drag along a row: down in the middle of one cell, one move per cell
+	/// to the middle of another, then up in the middle of a third (the same cell as the last move
+	/// for an ordinary drag).
+	/// </summary>
+	/// <param name="from">The column the finger goes down in.</param>
+	/// <param name="lastMove">The column of the last move.</param>
+	/// <param name="release">The column it lifts in.</param>
+	/// <param name="row">The row it runs along.</param>
+	/// <param name="name">The Gherkin name of the terminal.</param>
+	/// <returns>A task that completes once the whole gesture has been delivered.</returns>
+	private static async Task DragAlongRowAsync(int from, int lastMove, int release, int row, string name)
+	{
 		var cell = await MetricsAsync(name).ConfigureAwait(false);
 		var bounds = await DeviceRect.OfAsync(ElementRegistry.Resolve(name), inset: 0).ConfigureAwait(false);
 		var session = TestTargetFixture.Session;
@@ -312,13 +360,13 @@ public sealed class TerminalViewSteps
 		session.TouchPress(Finger.PointerId, At(from), y);
 		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 
-		for (var column = from + 1; column <= to; column++)
+		for (var column = from + 1; column <= lastMove; column++)
 		{
 			session.TouchMove(Finger.PointerId, At(column), y);
 			await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 		}
 
-		session.TouchRelease(Finger.PointerId, At(to), y);
+		session.TouchRelease(Finger.PointerId, At(release), y);
 		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
 	}
 

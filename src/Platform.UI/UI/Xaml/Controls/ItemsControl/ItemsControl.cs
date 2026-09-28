@@ -1088,12 +1088,16 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				if (args.Action == NotifyCollectionChangedAction.Reset)
 				{
-					for (int i = 0; i < ItemsPanelRoot.Children.Count; i++)
-					{
-						CleanUpContainer(ItemsPanelRoot.Children[i]);
-					}
-
+					// The containers leave the panel BEFORE they are cleaned up (as on the single-item Remove path): cleaning up
+					// a ContentPresenter clears its Content and with it the item DataContext, and while it is still in the panel
+					// its materialized template would inherit this control's DataContext and re-evaluate its bindings against it.
+					var oldContainers = ItemsPanelRoot.Children.ToArray();
 					ItemsPanelRoot.Children.Clear();
+
+					foreach (var oldContainer in oldContainers)
+					{
+						CleanUpContainer(oldContainer);
+					}
 
 					// Fall-through and materialize the call collection.
 				}
@@ -1124,9 +1128,12 @@ namespace Microsoft.UI.Xaml.Controls
 				{
 					var index = args.NewStartingIndex;
 					var container = ItemsPanelRoot.Children[index];
+
+					// Out of the panel before the clean-up, so that its template does not see this control's DataContext
+					ItemsPanelRoot.Children.RemoveAt(index);
 					LocalCleanupContainer(container);
 
-					ItemsPanelRoot.Children[index] = (UIElement)LocalCreateContainer(index);
+					ItemsPanelRoot.Children.Insert(index, (UIElement)LocalCreateContainer(index));
 					RequestLayoutPartial();
 					return;
 				}

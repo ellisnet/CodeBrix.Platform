@@ -302,6 +302,37 @@ change without notice.
     TextRunSegment      sealed class; int StartColumn, int CellCount,
                         string Text, int Attribute, bool IsWide
 
+Platform caret seam (internal; not for applications)
+----------------------------------------------------
+TerminalControl carries two INTERNAL members for platform heads whose soft
+keyboard pans the window to the focused native view (a head lays its
+keyboard focus view on the terminal's cursor cell). They are reached only
+through the add-in's InternalsVisibleTo grants (AssemblyInfo.cs); an
+application cannot call them and needs nothing from them. The Skia heads
+do not use them.
+
+    Rect GetCaretRectForPlatform()
+                        - the cursor cell in the control's own coordinates
+                          (DIPs): column x cell width, viewport row x cell
+                          height (the cursor's line less the scroll offset),
+                          one cell in size, plus the terminal surface's
+                          offset in the control. Rect.Empty (IsEmpty true)
+                          when the application hid the cursor (DECTCEM) or
+                          its line is scrolled out of view. UI thread.
+    event EventHandler CaretRectChangedForPlatform
+                        - raised (sender = the control) after that value
+                          changed: output moved the cursor or showed / hid
+                          it, a reset, the view scrolled (scroll bar, wheel,
+                          Shift+PageUp / PageDown, typing snapping back to
+                          the live tail), the grid was refitted to a new
+                          size, or the terminal font changed. The first
+                          change after the first handler is added is always
+                          reported. Nothing extra is computed while no
+                          handler is attached.
+
+A head that follows the caret also re-reads the rectangle on the control's
+own layout changes (a move of the whole control is not a caret change).
+
 
 COMPLETE EXAMPLES
 =================

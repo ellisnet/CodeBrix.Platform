@@ -143,14 +143,16 @@ public partial class ItemsControl
 
 		var panel = ItemsPanelRoot;
 
-		// Containers left from an ungrouped state (the panel held item containers directly).
-		foreach (var child in panel.Children.ToArray())
+		// Containers left from an ungrouped state (the panel held item containers directly). They leave the panel before
+		// they are cleaned up, so that an emptied template never sees this control's DataContext.
+		var leftovers = panel.Children.ToArray();
+		panel.Children.Clear();
+
+		foreach (var child in leftovers)
 		{
 			CleanUpContainer(child);
 			child.ClearValue(IndexForItemContainerProperty);
 		}
-
-		panel.Children.Clear();
 
 		var flatIndex = 0;
 		var groupCount = NumberOfDisplayGroups;
@@ -231,13 +233,15 @@ public partial class ItemsControl
 
 		foreach (var groupItem in panel.Children.OfType<GroupItem>().ToArray())
 		{
-			foreach (var container in groupItem.GetItemContainers().ToArray())
+			// Out of the group's panel before the clean-up, so that an emptied template never sees an inherited DataContext
+			var containers = groupItem.GetItemContainers().ToArray();
+			groupItem.ItemsPanel?.Children.Clear();
+
+			foreach (var container in containers)
 			{
 				CleanUpContainer(container);
 				container.ClearValue(IndexForItemContainerProperty);
 			}
-
-			groupItem.ItemsPanel?.Children.Clear();
 			groupItem.SetItemsPanel(null);
 
 			if (groupItem.HeaderContainer is { } header)

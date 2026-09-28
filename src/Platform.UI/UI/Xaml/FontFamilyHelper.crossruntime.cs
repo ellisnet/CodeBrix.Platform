@@ -48,10 +48,30 @@ internal static partial class FontFamilyHelper
 	internal static bool TryGetFontManifestUri(string fontFamily, out Uri uri)
 		=> Uri.TryCreate(fontFamily, UriKind.Absolute, out uri);
 
+	/// <summary>
+	/// Builds the URI of a font file's ".manifest" companion. A "#Family" fragment names a family inside the font file
+	/// (e.g. "ms-appx:///Fonts/Roboto.ttf#Roboto"): it is not part of the file path, so it is dropped before ".manifest"
+	/// is appended (appending after it put ".manifest" into the fragment and opened the font file itself as the manifest).
+	/// A URI without a fragment gets ".manifest" appended to its original string unchanged.
+	/// </summary>
+	/// <param name="uri">The URI of the font file, optionally followed by a "#Family" fragment.</param>
+	/// <returns>The URI of the font's manifest file.</returns>
+	internal static Uri GetFontManifestUri(Uri uri)
+	{
+		var fontFile = uri.OriginalString;
+		var fragmentStart = fontFile.IndexOf('#');
+		if (fragmentStart >= 0)
+		{
+			fontFile = fontFile.Substring(0, fragmentStart);
+		}
+
+		return new Uri(fontFile + ".manifest");
+	}
+
 	/// <param name="uri">The URI of the font (ending with.ttf without .manifest)</param>
 	public static async Task<bool> PreloadAllFontsInManifest(Uri uri)
 	{
-		var manifestUri = new Uri(uri.OriginalString + ".manifest");
+		var manifestUri = GetFontManifestUri(uri);
 		var path = Uri.UnescapeDataString(manifestUri.PathAndQuery).TrimStart('/');
 		if (!await StorageFileHelper.ExistsInPackage(path))
 		{

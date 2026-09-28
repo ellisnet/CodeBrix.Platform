@@ -44,6 +44,8 @@ internal sealed class TerminalRenderer
 	private double _lastPointerY;
 	private long _lastClickTick;
 	private (int Column, int Row) _lastClickCell = (-1, -1);
+	private SKRect _lastCaretRect;
+	private bool _isLastCaretRectKnown;
 
 	/// <summary>Creates the engine with an 80x25 terminal (a host resizes it with <see cref="FitToSize"/>).</summary>
 	internal TerminalRenderer()
@@ -77,6 +79,14 @@ internal sealed class TerminalRenderer
 
 	/// <summary>Raised with the input the terminal itself sends back to the host application (status reports).</summary>
 	internal event Action<string>? InputSent;
+
+	/// <summary>
+	/// Raised after an operation of this engine moved the caret rectangle (<see cref="GetCaretRect"/>): the cursor moved
+	/// or was shown/hidden by fed data, the viewport scrolled, the grid was refitted, the font changed, or a reset.
+	/// Only computed while something is subscribed (a platform that places its keyboard focus view on the caret), so a
+	/// host without a subscriber does exactly the work it did before.
+	/// </summary>
+	internal event Action? CaretRectChanged;
 
 	/// <summary>The terminal (buffer, modes, scrolling).</summary>
 	internal TerminalEngine Terminal => _terminal;
@@ -130,6 +140,7 @@ internal sealed class TerminalRenderer
 		{
 			_fontFamily = string.IsNullOrWhiteSpace(value) ? DefaultFontFamily : value;
 			_metrics = null;
+			NotifyCaretRectIfChanged();
 		}
 	}
 
@@ -141,6 +152,7 @@ internal sealed class TerminalRenderer
 		{
 			_fontSize = value > 4f ? value : 4f;
 			_metrics = null;
+			NotifyCaretRectIfChanged();
 		}
 	}
 
@@ -155,12 +167,20 @@ internal sealed class TerminalRenderer
 
 	/// <summary>Feeds VT output text into the terminal.</summary>
 	/// <param name="data">The text.</param>
-	internal void Feed(string data) => _terminal.Feed(data);
+	internal void Feed(string data)
+	{
+		_terminal.Feed(data);
+		NotifyCaretRectIfChanged();
+	}
 
 	/// <summary>Feeds VT output bytes into the terminal.</summary>
 	/// <param name="data">The bytes.</param>
 	/// <param name="length">How many of them.</param>
-	internal void Feed(byte[] data, int length) => _terminal.Feed(data, length);
+	internal void Feed(byte[] data, int length)
+	{
+		_terminal.Feed(data, length);
+		NotifyCaretRectIfChanged();
+	}
 
 	/// <summary>
 	/// A full reset (RIS) that also empties the screen and the scrollback and clears the selection - the state a
@@ -179,6 +199,7 @@ internal sealed class TerminalRenderer
 		_terminal.Buffer.Clear();
 
 		_selection.SelectNone();
+		NotifyCaretRectIfChanged();
 	}
 
 	/// <summary>Input is about to be sent: the view snaps back to the live tail and the cursor shows.</summary>
@@ -187,11 +208,16 @@ internal sealed class TerminalRenderer
 		//Typing snaps the view back to the live tail, like every terminal
 		_terminal.ScrollToBottom();
 		IsBlinkOn = true;
+		NotifyCaretRectIfChanged();
 	}
 
 	/// <summary>Scrolls the viewport by whole lines (negative = back into history).</summary>
 	/// <param name="delta">The line count.</param>
-	internal void ScrollLines(int delta) => _terminal.ScrollLines(delta);
+	internal void ScrollLines(int delta)
+	{
+		_terminal.ScrollLines(delta);
+		NotifyCaretRectIfChanged();
+	}
 
 	/// <summary>Scrolls one page (the rows less one) back into history or forward.</summary>
 	/// <param name="up">True for back into history.</param>
@@ -199,13 +225,17 @@ internal sealed class TerminalRenderer
 	{
 		var page = Math.Max(1, _terminal.Rows - 1);
 		_terminal.ScrollLines(up ? -page : page);
+		NotifyCaretRectIfChanged();
 	}
 
 	/// <summary>Scrolls for a mouse wheel delta (120 per notch; positive = back into history, three lines a notch).</summary>
 	/// <param name="wheelDelta">The wheel delta.</param>
-	internal void ScrollWheel(int wheelDelta) =>
+	internal void ScrollWheel(int wheelDelta)
+	{
 		//Wheel up (positive delta) scrolls back into history
 		_terminal.ScrollLines(-(wheelDelta / 120 * 3));
+		NotifyCaretRectIfChanged();
+	}
 
 	/// <summary>The grid (columns, rows) that fits a surface of the given size in the current font.</summary>
 	/// <param name="width">The surface width in DIPs.</param>
@@ -235,6 +265,7 @@ internal sealed class TerminalRenderer
 		var wasAtBottom = _terminal.IsAtBottom;
 		_terminal.Resize(columns, rows);
 		if (wasAtBottom) { _terminal.ScrollToBottom(); }
+		NotifyCaretRectIfChanged();
 		return true;
 	}
 
@@ -310,6 +341,7 @@ internal sealed class TerminalRenderer
 		//Above the top edge scrolls back into history; below scrolls forward
 		_terminal.ScrollLines(_lastPointerY < 0 ? -1 : 1);
 		ExtendSelectionTo(_lastPointerX, _lastPointerY);
+		NotifyCaretRectIfChanged();
 		return true;
 	}
 
@@ -340,7 +372,46 @@ internal sealed class TerminalRenderer
 		DrawCursor(canvas, buffer, cell);
 	}
 
+	/// <summary>
+	/// The cursor cell's rectangle in the surface's DIPs (the coordinates <see cref="Paint"/> draws in): column x cell
+	/// width, viewport row (the cursor's buffer line less the scroll offset) x cell height, one cell in size - the
+	/// block the cursor is painted as. <see cref="SKRect.Empty"/> when the cursor is hidden (DECTCEM) or its line is
+	/// scrolled out of the viewport.
+	/// </summary>
+	/// <returns>The caret rectangle, or an empty rectangle when there is no visible caret.</returns>
+	internal SKRect GetCaretRect()
+	{
+		if (_terminal.CursorHidden) { return SKRect.Empty; }
+
+		var buffer = _terminal.Buffer;
+		var screenRow = buffer.YBase + buffer.Y - buffer.YDisp;
+		if (screenRow < 0 || screenRow >= _terminal.Rows) { return SKRect.Empty; }
+
+		//The same cell DrawCursor paints
+		var cell = Metrics;
+		return SKRect.Create(buffer.X * cell.Width, screenRow * cell.Height, cell.Width, cell.Height);
+	}
+
 	private void RequestInvalidate() => InvalidateRequested?.Invoke();
+
+	//Raises CaretRectChanged when the caret rectangle differs from the last one reported. Nothing is computed (and the
+	//  font is not measured) while no one listens; the first computation after a subscriber appears always reports.
+	private void NotifyCaretRectIfChanged()
+	{
+		var handler = CaretRectChanged;
+		if (handler is null)
+		{
+			_isLastCaretRectKnown = false;
+			return;
+		}
+
+		var rect = GetCaretRect();
+		if (_isLastCaretRectKnown && rect == _lastCaretRect) { return; }
+
+		_lastCaretRect = rect;
+		_isLastCaretRectKnown = true;
+		handler();
+	}
 
 	private void ExtendSelectionTo(double x, double y)
 	{

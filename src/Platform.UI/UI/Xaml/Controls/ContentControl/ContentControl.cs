@@ -235,6 +235,9 @@ namespace Microsoft.UI.Xaml.Controls
 
 				if (_contentTemplateRoot != null)
 				{
+					// The root gets its content DataContext BEFORE it joins the tree: once added, it would otherwise inherit this
+					// control's DataContext (the page's) and evaluate its bindings against it first (WinUI never does).
+					SetContentDataContextBeforeRegistration();
 					RegisterContentTemplateRoot();
 
 					UpdateContentTransitions(null, this.ContentTransitions);
@@ -440,6 +443,24 @@ namespace Microsoft.UI.Xaml.Controls
 			else
 			{
 				ResetContentDataContextOverride();
+			}
+		}
+
+		/// <summary>
+		/// Gives a new content template root the Content as its DataContext before <see cref="RegisterContentTemplateRoot"/>
+		/// adds it as a child, so that its bindings are first evaluated against the content and never against the inherited
+		/// DataContext. Same rules as the non-view branch of <see cref="SyncDataContext"/>, which still runs afterwards and
+		/// then finds the value already in place.
+		/// </summary>
+		private void SetContentDataContextBeforeRegistration()
+		{
+			if (IsContentPresenterBypassEnabled
+				&& Content is not View
+				&& _contentTemplateRoot is IDependencyObjectStoreProvider provider
+				&& !(provider as DependencyObject).IsDependencyPropertyLocallySet(provider.Store.DataContextProperty))
+			{
+				_localContentDataContextOverride = true;
+				provider.Store.SetValue(provider.Store.DataContextProperty, Content, DependencyPropertyValuePrecedences.Local);
 			}
 		}
 

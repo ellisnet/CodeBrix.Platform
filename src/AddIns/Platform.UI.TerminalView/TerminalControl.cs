@@ -474,6 +474,14 @@ public sealed partial class TerminalControl : Control
 
     private void OnCanvasPointerReleased(object sender, PointerRoutedEventArgs e)
     {
+        //A touch can lift beyond its last move (a mouse's last move is its release point), so the
+        //selection is extended to where the pointer came up before the drag ends
+        if (_renderer.IsSelecting)
+        {
+            var position = e.GetCurrentPoint(_canvas).Position;
+            _renderer.DragTo(position.X, position.Y);
+        }
+
         if (!_renderer.EndDrag()) { return; }
 
         _dragScrollTimer.Stop();

@@ -107,6 +107,31 @@ Scenario: The clipboard chord copies what the finger selected
 	And the InputEmitted of "term" was never raised
 	And row 0 of "term" contains at least 5 percent "Magenta"
 
+Scenario: A drag selection that is released beyond its last move extends to the release point
+	Given the font "ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf" is warm
+	And the application shows a Grid named "cell" with:
+		| Property | Value |
+		| Width    | 800   |
+		| Height   | 600   |
+	And the layout "cell" holds a Terminal named "term" with:
+		| Property         | Value   |
+		| BackgroundColor  | Navy    |
+		| ForegroundColor  | Yellow  |
+		| SelectionColor   | Magenta |
+		| TerminalFontSize | 24      |
+	When the frame is captured
+	And the cursor of "term" is hidden
+	And the script "SampleGlyphs" is fed to "term"
+	And the frame is captured
+	And a finger drags from cell 0 as far as cell 4 and lifts in cell 10 along row 0 of "term"
+	And the key "C" is pressed with the Control and Shift keys held down
+	And the frame is captured as "after the lift"
+	Then the CopyRequested of "term" was raised at least once
+	And the text copied from "term" is "MMMMMMMMMM"
+	And cell 0, 0 of "term" is uniformly "Magenta"
+	And cell 9, 0 of "term" is uniformly "Magenta"
+	And cell 10, 0 of "term" is uniformly "Navy"
+
 Scenario: A session that renames itself says so and leaves the screen alone
 	Given the font "ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf" is warm
 	And the application shows a Grid named "cell" with:

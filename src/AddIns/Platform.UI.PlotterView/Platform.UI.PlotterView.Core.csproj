@@ -47,7 +47,7 @@
 		<!-- The same packages the Skia project references (it declares them for the package); keep
 		     the Plotter version in step with it. -->
 		<PackageReference Include="SkiaSharp" />
-		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.252.1250" />
+		<PackageReference Include="CodeBrix.Plotter.MitLicenseForever" Version="1.0.269.1424" />
 	</ItemGroup>
 
 	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly

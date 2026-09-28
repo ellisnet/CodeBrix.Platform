@@ -53,6 +53,55 @@ public class CloseTheDoorTests
 		uri.OriginalString.Should().Be("ms-appx:///Assets/Fonts/OpenSans.ttf");
 	}
 
+	// ---------------------------------------------------------------- Application.PreloadFonts manifest URI (WPE1-17)
+
+	[Fact]
+	public void When_The_Default_Font_Is_A_File_Uri_With_A_Family_Fragment_Then_The_Manifest_Uri_Drops_The_Fragment()
+	{
+		//Arrange
+		var isManifest = FontFamilyHelper.TryGetFontManifestUri("ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf#Roboto", out var uri);
+
+		//Act
+		var manifestUri = FontFamilyHelper.GetFontManifestUri(uri);
+
+		//Assert
+		isManifest.Should().BeTrue();
+		manifestUri.OriginalString.Should().Be("ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf.manifest");
+		manifestUri.Fragment.Should().BeEmpty();
+		Uri.UnescapeDataString(manifestUri.PathAndQuery).Should().Be("/CodeBrix.Platform.Fonts.Roboto/Fonts/Roboto.ttf.manifest");
+	}
+
+	[Fact]
+	public void When_The_Default_Font_Is_A_Bare_Family_Name_Then_No_Manifest_Is_Attempted_And_Nothing_Throws()
+	{
+		//Arrange
+		Uri? uri = null;
+		var isManifest = true;
+
+		//Act
+		var act = () => isManifest = FontFamilyHelper.TryGetFontManifestUri("Roboto", out uri);
+
+		//Assert
+		act.Should().NotThrow();
+		isManifest.Should().BeFalse();
+		uri.Should().BeNull();
+	}
+
+	[Fact]
+	public void When_The_Default_Font_Is_A_Plain_File_Uri_Then_The_Manifest_Uri_Is_The_File_Uri_Plus_Manifest()
+	{
+		//Arrange
+		var isManifest = FontFamilyHelper.TryGetFontManifestUri("ms-appx:///Assets/Fonts/OpenSans.ttf", out var uri);
+
+		//Act
+		var manifestUri = FontFamilyHelper.GetFontManifestUri(uri);
+
+		//Assert
+		isManifest.Should().BeTrue();
+		manifestUri.OriginalString.Should().Be("ms-appx:///Assets/Fonts/OpenSans.ttf.manifest");
+		Uri.UnescapeDataString(manifestUri.PathAndQuery).Should().Be("/Assets/Fonts/OpenSans.ttf.manifest");
+	}
+
 	// ---------------------------------------------------------------- SvgImageSource with no provider (AP1-C)
 
 	[Fact]

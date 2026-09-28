@@ -47,7 +47,7 @@
 		<!-- The audio engine: CodeBrix.Audio (WAV/MP3/Ogg Vorbis/FLAC reading, and the SoundFont, SFZ and
 		     Decent Sampler synthesizers behind MidiPlayer) + CodeBrix.Audio.Engine (device playback via the
 		     bundled codebrix_miniaudio native backend) ship in this one package. -->
-		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.264.1197" />
+		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.269.1270" />
 
 		<!-- The add-in's Core assembly ships INSIDE this package (CodeBrixBundleInPackage, see
 		     ../AddIn.CorePackaging.targets): not a package dependency, the same nupkg. -->

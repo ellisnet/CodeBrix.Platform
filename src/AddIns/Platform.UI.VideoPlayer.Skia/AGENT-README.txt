@@ -93,8 +93,13 @@ Dependencies of this package (flow in automatically, no separate install):
                                                     clock, transport, captions,
                                                     chapters, the effect chain
                                                     and the colour-shader source
+  CodeBrix.Audio.MitLicenseForever                  audio output: the video's
+                                                    sound plays through
+                                                    CodeBrix.Audio and its
+                                                    bundled desktop backend
 
-That is the whole list: THREE dependencies. In particular there is no
+That is the whole list: FOUR dependencies. This package depends on
+CodeBrix.Audio for audio output; nothing more is needed for sound. In particular there is no
 CodeBrix.VideoPlayback.Skia - that package is the playback engine's own
 SkiaSharp presenter, for hosts outside this family (WPF, WinUI, MAUI, Avalonia),
 and it pins its own SkiaSharp version. This family publishes as one unit and
