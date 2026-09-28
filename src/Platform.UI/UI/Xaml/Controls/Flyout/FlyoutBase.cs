@@ -380,6 +380,11 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 			{
 				_openFlyouts.Remove(this);
 
+				// CodeBrix: the flyouts still open on top of this one (its sub-flyouts) are closed below, once
+				// the dispatcher gets to it. Only those - a flyout opened after this one closed (a MenuBar
+				// moving from one menu to the next on Right/Left) is not a sub-flyout and must stay open.
+				var flyoutsOpenAtClose = _openFlyouts.ToArray();
+
 				_isClosedPending = true;
 
 				// TODO Uno: Closed should occur on PresenterUnloaded,
@@ -389,7 +394,7 @@ namespace Microsoft.UI.Xaml.Controls.Primitives
 					Closed?.Invoke(this, EventArgs.Empty);
 					_isClosedPending = false;
 
-					if (_openFlyouts.Count > 0)
+					if (_openFlyouts.Count > 0 && Array.IndexOf(flyoutsOpenAtClose, _openFlyouts[0]) >= 0)
 					{
 						_openFlyouts[0].Hide();
 					}

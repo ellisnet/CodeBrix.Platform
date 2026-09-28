@@ -1727,6 +1727,43 @@ which is not implemented) heads each group with its header above the group and
 has no placement or padding options; give the GridView an ItemsStackPanel for
 them.
 
+MENU BAR KEYBOARD NAVIGATION follows classic Windows menus. With a menu open,
+Up/Down move between its items and Enter invokes one; Right (or Left) on an
+item without a submenu closes that menu and opens the next (or previous) one
+with its first item highlighted, wrapping at the ends. Escape closes an open
+menu and leaves its title highlighted; a second Escape leaves the menu bar -
+the highlight goes and keyboard focus returns to whatever had it before the
+menus were entered (a game surface, say). An Escape that nothing else uses
+(no focused element, no keyboard accelerator) while no menu is open always
+clears every menu-title highlight and takes focus off the menu bar. Access-key
+mode that Alt+letter carried into an open menu ends when that menu closes,
+however it closes, so Alt+letter works again afterwards.
+Running a menu command ends the menus too: when a menu closes because one of
+its items ran (Enter or a click), keyboard focus goes back to where it was
+before the menus were entered, and a menu shortcut pressed while another menu
+is open closes that menu before its command runs.
+
+MENU ITEM SHORTCUT TEXT is opt-in. A MenuFlyoutItem always shows an explicitly
+set KeyboardAcceleratorTextOverride at its right-hand side. To have items that
+carry KeyboardAccelerators show their text automatically ("Ctrl+S", built from
+the first accelerator) as WinUI does, set this once at startup, before any
+menu is shown:
+
+    global::CodeBrix.Platform.UI.FeatureConfiguration.MenuFlyoutItem
+        .ShowKeyboardAcceleratorText = true;
+
+The default is false, so an app that does not opt in keeps its menus as they
+were.
+
+MENU ITEM SHORTCUTS WORK APP-WIDE. A KeyboardAccelerator on a MenuFlyoutItem
+(or a ToggleMenuFlyoutItem, or an item in a MenuFlyoutSubItem) of a MenuBar
+that is on screen fires wherever keyboard focus is, with its menu closed -
+Ctrl+S runs File > Save as in WinUI. The focused element still gets the key
+first: an accelerator is only tried when the key's KeyDown was not handled, so
+a focused control (a game surface, say) that sets e.Handled = true for a key
+keeps that key for itself. Disabled or collapsed items, menus and menu bars
+never fire, and accelerators with a ScopeOwner are left to their scope.
+
 COMMAND BARS work on the Skia heads, written exactly as in WinUI: CommandBar
 with PrimaryCommands and SecondaryCommands, AppBarButton, AppBarToggleButton,
 AppBarSeparator and AppBarElementContainer, DefaultLabelPosition

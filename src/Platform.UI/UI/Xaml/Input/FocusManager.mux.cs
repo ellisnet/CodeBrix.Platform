@@ -1761,6 +1761,10 @@ namespace Microsoft.UI.Xaml.Input
 					// Make sure the FocusState is up-to-date.
 					newFocusAsElement.UpdateFocusState(coercedFocusState);
 					_realFocusStateForFocusedElement = nonCoercedFocusState;
+
+					// CodeBrix: redraw the focus rectangle for the new state (e.g. Pointer -> Keyboard shows it),
+					// as the focus-change path below does - the render loop does not check focus visuals itself.
+					UpdateFocusRect(focusNavigationDirection, false);
 				}
 				else if (FocusableHelper.GetIFocusableForDO(newFocusTarget) is IFocusable newFocusAsIFocusable)
 				{

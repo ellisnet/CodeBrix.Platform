@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Documents.TextFormatting;
 using Microsoft.UI.Xaml.Media;
 using SkiaSharp;
 using CodeBrix.Platform.UI.Contracts;
+using Windows.UI.Text;
 
 namespace Microsoft.UI.Xaml.Documents;
 
@@ -240,6 +241,35 @@ internal readonly partial struct UnicodeText : IParsedText
 					else
 					{
 						DrawText(glyphs, positions, session, run.inline.Foreground);
+					}
+
+					// The Underline / Strikethrough line of a run whose inline carries TextDecorations (set on the
+					// Run itself, or inherited from an Underline span or the TextBlock). Host-free TextRunSpec runs
+					// have no inline and so never carry decorations.
+					if (run.inline.Inline is { } decoratedInline && run.width > 0)
+					{
+						var decorations = decoratedInline.TextDecorations;
+						if ((decorations & (TextDecorations.Underline | TextDecorations.Strikethrough)) != 0)
+						{
+							var metrics = run.fontDetails.SKFontMetrics;
+							var fontSize = run.fontDetails.SKFontSize;
+							var baselineY = line.y + line.baselineOffset;
+							var decorationPaint = SetupPaint(run.inline.Foreground, session.Opacity);
+
+							if ((decorations & TextDecorations.Underline) != 0)
+							{
+								var thickness = Math.Max(1f, metrics.UnderlineThickness ?? fontSize / 14f);
+								var y = baselineY + (metrics.UnderlinePosition ?? fontSize / 10f);
+								session.Canvas.DrawRect(new SKRect(currentLineX, y, currentLineX + run.width, y + thickness), decorationPaint);
+							}
+
+							if ((decorations & TextDecorations.Strikethrough) != 0)
+							{
+								var thickness = Math.Max(1f, metrics.StrikeoutThickness ?? fontSize / 14f);
+								var y = baselineY + (metrics.StrikeoutPosition ?? fontSize / -3.5f);
+								session.Canvas.DrawRect(new SKRect(currentLineX, y - thickness / 2, currentLineX + run.width, y + thickness / 2), decorationPaint);
+							}
+						}
 					}
 
 					currentLineX += run.width;

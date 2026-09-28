@@ -1,0 +1,6 @@
+<Project>
+  <!--
+    Stops MSBuild from importing the CodeBrix.Platform repository's own Directory.Build.props: this app is
+    built like any application outside the repository, from the packages on nuget.org alone.
+  -->
+</Project>

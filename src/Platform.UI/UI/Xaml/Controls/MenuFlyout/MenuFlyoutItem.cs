@@ -754,13 +754,14 @@ namespace Microsoft.UI.Xaml.Controls
 				// then we'll see if we can ruct it ourselves based on keyboard accelerators
 				// set on this item.  For example, if a keyboard accelerator with key "S" and modifier "Control"
 				// is set, then we'll convert that into the keyboard accelerator text "Ctrl+S".
-				if (pValue == null)
+				// (The public getter coalesces an unset value to "", so test for empty, not null.)
+				if (string.IsNullOrEmpty(pValue))
 				{
 					pValue = KeyboardAccelerator.GetStringRepresentationForUIElement(this);
 
 					// If we were able to get a string representation from keyboard accelerators,
 					// then we should now set that as the value of KeyboardAcceleratorText.
-					if (pValue != null)
+					if (!string.IsNullOrEmpty(pValue))
 					{
 						KeyboardAcceleratorTextOverrideImpl = pValue;
 					}

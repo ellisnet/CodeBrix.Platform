@@ -1,0 +1,125 @@
+<Page x:Class="KeyPressTester.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+      FontFamily="{StaticResource OpenSansFont}">
+
+  <Grid RowSpacing="8">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- DRAKON.Brix-style menu bar: Alt shows the access keys, Alt+F / Alt+M / Alt+H open
+         the menus, and the menu items carry Ctrl+ keyboard accelerators. -->
+    <MenuBar x:Name="MainMenuBar" Grid.Row="0">
+      <MenuBarItem x:Name="FileMenu" Title="File" AccessKey="F">
+        <MenuFlyoutItem x:Name="NewGameItem" Text="New Game" AccessKey="N" />
+        <MenuFlyoutItem x:Name="PrintItem" Text="Print" AccessKey="P" />
+        <MenuFlyoutItem x:Name="SaveItem" Text="Save" AccessKey="S" />
+        <MenuFlyoutSeparator />
+        <MenuFlyoutItem x:Name="ClearLogItem" Text="Clear Log" AccessKey="C" />
+      </MenuBarItem>
+      <MenuBarItem x:Name="MoveMenu" Title="Move" AccessKey="M">
+        <MenuFlyoutItem x:Name="MoveUpItem" Text="Move Up" AccessKey="U" />
+        <MenuFlyoutItem x:Name="MoveDownItem" Text="Move Down" AccessKey="D" />
+        <MenuFlyoutItem x:Name="MoveLeftItem" Text="Move Left" AccessKey="L" />
+        <MenuFlyoutItem x:Name="MoveRightItem" Text="Move Right" AccessKey="R" />
+      </MenuBarItem>
+      <MenuBarItem x:Name="HelpMenu" Title="Help" AccessKey="H">
+        <MenuFlyoutItem x:Name="AboutItem" Text="About Key Press Tester" AccessKey="A" />
+      </MenuBarItem>
+    </MenuBar>
+
+    <!-- Title, instructions and the live status line -->
+    <StackPanel Grid.Row="1" Padding="16,0,16,0" Spacing="4">
+      <TextBlock Text="Key Press Tester" FontSize="24" FontWeight="Bold" />
+      <TextBlock TextWrapping="Wrap" FontSize="13"
+                 Text="Press keys and key combinations. Every key event is recorded by several independent listeners, from the native keyboard source (CoreWindow) down to the focused element, so the log shows exactly which layers noticed each key press. Click the game surface to give it keyboard focus the way a game does, then use the arrow keys or WASD to move, Space to jump and Ctrl to fire. Hold Alt to see the menus' access keys underlined: Alt+F opens File, then P prints. Menu items show their shortcut keys (Ctrl+P prints directly); Alt+J, Ctrl+Shift+K and F5 are page shortcuts." />
+      <TextBlock x:Name="StatusText" FontSize="12" TextWrapping="Wrap" Foreground="#FF1E88E5" />
+    </StackPanel>
+
+    <Grid Grid.Row="2" Padding="16,0,16,16" ColumnSpacing="16">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="5*" />
+        <ColumnDefinition Width="6*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Left column: game surface, text box, options and per-listener totals -->
+      <ScrollViewer Grid.Column="0">
+        <StackPanel Spacing="10">
+
+          <!-- The "game": a focusable surface that receives KeyDown/KeyUp only while it holds
+               keyboard focus, exactly like the GameEngine GameSurfaceCanvas used by Doom.Brix. -->
+          <Border x:Name="GameSurfaceBorder" BorderThickness="3" BorderBrush="#FF757575" CornerRadius="4">
+            <Grid x:Name="GameSurface" Height="220" Background="#FF101820" IsTabStop="True">
+              <Canvas x:Name="GameCanvas">
+                <Rectangle x:Name="Player" Width="28" Height="28" Fill="#FF4CAF50"
+                           Canvas.Left="120" Canvas.Top="96" />
+                <Ellipse x:Name="Shot" Width="10" Height="10" Fill="#FFFFEB3B" Visibility="Collapsed" />
+              </Canvas>
+              <TextBlock x:Name="GameSurfaceStatus" Margin="8" FontSize="12" Foreground="#FFB0BEC5"
+                         VerticalAlignment="Top" TextWrapping="Wrap" IsHitTestVisible="False" />
+              <TextBlock x:Name="HeldKeysText" Margin="8" FontSize="14" Foreground="White"
+                         VerticalAlignment="Bottom" TextWrapping="Wrap" IsHitTestVisible="False" />
+            </Grid>
+          </Border>
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Button x:Name="FocusSurfaceButton" Content="Focus game surface" />
+            <Button x:Name="ClearLogButton" Content="Clear log" />
+          </StackPanel>
+
+          <!-- Text input comparison: typing here should work even when games do not -->
+          <StackPanel Spacing="2">
+            <TextBlock Text="Text box (compare ordinary text input)" FontSize="12" />
+            <TextBox x:Name="TypingBox" PlaceholderText="Click here and type..." />
+          </StackPanel>
+
+          <!-- Options -->
+          <StackPanel Spacing="0">
+            <CheckBox x:Name="LogKeyUpCheck" Content="Log KeyUp events" IsChecked="True" />
+            <CheckBox x:Name="LogRepeatsCheck" Content="Log auto-repeat KeyDown events" IsChecked="False" />
+            <CheckBox x:Name="HandleSurfaceKeysCheck" IsChecked="False"
+                      Content="Game surface marks its key events Handled (e.Handled = true)" />
+            <CheckBox x:Name="RefocusOnActivateCheck" IsChecked="True"
+                      Content="Give the game surface focus again when the window is activated" />
+          </StackPanel>
+
+          <!-- Per-listener totals (rows are built in code) -->
+          <StackPanel Spacing="2">
+            <TextBlock Text="Listeners - how many key events each layer noticed, and the last one" FontSize="13" FontWeight="SemiBold" />
+            <Grid x:Name="ListenerGrid" ColumnSpacing="12" RowSpacing="2">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+            </Grid>
+          </StackPanel>
+        </StackPanel>
+      </ScrollViewer>
+
+      <!-- Right column: the event log, newest first -->
+      <Grid Grid.Column="1" RowSpacing="4">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="Event log (newest first)" FontSize="13" FontWeight="SemiBold" />
+        <Border Grid.Row="1" BorderThickness="1" BorderBrush="#FF9E9E9E" CornerRadius="4">
+          <ScrollViewer Padding="6,2,6,2">
+            <ItemsControl x:Name="LogList" IsTabStop="False">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <TextBlock Text="{Binding}" FontSize="12" TextWrapping="Wrap" Margin="0,1,0,1" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</Page>

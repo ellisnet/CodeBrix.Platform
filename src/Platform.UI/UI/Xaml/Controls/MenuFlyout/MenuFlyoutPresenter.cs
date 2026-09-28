@@ -300,7 +300,14 @@ namespace Microsoft.UI.Xaml.Controls
 						iconElement = (itemAsMenuItem as MenuFlyoutItem).Icon;
 						m_containsIconItems = m_containsIconItems || iconElement != null;
 
-						keyboardAcceleratorText = (itemAsMenuItem as MenuFlyoutItem).KeyboardAcceleratorTextOverride;
+						// When the app opts in (FeatureConfiguration.MenuFlyoutItem.ShowKeyboardAcceleratorText),
+						// the Impl getter builds the text from the item's KeyboardAccelerators (e.g. "Ctrl+S")
+						// when no override is set, and stores it in KeyboardAcceleratorTextOverride where the
+						// item template's KeyboardAcceleratorTextBlock displays it (WinUI behaviour). Otherwise
+						// only an explicitly set override is shown.
+						keyboardAcceleratorText = global::CodeBrix.Platform.UI.FeatureConfiguration.MenuFlyoutItem.ShowKeyboardAcceleratorText
+							? (itemAsMenuItem as MenuFlyoutItem).KeyboardAcceleratorTextOverrideImpl
+							: (itemAsMenuItem as MenuFlyoutItem).KeyboardAcceleratorTextOverride;
 						m_containsItemsWithKeyboardAcceleratorText = m_containsItemsWithKeyboardAcceleratorText || !string.IsNullOrEmpty(keyboardAcceleratorText);
 					}
 					else

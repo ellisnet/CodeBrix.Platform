@@ -1,0 +1,12 @@
+<Solution>
+  <!-- KeyPressTester.slnx - KeyPressTester built against the CodeBrix.Platform packages on nuget.org
+       (every head in one solution; all of them build with the plain .NET SDK on Linux, macOS and Windows). -->
+  <Project Path="KeyPressTester.UI/KeyPressTester.UI.shproj" Id="1561cb9f-1343-4428-bff6-cbd96791019f" />
+  <Project Path="KeyPressTester.Core/KeyPressTester.Core.csproj" />
+  <Project Path="KeyPressTester.LinuxX11/KeyPressTester.LinuxX11.csproj" />
+  <Project Path="KeyPressTester.LinuxWayland/KeyPressTester.LinuxWayland.csproj" />
+  <Project Path="KeyPressTester.LinuxFrameBuffer/KeyPressTester.LinuxFrameBuffer.csproj" />
+  <Project Path="KeyPressTester.MacOS/KeyPressTester.MacOS.csproj" />
+  <Project Path="KeyPressTester.Win32Skia/KeyPressTester.Win32Skia.csproj" />
+  <Project Path="KeyPressTester.WinWpfSkia/KeyPressTester.WinWpfSkia.csproj" />
+</Solution>

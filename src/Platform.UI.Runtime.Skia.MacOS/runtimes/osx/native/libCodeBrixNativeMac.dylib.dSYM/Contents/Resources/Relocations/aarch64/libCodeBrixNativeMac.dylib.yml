@@ -2,377 +2,377 @@
 triple:          'arm64-apple-darwin'
 binary-path:     '/Volumes/VideoWork/GitHome/CodeBrix.Platform/src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/build/Release/libCodeBrixNativeMac.dylib'
 relocations:
-  - { offset: 0x1776A8, size: 0x8, addend: 0x0, symName: _get_best_location, symObjAddr: 0x0, symBinAddr: 0x1068, symSize: 0x164 }
-  - { offset: 0x17774A, size: 0x8, addend: 0x0, symName: _get_best_location, symObjAddr: 0x0, symBinAddr: 0x1068, symSize: 0x164 }
-  - { offset: 0x1777A4, size: 0x8, addend: 0x0, symName: _get_allowed, symObjAddr: 0x164, symBinAddr: 0x11CC, symSize: 0x90 }
-  - { offset: 0x17782D, size: 0x8, addend: 0x0, symName: _codebrix_pick_single_folder, symObjAddr: 0x1F4, symBinAddr: 0x125C, symSize: 0x190 }
-  - { offset: 0x1778E7, size: 0x8, addend: 0x0, symName: _codebrix_pick_single_file, symObjAddr: 0x384, symBinAddr: 0x13EC, symSize: 0x19C }
-  - { offset: 0x1779C2, size: 0x8, addend: 0x0, symName: _codebrix_pick_multiple_files, symObjAddr: 0x520, symBinAddr: 0x1588, symSize: 0x1F8 }
-  - { offset: 0x177B32, size: 0x8, addend: 0x0, symName: _codebrix_pick_save_file, symObjAddr: 0x718, symBinAddr: 0x1780, symSize: 0x1BC }
-  - { offset: 0x177C99, size: 0x8, addend: 0x0, symName: '-[UNOSoftView drawRect:]', symObjAddr: 0x0, symBinAddr: 0x193C, symSize: 0x194 }
-  - { offset: 0x177CBA, size: 0x8, addend: 0x0, symName: '-[UNOSoftView drawRect:]', symObjAddr: 0x0, symBinAddr: 0x193C, symSize: 0x194 }
-  - { offset: 0x177FB4, size: 0x8, addend: 0x0, symName: '-[UNOSoftView setFrameSize:]', symObjAddr: 0x194, symBinAddr: 0x1AD0, symSize: 0x80 }
-  - { offset: 0x1780BA, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate initWithMetalKitView:]', symObjAddr: 0x0, symBinAddr: 0x1B50, symSize: 0xD8 }
-  - { offset: 0x178133, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate initWithMetalKitView:]', symObjAddr: 0x0, symBinAddr: 0x1B50, symSize: 0xD8 }
-  - { offset: 0x17817A, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate drawInMTKView:]', symObjAddr: 0xD8, symBinAddr: 0x1C28, symSize: 0x110 }
-  - { offset: 0x17824F, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate mtkView:drawableSizeWillChange:]', symObjAddr: 0x1E8, symBinAddr: 0x1D38, symSize: 0xA0 }
-  - { offset: 0x1782FD, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate queue]', symObjAddr: 0x288, symBinAddr: 0x1DD8, symSize: 0xC }
-  - { offset: 0x178334, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate setQueue:]', symObjAddr: 0x294, symBinAddr: 0x1DE4, symSize: 0x8 }
-  - { offset: 0x178373, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate .cxx_destruct]', symObjAddr: 0x29C, symBinAddr: 0x1DEC, symSize: 0x30 }
-  - { offset: 0x178430, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme_change_callback, symObjAddr: 0x0, symBinAddr: 0x1E1C, symSize: 0xC }
-  - { offset: 0x17844A, size: 0x8, addend: 0x0, symName: _ad, symObjAddr: 0x5218, symBinAddr: 0x1AF78, symSize: 0x0 }
-  - { offset: 0x178477, size: 0x8, addend: 0x0, symName: _system_theme_change, symObjAddr: 0x5210, symBinAddr: 0x1AF70, symSize: 0x0 }
-  - { offset: 0x17849E, size: 0x8, addend: 0x0, symName: _device, symObjAddr: 0x5220, symBinAddr: 0x1AF80, symSize: 0x0 }
-  - { offset: 0x1784DE, size: 0x8, addend: 0x0, symName: _application_can_exit, symObjAddr: 0x5228, symBinAddr: 0x1AF88, symSize: 0x0 }
-  - { offset: 0x178511, size: 0x8, addend: 0x0, symName: _application_start, symObjAddr: 0x5230, symBinAddr: 0x1AF90, symSize: 0x0 }
-  - { offset: 0x178527, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme_change_callback, symObjAddr: 0x0, symBinAddr: 0x1E1C, symSize: 0xC }
-  - { offset: 0x17853B, size: 0x8, addend: 0x0, symName: _codebrix_set_system_theme_change_callback, symObjAddr: 0xC, symBinAddr: 0x1E28, symSize: 0xC }
-  - { offset: 0x178560, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme, symObjAddr: 0x18, symBinAddr: 0x1E34, symSize: 0x10C }
-  - { offset: 0x1785AB, size: 0x8, addend: 0x0, symName: _codebrix_app_initialize, symObjAddr: 0x124, symBinAddr: 0x1F40, symSize: 0x100 }
-  - { offset: 0x178639, size: 0x8, addend: 0x0, symName: _codebrix_application_get_metal_device, symObjAddr: 0x224, symBinAddr: 0x2040, symSize: 0x2C }
-  - { offset: 0x178653, size: 0x8, addend: 0x0, symName: _codebrix_application_set_badge, symObjAddr: 0x250, symBinAddr: 0x206C, symSize: 0x88 }
-  - { offset: 0x17869A, size: 0x8, addend: 0x0, symName: _codebrix_application_set_icon, symObjAddr: 0x2D8, symBinAddr: 0x20F4, symSize: 0x98 }
-  - { offset: 0x1786D1, size: 0x8, addend: 0x0, symName: _codebrix_application_open_url, symObjAddr: 0x370, symBinAddr: 0x218C, symSize: 0x9C }
-  - { offset: 0x17870C, size: 0x8, addend: 0x0, symName: _codebrix_application_query_url_support, symObjAddr: 0x40C, symBinAddr: 0x2228, symSize: 0xAC }
-  - { offset: 0x178747, size: 0x8, addend: 0x0, symName: _codebrix_get_application_can_exit_callback, symObjAddr: 0x4B8, symBinAddr: 0x22D4, symSize: 0xC }
-  - { offset: 0x17875B, size: 0x8, addend: 0x0, symName: _codebrix_set_application_can_exit_callback, symObjAddr: 0x4C4, symBinAddr: 0x22E0, symSize: 0xC }
-  - { offset: 0x178780, size: 0x8, addend: 0x0, symName: _codebrix_get_application_start_callback, symObjAddr: 0x4D0, symBinAddr: 0x22EC, symSize: 0xC }
-  - { offset: 0x178794, size: 0x8, addend: 0x0, symName: _codebrix_set_application_start_callback, symObjAddr: 0x4DC, symBinAddr: 0x22F8, symSize: 0xC }
-  - { offset: 0x1787B9, size: 0x8, addend: 0x0, symName: _codebrix_application_is_bundled, symObjAddr: 0x4E8, symBinAddr: 0x2304, symSize: 0x54 }
-  - { offset: 0x1787D3, size: 0x8, addend: 0x0, symName: _codebrix_application_quit, symObjAddr: 0x53C, symBinAddr: 0x2358, symSize: 0x3C }
-  - { offset: 0x178807, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationDidFinishLaunching:]', symObjAddr: 0x578, symBinAddr: 0x2394, symSize: 0xC }
-  - { offset: 0x178845, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationDidFinishLaunching:]', symObjAddr: 0x578, symBinAddr: 0x2394, symSize: 0xC }
-  - { offset: 0x178870, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationShouldTerminate:]', symObjAddr: 0x584, symBinAddr: 0x23A0, symSize: 0x20 }
-  - { offset: 0x1788D0, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationShouldTerminateAfterLastWindowClosed:]', symObjAddr: 0x5A4, symBinAddr: 0x23C0, symSize: 0x8 }
-  - { offset: 0x17890F, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x5AC, symBinAddr: 0x23C8, symSize: 0x8C }
-  - { offset: 0x1789C4, size: 0x8, addend: 0x0, symName: '___73-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x638, symBinAddr: 0x2454, symSize: 0xC }
-  - { offset: 0x1789EE, size: 0x8, addend: 0x0, symName: '___73-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x638, symBinAddr: 0x2454, symSize: 0xC }
-  - { offset: 0x178B1D, size: 0x8, addend: 0x0, symName: _codebrix_get_resize_callback, symObjAddr: 0x0, symBinAddr: 0x2460, symSize: 0xC }
-  - { offset: 0x178B88, size: 0x8, addend: 0x0, symName: _main_window, symObjAddr: 0x11580, symBinAddr: 0x1AFB0, symSize: 0x0 }
-  - { offset: 0x178BA3, size: 0x8, addend: 0x0, symName: _windows, symObjAddr: 0x11590, symBinAddr: 0x1AFC0, symSize: 0x0 }
-  - { offset: 0x178BBE, size: 0x8, addend: 0x0, symName: _windowDidChangeScreen, symObjAddr: 0x11588, symBinAddr: 0x1AFB8, symSize: 0x0 }
-  - { offset: 0x178BFE, size: 0x8, addend: 0x0, symName: _window_did_change_screen, symObjAddr: 0x11598, symBinAddr: 0x1AFC8, symSize: 0x0 }
-  - { offset: 0x178C49, size: 0x8, addend: 0x0, symName: _window_did_change_screen_parameters, symObjAddr: 0x115A0, symBinAddr: 0x1AFD0, symSize: 0x0 }
-  - { offset: 0x178C77, size: 0x8, addend: 0x0, symName: _window_resize, symObjAddr: 0x11568, symBinAddr: 0x1AF98, symSize: 0x0 }
-  - { offset: 0x178CAF, size: 0x8, addend: 0x0, symName: _metal_draw, symObjAddr: 0x11570, symBinAddr: 0x1AFA0, symSize: 0x0 }
-  - { offset: 0x178CEB, size: 0x8, addend: 0x0, symName: _soft_draw, symObjAddr: 0x11578, symBinAddr: 0x1AFA8, symSize: 0x0 }
-  - { offset: 0x178D3E, size: 0x8, addend: 0x0, symName: _window_key_down, symObjAddr: 0x115A8, symBinAddr: 0x1AFD8, symSize: 0x0 }
-  - { offset: 0x179306, size: 0x8, addend: 0x0, symName: _window_key_up, symObjAddr: 0x115B0, symBinAddr: 0x1AFE0, symSize: 0x0 }
-  - { offset: 0x17931D, size: 0x8, addend: 0x0, symName: _window_mouse_event, symObjAddr: 0x115B8, symBinAddr: 0x1AFE8, symSize: 0x0 }
-  - { offset: 0x1794A9, size: 0x8, addend: 0x0, symName: _window_move_event, symObjAddr: 0x115C0, symBinAddr: 0x1AFF0, symSize: 0x0 }
-  - { offset: 0x1794E1, size: 0x8, addend: 0x0, symName: _window_resize_event, symObjAddr: 0x115C8, symBinAddr: 0x1AFF8, symSize: 0x0 }
-  - { offset: 0x1794F8, size: 0x8, addend: 0x0, symName: _window_should_close, symObjAddr: 0x115D0, symBinAddr: 0x1B000, symSize: 0x0 }
-  - { offset: 0x179532, size: 0x8, addend: 0x0, symName: _window_close, symObjAddr: 0x115D8, symBinAddr: 0x1B008, symSize: 0x0 }
-  - { offset: 0x179561, size: 0x8, addend: 0x0, symName: __previousFlags, symObjAddr: 0x115F8, symBinAddr: 0x1B168, symSize: 0x0 }
-  - { offset: 0x179578, size: 0x8, addend: 0x0, symName: __osVersion, symObjAddr: 0x115E0, symBinAddr: 0x1B150, symSize: 0x0 }
-  - { offset: 0x1795E1, size: 0x8, addend: 0x0, symName: _codebrix_get_resize_callback, symObjAddr: 0x0, symBinAddr: 0x2460, symSize: 0xC }
-  - { offset: 0x1795FB, size: 0x8, addend: 0x0, symName: _codebrix_get_metal_draw_callback, symObjAddr: 0xC, symBinAddr: 0x246C, symSize: 0xC }
-  - { offset: 0x179615, size: 0x8, addend: 0x0, symName: _codebrix_get_soft_draw_callback, symObjAddr: 0x18, symBinAddr: 0x2478, symSize: 0xC }
-  - { offset: 0x17962F, size: 0x8, addend: 0x0, symName: _codebrix_set_drawing_callbacks, symObjAddr: 0x24, symBinAddr: 0x2484, symSize: 0x1C }
-  - { offset: 0x179670, size: 0x8, addend: 0x0, symName: '+[windowDidChangeScreenNoteClass init]', symObjAddr: 0x40, symBinAddr: 0x24A0, symSize: 0x1C }
-  - { offset: 0x1796C1, size: 0x8, addend: 0x0, symName: '-[windowDidChangeScreenNoteClass windowDidChangeScreenNotification:]', symObjAddr: 0x5C, symBinAddr: 0x24BC, symSize: 0x8C }
-  - { offset: 0x179767, size: 0x8, addend: 0x0, symName: _codebrix_get_window_did_change_screen_callback, symObjAddr: 0xE8, symBinAddr: 0x2548, symSize: 0xC }
-  - { offset: 0x179789, size: 0x8, addend: 0x0, symName: '-[windowDidChangeScreenNoteClass applicationDidChangeScreenParametersNotification:]', symObjAddr: 0xF4, symBinAddr: 0x2554, symSize: 0x3C }
-  - { offset: 0x1797F9, size: 0x8, addend: 0x0, symName: _codebrix_get_window_did_change_screen_parameters_callback, symObjAddr: 0x130, symBinAddr: 0x2590, symSize: 0xC }
-  - { offset: 0x17980D, size: 0x8, addend: 0x0, symName: _codebrix_app_get_main_window, symObjAddr: 0x13C, symBinAddr: 0x259C, symSize: 0x60 }
-  - { offset: 0x179836, size: 0x8, addend: 0x0, symName: _codebrix_window_create, symObjAddr: 0x19C, symBinAddr: 0x25FC, symSize: 0x200 }
-  - { offset: 0x17990C, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x39C, symBinAddr: 0x27FC, symSize: 0x8 }
-  - { offset: 0x179923, size: 0x8, addend: 0x0, symName: _codebrix_window_create.cold.1, symObjAddr: 0x1E10, symBinAddr: 0xA0B8, symSize: 0x28 }
-  - { offset: 0x17993B, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x39C, symBinAddr: 0x27FC, symSize: 0x8 }
-  - { offset: 0x17996E, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView initWithFrame:device:]', symObjAddr: 0x3A4, symBinAddr: 0x2804, symSize: 0x34 }
-  - { offset: 0x1799C1, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView clipLayer]', symObjAddr: 0x3D8, symBinAddr: 0x2838, symSize: 0x10 }
-  - { offset: 0x1799F9, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView setClipLayer:]', symObjAddr: 0x3E8, symBinAddr: 0x2848, symSize: 0xC }
-  - { offset: 0x179A39, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView .cxx_destruct]', symObjAddr: 0x3F4, symBinAddr: 0x2854, symSize: 0x14 }
-  - { offset: 0x179AA9, size: 0x8, addend: 0x0, symName: _codebrix_window_activate, symObjAddr: 0x408, symBinAddr: 0x2868, symSize: 0x90 }
-  - { offset: 0x179B34, size: 0x8, addend: 0x0, symName: _codebrix_window_minimize, symObjAddr: 0x498, symBinAddr: 0x28F8, symSize: 0x4C }
-  - { offset: 0x179B5D, size: 0x8, addend: 0x0, symName: _codebrix_window_maximize, symObjAddr: 0x4E4, symBinAddr: 0x2944, symSize: 0x8 }
-  - { offset: 0x179B7A, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change, symObjAddr: 0x4EC, symBinAddr: 0x294C, symSize: 0x84 }
-  - { offset: 0x179BB4, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x570, symBinAddr: 0x29D0, symSize: 0x4C }
-  - { offset: 0x179BBF, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change.cold.1, symObjAddr: 0x1E38, symBinAddr: 0xA0E0, symSize: 0x28 }
-  - { offset: 0x179BD7, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x570, symBinAddr: 0x29D0, symSize: 0x4C }
-  - { offset: 0x179BFE, size: 0x8, addend: 0x0, symName: _codebrix_window_close, symObjAddr: 0x5BC, symBinAddr: 0x2A1C, symSize: 0x8 }
-  - { offset: 0x179C23, size: 0x8, addend: 0x0, symName: _codebrix_window_move, symObjAddr: 0x5C4, symBinAddr: 0x2A24, symSize: 0x4 }
-  - { offset: 0x179C66, size: 0x8, addend: 0x0, symName: _codebrix_window_resize, symObjAddr: 0x5C8, symBinAddr: 0x2A28, symSize: 0x98 }
-  - { offset: 0x179CF0, size: 0x8, addend: 0x0, symName: _codebrix_window_set_min_size, symObjAddr: 0x660, symBinAddr: 0x2AC0, symSize: 0x4 }
-  - { offset: 0x179D33, size: 0x8, addend: 0x0, symName: _codebrix_window_set_max_size, symObjAddr: 0x664, symBinAddr: 0x2AC4, symSize: 0x4 }
-  - { offset: 0x179D76, size: 0x8, addend: 0x0, symName: _codebrix_window_get_position, symObjAddr: 0x668, symBinAddr: 0x2AC8, symSize: 0x2C }
-  - { offset: 0x179DCD, size: 0x8, addend: 0x0, symName: _codebrix_window_get_title, symObjAddr: 0x694, symBinAddr: 0x2AF4, symSize: 0x44 }
-  - { offset: 0x179E22, size: 0x8, addend: 0x0, symName: _codebrix_window_set_title, symObjAddr: 0x6D8, symBinAddr: 0x2B38, symSize: 0x64 }
-  - { offset: 0x179E59, size: 0x8, addend: 0x0, symName: _codebrix_window_is_full_screen, symObjAddr: 0x73C, symBinAddr: 0x2B9C, symSize: 0x1C }
-  - { offset: 0x179E97, size: 0x8, addend: 0x0, symName: _codebrix_window_enter_full_screen, symObjAddr: 0x758, symBinAddr: 0x2BB8, symSize: 0x50 }
-  - { offset: 0x179ED1, size: 0x8, addend: 0x0, symName: _codebrix_window_exit_full_screen, symObjAddr: 0x7A8, symBinAddr: 0x2C08, symSize: 0x40 }
-  - { offset: 0x179F16, size: 0x8, addend: 0x0, symName: _codebrix_window_restore, symObjAddr: 0x7E8, symBinAddr: 0x2C48, symSize: 0x74 }
-  - { offset: 0x179F6F, size: 0x8, addend: 0x0, symName: _codebrix_window_get_overlapped_presenter_state, symObjAddr: 0x85C, symBinAddr: 0x2CBC, symSize: 0x4 }
-  - { offset: 0x179F8C, size: 0x8, addend: 0x0, symName: _codebrix_window_set_always_on_top, symObjAddr: 0x860, symBinAddr: 0x2CC0, symSize: 0x44 }
-  - { offset: 0x179FD7, size: 0x8, addend: 0x0, symName: _codebrix_window_set_border_and_title_bar, symObjAddr: 0x8A4, symBinAddr: 0x2D04, symSize: 0x48 }
-  - { offset: 0x17A033, size: 0x8, addend: 0x0, symName: _codebrix_window_set_maximizable, symObjAddr: 0x8EC, symBinAddr: 0x2D4C, symSize: 0x70 }
-  - { offset: 0x17A06D, size: 0x8, addend: 0x0, symName: _codebrix_window_set_minimizable, symObjAddr: 0x95C, symBinAddr: 0x2DBC, symSize: 0x48 }
-  - { offset: 0x17A0B8, size: 0x8, addend: 0x0, symName: _codebrix_window_set_modal, symObjAddr: 0x9A4, symBinAddr: 0x2E04, symSize: 0x28 }
-  - { offset: 0x17A0F6, size: 0x8, addend: 0x0, symName: _codebrix_window_set_resizable, symObjAddr: 0x9CC, symBinAddr: 0x2E2C, symSize: 0x48 }
-  - { offset: 0x17A141, size: 0x8, addend: 0x0, symName: _codebrix_set_window_screen_change_callbacks, symObjAddr: 0xA14, symBinAddr: 0x2E74, symSize: 0x58 }
-  - { offset: 0x17A17B, size: 0x8, addend: 0x0, symName: _get_virtual_key, symObjAddr: 0xA6C, symBinAddr: 0x2ECC, symSize: 0x20 }
-  - { offset: 0x17A1A8, size: 0x8, addend: 0x0, symName: _get_modifiers, symObjAddr: 0xA8C, symBinAddr: 0x2EEC, symSize: 0x1C }
-  - { offset: 0x17A1D1, size: 0x8, addend: 0x0, symName: _get_unicode, symObjAddr: 0xAA8, symBinAddr: 0x2F08, symSize: 0x6C }
-  - { offset: 0x17A290, size: 0x8, addend: 0x0, symName: _codebrix_set_window_events_callbacks, symObjAddr: 0xB14, symBinAddr: 0x2F74, symSize: 0x2C }
-  - { offset: 0x17A2F3, size: 0x8, addend: 0x0, symName: _codebrix_get_window_should_close_callback, symObjAddr: 0xB40, symBinAddr: 0x2FA0, symSize: 0xC }
-  - { offset: 0x17A307, size: 0x8, addend: 0x0, symName: _codebrix_get_window_close_callback, symObjAddr: 0xB4C, symBinAddr: 0x2FAC, symSize: 0xC }
-  - { offset: 0x17A31B, size: 0x8, addend: 0x0, symName: _codebrix_set_window_close_callbacks, symObjAddr: 0xB58, symBinAddr: 0x2FB8, symSize: 0x14 }
-  - { offset: 0x17A351, size: 0x8, addend: 0x0, symName: _codebrix_window_get_metal_handles, symObjAddr: 0xB6C, symBinAddr: 0x2FCC, symSize: 0x70 }
-  - { offset: 0x17A3AA, size: 0x8, addend: 0x0, symName: _readNextCoord, symObjAddr: 0xBDC, symBinAddr: 0x303C, symSize: 0x60 }
-  - { offset: 0x17A495, size: 0x8, addend: 0x0, symName: _codebrix_window_clip_svg, symObjAddr: 0xC3C, symBinAddr: 0x309C, symSize: 0x5F8 }
-  - { offset: 0x17AAE0, size: 0x8, addend: 0x0, symName: '+[UNOWindow initialize]', symObjAddr: 0x1234, symBinAddr: 0x3694, symSize: 0x9C }
-  - { offset: 0x17AB10, size: 0x8, addend: 0x0, symName: '-[UNOWindow initWithContentRect:styleMask:backing:defer:]', symObjAddr: 0x12D0, symBinAddr: 0x3730, symSize: 0x60 }
-  - { offset: 0x17AB88, size: 0x8, addend: 0x0, symName: '-[UNOWindow dealloc]', symObjAddr: 0x1330, symBinAddr: 0x3790, symSize: 0x50 }
-  - { offset: 0x17ABBC, size: 0x8, addend: 0x0, symName: '-[UNOWindow getPositionFrom:x:y:]', symObjAddr: 0x1380, symBinAddr: 0x37E0, symSize: 0xA0 }
-  - { offset: 0x17AC7A, size: 0x8, addend: 0x0, symName: '-[UNOWindow sendEvent:]', symObjAddr: 0x1420, symBinAddr: 0x3880, symSize: 0x488 }
-  - { offset: 0x17AED9, size: 0x8, addend: 0x0, symName: '-[UNOWindow processModifiers:event:]', symObjAddr: 0x18A8, symBinAddr: 0x3D08, symSize: 0x12C }
-  - { offset: 0x17B094, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillStartLiveResize:]', symObjAddr: 0x19D4, symBinAddr: 0x3E34, symSize: 0xB4 }
-  - { offset: 0x17B0FB, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidEndLiveResize:]', symObjAddr: 0x1A88, symBinAddr: 0x3EE8, symSize: 0xB4 }
-  - { offset: 0x17B162, size: 0x8, addend: 0x0, symName: '-[UNOWindow performMiniaturize:]', symObjAddr: 0x1B3C, symBinAddr: 0x3F9C, symSize: 0x64 }
-  - { offset: 0x17B1A7, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillMiniaturize:]', symObjAddr: 0x1BA0, symBinAddr: 0x4000, symSize: 0x8 }
-  - { offset: 0x17B1E6, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidMiniaturize:]', symObjAddr: 0x1BA8, symBinAddr: 0x4008, symSize: 0x8 }
-  - { offset: 0x17B225, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidDeminiaturize:]', symObjAddr: 0x1BB0, symBinAddr: 0x4010, symSize: 0x8 }
-  - { offset: 0x17B264, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldZoom:toFrame:]', symObjAddr: 0x1BB8, symBinAddr: 0x4018, symSize: 0x24 }
-  - { offset: 0x17B2B6, size: 0x8, addend: 0x0, symName: '-[UNOWindow performZoom:]', symObjAddr: 0x1BDC, symBinAddr: 0x403C, symSize: 0x4C }
-  - { offset: 0x17B2FB, size: 0x8, addend: 0x0, symName: '-[UNOWindow zoom:]', symObjAddr: 0x1C28, symBinAddr: 0x4088, symSize: 0x74 }
-  - { offset: 0x17B34E, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidMove:]', symObjAddr: 0x1C9C, symBinAddr: 0x40FC, symSize: 0x2C }
-  - { offset: 0x17B3D0, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidResize:]', symObjAddr: 0x1CC8, symBinAddr: 0x4128, symSize: 0x64 }
-  - { offset: 0x17B461, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldClose:]', symObjAddr: 0x1D2C, symBinAddr: 0x418C, symSize: 0xC }
-  - { offset: 0x17B4B4, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldClose:]', symObjAddr: 0x1D2C, symBinAddr: 0x418C, symSize: 0xC }
-  - { offset: 0x17B4F6, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillClose:]', symObjAddr: 0x1D38, symBinAddr: 0x4198, symSize: 0x88 }
-  - { offset: 0x17B572, size: 0x8, addend: 0x0, symName: '-[UNOWindow overlappedPresenterState]', symObjAddr: 0x1DC0, symBinAddr: 0x4220, symSize: 0x10 }
-  - { offset: 0x17B5AA, size: 0x8, addend: 0x0, symName: '-[UNOWindow setOverlappedPresenterState:]', symObjAddr: 0x1DD0, symBinAddr: 0x4230, symSize: 0x10 }
-  - { offset: 0x17B5E8, size: 0x8, addend: 0x0, symName: '-[UNOWindow metalViewDelegate]', symObjAddr: 0x1DE0, symBinAddr: 0x4240, symSize: 0x10 }
-  - { offset: 0x17B61F, size: 0x8, addend: 0x0, symName: '-[UNOWindow setMetalViewDelegate:]', symObjAddr: 0x1DF0, symBinAddr: 0x4250, symSize: 0xC }
-  - { offset: 0x17B65E, size: 0x8, addend: 0x0, symName: '-[UNOWindow .cxx_destruct]', symObjAddr: 0x1DFC, symBinAddr: 0x425C, symSize: 0x14 }
-  - { offset: 0x17B77D, size: 0x8, addend: 0x0, symName: '+[MouseButtons track:]', symObjAddr: 0x0, symBinAddr: 0x4270, symSize: 0x104 }
-  - { offset: 0x17B797, size: 0x8, addend: 0x0, symName: _sDepth, symObjAddr: 0x1530, symBinAddr: 0x1B010, symSize: 0x0 }
-  - { offset: 0x17B7BB, size: 0x8, addend: 0x0, symName: '+[MouseButtons track:]', symObjAddr: 0x0, symBinAddr: 0x4270, symSize: 0x104 }
-  - { offset: 0x17B838, size: 0x8, addend: 0x0, symName: '+[MouseButtons mask]', symObjAddr: 0x104, symBinAddr: 0x4374, symSize: 0xC8 }
-  - { offset: 0x17B985, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_clear, symObjAddr: 0x0, symBinAddr: 0x443C, symSize: 0x38 }
-  - { offset: 0x17B9AD, size: 0x8, addend: 0x0, symName: _clipboard_changed, symObjAddr: 0x3328, symBinAddr: 0x1B040, symSize: 0x0 }
-  - { offset: 0x17B9D4, size: 0x8, addend: 0x0, symName: _timer, symObjAddr: 0x3320, symBinAddr: 0x1B038, symSize: 0x0 }
-  - { offset: 0x17B9EF, size: 0x8, addend: 0x0, symName: _lastCount, symObjAddr: 0x3318, symBinAddr: 0x1B030, symSize: 0x0 }
-  - { offset: 0x17BA00, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_clear, symObjAddr: 0x0, symBinAddr: 0x443C, symSize: 0x38 }
-  - { offset: 0x17BA16, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_get_content, symObjAddr: 0x38, symBinAddr: 0x4474, symSize: 0x2D8 }
-  - { offset: 0x17BB8E, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_set_content, symObjAddr: 0x310, symBinAddr: 0x474C, symSize: 0x2FC }
-  - { offset: 0x17BCC4, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_start_content_changed, symObjAddr: 0x60C, symBinAddr: 0x4A48, symSize: 0x78 }
-  - { offset: 0x17BCE7, size: 0x8, addend: 0x0, symName: ___codebrix_clipboard_start_content_changed_block_invoke, symObjAddr: 0x684, symBinAddr: 0x4AC0, symSize: 0x60 }
-  - { offset: 0x17BD5A, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_get_content_changed_callback, symObjAddr: 0x6E4, symBinAddr: 0x4B20, symSize: 0xC }
-  - { offset: 0x17BD6E, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_stop_content_changed, symObjAddr: 0x6F0, symBinAddr: 0x4B2C, symSize: 0xC }
-  - { offset: 0x17BD84, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_set_content_changed_callback, symObjAddr: 0x6FC, symBinAddr: 0x4B38, symSize: 0xC }
-  - { offset: 0x17BF33, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_periodic_position_update_callback, symObjAddr: 0x0, symBinAddr: 0x4B44, symSize: 0xC }
-  - { offset: 0x17BF4D, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_periodic_position_update, symObjAddr: 0xA828, symBinAddr: 0x1B048, symSize: 0x0 }
-  - { offset: 0x17C00E, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_rate_changed, symObjAddr: 0xA830, symBinAddr: 0x1B050, symSize: 0x0 }
-  - { offset: 0x17C02F, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_video_dimension_changed, symObjAddr: 0xA838, symBinAddr: 0x1B058, symSize: 0x0 }
-  - { offset: 0x17C066, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_duration_changed, symObjAddr: 0xA840, symBinAddr: 0x1B060, symSize: 0x0 }
-  - { offset: 0x17C087, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_ready_to_play, symObjAddr: 0xA848, symBinAddr: 0x1B068, symSize: 0x0 }
-  - { offset: 0x17C0A8, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_buffering_progress_changed, symObjAddr: 0xA850, symBinAddr: 0x1B070, symSize: 0x0 }
-  - { offset: 0x17C0C9, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_opened, symObjAddr: 0xA858, symBinAddr: 0x1B078, symSize: 0x0 }
-  - { offset: 0x17C0F6, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_ended, symObjAddr: 0xA860, symBinAddr: 0x1B080, symSize: 0x0 }
-  - { offset: 0x17C10C, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_failed, symObjAddr: 0xA868, symBinAddr: 0x1B088, symSize: 0x0 }
-  - { offset: 0x17C122, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_stalled, symObjAddr: 0xA870, symBinAddr: 0x1B090, symSize: 0x0 }
-  - { offset: 0x17C139, size: 0x8, addend: 0x0, symName: _players, symObjAddr: 0xA878, symBinAddr: 0x1B098, symSize: 0x0 }
-  - { offset: 0x17C155, size: 0x8, addend: 0x0, symName: _timeObserver, symObjAddr: 0xA880, symBinAddr: 0x1B170, symSize: 0x0 }
-  - { offset: 0x17C1E5, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_periodic_position_update_callback, symObjAddr: 0x0, symBinAddr: 0x4B44, symSize: 0xC }
-  - { offset: 0x17C1F9, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_rate_changed_callback, symObjAddr: 0xC, symBinAddr: 0x4B50, symSize: 0xC }
-  - { offset: 0x17C20D, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_video_dimension_changed_callback, symObjAddr: 0x18, symBinAddr: 0x4B5C, symSize: 0xC }
-  - { offset: 0x17C221, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_duration_changed_callback, symObjAddr: 0x24, symBinAddr: 0x4B68, symSize: 0xC }
-  - { offset: 0x17C235, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_ready_to_play_callback, symObjAddr: 0x30, symBinAddr: 0x4B74, symSize: 0xC }
-  - { offset: 0x17C249, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_buffering_progress_changed_callback, symObjAddr: 0x3C, symBinAddr: 0x4B80, symSize: 0xC }
-  - { offset: 0x17C25D, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_opened, symObjAddr: 0x48, symBinAddr: 0x4B8C, symSize: 0xC }
-  - { offset: 0x17C271, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_ended, symObjAddr: 0x54, symBinAddr: 0x4B98, symSize: 0xC }
-  - { offset: 0x17C285, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_failed, symObjAddr: 0x60, symBinAddr: 0x4BA4, symSize: 0xC }
-  - { offset: 0x17C299, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_stalled, symObjAddr: 0x6C, symBinAddr: 0x4BB0, symSize: 0xC }
-  - { offset: 0x17C2AD, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_callbacks, symObjAddr: 0x78, symBinAddr: 0x4BBC, symSize: 0x58 }
-  - { offset: 0x17C352, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_create, symObjAddr: 0xD0, symBinAddr: 0x4C14, symSize: 0x1C }
-  - { offset: 0x17C37D, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_notifications, symObjAddr: 0xEC, symBinAddr: 0x4C30, symSize: 0x4 }
-  - { offset: 0x17C3A2, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_is_video, symObjAddr: 0xF0, symBinAddr: 0x4C34, symSize: 0x4 }
-  - { offset: 0x17C3CB, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_current_time, symObjAddr: 0xF4, symBinAddr: 0x4C38, symSize: 0x7C }
-  - { offset: 0x17C415, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_current_time, symObjAddr: 0x170, symBinAddr: 0x4CB4, symSize: 0xA0 }
-  - { offset: 0x17C48F, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_rate, symObjAddr: 0x210, symBinAddr: 0x4D54, symSize: 0x44 }
-  - { offset: 0x17C4BA, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_rate, symObjAddr: 0x254, symBinAddr: 0x4D98, symSize: 0x90 }
-  - { offset: 0x17C4F1, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source, symObjAddr: 0x2E4, symBinAddr: 0x4E28, symSize: 0x80 }
-  - { offset: 0x17C538, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source_path, symObjAddr: 0x364, symBinAddr: 0x4EA8, symSize: 0x158 }
-  - { offset: 0x17C5C6, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source_uri, symObjAddr: 0x4BC, symBinAddr: 0x5000, symSize: 0x88 }
-  - { offset: 0x17C63A, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_stretch, symObjAddr: 0x544, symBinAddr: 0x5088, symSize: 0x7C }
-  - { offset: 0x17C681, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_volume, symObjAddr: 0x5C0, symBinAddr: 0x5104, symSize: 0x40 }
-  - { offset: 0x17C6B8, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_pause, symObjAddr: 0x600, symBinAddr: 0x5144, symSize: 0x30 }
-  - { offset: 0x17C6DF, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_play, symObjAddr: 0x630, symBinAddr: 0x5174, symSize: 0x1A4 }
-  - { offset: 0x17C76C, size: 0x8, addend: 0x0, symName: ___codebrix_mediaplayer_play_block_invoke, symObjAddr: 0x7D4, symBinAddr: 0x5318, symSize: 0x8 }
-  - { offset: 0x17C7A7, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s, symObjAddr: 0x7DC, symBinAddr: 0x5320, symSize: 0x8 }
-  - { offset: 0x17C7CE, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s, symObjAddr: 0x7E4, symBinAddr: 0x5328, symSize: 0x8 }
-  - { offset: 0x17C7ED, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_stop, symObjAddr: 0x7EC, symBinAddr: 0x5330, symSize: 0x7C }
-  - { offset: 0x17C825, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_toggle_mute, symObjAddr: 0x868, symBinAddr: 0x53AC, symSize: 0x78 }
-  - { offset: 0x17C84E, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_step_by, symObjAddr: 0x8E0, symBinAddr: 0x5424, symSize: 0x84 }
-  - { offset: 0x17C899, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_create_view, symObjAddr: 0x964, symBinAddr: 0x54A8, symSize: 0x30 }
-  - { offset: 0x17C8C6, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_view, symObjAddr: 0x994, symBinAddr: 0x54D8, symSize: 0x170 }
-  - { offset: 0x17C911, size: 0x8, addend: 0x0, symName: '+[UNOMediaPlayer initialize]', symObjAddr: 0xB04, symBinAddr: 0x5648, symSize: 0x34 }
-  - { offset: 0x17C941, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer init]', symObjAddr: 0xB38, symBinAddr: 0x567C, symSize: 0xDC }
-  - { offset: 0x17C987, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setNotifications]', symObjAddr: 0xC14, symBinAddr: 0x5758, symSize: 0x34C }
-  - { offset: 0x17CA2F, size: 0x8, addend: 0x0, symName: '___34-[UNOMediaPlayer setNotifications]_block_invoke', symObjAddr: 0xF60, symBinAddr: 0x5AA4, symSize: 0x100 }
-  - { offset: 0x17CAE4, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32w, symObjAddr: 0x1060, symBinAddr: 0x5BA4, symSize: 0xC }
-  - { offset: 0x17CB0D, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32w, symObjAddr: 0x106C, symBinAddr: 0x5BB0, symSize: 0x8 }
-  - { offset: 0x17CB2C, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer dealloc]', symObjAddr: 0x1074, symBinAddr: 0x5BB8, symSize: 0x190 }
-  - { offset: 0x17CBBB, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x1204, symBinAddr: 0x5D48, symSize: 0x590 }
-  - { offset: 0x17CF1D, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFinish:]', symObjAddr: 0x1794, symBinAddr: 0x62D8, symSize: 0xC }
-  - { offset: 0x17CF5F, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFinish:]', symObjAddr: 0x1794, symBinAddr: 0x62D8, symSize: 0xC }
-  - { offset: 0x17CF87, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFailed:]', symObjAddr: 0x17A0, symBinAddr: 0x62E4, symSize: 0xC }
-  - { offset: 0x17CFC9, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFailed:]', symObjAddr: 0x17A0, symBinAddr: 0x62E4, symSize: 0xC }
-  - { offset: 0x17CFFE, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidStall:]', symObjAddr: 0x17AC, symBinAddr: 0x62F0, symSize: 0xC }
-  - { offset: 0x17D040, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidStall:]', symObjAddr: 0x17AC, symBinAddr: 0x62F0, symSize: 0xC }
-  - { offset: 0x17D068, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer player]', symObjAddr: 0x17B8, symBinAddr: 0x62FC, symSize: 0x8 }
-  - { offset: 0x17D09F, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setPlayer:]', symObjAddr: 0x17C0, symBinAddr: 0x6304, symSize: 0x30 }
-  - { offset: 0x17D0E0, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer videoLayer]', symObjAddr: 0x17F0, symBinAddr: 0x6334, symSize: 0x8 }
-  - { offset: 0x17D117, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setVideoLayer:]', symObjAddr: 0x17F8, symBinAddr: 0x633C, symSize: 0x30 }
-  - { offset: 0x17D158, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer isVideo]', symObjAddr: 0x1828, symBinAddr: 0x636C, symSize: 0x8 }
-  - { offset: 0x17D18F, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setIsVideo:]', symObjAddr: 0x1830, symBinAddr: 0x6374, symSize: 0x8 }
-  - { offset: 0x17D1CA, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer .cxx_destruct]', symObjAddr: 0x1838, symBinAddr: 0x637C, symSize: 0x30 }
-  - { offset: 0x17D1FE, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView initWithCoder:]', symObjAddr: 0x1868, symBinAddr: 0x63AC, symSize: 0x34 }
-  - { offset: 0x17D247, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView initWithFrame:]', symObjAddr: 0x189C, symBinAddr: 0x63E0, symSize: 0x6C }
-  - { offset: 0x17D2AC, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView isFlipped]', symObjAddr: 0x1908, symBinAddr: 0x644C, symSize: 0x8 }
-  - { offset: 0x17D2E0, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView wantsUpdateLayer]', symObjAddr: 0x1910, symBinAddr: 0x6454, symSize: 0x8 }
-  - { offset: 0x17D314, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView dispose]', symObjAddr: 0x1918, symBinAddr: 0x645C, symSize: 0x44 }
-  - { offset: 0x17D348, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView layout]', symObjAddr: 0x195C, symBinAddr: 0x64A0, symSize: 0x1B0 }
-  - { offset: 0x17D3C5, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView originalSuperView]', symObjAddr: 0x1B0C, symBinAddr: 0x6650, symSize: 0x10 }
-  - { offset: 0x17D3FD, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView setOriginalSuperView:]', symObjAddr: 0x1B1C, symBinAddr: 0x6660, symSize: 0x40 }
-  - { offset: 0x17D43F, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView .cxx_destruct]', symObjAddr: 0x1B5C, symBinAddr: 0x66A0, symSize: 0x14 }
-  - { offset: 0x17D697, size: 0x8, addend: 0x0, symName: _codebrix_cursor_hide, symObjAddr: 0x0, symBinAddr: 0x66B4, symSize: 0xC }
-  - { offset: 0x17D6B1, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_monitor, symObjAddr: 0x3370, symBinAddr: 0x1B0A0, symSize: 0x0 }
-  - { offset: 0x17D6F1, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_callback, symObjAddr: 0x3378, symBinAddr: 0x1B0A8, symSize: 0x0 }
-  - { offset: 0x17D7BC, size: 0x8, addend: 0x0, symName: _codebrix_cursor_hide, symObjAddr: 0x0, symBinAddr: 0x66B4, symSize: 0xC }
-  - { offset: 0x17D7D2, size: 0x8, addend: 0x0, symName: _codebrix_cursor_show, symObjAddr: 0xC, symBinAddr: 0x66C0, symSize: 0xC }
-  - { offset: 0x17D7E8, size: 0x8, addend: 0x0, symName: _codebrix_cursor_set, symObjAddr: 0x18, symBinAddr: 0x66CC, symSize: 0x1C4 }
-  - { offset: 0x17D833, size: 0x8, addend: 0x0, symName: '+[UNOCursor helpCursor]', symObjAddr: 0x1DC, symBinAddr: 0x6890, symSize: 0x28 }
-  - { offset: 0x17D87A, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeAllCursor]', symObjAddr: 0x204, symBinAddr: 0x68B8, symSize: 0x28 }
-  - { offset: 0x17D8C1, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeNortheastSouthwestCursor]', symObjAddr: 0x22C, symBinAddr: 0x68E0, symSize: 0x28 }
-  - { offset: 0x17D908, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeNorthwestSoutheastCursor]', symObjAddr: 0x254, symBinAddr: 0x6908, symSize: 0x28 }
-  - { offset: 0x17D94F, size: 0x8, addend: 0x0, symName: '+[UNOCursor waitCursor]', symObjAddr: 0x27C, symBinAddr: 0x6930, symSize: 0x28 }
-  - { offset: 0x17D996, size: 0x8, addend: 0x0, symName: '-[UNOCursor _coreCursorType]', symObjAddr: 0x2A4, symBinAddr: 0x6958, symSize: 0x10 }
-  - { offset: 0x17D9CD, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_begin, symObjAddr: 0x2B4, symBinAddr: 0x6968, symSize: 0x70 }
-  - { offset: 0x17DA1B, size: 0x8, addend: 0x0, symName: ___codebrix_mouse_relative_begin_block_invoke, symObjAddr: 0x324, symBinAddr: 0x69D8, symSize: 0x5C }
-  - { offset: 0x17DA81, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_end, symObjAddr: 0x380, symBinAddr: 0x6A34, symSize: 0x48 }
-  - { offset: 0x17DBEC, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x6A7C, symSize: 0xC }
-  - { offset: 0x17DC62, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0x134A8, symBinAddr: 0x1B0B0, symSize: 0x0 }
-  - { offset: 0x17DC9E, size: 0x8, addend: 0x0, symName: _invoke, symObjAddr: 0x134B0, symBinAddr: 0x1B0B8, symSize: 0x0 }
-  - { offset: 0x17DCB4, size: 0x8, addend: 0x0, symName: _navigation_starting, symObjAddr: 0x134B8, symBinAddr: 0x1B0C0, symSize: 0x0 }
-  - { offset: 0x17DCF6, size: 0x8, addend: 0x0, symName: _navigation_finishing, symObjAddr: 0x134C0, symBinAddr: 0x1B0C8, symSize: 0x0 }
-  - { offset: 0x17DD28, size: 0x8, addend: 0x0, symName: _property_change_notification, symObjAddr: 0x134C8, symBinAddr: 0x1B0D0, symSize: 0x0 }
-  - { offset: 0x17DD5A, size: 0x8, addend: 0x0, symName: _receive_web_message, symObjAddr: 0x134D0, symBinAddr: 0x1B0D8, symSize: 0x0 }
-  - { offset: 0x17DD70, size: 0x8, addend: 0x0, symName: _navigation_failing, symObjAddr: 0x134D8, symBinAddr: 0x1B0E0, symSize: 0x0 }
-  - { offset: 0x17DDAE, size: 0x8, addend: 0x0, symName: _unsupported_scheme_identified, symObjAddr: 0x134E0, symBinAddr: 0x1B0E8, symSize: 0x0 }
-  - { offset: 0x17DDCF, size: 0x8, addend: 0x0, symName: _download_starting, symObjAddr: 0x134E8, symBinAddr: 0x1B0F0, symSize: 0x0 }
-  - { offset: 0x17DE22, size: 0x8, addend: 0x0, symName: _download_progress, symObjAddr: 0x134F0, symBinAddr: 0x1B0F8, symSize: 0x0 }
-  - { offset: 0x17DE59, size: 0x8, addend: 0x0, symName: _download_finished, symObjAddr: 0x134F8, symBinAddr: 0x1B100, symSize: 0x0 }
-  - { offset: 0x17DE95, size: 0x8, addend: 0x0, symName: _download_delegates, symObjAddr: 0x13500, symBinAddr: 0x1B108, symSize: 0x0 }
-  - { offset: 0x17DEB1, size: 0x8, addend: 0x0, symName: _new_window_requested, symObjAddr: 0x13508, symBinAddr: 0x1B110, symSize: 0x0 }
-  - { offset: 0x17E0A3, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x6A7C, symSize: 0xC }
-  - { offset: 0x17E0B7, size: 0x8, addend: 0x0, symName: _codebrix_set_execute_callback, symObjAddr: 0xC, symBinAddr: 0x6A88, symSize: 0xC }
-  - { offset: 0x17E0DC, size: 0x8, addend: 0x0, symName: _codebrix_get_invoke_callback, symObjAddr: 0x18, symBinAddr: 0x6A94, symSize: 0xC }
-  - { offset: 0x17E0F0, size: 0x8, addend: 0x0, symName: _codebrix_set_invoke_callback, symObjAddr: 0x24, symBinAddr: 0x6AA0, symSize: 0xC }
-  - { offset: 0x17E115, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_starting_callback, symObjAddr: 0x30, symBinAddr: 0x6AAC, symSize: 0xC }
-  - { offset: 0x17E129, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_finishing_callback, symObjAddr: 0x3C, symBinAddr: 0x6AB8, symSize: 0xC }
-  - { offset: 0x17E13D, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_notification_callback, symObjAddr: 0x48, symBinAddr: 0x6AC4, symSize: 0xC }
-  - { offset: 0x17E151, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_receive_web_message_callback, symObjAddr: 0x54, symBinAddr: 0x6AD0, symSize: 0xC }
-  - { offset: 0x17E165, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_failing_callback, symObjAddr: 0x60, symBinAddr: 0x6ADC, symSize: 0xC }
-  - { offset: 0x17E179, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_navigation_callbacks, symObjAddr: 0x6C, symBinAddr: 0x6AE8, symSize: 0x2C }
-  - { offset: 0x17E1D6, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_unsupported_scheme_identified_callback, symObjAddr: 0x98, symBinAddr: 0x6B14, symSize: 0xC }
-  - { offset: 0x17E1EA, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_unsupported_scheme_identified_callback, symObjAddr: 0xA4, symBinAddr: 0x6B20, symSize: 0xC }
-  - { offset: 0x17E20F, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_download_callbacks, symObjAddr: 0xB0, symBinAddr: 0x6B2C, symSize: 0x1C }
-  - { offset: 0x17E250, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download:decideDestinationUsingResponse:suggestedFilename:completionHandler:]', symObjAddr: 0xCC, symBinAddr: 0x6B48, symSize: 0x1E8 }
-  - { offset: 0x17E354, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x2B4, symBinAddr: 0x6D30, symSize: 0x10C }
-  - { offset: 0x17E48E, size: 0x8, addend: 0x0, symName: '___72-[CDBRXDownloadDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x3C0, symBinAddr: 0x6E3C, symSize: 0x20 }
-  - { offset: 0x17E4F5, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate startObservingProgress]', symObjAddr: 0x3E0, symBinAddr: 0x6E5C, symSize: 0xD4 }
-  - { offset: 0x17E528, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate finishWithSuccess:wasCancelled:errorMessage:]', symObjAddr: 0x4B4, symBinAddr: 0x6F30, symSize: 0x100 }
-  - { offset: 0x17E5C4, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate downloadDidFinish:]', symObjAddr: 0x5B4, symBinAddr: 0x7030, symSize: 0x10 }
-  - { offset: 0x17E601, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download:didFailWithError:resumeData:]', symObjAddr: 0x5C4, symBinAddr: 0x7040, symSize: 0xB4 }
-  - { offset: 0x17E66C, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate webview]', symObjAddr: 0x678, symBinAddr: 0x70F4, symSize: 0x18 }
-  - { offset: 0x17E6A3, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setWebview:]', symObjAddr: 0x690, symBinAddr: 0x710C, symSize: 0xC }
-  - { offset: 0x17E6E4, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download]', symObjAddr: 0x69C, symBinAddr: 0x7118, symSize: 0x8 }
-  - { offset: 0x17E71B, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setDownload:]', symObjAddr: 0x6A4, symBinAddr: 0x7120, symSize: 0x30 }
-  - { offset: 0x17E75C, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate destinationHandler]', symObjAddr: 0x6D4, symBinAddr: 0x7150, symSize: 0x8 }
-  - { offset: 0x17E793, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setDestinationHandler:]', symObjAddr: 0x6DC, symBinAddr: 0x7158, symSize: 0x8 }
-  - { offset: 0x17E7D2, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate observedProgress]', symObjAddr: 0x6E4, symBinAddr: 0x7160, symSize: 0x8 }
-  - { offset: 0x17E809, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setObservedProgress:]', symObjAddr: 0x6EC, symBinAddr: 0x7168, symSize: 0x30 }
-  - { offset: 0x17E84A, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate .cxx_destruct]', symObjAddr: 0x71C, symBinAddr: 0x7198, symSize: 0x44 }
-  - { offset: 0x17E87D, size: 0x8, addend: 0x0, symName: _codebrix_webview_download_set_destination, symObjAddr: 0x760, symBinAddr: 0x71DC, symSize: 0x114 }
-  - { offset: 0x17E933, size: 0x8, addend: 0x0, symName: _codebrix_download_delegate_get, symObjAddr: 0x874, symBinAddr: 0x72F0, symSize: 0x6C }
-  - { offset: 0x17E95E, size: 0x8, addend: 0x0, symName: _codebrix_webview_download_cancel, symObjAddr: 0x8E0, symBinAddr: 0x735C, symSize: 0xD0 }
-  - { offset: 0x17E9EB, size: 0x8, addend: 0x0, symName: ___codebrix_webview_download_cancel_block_invoke, symObjAddr: 0x9B0, symBinAddr: 0x742C, symSize: 0x4 }
-  - { offset: 0x17EA1E, size: 0x8, addend: 0x0, symName: _codebrix_webview_create, symObjAddr: 0x9B4, symBinAddr: 0x7430, symSize: 0x1B4 }
-  - { offset: 0x17EA8F, size: 0x8, addend: 0x0, symName: _codebrix_webview_get_title, symObjAddr: 0xB68, symBinAddr: 0x75E4, symSize: 0x44 }
-  - { offset: 0x17EAE1, size: 0x8, addend: 0x0, symName: _codebrix_webview_can_go_back, symObjAddr: 0xBAC, symBinAddr: 0x7628, symSize: 0x4 }
-  - { offset: 0x17EB0C, size: 0x8, addend: 0x0, symName: _codebrix_webview_can_go_forward, symObjAddr: 0xBB0, symBinAddr: 0x762C, symSize: 0x4 }
-  - { offset: 0x17EB37, size: 0x8, addend: 0x0, symName: _codebrix_webview_go_back, symObjAddr: 0xBB4, symBinAddr: 0x7630, symSize: 0x1C }
-  - { offset: 0x17EB60, size: 0x8, addend: 0x0, symName: _codebrix_webview_go_forward, symObjAddr: 0xBD0, symBinAddr: 0x764C, symSize: 0x1C }
-  - { offset: 0x17EB89, size: 0x8, addend: 0x0, symName: _codebrix_webview_navigate, symObjAddr: 0xBEC, symBinAddr: 0x7668, symSize: 0x2D0 }
-  - { offset: 0x17ECD6, size: 0x8, addend: 0x0, symName: _codebrix_webview_load_html, symObjAddr: 0xEBC, symBinAddr: 0x7938, symSize: 0x94 }
-  - { offset: 0x17ED32, size: 0x8, addend: 0x0, symName: _codebrix_webview_reload, symObjAddr: 0xF50, symBinAddr: 0x79CC, symSize: 0x1C }
-  - { offset: 0x17ED5B, size: 0x8, addend: 0x0, symName: _codebrix_webview_stop, symObjAddr: 0xF6C, symBinAddr: 0x79E8, symSize: 0x4 }
-  - { offset: 0x17ED82, size: 0x8, addend: 0x0, symName: _codebrix_webview_execute_script, symObjAddr: 0xF70, symBinAddr: 0x79EC, symSize: 0xA8 }
-  - { offset: 0x17EDEB, size: 0x8, addend: 0x0, symName: ___codebrix_webview_execute_script_block_invoke, symObjAddr: 0x1018, symBinAddr: 0x7A94, symSize: 0x218 }
-  - { offset: 0x17EF1F, size: 0x8, addend: 0x0, symName: _codebrix_webview_invoke_script, symObjAddr: 0x1230, symBinAddr: 0x7CAC, symSize: 0xA8 }
-  - { offset: 0x17EF88, size: 0x8, addend: 0x0, symName: ___codebrix_webview_invoke_script_block_invoke, symObjAddr: 0x12D8, symBinAddr: 0x7D54, symSize: 0xB8 }
-  - { offset: 0x17F04A, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_scrolling_enabled, symObjAddr: 0x1390, symBinAddr: 0x7E0C, symSize: 0x8 }
-  - { offset: 0x17F082, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_user_agent, symObjAddr: 0x1398, symBinAddr: 0x7E14, symSize: 0x88 }
-  - { offset: 0x17F0BC, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithCoder:]', symObjAddr: 0x1420, symBinAddr: 0x7E9C, symSize: 0x34 }
-  - { offset: 0x17F105, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithFrame:configuration:]', symObjAddr: 0x1454, symBinAddr: 0x7ED0, symSize: 0x12C }
-  - { offset: 0x17F188, size: 0x8, addend: 0x0, symName: '-[UNOWebView didChangeValueForKey:]', symObjAddr: 0x1580, symBinAddr: 0x7FFC, symSize: 0xD4 }
-  - { offset: 0x17F208, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollWheel:]', symObjAddr: 0x1654, symBinAddr: 0x80D0, symSize: 0x8C }
-  - { offset: 0x17F24D, size: 0x8, addend: 0x0, symName: '-[UNOWebView dispose]', symObjAddr: 0x16E0, symBinAddr: 0x815C, symSize: 0x80 }
-  - { offset: 0x17F281, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0x1760, symBinAddr: 0x81DC, symSize: 0x170 }
-  - { offset: 0x17F313, size: 0x8, addend: 0x0, symName: '___94-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x18D0, symBinAddr: 0x834C, symSize: 0x14 }
-  - { offset: 0x17F36E, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32b, symObjAddr: 0x18E4, symBinAddr: 0x8360, symSize: 0x10 }
-  - { offset: 0x17F397, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0x18FC, symBinAddr: 0x8370, symSize: 0x88 }
-  - { offset: 0x17F428, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]', symObjAddr: 0x1984, symBinAddr: 0x83F8, symSize: 0x1E0 }
-  - { offset: 0x17F4DC, size: 0x8, addend: 0x0, symName: '___107-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1B64, symBinAddr: 0x85D8, symSize: 0x64 }
-  - { offset: 0x17F56A, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s40b, symObjAddr: 0x1BC8, symBinAddr: 0x863C, symSize: 0x34 }
-  - { offset: 0x17F593, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s40s, symObjAddr: 0x1BFC, symBinAddr: 0x8670, symSize: 0x28 }
-  - { offset: 0x17F5B2, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]', symObjAddr: 0x1C24, symBinAddr: 0x8698, symSize: 0x138 }
-  - { offset: 0x17F633, size: 0x8, addend: 0x0, symName: '___84-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1D5C, symBinAddr: 0x87D0, symSize: 0x64 }
-  - { offset: 0x17F6C1, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_new_window_requested_callback, symObjAddr: 0x1DC0, symBinAddr: 0x8834, symSize: 0xC }
-  - { offset: 0x17F6D5, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_new_window_requested_callback, symObjAddr: 0x1DCC, symBinAddr: 0x8840, symSize: 0xC }
-  - { offset: 0x17F70A, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:]', symObjAddr: 0x1DD8, symBinAddr: 0x884C, symSize: 0x230 }
-  - { offset: 0x17F7FA, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x2008, symBinAddr: 0x8A7C, symSize: 0x80 }
-  - { offset: 0x17F805, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:].cold.1', symObjAddr: 0x2C34, symBinAddr: 0xA108, symSize: 0x28 }
-  - { offset: 0x17F82A, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x2008, symBinAddr: 0x8A7C, symSize: 0x80 }
-  - { offset: 0x17F8AF, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFailProvisionalNavigation:withError:]', symObjAddr: 0x2088, symBinAddr: 0x8AFC, symSize: 0x14C }
-  - { offset: 0x17F95D, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFinishNavigation:]', symObjAddr: 0x21D4, symBinAddr: 0x8C48, symSize: 0xA8 }
-  - { offset: 0x17F9D5, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didReceiveServerRedirectForProvisionalNavigation:]', symObjAddr: 0x227C, symBinAddr: 0x8CF0, symSize: 0x80 }
-  - { offset: 0x17FA4D, size: 0x8, addend: 0x0, symName: '-[UNOWebView isAnchorNavigation:url:]', symObjAddr: 0x22FC, symBinAddr: 0x8D70, symSize: 0x160 }
-  - { offset: 0x17FAF2, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationAction:decisionHandler:]', symObjAddr: 0x245C, symBinAddr: 0x8ED0, symSize: 0x2C0 }
-  - { offset: 0x17FCAB, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationResponse:decisionHandler:]', symObjAddr: 0x271C, symBinAddr: 0x9190, symSize: 0x17C }
-  - { offset: 0x17FD5E, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:navigationResponse:didBecomeDownload:]', symObjAddr: 0x2898, symBinAddr: 0x930C, symSize: 0xC }
-  - { offset: 0x17FDDC, size: 0x8, addend: 0x0, symName: _codebrix_download_attach, symObjAddr: 0x28A4, symBinAddr: 0x9318, symSize: 0xE0 }
-  - { offset: 0x17FE23, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:navigationAction:didBecomeDownload:]', symObjAddr: 0x2984, symBinAddr: 0x93F8, symSize: 0xC }
-  - { offset: 0x17FEAE, size: 0x8, addend: 0x0, symName: '-[UNOWebView userContentController:didReceiveScriptMessage:]', symObjAddr: 0x2990, symBinAddr: 0x9404, symSize: 0xDC }
-  - { offset: 0x17FF51, size: 0x8, addend: 0x0, symName: '-[UNOWebView originalSuperView]', symObjAddr: 0x2A6C, symBinAddr: 0x94E0, symSize: 0x10 }
-  - { offset: 0x17FF89, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOriginalSuperView:]', symObjAddr: 0x2A7C, symBinAddr: 0x94F0, symSize: 0x40 }
-  - { offset: 0x17FFCB, size: 0x8, addend: 0x0, symName: '-[UNOWebView okString]', symObjAddr: 0x2ABC, symBinAddr: 0x9530, symSize: 0x10 }
-  - { offset: 0x180002, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOkString:]', symObjAddr: 0x2ACC, symBinAddr: 0x9540, symSize: 0x40 }
-  - { offset: 0x180043, size: 0x8, addend: 0x0, symName: '-[UNOWebView cancelString]', symObjAddr: 0x2B0C, symBinAddr: 0x9580, symSize: 0x10 }
-  - { offset: 0x18007A, size: 0x8, addend: 0x0, symName: '-[UNOWebView setCancelString:]', symObjAddr: 0x2B1C, symBinAddr: 0x9590, symSize: 0x40 }
-  - { offset: 0x1800BB, size: 0x8, addend: 0x0, symName: '-[UNOWebView lastNavigationUrl]', symObjAddr: 0x2B5C, symBinAddr: 0x95D0, symSize: 0x10 }
-  - { offset: 0x1800F2, size: 0x8, addend: 0x0, symName: '-[UNOWebView setLastNavigationUrl:]', symObjAddr: 0x2B6C, symBinAddr: 0x95E0, symSize: 0x40 }
-  - { offset: 0x180133, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollingEnabled]', symObjAddr: 0x2BAC, symBinAddr: 0x9620, symSize: 0x10 }
-  - { offset: 0x18016A, size: 0x8, addend: 0x0, symName: '-[UNOWebView setScrollingEnabled:]', symObjAddr: 0x2BBC, symBinAddr: 0x9630, symSize: 0x10 }
-  - { offset: 0x1801A5, size: 0x8, addend: 0x0, symName: '-[UNOWebView .cxx_destruct]', symObjAddr: 0x2BCC, symBinAddr: 0x9640, symSize: 0x68 }
-  - { offset: 0x180807, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x96A8, symSize: 0x18 }
-  - { offset: 0x180821, size: 0x8, addend: 0x0, symName: _elements, symObjAddr: 0x34F0, symBinAddr: 0x1B118, symSize: 0x0 }
-  - { offset: 0x18083C, size: 0x8, addend: 0x0, symName: _transients, symObjAddr: 0x34F8, symBinAddr: 0x1B120, symSize: 0x0 }
-  - { offset: 0x180872, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x96A8, symSize: 0x18 }
-  - { offset: 0x1808A9, size: 0x8, addend: 0x0, symName: '-[UNORedView updateLayer]', symObjAddr: 0x18, symBinAddr: 0x96C0, symSize: 0x70 }
-  - { offset: 0x1808DC, size: 0x8, addend: 0x0, symName: '-[UNORedView detach]', symObjAddr: 0x88, symBinAddr: 0x9730, symSize: 0x4 }
-  - { offset: 0x18090B, size: 0x8, addend: 0x0, symName: '-[UNORedView dispose]', symObjAddr: 0x8C, symBinAddr: 0x9734, symSize: 0x44 }
-  - { offset: 0x18093E, size: 0x8, addend: 0x0, symName: '-[UNORedView originalSuperView]', symObjAddr: 0xD0, symBinAddr: 0x9778, symSize: 0x10 }
-  - { offset: 0x180975, size: 0x8, addend: 0x0, symName: '-[UNORedView setOriginalSuperView:]', symObjAddr: 0xE0, symBinAddr: 0x9788, symSize: 0x40 }
-  - { offset: 0x1809B6, size: 0x8, addend: 0x0, symName: '-[UNORedView .cxx_destruct]', symObjAddr: 0x120, symBinAddr: 0x97C8, symSize: 0x14 }
-  - { offset: 0x1809E9, size: 0x8, addend: 0x0, symName: _codebrix_native_create_sample, symObjAddr: 0x134, symBinAddr: 0x97DC, symSize: 0x16C }
-  - { offset: 0x180A44, size: 0x8, addend: 0x0, symName: _codebrix_native_arrange, symObjAddr: 0x2A0, symBinAddr: 0x9948, symSize: 0x4 }
-  - { offset: 0x180AB5, size: 0x8, addend: 0x0, symName: _codebrix_native_attach, symObjAddr: 0x2A4, symBinAddr: 0x994C, symSize: 0x94 }
-  - { offset: 0x180AEC, size: 0x8, addend: 0x0, symName: _codebrix_native_detach, symObjAddr: 0x338, symBinAddr: 0x99E0, symSize: 0x9C }
-  - { offset: 0x180B13, size: 0x8, addend: 0x0, symName: _codebrix_native_is_attached, symObjAddr: 0x3D4, symBinAddr: 0x9A7C, symSize: 0x18 }
-  - { offset: 0x180B6F, size: 0x8, addend: 0x0, symName: _codebrix_native_measure, symObjAddr: 0x3EC, symBinAddr: 0x9A94, symSize: 0xFC }
-  - { offset: 0x180C64, size: 0x8, addend: 0x0, symName: _codebrix_native_set_opacity, symObjAddr: 0x4E8, symBinAddr: 0x9B90, symSize: 0x4 }
-  - { offset: 0x180C98, size: 0x8, addend: 0x0, symName: _codebrix_native_dispose, symObjAddr: 0x4EC, symBinAddr: 0x9B94, symSize: 0x3C }
+  - { offset: 0x1760A2, size: 0x8, addend: 0x0, symName: _get_best_location, symObjAddr: 0x0, symBinAddr: 0xFA8, symSize: 0x164 }
+  - { offset: 0x176148, size: 0x8, addend: 0x0, symName: _get_best_location, symObjAddr: 0x0, symBinAddr: 0xFA8, symSize: 0x164 }
+  - { offset: 0x1761A2, size: 0x8, addend: 0x0, symName: _get_allowed, symObjAddr: 0x164, symBinAddr: 0x110C, symSize: 0x90 }
+  - { offset: 0x17622B, size: 0x8, addend: 0x0, symName: _codebrix_pick_single_folder, symObjAddr: 0x1F4, symBinAddr: 0x119C, symSize: 0x190 }
+  - { offset: 0x1762E5, size: 0x8, addend: 0x0, symName: _codebrix_pick_single_file, symObjAddr: 0x384, symBinAddr: 0x132C, symSize: 0x19C }
+  - { offset: 0x1763C0, size: 0x8, addend: 0x0, symName: _codebrix_pick_multiple_files, symObjAddr: 0x520, symBinAddr: 0x14C8, symSize: 0x1F8 }
+  - { offset: 0x176530, size: 0x8, addend: 0x0, symName: _codebrix_pick_save_file, symObjAddr: 0x718, symBinAddr: 0x16C0, symSize: 0x1BC }
+  - { offset: 0x176697, size: 0x8, addend: 0x0, symName: '-[UNOSoftView drawRect:]', symObjAddr: 0x0, symBinAddr: 0x187C, symSize: 0x194 }
+  - { offset: 0x1766B8, size: 0x8, addend: 0x0, symName: '-[UNOSoftView drawRect:]', symObjAddr: 0x0, symBinAddr: 0x187C, symSize: 0x194 }
+  - { offset: 0x1769B3, size: 0x8, addend: 0x0, symName: '-[UNOSoftView setFrameSize:]', symObjAddr: 0x194, symBinAddr: 0x1A10, symSize: 0x80 }
+  - { offset: 0x176AB9, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate initWithMetalKitView:]', symObjAddr: 0x0, symBinAddr: 0x1A90, symSize: 0xD8 }
+  - { offset: 0x176B32, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate initWithMetalKitView:]', symObjAddr: 0x0, symBinAddr: 0x1A90, symSize: 0xD8 }
+  - { offset: 0x176B79, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate drawInMTKView:]', symObjAddr: 0xD8, symBinAddr: 0x1B68, symSize: 0x10C }
+  - { offset: 0x176C4E, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate mtkView:drawableSizeWillChange:]', symObjAddr: 0x1E4, symBinAddr: 0x1C74, symSize: 0x9C }
+  - { offset: 0x176CFC, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate queue]', symObjAddr: 0x280, symBinAddr: 0x1D10, symSize: 0xC }
+  - { offset: 0x176D33, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate setQueue:]', symObjAddr: 0x28C, symBinAddr: 0x1D1C, symSize: 0x8 }
+  - { offset: 0x176D72, size: 0x8, addend: 0x0, symName: '-[UNOMetalViewDelegate .cxx_destruct]', symObjAddr: 0x294, symBinAddr: 0x1D24, symSize: 0x30 }
+  - { offset: 0x176E2F, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme_change_callback, symObjAddr: 0x0, symBinAddr: 0x1D54, symSize: 0xC }
+  - { offset: 0x176E49, size: 0x8, addend: 0x0, symName: _ad, symObjAddr: 0x5318, symBinAddr: 0x1AD68, symSize: 0x0 }
+  - { offset: 0x176E76, size: 0x8, addend: 0x0, symName: _system_theme_change, symObjAddr: 0x5310, symBinAddr: 0x1AD60, symSize: 0x0 }
+  - { offset: 0x176E9D, size: 0x8, addend: 0x0, symName: _device, symObjAddr: 0x5320, symBinAddr: 0x1AD70, symSize: 0x0 }
+  - { offset: 0x176EDD, size: 0x8, addend: 0x0, symName: _application_can_exit, symObjAddr: 0x5328, symBinAddr: 0x1AD78, symSize: 0x0 }
+  - { offset: 0x176F10, size: 0x8, addend: 0x0, symName: _application_start, symObjAddr: 0x5330, symBinAddr: 0x1AD80, symSize: 0x0 }
+  - { offset: 0x176F26, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme_change_callback, symObjAddr: 0x0, symBinAddr: 0x1D54, symSize: 0xC }
+  - { offset: 0x176F3A, size: 0x8, addend: 0x0, symName: _codebrix_set_system_theme_change_callback, symObjAddr: 0xC, symBinAddr: 0x1D60, symSize: 0xC }
+  - { offset: 0x176F5F, size: 0x8, addend: 0x0, symName: _codebrix_get_system_theme, symObjAddr: 0x18, symBinAddr: 0x1D6C, symSize: 0x10C }
+  - { offset: 0x176FAA, size: 0x8, addend: 0x0, symName: _codebrix_app_initialize, symObjAddr: 0x124, symBinAddr: 0x1E78, symSize: 0x100 }
+  - { offset: 0x177038, size: 0x8, addend: 0x0, symName: _codebrix_application_get_metal_device, symObjAddr: 0x224, symBinAddr: 0x1F78, symSize: 0xC }
+  - { offset: 0x177052, size: 0x8, addend: 0x0, symName: _codebrix_application_set_badge, symObjAddr: 0x230, symBinAddr: 0x1F84, symSize: 0x88 }
+  - { offset: 0x177099, size: 0x8, addend: 0x0, symName: _codebrix_application_set_icon, symObjAddr: 0x2B8, symBinAddr: 0x200C, symSize: 0x98 }
+  - { offset: 0x1770D0, size: 0x8, addend: 0x0, symName: _codebrix_application_open_url, symObjAddr: 0x350, symBinAddr: 0x20A4, symSize: 0x9C }
+  - { offset: 0x17710B, size: 0x8, addend: 0x0, symName: _codebrix_application_query_url_support, symObjAddr: 0x3EC, symBinAddr: 0x2140, symSize: 0xAC }
+  - { offset: 0x177146, size: 0x8, addend: 0x0, symName: _codebrix_get_application_can_exit_callback, symObjAddr: 0x498, symBinAddr: 0x21EC, symSize: 0xC }
+  - { offset: 0x17715A, size: 0x8, addend: 0x0, symName: _codebrix_set_application_can_exit_callback, symObjAddr: 0x4A4, symBinAddr: 0x21F8, symSize: 0xC }
+  - { offset: 0x17717F, size: 0x8, addend: 0x0, symName: _codebrix_get_application_start_callback, symObjAddr: 0x4B0, symBinAddr: 0x2204, symSize: 0xC }
+  - { offset: 0x177193, size: 0x8, addend: 0x0, symName: _codebrix_set_application_start_callback, symObjAddr: 0x4BC, symBinAddr: 0x2210, symSize: 0xC }
+  - { offset: 0x1771B8, size: 0x8, addend: 0x0, symName: _codebrix_application_is_bundled, symObjAddr: 0x4C8, symBinAddr: 0x221C, symSize: 0x54 }
+  - { offset: 0x1771D2, size: 0x8, addend: 0x0, symName: _codebrix_application_quit, symObjAddr: 0x51C, symBinAddr: 0x2270, symSize: 0x3C }
+  - { offset: 0x177206, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationDidFinishLaunching:]', symObjAddr: 0x558, symBinAddr: 0x22AC, symSize: 0xC }
+  - { offset: 0x177244, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationDidFinishLaunching:]', symObjAddr: 0x558, symBinAddr: 0x22AC, symSize: 0xC }
+  - { offset: 0x17726F, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationShouldTerminate:]', symObjAddr: 0x564, symBinAddr: 0x22B8, symSize: 0x20 }
+  - { offset: 0x1772CF, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate applicationShouldTerminateAfterLastWindowClosed:]', symObjAddr: 0x584, symBinAddr: 0x22D8, symSize: 0x8 }
+  - { offset: 0x17730E, size: 0x8, addend: 0x0, symName: '-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x58C, symBinAddr: 0x22E0, symSize: 0x8C }
+  - { offset: 0x1773C3, size: 0x8, addend: 0x0, symName: '___73-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x618, symBinAddr: 0x236C, symSize: 0xC }
+  - { offset: 0x1773ED, size: 0x8, addend: 0x0, symName: '___73-[UNOApplicationDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x618, symBinAddr: 0x236C, symSize: 0xC }
+  - { offset: 0x17751C, size: 0x8, addend: 0x0, symName: _codebrix_get_resize_callback, symObjAddr: 0x0, symBinAddr: 0x2378, symSize: 0xC }
+  - { offset: 0x17758B, size: 0x8, addend: 0x0, symName: _main_window, symObjAddr: 0x116C0, symBinAddr: 0x1ADA0, symSize: 0x0 }
+  - { offset: 0x1775A6, size: 0x8, addend: 0x0, symName: _windows, symObjAddr: 0x116D0, symBinAddr: 0x1ADB0, symSize: 0x0 }
+  - { offset: 0x1775C1, size: 0x8, addend: 0x0, symName: _windowDidChangeScreen, symObjAddr: 0x116C8, symBinAddr: 0x1ADA8, symSize: 0x0 }
+  - { offset: 0x177601, size: 0x8, addend: 0x0, symName: _window_did_change_screen, symObjAddr: 0x116D8, symBinAddr: 0x1ADB8, symSize: 0x0 }
+  - { offset: 0x17764C, size: 0x8, addend: 0x0, symName: _window_did_change_screen_parameters, symObjAddr: 0x116E0, symBinAddr: 0x1ADC0, symSize: 0x0 }
+  - { offset: 0x17767A, size: 0x8, addend: 0x0, symName: _window_resize, symObjAddr: 0x116A8, symBinAddr: 0x1AD88, symSize: 0x0 }
+  - { offset: 0x1776B2, size: 0x8, addend: 0x0, symName: _metal_draw, symObjAddr: 0x116B0, symBinAddr: 0x1AD90, symSize: 0x0 }
+  - { offset: 0x1776EE, size: 0x8, addend: 0x0, symName: _soft_draw, symObjAddr: 0x116B8, symBinAddr: 0x1AD98, symSize: 0x0 }
+  - { offset: 0x177741, size: 0x8, addend: 0x0, symName: _window_key_down, symObjAddr: 0x116E8, symBinAddr: 0x1ADC8, symSize: 0x0 }
+  - { offset: 0x177D09, size: 0x8, addend: 0x0, symName: _window_key_up, symObjAddr: 0x116F0, symBinAddr: 0x1ADD0, symSize: 0x0 }
+  - { offset: 0x177D20, size: 0x8, addend: 0x0, symName: _window_mouse_event, symObjAddr: 0x116F8, symBinAddr: 0x1ADD8, symSize: 0x0 }
+  - { offset: 0x177EAC, size: 0x8, addend: 0x0, symName: _window_move_event, symObjAddr: 0x11700, symBinAddr: 0x1ADE0, symSize: 0x0 }
+  - { offset: 0x177EE4, size: 0x8, addend: 0x0, symName: _window_resize_event, symObjAddr: 0x11708, symBinAddr: 0x1ADE8, symSize: 0x0 }
+  - { offset: 0x177EFB, size: 0x8, addend: 0x0, symName: _window_should_close, symObjAddr: 0x11710, symBinAddr: 0x1ADF0, symSize: 0x0 }
+  - { offset: 0x177F35, size: 0x8, addend: 0x0, symName: _window_close, symObjAddr: 0x11718, symBinAddr: 0x1ADF8, symSize: 0x0 }
+  - { offset: 0x177F64, size: 0x8, addend: 0x0, symName: __previousFlags, symObjAddr: 0x11738, symBinAddr: 0x1AF58, symSize: 0x0 }
+  - { offset: 0x177F7B, size: 0x8, addend: 0x0, symName: __osVersion, symObjAddr: 0x11720, symBinAddr: 0x1AF40, symSize: 0x0 }
+  - { offset: 0x177FE4, size: 0x8, addend: 0x0, symName: _codebrix_get_resize_callback, symObjAddr: 0x0, symBinAddr: 0x2378, symSize: 0xC }
+  - { offset: 0x177FFE, size: 0x8, addend: 0x0, symName: _codebrix_get_metal_draw_callback, symObjAddr: 0xC, symBinAddr: 0x2384, symSize: 0xC }
+  - { offset: 0x178018, size: 0x8, addend: 0x0, symName: _codebrix_get_soft_draw_callback, symObjAddr: 0x18, symBinAddr: 0x2390, symSize: 0xC }
+  - { offset: 0x178032, size: 0x8, addend: 0x0, symName: _codebrix_set_drawing_callbacks, symObjAddr: 0x24, symBinAddr: 0x239C, symSize: 0x1C }
+  - { offset: 0x178073, size: 0x8, addend: 0x0, symName: '+[windowDidChangeScreenNoteClass init]', symObjAddr: 0x40, symBinAddr: 0x23B8, symSize: 0x1C }
+  - { offset: 0x1780C4, size: 0x8, addend: 0x0, symName: '-[windowDidChangeScreenNoteClass windowDidChangeScreenNotification:]', symObjAddr: 0x5C, symBinAddr: 0x23D4, symSize: 0x8C }
+  - { offset: 0x17816A, size: 0x8, addend: 0x0, symName: _codebrix_get_window_did_change_screen_callback, symObjAddr: 0xE8, symBinAddr: 0x2460, symSize: 0xC }
+  - { offset: 0x17818C, size: 0x8, addend: 0x0, symName: '-[windowDidChangeScreenNoteClass applicationDidChangeScreenParametersNotification:]', symObjAddr: 0xF4, symBinAddr: 0x246C, symSize: 0x3C }
+  - { offset: 0x1781FC, size: 0x8, addend: 0x0, symName: _codebrix_get_window_did_change_screen_parameters_callback, symObjAddr: 0x130, symBinAddr: 0x24A8, symSize: 0xC }
+  - { offset: 0x178210, size: 0x8, addend: 0x0, symName: _codebrix_app_get_main_window, symObjAddr: 0x13C, symBinAddr: 0x24B4, symSize: 0x54 }
+  - { offset: 0x178239, size: 0x8, addend: 0x0, symName: _codebrix_window_create, symObjAddr: 0x190, symBinAddr: 0x2508, symSize: 0x200 }
+  - { offset: 0x17830F, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x390, symBinAddr: 0x2708, symSize: 0x8 }
+  - { offset: 0x178326, size: 0x8, addend: 0x0, symName: _codebrix_window_create.cold.1, symObjAddr: 0x1DEC, symBinAddr: 0x9CAC, symSize: 0x28 }
+  - { offset: 0x17833E, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView isFlipped]', symObjAddr: 0x390, symBinAddr: 0x2708, symSize: 0x8 }
+  - { offset: 0x178371, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView initWithFrame:device:]', symObjAddr: 0x398, symBinAddr: 0x2710, symSize: 0x34 }
+  - { offset: 0x1783C4, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView clipLayer]', symObjAddr: 0x3CC, symBinAddr: 0x2744, symSize: 0x10 }
+  - { offset: 0x1783FC, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView setClipLayer:]', symObjAddr: 0x3DC, symBinAddr: 0x2754, symSize: 0xC }
+  - { offset: 0x17843C, size: 0x8, addend: 0x0, symName: '-[UNOMetalFlippedView .cxx_destruct]', symObjAddr: 0x3E8, symBinAddr: 0x2760, symSize: 0x14 }
+  - { offset: 0x1784AC, size: 0x8, addend: 0x0, symName: _codebrix_window_activate, symObjAddr: 0x3FC, symBinAddr: 0x2774, symSize: 0x8C }
+  - { offset: 0x178526, size: 0x8, addend: 0x0, symName: _codebrix_window_minimize, symObjAddr: 0x488, symBinAddr: 0x2800, symSize: 0x48 }
+  - { offset: 0x17854F, size: 0x8, addend: 0x0, symName: _codebrix_window_maximize, symObjAddr: 0x4D0, symBinAddr: 0x2848, symSize: 0x8 }
+  - { offset: 0x17856C, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change, symObjAddr: 0x4D8, symBinAddr: 0x2850, symSize: 0x84 }
+  - { offset: 0x1785A6, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x55C, symBinAddr: 0x28D4, symSize: 0x4C }
+  - { offset: 0x1785B1, size: 0x8, addend: 0x0, symName: _codebrix_window_notify_screen_change.cold.1, symObjAddr: 0x1E14, symBinAddr: 0x9CD4, symSize: 0x28 }
+  - { offset: 0x1785C9, size: 0x8, addend: 0x0, symName: _codebrix_window_invalidate, symObjAddr: 0x55C, symBinAddr: 0x28D4, symSize: 0x4C }
+  - { offset: 0x1785F0, size: 0x8, addend: 0x0, symName: _codebrix_window_close, symObjAddr: 0x5A8, symBinAddr: 0x2920, symSize: 0x8 }
+  - { offset: 0x178615, size: 0x8, addend: 0x0, symName: _codebrix_window_move, symObjAddr: 0x5B0, symBinAddr: 0x2928, symSize: 0x4 }
+  - { offset: 0x178658, size: 0x8, addend: 0x0, symName: _codebrix_window_resize, symObjAddr: 0x5B4, symBinAddr: 0x292C, symSize: 0x98 }
+  - { offset: 0x1786E2, size: 0x8, addend: 0x0, symName: _codebrix_window_set_min_size, symObjAddr: 0x64C, symBinAddr: 0x29C4, symSize: 0x4 }
+  - { offset: 0x178725, size: 0x8, addend: 0x0, symName: _codebrix_window_set_max_size, symObjAddr: 0x650, symBinAddr: 0x29C8, symSize: 0x4 }
+  - { offset: 0x178768, size: 0x8, addend: 0x0, symName: _codebrix_window_get_position, symObjAddr: 0x654, symBinAddr: 0x29CC, symSize: 0x2C }
+  - { offset: 0x1787BF, size: 0x8, addend: 0x0, symName: _codebrix_window_get_title, symObjAddr: 0x680, symBinAddr: 0x29F8, symSize: 0x44 }
+  - { offset: 0x178814, size: 0x8, addend: 0x0, symName: _codebrix_window_set_title, symObjAddr: 0x6C4, symBinAddr: 0x2A3C, symSize: 0x64 }
+  - { offset: 0x17884B, size: 0x8, addend: 0x0, symName: _codebrix_window_is_full_screen, symObjAddr: 0x728, symBinAddr: 0x2AA0, symSize: 0x1C }
+  - { offset: 0x178889, size: 0x8, addend: 0x0, symName: _codebrix_window_enter_full_screen, symObjAddr: 0x744, symBinAddr: 0x2ABC, symSize: 0x50 }
+  - { offset: 0x1788C3, size: 0x8, addend: 0x0, symName: _codebrix_window_exit_full_screen, symObjAddr: 0x794, symBinAddr: 0x2B0C, symSize: 0x40 }
+  - { offset: 0x178908, size: 0x8, addend: 0x0, symName: _codebrix_window_restore, symObjAddr: 0x7D4, symBinAddr: 0x2B4C, symSize: 0x70 }
+  - { offset: 0x178958, size: 0x8, addend: 0x0, symName: _codebrix_window_get_overlapped_presenter_state, symObjAddr: 0x844, symBinAddr: 0x2BBC, symSize: 0x4 }
+  - { offset: 0x178975, size: 0x8, addend: 0x0, symName: _codebrix_window_set_always_on_top, symObjAddr: 0x848, symBinAddr: 0x2BC0, symSize: 0x40 }
+  - { offset: 0x1789C0, size: 0x8, addend: 0x0, symName: _codebrix_window_set_border_and_title_bar, symObjAddr: 0x888, symBinAddr: 0x2C00, symSize: 0x44 }
+  - { offset: 0x178A1C, size: 0x8, addend: 0x0, symName: _codebrix_window_set_maximizable, symObjAddr: 0x8CC, symBinAddr: 0x2C44, symSize: 0x6C }
+  - { offset: 0x178A56, size: 0x8, addend: 0x0, symName: _codebrix_window_set_minimizable, symObjAddr: 0x938, symBinAddr: 0x2CB0, symSize: 0x44 }
+  - { offset: 0x178AA1, size: 0x8, addend: 0x0, symName: _codebrix_window_set_modal, symObjAddr: 0x97C, symBinAddr: 0x2CF4, symSize: 0x28 }
+  - { offset: 0x178ADF, size: 0x8, addend: 0x0, symName: _codebrix_window_set_resizable, symObjAddr: 0x9A4, symBinAddr: 0x2D1C, symSize: 0x44 }
+  - { offset: 0x178B2A, size: 0x8, addend: 0x0, symName: _codebrix_set_window_screen_change_callbacks, symObjAddr: 0x9E8, symBinAddr: 0x2D60, symSize: 0x58 }
+  - { offset: 0x178B64, size: 0x8, addend: 0x0, symName: _get_virtual_key, symObjAddr: 0xA40, symBinAddr: 0x2DB8, symSize: 0x20 }
+  - { offset: 0x178B91, size: 0x8, addend: 0x0, symName: _get_modifiers, symObjAddr: 0xA60, symBinAddr: 0x2DD8, symSize: 0x1C }
+  - { offset: 0x178BBA, size: 0x8, addend: 0x0, symName: _get_unicode, symObjAddr: 0xA7C, symBinAddr: 0x2DF4, symSize: 0x6C }
+  - { offset: 0x178C79, size: 0x8, addend: 0x0, symName: _codebrix_set_window_events_callbacks, symObjAddr: 0xAE8, symBinAddr: 0x2E60, symSize: 0x2C }
+  - { offset: 0x178CDC, size: 0x8, addend: 0x0, symName: _codebrix_get_window_should_close_callback, symObjAddr: 0xB14, symBinAddr: 0x2E8C, symSize: 0xC }
+  - { offset: 0x178CF0, size: 0x8, addend: 0x0, symName: _codebrix_get_window_close_callback, symObjAddr: 0xB20, symBinAddr: 0x2E98, symSize: 0xC }
+  - { offset: 0x178D04, size: 0x8, addend: 0x0, symName: _codebrix_set_window_close_callbacks, symObjAddr: 0xB2C, symBinAddr: 0x2EA4, symSize: 0x14 }
+  - { offset: 0x178D3A, size: 0x8, addend: 0x0, symName: _codebrix_window_get_metal_handles, symObjAddr: 0xB40, symBinAddr: 0x2EB8, symSize: 0x70 }
+  - { offset: 0x178D93, size: 0x8, addend: 0x0, symName: _readNextCoord, symObjAddr: 0xBB0, symBinAddr: 0x2F28, symSize: 0x60 }
+  - { offset: 0x178E7E, size: 0x8, addend: 0x0, symName: _codebrix_window_clip_svg, symObjAddr: 0xC10, symBinAddr: 0x2F88, symSize: 0x604 }
+  - { offset: 0x1794CA, size: 0x8, addend: 0x0, symName: '+[UNOWindow initialize]', symObjAddr: 0x1214, symBinAddr: 0x358C, symSize: 0x9C }
+  - { offset: 0x1794FA, size: 0x8, addend: 0x0, symName: '-[UNOWindow initWithContentRect:styleMask:backing:defer:]', symObjAddr: 0x12B0, symBinAddr: 0x3628, symSize: 0x60 }
+  - { offset: 0x179572, size: 0x8, addend: 0x0, symName: '-[UNOWindow dealloc]', symObjAddr: 0x1310, symBinAddr: 0x3688, symSize: 0x50 }
+  - { offset: 0x1795A6, size: 0x8, addend: 0x0, symName: '-[UNOWindow getPositionFrom:x:y:]', symObjAddr: 0x1360, symBinAddr: 0x36D8, symSize: 0xA0 }
+  - { offset: 0x179664, size: 0x8, addend: 0x0, symName: '-[UNOWindow sendEvent:]', symObjAddr: 0x1400, symBinAddr: 0x3778, symSize: 0x488 }
+  - { offset: 0x1798C3, size: 0x8, addend: 0x0, symName: '-[UNOWindow processModifiers:event:]', symObjAddr: 0x1888, symBinAddr: 0x3C00, symSize: 0x128 }
+  - { offset: 0x179A7E, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillStartLiveResize:]', symObjAddr: 0x19B0, symBinAddr: 0x3D28, symSize: 0xB4 }
+  - { offset: 0x179AE5, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidEndLiveResize:]', symObjAddr: 0x1A64, symBinAddr: 0x3DDC, symSize: 0xB4 }
+  - { offset: 0x179B4C, size: 0x8, addend: 0x0, symName: '-[UNOWindow performMiniaturize:]', symObjAddr: 0x1B18, symBinAddr: 0x3E90, symSize: 0x64 }
+  - { offset: 0x179B91, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillMiniaturize:]', symObjAddr: 0x1B7C, symBinAddr: 0x3EF4, symSize: 0x8 }
+  - { offset: 0x179BD0, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidMiniaturize:]', symObjAddr: 0x1B84, symBinAddr: 0x3EFC, symSize: 0x8 }
+  - { offset: 0x179C0F, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidDeminiaturize:]', symObjAddr: 0x1B8C, symBinAddr: 0x3F04, symSize: 0x8 }
+  - { offset: 0x179C4E, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldZoom:toFrame:]', symObjAddr: 0x1B94, symBinAddr: 0x3F0C, symSize: 0x24 }
+  - { offset: 0x179CA0, size: 0x8, addend: 0x0, symName: '-[UNOWindow performZoom:]', symObjAddr: 0x1BB8, symBinAddr: 0x3F30, symSize: 0x4C }
+  - { offset: 0x179CE5, size: 0x8, addend: 0x0, symName: '-[UNOWindow zoom:]', symObjAddr: 0x1C04, symBinAddr: 0x3F7C, symSize: 0x74 }
+  - { offset: 0x179D38, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidMove:]', symObjAddr: 0x1C78, symBinAddr: 0x3FF0, symSize: 0x2C }
+  - { offset: 0x179DBA, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowDidResize:]', symObjAddr: 0x1CA4, symBinAddr: 0x401C, symSize: 0x64 }
+  - { offset: 0x179E4B, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldClose:]', symObjAddr: 0x1D08, symBinAddr: 0x4080, symSize: 0xC }
+  - { offset: 0x179E9E, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowShouldClose:]', symObjAddr: 0x1D08, symBinAddr: 0x4080, symSize: 0xC }
+  - { offset: 0x179EE0, size: 0x8, addend: 0x0, symName: '-[UNOWindow windowWillClose:]', symObjAddr: 0x1D14, symBinAddr: 0x408C, symSize: 0x88 }
+  - { offset: 0x179F5C, size: 0x8, addend: 0x0, symName: '-[UNOWindow overlappedPresenterState]', symObjAddr: 0x1D9C, symBinAddr: 0x4114, symSize: 0x10 }
+  - { offset: 0x179F94, size: 0x8, addend: 0x0, symName: '-[UNOWindow setOverlappedPresenterState:]', symObjAddr: 0x1DAC, symBinAddr: 0x4124, symSize: 0x10 }
+  - { offset: 0x179FD2, size: 0x8, addend: 0x0, symName: '-[UNOWindow metalViewDelegate]', symObjAddr: 0x1DBC, symBinAddr: 0x4134, symSize: 0x10 }
+  - { offset: 0x17A009, size: 0x8, addend: 0x0, symName: '-[UNOWindow setMetalViewDelegate:]', symObjAddr: 0x1DCC, symBinAddr: 0x4144, symSize: 0xC }
+  - { offset: 0x17A048, size: 0x8, addend: 0x0, symName: '-[UNOWindow .cxx_destruct]', symObjAddr: 0x1DD8, symBinAddr: 0x4150, symSize: 0x14 }
+  - { offset: 0x17A167, size: 0x8, addend: 0x0, symName: '+[MouseButtons track:]', symObjAddr: 0x0, symBinAddr: 0x4164, symSize: 0x100 }
+  - { offset: 0x17A181, size: 0x8, addend: 0x0, symName: _sDepth, symObjAddr: 0x15A0, symBinAddr: 0x1AE00, symSize: 0x0 }
+  - { offset: 0x17A1A5, size: 0x8, addend: 0x0, symName: '+[MouseButtons track:]', symObjAddr: 0x0, symBinAddr: 0x4164, symSize: 0x100 }
+  - { offset: 0x17A222, size: 0x8, addend: 0x0, symName: '+[MouseButtons mask]', symObjAddr: 0x100, symBinAddr: 0x4264, symSize: 0xC8 }
+  - { offset: 0x17A36F, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_clear, symObjAddr: 0x0, symBinAddr: 0x432C, symSize: 0x38 }
+  - { offset: 0x17A397, size: 0x8, addend: 0x0, symName: _clipboard_changed, symObjAddr: 0x34E0, symBinAddr: 0x1AE30, symSize: 0x0 }
+  - { offset: 0x17A3BE, size: 0x8, addend: 0x0, symName: _timer, symObjAddr: 0x34D8, symBinAddr: 0x1AE28, symSize: 0x0 }
+  - { offset: 0x17A3D9, size: 0x8, addend: 0x0, symName: _lastCount, symObjAddr: 0x34D0, symBinAddr: 0x1AE20, symSize: 0x0 }
+  - { offset: 0x17A3EA, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_clear, symObjAddr: 0x0, symBinAddr: 0x432C, symSize: 0x38 }
+  - { offset: 0x17A400, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_get_content, symObjAddr: 0x38, symBinAddr: 0x4364, symSize: 0x2D8 }
+  - { offset: 0x17A578, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_set_content, symObjAddr: 0x310, symBinAddr: 0x463C, symSize: 0x2F8 }
+  - { offset: 0x17A6AE, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_start_content_changed, symObjAddr: 0x608, symBinAddr: 0x4934, symSize: 0x78 }
+  - { offset: 0x17A6D1, size: 0x8, addend: 0x0, symName: ___codebrix_clipboard_start_content_changed_block_invoke, symObjAddr: 0x680, symBinAddr: 0x49AC, symSize: 0x60 }
+  - { offset: 0x17A744, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_get_content_changed_callback, symObjAddr: 0x6E0, symBinAddr: 0x4A0C, symSize: 0xC }
+  - { offset: 0x17A758, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_stop_content_changed, symObjAddr: 0x6EC, symBinAddr: 0x4A18, symSize: 0xC }
+  - { offset: 0x17A76E, size: 0x8, addend: 0x0, symName: _codebrix_clipboard_set_content_changed_callback, symObjAddr: 0x6F8, symBinAddr: 0x4A24, symSize: 0xC }
+  - { offset: 0x17A91D, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_periodic_position_update_callback, symObjAddr: 0x0, symBinAddr: 0x4A30, symSize: 0xC }
+  - { offset: 0x17A937, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_periodic_position_update, symObjAddr: 0xA838, symBinAddr: 0x1AE38, symSize: 0x0 }
+  - { offset: 0x17A9F8, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_rate_changed, symObjAddr: 0xA840, symBinAddr: 0x1AE40, symSize: 0x0 }
+  - { offset: 0x17AA19, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_video_dimension_changed, symObjAddr: 0xA848, symBinAddr: 0x1AE48, symSize: 0x0 }
+  - { offset: 0x17AA50, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_duration_changed, symObjAddr: 0xA850, symBinAddr: 0x1AE50, symSize: 0x0 }
+  - { offset: 0x17AA71, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_ready_to_play, symObjAddr: 0xA858, symBinAddr: 0x1AE58, symSize: 0x0 }
+  - { offset: 0x17AA92, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_buffering_progress_changed, symObjAddr: 0xA860, symBinAddr: 0x1AE60, symSize: 0x0 }
+  - { offset: 0x17AAB3, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_opened, symObjAddr: 0xA868, symBinAddr: 0x1AE68, symSize: 0x0 }
+  - { offset: 0x17AAE0, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_ended, symObjAddr: 0xA870, symBinAddr: 0x1AE70, symSize: 0x0 }
+  - { offset: 0x17AAF6, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_failed, symObjAddr: 0xA878, symBinAddr: 0x1AE78, symSize: 0x0 }
+  - { offset: 0x17AB0C, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_on_media_stalled, symObjAddr: 0xA880, symBinAddr: 0x1AE80, symSize: 0x0 }
+  - { offset: 0x17AB23, size: 0x8, addend: 0x0, symName: _players, symObjAddr: 0xA888, symBinAddr: 0x1AE88, symSize: 0x0 }
+  - { offset: 0x17AB3F, size: 0x8, addend: 0x0, symName: _timeObserver, symObjAddr: 0xA890, symBinAddr: 0x1AF60, symSize: 0x0 }
+  - { offset: 0x17ABCF, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_periodic_position_update_callback, symObjAddr: 0x0, symBinAddr: 0x4A30, symSize: 0xC }
+  - { offset: 0x17ABE3, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_rate_changed_callback, symObjAddr: 0xC, symBinAddr: 0x4A3C, symSize: 0xC }
+  - { offset: 0x17ABF7, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_video_dimension_changed_callback, symObjAddr: 0x18, symBinAddr: 0x4A48, symSize: 0xC }
+  - { offset: 0x17AC0B, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_duration_changed_callback, symObjAddr: 0x24, symBinAddr: 0x4A54, symSize: 0xC }
+  - { offset: 0x17AC1F, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_ready_to_play_callback, symObjAddr: 0x30, symBinAddr: 0x4A60, symSize: 0xC }
+  - { offset: 0x17AC33, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_buffering_progress_changed_callback, symObjAddr: 0x3C, symBinAddr: 0x4A6C, symSize: 0xC }
+  - { offset: 0x17AC47, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_opened, symObjAddr: 0x48, symBinAddr: 0x4A78, symSize: 0xC }
+  - { offset: 0x17AC5B, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_ended, symObjAddr: 0x54, symBinAddr: 0x4A84, symSize: 0xC }
+  - { offset: 0x17AC6F, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_failed, symObjAddr: 0x60, symBinAddr: 0x4A90, symSize: 0xC }
+  - { offset: 0x17AC83, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_on_media_stalled, symObjAddr: 0x6C, symBinAddr: 0x4A9C, symSize: 0xC }
+  - { offset: 0x17AC97, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_callbacks, symObjAddr: 0x78, symBinAddr: 0x4AA8, symSize: 0x58 }
+  - { offset: 0x17AD3C, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_create, symObjAddr: 0xD0, symBinAddr: 0x4B00, symSize: 0x1C }
+  - { offset: 0x17AD67, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_notifications, symObjAddr: 0xEC, symBinAddr: 0x4B1C, symSize: 0x4 }
+  - { offset: 0x17AD8C, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_is_video, symObjAddr: 0xF0, symBinAddr: 0x4B20, symSize: 0x4 }
+  - { offset: 0x17ADB5, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_current_time, symObjAddr: 0xF4, symBinAddr: 0x4B24, symSize: 0x7C }
+  - { offset: 0x17ADFF, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_current_time, symObjAddr: 0x170, symBinAddr: 0x4BA0, symSize: 0xA0 }
+  - { offset: 0x17AE79, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_get_rate, symObjAddr: 0x210, symBinAddr: 0x4C40, symSize: 0x44 }
+  - { offset: 0x17AEA4, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_rate, symObjAddr: 0x254, symBinAddr: 0x4C84, symSize: 0x8C }
+  - { offset: 0x17AEDB, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source, symObjAddr: 0x2E0, symBinAddr: 0x4D10, symSize: 0x80 }
+  - { offset: 0x17AF22, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source_path, symObjAddr: 0x360, symBinAddr: 0x4D90, symSize: 0x158 }
+  - { offset: 0x17AFB0, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_source_uri, symObjAddr: 0x4B8, symBinAddr: 0x4EE8, symSize: 0x88 }
+  - { offset: 0x17B024, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_stretch, symObjAddr: 0x540, symBinAddr: 0x4F70, symSize: 0x7C }
+  - { offset: 0x17B06B, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_volume, symObjAddr: 0x5BC, symBinAddr: 0x4FEC, symSize: 0x40 }
+  - { offset: 0x17B0A2, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_pause, symObjAddr: 0x5FC, symBinAddr: 0x502C, symSize: 0x30 }
+  - { offset: 0x17B0C9, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_play, symObjAddr: 0x62C, symBinAddr: 0x505C, symSize: 0x1A0 }
+  - { offset: 0x17B156, size: 0x8, addend: 0x0, symName: ___codebrix_mediaplayer_play_block_invoke, symObjAddr: 0x7CC, symBinAddr: 0x51FC, symSize: 0x8 }
+  - { offset: 0x17B191, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s, symObjAddr: 0x7D4, symBinAddr: 0x5204, symSize: 0x8 }
+  - { offset: 0x17B1B8, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s, symObjAddr: 0x7DC, symBinAddr: 0x520C, symSize: 0x8 }
+  - { offset: 0x17B1D7, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_stop, symObjAddr: 0x7E4, symBinAddr: 0x5214, symSize: 0x7C }
+  - { offset: 0x17B20F, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_toggle_mute, symObjAddr: 0x860, symBinAddr: 0x5290, symSize: 0x74 }
+  - { offset: 0x17B238, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_step_by, symObjAddr: 0x8D4, symBinAddr: 0x5304, symSize: 0x84 }
+  - { offset: 0x17B283, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_create_view, symObjAddr: 0x958, symBinAddr: 0x5388, symSize: 0x30 }
+  - { offset: 0x17B2B0, size: 0x8, addend: 0x0, symName: _codebrix_mediaplayer_set_view, symObjAddr: 0x988, symBinAddr: 0x53B8, symSize: 0x178 }
+  - { offset: 0x17B2FB, size: 0x8, addend: 0x0, symName: '+[UNOMediaPlayer initialize]', symObjAddr: 0xB00, symBinAddr: 0x5530, symSize: 0x34 }
+  - { offset: 0x17B32B, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer init]', symObjAddr: 0xB34, symBinAddr: 0x5564, symSize: 0xDC }
+  - { offset: 0x17B371, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setNotifications]', symObjAddr: 0xC10, symBinAddr: 0x5640, symSize: 0x34C }
+  - { offset: 0x17B419, size: 0x8, addend: 0x0, symName: '___34-[UNOMediaPlayer setNotifications]_block_invoke', symObjAddr: 0xF5C, symBinAddr: 0x598C, symSize: 0x100 }
+  - { offset: 0x17B4CE, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32w, symObjAddr: 0x105C, symBinAddr: 0x5A8C, symSize: 0xC }
+  - { offset: 0x17B4F7, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32w, symObjAddr: 0x1068, symBinAddr: 0x5A98, symSize: 0x8 }
+  - { offset: 0x17B516, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer dealloc]', symObjAddr: 0x1070, symBinAddr: 0x5AA0, symSize: 0x190 }
+  - { offset: 0x17B5A5, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x1200, symBinAddr: 0x5C30, symSize: 0x58C }
+  - { offset: 0x17B907, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFinish:]', symObjAddr: 0x178C, symBinAddr: 0x61BC, symSize: 0xC }
+  - { offset: 0x17B949, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFinish:]', symObjAddr: 0x178C, symBinAddr: 0x61BC, symSize: 0xC }
+  - { offset: 0x17B971, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFailed:]', symObjAddr: 0x1798, symBinAddr: 0x61C8, symSize: 0xC }
+  - { offset: 0x17B9B3, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidFailed:]', symObjAddr: 0x1798, symBinAddr: 0x61C8, symSize: 0xC }
+  - { offset: 0x17B9E8, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidStall:]', symObjAddr: 0x17A4, symBinAddr: 0x61D4, symSize: 0xC }
+  - { offset: 0x17BA2A, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer playBackDidStall:]', symObjAddr: 0x17A4, symBinAddr: 0x61D4, symSize: 0xC }
+  - { offset: 0x17BA52, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer player]', symObjAddr: 0x17B0, symBinAddr: 0x61E0, symSize: 0x8 }
+  - { offset: 0x17BA89, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setPlayer:]', symObjAddr: 0x17B8, symBinAddr: 0x61E8, symSize: 0xC }
+  - { offset: 0x17BACA, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer videoLayer]', symObjAddr: 0x17C4, symBinAddr: 0x61F4, symSize: 0x8 }
+  - { offset: 0x17BB01, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setVideoLayer:]', symObjAddr: 0x17CC, symBinAddr: 0x61FC, symSize: 0xC }
+  - { offset: 0x17BB42, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer isVideo]', symObjAddr: 0x17D8, symBinAddr: 0x6208, symSize: 0x8 }
+  - { offset: 0x17BB79, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer setIsVideo:]', symObjAddr: 0x17E0, symBinAddr: 0x6210, symSize: 0x8 }
+  - { offset: 0x17BBB4, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayer .cxx_destruct]', symObjAddr: 0x17E8, symBinAddr: 0x6218, symSize: 0x30 }
+  - { offset: 0x17BBE8, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView initWithCoder:]', symObjAddr: 0x1818, symBinAddr: 0x6248, symSize: 0x34 }
+  - { offset: 0x17BC31, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView initWithFrame:]', symObjAddr: 0x184C, symBinAddr: 0x627C, symSize: 0x6C }
+  - { offset: 0x17BC96, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView isFlipped]', symObjAddr: 0x18B8, symBinAddr: 0x62E8, symSize: 0x8 }
+  - { offset: 0x17BCCA, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView wantsUpdateLayer]', symObjAddr: 0x18C0, symBinAddr: 0x62F0, symSize: 0x8 }
+  - { offset: 0x17BCFE, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView dispose]', symObjAddr: 0x18C8, symBinAddr: 0x62F8, symSize: 0x44 }
+  - { offset: 0x17BD32, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView layout]', symObjAddr: 0x190C, symBinAddr: 0x633C, symSize: 0x1B0 }
+  - { offset: 0x17BDAF, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView originalSuperView]', symObjAddr: 0x1ABC, symBinAddr: 0x64EC, symSize: 0x10 }
+  - { offset: 0x17BDE7, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView setOriginalSuperView:]', symObjAddr: 0x1ACC, symBinAddr: 0x64FC, symSize: 0x14 }
+  - { offset: 0x17BE29, size: 0x8, addend: 0x0, symName: '-[UNOMediaPlayerView .cxx_destruct]', symObjAddr: 0x1AE0, symBinAddr: 0x6510, symSize: 0x14 }
+  - { offset: 0x17C081, size: 0x8, addend: 0x0, symName: _codebrix_cursor_hide, symObjAddr: 0x0, symBinAddr: 0x6524, symSize: 0xC }
+  - { offset: 0x17C09B, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_monitor, symObjAddr: 0x3540, symBinAddr: 0x1AE90, symSize: 0x0 }
+  - { offset: 0x17C0DB, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_callback, symObjAddr: 0x3548, symBinAddr: 0x1AE98, symSize: 0x0 }
+  - { offset: 0x17C1A6, size: 0x8, addend: 0x0, symName: _codebrix_cursor_hide, symObjAddr: 0x0, symBinAddr: 0x6524, symSize: 0xC }
+  - { offset: 0x17C1BC, size: 0x8, addend: 0x0, symName: _codebrix_cursor_show, symObjAddr: 0xC, symBinAddr: 0x6530, symSize: 0xC }
+  - { offset: 0x17C1D2, size: 0x8, addend: 0x0, symName: _codebrix_cursor_set, symObjAddr: 0x18, symBinAddr: 0x653C, symSize: 0x1C4 }
+  - { offset: 0x17C21D, size: 0x8, addend: 0x0, symName: '+[UNOCursor helpCursor]', symObjAddr: 0x1DC, symBinAddr: 0x6700, symSize: 0x28 }
+  - { offset: 0x17C264, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeAllCursor]', symObjAddr: 0x204, symBinAddr: 0x6728, symSize: 0x28 }
+  - { offset: 0x17C2AB, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeNortheastSouthwestCursor]', symObjAddr: 0x22C, symBinAddr: 0x6750, symSize: 0x28 }
+  - { offset: 0x17C2F2, size: 0x8, addend: 0x0, symName: '+[UNOCursor sizeNorthwestSoutheastCursor]', symObjAddr: 0x254, symBinAddr: 0x6778, symSize: 0x28 }
+  - { offset: 0x17C339, size: 0x8, addend: 0x0, symName: '+[UNOCursor waitCursor]', symObjAddr: 0x27C, symBinAddr: 0x67A0, symSize: 0x28 }
+  - { offset: 0x17C380, size: 0x8, addend: 0x0, symName: '-[UNOCursor _coreCursorType]', symObjAddr: 0x2A4, symBinAddr: 0x67C8, symSize: 0x10 }
+  - { offset: 0x17C3B7, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_begin, symObjAddr: 0x2B4, symBinAddr: 0x67D8, symSize: 0x70 }
+  - { offset: 0x17C405, size: 0x8, addend: 0x0, symName: ___codebrix_mouse_relative_begin_block_invoke, symObjAddr: 0x324, symBinAddr: 0x6848, symSize: 0x5C }
+  - { offset: 0x17C46B, size: 0x8, addend: 0x0, symName: _codebrix_mouse_relative_end, symObjAddr: 0x380, symBinAddr: 0x68A4, symSize: 0x48 }
+  - { offset: 0x17C5D6, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x68EC, symSize: 0xC }
+  - { offset: 0x17C654, size: 0x8, addend: 0x0, symName: _execute, symObjAddr: 0x130B0, symBinAddr: 0x1AEA0, symSize: 0x0 }
+  - { offset: 0x17C690, size: 0x8, addend: 0x0, symName: _invoke, symObjAddr: 0x130B8, symBinAddr: 0x1AEA8, symSize: 0x0 }
+  - { offset: 0x17C6A6, size: 0x8, addend: 0x0, symName: _navigation_starting, symObjAddr: 0x130C0, symBinAddr: 0x1AEB0, symSize: 0x0 }
+  - { offset: 0x17C6E8, size: 0x8, addend: 0x0, symName: _navigation_finishing, symObjAddr: 0x130C8, symBinAddr: 0x1AEB8, symSize: 0x0 }
+  - { offset: 0x17C71A, size: 0x8, addend: 0x0, symName: _property_change_notification, symObjAddr: 0x130D0, symBinAddr: 0x1AEC0, symSize: 0x0 }
+  - { offset: 0x17C74C, size: 0x8, addend: 0x0, symName: _receive_web_message, symObjAddr: 0x130D8, symBinAddr: 0x1AEC8, symSize: 0x0 }
+  - { offset: 0x17C762, size: 0x8, addend: 0x0, symName: _navigation_failing, symObjAddr: 0x130E0, symBinAddr: 0x1AED0, symSize: 0x0 }
+  - { offset: 0x17C7A0, size: 0x8, addend: 0x0, symName: _unsupported_scheme_identified, symObjAddr: 0x130E8, symBinAddr: 0x1AED8, symSize: 0x0 }
+  - { offset: 0x17C7C1, size: 0x8, addend: 0x0, symName: _download_starting, symObjAddr: 0x130F0, symBinAddr: 0x1AEE0, symSize: 0x0 }
+  - { offset: 0x17C814, size: 0x8, addend: 0x0, symName: _download_progress, symObjAddr: 0x130F8, symBinAddr: 0x1AEE8, symSize: 0x0 }
+  - { offset: 0x17C84B, size: 0x8, addend: 0x0, symName: _download_finished, symObjAddr: 0x13100, symBinAddr: 0x1AEF0, symSize: 0x0 }
+  - { offset: 0x17C887, size: 0x8, addend: 0x0, symName: _download_delegates, symObjAddr: 0x13108, symBinAddr: 0x1AEF8, symSize: 0x0 }
+  - { offset: 0x17C8A3, size: 0x8, addend: 0x0, symName: _new_window_requested, symObjAddr: 0x13110, symBinAddr: 0x1AF00, symSize: 0x0 }
+  - { offset: 0x17CA95, size: 0x8, addend: 0x0, symName: _codebrix_get_execute_callback, symObjAddr: 0x0, symBinAddr: 0x68EC, symSize: 0xC }
+  - { offset: 0x17CAA9, size: 0x8, addend: 0x0, symName: _codebrix_set_execute_callback, symObjAddr: 0xC, symBinAddr: 0x68F8, symSize: 0xC }
+  - { offset: 0x17CACE, size: 0x8, addend: 0x0, symName: _codebrix_get_invoke_callback, symObjAddr: 0x18, symBinAddr: 0x6904, symSize: 0xC }
+  - { offset: 0x17CAE2, size: 0x8, addend: 0x0, symName: _codebrix_set_invoke_callback, symObjAddr: 0x24, symBinAddr: 0x6910, symSize: 0xC }
+  - { offset: 0x17CB07, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_starting_callback, symObjAddr: 0x30, symBinAddr: 0x691C, symSize: 0xC }
+  - { offset: 0x17CB1B, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_finishing_callback, symObjAddr: 0x3C, symBinAddr: 0x6928, symSize: 0xC }
+  - { offset: 0x17CB2F, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_notification_callback, symObjAddr: 0x48, symBinAddr: 0x6934, symSize: 0xC }
+  - { offset: 0x17CB43, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_receive_web_message_callback, symObjAddr: 0x54, symBinAddr: 0x6940, symSize: 0xC }
+  - { offset: 0x17CB57, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_navigation_failing_callback, symObjAddr: 0x60, symBinAddr: 0x694C, symSize: 0xC }
+  - { offset: 0x17CB6B, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_navigation_callbacks, symObjAddr: 0x6C, symBinAddr: 0x6958, symSize: 0x2C }
+  - { offset: 0x17CBC8, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_unsupported_scheme_identified_callback, symObjAddr: 0x98, symBinAddr: 0x6984, symSize: 0xC }
+  - { offset: 0x17CBDC, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_unsupported_scheme_identified_callback, symObjAddr: 0xA4, symBinAddr: 0x6990, symSize: 0xC }
+  - { offset: 0x17CC01, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_download_callbacks, symObjAddr: 0xB0, symBinAddr: 0x699C, symSize: 0x1C }
+  - { offset: 0x17CC42, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download:decideDestinationUsingResponse:suggestedFilename:completionHandler:]', symObjAddr: 0xCC, symBinAddr: 0x69B8, symSize: 0x1F4 }
+  - { offset: 0x17CD46, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate observeValueForKeyPath:ofObject:change:context:]', symObjAddr: 0x2C0, symBinAddr: 0x6BAC, symSize: 0xFC }
+  - { offset: 0x17CE7C, size: 0x8, addend: 0x0, symName: '___72-[CDBRXDownloadDelegate observeValueForKeyPath:ofObject:change:context:]_block_invoke', symObjAddr: 0x3BC, symBinAddr: 0x6CA8, symSize: 0x20 }
+  - { offset: 0x17CEE3, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate startObservingProgress]', symObjAddr: 0x3DC, symBinAddr: 0x6CC8, symSize: 0xD4 }
+  - { offset: 0x17CF16, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate finishWithSuccess:wasCancelled:errorMessage:]', symObjAddr: 0x4B0, symBinAddr: 0x6D9C, symSize: 0x100 }
+  - { offset: 0x17CFB2, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate downloadDidFinish:]', symObjAddr: 0x5B0, symBinAddr: 0x6E9C, symSize: 0x10 }
+  - { offset: 0x17CFEF, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download:didFailWithError:resumeData:]', symObjAddr: 0x5C0, symBinAddr: 0x6EAC, symSize: 0xB0 }
+  - { offset: 0x17D05A, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate webview]', symObjAddr: 0x670, symBinAddr: 0x6F5C, symSize: 0x18 }
+  - { offset: 0x17D091, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setWebview:]', symObjAddr: 0x688, symBinAddr: 0x6F74, symSize: 0xC }
+  - { offset: 0x17D0D2, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate download]', symObjAddr: 0x694, symBinAddr: 0x6F80, symSize: 0x8 }
+  - { offset: 0x17D109, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setDownload:]', symObjAddr: 0x69C, symBinAddr: 0x6F88, symSize: 0xC }
+  - { offset: 0x17D14A, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate destinationHandler]', symObjAddr: 0x6A8, symBinAddr: 0x6F94, symSize: 0x8 }
+  - { offset: 0x17D181, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setDestinationHandler:]', symObjAddr: 0x6B0, symBinAddr: 0x6F9C, symSize: 0x8 }
+  - { offset: 0x17D1C0, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate observedProgress]', symObjAddr: 0x6B8, symBinAddr: 0x6FA4, symSize: 0x8 }
+  - { offset: 0x17D1F7, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate setObservedProgress:]', symObjAddr: 0x6C0, symBinAddr: 0x6FAC, symSize: 0xC }
+  - { offset: 0x17D238, size: 0x8, addend: 0x0, symName: '-[CDBRXDownloadDelegate .cxx_destruct]', symObjAddr: 0x6CC, symBinAddr: 0x6FB8, symSize: 0x44 }
+  - { offset: 0x17D26B, size: 0x8, addend: 0x0, symName: _codebrix_webview_download_set_destination, symObjAddr: 0x710, symBinAddr: 0x6FFC, symSize: 0xE4 }
+  - { offset: 0x17D322, size: 0x8, addend: 0x0, symName: _codebrix_download_delegate_get, symObjAddr: 0x7F4, symBinAddr: 0x70E0, symSize: 0x6C }
+  - { offset: 0x17D34D, size: 0x8, addend: 0x0, symName: _codebrix_webview_download_cancel, symObjAddr: 0x860, symBinAddr: 0x714C, symSize: 0xA4 }
+  - { offset: 0x17D3E3, size: 0x8, addend: 0x0, symName: ___codebrix_webview_download_cancel_block_invoke, symObjAddr: 0x904, symBinAddr: 0x71F0, symSize: 0x4 }
+  - { offset: 0x17D416, size: 0x8, addend: 0x0, symName: _codebrix_webview_create, symObjAddr: 0x908, symBinAddr: 0x71F4, symSize: 0x178 }
+  - { offset: 0x17D487, size: 0x8, addend: 0x0, symName: _codebrix_webview_get_title, symObjAddr: 0xA80, symBinAddr: 0x736C, symSize: 0x44 }
+  - { offset: 0x17D4D9, size: 0x8, addend: 0x0, symName: _codebrix_webview_can_go_back, symObjAddr: 0xAC4, symBinAddr: 0x73B0, symSize: 0x4 }
+  - { offset: 0x17D504, size: 0x8, addend: 0x0, symName: _codebrix_webview_can_go_forward, symObjAddr: 0xAC8, symBinAddr: 0x73B4, symSize: 0x4 }
+  - { offset: 0x17D52F, size: 0x8, addend: 0x0, symName: _codebrix_webview_go_back, symObjAddr: 0xACC, symBinAddr: 0x73B8, symSize: 0x1C }
+  - { offset: 0x17D558, size: 0x8, addend: 0x0, symName: _codebrix_webview_go_forward, symObjAddr: 0xAE8, symBinAddr: 0x73D4, symSize: 0x1C }
+  - { offset: 0x17D581, size: 0x8, addend: 0x0, symName: _codebrix_webview_navigate, symObjAddr: 0xB04, symBinAddr: 0x73F0, symSize: 0x2D0 }
+  - { offset: 0x17D6CE, size: 0x8, addend: 0x0, symName: _codebrix_webview_load_html, symObjAddr: 0xDD4, symBinAddr: 0x76C0, symSize: 0x94 }
+  - { offset: 0x17D72A, size: 0x8, addend: 0x0, symName: _codebrix_webview_reload, symObjAddr: 0xE68, symBinAddr: 0x7754, symSize: 0x1C }
+  - { offset: 0x17D753, size: 0x8, addend: 0x0, symName: _codebrix_webview_stop, symObjAddr: 0xE84, symBinAddr: 0x7770, symSize: 0x4 }
+  - { offset: 0x17D77A, size: 0x8, addend: 0x0, symName: _codebrix_webview_execute_script, symObjAddr: 0xE88, symBinAddr: 0x7774, symSize: 0xA8 }
+  - { offset: 0x17D7E3, size: 0x8, addend: 0x0, symName: ___codebrix_webview_execute_script_block_invoke, symObjAddr: 0xF30, symBinAddr: 0x781C, symSize: 0x21C }
+  - { offset: 0x17D917, size: 0x8, addend: 0x0, symName: _codebrix_webview_invoke_script, symObjAddr: 0x114C, symBinAddr: 0x7A38, symSize: 0xA8 }
+  - { offset: 0x17D980, size: 0x8, addend: 0x0, symName: ___codebrix_webview_invoke_script_block_invoke, symObjAddr: 0x11F4, symBinAddr: 0x7AE0, symSize: 0xBC }
+  - { offset: 0x17DA42, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_scrolling_enabled, symObjAddr: 0x12B0, symBinAddr: 0x7B9C, symSize: 0x8 }
+  - { offset: 0x17DA7A, size: 0x8, addend: 0x0, symName: _codebrix_webview_set_user_agent, symObjAddr: 0x12B8, symBinAddr: 0x7BA4, symSize: 0x7C }
+  - { offset: 0x17DAB4, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithCoder:]', symObjAddr: 0x1334, symBinAddr: 0x7C20, symSize: 0x34 }
+  - { offset: 0x17DAFD, size: 0x8, addend: 0x0, symName: '-[UNOWebView initWithFrame:configuration:]', symObjAddr: 0x1368, symBinAddr: 0x7C54, symSize: 0x12C }
+  - { offset: 0x17DB80, size: 0x8, addend: 0x0, symName: '-[UNOWebView didChangeValueForKey:]', symObjAddr: 0x1494, symBinAddr: 0x7D80, symSize: 0xD0 }
+  - { offset: 0x17DC00, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollWheel:]', symObjAddr: 0x1564, symBinAddr: 0x7E50, symSize: 0x8C }
+  - { offset: 0x17DC45, size: 0x8, addend: 0x0, symName: '-[UNOWebView dispose]', symObjAddr: 0x15F0, symBinAddr: 0x7EDC, symSize: 0x80 }
+  - { offset: 0x17DC79, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0x1670, symBinAddr: 0x7F5C, symSize: 0x17C }
+  - { offset: 0x17DD07, size: 0x8, addend: 0x0, symName: '___94-[UNOWebView webView:runJavaScriptConfirmPanelWithMessage:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x17EC, symBinAddr: 0x80D8, symSize: 0x14 }
+  - { offset: 0x17DD62, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32b, symObjAddr: 0x1800, symBinAddr: 0x80EC, symSize: 0x10 }
+  - { offset: 0x17DD8B, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptAlertPanelWithMessage:initiatedByFrame:completionHandler:]', symObjAddr: 0x1818, symBinAddr: 0x80FC, symSize: 0x8C }
+  - { offset: 0x17DE1C, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]', symObjAddr: 0x18A4, symBinAddr: 0x8188, symSize: 0x1F4 }
+  - { offset: 0x17DECC, size: 0x8, addend: 0x0, symName: '___107-[UNOWebView webView:runJavaScriptTextInputPanelWithPrompt:defaultText:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1A98, symBinAddr: 0x837C, symSize: 0x64 }
+  - { offset: 0x17DF5A, size: 0x8, addend: 0x0, symName: ___copy_helper_block_e8_32s40b, symObjAddr: 0x1AFC, symBinAddr: 0x83E0, symSize: 0x34 }
+  - { offset: 0x17DF83, size: 0x8, addend: 0x0, symName: ___destroy_helper_block_e8_32s40s, symObjAddr: 0x1B30, symBinAddr: 0x8414, symSize: 0x28 }
+  - { offset: 0x17DFA2, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]', symObjAddr: 0x1B58, symBinAddr: 0x843C, symSize: 0x148 }
+  - { offset: 0x17E023, size: 0x8, addend: 0x0, symName: '___84-[UNOWebView webView:runOpenPanelWithParameters:initiatedByFrame:completionHandler:]_block_invoke', symObjAddr: 0x1CA0, symBinAddr: 0x8584, symSize: 0x64 }
+  - { offset: 0x17E0B1, size: 0x8, addend: 0x0, symName: _codebrix_get_webview_new_window_requested_callback, symObjAddr: 0x1D04, symBinAddr: 0x85E8, symSize: 0xC }
+  - { offset: 0x17E0C5, size: 0x8, addend: 0x0, symName: _codebrix_set_webview_new_window_requested_callback, symObjAddr: 0x1D10, symBinAddr: 0x85F4, symSize: 0xC }
+  - { offset: 0x17E0FA, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:]', symObjAddr: 0x1D1C, symBinAddr: 0x8600, symSize: 0x238 }
+  - { offset: 0x17E1EA, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x1F54, symBinAddr: 0x8838, symSize: 0x7C }
+  - { offset: 0x17E1F5, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:].cold.1', symObjAddr: 0x2A98, symBinAddr: 0x9CFC, symSize: 0x28 }
+  - { offset: 0x17E21A, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didStartProvisionalNavigation:]', symObjAddr: 0x1F54, symBinAddr: 0x8838, symSize: 0x7C }
+  - { offset: 0x17E29F, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFailProvisionalNavigation:withError:]', symObjAddr: 0x1FD0, symBinAddr: 0x88B4, symSize: 0x14C }
+  - { offset: 0x17E34D, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didFinishNavigation:]', symObjAddr: 0x211C, symBinAddr: 0x8A00, symSize: 0xA4 }
+  - { offset: 0x17E3C5, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:didReceiveServerRedirectForProvisionalNavigation:]', symObjAddr: 0x21C0, symBinAddr: 0x8AA4, symSize: 0x7C }
+  - { offset: 0x17E43D, size: 0x8, addend: 0x0, symName: '-[UNOWebView isAnchorNavigation:url:]', symObjAddr: 0x223C, symBinAddr: 0x8B20, symSize: 0x160 }
+  - { offset: 0x17E4E2, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationAction:decisionHandler:]', symObjAddr: 0x239C, symBinAddr: 0x8C80, symSize: 0x2A8 }
+  - { offset: 0x17E69B, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:decidePolicyForNavigationResponse:decisionHandler:]', symObjAddr: 0x2644, symBinAddr: 0x8F28, symSize: 0x168 }
+  - { offset: 0x17E74E, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:navigationResponse:didBecomeDownload:]', symObjAddr: 0x27AC, symBinAddr: 0x9090, symSize: 0xC }
+  - { offset: 0x17E7CC, size: 0x8, addend: 0x0, symName: _codebrix_download_attach, symObjAddr: 0x27B8, symBinAddr: 0x909C, symSize: 0xE4 }
+  - { offset: 0x17E813, size: 0x8, addend: 0x0, symName: '-[UNOWebView webView:navigationAction:didBecomeDownload:]', symObjAddr: 0x289C, symBinAddr: 0x9180, symSize: 0xC }
+  - { offset: 0x17E89E, size: 0x8, addend: 0x0, symName: '-[UNOWebView userContentController:didReceiveScriptMessage:]', symObjAddr: 0x28A8, symBinAddr: 0x918C, symSize: 0xD8 }
+  - { offset: 0x17E941, size: 0x8, addend: 0x0, symName: '-[UNOWebView originalSuperView]', symObjAddr: 0x2980, symBinAddr: 0x9264, symSize: 0x10 }
+  - { offset: 0x17E979, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOriginalSuperView:]', symObjAddr: 0x2990, symBinAddr: 0x9274, symSize: 0x14 }
+  - { offset: 0x17E9BB, size: 0x8, addend: 0x0, symName: '-[UNOWebView okString]', symObjAddr: 0x29A4, symBinAddr: 0x9288, symSize: 0x10 }
+  - { offset: 0x17E9F2, size: 0x8, addend: 0x0, symName: '-[UNOWebView setOkString:]', symObjAddr: 0x29B4, symBinAddr: 0x9298, symSize: 0x14 }
+  - { offset: 0x17EA33, size: 0x8, addend: 0x0, symName: '-[UNOWebView cancelString]', symObjAddr: 0x29C8, symBinAddr: 0x92AC, symSize: 0x10 }
+  - { offset: 0x17EA6A, size: 0x8, addend: 0x0, symName: '-[UNOWebView setCancelString:]', symObjAddr: 0x29D8, symBinAddr: 0x92BC, symSize: 0x14 }
+  - { offset: 0x17EAAB, size: 0x8, addend: 0x0, symName: '-[UNOWebView lastNavigationUrl]', symObjAddr: 0x29EC, symBinAddr: 0x92D0, symSize: 0x10 }
+  - { offset: 0x17EAE2, size: 0x8, addend: 0x0, symName: '-[UNOWebView setLastNavigationUrl:]', symObjAddr: 0x29FC, symBinAddr: 0x92E0, symSize: 0x14 }
+  - { offset: 0x17EB23, size: 0x8, addend: 0x0, symName: '-[UNOWebView scrollingEnabled]', symObjAddr: 0x2A10, symBinAddr: 0x92F4, symSize: 0x10 }
+  - { offset: 0x17EB5A, size: 0x8, addend: 0x0, symName: '-[UNOWebView setScrollingEnabled:]', symObjAddr: 0x2A20, symBinAddr: 0x9304, symSize: 0x10 }
+  - { offset: 0x17EB95, size: 0x8, addend: 0x0, symName: '-[UNOWebView .cxx_destruct]', symObjAddr: 0x2A30, symBinAddr: 0x9314, symSize: 0x68 }
+  - { offset: 0x17F1F7, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x937C, symSize: 0x18 }
+  - { offset: 0x17F211, size: 0x8, addend: 0x0, symName: _elements, symObjAddr: 0x3568, symBinAddr: 0x1AF08, symSize: 0x0 }
+  - { offset: 0x17F22C, size: 0x8, addend: 0x0, symName: _transients, symObjAddr: 0x3570, symBinAddr: 0x1AF10, symSize: 0x0 }
+  - { offset: 0x17F262, size: 0x8, addend: 0x0, symName: '-[UNORedView wantsUpdateLayer]', symObjAddr: 0x0, symBinAddr: 0x937C, symSize: 0x18 }
+  - { offset: 0x17F299, size: 0x8, addend: 0x0, symName: '-[UNORedView updateLayer]', symObjAddr: 0x18, symBinAddr: 0x9394, symSize: 0x70 }
+  - { offset: 0x17F2CC, size: 0x8, addend: 0x0, symName: '-[UNORedView detach]', symObjAddr: 0x88, symBinAddr: 0x9404, symSize: 0x4 }
+  - { offset: 0x17F2FB, size: 0x8, addend: 0x0, symName: '-[UNORedView dispose]', symObjAddr: 0x8C, symBinAddr: 0x9408, symSize: 0x44 }
+  - { offset: 0x17F32E, size: 0x8, addend: 0x0, symName: '-[UNORedView originalSuperView]', symObjAddr: 0xD0, symBinAddr: 0x944C, symSize: 0x10 }
+  - { offset: 0x17F365, size: 0x8, addend: 0x0, symName: '-[UNORedView setOriginalSuperView:]', symObjAddr: 0xE0, symBinAddr: 0x945C, symSize: 0x14 }
+  - { offset: 0x17F3A6, size: 0x8, addend: 0x0, symName: '-[UNORedView .cxx_destruct]', symObjAddr: 0xF4, symBinAddr: 0x9470, symSize: 0x14 }
+  - { offset: 0x17F3D9, size: 0x8, addend: 0x0, symName: _codebrix_native_create_sample, symObjAddr: 0x108, symBinAddr: 0x9484, symSize: 0x16C }
+  - { offset: 0x17F434, size: 0x8, addend: 0x0, symName: _codebrix_native_arrange, symObjAddr: 0x274, symBinAddr: 0x95F0, symSize: 0x4 }
+  - { offset: 0x17F4A5, size: 0x8, addend: 0x0, symName: _codebrix_native_attach, symObjAddr: 0x278, symBinAddr: 0x95F4, symSize: 0x94 }
+  - { offset: 0x17F4DC, size: 0x8, addend: 0x0, symName: _codebrix_native_detach, symObjAddr: 0x30C, symBinAddr: 0x9688, symSize: 0x98 }
+  - { offset: 0x17F503, size: 0x8, addend: 0x0, symName: _codebrix_native_is_attached, symObjAddr: 0x3A4, symBinAddr: 0x9720, symSize: 0x18 }
+  - { offset: 0x17F55F, size: 0x8, addend: 0x0, symName: _codebrix_native_measure, symObjAddr: 0x3BC, symBinAddr: 0x9738, symSize: 0xFC }
+  - { offset: 0x17F654, size: 0x8, addend: 0x0, symName: _codebrix_native_set_opacity, symObjAddr: 0x4B8, symBinAddr: 0x9834, symSize: 0x4 }
+  - { offset: 0x17F688, size: 0x8, addend: 0x0, symName: _codebrix_native_dispose, symObjAddr: 0x4BC, symBinAddr: 0x9838, symSize: 0x38 }
 ...
