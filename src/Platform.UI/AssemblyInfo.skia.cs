@@ -20,3 +20,5 @@ using CodeBrix.Platform.UI.Graphics;
 [assembly: InternalsVisibleTo("SamplesApp.Skia.Generic")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.RuntimeTests.HRApp.Skia")]
 
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

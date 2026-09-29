@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.PlayTest</AssemblyName>
+    <RootNamespace>CodeBrix.Platform.PlayTest</RootNamespace>
+    <PackageId>CodeBrix.Platform.PlayTest.ApacheLicenseForever</PackageId>
+    <Description>Playwright-style application tests on a fixed, cross-platform virtual Skia screen.</Description>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <IsPackable>true</IsPackable>
+    <UseCommonOverridePackage>true</UseCommonOverridePackage>
+    <StartupObject>CodeBrix.Platform.PlayTest.Preview.PreviewProgram</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
+    <ProjectReference Include="../Platform.UI/Platform.UI.Skia.csproj" />
+    <ProjectReference Include="../Platform.UWP/Platform.Skia.csproj" PrivateAssets="all" />
+    <ProjectReference Include="../Platform.Foundation/Platform.Foundation.Skia.csproj" PrivateAssets="all" />
+    <ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+    <PackageReference Include="SkiaSharp" />
+    <PackageReference Include="SkiaSharp.HarfBuzz" />
+    <PackageReference Include="HarfBuzzSharp" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+    <PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="../../icon-codebrix-128.png" Pack="true" PackagePath="/" />
+    <None Include="../../THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="/" />
+    <None Update="README.md;AGENT-README.txt" Pack="true" PackagePath="/" />
+    <None Update="buildTransitive/*.props" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.props" />
+    <None Update="buildTransitive/*.targets" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />
+  </ItemGroup>
+</Project>

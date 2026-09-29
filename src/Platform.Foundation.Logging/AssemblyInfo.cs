@@ -48,3 +48,5 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Composition")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Dispatching")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia")]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

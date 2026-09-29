@@ -24,6 +24,11 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           Linux frame buffer and macOS) plus the IDE-only emulated frame buffer
           head. START HERE for any CodeBrix.Platform application.
 
+  src/Platform.UI.Runtime.Skia.PlayTest/AGENT-README.txt
+    Package: CodeBrix.Platform.PlayTest.ApacheLicenseForever
+    Cross-platform offscreen Skia test head, Playwright-style C# locators and
+    assertions, fixed virtual screen, optional live view-only SDL3 preview.
+
   src/AddIns/Platform.WinUI.Graphics2DSK/AGENT-README.txt
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
           Immediate-mode 2D drawing: one XAML element you draw into with SkiaSharp.

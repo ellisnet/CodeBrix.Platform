@@ -1,0 +1,139 @@
+using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using CodeBrix.Platform.PlayTest.Hosting;
+using CodeBrix.Platform.PlayTest.Preview;
+using Microsoft.UI.Xaml;
+
+namespace CodeBrix.Platform.PlayTest;
+
+public enum ScreenOrientation { Landscape, Portrait }
+
+public sealed class PlayTestOptions
+{
+    public ScreenOrientation Orientation { get; set; } = ScreenOrientation.Landscape;
+    public bool Headless { get; set; } = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
+    public float Timeout { get; set; } = 10_000;
+    public float SlowMo { get; set; }
+    public string ArtifactsDirectory { get; set; } = Path.Combine("TestResults", "PlayTest");
+}
+
+public sealed class PlayTestException : Exception
+{
+    public PlayTestException(string message) : base(message) { }
+    public PlayTestException(string message, Exception inner) : base(message, inner) { }
+}
+
+public sealed class PlayTestApplication : IAsyncDisposable
+{
+    private static int _launched;
+    private readonly VirtualHost _host;
+    private PreviewConnection _preview;
+    private Task _run;
+    private int _disposed;
+    internal PlayTestOptions Options { get; }
+    public Page Page { get; }
+    public int Width => _host.Width;
+    public int Height => _host.Height;
+    public bool Headless => Options.Headless;
+    internal VirtualHost Host => _host;
+
+    private PlayTestApplication(Func<Application> factory, PlayTestOptions options)
+    {
+        Options = options;
+        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait);
+        Page = new Page(this);
+    }
+
+    public static async Task<PlayTestApplication> LaunchAsync(Func<Application> application, PlayTestOptions options = null)
+    {
+        ArgumentNullException.ThrowIfNull(application);
+        options ??= new PlayTestOptions();
+        if (!Enum.IsDefined(options.Orientation)) throw new ArgumentOutOfRangeException(nameof(options));
+        if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || options.SlowMo < 0 || !float.IsFinite(options.SlowMo))
+            throw new ArgumentOutOfRangeException(nameof(options));
+        if (Interlocked.Exchange(ref _launched, 1) != 0)
+            throw new InvalidOperationException("PlayTest 0.1 hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications or orientations.");
+        options = new PlayTestOptions
+        {
+            Orientation = options.Orientation, Headless = options.Headless,
+            Timeout = options.Timeout, SlowMo = options.SlowMo, ArtifactsDirectory = options.ArtifactsDirectory,
+        };
+        var result = new PlayTestApplication(application, options);
+        try
+        {
+            // Stable default culture; an app or a test can explicitly exercise other cultures.
+            CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+            CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo("en-US");
+            if (!options.Headless)
+            {
+                result._preview = await PreviewConnection.StartAsync(result.Width, result.Height).ConfigureAwait(false);
+                result._host.FramePresented += result._preview.Present;
+            }
+            result._run = Task.Run(result._host.Run);
+            await result._host.ReadyAsync().ConfigureAwait(false);
+            await result._host.CaptureAsync().ConfigureAwait(false);
+            return result;
+        }
+        catch { await result.DisposeAsync().ConfigureAwait(false); throw; }
+    }
+
+    // A C# counterpart to evaluating application state: evaluation is marshalled onto
+    // the actual UI thread. Tests should use locators for user actions.
+    public Task<T> EvaluateAsync<T>(Func<T> expression) => _host.OnUI(expression);
+    public Task EvaluateAsync(Action action) => _host.OnUI(action);
+
+    public async Task<T> WaitForAsync<T>(Func<T> probe, Func<T, bool> predicate, float? timeout = null, string description = "application outcome")
+    {
+        ArgumentNullException.ThrowIfNull(probe);
+        ArgumentNullException.ThrowIfNull(predicate);
+        var limit = timeout ?? Options.Timeout;
+        if (limit <= 0 || !float.IsFinite(limit)) throw new ArgumentOutOfRangeException(nameof(timeout));
+        var elapsed = Stopwatch.StartNew();
+        T actual = default;
+        do
+        {
+            actual = await EvaluateAsync(probe).ConfigureAwait(false);
+            if (predicate(actual)) return actual;
+            await Task.Delay(25).ConfigureAwait(false);
+        } while (elapsed.Elapsed.TotalMilliseconds < limit);
+        throw await FailureAsync($"Timed out waiting for {description}. Last observed value: {actual}").ConfigureAwait(false);
+    }
+
+    internal async Task SlowAsync()
+    {
+        if (Options.SlowMo > 0) await Task.Delay(TimeSpan.FromMilliseconds(Options.SlowMo)).ConfigureAwait(false);
+    }
+
+    internal async Task<PlayTestException> FailureAsync(string message)
+    {
+        try
+        {
+            var path = Path.GetFullPath(Path.Combine(Options.ArtifactsDirectory, $"failure-{Guid.NewGuid():N}.png"));
+            await Page.ScreenshotAsync(new() { Path = path }).ConfigureAwait(false);
+            message += "\nScreenshot: " + path;
+            message += "\nUI: " + await Page.DescribeAsync().ConfigureAwait(false);
+        }
+        catch (Exception e) { message += "\nDiagnostics unavailable: " + e.Message; }
+        return new PlayTestException(message);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
+        _host.Dispose();
+        if (_preview != null) await _preview.DisposeAsync().ConfigureAwait(false);
+        if (_run != null) await _run.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+    }
+}
+
+// Runner-neutral: xUnit, NUnit and MSTest fixtures may all use the same API.
+public abstract class PageTest
+{
+    protected PageTest(PlayTestApplication application) => Page = application.Page;
+    public Page Page { get; }
+    protected static LocatorAssertions Expect(Locator locator) => Assertions.Expect(locator);
+}

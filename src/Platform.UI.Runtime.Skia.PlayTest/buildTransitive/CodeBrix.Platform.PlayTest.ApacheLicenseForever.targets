@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <IsCodeBrixHead Condition="'$(OutputType)'=='Exe'">true</IsCodeBrixHead>
+  </PropertyGroup>
+  <Target Name="_CodeBrixPlayTestDefines" AfterTargets="PrepareForBuild">
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);CODEBRIX_REFERENCE_API;HAS_CODEBRIX;HAS_CODEBRIX_WINUI;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_PLAYTEST;__DESKTOP__;__CODEBRIX_SKIA__</DefineConstants>
+    </PropertyGroup>
+  </Target>
+  <Target Name="_CodeBrixPlayTestContent" BeforeTargets="CopyFilesToOutputDirectory;_CopyFilesMarkedCopyLocal">
+    <ItemGroup>
+      <ContentWithTargetPath Update="@(ContentWithTargetPath)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

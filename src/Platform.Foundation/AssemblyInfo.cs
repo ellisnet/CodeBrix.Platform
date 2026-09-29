@@ -53,3 +53,5 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Dispatching")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

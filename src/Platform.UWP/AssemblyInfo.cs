@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Wasm")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.WebAssembly")]

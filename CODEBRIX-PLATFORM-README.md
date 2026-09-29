@@ -247,6 +247,14 @@ The platform head package for macOS desktop applications, bootstrapped with `.Us
 
 ---
 
+**CodeBrix.Platform.PlayTest**
+NuGet Package ID: `CodeBrix.Platform.PlayTest.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+A .NET 10 test head for real application XAML and view models, with C# locator/action/assertion syntax modeled on Microsoft Playwright. The virtual Skia screen is fixed at 1920×1080 (or 1080×1920 portrait), and runs offscreen by default. `CODEBRIX_PLAYTEST_HEADED=1` shows a live, resizable, view-only SDL3 preview. Version 0.1 supports one window and one serialized application fixture per process. See `src/Platform.UI.Runtime.Skia.PlayTest/README.md` for the supported API and limitations.
+
+---
+
 **CodeBrix.Platform.WebView**
 NuGet Package ID: `CodeBrix.Platform.WebView.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

@@ -37,3 +37,5 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform")]
 
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
