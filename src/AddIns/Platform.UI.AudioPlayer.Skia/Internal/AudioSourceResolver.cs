@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using CodeBrix.Platform.UI.AudioPlayer.Skia.Contracts;
 
 namespace CodeBrix.Platform.UI.AudioPlayer.Skia.Internal;
@@ -17,6 +18,9 @@ internal static class AudioSourceResolver
 	private static IAssetLocation? _assets;
 
 	private static IAssetLocation Assets => _assets ??= PlatformContract.Resolve<IAssetLocation>();
+
+	//The assembly that holds the package-files contract (IApplicationPackageFilesPlatform)
+	private const string PlatformCoreAssemblyName = "CodeBrix.Platform.Core";
 
 	/// <summary>
 	/// Resolves <paramref name="source"/> to either a local file path or an open stream
@@ -123,8 +127,19 @@ internal static class AudioSourceResolver
 	/// Reads the full content of <paramref name="source"/> into memory (used by SoundEffect,
 	/// which preloads effects so no disk I/O happens on the real-time audio thread).
 	/// </summary>
+	/// <remarks>
+	/// An ms-appx: source is read through the platform's package files when the platform registered them
+	/// (IApplicationPackageFilesPlatform: a package whose files are not files on disk, an APK's assets for one), so a
+	/// sound effect needs nothing copied out first. With no such platform (the desktop heads) it is the file under the
+	/// installed folder, as before.
+	/// </remarks>
 	public static byte[] ReadAllBytes(string source)
 	{
+		if (TryReadPackageFile(source) is { } packaged)
+		{
+			return packaged;
+		}
+
 		var (filePath, stream) = Resolve(source);
 		if (filePath is not null)
 		{
@@ -137,5 +152,57 @@ internal static class AudioSourceResolver
 			stream!.CopyTo(buffer);
 			return buffer.ToArray();
 		}
+	}
+
+	/// <summary>
+	/// Reads an ms-appx: source through the registered package-files platform (WPE1-21), or returns null when the source
+	/// is not an ms-appx: URI or no such platform is registered (the caller then takes the file-path route). Throws
+	/// <see cref="FileNotFoundException"/> when the platform's package has no such file.
+	/// </summary>
+	/// <remarks>
+	/// The contract lives in CodeBrix.Platform.Core, which the resolver must not load on its own (the engine runs without
+	/// it - WPE1 C10). A platform that registered the contract has necessarily loaded that assembly, so the contract is
+	/// looked up only when it is already loaded, and the lookup sits in a method of its own that is compiled only then.
+	/// </remarks>
+	private static byte[]? TryReadPackageFile(string source)
+	{
+		if (string.IsNullOrWhiteSpace(source)
+			|| !Uri.TryCreate(source, UriKind.Absolute, out var uri)
+			|| !uri.Scheme.Equals("ms-appx", StringComparison.OrdinalIgnoreCase)
+			|| !IsPlatformCoreLoaded())
+		{
+			return null;
+		}
+
+		return ReadThroughPackageFiles(uri, source);
+	}
+
+	private static bool IsPlatformCoreLoaded()
+	{
+		foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+		{
+			if (string.Equals(assembly.GetName().Name, PlatformCoreAssemblyName, StringComparison.Ordinal))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	[MethodImpl(MethodImplOptions.NoInlining)]
+	private static byte[]? ReadThroughPackageFiles(Uri uri, string source)
+	{
+		if (CodeBrix.Platform.Helpers.ApplicationPackageFiles.Platform is not { } packageFiles)
+		{
+			return null;
+		}
+
+		var relativePath = CodeBrix.Platform.Helpers.ApplicationPackageFiles.GetRelativePath(uri);
+		using var stream = packageFiles.OpenRead(relativePath)
+			?? throw new FileNotFoundException($"The application package has no file '{relativePath}'.", source);
+		using var buffer = new MemoryStream();
+		stream.CopyTo(buffer);
+		return buffer.ToArray();
 	}
 }

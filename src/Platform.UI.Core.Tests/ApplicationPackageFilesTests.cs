@@ -274,6 +274,81 @@ public class ApplicationPackageFilesTests : IDisposable
 		}
 	}
 
+	// WPE1-21 (FIXLIST_codebrix_android_buildout [AP7-C] SoundEffect ms-appx): SoundEffect.Preload/Play(string) read an
+	// ms-appx source with File.ReadAllBytes under the installed folder before any platform code ran, so on a platform
+	// whose package files are not files an ms-appx sound effect was never found. It reads through the contract now.
+
+	[Fact]
+	public void When_A_Platform_Serves_The_Package_Then_A_Sound_Effect_Reads_Its_Ms_Appx_Source_Through_It()
+	{
+		//Arrange
+		var package = UsePackage(("Assets/Sounds/click one.wav", "RIFF-click"));
+
+		//Act
+		var bytes = CodeBrix.Platform.UI.AudioPlayer.Skia.Internal.AudioSourceResolver.ReadAllBytes("ms-appx:///Assets/Sounds/click%20one.wav");
+
+		//Assert
+		Encoding.UTF8.GetString(bytes).Should().Be("RIFF-click");
+		package.Opened.Should().Equal("Assets/Sounds/click one.wav");
+	}
+
+	[Fact]
+	public void When_A_Platform_Serves_The_Package_Then_Preloading_A_Sound_Effect_Needs_No_File_On_Disk()
+	{
+		//Arrange
+		var package = UsePackage(("Assets/Sounds/preload.wav", "RIFF-preload"));
+
+		try
+		{
+			//Act
+			var preload = () => CodeBrix.Platform.UI.AudioPlayer.Skia.SoundEffect.Preload("ms-appx:///Assets/Sounds/preload.wav");
+
+			//Assert
+			preload.Should().NotThrow();
+			package.Opened.Should().Equal("Assets/Sounds/preload.wav");
+		}
+		finally
+		{
+			CodeBrix.Platform.UI.AudioPlayer.Skia.SoundEffect.ClearCache();
+		}
+	}
+
+	[Fact]
+	public void When_The_Package_Has_No_Such_Sound_Then_FileNotFound_Is_Thrown()
+	{
+		//Arrange
+		UsePackage();
+
+		//Act
+		var read = () => CodeBrix.Platform.UI.AudioPlayer.Skia.Internal.AudioSourceResolver.ReadAllBytes("ms-appx:///Assets/Sounds/missing.wav");
+
+		//Assert
+		read.Should().Throw<FileNotFoundException>();
+	}
+
+	[Fact]
+	public void When_A_Platform_Serves_The_Package_Then_A_Sound_Effect_File_Path_Still_Reads_The_File()
+	{
+		//Arrange
+		var package = UsePackage(("Assets/Sounds/click.wav", "from the package"));
+		var file = Path.Combine(Path.GetTempPath(), "wpe121-" + Guid.NewGuid().ToString("N") + ".wav");
+		File.WriteAllText(file, "from the disk");
+
+		try
+		{
+			//Act
+			var bytes = CodeBrix.Platform.UI.AudioPlayer.Skia.Internal.AudioSourceResolver.ReadAllBytes(file);
+
+			//Assert
+			Encoding.UTF8.GetString(bytes).Should().Be("from the disk");
+			package.Opened.Should().BeEmpty();
+		}
+		finally
+		{
+			File.Delete(file);
+		}
+	}
+
 	private static FakePackage UsePackage(params (string Path, string Content)[] files)
 	{
 		var package = new FakePackage(files);

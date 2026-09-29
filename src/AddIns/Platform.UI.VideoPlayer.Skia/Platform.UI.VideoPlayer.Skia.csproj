@@ -55,14 +55,14 @@
 		     NEVER add CodeBrix.VideoPlayback.Skia back, and never add Dav1d, Opus or .Authoring -
 		     the first two are the application's own choice to register and the third is an
 		     authoring-time tool. -->
-		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.271.97" />
+		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.271.1195" />
 
 		<!-- The sound: CodeBrix.VideoPlayback plays its audio track through CodeBrix.Audio's shared core but
 		     does not choose a device backend - that is the consumer's choice (desktop or Android). This
 		     desktop add-in takes CodeBrix.Audio (the shared core + the bundled codebrix_miniaudio desktop
 		     backend) explicitly, at the SAME version as the AudioPlayer add-in, so a video's sound plays with
 		     no extra package in the application. -->
-		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.269.1270" />
+		<PackageReference Include="CodeBrix.Audio.MitLicenseForever" Version="1.0.271.1165" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency and
 		     Platform.WinUI.Graphics3DGL as CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever, both at

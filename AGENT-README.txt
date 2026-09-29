@@ -2477,3 +2477,14 @@ Dialog:           new ContentDialog { XamlRoot = XamlRoot, ... }.ShowAsync()
 Reference app:    https://github.com/ellisnet/JustBetweenUs  (main, CodeBrixPlatform/)
 
 ================================================================================
+
+FOCUS TARGETS REMOVED FROM THE VISUAL TREE
+========================================
+FeatureConfiguration.FocusManager.RestrictFocusToLiveTree is an opt-in
+compatibility switch (default false). When true, focus targets and their
+visual ancestors must still be live. A removed control or replaced page
+cannot regain focus through a saved reference. The target is checked again
+after GettingFocus/LosingFocus handlers, because those handlers can remove
+it. Existing focus navigation selects another live target on removal;
+when no target remains, focus is cleared. Set the switch before building
+the application visual tree. It applies to Core and the desktop heads.

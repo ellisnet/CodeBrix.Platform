@@ -29,6 +29,11 @@ What it has:
     auto-scroll while dragging past the top or bottom edge
   - clipboard copy AND paste, owned by the control: right-click context
     menu, Ctrl+Shift+C / Ctrl+Shift+V; pasted line endings normalized to CR
+  - touch: a finger dragged mainly up/down scrolls the history (one line per
+    row height travelled, the content follows the finger); a finger dragged
+    mainly sideways selects; a long press (half a second) then a drag
+    selects in any direction; a long press without a drag opens the
+    Copy/Paste menu where the finger lifts; a tap is a click
   - live grid resize following the control size, with (columns, rows)
     reported for PTY window-change requests
   - keyboard encoding through the engine's TerminalKeyEncoder:
@@ -230,6 +235,10 @@ Methods:
 
 Keyboard behaviour (what happens before InputEmitted fires):
   - Ctrl+Shift+C copies, Ctrl+Shift+V pastes; neither reaches the host.
+  - A character outside the Basic Multilingual Plane (an emoji) that a
+    keyboard delivers as two key presses, one UTF-16 half each, is sent as
+    ONE InputEmitted string holding the whole character; a half without its
+    partner is dropped.
   - Shift+PageUp / PageDown page through scrollback by (rows - 1) lines;
     neither reaches the host.
   - Ctrl and Alt chords go through TerminalKeyEncoder.Encode (Ctrl -> C0
@@ -668,6 +677,8 @@ QUICK REFERENCE CARD
     Keys:          Ctrl+Shift+C / V copy, paste | Shift+PgUp / PgDn scroll
     Mouse:         drag select | double-click word | right-click menu |
                    wheel 3 lines
+    Touch:         vertical drag scrolls | sideways drag selects |
+                   long press + drag selects | long press alone = menu
     Rules:         bounded size | Feed after Loaded | ConvertEol per source |
                    Scrollback before load | monospaced font | no mouse
                    reporting, no IME, no TrueColor | GridResized also fires

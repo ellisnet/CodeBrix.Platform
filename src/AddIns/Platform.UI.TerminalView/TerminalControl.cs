@@ -49,6 +49,9 @@ namespace CodeBrix.Platform.UI.TerminalView;
 /// a context menu, Ctrl+Shift+C copies, Ctrl+Shift+V pastes (line endings
 /// normalized to CR). Scrollback is reachable via the scrollbar, the mouse
 /// wheel, and Shift+PageUp/PageDown; typing snaps back to live output.
+/// With a finger: a vertical drag scrolls the history, a horizontal drag
+/// selects, a long press then a drag selects in any direction, and a long
+/// press without a drag opens the Copy/Paste menu where the finger lifts.
 /// </para>
 /// <para>
 /// Give the control a bounded size (a Grid star cell is ideal); the grid
@@ -63,6 +66,7 @@ public sealed partial class TerminalControl : Control
 
     private readonly TerminalRenderer _renderer;
     private readonly TerminalInputEncoder _keyInput = new();
+    private readonly TerminalTouchGesture _touch;
     private readonly FrameworkElement _canvas;
     private readonly ScrollBar _verticalScrollBar;
     private readonly MenuFlyout _contextMenu;
@@ -81,6 +85,7 @@ public sealed partial class TerminalControl : Control
         _renderer.Scrolled += UpdateScrollBar;
         _renderer.TitleChanged += title => TitleChanged?.Invoke(title);
         _renderer.InputSent += data => InputEmitted?.Invoke(data);
+        _touch = new TerminalTouchGesture(_renderer);
 
         IsTabStop = true;               //Required for key events
 
@@ -91,6 +96,8 @@ public sealed partial class TerminalControl : Control
         _canvas.PointerMoved += OnCanvasPointerMoved;
         _canvas.PointerReleased += OnCanvasPointerReleased;
         _canvas.PointerWheelChanged += OnCanvasPointerWheelChanged;
+        _canvas.PointerCaptureLost += (_, _) => _touch.Cancel();
+        _canvas.PointerCanceled += (_, _) => _touch.Cancel();
 
         // The theme's ScrollBar template renders through indicator visual states that a
         // hosting ScrollViewer normally drives; standing alone on these heads the bar
@@ -429,10 +436,18 @@ public sealed partial class TerminalControl : Control
         Focus(FocusState.Pointer);
         var point = e.GetCurrentPoint(_canvas);
 
+        //A finger: scroll, select or open the menu, decided as the contact goes on (Engine/TerminalTouchGesture)
+        if (IsTouch(e))
+        {
+            _touch.Press(point.Position.X, point.Position.Y, Environment.TickCount64);
+            _canvas.CapturePointer(e.Pointer);
+            e.Handled = true;
+            return;
+        }
+
         if (point.Properties.IsRightButtonPressed)
         {
-            _copyMenuItem.IsEnabled = _renderer.Selection.Active;
-            _contextMenu.ShowAt(_canvas, new FlyoutShowOptions { Position = point.Position });
+            ShowContextMenu(point.Position);
             e.Handled = true;
             return;
         }
@@ -454,6 +469,18 @@ public sealed partial class TerminalControl : Control
 
     private void OnCanvasPointerMoved(object sender, PointerRoutedEventArgs e)
     {
+        if (IsTouch(e) && _touch.State != TerminalTouchState.None)
+        {
+            var touchPosition = e.GetCurrentPoint(_canvas).Position;
+            if (_touch.Move(touchPosition.X, touchPosition.Y, Environment.TickCount64) == TerminalTouchState.Selecting)
+            {
+                UpdateDragAutoScroll(touchPosition.Y);
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         if (!_renderer.IsSelecting) { return; }
 
         var position = e.GetCurrentPoint(_canvas).Position;
@@ -474,6 +501,21 @@ public sealed partial class TerminalControl : Control
 
     private void OnCanvasPointerReleased(object sender, PointerRoutedEventArgs e)
     {
+        if (IsTouch(e) && _touch.State != TerminalTouchState.None)
+        {
+            var lift = e.GetCurrentPoint(_canvas).Position;
+            var outcome = _touch.Release(lift.X, lift.Y, Environment.TickCount64);
+            _dragScrollTimer.Stop();
+            _canvas.ReleasePointerCapture(e.Pointer);
+            if (outcome == TerminalTouchOutcome.ContextMenu)
+            {
+                ShowContextMenu(lift);
+            }
+
+            e.Handled = true;
+            return;
+        }
+
         //A touch can lift beyond its last move (a mouse's last move is its release point), so the
         //selection is extended to where the pointer came up before the drag ends
         if (_renderer.IsSelecting)
@@ -487,6 +529,29 @@ public sealed partial class TerminalControl : Control
         _dragScrollTimer.Stop();
         _canvas.ReleasePointerCapture(e.Pointer);
         e.Handled = true;
+    }
+
+    private static bool IsTouch(PointerRoutedEventArgs e) =>
+        e.Pointer.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch;
+
+    /// <summary>The Copy/Paste menu at a point of the surface (right button, or a finger's long press).</summary>
+    private void ShowContextMenu(global::Windows.Foundation.Point position)
+    {
+        _copyMenuItem.IsEnabled = _renderer.Selection.Active;
+        _contextMenu.ShowAt(_canvas, new FlyoutShowOptions { Position = position });
+    }
+
+    /// <summary>A selection drag held beyond the top/bottom edge scrolls the view while it is held there.</summary>
+    private void UpdateDragAutoScroll(double y)
+    {
+        if (y < 0 || y > _canvas.ActualHeight)
+        {
+            if (!_dragScrollTimer.IsEnabled) { _dragScrollTimer.Start(); }
+        }
+        else if (_dragScrollTimer.IsEnabled)
+        {
+            _dragScrollTimer.Stop();
+        }
     }
 
     private void CopySelection()
@@ -606,6 +671,12 @@ public sealed partial class TerminalControl : Control
         if (encoded != null)
         {
             RaiseInput(encoded);
+            e.Handled = true;
+        }
+        else if (e.UnicodeKey is { } half && char.IsSurrogate(half))
+        {
+            //The first half of a non-BMP character: the encoder holds it until the second half arrives, and the pair
+            //  is emitted as one string then
             e.Handled = true;
         }
     }

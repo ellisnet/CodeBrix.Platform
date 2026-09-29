@@ -51,6 +51,8 @@ internal static class TestPlatform
 
 			var composition = new NullCompositionPlatform();
 			ApiExtensibility.Register(typeof(ICompositionPlatform), _ => composition);
+			ApiExtensibility.Register(typeof(IRenderingPlatform), _ => new NullRenderingPlatform());
+			ApiExtensibility.Register(typeof(IFocusPlatform), _ => new NullFocusPlatform());
 
 			// Controls that load localized strings (TabView, for one) reach ApplicationData through the resource loader.
 			var applicationData = new TemporaryApplicationDataPlatform();
@@ -187,6 +189,22 @@ internal static class TestPlatform
 	private sealed class NullClipPlatform : ICompositionClipPlatform
 	{
 		internal static readonly NullClipPlatform Instance = new();
+	}
+
+	/// <summary>Allows a real Core content root without a window or a renderer.</summary>
+	private sealed class NullRenderingPlatform : IRenderingPlatform, ICompositionTargetPlatform
+	{
+		public void OnRenderFrameOpportunity(Microsoft.UI.Xaml.XamlRoot xamlRoot) { }
+		public ICompositionTargetPlatform CreateCompositionTargetPlatform(Microsoft.UI.Xaml.Media.CompositionTarget target) => this;
+		public bool CanRecordFrame() => false;
+		public void RecordFrame() { }
+		public void UpdateNativeElementsOrder() { }
+	}
+
+	/// <summary>Keeps focus in Core; there is no native view to focus.</summary>
+	private sealed class NullFocusPlatform : IFocusPlatform
+	{
+		public void FocusNative(Microsoft.UI.Xaml.UIElement? element) { }
 	}
 
 	private sealed class NullShapePlatform : ICompositionShapePlatform

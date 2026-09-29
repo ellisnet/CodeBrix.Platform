@@ -1806,6 +1806,13 @@ namespace Microsoft.UI.Xaml.Input
 				}
 			}
 
+			// A GettingFocus or LosingFocus handler can remove the candidate after the initial check.
+			if (newFocusTarget != null && FeatureConfiguration.FocusManager.RestrictFocusToLiveTree &&
+				!FocusProperties.IsInLiveFocusTree(newFocusTarget))
+			{
+				return Cleanup();
+			}
+
 			MUX_ASSERT((newFocusTarget == null) || IsFocusable(newFocusTarget));
 
 			// Update the previous focused control

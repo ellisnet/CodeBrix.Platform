@@ -452,6 +452,39 @@ public sealed class AudioPlayerSteps
 
 	// ------------------------------------------------------------- transport
 
+	/// <summary>Waits for the bound scrubber to match the player's position across two rendered frames.</summary>
+	/// <param name="sliderName">The name of the bound Slider.</param>
+	/// <param name="playerName">The name of the player it follows.</param>
+	/// <returns>A task that completes when the binding and layout have caught up.</returns>
+	[When("the Slider {string} has caught up with {string}")]
+	public async Task When_the_Slider_has_caught_up_with(string sliderName, string playerName)
+	{
+		var matchingFrames = 0;
+		var caughtUp = await Poll.UntilAsync(async () =>
+		{
+			await TestTargetFixture.RunOnUIThreadAsync(() =>
+				ElementRegistry.Resolve(sliderName).UpdateLayout()).ConfigureAwait(false);
+			await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
+			await TestTargetFixture.WaitForRenderAsync().ConfigureAwait(false);
+			var matches = false;
+			await TestTargetFixture.RunOnUIThreadAsync(() =>
+			{
+				var slider = (Slider)ElementRegistry.Resolve(sliderName);
+				var player = ElementRegistry.Resolve(playerName);
+				var position = player switch
+				{
+					AudioPlayerElement audio => audio.PositionSeconds,
+					MidiPlayerElement midi => midi.PositionSeconds,
+					_ => throw NotAPlayer(player, playerName),
+				};
+				matches = Math.Abs(slider.Value - position) < 0.001;
+			}).ConfigureAwait(false);
+			matchingFrames = matches ? matchingFrames + 1 : 0;
+			return matchingFrames >= 2;
+		}, TimeSpan.FromSeconds(2), PositionPollInterval).ConfigureAwait(false);
+		caughtUp.Should().BeTrue("the scrubber must follow the player's position before its fill is captured");
+	}
+
 	/// <summary>Asks a player to play, which is what a Play button does.</summary>
 	/// <param name="name">The Gherkin name of the player.</param>
 	/// <returns>A task that completes once the UI thread is idle again.</returns>

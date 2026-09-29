@@ -26,6 +26,8 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.MediaPlayer.WebAssembly")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Core")]
+// WPE1-21: SoundEffect reads an ms-appx sound through the package-files contract (IApplicationPackageFilesPlatform)
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AudioPlayer.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost")]
 

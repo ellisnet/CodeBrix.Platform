@@ -17,6 +17,7 @@ internal sealed class TerminalInputEncoder
 	private bool _controlDown;
 	private bool _altDown;
 	private bool _capsLock;
+	private char? _pendingHighSurrogate;
 
 	/// <summary>Whether a Shift key is down.</summary>
 	internal bool ShiftDown => _shiftDown;
@@ -101,8 +102,22 @@ internal sealed class TerminalInputEncoder
 	/// for printable keys, since the raw key cannot see shifted digit-row symbols like '(' on non-US layouts.</param>
 	/// <param name="applicationCursor">Whether the terminal's cursor keys are in application mode (DECCKM).</param>
 	/// <returns>The sequence, or null.</returns>
+	/// <remarks>
+	/// A character outside the Basic Multilingual Plane (an emoji, for one) arrives as TWO presses, each composing one
+	/// UTF-16 half (KeyRoutedEventArgs.UnicodeKey is a single char). The high half is held back (null is returned for it)
+	/// and sent together with the low half as ONE string, so a host never receives a lone surrogate. A half without its
+	/// partner is dropped.
+	/// </remarks>
 	internal string? Encode(TerminalKey key, char? composed, bool applicationCursor)
 	{
+		if (composed is { } half && char.IsSurrogate(half))
+		{
+			return PairSurrogate(half);
+		}
+
+		//Any other key abandons a high half still waiting for its partner
+		_pendingHighSurrogate = null;
+
 		var modifiers = Modifiers;
 
 		//Chords go through the full key mapping (Ctrl -> C0 codes, Alt -> ESC prefix)
@@ -128,5 +143,29 @@ internal sealed class TerminalInputEncoder
 		}
 
 		return TerminalKeyEncoder.Encode(key, modifiers, applicationCursor);
+	}
+
+	/// <summary>
+	/// One UTF-16 half of a non-BMP character: a high half is held until its low half arrives; the low half completes the
+	/// pair and the whole character is returned. A low half with no high half before it, or a high half replacing one
+	/// that never got its partner, is dropped.
+	/// </summary>
+	/// <param name="half">The surrogate the press composed.</param>
+	/// <returns>The complete character as a string, or null while it is not complete.</returns>
+	private string? PairSurrogate(char half)
+	{
+		if (char.IsHighSurrogate(half))
+		{
+			_pendingHighSurrogate = half;
+			return null;
+		}
+
+		if (_pendingHighSurrogate is { } high)
+		{
+			_pendingHighSurrogate = null;
+			return new string(new[] { high, half });
+		}
+
+		return null;
 	}
 }

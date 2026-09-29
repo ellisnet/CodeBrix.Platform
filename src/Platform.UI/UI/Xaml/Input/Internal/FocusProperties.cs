@@ -104,6 +104,11 @@ namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
 		/// <returns>A value indicating whether focus is allowed.</returns>
 		internal static bool IsFocusable(DependencyObject? dependencyObject)
 		{
+			if (FeatureConfiguration.FocusManager.RestrictFocusToLiveTree && !IsInLiveFocusTree(dependencyObject))
+			{
+				return false;
+			}
+
 			bool isFocusable = false;
 
 			var objectAsUI = dependencyObject as UIElement;
@@ -174,6 +179,11 @@ namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
 		/// <returns>True if there is a focusable child.</returns>
 		internal static bool CanHaveFocusableChildren(DependencyObject? parent)
 		{
+			if (FeatureConfiguration.FocusManager.RestrictFocusToLiveTree && !IsInLiveFocusTree(parent))
+			{
+				return false;
+			}
+
 			bool isFocusable = false;
 
 			if (parent == null)
@@ -267,6 +277,30 @@ namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
 			}
 
 			return isEngaged;
+		}
+
+		/// <summary>Checks the live ancestry, including the containing element of a text focus target.</summary>
+		internal static bool IsInLiveFocusTree(DependencyObject? element)
+		{
+			if (element is TextElement textElement)
+			{
+				element = textElement.GetContainingFrameworkElement();
+			}
+
+			if (element is not UIElement)
+			{
+				return false;
+			}
+
+			for (var current = element; current is UIElement uiElement; current = VisualTreeHelper.GetParent(current))
+			{
+				if (!uiElement.IsInLiveTree)
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		internal static bool IsGamepadFocusCandidate(DependencyObject dependencyObject) =>

@@ -29,8 +29,8 @@
          Dav1d is needed for EVERY clip this demo plays - every one carries AV1. Opus is needed
          only for the WebM and CodeBrix-Mode1 clips, whose soundtrack is Opus; the Mode2 clips
          carry Vorbis, which needs nothing. -->
-    <PackageReference Include="CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever" Version="1.0.242.1054" />
-    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.241.1040" />
+    <PackageReference Include="CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever" Version="1.0.271.1206" />
+    <PackageReference Include="CodeBrix.Audio.Opus.BsdLicenseForever" Version="1.0.271.1185" />
 
     <!-- Fluent symbol font (uno-fluentui-assets.ttf) used by WinUI control glyphs. This was a
          declared dependency of the CodeBrix.Platform.ApacheLicenseForever aggregate package

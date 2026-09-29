@@ -183,6 +183,7 @@ Scenario: A compressed file loads and plays exactly as an uncompressed one does
 	And the Maximum of "scrubber" is about 2.0
 	When "player" starts playing
 	And "player" plays past 0.8 seconds within 6000 milliseconds
+	And the Slider "scrubber" has caught up with "player"
 	And the frame is captured
 	Then "player" is playing
 	And the MediaFailed of "player" was never raised

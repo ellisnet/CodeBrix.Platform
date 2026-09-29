@@ -28,15 +28,11 @@ namespace Microsoft.UI.Xaml.Controls
 			return old;
 		}
 
-		private bool ContainsCore(View item)
-		{
-			throw new NotImplementedException();
-		}
+		private bool ContainsCore(View item) => _elements.Contains(item);
 
-		private void CopyToCore(View[] array, int arrayIndex)
-		{
-			throw new NotImplementedException();
-		}
+		//WPE1-21: ItemsControl's Reset path copies the panel's children (ToArray -> CopyTo) before it cleans them up
+		//  (WPE1-17), so the unit-test collection must support the copy like the platform one does
+		private void CopyToCore(View[] array, int arrayIndex) => _elements.CopyTo(array, arrayIndex);
 
 		private int CountCore() => _elements.Count;
 

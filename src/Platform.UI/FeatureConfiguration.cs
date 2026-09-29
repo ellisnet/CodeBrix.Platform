@@ -16,6 +16,17 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 {
 	public static class FeatureConfiguration
 	{
+		/// <summary>Configures focus management behavior.</summary>
+		public static class FocusManager
+		{
+			/// <summary>
+			/// When enabled, focus targets and their ancestors must belong to the live visual tree.
+			/// Removed elements cannot regain focus, including when removed during a focus-changing event.
+			/// The default is false for compatibility.
+			/// </summary>
+			public static bool RestrictFocusToLiveTree { get; set; }
+		}
+
 		public static class ApiInformation
 		{
 			/// <summary>

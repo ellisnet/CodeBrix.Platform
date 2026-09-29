@@ -298,13 +298,25 @@ internal sealed class TerminalRenderer
 			return false;
 		}
 
+		StartSelectionAt(x, y);
+		_lastClickTick = tickMilliseconds;
+		_lastClickCell = cell;
+		return true;
+	}
+
+	/// <summary>
+	/// Starts a drag selection at a point, clearing any selection there was, with no double-click check (a touch
+	/// gesture that has already decided it is a selection uses this; a press uses <see cref="PressAt"/>).
+	/// </summary>
+	/// <param name="x">The X coordinate in DIPs.</param>
+	/// <param name="y">The Y coordinate in DIPs.</param>
+	internal void StartSelectionAt(double x, double y)
+	{
+		var cell = HitTest(x, y);
 		if (_selection.Active) { _selection.SelectNone(); }
 		_selection.SetSoftStart(cell.Row, cell.Column);
 		_selecting = true;
 		_lastDragCell = cell;
-		_lastClickTick = tickMilliseconds;
-		_lastClickCell = cell;
-		return true;
 	}
 
 	/// <summary>A drag selection moved to a point (DIPs; may lie outside the surface).</summary>
