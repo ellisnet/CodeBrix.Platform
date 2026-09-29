@@ -34,16 +34,18 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private Thread _renderThread;
     private volatile bool _stopping;
     private Exception _failure;
-    private byte[] _pixels;
+    private VirtualFrame _frame;
+    private volatile VirtualScreen _screen;
     private long _sequence;
     private long _requested;
     private long _rendered;
     internal VirtualWindow Window { get; }
     internal VirtualInput Input { get; }
     internal VirtualClipboard Clipboard { get; } = new();
-    internal int Width { get; }
-    internal int Height { get; }
-    internal event Action<byte[]> FramePresented;
+    internal int Width => _screen.Width;
+    internal int Height => _screen.Height;
+    internal ScreenOrientation Orientation => _screen.Orientation;
+    internal event Action<VirtualFrame> FramePresented;
     internal UIElement Root => Window.Root;
     UIElement IXamlRootHost.RootElement => Root;
     public bool CanExit => true;
@@ -51,8 +53,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     internal VirtualHost(Func<Application> factory, bool portrait)
     {
         _factory = factory;
-        Width = portrait ? 1080 : 1920;
-        Height = portrait ? 1920 : 1080;
+        _screen = new VirtualScreen(portrait ? ScreenOrientation.Portrait : ScreenOrientation.Landscape);
         Window = new VirtualWindow(this);
         Input = new VirtualInput(this);
     }
@@ -128,6 +129,17 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     internal Task OnUI(Action action) => OnUI(() => { action(); return true; });
     internal Task ReadyAsync() => _ready.Task.WaitAsync(TimeSpan.FromSeconds(30));
 
+    // Dispatcher-only; callers await CaptureAsync before running the next test.
+    internal void SetOrientation(ScreenOrientation orientation)
+    {
+        if (!Enum.IsDefined(orientation)) throw new ArgumentOutOfRangeException(nameof(orientation));
+        if (_screen.Orientation == orientation) return;
+        lock (_frameLock) _screen = new VirtualScreen(orientation);
+        Window.UpdateSize();
+        DisplayInformation.GetForCurrentView().NotifyOrientationChanged();
+        InvalidateRender();
+    }
+
     public void InvalidateRender()
     {
         Interlocked.Increment(ref _requested);
@@ -136,16 +148,24 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
 
     private void RenderLoop()
     {
-        var info = new SKImageInfo(Width, Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        SKSurface surface = null;
+        SKImageInfo info = default;
         try
         {
-            using var surface = SKSurface.Create(info) ?? throw new PlayTestException("Could not create the virtual Skia surface.");
             while (!_stopping)
             {
                 _render.WaitOne();
                 if (_stopping) break;
                 if (Root?.Visual.CompositionTarget is not CompositionTarget target) continue;
                 var generation = Interlocked.Read(ref _requested);
+                var screen = _screen;
+                if (surface == null || info.Width != screen.Width || info.Height != screen.Height)
+                {
+                    surface?.Dispose();
+                    surface = null;
+                    info = new SKImageInfo(screen.Width, screen.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+                    surface = SKSurface.Create(info) ?? throw new PlayTestException("Could not create the virtual Skia surface.");
+                }
                 surface.Canvas.Clear(SKColors.Transparent);
                 target.OnNativePlatformFrameRequested(surface.Canvas, _ => surface.Canvas);
                 surface.Canvas.Flush();
@@ -157,9 +177,12 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
                             throw new PlayTestException("Could not read the rendered virtual screen.");
                 }
                 TaskCompletionSource<long> changed;
+                var frame = new VirtualFrame(screen, pixels);
                 lock (_frameLock)
                 {
-                    _pixels = pixels;
+                    // A frame already being drawn when orientation changed belongs to the old screen.
+                    if (!ReferenceEquals(screen, _screen)) continue;
+                    _frame = frame;
                     _rendered = generation;
                     _sequence++;
                     changed = _frameChanged;
@@ -167,15 +190,16 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
                 }
                 changed.TrySetResult(_sequence);
                 _ready.TrySetResult();
-                FramePresented?.Invoke(pixels);
+                FramePresented?.Invoke(frame);
                 // Limit live animation presentation; invalidations coalesce while waiting.
                 if (!_stopping) Thread.Sleep(16);
             }
         }
         catch (Exception e) { Fail(e); }
+        finally { surface?.Dispose(); }
     }
 
-    internal async Task<byte[]> CaptureAsync()
+    internal async Task<VirtualFrame> CaptureAsync()
     {
         // The compositor records on the UI thread and draws its previous recording.
         // Two passes with a dispatcher barrier produce the current tree, as in UIReqs.
@@ -189,7 +213,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
                 Task changed;
                 lock (_frameLock)
                 {
-                    if (_rendered >= generation) break;
+                    if (_rendered >= generation && ReferenceEquals(_frame?.Screen, _screen)) break;
                     changed = _frameChanged.Task;
                 }
                 await changed.WaitAsync(TimeSpan.FromSeconds(15)).ConfigureAwait(false);
@@ -197,7 +221,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
             }
             await OnUI(() => { }).ConfigureAwait(false);
         }
-        lock (_frameLock) return _pixels;
+        lock (_frameLock) return _frame;
     }
 
     internal void ThrowIfFailed()

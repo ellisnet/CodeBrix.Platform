@@ -2,6 +2,16 @@
   <PropertyGroup>
     <IsCodeBrixHead Condition="'$(OutputType)'=='Exe'">true</IsCodeBrixHead>
   </PropertyGroup>
+  <ItemGroup Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
+    <AssemblyMetadata Include="CodeBrixPlayTestPreferredOrientation" Value="$(CodeBrixPlayTestPreferredOrientation)" />
+  </ItemGroup>
+  <Target Name="_CodeBrixPlayTestValidateOrientation" BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
+    <Error Condition="'$(CodeBrixPlayTestPreferredOrientation)' != 'Landscape' and '$(CodeBrixPlayTestPreferredOrientation)' != 'Portrait'"
+           Text="CodeBrixPlayTestPreferredOrientation must be Landscape or Portrait." />
+    <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
+           Text="CodeBrixPlayTestPreferredOrientation requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
+  </Target>
   <Target Name="_CodeBrixPlayTestDefines" AfterTargets="PrepareForBuild">
     <PropertyGroup>
       <DefineConstants>$(DefineConstants);CODEBRIX_REFERENCE_API;HAS_CODEBRIX;HAS_CODEBRIX_WINUI;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_PLAYTEST;__DESKTOP__;__CODEBRIX_SKIA__</DefineConstants>

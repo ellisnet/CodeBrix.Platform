@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using CodeBrix.Platform.PlayTest.Hosting;
 
 namespace CodeBrix.Platform.PlayTest.Preview;
 
@@ -12,7 +13,7 @@ internal sealed class PreviewConnection : IAsyncDisposable
 {
     private readonly Process _process;
     private readonly Task<string> _errors;
-    private readonly Channel<byte[]> _frames = Channel.CreateBounded<byte[]>(new BoundedChannelOptions(1)
+    private readonly Channel<VirtualFrame> _frames = Channel.CreateBounded<VirtualFrame>(new BoundedChannelOptions(1)
     { FullMode = BoundedChannelFullMode.DropOldest, SingleReader = true, SingleWriter = true });
     private Task _writer;
 
@@ -53,19 +54,19 @@ internal sealed class PreviewConnection : IAsyncDisposable
         catch { await result.DisposeAsync().ConfigureAwait(false); throw; }
     }
 
-    internal void Present(byte[] pixels)
+    internal void Present(VirtualFrame frame)
     {
-        if (!_process.HasExited) _frames.Writer.TryWrite(pixels);
+        if (!_process.HasExited) _frames.Writer.TryWrite(frame);
+        else if (_process.ExitCode != 0) throw new PlayTestException($"PlayTest preview exited with code {_process.ExitCode}.");
     }
 
     private async Task WriteAsync()
     {
         try
         {
-            await foreach (var pixels in _frames.Reader.ReadAllAsync().ConfigureAwait(false))
+            await foreach (var frame in _frames.Reader.ReadAllAsync().ConfigureAwait(false))
             {
-                await _process.StandardInput.BaseStream.WriteAsync(pixels).ConfigureAwait(false);
-                await _process.StandardInput.BaseStream.FlushAsync().ConfigureAwait(false);
+                await PreviewFrames.WriteAsync(_process.StandardInput.BaseStream, frame).ConfigureAwait(false);
             }
         }
         catch (IOException) when (_process.HasExited) { }
@@ -81,12 +82,15 @@ internal sealed class PreviewConnection : IAsyncDisposable
             catch (IOException) { }
         }
         _process.StandardInput.Close();
+        var killed = false;
         if (!_process.HasExited)
         {
             try { await _process.WaitForExitAsync().WaitAsync(TimeSpan.FromSeconds(3)).ConfigureAwait(false); }
-            catch (TimeoutException) { _process.Kill(entireProcessTree: true); await _process.WaitForExitAsync().ConfigureAwait(false); }
+            catch (TimeoutException) { killed = true; _process.Kill(entireProcessTree: true); await _process.WaitForExitAsync().ConfigureAwait(false); }
         }
-        await _errors.ConfigureAwait(false);
+        var errors = await _errors.ConfigureAwait(false);
+        var exitCode = _process.ExitCode;
         _process.Dispose();
+        if (!killed && exitCode != 0) throw new PlayTestException($"PlayTest preview exited with code {exitCode}: {errors}");
     }
 }

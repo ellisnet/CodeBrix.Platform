@@ -2,6 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeBrix.Platform.PlayTest.Hosting;
@@ -14,11 +16,33 @@ public enum ScreenOrientation { Landscape, Portrait }
 
 public sealed class PlayTestOptions
 {
-    public ScreenOrientation Orientation { get; set; } = ScreenOrientation.Landscape;
+    private ScreenOrientation? _orientation;
+    /// <summary>An explicit orientation overrides environment and project preferences.</summary>
+    public ScreenOrientation Orientation { get => _orientation ?? ScreenOrientation.Landscape; set => _orientation = value; }
+    /// <summary>The test assembly containing the project preference; defaults to the entry assembly.</summary>
+    public Assembly ConfigurationAssembly { get; set; }
     public bool Headless { get; set; } = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
     public float Timeout { get; set; } = 10_000;
     public float SlowMo { get; set; }
     public string ArtifactsDirectory { get; set; } = Path.Combine("TestResults", "PlayTest");
+
+    /// <summary>Resolves code, environment, project metadata, then the landscape fallback.</summary>
+    public ScreenOrientation ResolveOrientation()
+    {
+        if (_orientation is { } explicitOrientation)
+        {
+            if (!Enum.IsDefined(explicitOrientation)) throw new ArgumentOutOfRangeException(nameof(Orientation));
+            return explicitOrientation;
+        }
+        var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_ORIENTATION");
+        if (!string.IsNullOrEmpty(environment))
+            return OrientationPreference.Parse(environment, "CODEBRIX_PLAYTEST_ORIENTATION");
+        var assembly = ConfigurationAssembly ?? Assembly.GetEntryAssembly();
+        var preference = assembly?.GetCustomAttributes<AssemblyMetadataAttribute>()
+            .SingleOrDefault(a => a.Key == "CodeBrixPlayTestPreferredOrientation")?.Value;
+        return string.IsNullOrEmpty(preference) ? ScreenOrientation.Landscape
+            : OrientationPreference.Parse(preference, "CodeBrixPlayTestPreferredOrientation");
+    }
 }
 
 public sealed class PlayTestException : Exception
@@ -39,6 +63,10 @@ public sealed class PlayTestApplication : IAsyncDisposable
     public int Width => _host.Width;
     public int Height => _host.Height;
     public bool Headless => Options.Headless;
+    /// <summary>The launch preference used by tests with no explicit orientation.</summary>
+    public ScreenOrientation PreferredOrientation => Options.Orientation;
+    /// <summary>The orientation of the current virtual screen.</summary>
+    public ScreenOrientation Orientation => _host.Orientation;
     internal VirtualHost Host => _host;
 
     private PlayTestApplication(Func<Application> factory, PlayTestOptions options)
@@ -52,14 +80,14 @@ public sealed class PlayTestApplication : IAsyncDisposable
     {
         ArgumentNullException.ThrowIfNull(application);
         options ??= new PlayTestOptions();
-        if (!Enum.IsDefined(options.Orientation)) throw new ArgumentOutOfRangeException(nameof(options));
+        var orientation = options.ResolveOrientation();
         if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || options.SlowMo < 0 || !float.IsFinite(options.SlowMo))
             throw new ArgumentOutOfRangeException(nameof(options));
         if (Interlocked.Exchange(ref _launched, 1) != 0)
-            throw new InvalidOperationException("PlayTest 0.1 hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications or orientations.");
+            throw new InvalidOperationException("PlayTest hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications.");
         options = new PlayTestOptions
         {
-            Orientation = options.Orientation, Headless = options.Headless,
+            Orientation = orientation, Headless = options.Headless,
             Timeout = options.Timeout, SlowMo = options.SlowMo, ArtifactsDirectory = options.ArtifactsDirectory,
         };
         var result = new PlayTestApplication(application, options);
@@ -85,6 +113,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
     // the actual UI thread. Tests should use locators for user actions.
     public Task<T> EvaluateAsync<T>(Func<T> expression) => _host.OnUI(expression);
     public Task EvaluateAsync(Action action) => _host.OnUI(action);
+
+    /// <summary>Changes the virtual screen and waits for layout/rendering. Null restores the launch preference.
+    /// Call between serialized tests, never concurrently with actions or screenshots.</summary>
+    public async Task SetOrientationAsync(ScreenOrientation? orientation = null)
+    {
+        var selected = orientation ?? PreferredOrientation;
+        if (!Enum.IsDefined(selected)) throw new ArgumentOutOfRangeException(nameof(orientation));
+        await EvaluateAsync(() => _host.SetOrientation(selected)).ConfigureAwait(false);
+        await _host.CaptureAsync().ConfigureAwait(false);
+    }
 
     public async Task<T> WaitForAsync<T>(Func<T> probe, Func<T, bool> predicate, float? timeout = null, string description = "application outcome")
     {

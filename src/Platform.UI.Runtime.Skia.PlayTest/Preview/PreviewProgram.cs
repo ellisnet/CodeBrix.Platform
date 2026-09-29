@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using CodeBrix.Platform.PlayTest.Hosting;
 using SDL;
 using static SDL.SDL3;
 
@@ -9,22 +10,17 @@ namespace CodeBrix.Platform.PlayTest.Preview;
 
 internal static class PreviewProgram
 {
-    private static byte[] _latest;
+    private static VirtualFrame _latest;
     private static volatile bool _finished;
 
-    private static async Task ReadFramesAsync(int length)
+    private static async Task ReadFramesAsync()
     {
         try
         {
             using var input = Console.OpenStandardInput();
-            while (true)
-            {
-                var frame = new byte[length];
-                await input.ReadExactlyAsync(frame).ConfigureAwait(false);
+            while (await PreviewFrames.ReadAsync(input).ConfigureAwait(false) is { } frame)
                 Interlocked.Exchange(ref _latest, frame);
-            }
         }
-        catch (EndOfStreamException) { }
         finally { _finished = true; }
     }
 
@@ -45,6 +41,9 @@ internal static class PreviewProgram
             if (!SDL_Init(SDL_InitFlags.SDL_INIT_VIDEO)) throw new InvalidOperationException(SDL_GetError());
             window = SDL_CreateWindow("CodeBrix PlayTest - view only", width / 2, height / 2, SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
             if (window == null) throw new InvalidOperationException(SDL_GetError());
+            // These proportions are the fixture preference and remain unchanged for the entire run.
+            // Individual test orientations affect only the frame and its letterboxed presentation.
+            // Aspect constraints are advisory on some desktops; letterboxing remains correct if denied.
             SDL_SetWindowAspectRatio(window, (float)width / height, (float)width / height);
             renderer = SDL_CreateRenderer(window, (byte*)null);
             if (renderer == null) throw new InvalidOperationException(SDL_GetError());
@@ -53,7 +52,7 @@ internal static class PreviewProgram
             texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, width, height);
             if (texture == null) throw new InvalidOperationException(SDL_GetError());
             SDL_SetTextureBlendMode(texture, SDL_BlendMode.SDL_BLENDMODE_NONE);
-            _ = Task.Run(() => ReadFramesAsync(checked(width * height * 4)));
+            var reader = Task.Run(ReadFramesAsync);
             Console.WriteLine("READY");
             Console.Out.Flush();
             var hasFrame = false;
@@ -65,19 +64,32 @@ internal static class PreviewProgram
                     if (e.type == (uint)SDL_EventType.SDL_EVENT_QUIT || e.type == (uint)SDL_EventType.SDL_EVENT_WINDOW_CLOSE_REQUESTED) return 0;
                     // All physical keyboard, pointer, wheel and touch events are discarded.
                 }
-                var pixels = Interlocked.Exchange(ref _latest, null);
-                if (pixels != null)
+                var frame = Interlocked.Exchange(ref _latest, null);
+                if (frame != null)
                 {
-                    fixed (byte* p = pixels)
+                    if (frame.Width != width || frame.Height != height)
+                    {
+                        SDL_DestroyTexture(texture);
+                        texture = null;
+                        width = frame.Width;
+                        height = frame.Height;
+                        if (!SDL_SetRenderLogicalPresentation(renderer, width, height, SDL_RendererLogicalPresentation.SDL_LOGICAL_PRESENTATION_LETTERBOX))
+                            throw new InvalidOperationException(SDL_GetError());
+                        texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGRA32, SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING, width, height);
+                        if (texture == null) throw new InvalidOperationException(SDL_GetError());
+                        SDL_SetTextureBlendMode(texture, SDL_BlendMode.SDL_BLENDMODE_NONE);
+                    }
+                    fixed (byte* p = frame.Pixels)
                         if (!SDL_UpdateTexture(texture, null, (IntPtr)p, width * 4)) throw new InvalidOperationException(SDL_GetError());
                     hasFrame = true;
                 }
-                SDL_SetRenderDrawColor(renderer, 24, 24, 24, 255);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
                 SDL_RenderClear(renderer);
                 if (hasFrame) SDL_RenderTexture(renderer, texture, null, null);
                 SDL_RenderPresent(renderer);
                 Thread.Sleep(16);
             }
+            reader.GetAwaiter().GetResult(); // A truncated or malformed frame must fail the headed run.
             return 0;
         }
         catch (Exception e) { Console.Error.WriteLine(e); return 1; }

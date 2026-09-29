@@ -56,15 +56,23 @@ public sealed class Page
     public Task<T> EvaluateAsync<T>(Func<T> expression) => Application.EvaluateAsync(expression);
     public Task EvaluateAsync(Action expression) => Application.EvaluateAsync(expression);
 
-    /// <summary>Installs a fresh application page on the UI thread for fixture isolation.</summary>
-    public async Task SetContentAsync(Func<UIElement> content)
+    /// <summary>Installs a fresh page using the fixture's launch preference.</summary>
+    public Task SetContentAsync(Func<UIElement> content) => SetContentAsync(content, null);
+
+    /// <summary>Installs a fresh page in the required orientation. Null restores the fixture's launch preference.
+    /// Orientation is applied before the page factory runs. Shared fixtures must be serialized.</summary>
+    public async Task SetContentAsync(Func<UIElement> content, ScreenOrientation? orientation)
     {
         ArgumentNullException.ThrowIfNull(content);
+        var selected = orientation ?? Application.PreferredOrientation;
+        if (!Enum.IsDefined(selected)) throw new ArgumentOutOfRangeException(nameof(orientation));
         await Application.EvaluateAsync(() =>
         {
             var window = Application.Host.Window.ManagedWindow;
             foreach (var popup in VisualTreeHelper.GetOpenPopupsForXamlRoot(window.Content.XamlRoot).ToArray()) popup.IsOpen = false;
             if (window.Content is FrameworkElement { DataContext: IDisposable disposable }) disposable.Dispose();
+            window.Content = null;
+            Application.Host.SetOrientation(selected);
             window.Content = content();
             Clipboard.Clear();
         }).ConfigureAwait(false);
@@ -73,8 +81,9 @@ public sealed class Page
 
     public async Task<byte[]> ScreenshotAsync(PageScreenshotOptions options = null)
     {
-        var pixels = await Application.Host.CaptureAsync().ConfigureAwait(false);
-        var info = new SKImageInfo(Application.Width, Application.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        var frame = await Application.Host.CaptureAsync().ConfigureAwait(false);
+        var pixels = frame.Pixels;
+        var info = new SKImageInfo(frame.Width, frame.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
         using var bitmap = new SKBitmap(info);
         System.Runtime.InteropServices.Marshal.Copy(pixels, 0, bitmap.GetPixels(), pixels.Length);
         using var image = SKImage.FromBitmap(bitmap);

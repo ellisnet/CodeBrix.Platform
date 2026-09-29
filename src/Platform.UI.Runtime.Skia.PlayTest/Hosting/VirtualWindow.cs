@@ -29,11 +29,16 @@ internal sealed class VirtualWindow : NativeWindowWrapperBase, INativeWindowFact
         SetWindow(window, root);
         XamlRootMap.Register(root, _host);
         RasterizationScale = 1;
+        UpdateSize();
+        return this;
+    }
+
+    internal void UpdateSize()
+    {
         var bounds = new Rect(0, 0, _host.Width, _host.Height);
         SetBoundsAndVisibleBounds(bounds, bounds);
         var size = new SizeInt32(_host.Width, _host.Height);
         SetSizes(size, size);
-        return this;
     }
 
     protected internal override void Activate() => ActivationState = CoreWindowActivationState.CodeActivated;
