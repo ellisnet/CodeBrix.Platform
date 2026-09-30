@@ -70,7 +70,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
             try
             {
                 InitializeApplication();
-                foreach (var action in _queue.GetConsumingEnumerable()) action();
+                if (OperatingSystem.IsWindows()) WindowsMessagePump.Run(_queue);
+                else foreach (var action in _queue.GetConsumingEnumerable()) action();
             }
             catch (Exception e) { Fail(e); }
         }) { IsBackground = true, Name = "PlayTest UI" };
@@ -84,6 +85,14 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => _theme);
         SystemThemeHelper.RefreshSystemTheme();
         _filePickers.Register();
+        // Discover the application's optional add-in without adding a browser dependency
+        // to PlayTest or registering any desktop head's native-window provider.
+        if (OperatingSystem.IsWindows() && Type.GetType(
+            "CodeBrix.Platform.UI.WebView.Skia.Offscreen.WindowsOffscreenWebViewProvider, CodeBrix.Platform.UI.WebView.Skia") is { } provider)
+        {
+            ApiExtensibility.Register<Microsoft.Web.WebView2.Core.CoreWebView2>(
+                typeof(Microsoft.Web.WebView2.Core.INativeWebViewProvider), owner => Activator.CreateInstance(provider, owner));
+        }
         FeatureConfiguration.TextBox.UseOverlayOnSkia = false;
         FeatureConfiguration.Font.RestrictToEmbeddedFonts = true;
         CoreDispatcher.DispatchOverride = (action, priority) => Enqueue(action);

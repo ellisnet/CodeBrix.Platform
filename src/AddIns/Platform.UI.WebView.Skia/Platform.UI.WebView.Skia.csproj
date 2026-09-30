@@ -39,13 +39,24 @@
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
 
-		<!-- Pack-time ONLY: locates the Microsoft Edge WebView2 redistributable so its runtime assets
+		<!-- Locates the Microsoft Edge WebView2 redistributable so its runtime assets
 		     can be bundled into this package (see the buildTransitive .targets and the ItemGroup below).
-		     ExcludeAssets="all" so nothing is referenced or copied into THIS (Linux) add-on's own build;
+		     ExcludeAssets="all" keeps the SDK's default references/targets out of this add-in;
+		     the offscreen Windows provider uses the explicit aliased Core reference below.
 		     PrivateAssets="all" so it never flows to consumers as a dependency. Version comes from the
 		     PackageReference Update in src/Directory.Build.targets, matching the runtime packages. -->
 		<PackageReference Include="Microsoft.Web.WebView2" GeneratePathProperty="true" PrivateAssets="all" ExcludeAssets="all" />
 	</ItemGroup>
+
+    <!-- Compile the optional offscreen provider against the real SDK under an alias.
+         Runtime delivery stays in this add-in's buildTransitive payload. -->
+    <ItemGroup>
+        <Reference Include="Microsoft.Web.WebView2.Core">
+            <HintPath>$(PkgMicrosoft_Web_WebView2)/lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll</HintPath>
+            <Aliases>mswebview2</Aliases>
+            <Private>false</Private>
+        </Reference>
+    </ItemGroup>
 
 	<!-- Auto-imported into consuming heads by NuGet (file name must equal the package id). Packed as
 	     Content (not None) so it does not collide with the SDK's default None glob for this in-project

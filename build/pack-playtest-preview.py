@@ -34,6 +34,7 @@ def main():
         "src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj",
         "src/Platform.Analyzers/Platform.Analyzers.csproj",
         "src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj",
+        "src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj",
     ):
         run("dotnet", "build", project, "-c", "Release", "--verbosity", "minimal")
 
@@ -49,6 +50,7 @@ def main():
     for project in (
         "src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj",
         "src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj",
+        "src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj",
     ):
         run("dotnet", "pack", project, "-c", "Release", f"-p:PackageVersion={args.version}",
             "--no-restore", "--output", output, "--verbosity", "minimal")

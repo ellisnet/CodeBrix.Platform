@@ -218,10 +218,14 @@ value/text/state/count assertions, scripted storage pickers, state evaluation an
 Playwright browser features (DOM/CSS/JavaScript, network routing, browser contexts,
 tracing and browser downloads) are not simulated. GPU-only controls, other native
 dialogs, multiple windows and horizontal wheel input are outside this prototype.
-On Linux, an application that already references the WebView add-in can use its
-offscreen WPE WebKit browser, including rendering and XAML pointer/keyboard input;
-the system WPE libraries are still required. PlayTest does not supply a browser
-engine, DOM locators, or native WebView providers for Windows/macOS.
+An application that references the matching WebView add-in can use its offscreen
+browser, including rendering and XAML pointer/keyboard input: WPE WebKit on Linux
+(system WPE libraries required), or Edge WebView2 on Windows (installed WebView2
+runtime required). Windows browser profiles are isolated per process under
+`TestResults/PlayTest/WebView2` in the test output directory. PlayTest supplies the
+Windows STA message pump; the optional add-in supplies the browser provider and
+composites its frames into Skia, including screenshots and the SDL preview.
+PlayTest does not supply a browser engine, DOM locators, or a macOS WebView provider.
 
 The AriaRole enum is adapted from MIT-licensed Microsoft Playwright for .NET.
 See the packaged `THIRD-PARTY-NOTICES.txt` for attribution and license text.

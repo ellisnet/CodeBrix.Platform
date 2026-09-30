@@ -319,6 +319,13 @@ Windows-head specifics
 
 UI-THREAD RULES
 ---------------
+  - The Windows PlayTest head also uses this add-in. It supplies an STA message
+    pump and discovers the offscreen Edge provider automatically. Web content is
+    captured into the Skia scene and receives synthetic browser input, with no
+    visible native browser window. The Edge WebView2 runtime must be installed.
+    Profiles are isolated by process below TestResults/PlayTest/WebView2 in the
+    test output directory. PlayTest on Linux uses WPE; a macOS PlayTest browser
+    provider is not available. The regular desktop providers are unchanged.
   - WebView2 is a XAML Control: create it, set Source, and call its methods
     on the UI thread, like any other control.
   - Every event - NavigationStarting/Completed, WebMessageReceived,

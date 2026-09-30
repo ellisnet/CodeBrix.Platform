@@ -72,10 +72,16 @@ exercise that application's actual shared XAML and build the framework from sour
 Put general control demonstrations there, not into unrelated sample applications.
 JustBetweenUs and the five additional CodeBrix.Samples suites exercise their own
 application screens; the latter share PlayTestSupport in that repository.
-They use SilverAssertions and existing app service interfaces
-for offline data. Linux WPE WebView works through the app's own add-in; PlayTest
-adds no WebView package or native browser dependency. GPU-only GL controls remain
-unsupported. Do not claim Windows/macOS native browser support from Linux tests.
+They use SilverAssertions and existing app service interfaces for offline data.
+Linux WPE and Windows Edge WebView2 work through the app's own WebView add-in;
+PlayTest adds no WebView package or native browser dependency. On Windows, its
+STA dispatcher also pumps native messages for WebView2's COM callbacks. The
+optional add-in supplies an offscreen composition controller and captures its
+frames into Skia; pointer and keyboard input go through the browser input APIs.
+Browser profiles live below TestResults/PlayTest/WebView2, per process. The head
+flows packaged ICU assets/data for Windows/macOS text initialization. GPU-only GL
+controls and macOS PlayTest WebViews remain unsupported. Validate each OS on its
+own host before claiming runtime support.
 
 AriaRole.cs retains its original MIT notice. Update the root third-party notice
 whenever adapting additional upstream code. SDL3 is a normal NuGet dependency.

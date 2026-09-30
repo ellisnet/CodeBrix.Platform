@@ -106,3 +106,26 @@ On Linux x64 / X11:
 After adding the delay preferences, all 38 cases passed headless, headed with
 `CODEBRIX_PLAYTEST_SLOWMO` unset (the new 250 ms default), and headed with an
 explicit zero. Fixture `SlowMo` overrides remain supported.
+
+The Windows native-preview check is available from the repository root:
+
+```powershell
+./build/test-scripts/playtest-preview-windows.ps1 `
+  -TestOutput ../CodeBrix.Samples/JustBetweenUs/CodeBrixPlatform/tests/JustBetweenUs.PlayTests/bin/Release/net10.0 `
+  -Artifacts TestResults/PlayTestPreview-Windows
+```
+
+Build the sample test output first. The check opens only its own preview windows,
+captures their client areas, and validates eight alternating landscape/portrait
+frames with stable window sizes and centered letterboxing. Four additional checks
+cover clean EOF, invalid dimensions, a truncated header and truncated pixels.
+It uses PowerShell 7 and Windows' drawing APIs, with no Python imaging dependency.
+Keep the preview windows unobscured while the capture check runs.
+
+On Windows x64, 2026-09-30, all 38 cases passed in each of headless/light
+landscape, headless/light portrait, headed/dark landscape and headed/dark
+portrait: 152 executions, zero failures or skips. Headed runs used the Windows
+SDL driver and the default 250 ms action delay. The native-preview check above
+also passed all eight frame/orientation checks and four protocol checks.
+The six CodeBrix.Samples application suites passed the same matrix using local
+preview `.12`, for 676 passing executions across both repositories.
