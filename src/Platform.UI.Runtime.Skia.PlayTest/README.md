@@ -39,6 +39,25 @@ Names are case-insensitive; invalid selected values fail with a descriptive erro
 The host uses software Skia, embedded fonts, and a stable default culture;
 application-specific OS services can still differ across systems.
 
+The simulated operating-system theme is resolved once, before constructing the
+application, in this order:
+
+1. `CODEBRIX_PLAYTEST_THEME=dark` or `light`.
+2. `<CodeBrixPlayTestPreferredTheme>Dark</CodeBrixPlayTestPreferredTheme>` in the
+   test `.csproj` (Light is also accepted).
+3. Light.
+
+Names are case-insensitive. An unset or empty environment value falls back to
+the project; invalid selected values fail with a descriptive error. Project
+preferences use the same `ConfigurationAssembly` metadata mechanism as orientation.
+The host supplies this preference to the framework's normal system-theme provider,
+so application startup, theme resources and `UISettings` system-color queries see
+it. `application.SystemTheme` reports the simulated preference. It remains fixed
+for the run and never follows the real desktop's theme. An application can still
+explicitly choose its own theme. Headless rendering, screenshots and the visible
+preview all use the same application pixels. Run separate processes to test
+startup under both OS themes; orientation changes do not change the theme.
+
 Tests can override the preference without starting another application. Use
 `Page.SetContentAsync(() => new MainPage(), ScreenOrientation.Portrait)` to apply
 orientation **before** constructing a fresh page and wait for layout/rendering.
@@ -92,8 +111,27 @@ The developer can still resize the window manually; frames scale without
 stretching or cropping. Screenshots contain the actual virtual screen, without
 preview bars. All physical
 keyboard, pointer, wheel and touch input is discarded. Closing the preview
-does not close the test application. `PlayTestOptions.SlowMo` (milliseconds)
-can make test actions easier to watch. Headless execution needs no display server.
+does not close the test application. Headless execution needs no display server.
+
+Headed runs assume **250 ms between actions**; headless runs assume zero.
+Set `CODEBRIX_PLAYTEST_SLOWMO` to another delay in milliseconds, including `0`
+for full speed. An unset or empty variable uses the headed/headless default.
+An explicit `PlayTestOptions.SlowMo` in code overrides the environment, including
+an explicit zero. Leave it unset in fixtures to use the normal preferences.
+The default follows the final `Headless` option, including an explicit code
+override. The delay is resolved once at launch and does not change during a run.
+Values must be finite and non-negative, with `.` as the decimal separator.
+
+For an application whose fixture should always use 750 ms, set it in the launch
+options (this also overrides any `CODEBRIX_PLAYTEST_SLOWMO` value):
+
+```csharp
+Application = await PlayTestApplication.LaunchAsync(() => new App(), new()
+{
+    ConfigurationAssembly = typeof(AppFixture).Assembly,
+    SlowMo = 750,
+});
+```
 
 Locators resolve on every use. `GetByRole` uses automation peers and accessible
 names; `GetByLabel` uses accessible names; `GetByTestId` uses
@@ -116,15 +154,74 @@ operations use an isolated in-process clipboard, readable with
 Timeout failures include a PNG path and a visual-tree description under
 `TestResults/PlayTest` (override `ArtifactsDirectory` when needed).
 
+### Scripted file and folder pickers
+
+The [PlayTestDemo application](../../samples/CodeBrixPlatform/PlayTestDemo/README.md)
+contains runnable control/picker examples and their regression tests. It uses
+the framework from source and also has six normal desktop heads. Generic control
+demonstrations belong there; application suites should test their own UI.
+
+Queue a response before the action that opens the application's normal
+`Windows.Storage.Pickers` picker. No native picker or replacement dialog is
+displayed, including in headed mode:
+
+```csharp
+application.FilePickers.EnqueueFolder(assetsDirectory);
+await Page.GetByRole(AriaRole.Button, new() { Name = "Choose assets folder…", Exact = true }).ClickAsync();
+
+application.FilePickers.EnqueueOpenFile(inputFile);
+application.FilePickers.EnqueueOpenFiles(firstFile, secondFile);
+application.FilePickers.EnqueueSaveFile(outputFile);
+
+// Cancel the next picker of the corresponding kind:
+application.FilePickers.EnqueueFolder(null);
+application.FilePickers.EnqueueOpenFile(null);
+application.FilePickers.EnqueueSaveFile(null);
+```
+
+Folder, open-file and save-file responses have separate FIFO queues. Single and
+multiple open pickers share the open-file queue. Cancel returns null for single
+selection and an empty list for multiple selection. A single-file picker rejects
+a multiple-file response. Paths become absolute when queued. Selected folders
+and input files must exist; tests should create their own fixture data. A save
+file's parent folder must exist. Selecting a new save path creates an empty file,
+matching a native picker; selecting an existing file leaves its contents intact.
+Tests and application code remain responsible for actual reads and writes.
+
+An unqueued request throws `PlayTestException` instead of silently cancelling.
+Request counts and `LastSuggestedFileName` are available for assertions.
+Call `application.FilePickers.Clear()` between serialized tests to clear queued
+responses and reset this history; `Page.SetContentAsync` does not clear it.
+
+### Checked controls and scrolling
+
+`CheckAsync`, `UncheckAsync` and `SetCheckedAsync(bool)` support CheckBox,
+RadioButton, ToggleButton and ToggleSwitch. They use real pointer input when a
+state change is needed and do nothing when the requested state is already set.
+The resulting state is retried and checked. Use `IsCheckedAsync()` to read it or
+`Expect(locator).ToBeCheckedAsync()` / `.Not.ToBeCheckedAsync()` to wait for it.
+An unsupported control type throws a descriptive exception. Normal disabled,
+visibility and hit-test checks apply to state-changing actions.
+Radio buttons follow their usual UI behavior: checking works, but clicking a
+selected radio button cannot uncheck it, so that requested transition times out.
+
+`ScrollIntoViewIfNeededAsync()` uses XAML's bring-into-view mechanism to reveal an
+attached element in a ScrollViewer before clicking it. Virtualized items must
+first be materialized by scrolling their container.
+
 Version 0.1 supports a single window and a single application per process.
 `Page.SetContentAsync(() => new MainPage())` installs a fresh page between tests;
 application singletons are still shared and should be reset explicitly as needed.
 Supported API includes role/text/label/test-ID locators, scoped role/test-ID
-locators, filtering, First/Last/Nth, click/fill/press, mouse and keyboard input,
-value/text/state/count assertions, state evaluation and screenshots. Unsupported
+locators, filtering, First/Last/Nth, click/fill/press/check/scroll, mouse and keyboard input,
+value/text/state/count assertions, scripted storage pickers, state evaluation and screenshots. Unsupported
 Playwright browser features (DOM/CSS/JavaScript, network routing, browser contexts,
-tracing and browser downloads) are not simulated. GPU-only controls, native
+tracing and browser downloads) are not simulated. GPU-only controls, other native
 dialogs, multiple windows and horizontal wheel input are outside this prototype.
+On Linux, an application that already references the WebView add-in can use its
+offscreen WPE WebKit browser, including rendering and XAML pointer/keyboard input;
+the system WPE libraries are still required. PlayTest does not supply a browser
+engine, DOM locators, or native WebView providers for Windows/macOS.
 
 The AriaRole enum is adapted from MIT-licensed Microsoft Playwright for .NET.
 See the packaged `THIRD-PARTY-NOTICES.txt` for attribution and license text.

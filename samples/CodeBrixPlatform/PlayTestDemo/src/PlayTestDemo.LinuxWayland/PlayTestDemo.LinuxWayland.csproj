@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PlayTestDemoHead>LinuxWayland</PlayTestDemoHead>
+    <TargetFramework>net10.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX_SKIA_WAYLAND;__CODEBRIX_SKIA_WAYLAND__</DefineConstants>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.Wayland/Platform.UI.Runtime.Skia.Wayland.csproj" />
+  </ItemGroup>
+</Project>

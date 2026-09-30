@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CodeBrix.Platform.ApplicationModel.Core;
 using CodeBrix.Platform.ApplicationModel.DataTransfer;
 using CodeBrix.Platform.Foundation.Extensibility;
+using CodeBrix.Platform.Helpers.Theming;
 using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Dispatching;
 using CodeBrix.Platform.UI.Hosting;
@@ -24,6 +25,8 @@ namespace CodeBrix.Platform.PlayTest.Hosting;
 internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHost, ICoreApplicationExtension, IDisposable
 {
     private readonly Func<Application> _factory;
+    private readonly VirtualSystemTheme _theme;
+    private readonly PlayTestFilePickers _filePickers;
     private readonly BlockingCollection<Action> _queue = new();
     private readonly ManualResetEventSlim _exit = new();
     private readonly AutoResetEvent _render = new(false);
@@ -50,9 +53,11 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     UIElement IXamlRootHost.RootElement => Root;
     public bool CanExit => true;
 
-    internal VirtualHost(Func<Application> factory, bool portrait)
+    internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers)
     {
         _factory = factory;
+        _theme = new VirtualSystemTheme(theme);
+        _filePickers = filePickers;
         _screen = new VirtualScreen(portrait ? ScreenOrientation.Portrait : ScreenOrientation.Landscape);
         Window = new VirtualWindow(this);
         Input = new VirtualInput(this);
@@ -75,6 +80,10 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
 
     private void InitializeApplication()
     {
+        // Register before constructing the app, including its theme resources and system-color queries.
+        ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => _theme);
+        SystemThemeHelper.RefreshSystemTheme();
+        _filePickers.Register();
         FeatureConfiguration.TextBox.UseOverlayOnSkia = false;
         FeatureConfiguration.Font.RestrictToEmbeddedFonts = true;
         CoreDispatcher.DispatchOverride = (action, priority) => Enqueue(action);

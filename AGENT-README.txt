@@ -2278,6 +2278,9 @@ the reference lines):
         one demo per add-in (six heads each); their AGENT-READMEs describe them
 
 Framework tests that double as API examples:
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlayTestDemo
+        dedicated control/picker demo with six desktop heads and PlayTest regression
+        cases; general-purpose testing UI belongs here rather than in unrelated apps
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI.RuntimeTests
         runtime tests for controls, binding, navigation and windowing
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI.Toolkit.Tests

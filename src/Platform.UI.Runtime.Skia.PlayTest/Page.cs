@@ -70,7 +70,11 @@ public sealed class Page
         {
             var window = Application.Host.Window.ManagedWindow;
             foreach (var popup in VisualTreeHelper.GetOpenPopupsForXamlRoot(window.Content.XamlRoot).ToArray()) popup.IsOpen = false;
-            if (window.Content is FrameworkElement { DataContext: IDisposable disposable }) disposable.Dispose();
+            // Application startup commonly hosts its page inside a navigation Frame.
+            // Dispose that page's view model too, so its timers/streams do not outlive a reset.
+            var previous = window.Content;
+            while (previous is Frame { Content: UIElement child }) previous = child;
+            if (previous is FrameworkElement { DataContext: IDisposable disposable }) disposable.Dispose();
             window.Content = null;
             Application.Host.SetOrientation(selected);
             window.Content = content();

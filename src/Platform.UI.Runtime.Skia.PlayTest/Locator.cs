@@ -51,6 +51,40 @@ public sealed class Locator
     public Task<bool> IsVisibleAsync() => App.EvaluateAsync(() => VisualTree.Visible(Single()));
     public Task<bool> IsEnabledAsync() => App.EvaluateAsync(() => Single() is { } e && VisualTree.Enabled(e));
     public Task<bool> IsDisabledAsync() => App.EvaluateAsync(() => Single() is { } e && !VisualTree.Enabled(e));
+    public Task<bool> IsCheckedAsync() => ReadAsync(VisualTree.Checked);
+    public Task CheckAsync(LocatorClickOptions options = null) => SetCheckedAsync(true, options);
+    public Task UncheckAsync(LocatorClickOptions options = null) => SetCheckedAsync(false, options);
+
+    public async Task SetCheckedAsync(bool value, LocatorClickOptions options = null)
+    {
+        var alreadySet = false;
+        await RetryAsync(() =>
+        {
+            var element = Single();
+            if (element == null) return false;
+            alreadySet = VisualTree.Checked(element) == value;
+            return true;
+        }, options?.Timeout, "checkable element attached").ConfigureAwait(false);
+        if (alreadySet) return;
+        await ClickAsync(options).ConfigureAwait(false);
+        await RetryAsync(() => Single() is { } element && VisualTree.Checked(element) == value,
+            options?.Timeout, value ? "checked" : "unchecked").ConfigureAwait(false);
+    }
+
+    /// <summary>Bring an attached element into its scrollable viewport. Virtualized items must
+    /// first be materialized by scrolling their container.</summary>
+    public async Task ScrollIntoViewIfNeededAsync(LocatorOptions options = null)
+    {
+        await RetryAsync(() =>
+        {
+            var element = Single();
+            if (!VisualTree.Visible(element)) return false;
+            element.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false });
+            return true;
+        }, options?.Timeout, "visible element attached").ConfigureAwait(false);
+        await App.Host.CaptureAsync().ConfigureAwait(false);
+        await App.SlowAsync().ConfigureAwait(false);
+    }
     public async Task<string> InputValueAsync() => await ReadAsync(VisualTree.Value).ConfigureAwait(false);
     public async Task<string> InnerTextAsync() => await ReadAsync(VisualTree.Text).ConfigureAwait(false);
     public Task<string> TextContentAsync() => InnerTextAsync();
@@ -78,7 +112,7 @@ public sealed class Locator
         {
             var element = Single();
             if (!VisualTree.Visible(element) || !VisualTree.Enabled(element)) { previous = null; return false; }
-            var bounds = VisualTree.Bounds(element);
+            var bounds = VisualTree.Bounds(VisualTree.ClickTarget(element));
             var point = new Point(bounds.X + bounds.Width / 2, bounds.Y + bounds.Height / 2);
             if (previous != bounds) { previous = bounds; return false; }
             if (point.X < 0 || point.X >= App.Width || point.Y < 0 || point.Y >= App.Height || !VisualTree.ReceivesEvents(element, point)) return false;

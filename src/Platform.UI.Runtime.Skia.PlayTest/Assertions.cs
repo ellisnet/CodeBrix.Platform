@@ -24,6 +24,7 @@ public sealed class LocatorAssertions
         VisualTree.Enabled, options?.Timeout, "enabled");
     public Task ToBeDisabledAsync(LocatorAssertionsToBeDisabledOptions options = null) => Check(
         e => !VisualTree.Enabled(e), options?.Timeout, "disabled");
+    public Task ToBeCheckedAsync(LocatorOptions options = null) => Check(VisualTree.Checked, options?.Timeout, "checked");
     public Task ToHaveCountAsync(int count, LocatorAssertionsToHaveCountOptions options = null) => _locator.RetryAsync(
         () => (_locator.Resolve().Length == count) != _not, options?.Timeout, (_not ? "not " : "") + $"count {count}");
     public Task ToHaveValueAsync(string value, LocatorAssertionsToHaveValueOptions options = null) => Check(

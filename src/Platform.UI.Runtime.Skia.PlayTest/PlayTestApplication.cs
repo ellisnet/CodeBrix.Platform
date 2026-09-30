@@ -17,14 +17,27 @@ public enum ScreenOrientation { Landscape, Portrait }
 public sealed class PlayTestOptions
 {
     private ScreenOrientation? _orientation;
+    private float? _slowMo;
     /// <summary>An explicit orientation overrides environment and project preferences.</summary>
     public ScreenOrientation Orientation { get => _orientation ?? ScreenOrientation.Landscape; set => _orientation = value; }
-    /// <summary>The test assembly containing the project preference; defaults to the entry assembly.</summary>
+    /// <summary>The test assembly containing project preferences; defaults to the entry assembly.</summary>
     public Assembly ConfigurationAssembly { get; set; }
     public bool Headless { get; set; } = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
     public float Timeout { get; set; } = 10_000;
-    public float SlowMo { get; set; }
+    /// <summary>Action delay in milliseconds. An explicit value (including zero) wins over
+    /// CODEBRIX_PLAYTEST_SLOWMO; otherwise defaults to 250 in headed mode and zero headless.</summary>
+    public float SlowMo { get => _slowMo ?? DefaultSlowMo(); set => _slowMo = value; }
     public string ArtifactsDirectory { get; set; } = Path.Combine("TestResults", "PlayTest");
+
+    private float DefaultSlowMo()
+    {
+        var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_SLOWMO");
+        if (string.IsNullOrEmpty(environment)) return Headless ? 0 : 250;
+        if (float.TryParse(environment, NumberStyles.Float, CultureInfo.InvariantCulture, out var delay)
+            && float.IsFinite(delay) && delay >= 0)
+            return delay;
+        throw new ArgumentException($"CODEBRIX_PLAYTEST_SLOWMO must be a finite, non-negative number of milliseconds; received '{environment}'.");
+    }
 
     /// <summary>Resolves code, environment, project metadata, then the landscape fallback.</summary>
     public ScreenOrientation ResolveOrientation()
@@ -43,6 +56,26 @@ public sealed class PlayTestOptions
         return string.IsNullOrEmpty(preference) ? ScreenOrientation.Landscape
             : OrientationPreference.Parse(preference, "CodeBrixPlayTestPreferredOrientation");
     }
+
+    /// <summary>Resolves the simulated OS theme: environment, project metadata, then Light.</summary>
+    public ApplicationTheme ResolveTheme()
+    {
+        var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_THEME");
+        if (!string.IsNullOrEmpty(environment))
+            return ParseTheme(environment, "CODEBRIX_PLAYTEST_THEME");
+        var assembly = ConfigurationAssembly ?? Assembly.GetEntryAssembly();
+        var preference = assembly?.GetCustomAttributes<AssemblyMetadataAttribute>()
+            .SingleOrDefault(a => a.Key == "CodeBrixPlayTestPreferredTheme")?.Value;
+        return string.IsNullOrEmpty(preference) ? ApplicationTheme.Light
+            : ParseTheme(preference, "CodeBrixPlayTestPreferredTheme");
+    }
+
+    private static ApplicationTheme ParseTheme(string value, string source)
+    {
+        if (string.Equals(value, "light", StringComparison.OrdinalIgnoreCase)) return ApplicationTheme.Light;
+        if (string.Equals(value, "dark", StringComparison.OrdinalIgnoreCase)) return ApplicationTheme.Dark;
+        throw new ArgumentException($"{source} must be Light or Dark; received '{value}'.");
+    }
 }
 
 public sealed class PlayTestException : Exception
@@ -60,19 +93,24 @@ public sealed class PlayTestApplication : IAsyncDisposable
     private int _disposed;
     internal PlayTestOptions Options { get; }
     public Page Page { get; }
+    public PlayTestFilePickers FilePickers { get; } = new();
     public int Width => _host.Width;
     public int Height => _host.Height;
     public bool Headless => Options.Headless;
+    /// <summary>The simulated OS theme, resolved before app construction and fixed for this run.
+    /// An application may explicitly choose its own requested theme.</summary>
+    public ApplicationTheme SystemTheme { get; }
     /// <summary>The launch preference used by tests with no explicit orientation.</summary>
     public ScreenOrientation PreferredOrientation => Options.Orientation;
     /// <summary>The orientation of the current virtual screen.</summary>
     public ScreenOrientation Orientation => _host.Orientation;
     internal VirtualHost Host => _host;
 
-    private PlayTestApplication(Func<Application> factory, PlayTestOptions options)
+    private PlayTestApplication(Func<Application> factory, PlayTestOptions options, ApplicationTheme theme)
     {
         Options = options;
-        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait);
+        SystemTheme = theme;
+        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait, theme, FilePickers);
         Page = new Page(this);
     }
 
@@ -81,16 +119,18 @@ public sealed class PlayTestApplication : IAsyncDisposable
         ArgumentNullException.ThrowIfNull(application);
         options ??= new PlayTestOptions();
         var orientation = options.ResolveOrientation();
-        if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || options.SlowMo < 0 || !float.IsFinite(options.SlowMo))
+        var theme = options.ResolveTheme();
+        var slowMo = options.SlowMo;
+        if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || slowMo < 0 || !float.IsFinite(slowMo))
             throw new ArgumentOutOfRangeException(nameof(options));
         if (Interlocked.Exchange(ref _launched, 1) != 0)
             throw new InvalidOperationException("PlayTest hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications.");
         options = new PlayTestOptions
         {
             Orientation = orientation, Headless = options.Headless,
-            Timeout = options.Timeout, SlowMo = options.SlowMo, ArtifactsDirectory = options.ArtifactsDirectory,
+            Timeout = options.Timeout, SlowMo = slowMo, ArtifactsDirectory = options.ArtifactsDirectory,
         };
-        var result = new PlayTestApplication(application, options);
+        var result = new PlayTestApplication(application, options, theme);
         try
         {
             // Stable default culture; an app or a test can explicitly exercise other cultures.

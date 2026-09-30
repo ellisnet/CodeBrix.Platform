@@ -5,6 +5,16 @@
   <ItemGroup Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
     <AssemblyMetadata Include="CodeBrixPlayTestPreferredOrientation" Value="$(CodeBrixPlayTestPreferredOrientation)" />
   </ItemGroup>
+  <ItemGroup Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
+    <AssemblyMetadata Include="CodeBrixPlayTestPreferredTheme" Value="$(CodeBrixPlayTestPreferredTheme)" />
+  </ItemGroup>
+  <Target Name="_CodeBrixPlayTestValidateTheme" BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
+    <Error Condition="'$(CodeBrixPlayTestPreferredTheme)' != 'Light' and '$(CodeBrixPlayTestPreferredTheme)' != 'Dark'"
+           Text="CodeBrixPlayTestPreferredTheme must be Light or Dark." />
+    <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
+           Text="CodeBrixPlayTestPreferredTheme requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
+  </Target>
   <Target Name="_CodeBrixPlayTestValidateOrientation" BeforeTargets="GenerateAssemblyInfo"
           Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
     <Error Condition="'$(CodeBrixPlayTestPreferredOrientation)' != 'Landscape' and '$(CodeBrixPlayTestPreferredOrientation)' != 'Portrait'"

@@ -1,0 +1,64 @@
+<Page x:Class="PlayTestDemo.Views.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+    <StackPanel Padding="32" Spacing="20" MaxWidth="1000" HorizontalAlignment="Stretch">
+      <TextBlock Text="PlayTestDemo" FontSize="32" FontWeight="SemiBold" />
+      <TextBlock Text="A home for control and interaction tests. Try the controls yourself, or watch the PlayTests preview."
+                 TextWrapping="Wrap" />
+
+      <Border Padding="20" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Checked controls" FontSize="22" FontWeight="SemiBold" />
+          <CheckBox x:Name="DemoCheckBox" Content="Enable the checkbox option" AutomationProperties.AutomationId="DemoCheckBox"
+                    Checked="OnCheckChanged" Unchecked="OnCheckChanged" />
+          <TextBlock Text="{Binding CheckStatus}" AutomationProperties.AutomationId="CheckStatus" />
+          <ToggleSwitch x:Name="DemoToggleSwitch" Header="Enable the switch option" AutomationProperties.AutomationId="DemoToggleSwitch"
+                        Toggled="OnToggleChanged" />
+          <TextBlock Text="{Binding ToggleStatus}" AutomationProperties.AutomationId="ToggleStatus" />
+        </StackPanel>
+      </Border>
+
+      <Border Padding="20" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+        <StackPanel Spacing="10">
+          <TextBlock Text="File and folder pickers" FontSize="22" FontWeight="SemiBold" />
+          <TextBlock Text="Open reads a text file. Save selects a destination without overwriting its contents."
+                     TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button Content="Choose folder" Click="OnChooseFolder" />
+            <Button Content="Open text file" Click="OnOpenFile" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <Button Content="Open multiple files" Click="OnOpenFiles" />
+            <Button Content="Choose save path" Click="OnSaveFile" />
+          </StackPanel>
+          <TextBlock Text="{Binding PickerOutcome}" FontWeight="SemiBold" AutomationProperties.AutomationId="PickerOutcome" />
+          <TextBlock Text="{Binding PickerStatus}" TextWrapping="Wrap" IsTextSelectionEnabled="True"
+                     AutomationProperties.AutomationId="PickerStatus" />
+          <TextBlock Text="{Binding SelectedText}" TextWrapping="Wrap" MaxHeight="100"
+                     AutomationProperties.AutomationId="SelectedText" />
+        </StackPanel>
+      </Border>
+
+      <Border Padding="20" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1">
+        <StackPanel Spacing="10">
+          <TextBlock Text="Scrolling" FontSize="22" FontWeight="SemiBold" />
+          <TextBlock Text="Scroll inside the panel to reach the target button." TextWrapping="Wrap" />
+          <ScrollViewer Height="160" VerticalScrollBarVisibility="Visible" AutomationProperties.AutomationId="ScrollPanel">
+            <StackPanel Spacing="12">
+              <Border Height="800" Background="{ThemeResource ControlFillColorSecondaryBrush}">
+                <TextBlock Text="More content below ↓" Margin="16" VerticalAlignment="Top" />
+              </Border>
+              <Button Content="Below the fold" Click="OnScrollTarget" />
+            </StackPanel>
+          </ScrollViewer>
+          <TextBlock Text="{Binding ScrollStatus}" AutomationProperties.AutomationId="ScrollStatus" />
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
+</Page>

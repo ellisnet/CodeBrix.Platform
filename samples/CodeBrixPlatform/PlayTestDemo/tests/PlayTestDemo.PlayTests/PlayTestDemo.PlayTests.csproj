@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+    <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+    <CodeBrixPlayTestPreferredOrientation Condition="'$(CodeBrixPlayTestPreferredOrientation)' == ''">Landscape</CodeBrixPlayTestPreferredOrientation>
+    <CodeBrixPlayTestPreferredTheme Condition="'$(CodeBrixPlayTestPreferredTheme)' == ''">Light</CodeBrixPlayTestPreferredTheme>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+    <PackageReference Include="xunit.v3" Version="4.0.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+  </ItemGroup>
+  <Import Project="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest/buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />
+</Project>

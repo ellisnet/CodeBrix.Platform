@@ -43,6 +43,11 @@ internal static class VisualTree
     internal static Rect Bounds(UIElement element) => element is FrameworkElement f
         ? element.TransformToVisual(null).TransformBounds(new Rect(0, 0, f.ActualWidth, f.ActualHeight)) : default;
 
+    // A stretched ToggleSwitch includes its header and empty layout space. Its thumb
+    // is the actual pointer target, including with the framework's default template.
+    internal static UIElement ClickTarget(UIElement element) => element is ToggleSwitch
+        ? (UIElement)Walk(element).OfType<Thumb>().FirstOrDefault() ?? element : element;
+
     internal static bool Visible(UIElement element)
     {
         if (element == null || element.XamlRoot == null) return false;
@@ -119,6 +124,13 @@ internal static class VisualTree
         TextBox text => InputText(text.Text),
         ComboBox combo => combo.SelectedItem?.ToString() ?? "",
         _ => throw new PlayTestException("InputValueAsync/ToHaveValueAsync requires a text box, password box, or combo box."),
+    };
+
+    internal static bool Checked(UIElement element) => element switch
+    {
+        ToggleSwitch toggle => toggle.IsOn,
+        ToggleButton toggle => toggle.IsChecked == true,
+        _ => throw new PlayTestException("Checked state requires a checkbox, radio button, toggle button, or toggle switch."),
     };
 
     internal static bool ReceivesEvents(UIElement target, Point point)

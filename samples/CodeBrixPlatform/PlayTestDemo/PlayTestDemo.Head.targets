@@ -1,0 +1,45 @@
+<Project>
+  <!-- Like the other in-repository demos, consume framework source rather than NuGets.
+       ProjectReference does not import the package's XAML/runtime buildTransitive wiring. -->
+  <PropertyGroup>
+    <PlayTestDemoPlatformSource>$(MSBuildThisFileDirectory)../../../src/</PlayTestDemoPlatformSource>
+    <TargetFramework Condition="'$(TargetFramework)' == ''">net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+    <IsCodeBrixHead>true</IsCodeBrixHead>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;__CODEBRIX__;HAS_CODEBRIX_WINUI;__CODEBRIX_WINUI__;WINUI_WINDOWING;CODEBRIX_HAS_FRAMEWORKELEMENT_MEASUREOVERRIDE;CODEBRIX_HAS_NO_IDEPENDENCYOBJECT;CODEBRIX_REFERENCE_API;HAS_CODEBRIX_SKIA;__DESKTOP__;__CODEBRIX_SKIA__</DefineConstants>
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+    <CodeBrixUIMSBuildTasksPath>$(PlayTestDemoPlatformSource)SourceGenerators/Platform.UI.Tasks/bin/$(Configuration)_Shadow</CodeBrixUIMSBuildTasksPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildThisFileDirectory)src/PlayTestDemo.UI/PlayTestDemo.UI.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)src/PlayTestDemo.Core/PlayTestDemo.Core.csproj" />
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)SourceGenerators/Platform.UI.SourceGenerators/Platform.UI.SourceGenerators.csproj"
+                      ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" UndefineProperties="TargetFramework" />
+  </ItemGroup>
+  <Import Project="$(PlayTestDemoPlatformSource)SourceGenerators/Platform.UI.SourceGenerators/Content/Platform.UI.SourceGenerators.props" />
+  <Import Project="$(PlayTestDemoPlatformSource)SourceGenerators/Platform.UI.Tasks/Content/Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == ''" />
+  <Target Name="_PlayTestDemoUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences" Condition="'$(PlayTestDemoHead)' != 'MacOS'">
+    <PropertyGroup>
+      <_PlayTestDemoSkiaUwp>$(PlayTestDemoPlatformSource)Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_PlayTestDemoSkiaUwp>
+      <_PlayTestDemoSkiaComp>$(PlayTestDemoPlatformSource)Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_PlayTestDemoSkiaComp>
+      <_PlayTestDemoSkiaDisp>$(PlayTestDemoPlatformSource)Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_PlayTestDemoSkiaDisp>
+    </PropertyGroup>
+    <ItemGroup>
+      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+      <!-- Add the .Skia variants in their place. -->
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_PlayTestDemoSkiaUwp)\CodeBrix.Platform.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_PlayTestDemoSkiaUwp)\CodeBrix.Platform.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_PlayTestDemoSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_PlayTestDemoSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_PlayTestDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+      <ReferenceCopyLocalPaths Include="$(_PlayTestDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_PlayTestDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+    </ItemGroup>
+  </Target>
+
+</Project>
