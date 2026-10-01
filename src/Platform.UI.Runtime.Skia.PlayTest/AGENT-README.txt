@@ -113,6 +113,25 @@ claiming runtime support.
 AriaRole.cs retains its original MIT notice. Update the root third-party notice
 whenever adapting additional upstream code. SDL3 is a normal NuGet dependency.
 
+Desktop control contracts: GetByType<T> keeps add-in types in the application,
+not in PlayTest's dependency graph. Fill/value assertions fall back to the standard
+IValueProvider; checked actions fall back to IToggleProvider. AdvancedTextEdit
+owns its peer and focus forwarding. Before typing, preserve existing focus in a
+composite control's subtree; refocusing its outer control can defer forwarding
+and lose input. Prefer the automation peer's SetFocus for a new focus target.
+TypeAsync/PressSequentiallyAsync dispatch actual character key events, including
+Enter/Tab, rather than replacing Document.Text or calling editor handlers.
+
+Menu names use their labels without template arrows/check glyphs. Menubar,
+Menuitem (including submenus), Menuitemcheckbox, Menu and Toolbar are supported.
+Toggle menu items may leave the visible tree after a check; verify that item's
+result rather than waiting for its flyout to reopen. Hover, positioned/multi/right
+clicks and stepped drags retain strictness, bounds checks and hit testing. Always
+release a drag's pointer on failure. One outer recording scope represents each
+logical action. DesktopControlTests in PlayTestDemo cover composite input,
+read-only/undo, completion, menu dismissal, toolbar commands/overflow and invalid
+pointer positions; Fresco's suite exercises real nested TriPaneView divider drags.
+
 Screenshot recording: --screenshotfolder claims an existing empty folder only at
 execution, never during option validation/discovery. Record PNGs from the virtual
 Skia surface, not the desktop preview. buildTransitive/CodeBrix.PlayTest.Xunit.cs

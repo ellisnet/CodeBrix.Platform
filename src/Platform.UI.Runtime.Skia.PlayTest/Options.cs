@@ -27,7 +27,30 @@ public sealed class LocatorFilterOptions
     public Regex HasTextRegex { get; set; }
 }
 
-public sealed class LocatorClickOptions : LocatorOptions { }
+public enum MouseButton { Left, Right, Middle }
+
+/// <summary>Logical-pixel position relative to the element's top-left corner.</summary>
+public sealed class LocatorPosition
+{
+    public float X { get; set; }
+    public float Y { get; set; }
+}
+
+public sealed class LocatorClickOptions : LocatorOptions
+{
+    public LocatorPosition Position { get; set; }
+    public MouseButton Button { get; set; }
+    public int ClickCount { get; set; } = 1;
+}
+public sealed class LocatorHoverOptions : LocatorOptions
+{
+    public LocatorPosition Position { get; set; }
+}
+public sealed class LocatorDragOptions : LocatorOptions
+{
+    public LocatorPosition Position { get; set; }
+    public int Steps { get; set; } = 10;
+}
 public sealed class LocatorFillOptions : LocatorOptions { }
 public sealed class LocatorPressOptions : LocatorOptions { }
 public sealed class LocatorAssertionsToBeVisibleOptions : LocatorOptions { }

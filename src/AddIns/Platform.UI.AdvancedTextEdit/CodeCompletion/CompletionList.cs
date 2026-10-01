@@ -158,6 +158,9 @@ public partial class CompletionList : Control
 	//was previously: HandleKey(KeyEventArgs e), setting e.Handled.
 	public bool HandleKey(VirtualKey key)
 	{
+		// A filter with no matches must not swallow Enter/Tab or caret navigation.
+		// There is nothing to complete; the editor should handle these keys normally.
+		if (listBox.Items.Count == 0) return false;
 		// We have to do some key handling manually, because the default doesn't work with
 		// our simulated events.
 		// Also, the default PageUp/PageDown implementation changes the focus, so we avoid it.

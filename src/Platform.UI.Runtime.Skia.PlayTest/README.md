@@ -333,8 +333,8 @@ first be materialized by scrolling their container.
 Version 0.1 supports a single window and a single application per process.
 `Page.SetContentAsync(() => new MainPage())` installs a fresh page between tests;
 application singletons are still shared and should be reset explicitly as needed.
-Supported API includes role/text/label/test-ID locators, scoped role/test-ID
-locators, filtering, First/Last/Nth, click/fill/press/check/scroll, mouse and keyboard input,
+Supported API includes role/text/label/test-ID/type locators, scoped locators,
+filtering, First/Last/Nth, click/hover/drag/fill/press/check/scroll, mouse and keyboard input,
 value/text/state/count assertions, scripted storage pickers, state evaluation and screenshots. Unsupported
 Playwright browser features (DOM/CSS/JavaScript, network routing, browser contexts,
 tracing and browser downloads) are not simulated. GPU-only controls, other native
@@ -357,6 +357,47 @@ composites its frames into Skia, including screenshots and the SDL preview.
 PlayTest does not supply a browser engine or DOM locators. Native browser file
 uploads, script dialogs and downloads are outside the macOS offscreen adapter's
 current surface; file upload/dialog requests are cancelled without displaying UI.
+
+### Editors, toolbars, menus and split panes
+
+`GetByType<T>()` finds visible controls by an application-owned type. It is lazy
+and supports the same strictness, scoping, filtering and retries as role locators.
+Pass `includeHidden: true` when inspecting attached hidden controls. Referencing
+an add-in from the test application does not add that dependency to PlayTest.
+
+```csharp
+var editor = Page.GetByRole(AriaRole.Textbox, new() { Name = "Source editor", Exact = true });
+await editor.FillAsync("first value");
+await editor.FillAsync("second value");
+await editor.PressAsync("Control+z");
+await Expect(editor).ToHaveValueAsync("first value");
+await editor.PressSequentiallyAsync("\nnext line");
+
+await Page.GetByRole(AriaRole.Menuitem, new() { Name = "More", Exact = true }).HoverAsync();
+await Page.GetByType<MyDivider>().DragByAsync(80, 0);
+await editor.ClickAsync(new() { Button = MouseButton.Right, Position = new() { X = 100, Y = 30 } });
+```
+
+`PressSequentiallyAsync` focuses the control (preserving focus on a child of a
+composite editor) and sends each character through routed key events. Enter and
+Tab therefore exercise normal indentation/completion handlers. `Keyboard.TypeAsync`
+does the same on the already focused control; `FillAsync` replaces the whole
+value. Custom editors support fill/value assertions through `IValueProvider`.
+Read-only providers are respected. AdvancedTextEdit implements this contract in
+its own package, including undoable replacement and text-area focus.
+
+Menus expose `Menubar`, `Menu`, `Menuitem` and `Menuitemcheckbox`; names exclude
+template arrow/check glyphs. Toolbar peers expose `Toolbar` and buttons, including
+split buttons. Checked actions also support standard `IToggleProvider` peers.
+Checking a toggle menu item verifies its result after the flyout dismisses.
+
+Click options accept a relative logical-pixel `Position`, a left/right/middle
+`Button`, and `ClickCount` (1–3). `HoverAsync` accepts a relative position too.
+`DragByAsync(deltaX, deltaY)` presses, moves in bounded steps (default 10), then
+releases in a `finally` block. Start points must be visible, enabled, stable and
+hit-testable; positions must be inside the target and drag endpoints inside the
+virtual screen. These actions use pointer input rather than invoking handlers.
+They are automatically included in screenshot recordings as one logical step.
 
 The AriaRole enum is adapted from MIT-licensed Microsoft Playwright for .NET.
 See the packaged `THIRD-PARTY-NOTICES.txt` for attribution and license text.

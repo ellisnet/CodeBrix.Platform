@@ -7,6 +7,13 @@ folder, single-file, multiple-file and save-path pickers. Status text shows the
 results and event counts. File opening reads text; choosing a save path does not
 write or replace file contents.
 
+“Try desktop controls” opens a shared interactive screen with AdvancedTextEdit,
+nested menus, toolbar commands, split buttons, checked items, overflow and
+read-only editing. The demo application references the CommandBar and
+AdvancedTextEdit add-ins; the PlayTest package does not. `DesktopControlTests.cs`
+covers these interactions through typed/role locators and real input, including
+failure paths, undo, composite focus and empty completion lists.
+
 ## Projects
 
 - `src/PlayTestDemo.Core`: view model and shared framework/font references.
@@ -200,3 +207,14 @@ metadata and notes. The standalone recording checker passed its expected failing
 case, two passing theory rows, 17 PNGs and nine invalid option/destination checks.
 The six sample package consumers passed another 133 cases with recording on local
 preview `.18`; the combined seven-suite run produced 1,183 PNGs.
+
+### Desktop controls and AdvancedTextEdit
+
+On Intel macOS (2026-09-30), the expanded suite passed all 72 cases headlessly
+and all 72 in a dark portrait preview, with zero failures or skips. This includes
+the standard automation Value provider, composite focus, undo, whole-document
+and partial read-only protection, completion, tab header names, toolbar commands
+and overflow, nested/toggle menus, right/double clicks, and disabled-drag cleanup.
+The editor and CommandBar references belong to the demo application; PlayTest
+itself gains no package dependency. Windows/Linux and Apple Silicon execution
+of these new cases still needs validation on those machines.

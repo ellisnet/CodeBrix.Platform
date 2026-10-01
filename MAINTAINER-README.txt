@@ -1007,3 +1007,32 @@ contained only the application's commands, without an automatic search item.
 Native File > New Document and File > Quit also passed with clean process exit.
 The head's normal build and osx-arm64 cross-build passed without warnings or
 errors; Apple Silicon runtime validation still needs that machine.
+
+PLAYTEST DESKTOP CONTROL AND EDITOR COVERAGE
+==========================================
+The PlayTestDemo shared UI now includes DesktopControlsView, accessible through
+"Try desktop controls" in every head. DesktopControlTests exercises typed/role
+locators, composite editor focus, IValueProvider fill/undo/read-only, empty
+completion, toolbar commands/toggles/overflow/split buttons, nested menus,
+right/double clicks, dismissed toggle-menu state, element tab headers and invalid
+pointer positions. The demo application's add-in project references do not add
+dependencies to the PlayTest package.
+
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release --nonheadless
+
+Fresco.Brix in CodeBrix.Samples.Gpl3 provides application-level coverage of nested
+TriPaneView drags, split editors, document tabs, menus/dialogs and engraving. Its
+test-only head consumes a local PlayTest/AdvancedTextEdit set; build both with:
+
+    python3 build/pack-playtest-preview.py --version <fresh-prerelease> --with-editor
+
+The optional switch adds TextLayout and AdvancedTextEdit to the local feed.
+Nothing is published. Existing app heads retain their own package versions.
+
+Intel macOS validation (2026-09-30): all 72 PlayTestDemo cases pass headless and
+headed dark/portrait, including protected editor sections and disabled drags.
+The new cases have not yet been executed on Windows, Linux or Apple Silicon.
+Fresco's package-consumer suite passed 104 cases headlessly and 104 in a dark
+portrait preview against local .22, with 1,169 validated automatic PNGs. Its
+README records the application fixes, final wizard checks and remaining limits.

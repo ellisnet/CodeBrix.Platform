@@ -21,6 +21,7 @@ public sealed partial class MainPage : Page
     }
 
     private void OnCheckChanged(object sender, RoutedEventArgs e) => ViewModel.RecordCheck(((CheckBox)sender).IsChecked == true);
+    private void OnDesktopControls(object sender, RoutedEventArgs e) => Content = new DesktopControlsView();
     private void OnToggleChanged(object sender, RoutedEventArgs e) => ViewModel.RecordToggle(((ToggleSwitch)sender).IsOn);
     private void OnScrollTarget(object sender, RoutedEventArgs e) => ViewModel.RecordScrollClick();
 

@@ -43,7 +43,9 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
         pickers, supported controls and limitations. Includes the headed
         250 ms action-delay default, command-line preview/theme/orientation switches,
         automatic start/step/final PNG recording and screenshot-index.json,
-        and fixture/environment overrides.
+        and fixture/environment overrides. Also covers typed locators, menu and
+        toolbar roles, hover/positioned clicks, divider dragging, and custom
+        editors through standard UI automation providers.
 
       samples/CodeBrixPlatform/PlayTestDemo/README.md
         Runnable examples: demo and PlayTests project structure, build/run

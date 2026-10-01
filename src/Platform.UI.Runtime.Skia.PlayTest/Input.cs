@@ -54,6 +54,33 @@ public sealed class Keyboard
         await _app.Host.CaptureAsync().ConfigureAwait(false);
     }
 
+    /// <summary>Types characters through routed key events on the focused control. Newlines and tabs
+    /// use Enter and Tab, preserving the application's indentation, completion and shortcut handling.</summary>
+    public async Task TypeAsync(string text)
+    {
+        await using var step = Recording.PlayTestRecording.Step(_app, "Type");
+        ArgumentNullException.ThrowIfNull(text);
+        var characters = VisualTree.InputText(text);
+        foreach (var character in characters)
+        {
+            await _app.EvaluateAsync(() =>
+            {
+                var key = character switch
+                {
+                    '\n' => VirtualKey.Enter,
+                    '\t' => VirtualKey.Tab,
+                    _ when char.IsAsciiLetter(character) => Enum.Parse<VirtualKey>(char.ToUpperInvariant(character).ToString()),
+                    _ when char.IsAsciiDigit(character) => VirtualKey.Number0 + (character - '0'),
+                    _ => VirtualKey.None,
+                };
+                try { _app.Host.Input.Key(true, key, character); }
+                finally { _app.Host.Input.Key(false, key); }
+            }).ConfigureAwait(false);
+        }
+        await _app.Host.CaptureAsync().ConfigureAwait(false);
+        await _app.SlowAsync().ConfigureAwait(false);
+    }
+
     private static VirtualKey Parse(string key) => key switch
     {
         "ControlOrMeta" => VirtualKey.Control, // Virtual head has a stable Windows-style key model on every OS.

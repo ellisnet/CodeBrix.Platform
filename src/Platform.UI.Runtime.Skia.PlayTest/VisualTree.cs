@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Automation.Peers;
+using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Media;
@@ -86,6 +87,11 @@ internal static class VisualTree
         if (!string.IsNullOrEmpty(name)) return name;
         var label = AutomationProperties.GetLabeledBy(element);
         if (label != null) return Text(label);
+        // The default menu templates include arrow/check glyphs in their peer's
+        // aggregated name. Those adornments are not part of the command label.
+        if (element is MenuFlyoutItem item) return item.Text ?? "";
+        if (element is MenuFlyoutSubItem submenu) return submenu.Text ?? "";
+        if (element is MenuBarItem topMenu) return topMenu.Title ?? "";
         var peer = FrameworkElementAutomationPeer.CreatePeerForElement(element);
         name = peer?.GetName();
         return string.IsNullOrEmpty(name) ? (element is TextBox ? "" : Text(element)) : name;
@@ -94,12 +100,24 @@ internal static class VisualTree
     internal static AriaRole Role(UIElement element)
     {
         if (element is ContentDialog) return AriaRole.Dialog;
+        if (element is MenuBar) return AriaRole.Menubar;
+        if (element is MenuBarItem) return AriaRole.Menuitem;
+        if (element is ToggleMenuFlyoutItem) return AriaRole.Menuitemcheckbox;
+        if (element is MenuFlyoutSubItem) return AriaRole.Menuitem;
+        if (element is MenuFlyoutPresenter) return AriaRole.Menu;
         if (element is ToggleSwitch) return AriaRole.Switch;
         if (element is ComboBoxItem) return AriaRole.Option;
         var peer = FrameworkElementAutomationPeer.CreatePeerForElement(element);
         return peer?.GetAutomationControlType() switch
         {
             AutomationControlType.Button => AriaRole.Button,
+            AutomationControlType.SplitButton => AriaRole.Button,
+            AutomationControlType.ToolBar => AriaRole.Toolbar,
+            AutomationControlType.Group => AriaRole.Group,
+            AutomationControlType.Menu => AriaRole.Menu,
+            AutomationControlType.MenuBar => AriaRole.Menubar,
+            AutomationControlType.MenuItem => AriaRole.Menuitem,
+            AutomationControlType.Separator => AriaRole.Separator,
             AutomationControlType.CheckBox => AriaRole.Checkbox,
             AutomationControlType.ComboBox => AriaRole.Combobox,
             AutomationControlType.Edit => AriaRole.Textbox,
@@ -123,15 +141,22 @@ internal static class VisualTree
         PasswordBox password => password.Password ?? "",
         TextBox text => InputText(text.Text),
         ComboBox combo => combo.SelectedItem?.ToString() ?? "",
-        _ => throw new PlayTestException("InputValueAsync/ToHaveValueAsync requires a text box, password box, or combo box."),
+        _ when ValueProvider(element) is { } value => InputText(value.Value),
+        _ => throw new PlayTestException("InputValueAsync/ToHaveValueAsync requires a text box, password box, combo box, or automation Value provider."),
     };
 
     internal static bool Checked(UIElement element) => element switch
     {
         ToggleSwitch toggle => toggle.IsOn,
         ToggleButton toggle => toggle.IsChecked == true,
-        _ => throw new PlayTestException("Checked state requires a checkbox, radio button, toggle button, or toggle switch."),
+        ToggleMenuFlyoutItem toggle => toggle.IsChecked,
+        _ when FrameworkElementAutomationPeer.CreatePeerForElement(element)?.GetPattern(PatternInterface.Toggle) is IToggleProvider toggle
+            => toggle.ToggleState == ToggleState.On,
+        _ => throw new PlayTestException("Checked state requires a checkable control or automation Toggle provider."),
     };
+
+    internal static IValueProvider ValueProvider(UIElement element) =>
+        FrameworkElementAutomationPeer.CreatePeerForElement(element)?.GetPattern(PatternInterface.Value) as IValueProvider;
 
     internal static bool ReceivesEvents(UIElement target, Point point)
     {

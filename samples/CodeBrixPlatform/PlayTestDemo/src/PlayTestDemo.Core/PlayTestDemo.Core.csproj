@@ -13,6 +13,8 @@
     <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" />
     <ProjectReference Include="../../../../../src/Platform.UI/Platform.UI.Skia.csproj" />
     <ProjectReference Include="../../../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/AddIns/Platform.UI.CommandBar/Platform.UI.CommandBar.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
     <ProjectReference Include="../../../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
     <ProjectReference Include="../../../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
     <ProjectReference Include="../../../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />

@@ -16,6 +16,8 @@ internal sealed class VirtualInput : ICodeBrixCorePointerInputSource, ICodeBrixK
     private readonly HashSet<PointerIdentifier> _captures = new();
     private VirtualKeyModifiers _modifiers;
     private bool _leftPressed;
+    private bool _rightPressed;
+    private bool _middlePressed;
     private bool _entered;
     internal VirtualInput(VirtualHost host) => _host = host;
     public event TypedEventHandler<object, PointerEventArgs> PointerEntered;
@@ -41,23 +43,43 @@ internal sealed class VirtualInput : ICodeBrixCorePointerInputSource, ICodeBrixK
     internal void Move(double x, double y) => Pointer("move", x, y);
     internal void Down() => Pointer("down", PointerPosition.X, PointerPosition.Y);
     internal void Up() => Pointer("up", PointerPosition.X, PointerPosition.Y);
+    internal void Down(MouseButton button) => Pointer("down", PointerPosition.X, PointerPosition.Y, button: button);
+    internal void Up(MouseButton button) => Pointer("up", PointerPosition.X, PointerPosition.Y, button: button);
     internal void Wheel(int delta) => Pointer("wheel", PointerPosition.X, PointerPosition.Y, delta);
 
-    private void Pointer(string kind, double x, double y, int wheel = 0)
+    private void Pointer(string kind, double x, double y, int wheel = 0, MouseButton button = MouseButton.Left)
     {
         PointerPosition = new Point(x, y);
-        if (kind == "down") _leftPressed = true;
-        if (kind == "up") _leftPressed = false;
+        if (kind is "down" or "up")
+        {
+            switch (button)
+            {
+                case MouseButton.Left: _leftPressed = kind == "down"; break;
+                case MouseButton.Right: _rightPressed = kind == "down"; break;
+                case MouseButton.Middle: _middlePressed = kind == "down"; break;
+                default: throw new ArgumentOutOfRangeException(nameof(button));
+            }
+        }
         var properties = new PointerPointProperties
         {
             IsLeftButtonPressed = _leftPressed,
-            PointerUpdateKind = kind == "down" ? PointerUpdateKind.LeftButtonPressed
-                : kind == "up" ? PointerUpdateKind.LeftButtonReleased : PointerUpdateKind.Other,
+            IsRightButtonPressed = _rightPressed,
+            IsMiddleButtonPressed = _middlePressed,
+            PointerUpdateKind = (kind, button) switch
+            {
+                ("down", MouseButton.Left) => PointerUpdateKind.LeftButtonPressed,
+                ("up", MouseButton.Left) => PointerUpdateKind.LeftButtonReleased,
+                ("down", MouseButton.Right) => PointerUpdateKind.RightButtonPressed,
+                ("up", MouseButton.Right) => PointerUpdateKind.RightButtonReleased,
+                ("down", MouseButton.Middle) => PointerUpdateKind.MiddleButtonPressed,
+                ("up", MouseButton.Middle) => PointerUpdateKind.MiddleButtonReleased,
+                _ => PointerUpdateKind.Other,
+            },
             MouseWheelDelta = wheel,
         };
         var timestamp = (ulong)(Stopwatch.GetTimestamp() * 1_000_000.0 / Stopwatch.Frequency);
         var point = new PointerPoint((uint)timestamp, timestamp, PointerDevice.For(PointerDeviceType.Mouse),
-            1, PointerPosition, PointerPosition, _leftPressed, properties);
+            1, PointerPosition, PointerPosition, _leftPressed || _rightPressed || _middlePressed, properties);
         var args = new PointerEventArgs(point, _modifiers);
         if (!_entered) { _entered = true; PointerEntered?.Invoke(this, args); }
         switch (kind)

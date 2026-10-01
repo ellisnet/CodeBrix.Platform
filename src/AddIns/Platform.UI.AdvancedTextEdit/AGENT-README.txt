@@ -1091,6 +1091,24 @@ COMMON PITFALLS TO AVOID
   - "MarkDownWithFontSize" is registered after "MarkDown" for ".md", so
     GetDefinitionByExtension(".md") returns the font-size variant.
 
+UI AUTOMATION AND PLAYTEST
+==========================
+AdvancedTextEditAutomationPeer exposes AutomationControlType.Edit and the
+standard IValueProvider pattern. Value returns Editor.Text. SetValue replaces
+the document through TextDocument.Replace, preserving undo history, and puts
+the caret after the new text. It refuses disabled, read-only or partially
+protected documents; it does not bypass ReadOnlySectionProvider. Automation
+focus goes directly to TextArea and HasKeyboardFocus reports that child's state.
+There is no PlayTest dependency in this add-in and no editor dependency in
+PlayTest. The consuming test application references both packages.
+
+Use FillAsync for whole-value setup and PressSequentiallyAsync/PressAsync to
+exercise character input, completion, indentation, selection and shortcuts.
+An empty completion list leaves Enter/Tab and navigation to the editor instead
+of consuming keys when there is nothing to select. PlayTestDemo includes real
+window regression tests for these contracts. This peer does not yet implement
+UI Automation's Text/TextRange provider patterns.
+
 WHAT THIS PACKAGE DOES NOT DO
 =============================
   - No IME composition (CJK input methods) and no drag-and-drop of selected
@@ -1103,8 +1121,8 @@ WHAT THIS PACKAGE DOES NOT DO
     CSharpIndentationStrategy.
   - No find-and-replace UI (the SearchPanel finds only; replace through
     ISearchStrategy + Document.Replace).
-  - No printing, no minimap, no multiple carets, no split views, no UI
-    automation peer, no themes/resource dictionaries to restyle the chrome (the
+  - No printing, no minimap, no multiple carets, no split views, no themes/resource
+    dictionaries to restyle the chrome (the
     editor, search panel and completion popups build their visuals in code and
     expose brush properties instead).
   - No XAML-declared key bindings or commands; bindings are added from code.

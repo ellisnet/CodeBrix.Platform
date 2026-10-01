@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", required=True, help="Use a new prerelease version for each changed package set.")
     parser.add_argument("--output", type=Path, default=ROOT / "nugets/PlayTest")
+    parser.add_argument("--with-editor", action="store_true", help="Also build matching AdvancedTextEdit/TextLayout add-ins for editor integration tests; these are not PlayTest dependencies.")
     args = parser.parse_args()
     if "-" not in args.version:
         parser.error("This local preview helper requires a prerelease version (for example 1.0.271.1-playtest.2).")
@@ -40,6 +41,13 @@ def main():
     ):
         run("dotnet", "build", project, "-c", "Release", "--verbosity", "minimal")
 
+    editor_projects = (
+        "src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Skia.csproj",
+        "src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj",
+    ) if args.with_editor else ()
+    for project in editor_projects:
+        run("dotnet", "build", project, "-c", "Release", "--verbosity", "minimal")
+
     props = ROOT / "build/obj/playtest-nuspec-props"
     run("dotnet", "run", "--project", "src/Platform.PackageDependencyValidator/Platform.PackageDependencyValidator.csproj",
         "-c", "Release", "--", "--map", ROOT / "build/nuget/package-dependency-map.json",
@@ -53,7 +61,7 @@ def main():
         "src/Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj",
         "src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj",
         "src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj",
-    ):
+    ) + editor_projects:
         run("dotnet", "pack", project, "-c", "Release", f"-p:PackageVersion={args.version}",
             "--no-restore", "--output", output, "--verbosity", "minimal")
     with zipfile.ZipFile(output / f"CodeBrix.Platform.WebView.ApacheLicenseForever.{args.version}.nupkg") as package:

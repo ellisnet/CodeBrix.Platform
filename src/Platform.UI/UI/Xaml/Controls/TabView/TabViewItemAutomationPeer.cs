@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Automation.Provider;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
 using CodeBrix.Platform.UI.Helpers.WinUI;
+using CodeBrix.Platform.UI;
 
 namespace Microsoft.UI.Xaml.Automation.Peers;
 
@@ -44,7 +45,12 @@ public partial class TabViewItemAutomationPeer : ListViewItemAutomationPeer, ISe
 			var tvi = Owner as TabViewItem;
 			if (tvi != null)
 			{
-				returnHString = SharedHelpers.TryGetStringRepresentationFromObject(tvi.Header);
+				// Element headers carry their own accessible text. ToString() exposes
+				// the CLR type name (for example TextBlock), not the tab's title.
+				returnHString = tvi.Header is UIElement header
+					? FrameworkElementAutomationPeer.CreatePeerForElement(header)?.GetName()
+						?? (header as FrameworkElement)?.GetAccessibilityInnerText()
+					: SharedHelpers.TryGetStringRepresentationFromObject(tvi.Header);
 			}
 		}
 

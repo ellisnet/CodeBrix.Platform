@@ -35,6 +35,12 @@ public sealed class Page
         () => VisualTree.Walk(Application.Host.Root, includePopups: true).Where(e => AutomationProperties.GetAutomationId(e) == testId),
         $"GetByTestId(\"{testId}\")");
 
+    /// <summary>Finds controls by an application-owned type without requiring PlayTest
+    /// to reference the library declaring that type. Resolution remains lazy.</summary>
+    public Locator GetByType<T>(bool includeHidden = false) where T : UIElement => new(this,
+        () => VisualTree.Walk(Application.Host.Root, includePopups: true).OfType<T>()
+            .Where(e => includeHidden || VisualTree.Visible(e)), $"GetByType<{typeof(T).Name}>()");
+
     public Locator GetByText(string text, PageGetByTextOptions options = null) => TextLocator(
         value => VisualTree.Matches(value, text, options?.Exact == true), $"GetByText(\"{text}\")");
     public Locator GetByText(Regex text) => TextLocator(text.IsMatch, $"GetByText(/{text}/)");
