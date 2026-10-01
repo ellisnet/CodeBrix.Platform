@@ -56,6 +56,9 @@ public partial class TextBox
 
 	private static readonly VirtualKeyModifiers _platformCtrlKey;
 
+	private static VirtualKeyModifiers EditingCommandModifier =>
+		FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts ? _platformCtrlKey : VirtualKeyModifiers.Control;
+
 	// We track what constitutes one typing "action" that can be undone/redone. The general gist is that
 	// any sequence of characters (with backspace allowed) without any navigation moves (pointer click, arrow keys, etc.)
 	// will be one "run"/"action". However, there are some arbitrary exceptions, so that is only a rule of thumb.
@@ -465,7 +468,7 @@ public partial class TextBox
 		var (selectionStart, selectionLength) = _selection.selectionEndsAtTheStart ? (_selection.start + _selection.length, -_selection.length) : (_selection.start, _selection.length);
 		var text = Text;
 		var shift = args.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Shift);
-		var ctrl = args.KeyboardModifiers.HasFlag(_platformCtrlKey);
+		var ctrl = args.KeyboardModifiers.HasFlag(EditingCommandModifier);
 		switch (args.Key)
 		{
 			case VirtualKey.Escape:
@@ -485,7 +488,7 @@ public partial class TextBox
 				return;
 			case VirtualKey.Up:
 				// on macOS start of document is `Command` and `Up`
-				if (ctrl && OperatingSystem.IsMacOS())
+				if (ctrl && FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 				{
 					KeyDownHome(args, text, ctrl, shift, ref selectionStart, ref selectionLength);
 				}
@@ -496,7 +499,7 @@ public partial class TextBox
 				break;
 			case VirtualKey.Down:
 				// on macOS end of document is `Command` and `Down`
-				if (ctrl && OperatingSystem.IsMacOS())
+				if (ctrl && FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 				{
 					KeyDownEnd(args, text, ctrl, shift, ref selectionStart, ref selectionLength);
 				}
@@ -543,7 +546,7 @@ public partial class TextBox
 
 		var text = Text;
 		var shift = args.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Shift);
-		var ctrl = args.KeyboardModifiers.HasFlag(_platformCtrlKey);
+		var ctrl = args.KeyboardModifiers.HasFlag(EditingCommandModifier);
 		// Text commands: always return from this switch, never break
 		switch (args.Key)
 		{
@@ -594,7 +597,7 @@ public partial class TextBox
 		{
 			case VirtualKey.Up:
 				// on macOS start of document is `Command` and `Up`
-				if (ctrl && OperatingSystem.IsMacOS())
+				if (ctrl && FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 				{
 					KeyDownHome(args, text, ctrl, shift, ref selectionStart, ref selectionLength);
 				}
@@ -605,7 +608,7 @@ public partial class TextBox
 				break;
 			case VirtualKey.Down:
 				// on macOS end of document is `Command` and `Down`
-				if (ctrl && OperatingSystem.IsMacOS())
+				if (ctrl && FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 				{
 					KeyDownEnd(args, text, ctrl, shift, ref selectionStart, ref selectionLength);
 				}
@@ -700,7 +703,7 @@ public partial class TextBox
 	private void KeyDownBack(KeyRoutedEventArgs args, ref string text, bool ctrl, bool shift, ref int selectionStart, ref int selectionLength)
 	{
 		// on macOS it is `option` + `delete` (same location as backspace on PC keyboards) that removes the previous word
-		if (OperatingSystem.IsMacOS())
+		if (FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 		{
 			ctrl = args.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Menu);
 		}
@@ -853,7 +856,7 @@ public partial class TextBox
 		// on macOS it is:
 		// * `option` + `right` that moves to the next word
 		// * `shift` + `option` + `right` that select the next word
-		if (OperatingSystem.IsMacOS())
+		if (FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 		{
 			ctrl = args.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Menu);
 		}
@@ -984,7 +987,7 @@ public partial class TextBox
 	private void KeyDownDelete(KeyRoutedEventArgs args, ref string text, bool ctrl, bool shift, ref int selectionStart, ref int selectionLength)
 	{
 		// on macOS it is `option` + `delete>` that removes the next word
-		if (OperatingSystem.IsMacOS())
+		if (FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts && OperatingSystem.IsMacOS())
 		{
 			ctrl = args.KeyboardModifiers.HasFlag(VirtualKeyModifiers.Menu);
 		}

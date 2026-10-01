@@ -67,4 +67,5 @@
 
 	</ItemGroup>
 
+	<Import Project="CodeBrix.WebView.MacOS.targets" />
 </Project>

@@ -86,14 +86,18 @@ public sealed class SlowMoPreferenceTests
         const string delayName = "CODEBRIX_PLAYTEST_SLOWMO";
         var previousHeaded = Environment.GetEnvironmentVariable(headedName);
         var previousDelay = Environment.GetEnvironmentVariable(delayName);
+        const string commandLineName = "CodeBrix.Platform.PlayTest.CommandLineHeadless";
+        var previousCommandLine = AppContext.GetData(commandLineName);
         try
         {
+            AppContext.SetData(commandLineName, null);
             Environment.SetEnvironmentVariable(headedName, headed);
             Environment.SetEnvironmentVariable(delayName, delay);
             action();
         }
         finally
         {
+            AppContext.SetData(commandLineName, previousCommandLine);
             Environment.SetEnvironmentVariable(headedName, previousHeaded);
             Environment.SetEnvironmentVariable(delayName, previousDelay);
         }

@@ -153,8 +153,14 @@ Studio instance can also hold the lock; close it if the shutdown does not clear
 it.
 
 macOS native library: src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac is
-built with xcodebuild through build.sh (chmod +x it). The csproj only enables
-the native step on Apple Silicon; full Xcode is required there.
+built by the head csproj on macOS. Apple Silicon keeps its normal Xcode build
+through build.sh; Intel defaults to build-clang.sh using Apple's Command Line
+Tools. Either Release route produces one universal x86_64 + arm64 dylib. Select the
+Command Line Tools route explicitly with -p:NativeMacBuildTool=Clang on either
+CPU. Both builds include CDBRXMenus.m (also listed in the Xcode project), which
+implements the opt-in system menu bar; the native dylib is packaged by the
+existing _AddNativeMacToPackage target. BuildNativeMac=false remains a managed-
+only build. Native sources and build instructions live in this repository.
 
 Wayland protocol bindings under src/Platform.UI.Runtime.Skia.Wayland/
 Wayland_Bindings/ are GENERATED and committed; regenerate them with
@@ -697,8 +703,8 @@ Windows with the rest of the set.
 
 --- ON macOS (Apple Silicon): build ONLY the macOS package (pinned version) ---
 
-The macOS head package contains a native dylib that can ONLY be built on Apple
-Silicon, so it is NOT produced by the Windows run above (a macOS package built
+The macOS head package contains a native dylib that must be built on a Mac,
+so it is NOT produced by the Windows run above (a macOS package built
 on Windows is managed-only: fine to compile against, useless at run time).
 Rebuild it on an Apple Silicon Mac, pinning the version to the SAME version
 the Windows run already produced and published to nuget.org. That keeps its
@@ -721,15 +727,15 @@ still flowing to the ProjectReference dependency versions. This produces:
 
     nugets/Release/<version>/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.<version>.nupkg
 
-PREREQUISITES on the Mac: full Xcode installed (the native build uses
-xcodebuild; the csproj only enables the native step on Apple Silicon) and the
-native build script src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/build.sh
-must be executable (chmod +x). A correctly built macOS package is a universal
-binary and runs on both Apple Silicon and Intel Macs.
+PREREQUISITES: full Xcode for the default Apple Silicon build; Apple's Command
+Line Tools for the default Intel build or -p:NativeMacBuildTool=Clang on either
+CPU. The latter links the restored SkiaSharp native asset, without downloading
+an extra copy. A correctly built macOS package is a universal binary and runs
+on both Apple Silicon and Intel Macs.
 
 VERIFY THE macOS PACKAGE BEFORE UPLOADING. A managed-only package (no native
 dylib) packs WITHOUT error on any machine where the native step is skipped
-(e.g. not Apple Silicon, or BuildNativeMac=false) and is useless at runtime.
+(e.g. a non-Mac host, or BuildNativeMac=false) and is useless at runtime.
 After packing, confirm the native universal binary is inside the .nupkg:
 
     unzip -l nugets/Release/<version>/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.<version>.nupkg \
@@ -930,3 +936,74 @@ NOTES
   - templates/TemplateApp.zip is the scaffold CodeBrix.Develop's "New
     CodeBrix.Platform Application" uses; keep it in step with the reference
     structure documented in AGENT-README.txt.
+
+MACOS APPLICATION NAMING AND SYSTEM MENU VALIDATION
+--------------------------------------------------
+UseMacOS(mac => mac.UseSystemAppName("My App")) applies a startup-only,
+process-wide name independently of menu projection. It sets NSProcessInfo's
+name and AppKit's process-local bundle-name caches before creating NSApplication,
+then synchronizes the running-application display name during
+applicationWillFinishLaunching. No bundle/executable/assembly files are renamed
+or modified. See PlatformNativeMac/README.md under the macOS head for the guarded
+LaunchServices SPI and cache-mutability compatibility behavior.
+
+The opt-in is UseMacOS(mac => mac.UseSystemMenuBar()). MacOSMenuBarExtension
+selects the first visible MenuBar in visual-tree order per window. Only that
+bar suppresses its layout/rendering; its properties and logical lifetime stay
+intact, and additional bars remain in-window. The extension is registered only
+by an opted-in macOS host. Native callbacks queue command invocation after
+AppKit menu tracking, and do not bypass the application's Quit handler.
+Native menu/item objects are reconciled by managed element ID, with AppKit-owned
+items preserved. NSApplication.helpMenu points to an unlisted menu while the
+projection is active, using AppKit's supported opt-out from automatic Spotlight
+Help search. This avoids Help opening and immediately closing on macOS 15 and
+keeps the Help contents defined by the application. Deactivation restores the
+host's original Help-menu policy.
+
+A real-AppKit regression probe (run from an interactive macOS desktop):
+
+    dotnet build build/test-scripts/MacOSMenuBarProbe/MacOSMenuBarProbe.csproj -c Release
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll native
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll composition
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll default
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll close
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll validation
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name-menu
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name-menu-reversed
+
+The probe checks first-visible selection, zero menu-row footprint, additional
+bars, hiding/removing/reloading menus, dynamic submenus, commands, toggle state,
+shortcuts, disabled entries, focus/pointer exclusion, modal dialogs and window
+switching. MenuTracking.m drives the actual Help menu-bar accessibility action
+in process, observes sustained AppKit tracking before dismissal, and repeats
+after refreshes. It needs an interactive desktop but no Accessibility or Screen
+Recording grant. The close mode finishes through Window.Close
+rather than Application.Exit, checking the existing last-window exit policy.
+The native mode uses DirectSkiaCanvasMode; composition uses the default renderer.
+These checks use the real macOS host, not PlayTest's virtual host. On the Intel
+Mac (2026-09-30), both name+menu option orders passed 49 checks, name-only passed
+6, menu-only passed 45, and default passed 4. Validation rejects null/blank/
+embedded-null names and checks that configuring the builder is fluent and does
+not mutate process state.
+The naming checks include Unicode, NSProcessInfo.processName, AppKit's actual
+application-menu accessibility title, NSRunningApplication.localizedName, and
+unchanged assembly identity. Apple Silicon execution still needs validation on
+that machine. The native Release binary contains both CPUs.
+
+Local prerelease packages for testing without a public release:
+
+    python3 build/pack-macos-preview.py --version 1.0.273.1-macosmenu.4
+
+Choose a fresh prerelease version after changing code. The script builds the
+core, shared runtime, framebuffer dependency and macOS head into nugets/MacOSPreview,
+checks both native architectures and the menu/name exports, and never publishes.
+Preview 1.0.273.1-macosmenu.4 was consumed by Fresco.Brix's macOS head on Intel:
+Cocoa's process name, NSRunningApplication.localizedName and the actual AppKit
+application-menu caption all reported Fresco.Brix, while the assembly remained
+Fresco.Brix.MacOS. Help opened and stayed visible on five successive menu-bar
+activations, Help > About opened its dialog, and Help worked again after that dialog closed. Help
+contained only the application's commands, without an automatic search item.
+Native File > New Document and File > Quit also passed with clean process exit.
+The head's normal build and osx-arm64 cross-build passed without warnings or
+errors; Apple Silicon runtime validation still needs that machine.

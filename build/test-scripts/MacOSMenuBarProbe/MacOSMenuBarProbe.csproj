@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <_IsCodeBrixMacOSHead>true</_IsCodeBrixMacOSHead>
+    <IsCodeBrixHead>true</IsCodeBrixHead>
+    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+    <SupportsFontManifest>true</SupportsFontManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.248.1181" GeneratePathProperty="true" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" GeneratePathProperty="true" />
+    <ProjectReference Include="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="../../../src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
+    <ProjectReference Include="../../../src/Platform.UWP/Platform.Skia.csproj" />
+    <ProjectReference Include="../../../src/Platform.Foundation/Platform.Foundation.Skia.csproj" />
+    <ProjectReference Include="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
+  </ItemGroup>
+  <Import Project="../../../samples/CodeBrixPlatform/CodeBrix.MacOSHead.targets" />
+  <Import Project="../../../src/Platform.UI.Runtime.Skia.MacOS/buildTransitive/Platform.WinUI.Runtime.Skia.MacOS.targets" />
+  <Import Project="../../../src/SourceGenerators/Platform.UI.SourceGenerators/Content/Platform.UI.SourceGenerators.props" />
+  <!-- This small C#-only source probe does not run the full XAML asset pipeline. -->
+  <Target Name="BuildMenuTrackingProbe" AfterTargets="Build"
+          Inputs="$(MSBuildProjectDirectory)/MenuTracking.m"
+          Outputs="$(OutDir)libMenuTrackingProbe.dylib">
+    <Exec Command="xcrun clang -dynamiclib -fobjc-arc -fmodules -arch x86_64 -arch arm64 -mmacosx-version-min=12.0 -framework AppKit &quot;$(MSBuildProjectDirectory)/MenuTracking.m&quot; -o &quot;$(OutDir)libMenuTrackingProbe.dylib&quot;" />
+  </Target>
+  <Target Name="CopyProbeFonts" AfterTargets="Build">
+    <ItemGroup>
+      <_ProbeOpenSans Include="$(PkgCodeBrix_Platform_Fonts_OpenSans_ApacheLicenseForever)/lib/net10.0/CodeBrix.Platform.Fonts.OpenSans/Fonts/*" />
+      <_ProbeFluent Include="$(PkgCodeBrix_Platform_Fonts_Fluent_ApacheLicenseForever)/lib/net10.0/CodeBrix.Platform.Fonts.Fluent/Fonts/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_ProbeOpenSans)" DestinationFolder="$(OutDir)CodeBrix.Platform.Fonts.OpenSans/Fonts" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_ProbeFluent)" DestinationFolder="$(OutDir)CodeBrix.Platform.Fonts.Fluent/Fonts" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

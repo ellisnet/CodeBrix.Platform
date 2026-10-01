@@ -38,13 +38,20 @@ dotnet run --project src/PlayTestDemo.LinuxX11 -c Release
 dotnet test --project tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
 
 # Visible, view-only preview on a desktop; no picker dialogs appear.
-CODEBRIX_PLAYTEST_HEADED=1 CODEBRIX_PLAYTEST_ORIENTATION=landscape \
-CODEBRIX_PLAYTEST_THEME=dark \
-dotnet test --project tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+dotnet test --project tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release --headed
 ```
 
-The environment assignment syntax above is for bash/zsh. On PowerShell, set the
-corresponding `$env:CODEBRIX_PLAYTEST_*` variables before `dotnet test`.
+`--nonheadless` is an alias for `--headed`; `--headless` suppresses the preview.
+These switches work on Windows, macOS and Linux, overriding
+`CODEBRIX_PLAYTEST_HEADED`. Explicit `PlayTestOptions.Headless` in a fixture wins
+over both. The test project automatically registers these options through the
+same PlayTest targets used by NuGet consumers. `--theme=dark|light` and
+`--orientation=portrait|landscape` (case-insensitive) override environment/project
+preferences while retaining explicit fixture/test requirements. Add
+`--screenshotfolder="/absolute/path/to/an/existing empty folder"` for automatic
+start/step/final PNGs and a root `screenshot-index.json`; no UI test edits are needed.
+The [recording guide](../../../src/Platform.UI.Runtime.Skia.PlayTest/README.md#automatic-screenshot-recording)
+describes folder layout, metadata and supported operation boundaries.
 Headed runs default to 250 ms between actions. Set `CODEBRIX_PLAYTEST_SLOWMO`
 to another delay, including `0`, to override it. Headless runs default to zero.
 Use the relevant desktop head on other operating systems; the PlayTests project
@@ -53,8 +60,9 @@ not a normal desktop preview.
 
 ## Coverage and adding tests
 
-The 19 UI cases include 15 control/picker regression cases transferred from
-JustBetweenUs.PlayTests, plus four method/case orientation examples:
+The 20 UI cases include 15 control/picker regression cases transferred from
+JustBetweenUs.PlayTests, four method/case orientation examples, and one check that
+the requested preview mode reaches the running application:
 
 - Checkbox and toggle-switch input, checked-state assertions, and idempotence.
 - Scrolling an initially clipped button into view and clicking it.
@@ -65,6 +73,11 @@ JustBetweenUs.PlayTests, plus four method/case orientation examples:
 
 `SlowMoPreferenceTests` adds 19 configuration cases for delay defaults,
 environment/code overrides, explicit zero, culture and invalid values.
+`PreviewCommandLineTests` adds 12 cases for command-line/environment precedence,
+the `--nonheadless` alias, delay defaults, explicit fixture overrides and conflicting
+options. `DisplayCommandLineTests` adds 10 cases for theme/orientation precedence,
+invalid values, and empty-directory validation, for **61 cases total**. Configuration tests restore process settings so
+they can also run inside a suite launched with an explicit preview switch.
 
 The fixture launches one application and installs a fresh **demo MainPage** for
 each serialized test. It clears picker responses, resolves orientation traits,
@@ -129,3 +142,61 @@ SDL driver and the default 250 ms action delay. The native-preview check above
 also passed all eight frame/orientation checks and four protocol checks.
 The six CodeBrix.Samples application suites passed the same matrix using local
 preview `.12`, for 676 passing executions across both repositories.
+
+The macOS native-preview check is available from the repository root:
+
+```sh
+python3 build/test-scripts/playtest-preview-macos.py \
+  --test-output samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/bin/Release/net10.0 \
+  --artifacts TestResults/PlayTestPreview-macOS
+```
+
+Build the test project first. This checker requires macOS 14+, Apple's command-line
+tools, and Screen Recording permission for the invoking terminal or agent. It
+captures only the preview processes it starts, using ScreenCaptureKit, and needs
+no Python imaging package. Application tests and their virtual screenshots do
+not need Screen Recording permission.
+
+On Intel macOS 15.8, 2026-09-30, all eight native frame/orientation checks and four
+protocol checks passed. Both 960x540 and 540x960 client areas retained their sizes
+through alternating landscape/portrait frames, with centered black letterboxing.
+
+All 38 PlayTestDemo cases also passed in each of headless/light landscape,
+headless/light portrait, headed/dark landscape and headed/dark portrait:
+152 executions, zero failures or skips. Headed runs used Cocoa and the default
+250 ms action delay. The six CodeBrix.Samples suites passed that same matrix with
+local preview `.16`, for 684 passing executions across both repositories.
+
+After adding the command-line preview switches, all 51 cases passed on this Intel
+Mac in each of four launches: `--headless` with default environment, `--headed`
+with `CODEBRIX_PLAYTEST_HEADED=0`, `--nonheadless` with that same environment, and
+`--headless` with `CODEBRIX_PLAYTEST_HEADED=1`. The application-level case checked
+the actual running host's mode. Conflicting flags were rejected before execution;
+the direct test executable printed the conflict diagnostic. Package consumers
+also passed with the `.17` adapter; see CodeBrix.Samples/PlayTestSupport/README.md.
+
+### Automatic recording regression harness
+
+From the repository root, build and run the separate checker:
+
+```sh
+dotnet build build/test-scripts/PlayTestRecordingProbe/PlayTestRecordingProbe.csproj -c Release
+python3 build/test-scripts/playtest-recording.py
+```
+
+The probe deliberately contains one failing and one skipped test. The Python
+checker verifies the expected runner result, final capture after failure, nested
+namespace/theory folders, PNG signatures/dimensions/pixel changes, source locations,
+metadata/outcomes, CLI precedence, and rejected destination folders/values. The
+checker succeeds only when these contracts hold. Its negative cases are separate
+from this demo's normal passing suite.
+
+
+On Intel macOS (2026-09-30), all 61 cases passed with CLI Dark/Portrait overriding
+Light/Landscape environment values and no recording. All 61 also passed in headed
+mode with CLI Light/Landscape overriding the reverse environment values, producing
+194 validated PNGs for the 20 UI cases; the 41 configuration-only cases have index
+metadata and notes. The standalone recording checker passed its expected failing
+case, two passing theory rows, 17 PNGs and nine invalid option/destination checks.
+The six sample package consumers passed another 133 cases with recording on local
+preview `.18`; the combined seven-suite run produced 1,183 PNGs.

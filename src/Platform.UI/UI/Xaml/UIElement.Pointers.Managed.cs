@@ -79,6 +79,9 @@ namespace Microsoft.UI.Xaml
 
 			// If we're not locally hit-test visible, visible, or enabled, we should be collapsed. Our children will be collapsed as well.
 			if (
+#if __SKIA__
+				IsVisualPresentationSuppressed ||
+#endif
 #if false
 				!(IsLoaded || HtmlTagIsSvg) ||
 #else

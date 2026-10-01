@@ -23,6 +23,12 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           runtime, and the six shipping platform heads (Win32, WPF, X11, Wayland,
           Linux frame buffer and macOS) plus the IDE-only emulated frame buffer
           head. START HERE for any CodeBrix.Platform application.
+          Includes independent UseSystemAppName("My App") and UseSystemMenuBar()
+          options in UseMacOS(...), the first-visible
+          MenuBar selection rule, and native menu behavior. Native build details:
+          src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/README.md.
+          MAINTAINER-README.txt lists the AppKit regression probe and local
+          macOS preview-package build command.
 
   src/Platform.UI.Runtime.Skia.PlayTest/AGENT-README.txt
     Package: CodeBrix.Platform.PlayTest.ApacheLicenseForever
@@ -35,12 +41,15 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
         Developer usage: test-project setup, fixtures, locators, assertions,
         orientation and theme preferences, letterboxing, scripted file/folder
         pickers, supported controls and limitations. Includes the headed
-        250 ms action-delay default and fixture/environment overrides.
+        250 ms action-delay default, command-line preview/theme/orientation switches,
+        automatic start/step/final PNG recording and screenshot-index.json,
+        and fixture/environment overrides.
 
       samples/CodeBrixPlatform/PlayTestDemo/README.md
         Runnable examples: demo and PlayTests project structure, build/run
         commands, coverage and validation. Start here to run the dedicated
         control/picker demo or add general PlayTest regression examples.
+        Includes Windows and macOS native preview pixel-check commands.
 
   src/AddIns/Platform.WinUI.Graphics2DSK/AGENT-README.txt
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
@@ -143,6 +152,9 @@ MAINTAINER AND EXTRAS
       Building, testing, packaging, versioning and provenance notes for maintainers.
   EXTRAS-README.txt
       Samples, tools and other non-package content in this repository.
+  tools/MacOsWebViewHelper/README.md
+      Native PlayTest WKWebView helper source and standalone universal build
+      instructions for Intel and Apple Silicon Macs.
 
 GENERAL
 -------

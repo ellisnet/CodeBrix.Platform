@@ -3,6 +3,7 @@
 import argparse
 from pathlib import Path
 import subprocess
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -27,6 +28,7 @@ def main():
     # These graphs cover every assembly in the core nuspec. This includes companion
     # resource/toolkit libraries that a bare head-project build does not reference.
     for project in (
+        "src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj",
         "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj",
         "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj",
         "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj",
@@ -54,6 +56,14 @@ def main():
     ):
         run("dotnet", "pack", project, "-c", "Release", f"-p:PackageVersion={args.version}",
             "--no-restore", "--output", output, "--verbosity", "minimal")
+    with zipfile.ZipFile(output / f"CodeBrix.Platform.WebView.ApacheLicenseForever.{args.version}.nupkg") as package:
+        for asset in ("buildTransitive/CodeBrix.WebView.MacOS.targets", "buildTransitive/macos/PlayTestWebView.m"):
+            if asset not in package.namelist():
+                raise RuntimeError(f"WebView package is missing required macOS asset: {asset}")
+    with zipfile.ZipFile(output / f"CodeBrix.Platform.PlayTest.ApacheLicenseForever.{args.version}.nupkg") as package:
+        for asset in ("buildTransitive/CodeBrix.PlayTest.TestingPlatform.cs", "buildTransitive/CodeBrix.PlayTest.Xunit.cs"):
+            if asset not in package.namelist():
+                raise RuntimeError(f"PlayTest package is missing its runner adapter: {asset}")
     print(f"Local packages are in {output}. No packages were published.")
 
 

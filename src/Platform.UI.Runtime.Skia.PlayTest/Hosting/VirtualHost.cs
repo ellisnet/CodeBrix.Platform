@@ -87,12 +87,16 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         _filePickers.Register();
         // Discover the application's optional add-in without adding a browser dependency
         // to PlayTest or registering any desktop head's native-window provider.
-        if (OperatingSystem.IsWindows() && Type.GetType(
-            "CodeBrix.Platform.UI.WebView.Skia.Offscreen.WindowsOffscreenWebViewProvider, CodeBrix.Platform.UI.WebView.Skia") is { } provider)
+        var providerName = OperatingSystem.IsWindows() ? "WindowsOffscreenWebViewProvider"
+            : OperatingSystem.IsMacOS() ? "MacOSOffscreenWebViewProvider" : null;
+        if (providerName != null && Type.GetType(
+            $"CodeBrix.Platform.UI.WebView.Skia.Offscreen.{providerName}, CodeBrix.Platform.UI.WebView.Skia") is { } provider)
         {
             ApiExtensibility.Register<Microsoft.Web.WebView2.Core.CoreWebView2>(
                 typeof(Microsoft.Web.WebView2.Core.INativeWebViewProvider), owner => Activator.CreateInstance(provider, owner));
         }
+        // Match the virtual keyboard's stable Control-based editing model on every OS.
+        FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts = false;
         FeatureConfiguration.TextBox.UseOverlayOnSkia = false;
         FeatureConfiguration.Font.RestrictToEmbeddedFonts = true;
         CoreDispatcher.DispatchOverride = (action, priority) => Enqueue(action);

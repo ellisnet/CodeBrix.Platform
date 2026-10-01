@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CB2026093000000000000001 /* CDBRXMenus.m in Sources */ = {isa = PBXBuildFile; fileRef = CB2026093000000000000002 /* CDBRXMenus.m */; };
 		43BC95F62E618E5400902390 /* MouseButtons.h in Headers */ = {isa = PBXBuildFile; fileRef = 43BC95F52E618E4700902390 /* MouseButtons.h */; };
 		43BC95FA2E618F0900902390 /* MouseButtons.m in Sources */ = {isa = PBXBuildFile; fileRef = 43BC95F92E618F0900902390 /* MouseButtons.m */; };
 		D116C63E2AC79876004B975F /* CDBRXCursor.m in Sources */ = {isa = PBXBuildFile; fileRef = D116C63D2AC79876004B975F /* CDBRXCursor.m */; };
@@ -27,6 +28,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CB2026093000000000000002 /* CDBRXMenus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CDBRXMenus.m; sourceTree = "<group>"; };
 		43BC95F52E618E4700902390 /* MouseButtons.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MouseButtons.h; sourceTree = "<group>"; };
 		43BC95F92E618F0900902390 /* MouseButtons.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MouseButtons.m; sourceTree = "<group>"; };
 		D116C63C2AC793C0004B975F /* CDBRXCursor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CDBRXCursor.h; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 			isa = PBXGroup;
 			children = (
 				43BC95F92E618F0900902390 /* MouseButtons.m */,
+				CB2026093000000000000002 /* CDBRXMenus.m */,
 				43BC95F52E618E4700902390 /* MouseButtons.h */,
 				D11A81682D09F05400B3C0A5 /* CDBRXMediaPlayer.h */,
 				D11A816A2D09F06400B3C0A5 /* CDBRXMediaPlayer.m */,
@@ -201,6 +204,7 @@
 				D1A065222A84688000101BE6 /* CDBRXApplication.m in Sources */,
 				D1A065252A8AC23800101BE6 /* CDBRXWindow.m in Sources */,
 				43BC95FA2E618F0900902390 /* MouseButtons.m in Sources */,
+				CB2026093000000000000001 /* CDBRXMenus.m in Sources */,
 				D1CC768B2AB9D464002A44F0 /* CDBRXClipboard.m in Sources */,
 				D11A816B2D09F06700B3C0A5 /* CDBRXMediaPlayer.m in Sources */,
 				D116C63E2AC79876004B975F /* CDBRXCursor.m in Sources */,

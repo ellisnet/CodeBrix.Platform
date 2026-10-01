@@ -615,6 +615,8 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 
 		public static class TextBox
 		{
+			// Virtual hosts can use Control-based editing consistently across operating systems.
+			internal static bool UsePlatformKeyboardShortcuts { get; set; } = true;
 
 			/// <summary>
 			/// Determines if the caret is visible or not.

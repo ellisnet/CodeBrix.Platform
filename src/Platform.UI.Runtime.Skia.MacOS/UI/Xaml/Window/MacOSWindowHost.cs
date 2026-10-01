@@ -203,6 +203,8 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 	}
 
 	public UIElement? RootElement => _winUIWindow.RootElement;
+	internal Window Window => _winUIWindow;
+	internal nint NativeHandle => _nativeWindow.Handle;
 
 	/// <summary>
 	/// Returns the <c>MTLDevice</c> handle backing this window's Metal render surface, or

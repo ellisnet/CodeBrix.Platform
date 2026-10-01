@@ -25,10 +25,11 @@ The virtual screen is 1920×1080 landscape or 1080×1920 portrait, at scale 1.
 Its preferred orientation is resolved once at launch, in this order:
 
 1. An explicitly assigned `PlayTestOptions.Orientation` in code.
-2. `CODEBRIX_PLAYTEST_ORIENTATION=portrait` or `landscape`.
-3. `<CodeBrixPlayTestPreferredOrientation>Portrait</CodeBrixPlayTestPreferredOrientation>`
+2. `--orientation=portrait` or `--orientation=landscape`.
+3. `CODEBRIX_PLAYTEST_ORIENTATION=portrait` or `landscape`.
+4. `<CodeBrixPlayTestPreferredOrientation>Portrait</CodeBrixPlayTestPreferredOrientation>`
    in the test `.csproj` (either orientation is accepted).
-4. Landscape.
+5. Landscape.
 
 Leave `Orientation` unset to use that fallback chain. The package emits the project
 preference as assembly metadata; set `ConfigurationAssembly = typeof(AppFixture).Assembly`
@@ -42,10 +43,12 @@ application-specific OS services can still differ across systems.
 The simulated operating-system theme is resolved once, before constructing the
 application, in this order:
 
-1. `CODEBRIX_PLAYTEST_THEME=dark` or `light`.
-2. `<CodeBrixPlayTestPreferredTheme>Dark</CodeBrixPlayTestPreferredTheme>` in the
+1. An explicitly assigned `PlayTestOptions.Theme` in the application fixture.
+2. `--theme=dark` or `--theme=light`.
+3. `CODEBRIX_PLAYTEST_THEME=dark` or `light`.
+4. `<CodeBrixPlayTestPreferredTheme>Dark</CodeBrixPlayTestPreferredTheme>` in the
    test `.csproj` (Light is also accepted).
-3. Light.
+5. Light.
 
 Names are case-insensitive. An unset or empty environment value falls back to
 the project; invalid selected values fail with a descriptive error. Project
@@ -101,9 +104,126 @@ Row requirement > method requirement > fixture preference. Conflicting row
 requirements are errors. Other runners can pass their method and row metadata to
 the same resolver. The attribute itself does not install runner hooks.
 
-Run the project with `dotnet test`. Headless is the default. Set
-`CODEBRIX_PLAYTEST_HEADED=1` to open a live SDL3 preview on Windows, macOS,
-X11 or Wayland. The preview runs in a separate process. Its initial size and
+Run the project with `dotnet test`. Headless is the default. With .NET 10's
+Microsoft.Testing.Platform runner, the PlayTest package automatically enables:
+
+```sh
+dotnet test MyApp.PlayTests.csproj --headed
+dotnet test MyApp.PlayTests.csproj --nonheadless  # Alias for --headed
+dotnet test MyApp.PlayTests.csproj --headless
+dotnet test MyApp.PlayTests.csproj --nonheadless --theme=dark --orientation=portrait
+```
+
+These switches work on Windows, macOS and Linux (X11/Wayland previews). No extra
+project properties or fixture changes are needed beyond the test project's
+existing MTP setup and the updated PlayTest package. They appear in `--help`.
+Use one mode per invocation; combining `--headless` with either headed spelling
+is an error. Mode precedence is **explicit `PlayTestOptions.Headless` in code >
+command-line option > `CODEBRIX_PLAYTEST_HEADED` > headless**. Thus `--headed`
+overrides `CODEBRIX_PLAYTEST_HEADED=0`, and `--headless` overrides a value of `1`.
+Leave `Headless` unset in fixtures to let the command line control the preview.
+
+`--theme` accepts only `light` or `dark`; `--orientation` accepts only `landscape`
+or `portrait`, all case-insensitive. Both `--theme=dark` and `--theme dark` work.
+These options override environment and project preferences, but explicit fixture
+options, orientation requirements applied by tests/theory rows, and application or
+element `RequestedTheme` choices retain priority. Theme selects the simulated OS
+preference at launch; it does not force every element to use that theme.
+
+The standard generated xUnit/MSTest/NUnit MTP entry points register the adapter
+automatically. A custom MTP entry point must call its generated
+`AddSelfRegisteredExtensions(builder, args)` method. Direct `dotnet test` extension
+options require MTP mode in `global.json`, as in the setup above; VSTest mode does
+not gain these switches. Environment/code configuration remains available for
+other runners. When running a solution, use the option on PlayTest projects or
+modules that register it; unrelated test projects may reject the unknown switch.
+
+### Automatic screenshot recording
+
+In xUnit v3 projects using version 4 or later (including all the sample suites),
+the updated NuGet automatically installs recording hooks. No test methods, fixtures,
+attributes or additional project properties are needed. The command-line options
+are shared across Windows, Linux and macOS. Screenshot recording uses the virtual
+Skia screen in both headless and headed modes, without desktop capture permissions.
+
+First create a **new, empty folder**, then run:
+
+```sh
+mkdir -p "$HOME/Temp/JustBetweenUs PlayTest run 2026-09-30"
+dotnet test JustBetweenUs.PlayTests.csproj --nonheadless --theme=dark --orientation=portrait \
+  --screenshotfolder="$HOME/Temp/JustBetweenUs PlayTest run 2026-09-30"
+```
+
+The option accepts relative paths (relative to the test process working directory),
+absolute paths and a leading `~/`, including inside a quoted value. Quoting the
+entire value is recommended for spaces. The folder must already exist and contain
+**nothing**, including hidden files or empty subdirectories. Invalid paths and
+nonempty folders fail before tests run; the recorder never empties a destination.
+Use a different empty folder for every run and every test module. Discovery/help
+does not claim the folder. Microsoft.Testing.Platform can summarize invalid options
+as "Zero tests ran" in `dotnet test`; invoking the compiled test DLL with
+`dotnet exec MyApp.PlayTests.dll ...` also shows the detailed option diagnostic.
+
+For namespace `JustBetweenUs.PlayTests.SendButton.Clicking`, class `ClickTests`,
+and method `clicking_button_adds_test`, the output is:
+
+```text
+screenshot-index.json
+SendButton/Clicking/ClickTests/clicking_button_adds_test/
+  screenshot-start.png
+  screenshot-1.png
+  screenshot-2.png
+  screenshot-final.png
+```
+
+Theory methods add `test-case-1/`, `test-case-2/`, etc. below the method folder.
+Case numbers follow **execution order within that method for this invocation**;
+use recorded IDs, display names and arguments to identify a row across filtered
+runs or runner ordering changes. The test project's `RootNamespace` is omitted
+only when it is an exact namespace prefix. Other namespaces remain complete.
+Names unsafe on Windows are escaped; long names and collisions get a hash suffix.
+
+The starting image is taken **after test setup and before the test body**. A PNG
+is then captured after each PlayTest action, including clicks, text/keyboard/mouse
+input, check/uncheck, scrolling, page replacement, orientation changes and explicit
+`EvaluateAsync`. Completed PlayTest assertions and waits also capture the UI so
+asynchronous outcomes are represented. Nested implementation calls and retry polls
+do not generate extra images. The final image is captured before test cleanup,
+including when a test throws. All captures use the actual app pixels, without
+preview letterboxing. No recording work runs when the option is absent.
+
+This records **PlayTest API boundaries**, not every C# statement or animation frame.
+For example, changes made by arbitrary background tasks appear at the next action,
+PlayTest wait/assertion or final capture. Existing tests using PlayTest's normal UI
+and waiting APIs need no changes. A skipped test has no executing lifecycle and
+produces no recording entry. An executed configuration-only test without a running
+app, or a test whose setup fails before the body, has metadata and an explanatory
+`screenshotNote`; it cannot produce images of a nonexistent UI. Shared-app tests
+must be serialized, as required by PlayTest itself.
+
+`screenshot-index.json` has `schemaVersion: 1` and is replaced atomically after
+each capture/test. It contains:
+
+- Run ID, completion status, local start/end timestamps with UTC offsets, OS,
+  architecture, .NET version, time zone, machine name and process ID.
+- Test/app/PlayTest assembly identities and versions, root namespace, CLI and
+  environment preferences, resolved preview/theme/orientation and action delay.
+- Each executed test's ID, display name, namespace, class, method/signature,
+  row number and formatted argument values, timestamps, duration, outcome and errors.
+- Each PNG's relative path, start/step/final kind, step number, local capture time,
+  operation/locator, dimensions, orientation, simulated OS theme, application and
+  root-element theme choices, and source file/line when available from debug symbols.
+
+Step source locations point to the calling test or helper; optimized code or missing
+PDBs can make them unavailable (`null`). A normally finished run is `completed` even
+when some tests failed; inspect the individual outcomes. An interrupted process can
+leave a valid partial index marked `running`. Capture/write failures are reported
+and fail the affected test. This feature currently requires the reflection-based
+xUnit v3 runner; other MTP runners retain theme/orientation/preview options and
+reject `--screenshotfolder` with an explanatory error.
+
+You can still set `CODEBRIX_PLAYTEST_HEADED=1` to open the preview. The preview
+runs in a separate process. Its initial size and
 aspect ratio follow the launch preference and stay unchanged when tests switch
 orientation. Portrait frames in a landscape preview get black bars on the left
 and right; landscape frames in a portrait preview get bars above and below.
@@ -145,6 +265,7 @@ Input values expose LF (`\n`) line endings, matching browser textareas; the
 application's native TextBox value retains WinUI's own line-ending convention.
 The virtual head uses a consistent Control-based shortcut model on all OSs;
 `ControlOrMeta` therefore maps to Control.
+TextBox selection, paste and word editing follow that model on macOS too.
 
 Use retrying assertions for the outcome of an action, not just its dispatch.
 For nonvisual outcomes use `application.WaitForAsync(() => service.Completed,
@@ -221,11 +342,21 @@ dialogs, multiple windows and horizontal wheel input are outside this prototype.
 An application that references the matching WebView add-in can use its offscreen
 browser, including rendering and XAML pointer/keyboard input: WPE WebKit on Linux
 (system WPE libraries required), or Edge WebView2 on Windows (installed WebView2
-runtime required). Windows browser profiles are isolated per process under
+runtime required), or WKWebView on macOS 12 and later. The macOS add-in supplies
+a separate native helper using the system WebKit engine, with a nonpersistent
+data store. Its snapshots are composited into Skia and its native pointer/keyboard
+events are driven by PlayTest. No native browser window is shown. Packages built
+on macOS include a universal Intel/Apple Silicon helper; packages built elsewhere
+compile the bundled helper source during the first macOS PlayTest build using
+Apple's command-line tools. The helper's complete source and standalone build
+instructions live in [tools/MacOsWebViewHelper](../../tools/MacOsWebViewHelper/README.md)
+in this repository. Windows browser profiles are isolated per process under
 `TestResults/PlayTest/WebView2` in the test output directory. PlayTest supplies the
 Windows STA message pump; the optional add-in supplies the browser provider and
 composites its frames into Skia, including screenshots and the SDL preview.
-PlayTest does not supply a browser engine, DOM locators, or a macOS WebView provider.
+PlayTest does not supply a browser engine or DOM locators. Native browser file
+uploads, script dialogs and downloads are outside the macOS offscreen adapter's
+current surface; file upload/dialog requests are cancelled without displaying UI.
 
 The AriaRole enum is adapted from MIT-licensed Microsoft Playwright for .NET.
 See the packaged `THIRD-PARTY-NOTICES.txt` for attribution and license text.

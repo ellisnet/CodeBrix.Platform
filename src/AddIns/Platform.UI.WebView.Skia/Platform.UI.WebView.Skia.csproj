@@ -86,6 +86,9 @@
 	</PropertyGroup>
 	<Target Name="_CbxAddWebView2Payload">
 		<ItemGroup>
+			<TfmSpecificPackageFile Include="$(_CbxMacWebViewHelper)" Condition="Exists('$(_CbxMacWebViewHelper)')">
+				<PackagePath>buildTransitive/macos/CodeBrix.PlayTest.WebView</PackagePath>
+			</TfmSpecificPackageFile>
 			<TfmSpecificPackageFile Include="$(PkgMicrosoft_Web_WebView2)\lib_manual\netcoreapp3.0\Microsoft.Web.WebView2.Core.dll">
 				<PackagePath>buildTransitive\webview2\Microsoft.Web.WebView2.Core.dll</PackagePath>
 			</TfmSpecificPackageFile>
@@ -121,5 +124,13 @@
 		     comment) is fixed at source rather than suppressed - the comment IS the deliverable. -->
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
-
+	<PropertyGroup>
+		<_CbxBuildMacWebView>true</_CbxBuildMacWebView>
+		<_CbxMacWebViewSource>$(MSBuildThisFileDirectory)../../../tools/MacOsWebViewHelper/PlayTestWebView.m</_CbxMacWebViewSource>
+	</PropertyGroup>
+	<ItemGroup>
+		<Content Include="../../../tools/MacOsWebViewHelper/PlayTestWebView.m" Pack="true" PackagePath="buildTransitive/macos/PlayTestWebView.m" />
+		<Content Include="../../../tools/MacOsWebViewHelper/CodeBrix.WebView.MacOS.targets" Pack="true" PackagePath="buildTransitive/CodeBrix.WebView.MacOS.targets" />
+	</ItemGroup>
+	<Import Project="../../../tools/MacOsWebViewHelper/CodeBrix.WebView.MacOS.targets" />
 </Project>

@@ -35,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" GeneratePathProperty="true" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.macOS" />
 		<PackageReference Include="HarfBuzzSharp" />
 		<PackageReference Include="SkiaSharp" />
@@ -46,13 +46,11 @@
 	<PropertyGroup>
 		<_XcodeBuildArgs Condition="'$(Configuration)'=='Debug'">build-for-testing -scheme CodeBrixNativeMac</_XcodeBuildArgs>
 
-		<!-- The native macOS dylib is built by Xcode. In this project's setup full Xcode
-		     only exists on Apple Silicon, so default to building the native lib only there.
-		     On an Intel Mac (Command Line Tools, no xcodebuild) the native step is skipped
-		     so `dotnet build` / `dotnet test` still smoke-test the managed code.
-		     NuGet packaging is always done on Apple Silicon, where this runs as before.
-		     Override either way with -p:BuildNativeMac=true|false. -->
-		<BuildNativeMac Condition="'$(BuildNativeMac)' == '' and $([MSBuild]::IsOsPlatform('OSX')) and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">true</BuildNativeMac>
+		<!-- Preserve the regular Apple Silicon/Xcode packaging workflow. Apple's
+		     Command Line Tools also build a universal dylib on either CPU. -->
+		<NativeMacBuildTool Condition="'$(NativeMacBuildTool)' == '' and '$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture)' == 'Arm64'">Xcode</NativeMacBuildTool>
+		<NativeMacBuildTool Condition="'$(NativeMacBuildTool)' == ''">Clang</NativeMacBuildTool>
+		<BuildNativeMac Condition="'$(BuildNativeMac)' == '' and $([MSBuild]::IsOsPlatform('OSX'))">true</BuildNativeMac>
 		<BuildNativeMac Condition="'$(BuildNativeMac)' == ''">false</BuildNativeMac>
 
 		<!-- Contribute the freshly-built native dylib to the package at pack time.
@@ -62,12 +60,19 @@
 		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddNativeMacToPackage</TargetsForTfmSpecificContentInPackage>
 	</PropertyGroup>
 
-	<Target Name="BuildCodeBrixNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' == 'true'">
-		<Exec Command="$(MSBuildThisFileDirectory)PlatformNativeMac/build.sh $(_XcodeBuildArgs)" WorkingDirectory="$(MSBuildThisFileDirectory)PlatformNativeMac/" />
+	<ItemGroup>
+		<_NativeMacSource Include="$(MSBuildThisFileDirectory)PlatformNativeMac/PlatformNativeMac/*.m;$(MSBuildThisFileDirectory)PlatformNativeMac/PlatformNativeMac/*.h;$(MSBuildThisFileDirectory)PlatformNativeMac/PlatformNativeMac/*.sh;$(MSBuildThisFileDirectory)PlatformNativeMac/*.sh;$(MSBuildThisFileDirectory)PlatformNativeMac/PlatformNativeMac.xcodeproj/project.pbxproj;$(MSBuildProjectFullPath)" />
+	</ItemGroup>
+	<Target Name="BuildCodeBrixNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' == 'true'"
+			Inputs="@(_NativeMacSource);$(PkgSkiaSharp_NativeAssets_macos)/runtimes/osx/native/libSkiaSharp.dylib"
+			Outputs="$(MSBuildThisFileDirectory)PlatformNativeMac/build/$(Configuration)/libCodeBrixNativeMac.dylib">
+		<Exec Condition="'$(NativeMacBuildTool)' == 'Clang'" Command="bash &quot;$(MSBuildThisFileDirectory)PlatformNativeMac/build-clang.sh&quot; &quot;$(Configuration)&quot; &quot;$(PkgSkiaSharp_NativeAssets_macos)/runtimes/osx/native/libSkiaSharp.dylib&quot;" />
+		<Exec Condition="'$(NativeMacBuildTool)' == 'Xcode'" Command="bash &quot;$(MSBuildThisFileDirectory)PlatformNativeMac/build.sh&quot; $(_XcodeBuildArgs)" WorkingDirectory="$(MSBuildThisFileDirectory)PlatformNativeMac/" />
+		<Error Condition="'$(NativeMacBuildTool)' != 'Clang' and '$(NativeMacBuildTool)' != 'Xcode'" Text="NativeMacBuildTool must be Clang or Xcode." />
 	</Target>
 
 	<Target Name="_ReportSkippedNativeMac" BeforeTargets="CoreCompile" Condition="'$(BuildNativeMac)' != 'true' and $([MSBuild]::IsOsPlatform('OSX'))">
-		<Message Importance="high" Text="Skipping native macOS build (BuildNativeMac=false — e.g. Intel Mac without Xcode). Managed build only; libCodeBrixNativeMac.dylib will be absent, so native-dependent tests won't run here." />
+		<Message Importance="high" Text="Skipping native macOS build (BuildNativeMac=false). Managed build only." />
 	</Target>
 
 	<Target Name="_AddNativeMacToPackage" DependsOnTargets="BuildCodeBrixNativeMac" Condition="'$(BuildNativeMac)' == 'true'">

@@ -147,7 +147,11 @@ namespace Microsoft.UI.Xaml
 
 		internal virtual bool IsFocusableForFocusEngagement() => false;
 
-		internal protected bool IsVisible() => Visibility == Visibility.Visible;
+		internal protected bool IsVisible() => Visibility == Visibility.Visible
+#if __SKIA__
+			&& !IsVisualPresentationSuppressed
+#endif
+			;
 
 		private bool IsEnabled()
 		{

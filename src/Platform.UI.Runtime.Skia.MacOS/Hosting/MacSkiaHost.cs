@@ -51,8 +51,17 @@ public class MacSkiaHost : SkiaHost, ISkiaApplicationHost
 
 	public RenderSurfaceType RenderSurfaceType { get; set; }
 
+	internal bool UseSystemMenuBar { get; init; }
+	internal string? SystemAppName { get; init; }
+
 	protected override void Initialize()
 	{
+		// AppKit caches its application name during initialization. Apply this
+		// startup-only option before creating NSApplication, with either menu mode.
+		if (SystemAppName is { } name && !NativeCodeBrix.codebrix_application_set_name(name))
+		{
+			throw new InvalidOperationException("The macOS application name could not be configured. Run the host on the main thread; this macOS version must support updating AppKit's in-process bundle-name cache.");
+		}
 		if (!InitializeMac())
 		{
 			if (this.Log().IsEnabled(LogLevel.Error))
@@ -63,6 +72,10 @@ public class MacSkiaHost : SkiaHost, ISkiaApplicationHost
 		}
 
 		InitializeDispatcher();
+		if (UseSystemMenuBar)
+		{
+			MacOSMenuBarExtension.Register();
+		}
 	}
 
 	protected override unsafe Task RunLoop()

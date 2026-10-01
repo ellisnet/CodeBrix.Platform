@@ -57,6 +57,7 @@ public sealed class Locator
 
     public async Task SetCheckedAsync(bool value, LocatorClickOptions options = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "SetChecked", Description);
         var alreadySet = false;
         await RetryAsync(() =>
         {
@@ -75,6 +76,7 @@ public sealed class Locator
     /// first be materialized by scrolling their container.</summary>
     public async Task ScrollIntoViewIfNeededAsync(LocatorOptions options = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "ScrollIntoView", Description);
         await RetryAsync(() =>
         {
             var element = Single();
@@ -105,6 +107,7 @@ public sealed class Locator
 
     public async Task ClickAsync(LocatorClickOptions options = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "Click", Description);
         // A matching control must remain at the same bounds over two rendered frames,
         // and the compositor's real hit test must reach it before pointer injection.
         Rect? previous = null;
@@ -127,6 +130,7 @@ public sealed class Locator
 
     public async Task FillAsync(string value, LocatorFillOptions options = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "Fill", Description);
         ArgumentNullException.ThrowIfNull(value);
         await RetryAsync(() =>
         {
@@ -153,6 +157,7 @@ public sealed class Locator
 
     public async Task PressAsync(string key, LocatorPressOptions options = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "Press", Description);
         await RetryAsync(() => Single() is Control control && VisualTree.Visible(control) &&
             VisualTree.Enabled(control) && control.Focus(FocusState.Programmatic), options?.Timeout, "focusable element").ConfigureAwait(false);
         await Page.Keyboard.PressAsync(key).ConfigureAwait(false);
@@ -160,6 +165,7 @@ public sealed class Locator
 
     internal async Task RetryAsync(Func<bool> check, float? timeout, string expectation, bool render = false)
     {
+        await using var step = Recording.PlayTestRecording.Step(App, "WaitForElement", Description + "; " + expectation);
         var limit = timeout ?? App.Options.Timeout;
         if (limit <= 0 || !float.IsFinite(limit)) throw new ArgumentOutOfRangeException(nameof(timeout));
         var elapsed = Stopwatch.StartNew();

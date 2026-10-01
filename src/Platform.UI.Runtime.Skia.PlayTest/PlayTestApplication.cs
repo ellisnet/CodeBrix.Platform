@@ -17,12 +17,19 @@ public enum ScreenOrientation { Landscape, Portrait }
 public sealed class PlayTestOptions
 {
     private ScreenOrientation? _orientation;
+    private ApplicationTheme? _theme;
     private float? _slowMo;
-    /// <summary>An explicit orientation overrides environment and project preferences.</summary>
+    /// <summary>An explicit orientation overrides command-line, environment and project preferences.</summary>
     public ScreenOrientation Orientation { get => _orientation ?? ScreenOrientation.Landscape; set => _orientation = value; }
+    /// <summary>An explicit simulated system theme overrides command-line, environment and project preferences.</summary>
+    public ApplicationTheme Theme { get => _theme ?? ApplicationTheme.Light; set => _theme = value; }
     /// <summary>The test assembly containing project preferences; defaults to the entry assembly.</summary>
     public Assembly ConfigurationAssembly { get; set; }
-    public bool Headless { get; set; } = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
+    /// <summary>An explicit value overrides the runner's --headed/--headless option,
+    /// then CODEBRIX_PLAYTEST_HEADED. The fallback is headless.</summary>
+    public bool Headless { get; set; } =
+        AppContext.GetData("CodeBrix.Platform.PlayTest.CommandLineHeadless") is bool headless
+            ? headless : Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
     public float Timeout { get; set; } = 10_000;
     /// <summary>Action delay in milliseconds. An explicit value (including zero) wins over
     /// CODEBRIX_PLAYTEST_SLOWMO; otherwise defaults to 250 in headed mode and zero headless.</summary>
@@ -39,7 +46,7 @@ public sealed class PlayTestOptions
         throw new ArgumentException($"CODEBRIX_PLAYTEST_SLOWMO must be a finite, non-negative number of milliseconds; received '{environment}'.");
     }
 
-    /// <summary>Resolves code, environment, project metadata, then the landscape fallback.</summary>
+    /// <summary>Resolves code, command line, environment, project metadata, then the landscape fallback.</summary>
     public ScreenOrientation ResolveOrientation()
     {
         if (_orientation is { } explicitOrientation)
@@ -47,6 +54,8 @@ public sealed class PlayTestOptions
             if (!Enum.IsDefined(explicitOrientation)) throw new ArgumentOutOfRangeException(nameof(Orientation));
             return explicitOrientation;
         }
+        if (AppContext.GetData("CodeBrix.Platform.PlayTest.CommandLineOrientation") is string commandLine)
+            return OrientationPreference.Parse(commandLine, "--orientation");
         var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_ORIENTATION");
         if (!string.IsNullOrEmpty(environment))
             return OrientationPreference.Parse(environment, "CODEBRIX_PLAYTEST_ORIENTATION");
@@ -57,9 +66,16 @@ public sealed class PlayTestOptions
             : OrientationPreference.Parse(preference, "CodeBrixPlayTestPreferredOrientation");
     }
 
-    /// <summary>Resolves the simulated OS theme: environment, project metadata, then Light.</summary>
+    /// <summary>Resolves the simulated OS theme: code, command line, environment, project metadata, then Light.</summary>
     public ApplicationTheme ResolveTheme()
     {
+        if (_theme is { } explicitTheme)
+        {
+            if (!Enum.IsDefined(explicitTheme)) throw new ArgumentOutOfRangeException(nameof(Theme));
+            return explicitTheme;
+        }
+        if (AppContext.GetData("CodeBrix.Platform.PlayTest.CommandLineTheme") is string commandLine)
+            return ParseTheme(commandLine, "--theme");
         var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_THEME");
         if (!string.IsNullOrEmpty(environment))
             return ParseTheme(environment, "CODEBRIX_PLAYTEST_THEME");
@@ -91,6 +107,8 @@ public sealed class PlayTestApplication : IAsyncDisposable
     private PreviewConnection _preview;
     private Task _run;
     private int _disposed;
+    internal static PlayTestApplication Current { get; private set; }
+    internal Type ApplicationType { get; private set; }
     internal PlayTestOptions Options { get; }
     public Page Page { get; }
     public PlayTestFilePickers FilePickers { get; } = new();
@@ -144,6 +162,8 @@ public sealed class PlayTestApplication : IAsyncDisposable
             result._run = Task.Run(result._host.Run);
             await result._host.ReadyAsync().ConfigureAwait(false);
             await result._host.CaptureAsync().ConfigureAwait(false);
+            result.ApplicationType = await result._host.OnUI(() => Application.Current.GetType()).ConfigureAwait(false);
+            Current = result;
             return result;
         }
         catch { await result.DisposeAsync().ConfigureAwait(false); throw; }
@@ -151,13 +171,22 @@ public sealed class PlayTestApplication : IAsyncDisposable
 
     // A C# counterpart to evaluating application state: evaluation is marshalled onto
     // the actual UI thread. Tests should use locators for user actions.
-    public Task<T> EvaluateAsync<T>(Func<T> expression) => _host.OnUI(expression);
-    public Task EvaluateAsync(Action action) => _host.OnUI(action);
+    public async Task<T> EvaluateAsync<T>(Func<T> expression)
+    {
+        await using var step = Recording.PlayTestRecording.Step(this, "Evaluate");
+        return await _host.OnUI(expression).ConfigureAwait(false);
+    }
+    public async Task EvaluateAsync(Action action)
+    {
+        await using var step = Recording.PlayTestRecording.Step(this, "Evaluate");
+        await _host.OnUI(action).ConfigureAwait(false);
+    }
 
     /// <summary>Changes the virtual screen and waits for layout/rendering. Null restores the launch preference.
     /// Call between serialized tests, never concurrently with actions or screenshots.</summary>
     public async Task SetOrientationAsync(ScreenOrientation? orientation = null)
     {
+        await using var step = Recording.PlayTestRecording.Step(this, "SetOrientation");
         var selected = orientation ?? PreferredOrientation;
         if (!Enum.IsDefined(selected)) throw new ArgumentOutOfRangeException(nameof(orientation));
         await EvaluateAsync(() => _host.SetOrientation(selected)).ConfigureAwait(false);
@@ -166,6 +195,7 @@ public sealed class PlayTestApplication : IAsyncDisposable
 
     public async Task<T> WaitForAsync<T>(Func<T> probe, Func<T, bool> predicate, float? timeout = null, string description = "application outcome")
     {
+        await using var step = Recording.PlayTestRecording.Step(this, "WaitFor", description);
         ArgumentNullException.ThrowIfNull(probe);
         ArgumentNullException.ThrowIfNull(predicate);
         var limit = timeout ?? Options.Timeout;
@@ -202,9 +232,14 @@ public sealed class PlayTestApplication : IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
-        _host.Dispose();
-        if (_preview != null) await _preview.DisposeAsync().ConfigureAwait(false);
-        if (_run != null) await _run.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+        try { await Recording.PlayTestRecording.BeforeApplicationDisposedAsync(this).ConfigureAwait(false); }
+        finally
+        {
+            if (ReferenceEquals(Current, this)) Current = null;
+            _host.Dispose();
+            if (_preview != null) await _preview.DisposeAsync().ConfigureAwait(false);
+            if (_run != null) await _run.WaitAsync(TimeSpan.FromSeconds(10)).ConfigureAwait(false);
+        }
     }
 }
 

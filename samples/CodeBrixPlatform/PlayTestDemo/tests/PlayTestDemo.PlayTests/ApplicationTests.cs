@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Threading.Tasks;
 using CodeBrix.Platform.PlayTest;
@@ -17,6 +18,16 @@ public sealed partial class ApplicationTests(AppFixture fixture) : PageTest(fixt
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
     private Locator Button(string name) => Page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
+
+    [Fact]
+    public void Preview_mode_reaches_the_running_application()
+    {
+        var arguments = Environment.GetCommandLineArgs();
+        var headed = Array.IndexOf(arguments, "--headed") >= 0 || Array.IndexOf(arguments, "--nonheadless") >= 0;
+        var headless = Array.IndexOf(arguments, "--headless") >= 0;
+        var expected = headed ? false : headless || Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
+        fixture.Application.Headless.Should().Be(expected);
+    }
 
     [Fact]
     [PlayTestOrientation(ScreenOrientation.Landscape)]

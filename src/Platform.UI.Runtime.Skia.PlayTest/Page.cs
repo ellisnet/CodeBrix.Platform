@@ -63,6 +63,7 @@ public sealed class Page
     /// Orientation is applied before the page factory runs. Shared fixtures must be serialized.</summary>
     public async Task SetContentAsync(Func<UIElement> content, ScreenOrientation? orientation)
     {
+        await using var step = Recording.PlayTestRecording.Step(Application, "SetContent");
         ArgumentNullException.ThrowIfNull(content);
         var selected = orientation ?? Application.PreferredOrientation;
         if (!Enum.IsDefined(selected)) throw new ArgumentOutOfRangeException(nameof(orientation));

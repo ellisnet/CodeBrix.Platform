@@ -242,7 +242,7 @@ namespace Microsoft.UI.Xaml
 					try
 #endif
 					{
-						if (this.Visibility == Visibility.Collapsed)
+						if (this.Visibility == Visibility.Collapsed || IsVisualPresentationSuppressed)
 						{
 							m_desiredSize = default;
 							return;
@@ -339,7 +339,7 @@ namespace Microsoft.UI.Xaml
 
 			var firstArrangeDone = IsFirstArrangeDone;
 
-			if (Visibility == Visibility.Collapsed)
+			if (Visibility == Visibility.Collapsed || IsVisualPresentationSuppressed)
 			{
 				m_finalRect = finalRect;
 				HideVisual();

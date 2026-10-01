@@ -30,6 +30,8 @@
     <PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="buildTransitive/**/*.cs" />
+    <Content Include="buildTransitive/*.cs" Pack="true" PackagePath="buildTransitive/" />
     <None Include="../../icon-codebrix-128.png" Pack="true" PackagePath="/" />
     <None Include="../../THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="/" />
     <None Update="README.md;AGENT-README.txt" Pack="true" PackagePath="/" />

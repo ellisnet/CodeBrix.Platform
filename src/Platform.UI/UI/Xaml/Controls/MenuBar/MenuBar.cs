@@ -45,6 +45,7 @@ namespace Microsoft.UI.Xaml.Controls
 			Items = new ObservableCollection<MenuBarItem>();
 
 			this.SetDefaultStyleKey();
+			InitializeNativeMenuBar();
 
 			Loaded += (_, _) => RegisterLoaded(this);
 			Unloaded += (_, _) => UnregisterLoaded(this);
@@ -52,6 +53,8 @@ namespace Microsoft.UI.Xaml.Controls
 			// handledEventsToo: record where focus was before it entered the menus, whoever moved it
 			AddHandler(GettingFocusEvent, new TypedEventHandler<UIElement, GettingFocusEventArgs>(OnGettingFocus), true);
 		}
+
+		partial void InitializeNativeMenuBar();
 
 		// Where keyboard focus was before it entered the menu bar (weakly held), so leaving the menu bar
 		// (Escape on a title with no menu open) can put it back - on a game surface, say.
@@ -222,7 +225,7 @@ namespace Microsoft.UI.Xaml.Controls
 					!menuBar.IsLoaded ||
 					menuBar.XamlRoot != xamlRoot ||
 					!menuBar.IsEnabled ||
-					!FocusProperties.IsVisible(menuBar) ||
+					menuBar.Visibility != Visibility.Visible ||
 					!FocusProperties.AreAllAncestorsVisible(menuBar))
 				{
 					continue;

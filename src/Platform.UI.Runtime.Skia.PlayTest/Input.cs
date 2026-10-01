@@ -16,6 +16,7 @@ public sealed class Keyboard
 
     public async Task PressAsync(string key)
     {
+        await using var step = Recording.PlayTestRecording.Step(_app, "KeyPress");
         ArgumentException.ThrowIfNullOrWhiteSpace(key);
         var parts = key.Split('+');
         var keys = parts.Select(Parse).ToArray();
@@ -39,6 +40,7 @@ public sealed class Keyboard
 
     public async Task InsertTextAsync(string text)
     {
+        await using var step = Recording.PlayTestRecording.Step(_app, "InsertText");
         ArgumentNullException.ThrowIfNull(text);
         await _app.EvaluateAsync(() =>
         {
@@ -74,20 +76,34 @@ public sealed class Mouse
 {
     private readonly PlayTestApplication _app;
     internal Mouse(PlayTestApplication app) => _app = app;
-    public Task MoveAsync(float x, float y) => _app.EvaluateAsync(() => _app.Host.Input.Move(x, y));
-    public Task DownAsync() => _app.EvaluateAsync(_app.Host.Input.Down);
-    public Task UpAsync() => _app.EvaluateAsync(_app.Host.Input.Up);
+    public async Task MoveAsync(float x, float y)
+    {
+        await using var step = Recording.PlayTestRecording.Step(_app, "MouseMove");
+        await _app.EvaluateAsync(() => _app.Host.Input.Move(x, y)).ConfigureAwait(false);
+    }
+    public async Task DownAsync()
+    {
+        await using var step = Recording.PlayTestRecording.Step(_app, "MouseDown");
+        await _app.EvaluateAsync(_app.Host.Input.Down).ConfigureAwait(false);
+    }
+    public async Task UpAsync()
+    {
+        await using var step = Recording.PlayTestRecording.Step(_app, "MouseUp");
+        await _app.EvaluateAsync(_app.Host.Input.Up).ConfigureAwait(false);
+    }
     public async Task ClickAsync(float x, float y)
     {
+        await using var step = Recording.PlayTestRecording.Step(_app, "MouseClick");
         await MoveAsync(x, y).ConfigureAwait(false);
         await DownAsync().ConfigureAwait(false);
         await UpAsync().ConfigureAwait(false);
         await _app.Host.CaptureAsync().ConfigureAwait(false);
         await _app.SlowAsync().ConfigureAwait(false);
     }
-    public Task WheelAsync(float deltaX, float deltaY)
+    public async Task WheelAsync(float deltaX, float deltaY)
     {
+        await using var step = Recording.PlayTestRecording.Step(_app, "MouseWheel");
         if (deltaX != 0) throw new NotSupportedException("PlayTest 0.1 supports vertical scrolling only.");
-        return _app.EvaluateAsync(() => _app.Host.Input.Wheel(-(int)deltaY));
+        await _app.EvaluateAsync(() => _app.Host.Input.Wheel(-(int)deltaY)).ConfigureAwait(false);
     }
 }
