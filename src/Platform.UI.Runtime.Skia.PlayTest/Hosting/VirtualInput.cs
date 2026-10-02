@@ -1,4 +1,3 @@
-// Pointer/key construction adapted from FrameBuffer.Emulated/Devices/Input.
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +9,7 @@ using Windows.UI.Input;
 
 namespace CodeBrix.Platform.PlayTest.Hosting;
 
+// Pointer/key construction adapted from FrameBuffer.Emulated/Devices/Input.
 internal sealed class VirtualInput : ICodeBrixCorePointerInputSource, ICodeBrixKeyboardInputSource
 {
     private readonly VirtualHost _host;
@@ -20,16 +20,16 @@ internal sealed class VirtualInput : ICodeBrixCorePointerInputSource, ICodeBrixK
     private bool _middlePressed;
     private bool _entered;
     internal VirtualInput(VirtualHost host) => _host = host;
-    public event TypedEventHandler<object, PointerEventArgs> PointerEntered;
+    public event TypedEventHandler<object, PointerEventArgs>? PointerEntered;
     public event TypedEventHandler<object, PointerEventArgs> PointerExited { add { } remove { } }
-    public event TypedEventHandler<object, PointerEventArgs> PointerMoved;
-    public event TypedEventHandler<object, PointerEventArgs> PointerPressed;
-    public event TypedEventHandler<object, PointerEventArgs> PointerReleased;
-    public event TypedEventHandler<object, PointerEventArgs> PointerWheelChanged;
+    public event TypedEventHandler<object, PointerEventArgs>? PointerMoved;
+    public event TypedEventHandler<object, PointerEventArgs>? PointerPressed;
+    public event TypedEventHandler<object, PointerEventArgs>? PointerReleased;
+    public event TypedEventHandler<object, PointerEventArgs>? PointerWheelChanged;
     public event TypedEventHandler<object, PointerEventArgs> PointerCancelled { add { } remove { } }
     public event TypedEventHandler<object, PointerEventArgs> PointerCaptureLost { add { } remove { } }
-    public event TypedEventHandler<object, KeyEventArgs> KeyDown;
-    public event TypedEventHandler<object, KeyEventArgs> KeyUp;
+    public event TypedEventHandler<object, KeyEventArgs>? KeyDown;
+    public event TypedEventHandler<object, KeyEventArgs>? KeyUp;
     public bool HasCapture => _captures.Count > 0;
     public CoreCursor PointerCursor { get; set; } = new(CoreCursorType.Arrow, 0);
     public Point PointerPosition { get; private set; }

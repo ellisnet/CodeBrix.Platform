@@ -16,18 +16,38 @@ namespace CodeBrix.Platform.PlayTest;
 /// Enqueue a response before clicking the control that opens the picker.</summary>
 public sealed class PlayTestFilePickers
 {
-    private readonly ConcurrentQueue<string> _folders = new();
-    private readonly ConcurrentQueue<string> _saveFiles = new();
+    private readonly ConcurrentQueue<string?> _folders = new();
+    private readonly ConcurrentQueue<string?> _saveFiles = new();
     private readonly ConcurrentQueue<string[]> _openFiles = new();
-    public string LastSuggestedFileName { get; private set; }
+
+    /// <summary>The <c>SuggestedFileName</c> of the most recent save picker, or null.</summary>
+    public string? LastSuggestedFileName { get; private set; }
+
+    /// <summary>Number of folder pickers the application has opened since the last <see cref="Clear"/>.</summary>
     public int FolderRequestCount { get; private set; }
+
+    /// <summary>Number of save-file pickers the application has opened since the last <see cref="Clear"/>.</summary>
     public int SaveFileRequestCount { get; private set; }
+
+    /// <summary>Number of open-file pickers (single or multiple) opened since the last <see cref="Clear"/>.</summary>
     public int OpenFileRequestCount { get; private set; }
 
-    public void EnqueueFolder(string path) => _folders.Enqueue(path == null ? null : Path.GetFullPath(path));
-    public void EnqueueSaveFile(string path) => _saveFiles.Enqueue(path == null ? null : Path.GetFullPath(path));
-    public void EnqueueOpenFile(string path) => EnqueueOpenFiles(path == null ? null : new[] { path });
-    public void EnqueueOpenFiles(params string[] paths) =>
+    /// <summary>Queues the answer for the next folder picker. The folder must exist when the picker opens.</summary>
+    /// <param name="path">The folder to select (made absolute now), or null to cancel.</param>
+    public void EnqueueFolder(string? path) => _folders.Enqueue(path == null ? null : Path.GetFullPath(path));
+
+    /// <summary>Queues the answer for the next save-file picker. Its parent folder must exist; a new name
+    /// creates an empty file, and an existing file is returned intact.</summary>
+    /// <param name="path">The file to select (made absolute now), or null to cancel.</param>
+    public void EnqueueSaveFile(string? path) => _saveFiles.Enqueue(path == null ? null : Path.GetFullPath(path));
+
+    /// <summary>Queues one file for the next open-file picker. The file must exist when the picker opens.</summary>
+    /// <param name="path">The file to select (made absolute now), or null to cancel.</param>
+    public void EnqueueOpenFile(string? path) => EnqueueOpenFiles(path == null ? null : new[] { path });
+
+    /// <summary>Queues several files for the next open-file picker. A single-file picker rejects more than one.</summary>
+    /// <param name="paths">The files to select (made absolute now), or null or empty to cancel.</param>
+    public void EnqueueOpenFiles(params string[]? paths) =>
         _openFiles.Enqueue(paths?.Select(Path.GetFullPath).ToArray() ?? Array.Empty<string>());
 
     /// <summary>Clear unused responses between serialized tests.</summary>
@@ -58,7 +78,7 @@ public sealed class PlayTestFilePickers
             return paths;
         }
 
-        public async Task<StorageFile> PickSingleFileAsync(CancellationToken token)
+        public async Task<StorageFile?> PickSingleFileAsync(CancellationToken token)
         {
             var paths = Take(token);
             if (paths.Length > 1) throw new PlayTestException("A single-file picker cannot select multiple queued files.");
@@ -85,7 +105,7 @@ public sealed class PlayTestFilePickers
 
     private sealed class FolderResponse(PlayTestFilePickers owner) : IFolderPickerExtension
     {
-        public async Task<StorageFolder> PickSingleFolderAsync(CancellationToken token)
+        public async Task<StorageFolder?> PickSingleFolderAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             owner.FolderRequestCount++;
@@ -101,7 +121,7 @@ public sealed class PlayTestFilePickers
     {
         public void Customize(FileSavePicker picker) => owner.LastSuggestedFileName = picker.SuggestedFileName;
 
-        public async Task<StorageFile> PickSaveFileAsync(CancellationToken token)
+        public async Task<StorageFile?> PickSaveFileAsync(CancellationToken token)
         {
             token.ThrowIfCancellationRequested();
             owner.SaveFileRequestCount++;
@@ -111,7 +131,7 @@ public sealed class PlayTestFilePickers
             // Match a native save picker: a new name may create an empty placeholder;
             // an existing file is returned intact, never truncated by the picker.
             var directory = Path.GetDirectoryName(path);
-            if (!Directory.Exists(directory)) throw new DirectoryNotFoundException("The scripted save-picker parent folder does not exist: " + directory);
+            if (directory == null || !Directory.Exists(directory)) throw new DirectoryNotFoundException("The scripted save-picker parent folder does not exist: " + directory);
             var folder = await StorageFolder.GetFolderFromPathAsync(directory);
             return await folder.CreateFileAsync(Path.GetFileName(path), CreationCollisionOption.OpenIfExists);
         }

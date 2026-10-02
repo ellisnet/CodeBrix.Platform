@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.UI.Xaml;
@@ -15,7 +16,7 @@ namespace CodeBrix.Platform.PlayTest;
 
 internal static class VisualTree
 {
-    internal static IEnumerable<UIElement> Walk(UIElement root, bool includePopups = false)
+    internal static IEnumerable<UIElement> Walk(UIElement? root, bool includePopups = false)
     {
         if (root == null) yield break;
         var seen = new HashSet<UIElement>();
@@ -36,7 +37,7 @@ internal static class VisualTree
 
     internal static bool Within(UIElement child, UIElement ancestor)
     {
-        for (DependencyObject node = child; node != null; node = VisualTreeHelper.GetParent(node))
+        for (DependencyObject? node = child; node != null; node = VisualTreeHelper.GetParent(node))
             if (node == ancestor) return true;
         return false;
     }
@@ -47,12 +48,12 @@ internal static class VisualTree
     // A stretched ToggleSwitch includes its header and empty layout space. Its thumb
     // is the actual pointer target, including with the framework's default template.
     internal static UIElement ClickTarget(UIElement element) => element is ToggleSwitch
-        ? (UIElement)Walk(element).OfType<Thumb>().FirstOrDefault() ?? element : element;
+        ? Walk(element).OfType<Thumb>().FirstOrDefault() ?? element : element;
 
-    internal static bool Visible(UIElement element)
+    internal static bool Visible([NotNullWhen(true)] UIElement? element)
     {
         if (element == null || element.XamlRoot == null) return false;
-        for (DependencyObject node = element; node != null; node = VisualTreeHelper.GetParent(node))
+        for (DependencyObject? node = element; node != null; node = VisualTreeHelper.GetParent(node))
             if (node is UIElement ui && ui.Visibility != Visibility.Visible) return false;
         var bounds = Bounds(element);
         return bounds.Width > 0 && bounds.Height > 0;
@@ -60,16 +61,16 @@ internal static class VisualTree
 
     internal static bool Enabled(UIElement element)
     {
-        for (DependencyObject node = element; node != null; node = VisualTreeHelper.GetParent(node))
+        for (DependencyObject? node = element; node != null; node = VisualTreeHelper.GetParent(node))
             if (node is Control control && !control.IsEnabled) return false;
         return true;
     }
 
-    internal static string Normalize(string value) => Regex.Replace(value ?? "", @"\s+", " ").Trim();
+    internal static string Normalize(string? value) => Regex.Replace(value ?? "", @"\s+", " ").Trim();
     // Browser textarea values use LF; WinUI TextBox internally uses CR. Expose
     // the same portable value to Playwright-style tests without altering the app.
-    internal static string InputText(string value) => (value ?? "").Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
-    internal static bool Matches(string actual, string expected, bool exact) => exact
+    internal static string InputText(string? value) => (value ?? "").Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+    internal static bool Matches(string? actual, string? expected, bool exact) => exact
         ? string.Equals(Normalize(actual), Normalize(expected), StringComparison.Ordinal)
         : Normalize(actual).Contains(Normalize(expected), StringComparison.OrdinalIgnoreCase);
 
@@ -93,8 +94,8 @@ internal static class VisualTree
         if (element is MenuFlyoutSubItem submenu) return submenu.Text ?? "";
         if (element is MenuBarItem topMenu) return topMenu.Title ?? "";
         var peer = FrameworkElementAutomationPeer.CreatePeerForElement(element);
-        name = peer?.GetName();
-        return string.IsNullOrEmpty(name) ? (element is TextBox ? "" : Text(element)) : name;
+        var peerName = peer?.GetName();
+        return string.IsNullOrEmpty(peerName) ? (element is TextBox ? "" : Text(element)) : peerName;
     }
 
     internal static AriaRole Role(UIElement element)
@@ -155,7 +156,7 @@ internal static class VisualTree
         _ => throw new PlayTestException("Checked state requires a checkable control or automation Toggle provider."),
     };
 
-    internal static IValueProvider ValueProvider(UIElement element) =>
+    internal static IValueProvider? ValueProvider(UIElement element) =>
         FrameworkElementAutomationPeer.CreatePeerForElement(element)?.GetPattern(PatternInterface.Value) as IValueProvider;
 
     internal static bool ReceivesEvents(UIElement target, Point point)

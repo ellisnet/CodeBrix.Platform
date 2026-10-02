@@ -1,5 +1,3 @@
-// Rendering and host registration adapted from FrameBuffer.Emulated/Hosting/TestTargetHost.cs
-// and Rendering/EmulatedRenderer.cs. The existing head is deliberately independent.
 using System;
 using System.Collections.Concurrent;
 using System.Threading;
@@ -22,6 +20,8 @@ using Windows.UI.Core;
 
 namespace CodeBrix.Platform.PlayTest.Hosting;
 
+// Rendering and host registration adapted from FrameBuffer.Emulated/Hosting/TestTargetHost.cs
+// and Rendering/EmulatedRenderer.cs. The existing head is deliberately independent.
 internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHost, ICoreApplicationExtension, IDisposable
 {
     private readonly Func<Application> _factory;
@@ -33,11 +33,11 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private readonly TaskCompletionSource _ready = new(TaskCreationOptions.RunContinuationsAsynchronously);
     private readonly object _frameLock = new();
     private TaskCompletionSource<long> _frameChanged = new(TaskCreationOptions.RunContinuationsAsynchronously);
-    private Thread _uiThread;
-    private Thread _renderThread;
+    private Thread? _uiThread;
+    private Thread? _renderThread;
     private volatile bool _stopping;
-    private Exception _failure;
-    private VirtualFrame _frame;
+    private Exception? _failure;
+    private VirtualFrame? _frame;
     private volatile VirtualScreen _screen;
     private long _sequence;
     private long _requested;
@@ -48,9 +48,9 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     internal int Width => _screen.Width;
     internal int Height => _screen.Height;
     internal ScreenOrientation Orientation => _screen.Orientation;
-    internal event Action<VirtualFrame> FramePresented;
-    internal UIElement Root => Window.Root;
-    UIElement IXamlRootHost.RootElement => Root;
+    internal event Action<VirtualFrame>? FramePresented;
+    internal UIElement? Root => Window.Root;
+    UIElement? IXamlRootHost.RootElement => Root;
     public bool CanExit => true;
 
     internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers)
@@ -93,7 +93,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
             $"CodeBrix.Platform.UI.WebView.Skia.Offscreen.{providerName}, CodeBrix.Platform.UI.WebView.Skia") is { } provider)
         {
             ApiExtensibility.Register<Microsoft.Web.WebView2.Core.CoreWebView2>(
-                typeof(Microsoft.Web.WebView2.Core.INativeWebViewProvider), owner => Activator.CreateInstance(provider, owner));
+                typeof(Microsoft.Web.WebView2.Core.INativeWebViewProvider), owner => Activator.CreateInstance(provider, owner)
+                    ?? throw new PlayTestException("Could not create the offscreen WebView provider " + provider.FullName + "."));
         }
         // Match the virtual keyboard's stable Control-based editing model on every OS.
         FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts = false;
@@ -170,7 +171,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
 
     private void RenderLoop()
     {
-        SKSurface surface = null;
+        SKSurface? surface = null;
         SKImageInfo info = default;
         try
         {
@@ -243,7 +244,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
             }
             await OnUI(() => { }).ConfigureAwait(false);
         }
-        lock (_frameLock) return _frame;
+        lock (_frameLock) return _frame ?? throw new PlayTestException("The virtual screen has not rendered a frame.");
     }
 
     internal void ThrowIfFailed()

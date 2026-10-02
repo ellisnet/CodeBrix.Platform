@@ -1,4 +1,3 @@
-// Compiled into xUnit v3 4+ consumers; no test or fixture annotations are needed.
 using System;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +10,8 @@ using Xunit.v3;
 [assembly: CodeBrix.Platform.PlayTest.TestingPlatform.ScreenshotRecording]
 
 namespace CodeBrix.Platform.PlayTest.TestingPlatform;
+
+// Compiled into xUnit v3 4+ consumers; no test or fixture annotations are needed.
 
 internal sealed class ScreenshotRecordingFixture : IAsyncLifetime, INotifyTestLifecycleAsync
 {

@@ -95,10 +95,12 @@ A dedicated application for PlayTest control and picker regression coverage.
 Its shared XAML contains checked controls, a nested scrolling target and normal
 folder/open/multiple-open/save picker buttons with visible results. Desktop heads
 use their usual pickers; PlayTests supplies paths or cancellation without UI.
-The 19 serialized UI cases include the 15 generic control/picker cases moved
-out of JustBetweenUs, plus method- and case-level orientation demonstrations.
-Another 19 configuration cases cover the headed 250 ms action-delay default,
-code/environment overrides (including zero), culture and invalid values.
+Its serialized UI cases hold the generic control/picker regression coverage
+(moved out of JustBetweenUs), method- and case-level orientation
+demonstrations and the desktop-control cases; every case here needs the running
+application. Configuration-only cases (preference precedence, command-line
+switches, invalid values) live in the host-free
+src/Platform.UI.Runtime.Skia.PlayTest.Tests project instead.
 Uses SilverAssertions, disabled nullable/implicit usings, and source references
 to the framework. No local preview NuGet feed or CodeBrix.Samples clone is needed.
 See the sample README for headed mode, theme/orientation preferences and layout.

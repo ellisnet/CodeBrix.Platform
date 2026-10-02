@@ -1,4 +1,3 @@
-// Adapted from the CodeBrix.Platform FrameBuffer.Emulated window and display extensions.
 using System;
 using CodeBrix.Platform.UI.Hosting;
 using CodeBrix.Platform.UI.Xaml.Controls;
@@ -11,21 +10,22 @@ using Windows.UI.ViewManagement;
 
 namespace CodeBrix.Platform.PlayTest.Hosting;
 
+// Adapted from the CodeBrix.Platform FrameBuffer.Emulated window and display extensions.
 internal sealed class VirtualWindow : NativeWindowWrapperBase, INativeWindowFactoryExtension
 {
     private readonly VirtualHost _host;
     internal VirtualWindow(VirtualHost host) => _host = host;
-    public override object NativeWindow => null;
+    public override object? NativeWindow => null;
     public override string Title { get; set; } = "PlayTest";
     public bool SupportsClosingCancellation => false;
     public bool SupportsMultipleWindows => false;
-    internal UIElement Root => Window?.RootElement;
-    internal Window ManagedWindow => Window;
+    internal UIElement? Root => Window?.RootElement;
+    internal Window? ManagedWindow => Window;
 
     public INativeWindowWrapper CreateWindow(Window window, XamlRoot root)
     {
         if (Window != null && Window != window)
-            throw new NotSupportedException("PlayTest 0.1 supports one application window per process.");
+            throw new NotSupportedException("PlayTest supports one application window per process.");
         SetWindow(window, root);
         XamlRootMap.Register(root, _host);
         RasterizationScale = 1;

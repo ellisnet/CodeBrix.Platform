@@ -20,7 +20,7 @@ internal static class PreviewFrames
         await output.FlushAsync().ConfigureAwait(false);
     }
 
-    internal static async Task<VirtualFrame> ReadAsync(Stream input)
+    internal static async Task<VirtualFrame?> ReadAsync(Stream input)
     {
         var header = new byte[8];
         if (await input.ReadAsync(header.AsMemory(0, 1)).ConfigureAwait(false) == 0) return null;

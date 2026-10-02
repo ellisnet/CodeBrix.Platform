@@ -1,41 +1,88 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <OutputType>Exe</OutputType>
-    <AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.PlayTest</AssemblyName>
-    <RootNamespace>CodeBrix.Platform.PlayTest</RootNamespace>
-    <PackageId>CodeBrix.Platform.PlayTest.ApacheLicenseForever</PackageId>
-    <Description>Playwright-style application tests on a fixed, cross-platform virtual Skia screen.</Description>
-    <Nullable>disable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <IsPackable>true</IsPackable>
-    <UseCommonOverridePackage>true</UseCommonOverridePackage>
-    <StartupObject>CodeBrix.Platform.PlayTest.Preview.PreviewProgram</StartupObject>
-  </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="../Platform.UI.Runtime.Skia/Platform.UI.Runtime.Skia.csproj" />
-    <ProjectReference Include="../Platform.UI/Platform.UI.Skia.csproj" />
-    <ProjectReference Include="../Platform.UWP/Platform.Skia.csproj" PrivateAssets="all" />
-    <ProjectReference Include="../Platform.Foundation/Platform.Foundation.Skia.csproj" PrivateAssets="all" />
-    <ProjectReference Include="../CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
-    <!-- Windows/macOS need packaged ICU. Their shared data target embeds the archive once. -->
-    <PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.249.1295" />
-    <PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.249.1295" />
-    <PackageReference Include="SkiaSharp" />
-    <PackageReference Include="SkiaSharp.HarfBuzz" />
-    <PackageReference Include="HarfBuzzSharp" />
-    <PackageReference Include="SkiaSharp.NativeAssets.Linux" />
-    <PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
-    <PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="buildTransitive/**/*.cs" />
-    <Content Include="buildTransitive/*.cs" Pack="true" PackagePath="buildTransitive/" />
-    <None Include="../../icon-codebrix-128.png" Pack="true" PackagePath="/" />
-    <None Include="../../THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="/" />
-    <None Update="README.md;AGENT-README.txt" Pack="true" PackagePath="/" />
-    <None Update="buildTransitive/*.props" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.props" />
-    <None Update="buildTransitive/*.targets" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />
-  </ItemGroup>
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.PlayTest</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj (the _CsprojPackage list) with the
+		     shared date-stamped version, so no GeneratePackageOnBuild here. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
+		<Title>CodeBrix.Platform.PlayTest</Title>
+		<Description>Playwright-style application tests on a fixed, cross-platform virtual Skia screen.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.PlayTest.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.PlayTest</RootNamespace>
+
+		<UseCommonOverridePackage>true</UseCommonOverridePackage>
+
+		<!-- The package ships its IntelliSense text: the .xml lands beside the dll and is packed
+		     with it. CS1591 (a public member with no XML comment) is fixed at source, never
+		     suppressed. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+		<!-- UNUSUAL BUT DELIBERATE: this is the only packed Platform project that is an Exe. The
+		     package assembly doubles as the headed preview's process entry point: PreviewConnection
+		     starts `dotnet exec <consumer deps/runtimeconfig> CodeBrix.Platform.UI.Runtime.Skia.PlayTest.dll
+		     preview-args`, so SDL gets a process main thread (required on macOS) and no second
+		     package or executable is needed. StartupObject names that entry point. -->
+		<OutputType>Exe</OutputType>
+		<StartupObject>CodeBrix.Platform.PlayTest.Preview.PreviewProgram</StartupObject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" Visible="false" />
+		<!-- PlayTest ships its own consumer guide (the add-in pattern), not the root AGENT-README. -->
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<!-- Folded into the core package (like the Toolkit and logging adapter), so it is never a
+		     separate package dependency of PlayTest. -->
+		<ProjectReference Include="..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Windows/macOS need packaged ICU; their shared data target embeds the archive once.
+		     Pinned explicitly, as the TextLayout add-in does, because PlayTest renders text on
+		     every OS without a desktop head supplying ICU. -->
+		<PackageReference Include="CodeBrix.Platform.Unicode.ApacheLicenseForever" Version="1.0.249.1295" />
+		<PackageReference Include="CodeBrix.Platform.UnicodeMacOs.ApacheLicenseForever" Version="1.0.249.1295" />
+		<PackageReference Include="SkiaSharp" />
+		<PackageReference Include="SkiaSharp.HarfBuzz" />
+		<PackageReference Include="HarfBuzzSharp" />
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
+		<!-- SDL3 bindings + natives for the headed preview only. To be replaced by
+		     CodeBrix.Sdl3.ZlibLicenseForever once that package is published on nuget.org. -->
+		<PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The runner adapters are SOURCE compiled into consuming test projects by the
+		     buildTransitive targets (they bind to the consumer's own Microsoft.Testing.Platform and
+		     xUnit versions), so they are never compiled into this assembly. -->
+		<Compile Remove="buildTransitive/**/*.cs" />
+		<Content Include="buildTransitive/*.cs" Pack="true" PackagePath="buildTransitive/" />
+		<!-- Pack the buildTransitive props/targets under the PackageId so NuGet auto-imports them.
+		     Explicit Includes, as in the heads: with TargetFrameworks the pack runs in the outer
+		     build, which has no default None items, so a None Update would match nothing. -->
+		<Content Include="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.props" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.props" />
+		<Content Include="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" Pack="true" PackagePath="buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />
+	</ItemGroup>
 </Project>

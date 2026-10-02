@@ -9,7 +9,7 @@ namespace CodeBrix.Platform.PlayTest.Hosting;
 internal sealed class VirtualClipboard : IClipboardExtension
 {
     private DataPackageView _content = new DataPackage().GetView();
-    public event EventHandler<object> ContentChanged;
+    public event EventHandler<object>? ContentChanged;
     public void StartContentChanged() { }
     public void StopContentChanged() { }
     public void Flush() { }

@@ -9,11 +9,20 @@ using Windows.System;
 
 namespace CodeBrix.Platform.PlayTest;
 
+/// <summary>Synthetic keyboard input for the virtual application. Physical desktop input never reaches it.</summary>
 public sealed class Keyboard
 {
     private readonly PlayTestApplication _app;
     internal Keyboard(PlayTestApplication app) => _app = app;
 
+    /// <summary>Presses and releases a key or chord on the focused element, for example <c>Enter</c>,
+    /// <c>Control+z</c>, <c>Shift+Tab</c> or <c>ArrowDown</c>. Modifiers are released in reverse
+    /// order even when a handler throws. <c>ControlOrMeta</c> maps to Control on every OS.</summary>
+    /// <param name="key">One key name, or several joined by <c>+</c>: a letter or digit, a
+    /// <c>Windows.System.VirtualKey</c> name (case-insensitive), or Control, Alt, Meta, Backspace,
+    /// ArrowLeft, ArrowRight, ArrowUp, ArrowDown, ControlOrMeta.</param>
+    /// <returns>A task that completes after the next rendered frame.</returns>
+    /// <exception cref="ArgumentException"><paramref name="key"/> is empty or names an unsupported key.</exception>
     public async Task PressAsync(string key)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "KeyPress");
@@ -38,13 +47,19 @@ public sealed class Keyboard
         await _app.SlowAsync().ConfigureAwait(false);
     }
 
+    /// <summary>Replaces the focused text box's selection with <paramref name="text"/> without key events,
+    /// like pasting. Use <see cref="TypeAsync"/> to exercise key handlers.</summary>
+    /// <param name="text">The text to insert.</param>
+    /// <returns>A task that completes after the next rendered frame.</returns>
+    /// <exception cref="PlayTestException">No editable, enabled text box has focus.</exception>
     public async Task InsertTextAsync(string text)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "InsertText");
         ArgumentNullException.ThrowIfNull(text);
         await _app.EvaluateAsync(() =>
         {
-            if (FocusManager.GetFocusedElement(_app.Host.Root.XamlRoot) is not TextBox { IsReadOnly: false, IsEnabled: true } box)
+            if (_app.Host.Root?.XamlRoot is not { } root
+                || FocusManager.GetFocusedElement(root) is not TextBox { IsReadOnly: false, IsEnabled: true } box)
                 throw new PlayTestException("InsertTextAsync requires a focused, editable text box.");
             var start = box.SelectionStart;
             var retainedLength = box.Text.Length - box.SelectionLength;
@@ -56,6 +71,8 @@ public sealed class Keyboard
 
     /// <summary>Types characters through routed key events on the focused control. Newlines and tabs
     /// use Enter and Tab, preserving the application's indentation, completion and shortcut handling.</summary>
+    /// <param name="text">The characters to type; CR and CRLF are typed as Enter.</param>
+    /// <returns>A task that completes after the next rendered frame.</returns>
     public async Task TypeAsync(string text)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "Type");
@@ -81,7 +98,8 @@ public sealed class Keyboard
         await _app.SlowAsync().ConfigureAwait(false);
     }
 
-    private static VirtualKey Parse(string key) => key switch
+    // Internal (not private) so the host-free unit tests can fence the key-name table.
+    internal static VirtualKey Parse(string key) => key switch
     {
         "ControlOrMeta" => VirtualKey.Control, // Virtual head has a stable Windows-style key model on every OS.
         "Control" => VirtualKey.Control,
@@ -99,25 +117,41 @@ public sealed class Keyboard
     };
 }
 
+/// <summary>Synthetic mouse input at virtual-screen coordinates. Prefer locator actions, which wait for
+/// a stable, hit-testable target; use the mouse directly for free-form gestures.</summary>
 public sealed class Mouse
 {
     private readonly PlayTestApplication _app;
     internal Mouse(PlayTestApplication app) => _app = app;
+
+    /// <summary>Moves the pointer to a virtual-screen position.</summary>
+    /// <param name="x">Horizontal position in logical pixels.</param>
+    /// <param name="y">Vertical position in logical pixels.</param>
+    /// <returns>A task that completes when the move has been dispatched.</returns>
     public async Task MoveAsync(float x, float y)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "MouseMove");
         await _app.EvaluateAsync(() => _app.Host.Input.Move(x, y)).ConfigureAwait(false);
     }
+    /// <summary>Presses the left button at the current pointer position.</summary>
+    /// <returns>A task that completes when the press has been dispatched.</returns>
     public async Task DownAsync()
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "MouseDown");
         await _app.EvaluateAsync(_app.Host.Input.Down).ConfigureAwait(false);
     }
+    /// <summary>Releases the left button at the current pointer position.</summary>
+    /// <returns>A task that completes when the release has been dispatched.</returns>
     public async Task UpAsync()
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "MouseUp");
         await _app.EvaluateAsync(_app.Host.Input.Up).ConfigureAwait(false);
     }
+    /// <summary>Moves to a virtual-screen position and clicks the left button there, without the
+    /// stability and hit-test checks of <see cref="Locator.ClickAsync"/>.</summary>
+    /// <param name="x">Horizontal position in logical pixels.</param>
+    /// <param name="y">Vertical position in logical pixels.</param>
+    /// <returns>A task that completes after the next rendered frame.</returns>
     public async Task ClickAsync(float x, float y)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "MouseClick");
@@ -127,10 +161,15 @@ public sealed class Mouse
         await _app.Host.CaptureAsync().ConfigureAwait(false);
         await _app.SlowAsync().ConfigureAwait(false);
     }
+    /// <summary>Turns the mouse wheel at the current pointer position.</summary>
+    /// <param name="deltaX">Must be zero: horizontal wheel input is not supported.</param>
+    /// <param name="deltaY">Vertical delta; positive scrolls content down, as in a browser.</param>
+    /// <returns>A task that completes when the wheel event has been dispatched.</returns>
+    /// <exception cref="NotSupportedException"><paramref name="deltaX"/> is not zero.</exception>
     public async Task WheelAsync(float deltaX, float deltaY)
     {
         await using var step = Recording.PlayTestRecording.Step(_app, "MouseWheel");
-        if (deltaX != 0) throw new NotSupportedException("PlayTest 0.1 supports vertical scrolling only.");
+        if (deltaX != 0) throw new NotSupportedException("PlayTest supports vertical scrolling only.");
         await _app.EvaluateAsync(() => _app.Host.Input.Wheel(-(int)deltaY)).ConfigureAwait(false);
     }
 }

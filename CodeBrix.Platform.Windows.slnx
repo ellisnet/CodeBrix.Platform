@@ -116,6 +116,7 @@
     <Project Path="src/Platform.UWP/Platform.Tests.csproj" />
     <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Skia.csproj" />
     <Project Path="src/Platform.UI.Headless.Tests/Platform.UI.Headless.Tests.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj" />
     <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Windows.csproj" />
     <Project Path="src/Platform.Foundation/Platform.Foundation.Tests.csproj" />
     <Project Path="src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj" />

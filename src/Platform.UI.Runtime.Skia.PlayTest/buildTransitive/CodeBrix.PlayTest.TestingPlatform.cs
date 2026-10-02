@@ -1,15 +1,19 @@
-// Compiled into Microsoft.Testing.Platform consumers by the package's targets.
-// Keeping the adapter here leaves the PlayTest runtime independent of test runners.
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CodeBrix.Platform.PlayTest.Recording;
 using Microsoft.Testing.Platform.Builder;
 using Microsoft.Testing.Platform.CommandLine;
 using Microsoft.Testing.Platform.Extensions;
 using Microsoft.Testing.Platform.Extensions.CommandLine;
-using CodeBrix.Platform.PlayTest.Recording;
 
 namespace CodeBrix.Platform.PlayTest.TestingPlatform;
+
+// Compiled into Microsoft.Testing.Platform consumers by the package's targets.
+// Keeping the adapter here leaves the PlayTest runtime independent of test runners.
+// Consumers compile this file with their own nullable setting (enabled or disabled), so it is
+// written to be warning-free either way: no reference-type '?' annotations, and nullable values
+// flow through 'var' locals only.
 
 internal static class TestingPlatformBuilderHook
 {
@@ -81,10 +85,12 @@ internal sealed class PreviewCommandLineOptions : ICommandLineOptionsProvider
 
         try
         {
-            string Read(string name) => commandLineOptions.TryGetOptionArgumentList(name, out var values) ? ValidateValue(name, values) : null;
-            var theme = Read("theme");
-            var orientation = Read("orientation");
-            var folder = Read("screenshotfolder");
+            var theme = commandLineOptions.TryGetOptionArgumentList("theme", out var themeValues)
+                ? ValidateValue("theme", themeValues) : null;
+            var orientation = commandLineOptions.TryGetOptionArgumentList("orientation", out var orientationValues)
+                ? ValidateValue("orientation", orientationValues) : null;
+            var folder = commandLineOptions.TryGetOptionArgumentList("screenshotfolder", out var folderValues)
+                ? ValidateValue("screenshotfolder", folderValues) : null;
             AppContext.SetData(HeadlessSetting, headed ? (object)false : headless ? true : null);
             AppContext.SetData(ThemeSetting, theme);
             AppContext.SetData(OrientationSetting, orientation);

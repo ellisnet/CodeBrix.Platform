@@ -12,8 +12,17 @@ using Microsoft.UI.Xaml;
 
 namespace CodeBrix.Platform.PlayTest;
 
-public enum ScreenOrientation { Landscape, Portrait }
+/// <summary>The shape of the virtual screen.</summary>
+public enum ScreenOrientation
+{
+    /// <summary>1920 x 1080 logical pixels.</summary>
+    Landscape,
+    /// <summary>1080 x 1920 logical pixels.</summary>
+    Portrait,
+}
 
+/// <summary>Launch options for <see cref="PlayTestApplication.LaunchAsync"/>. Leave a preference unset to
+/// let the command line, environment and project metadata decide; an explicit value always wins.</summary>
 public sealed class PlayTestOptions
 {
     private ScreenOrientation? _orientation;
@@ -24,16 +33,22 @@ public sealed class PlayTestOptions
     /// <summary>An explicit simulated system theme overrides command-line, environment and project preferences.</summary>
     public ApplicationTheme Theme { get => _theme ?? ApplicationTheme.Light; set => _theme = value; }
     /// <summary>The test assembly containing project preferences; defaults to the entry assembly.</summary>
-    public Assembly ConfigurationAssembly { get; set; }
+    public Assembly? ConfigurationAssembly { get; set; }
     /// <summary>An explicit value overrides the runner's --headed/--headless option,
     /// then CODEBRIX_PLAYTEST_HEADED. The fallback is headless.</summary>
     public bool Headless { get; set; } =
         AppContext.GetData("CodeBrix.Platform.PlayTest.CommandLineHeadless") is bool headless
             ? headless : Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_HEADED") != "1";
+
+    /// <summary>Default retry limit for actions and assertions, in milliseconds (10 seconds unless set).</summary>
     public float Timeout { get; set; } = 10_000;
+
     /// <summary>Action delay in milliseconds. An explicit value (including zero) wins over
     /// CODEBRIX_PLAYTEST_SLOWMO; otherwise defaults to 250 in headed mode and zero headless.</summary>
     public float SlowMo { get => _slowMo ?? DefaultSlowMo(); set => _slowMo = value; }
+
+    /// <summary>Folder for failure screenshots, relative to the working directory unless rooted;
+    /// <c>TestResults/PlayTest</c> by default.</summary>
     public string ArtifactsDirectory { get; set; } = Path.Combine("TestResults", "PlayTest");
 
     private float DefaultSlowMo()
@@ -47,6 +62,8 @@ public sealed class PlayTestOptions
     }
 
     /// <summary>Resolves code, command line, environment, project metadata, then the landscape fallback.</summary>
+    /// <returns>The orientation the application will launch in.</returns>
+    /// <exception cref="ArgumentException">The selected command-line, environment or project value is not Landscape or Portrait.</exception>
     public ScreenOrientation ResolveOrientation()
     {
         if (_orientation is { } explicitOrientation)
@@ -67,6 +84,8 @@ public sealed class PlayTestOptions
     }
 
     /// <summary>Resolves the simulated OS theme: code, command line, environment, project metadata, then Light.</summary>
+    /// <returns>The simulated system theme the application will launch with.</returns>
+    /// <exception cref="ArgumentException">The selected command-line, environment or project value is not Light or Dark.</exception>
     public ApplicationTheme ResolveTheme()
     {
         if (_theme is { } explicitTheme)
@@ -94,26 +113,46 @@ public sealed class PlayTestOptions
     }
 }
 
+/// <summary>A PlayTest failure: a timeout (whose message names a failure screenshot and describes the
+/// visible UI), strict-mode violation, unsupported element, or application/renderer crash.</summary>
 public sealed class PlayTestException : Exception
 {
+    /// <summary>Creates the exception with a message.</summary>
+    /// <param name="message">What failed.</param>
     public PlayTestException(string message) : base(message) { }
+
+    /// <summary>Creates the exception with a message and its cause.</summary>
+    /// <param name="message">What failed.</param>
+    /// <param name="inner">The underlying exception.</param>
     public PlayTestException(string message, Exception inner) : base(message, inner) { }
 }
 
+/// <summary>The application under test, running offscreen on a virtual Skia screen with its own UI
+/// thread. One application per process: share it through a fixture and dispose it when the suite ends.</summary>
 public sealed class PlayTestApplication : IAsyncDisposable
 {
     private static int _launched;
     private readonly VirtualHost _host;
-    private PreviewConnection _preview;
-    private Task _run;
+    private PreviewConnection? _preview;
+    private Task? _run;
     private int _disposed;
-    internal static PlayTestApplication Current { get; private set; }
-    internal Type ApplicationType { get; private set; }
+    internal static PlayTestApplication? Current { get; private set; }
+    internal Type? ApplicationType { get; private set; }
     internal PlayTestOptions Options { get; }
+
+    /// <summary>The application's page: locators, content, input and screenshots.</summary>
     public Page Page { get; }
+
+    /// <summary>Scripted responses for the application's folder, open-file and save-file pickers.</summary>
     public PlayTestFilePickers FilePickers { get; } = new();
+
+    /// <summary>Current virtual-screen width in logical pixels (1920 landscape, 1080 portrait).</summary>
     public int Width => _host.Width;
+
+    /// <summary>Current virtual-screen height in logical pixels (1080 landscape, 1920 portrait).</summary>
     public int Height => _host.Height;
+
+    /// <summary>True when no preview window is shown; resolved once at launch.</summary>
     public bool Headless => Options.Headless;
     /// <summary>The simulated OS theme, resolved before app construction and fixed for this run.
     /// An application may explicitly choose its own requested theme.</summary>
@@ -132,7 +171,15 @@ public sealed class PlayTestApplication : IAsyncDisposable
         Page = new Page(this);
     }
 
-    public static async Task<PlayTestApplication> LaunchAsync(Func<Application> application, PlayTestOptions options = null)
+    /// <summary>Starts the application offscreen and waits for its first rendered frame. Preferences are
+    /// resolved and validated once; a headed run also starts the view-only preview process.</summary>
+    /// <param name="application">Factory for the application's <c>Application</c> subclass, invoked on the UI thread.</param>
+    /// <param name="options">Optional launch options.</param>
+    /// <returns>The running application.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">The timeout or action delay is not positive/non-negative and finite.</exception>
+    /// <exception cref="ArgumentException">A selected preference value is invalid.</exception>
+    /// <exception cref="InvalidOperationException">An application was already launched in this process.</exception>
+    public static async Task<PlayTestApplication> LaunchAsync(Func<Application> application, PlayTestOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(application);
         options ??= new PlayTestOptions();
@@ -171,11 +218,20 @@ public sealed class PlayTestApplication : IAsyncDisposable
 
     // A C# counterpart to evaluating application state: evaluation is marshalled onto
     // the actual UI thread. Tests should use locators for user actions.
+
+    /// <summary>Runs <paramref name="expression"/> on the application's UI thread and returns its result.
+    /// Use it to read state; use locators for user actions.</summary>
+    /// <typeparam name="T">The result type.</typeparam>
+    /// <param name="expression">Code that reads application state.</param>
+    /// <returns>The expression's result.</returns>
     public async Task<T> EvaluateAsync<T>(Func<T> expression)
     {
         await using var step = Recording.PlayTestRecording.Step(this, "Evaluate");
         return await _host.OnUI(expression).ConfigureAwait(false);
     }
+    /// <summary>Runs <paramref name="action"/> on the application's UI thread.</summary>
+    /// <param name="action">Code that reads or prepares application state.</param>
+    /// <returns>A task that completes when the code has run.</returns>
     public async Task EvaluateAsync(Action action)
     {
         await using var step = Recording.PlayTestRecording.Step(this, "Evaluate");
@@ -184,6 +240,8 @@ public sealed class PlayTestApplication : IAsyncDisposable
 
     /// <summary>Changes the virtual screen and waits for layout/rendering. Null restores the launch preference.
     /// Call between serialized tests, never concurrently with actions or screenshots.</summary>
+    /// <param name="orientation">The orientation to apply, or null for the launch preference.</param>
+    /// <returns>A task that completes after the re-laid-out page has rendered.</returns>
     public async Task SetOrientationAsync(ScreenOrientation? orientation = null)
     {
         await using var step = Recording.PlayTestRecording.Step(this, "SetOrientation");
@@ -193,6 +251,15 @@ public sealed class PlayTestApplication : IAsyncDisposable
         await _host.CaptureAsync().ConfigureAwait(false);
     }
 
+    /// <summary>Polls <paramref name="probe"/> on the UI thread until <paramref name="predicate"/> accepts its
+    /// value; use it for non-visual outcomes such as a service call completing.</summary>
+    /// <typeparam name="T">The probed value's type.</typeparam>
+    /// <param name="probe">Reads the value, on the UI thread.</param>
+    /// <param name="predicate">Decides whether the value is the expected outcome.</param>
+    /// <param name="timeout">Milliseconds; null uses the application timeout.</param>
+    /// <param name="description">Names the outcome in the failure message.</param>
+    /// <returns>The first accepted value.</returns>
+    /// <exception cref="PlayTestException">No accepted value before the timeout; the message includes the last value.</exception>
     public async Task<T> WaitForAsync<T>(Func<T> probe, Func<T, bool> predicate, float? timeout = null, string description = "application outcome")
     {
         await using var step = Recording.PlayTestRecording.Step(this, "WaitFor", description);
@@ -201,7 +268,7 @@ public sealed class PlayTestApplication : IAsyncDisposable
         var limit = timeout ?? Options.Timeout;
         if (limit <= 0 || !float.IsFinite(limit)) throw new ArgumentOutOfRangeException(nameof(timeout));
         var elapsed = Stopwatch.StartNew();
-        T actual = default;
+        T? actual = default;
         do
         {
             actual = await EvaluateAsync(probe).ConfigureAwait(false);
@@ -229,6 +296,9 @@ public sealed class PlayTestApplication : IAsyncDisposable
         return new PlayTestException(message);
     }
 
+    /// <summary>Captures a final recording screenshot if one is due, then stops the application, its
+    /// renderer and any preview process. Safe to call more than once.</summary>
+    /// <returns>A task that completes when everything has stopped.</returns>
     public async ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
@@ -244,9 +314,20 @@ public sealed class PlayTestApplication : IAsyncDisposable
 }
 
 // Runner-neutral: xUnit, NUnit and MSTest fixtures may all use the same API.
+
+/// <summary>Optional base class for test classes: supplies <see cref="Page"/> and <see cref="Expect"/>
+/// without depending on a particular test runner.</summary>
 public abstract class PageTest
 {
+    /// <summary>Binds the test class to the shared application.</summary>
+    /// <param name="application">The fixture's running application.</param>
     protected PageTest(PlayTestApplication application) => Page = application.Page;
+
+    /// <summary>The shared application's page.</summary>
     public Page Page { get; }
+
+    /// <summary>Starts a retrying assertion; same as <see cref="Assertions.Expect"/>.</summary>
+    /// <param name="locator">The element(s) to assert on.</param>
+    /// <returns>The assertion builder.</returns>
     protected static LocatorAssertions Expect(Locator locator) => Assertions.Expect(locator);
 }

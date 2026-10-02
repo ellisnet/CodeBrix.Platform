@@ -32,21 +32,15 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
 
   src/Platform.UI.Runtime.Skia.PlayTest/AGENT-README.txt
     Package: CodeBrix.Platform.PlayTest.ApacheLicenseForever
-    Start here when extending PlayTest itself: architecture, implementation
-    rules, configuration precedence, preview behavior, packaging and test
-    locations. Read the usage guide below alongside these maintainer notes.
+    The test head: run the real application offscreen on a virtual Skia screen
+    and drive it with locators, actions and retrying assertions. Covers
+    test-project setup, fixtures, orientation/theme/preview/action-delay
+    preferences, command-line switches, automatic screenshot recording,
+    scripted file/folder pickers, checked controls, editors, menus, drags and
+    limitations. Maintainer notes: MAINTAINER-README.txt, THE PLAYTEST HEAD
+    PACKAGE.
 
-    Related PlayTest guides:
-      src/Platform.UI.Runtime.Skia.PlayTest/README.md
-        Developer usage: test-project setup, fixtures, locators, assertions,
-        orientation and theme preferences, letterboxing, scripted file/folder
-        pickers, supported controls and limitations. Includes the headed
-        250 ms action-delay default, command-line preview/theme/orientation switches,
-        automatic start/step/final PNG recording and screenshot-index.json,
-        and fixture/environment overrides. Also covers typed locators, menu and
-        toolbar roles, hover/positioned clicks, divider dragging, and custom
-        editors through standard UI automation providers.
-
+    Related PlayTest guide:
       samples/CodeBrixPlatform/PlayTestDemo/README.md
         Runnable examples: demo and PlayTests project structure, build/run
         commands, coverage and validation. Start here to run the dedicated

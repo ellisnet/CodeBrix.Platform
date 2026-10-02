@@ -2,7 +2,8 @@
 """X11 integration check for the packaged SDL preview: frame dimensions, bars and stable window size.
 
 Requires an X11 desktop, xdotool, ImageMagick import, and Pillow. Pass the built
-JustBetweenUs.PlayTests output directory. Opens only its own two preview windows,
+output directory of a PlayTest test project (PlayTestDemo.PlayTests in this repository by
+default; --test-name selects another, such as JustBetweenUs.PlayTests). Opens only its own two preview windows,
 sequentially; never injects desktop input. PNG evidence is saved under --artifacts.
 """
 import argparse
@@ -38,17 +39,17 @@ def capture(window):
     return Image.open(io.BytesIO(result.stdout)).convert("RGB")
 
 
-def preview_command(output, preferred):
+def preview_command(output, preferred, test_name):
     width, height = preferred
-    return ["dotnet", "exec", "--depsfile", str(output / "JustBetweenUs.PlayTests.deps.json"),
-            "--runtimeconfig", str(output / "JustBetweenUs.PlayTests.runtimeconfig.json"),
+    return ["dotnet", "exec", "--depsfile", str(output / (test_name + ".deps.json")),
+            "--runtimeconfig", str(output / (test_name + ".runtimeconfig.json")),
             str(output / "CodeBrix.Platform.UI.Runtime.Skia.PlayTest.dll"),
             "--preview", str(width), str(height)]
 
 
-def run(output, artifacts, preferred):
+def run(output, artifacts, preferred, test_name):
     width, height = preferred
-    process = subprocess.Popen(preview_command(output, preferred), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+    process = subprocess.Popen(preview_command(output, preferred, test_name), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                env={**os.environ, "SDL_VIDEODRIVER": "x11"})
     try:
         with selectors.DefaultSelector() as selector:
@@ -94,14 +95,14 @@ def run(output, artifacts, preferred):
             process.wait(timeout=5)
 
 
-def check_protocol_errors(output):
+def check_protocol_errors(output, test_name):
     for name, data, exit_code, error in [
         ("clean EOF", b"", 0, None),
         ("invalid dimensions", struct.pack("<ii", 100, 100), 1, b"InvalidDataException"),
         ("truncated header", b"\x80", 1, b"EndOfStreamException"),
         ("truncated pixels", struct.pack("<ii", 1920, 1080) + b"\x00", 1, b"EndOfStreamException"),
     ]:
-        result = subprocess.run(preview_command(output, (1920, 1080)), input=data, capture_output=True,
+        result = subprocess.run(preview_command(output, (1920, 1080), test_name), input=data, capture_output=True,
                                 timeout=20, env={**os.environ, "SDL_VIDEODRIVER": "dummy"})
         assert b"READY\n" in result.stdout, result.stderr.decode()
         assert result.returncode == exit_code, (name, result.returncode, result.stderr.decode())
@@ -113,12 +114,13 @@ def check_protocol_errors(output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--test-output", type=Path, required=True)
+    parser.add_argument("--test-name", default="PlayTestDemo.PlayTests")
     parser.add_argument("--artifacts", type=Path, default=Path("TestResults/PlayTestPreview"))
     args = parser.parse_args()
     args.artifacts.mkdir(parents=True, exist_ok=True)
     for preferred in [(1920, 1080), (1080, 1920)]:
-        run(args.test_output.resolve(), args.artifacts, preferred)
-    check_protocol_errors(args.test_output.resolve())
+        run(args.test_output.resolve(), args.artifacts, preferred, args.test_name)
+    check_protocol_errors(args.test_output.resolve(), args.test_name)
 
 
 if __name__ == "__main__":

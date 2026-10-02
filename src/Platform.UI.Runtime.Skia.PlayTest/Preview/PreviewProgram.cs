@@ -10,7 +10,7 @@ namespace CodeBrix.Platform.PlayTest.Preview;
 
 internal static class PreviewProgram
 {
-    private static VirtualFrame _latest;
+    private static VirtualFrame? _latest;
     private static volatile bool _finished;
 
     private static async Task ReadFramesAsync()

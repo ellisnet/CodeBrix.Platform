@@ -1,5 +1,8 @@
 param(
     [Parameter(Mandatory = $true)][string]$TestOutput,
+    # The PlayTest test project whose deps/runtimeconfig the preview runs with; PlayTestDemo.PlayTests in
+    # this repository by default, or another project such as JustBetweenUs.PlayTests.
+    [string]$TestName = 'PlayTestDemo.PlayTests',
     [string]$Artifacts = 'TestResults/PlayTestPreview-Windows'
 )
 
@@ -58,8 +61,8 @@ function Start-Preview([int]$Width, [int]$Height, [string]$Driver = 'windows') {
     $info.RedirectStandardError = $true
     $info.Environment['SDL_VIDEODRIVER'] = $Driver
     $null = $info.Environment.Remove('SDL_RENDER_DRIVER')
-    foreach ($arg in @('exec', '--depsfile', "$TestOutput/JustBetweenUs.PlayTests.deps.json",
-        '--runtimeconfig', "$TestOutput/JustBetweenUs.PlayTests.runtimeconfig.json",
+    foreach ($arg in @('exec', '--depsfile', "$TestOutput/$TestName.deps.json",
+        '--runtimeconfig', "$TestOutput/$TestName.runtimeconfig.json",
         "$TestOutput/CodeBrix.Platform.UI.Runtime.Skia.PlayTest.dll", '--preview', "$Width", "$Height")) {
         $info.ArgumentList.Add($arg)
     }

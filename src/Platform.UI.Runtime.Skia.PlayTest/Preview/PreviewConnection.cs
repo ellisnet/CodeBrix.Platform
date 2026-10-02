@@ -15,7 +15,7 @@ internal sealed class PreviewConnection : IAsyncDisposable
     private readonly Task<string> _errors;
     private readonly Channel<VirtualFrame> _frames = Channel.CreateBounded<VirtualFrame>(new BoundedChannelOptions(1)
     { FullMode = BoundedChannelFullMode.DropOldest, SingleReader = true, SingleWriter = true });
-    private Task _writer;
+    private Task? _writer;
 
     private PreviewConnection(Process process)
     {
@@ -29,7 +29,7 @@ internal sealed class PreviewConnection : IAsyncDisposable
         // RIDs. The separate process gives SDL the main thread, including on macOS.
         var entry = Assembly.GetEntryAssembly()?.Location;
         var candidates = new[] { string.IsNullOrEmpty(entry) ? "" : Path.ChangeExtension(entry, ".deps.json") }
-            .Concat(((string)AppContext.GetData("APP_CONTEXT_DEPS_FILES") ?? "")
+            .Concat((AppContext.GetData("APP_CONTEXT_DEPS_FILES") as string ?? "")
                 .Split(new[] { ';', Path.PathSeparator }, StringSplitOptions.RemoveEmptyEntries));
         var deps = candidates.FirstOrDefault(p => p.EndsWith(".deps.json", StringComparison.Ordinal) && File.Exists(p)
             && File.Exists(p[..^".deps.json".Length] + ".runtimeconfig.json"));
@@ -43,7 +43,8 @@ internal sealed class PreviewConnection : IAsyncDisposable
         foreach (var argument in new[] { "exec", "--depsfile", deps, "--runtimeconfig", runtimeconfig,
             typeof(PreviewConnection).Assembly.Location, "--preview", width.ToString(System.Globalization.CultureInfo.InvariantCulture),
             height.ToString(System.Globalization.CultureInfo.InvariantCulture) }) info.ArgumentList.Add(argument);
-        var result = new PreviewConnection(Process.Start(info));
+        var result = new PreviewConnection(Process.Start(info)
+            ?? throw new PlayTestException("Could not start the PlayTest preview process."));
         try
         {
             var ready = await result._process.StandardOutput.ReadLineAsync().WaitAsync(TimeSpan.FromSeconds(20)).ConfigureAwait(false);
