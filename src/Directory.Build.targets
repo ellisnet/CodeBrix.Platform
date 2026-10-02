@@ -108,7 +108,7 @@
 		<PackageReference Update="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
 		<PackageReference Update="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
 		<PackageReference Update="CommunityToolkit.Mvvm" Version="$(CommunityToolkitMvvmVersion)" />
-		<PackageReference Update="Microsoft.Web.WebView2" Version="1.0.4191.47" />
+		<PackageReference Update="Microsoft.Web.WebView2" Version="1.0.4258.31" />
 	</ItemGroup>
 
 	<Target Name="ValidateSolutionPath" BeforeTargets="Build">
