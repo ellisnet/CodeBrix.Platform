@@ -58,7 +58,7 @@ Windows and Linux do not build a separate custom native WebView executable:
 
 | Component | Repository source | External dependency |
 | --- | --- | --- |
-| Shared visible preview | `src/Platform.UI.Runtime.Skia.PlayTest/Preview/` | SDL3 through the `ppy.SDL3-CS` NuGet dependency |
+| Shared visible preview | `src/Platform.UI.Runtime.Skia.PlayTest/Preview/` | SDL3 through the `CodeBrix.Sdl3.ZlibLicenseForever` NuGet dependency |
 | Windows WebView adapter | `src/AddIns/Platform.UI.WebView.Skia/Windows/WindowsOffscreenWebView.cs` | Microsoft WebView2 SDK/loader from NuGet, plus installed Edge WebView2 runtime |
 | Windows message pump | `src/Platform.UI.Runtime.Skia.PlayTest/Hosting/WindowsMessagePump.cs` | Windows system APIs |
 | Linux WebView adapter | `src/AddIns/Platform.UI.WebView.Skia/Wpe*.cs`, `Interop/`, and `Input/` | System WPE WebKit, WPEBackend-fdo, libwpe and their dependencies |

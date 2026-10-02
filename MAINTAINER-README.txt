@@ -1043,11 +1043,10 @@ src/Platform.UI.Runtime.Skia.PlayTest; consumer guide: its AGENT-README.txt.)
     Extensions.Logging is PrivateAssets="all" for the same reason.
   - The Unicode/UnicodeMacOs pins follow the TextLayout add-in: PlayTest
     renders text on Windows/macOS without a desktop head to supply ICU.
-  - SDL3: the preview's bindings + natives currently come from the ppy.SDL3-CS
-    PackageReference. It is to be replaced by CodeBrix.Sdl3.ZlibLicenseForever
-    once that package is published on nuget.org (the usings in
-    Preview/PreviewProgram.cs then change to CodeBrix.Sdl3). SDL3 is a normal
-    NuGet dependency; no SDL initialization occurs in the offscreen
+  - SDL3: the preview's bindings + natives come from the family's own
+    CodeBrix.Sdl3.ZlibLicenseForever PackageReference (the usings in
+    Preview/PreviewProgram.cs are CodeBrix.Sdl3). It is a normal NuGet
+    dependency with none of its own; no SDL initialization occurs in the offscreen
     application process.
   - AssemblyInfo.cs grants InternalsVisibleTo to
     CodeBrix.Platform.UI.Runtime.Skia.PlayTest.Tests (the Runtime.Skia/X11

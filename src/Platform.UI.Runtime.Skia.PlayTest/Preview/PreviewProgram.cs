@@ -3,8 +3,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeBrix.Platform.PlayTest.Hosting;
-using SDL;
-using static SDL.SDL3;
+using CodeBrix.Sdl3;
+using static CodeBrix.Sdl3.SDL3;
 
 namespace CodeBrix.Platform.PlayTest.Preview;
 

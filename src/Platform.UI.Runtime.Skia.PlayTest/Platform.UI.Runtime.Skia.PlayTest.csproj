@@ -68,9 +68,11 @@
 		<PackageReference Include="HarfBuzzSharp" />
 		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
 		<PackageReference Include="HarfBuzzSharp.NativeAssets.Linux" />
-		<!-- SDL3 bindings + natives for the headed preview only. To be replaced by
-		     CodeBrix.Sdl3.ZlibLicenseForever once that package is published on nuget.org. -->
-		<PackageReference Include="ppy.SDL3-CS" Version="2026.722.0" />
+		<!-- SDL3 bindings + natives for the headed preview only (the preview runs in a separate
+		     process; the offscreen application process never initializes SDL). CodeBrix.Sdl3 is the
+		     family's own SDL3 package: managed bindings plus the SDL3 native library for every RID the
+		     preview can run on. It has no NuGet dependencies of its own. -->
+		<PackageReference Include="CodeBrix.Sdl3.ZlibLicenseForever" Version="1.0.275.85" />
 	</ItemGroup>
 
 	<ItemGroup>
