@@ -7,6 +7,7 @@ using global::System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
 
 // Since the Core/Skia split this assembly holds only the Skia implementations; it keeps every grant the

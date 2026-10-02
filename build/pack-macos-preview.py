@@ -27,11 +27,10 @@ def main():
         parser.error("That version is already in the feed. Choose a new version to avoid cached packages.")
     for project in (
         "src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj",
-        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj",
-        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj",
-        "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj",
+        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj",
+        "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Core.csproj",
         "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj",
-        "src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj",
+        "src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj",
         "src/Platform.Analyzers/Platform.Analyzers.csproj",
         "src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj",
     ):

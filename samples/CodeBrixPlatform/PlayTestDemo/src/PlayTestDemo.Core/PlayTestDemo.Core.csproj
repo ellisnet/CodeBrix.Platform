@@ -15,8 +15,8 @@
     <ProjectReference Include="../../../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
     <ProjectReference Include="../../../../../src/AddIns/Platform.UI.CommandBar/Platform.UI.CommandBar.Skia.csproj" />
     <ProjectReference Include="../../../../../src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
-    <ProjectReference Include="../../../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
-    <ProjectReference Include="../../../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
-    <ProjectReference Include="../../../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj" />
+    <ProjectReference Include="../../../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
   </ItemGroup>
 </Project>

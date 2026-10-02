@@ -540,7 +540,7 @@ for the whole Wayland effort is in THIRD-PARTY-NOTICES.txt at the repo root.
 
 ResourcesExtractor
 ------------------
-    tools/ResourcesExtractor    (ResourcesExtractor.sln, Windows only)
+    tools/ResourcesExtractor    (ResourcesExtractor.slnx, Windows only)
 
 A small WinUI utility that extracts the localized WinUI string resources from
 a running WinUI application, given the localizedResource.h header from the

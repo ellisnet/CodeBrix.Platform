@@ -109,7 +109,11 @@ namespace Microsoft.UI.Xaml
 			(child as IDependencyObjectStoreProvider)?.Store.ClearInheritedDataContext();
 
 #if CODEBRIX_HAS_ENHANCED_LIFECYCLE
-			var leaveParams = new LeaveParams(IsActiveInVisualTree);
+			// The element that owns a visual tree (RootVisual, XamlIslandRoot) is never Entered itself; VisualTree.AddRoot
+			// Enters its roots live explicitly. Removing one of those roots (a replaced Window content, say) must
+			// therefore leave live too, so the old content and its descendants stop being active - otherwise they keep
+			// counting as live focus targets after they are gone (RemovedElementFocusTests.ReplacedPageCannotRegainFocus).
+			var leaveParams = new LeaveParams(IsActiveInVisualTree || this is global::CodeBrix.Platform.UI.Xaml.Core.IRootElement);
 			child.Leave(leaveParams);
 #endif
 		}

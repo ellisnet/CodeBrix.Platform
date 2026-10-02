@@ -17,6 +17,7 @@ using global::System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.WebAssembly.Browser")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.MacOS")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.X11")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Wayland")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.Android")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.AppleUIKit")]

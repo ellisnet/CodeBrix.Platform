@@ -100,8 +100,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts = false;
         FeatureConfiguration.TextBox.UseOverlayOnSkia = false;
         FeatureConfiguration.Font.RestrictToEmbeddedFonts = true;
-        CoreDispatcher.DispatchOverride = (action, priority) => Enqueue(action);
-        CoreDispatcher.HasThreadAccessOverride = () => Thread.CurrentThread == _uiThread;
+        global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.DispatchOverride = (action, priority) => Enqueue(action);
+        global::CodeBrix.Platform.UI.Dispatching.Skia.DispatcherPumpSkiaPlatform.HasThreadAccessOverride = () => Thread.CurrentThread == _uiThread;
         ApiExtensibility.Register(typeof(INativeWindowFactoryExtension), _ => Window);
         ApiExtensibility.Register(typeof(ICoreApplicationExtension), _ => this);
         ApiExtensibility.Register<IXamlRootHost>(typeof(ICodeBrixCorePointerInputSource), _ => Input);
@@ -190,7 +190,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
                     surface = SKSurface.Create(info) ?? throw new PlayTestException("Could not create the virtual Skia surface.");
                 }
                 surface.Canvas.Clear(SKColors.Transparent);
-                target.OnNativePlatformFrameRequested(surface.Canvas, _ => surface.Canvas);
+                global::CodeBrix.Platform.UI.Skia.CompositionTargetSkiaPlatform.OnNativePlatformFrameRequested(target, surface.Canvas, _ => surface.Canvas);
                 surface.Canvas.Flush();
                 var pixels = new byte[info.BytesSize];
                 unsafe

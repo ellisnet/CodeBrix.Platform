@@ -111,10 +111,10 @@ public sealed class RemovedElementFocusTests
 		internal FocusTree(bool enabled)
 		{
 			CodeBrix.Platform.UI.FeatureConfiguration.FocusManager.RestrictFocusToLiveTree = enabled;
-			var host = new Grid();
-			Root = new ContentRoot(ContentRootType.CoreWindow, Colors.Transparent, host, new CoreServices());
-			host.SetVisualTree(Root.VisualTree);
-			host.Enter(new EnterParams(true), 0);
+			// A null root element makes the tree create its own RootVisual, the shape every application has. The root
+			// visual is never Entered (AddRoot marks it loaded and Enters only the content), so entering a stand-in
+			// host here would make AddChild and AddRoot both Enter the page and trip EventManager's loaded-list assert.
+			Root = new ContentRoot(ContentRootType.CoreWindow, Colors.Transparent, null, new CoreServices());
 			Root.VisualTree.SetPublicRootVisual(Page, null, null);
 		}
 

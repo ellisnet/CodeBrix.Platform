@@ -14,11 +14,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
     <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.248.1181" GeneratePathProperty="true" />
     <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" GeneratePathProperty="true" />
-    <ProjectReference Include="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+    <ProjectReference Include="../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
     <ProjectReference Include="../../../src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <ProjectReference Include="../../../src/Platform.UWP/Platform.Skia.csproj" />
-    <ProjectReference Include="../../../src/Platform.Foundation/Platform.Foundation.Skia.csproj" />
-    <ProjectReference Include="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
+    <ProjectReference Include="../../../src/Platform.Foundation/Platform.Foundation.Core.csproj" />
+    <ProjectReference Include="../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj" />
   </ItemGroup>
   <Import Project="../../../samples/CodeBrixPlatform/CodeBrix.MacOSHead.targets" />
   <Import Project="../../../src/Platform.UI.Runtime.Skia.MacOS/buildTransitive/Platform.WinUI.Runtime.Skia.MacOS.targets" />

@@ -297,6 +297,14 @@ namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
 
 			for (var current = element; current is UIElement uiElement; current = VisualTreeHelper.GetParent(current))
 			{
+				// The element that owns the tree (RootVisual, XamlIslandRoot) is never Entered itself: VisualTree.AddRoot
+				// marks it loaded and Enters only the content below it. Reaching it means every element on the way up
+				// was live, so it ends the walk as live rather than failing it.
+				if (uiElement is IRootElement)
+				{
+					return true;
+				}
+
 				if (!uiElement.IsInLiveTree)
 				{
 					return false;

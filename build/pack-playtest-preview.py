@@ -30,11 +30,10 @@ def main():
     # resource/toolkit libraries that a bare head-project build does not reference.
     for project in (
         "src/SourceGenerators/Platform.XamlMerge.Task/Platform.XamlMerge.Task.csproj",
-        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Reference.csproj",
-        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj",
-        "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Reference.csproj",
+        "src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj",
+        "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Core.csproj",
         "src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj",
-        "src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj",
+        "src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj",
         "src/Platform.Analyzers/Platform.Analyzers.csproj",
         "src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj",
         "src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj",
@@ -42,7 +41,7 @@ def main():
         run("dotnet", "build", project, "-c", "Release", "--verbosity", "minimal")
 
     editor_projects = (
-        "src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Skia.csproj",
+        "src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Core.csproj",
         "src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj",
     ) if args.with_editor else ()
     for project in editor_projects:

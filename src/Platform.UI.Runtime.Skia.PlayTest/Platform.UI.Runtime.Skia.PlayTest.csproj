@@ -49,12 +49,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
-		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
+		<ProjectReference Include="..\Platform.Foundation\Platform.Foundation.Core.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
 		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" TreatAsPackageReference="false" PrivateAssets="all" />
 		<!-- Folded into the core package (like the Toolkit and logging adapter), so it is never a
 		     separate package dependency of PlayTest. -->
-		<ProjectReference Include="..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.csproj" PrivateAssets="all" />
+		<ProjectReference Include="..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" PrivateAssets="all" />
 	</ItemGroup>
 
 	<ItemGroup>
