@@ -37,6 +37,8 @@ Package ids and the AGENT-README that covers each:
     CodeBrix.Platform.CommandBar.ApacheLicenseForever        src/AddIns/Platform.UI.CommandBar
     CodeBrix.Platform.FlexPanel.ApacheLicenseForever         src/AddIns/Platform.UI.FlexPanel
     CodeBrix.Platform.PlotterView.ApacheLicenseForever       src/AddIns/Platform.UI.PlotterView
+    CodeBrix.Platform.PlayTest.ApacheLicenseForever          src/Platform.UI.Runtime.Skia.PlayTest
+        (a test head, not an add-in: referenced by test projects only)
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout
     CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia
@@ -269,8 +271,14 @@ Studio instance can also hold the lock; close it if the shutdown does not clear
 it.
 
 macOS native library: src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac is
-built with xcodebuild through build.sh (chmod +x it). The csproj only enables
-the native step on Apple Silicon; full Xcode is required there.
+built by the head csproj on macOS. Apple Silicon keeps its normal Xcode build
+through build.sh; Intel defaults to build-clang.sh using Apple's Command Line
+Tools. Either Release route produces one universal x86_64 + arm64 dylib. Select the
+Command Line Tools route explicitly with -p:NativeMacBuildTool=Clang on either
+CPU. Both builds include CDBRXMenus.m (also listed in the Xcode project), which
+implements the opt-in system menu bar; the native dylib is packaged by the
+existing _AddNativeMacToPackage target. BuildNativeMac=false remains a managed-
+only build. Native sources and build instructions live in this repository.
 
 Wayland protocol bindings under src/Platform.UI.Runtime.Skia.Wayland/
 Wayland_Bindings/ are GENERATED and committed; regenerate them with
@@ -309,6 +317,10 @@ Microsoft.Testing.Platform per global.json):
         conversion - and for the X11 head's EWMH window-state rule; xunit.v3
         under Microsoft.Testing.Platform, no window, no X server, no Skia
         surface. Linux solution only)
+    src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj
+        (host-free unit tests for the PlayTest head's preferences, command-line
+        adapter, recording-folder rules and preview frame format; all three
+        solutions - see THE PLAYTEST HEAD PACKAGE)
     src/Platform.Foundation/Platform.Foundation.Tests.csproj
     src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj
     src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj
@@ -848,8 +860,8 @@ Windows with the rest of the set.
 
 --- ON macOS (Apple Silicon): build ONLY the macOS package (pinned version) ---
 
-The macOS head package contains a native dylib that can ONLY be built on Apple
-Silicon, so it is NOT produced by the Windows run above (a macOS package built
+The macOS head package contains a native dylib that must be built on a Mac,
+so it is NOT produced by the Windows run above (a macOS package built
 on Windows is managed-only: fine to compile against, useless at run time).
 Rebuild it on an Apple Silicon Mac, pinning the version to the SAME version
 the Windows run already produced and published to nuget.org. That keeps its
@@ -872,15 +884,15 @@ still flowing to the ProjectReference dependency versions. This produces:
 
     nugets/Release/<version>/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.<version>.nupkg
 
-PREREQUISITES on the Mac: full Xcode installed (the native build uses
-xcodebuild; the csproj only enables the native step on Apple Silicon) and the
-native build script src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/build.sh
-must be executable (chmod +x). A correctly built macOS package is a universal
-binary and runs on both Apple Silicon and Intel Macs.
+PREREQUISITES: full Xcode for the default Apple Silicon build; Apple's Command
+Line Tools for the default Intel build or -p:NativeMacBuildTool=Clang on either
+CPU. The latter links the restored SkiaSharp native asset, without downloading
+an extra copy. A correctly built macOS package is a universal binary and runs
+on both Apple Silicon and Intel Macs.
 
 VERIFY THE macOS PACKAGE BEFORE UPLOADING. A managed-only package (no native
 dylib) packs WITHOUT error on any machine where the native step is skipped
-(e.g. not Apple Silicon, or BuildNativeMac=false) and is useless at runtime.
+(e.g. a non-Mac host, or BuildNativeMac=false) and is useless at runtime.
 After packing, confirm the native universal binary is inside the .nupkg:
 
     unzip -l nugets/Release/<version>/CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever.<version>.nupkg \
@@ -1177,3 +1189,347 @@ NOTES
     release that carries the Core split (the first family version published
     after 1.0.254.167): the copy ships in that release and is gone from the
     one after it.
+
+MACOS APPLICATION NAMING AND SYSTEM MENU VALIDATION
+--------------------------------------------------
+UseMacOS(mac => mac.UseSystemAppName("My App")) applies a startup-only,
+process-wide name independently of menu projection. It sets NSProcessInfo's
+name and AppKit's process-local bundle-name caches before creating NSApplication,
+then synchronizes the running-application display name during
+applicationWillFinishLaunching. No bundle/executable/assembly files are renamed
+or modified. See PlatformNativeMac/README.md under the macOS head for the guarded
+LaunchServices SPI and cache-mutability compatibility behavior.
+
+The opt-in is UseMacOS(mac => mac.UseSystemMenuBar()). MacOSMenuBarExtension
+selects the first visible MenuBar in visual-tree order per window. Only that
+bar suppresses its layout/rendering; its properties and logical lifetime stay
+intact, and additional bars remain in-window. The extension is registered only
+by an opted-in macOS host. Native callbacks queue command invocation after
+AppKit menu tracking, and do not bypass the application's Quit handler.
+Native menu/item objects are reconciled by managed element ID, with AppKit-owned
+items preserved. NSApplication.helpMenu points to an unlisted menu while the
+projection is active, using AppKit's supported opt-out from automatic Spotlight
+Help search. This avoids Help opening and immediately closing on macOS 15 and
+keeps the Help contents defined by the application. Deactivation restores the
+host's original Help-menu policy.
+
+A real-AppKit regression probe (run from an interactive macOS desktop):
+
+    dotnet build build/test-scripts/MacOSMenuBarProbe/MacOSMenuBarProbe.csproj -c Release
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll native
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll composition
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll default
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll close
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll validation
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name-menu
+    dotnet build/test-scripts/MacOSMenuBarProbe/bin/Release/net10.0/MacOSMenuBarProbe.dll name-menu-reversed
+
+The probe checks first-visible selection, zero menu-row footprint, additional
+bars, hiding/removing/reloading menus, dynamic submenus, commands, toggle state,
+shortcuts, disabled entries, focus/pointer exclusion, modal dialogs and window
+switching. MenuTracking.m drives the actual Help menu-bar accessibility action
+in process, observes sustained AppKit tracking before dismissal, and repeats
+after refreshes. It needs an interactive desktop but no Accessibility or Screen
+Recording grant. The close mode finishes through Window.Close
+rather than Application.Exit, checking the existing last-window exit policy.
+The native mode uses DirectSkiaCanvasMode; composition uses the default renderer.
+These checks use the real macOS host, not PlayTest's virtual host. On the Intel
+Mac (2026-09-30), both name+menu option orders passed 49 checks, name-only passed
+6, menu-only passed 45, and default passed 4. Validation rejects null/blank/
+embedded-null names and checks that configuring the builder is fluent and does
+not mutate process state.
+The naming checks include Unicode, NSProcessInfo.processName, AppKit's actual
+application-menu accessibility title, NSRunningApplication.localizedName, and
+unchanged assembly identity. Apple Silicon execution still needs validation on
+that machine. The native Release binary contains both CPUs.
+
+Local prerelease packages for testing without a public release:
+
+    python3 build/pack-macos-preview.py --version 1.0.273.1-macosmenu.4
+
+Choose a fresh prerelease version after changing code. The script builds the
+core, shared runtime, framebuffer dependency and macOS head into nugets/MacOSPreview,
+checks both native architectures and the menu/name exports, and never publishes.
+Preview 1.0.273.1-macosmenu.4 was consumed by Fresco.Brix's macOS head on Intel:
+Cocoa's process name, NSRunningApplication.localizedName and the actual AppKit
+application-menu caption all reported Fresco.Brix, while the assembly remained
+Fresco.Brix.MacOS. Help opened and stayed visible on five successive menu-bar
+activations, Help > About opened its dialog, and Help worked again after that dialog closed. Help
+contained only the application's commands, without an automatic search item.
+Native File > New Document and File > Quit also passed with clean process exit.
+The head's normal build and osx-arm64 cross-build passed without warnings or
+errors; Apple Silicon runtime validation still needs that machine.
+
+THE PLAYTEST HEAD PACKAGE
+=========================
+(CodeBrix.Platform.PlayTest.ApacheLicenseForever,
+src/Platform.UI.Runtime.Skia.PlayTest; consumer guide: its AGENT-README.txt.)
+
+--- Project shape ---
+
+  - Namespace CodeBrix.Platform.PlayTest; assembly
+    CodeBrix.Platform.UI.Runtime.Skia.PlayTest; TargetFrameworks
+    $(NetSkiaPreviousAndCurrent) with ../targetframework-override-noplatform.props,
+    like the heads. Nullable is ENABLED, as in every head and add-in; implicit
+    usings are off (src/Directory.Build.props). GenerateDocumentationFile is
+    on: CS1591 is fixed by writing the doc comment, never by NoWarn.
+  - OutputType Exe + StartupObject (Preview/PreviewProgram): the ONLY packed
+    Platform project that is an executable. The package assembly doubles as
+    the headed preview's process entry point - PreviewConnection starts
+    `dotnet exec --depsfile <consumer>.deps.json --runtimeconfig
+    <consumer>.runtimeconfig.json CodeBrix.Platform.UI.Runtime.Skia.PlayTest.dll
+    --preview <w> <h>` - so no second package or executable is needed. Keep it.
+  - Packs the ROOT README.md (like every head/add-in), its OWN AGENT-README.txt
+    (the consumer guide, add-in pattern), the icon and THIRD-PARTY-NOTICES.txt;
+    buildTransitive/*.props|.targets are packed renamed to the PackageId; the
+    two runner adapters buildTransitive/*.cs are packed as content and
+    Compile-Removed from the assembly.
+  - Foundation/UWP ProjectReferences carry TreatAsPackageReference="false"
+    PrivateAssets="all" exactly like the heads (folded into the core package);
+    Extensions.Logging is PrivateAssets="all" for the same reason.
+  - The Unicode/UnicodeMacOs pins follow the TextLayout add-in: PlayTest
+    renders text on Windows/macOS without a desktop head to supply ICU.
+  - SDL3: the preview's bindings + natives come from the family's own
+    CodeBrix.Sdl3.ZlibLicenseForever PackageReference (the usings in
+    Preview/PreviewProgram.cs are CodeBrix.Sdl3). It is a normal NuGet
+    dependency with none of its own; no SDL initialization occurs in the offscreen
+    application process.
+  - AssemblyInfo.cs grants InternalsVisibleTo to
+    CodeBrix.Platform.UI.Runtime.Skia.PlayTest.Tests (the Runtime.Skia/X11
+    pattern).
+  - Normal packaging: build/CodeBrix.Platform.Build.csproj includes this
+    project in _CsprojPackage and applies the shared PackageVersion. Do not set
+    the assembly Version to a NuGet version. The core/runtime packages must
+    include the PlayTest friend declarations; an older published core alone
+    cannot run a newer PlayTest head. build/pack-playtest-preview.py builds a
+    local, never-published preview feed (EXTRAS-README.txt).
+
+--- Architecture ---
+
+This is a separate head; do not add PlayTest branches to the existing desktop
+heads. VirtualHost owns the UI dispatcher, the CPU Skia renderer, the
+window/display extensions, the isolated clipboard and synthetic input; it was
+adapted from the FrameBuffer.Emulated head but is deliberately independent of
+it. Shared framework assembly friend entries permit the same internal extension
+and compositor APIs used by the other heads. The virtual resolution is
+1920x1080 or 1080x1920 at rasterization scale 1. Orientation can change between
+serialized tests: a screen generation and its dimensions travel with each
+immutable frame, and frames from old generations are discarded.
+SetContentAsync applies an optional orientation before creating the page and
+restores the launch preference when no override is supplied. Page replacement
+disposes a Frame-hosted page's disposable DataContext as well as a direct
+page's DataContext.
+
+--- Preferences (keep the precedence chains exactly) ---
+
+  Preview: explicit PlayTestOptions.Headless, then the MTP command-line option
+  (--headed / --nonheadless / --headless), then CODEBRIX_PLAYTEST_HEADED, then
+  headless. Conflicting headed/headless flags are rejected before tests run.
+  The package compiles buildTransitive/CodeBrix.PlayTest.TestingPlatform.cs
+  into Microsoft.Testing.Platform consumers and registers its
+  TestingPlatformBuilderHook before MTP generates/caches
+  SelfRegisteredExtensions. Keep that adapter out of the runtime assembly and
+  its dependencies: it uses the consumer's MTP version. It is compiled with the
+  CONSUMER's nullable setting, so it must stay warning-free with nullable
+  enabled and disabled (no reference-type '?' annotations; nullable values flow
+  through var locals). Validation records a nullable Boolean in AppContext
+  under CodeBrix.Platform.PlayTest.CommandLineHeadless (and the theme,
+  orientation and screenshot-folder values under their CommandLine* keys)
+  without changing the environment. PlayTestOptions reads the headless setting
+  when constructed. Other runners retain environment/code configuration;
+  custom MTP entry points must invoke the generated AddSelfRegisteredExtensions
+  hook. The source-based PlayTestDemo imports these targets too.
+
+  Orientation: explicit PlayTestOptions.Orientation, --orientation, environment
+  variable CODEBRIX_PLAYTEST_ORIENTATION, CodeBrixPlayTestPreferredOrientation
+  project metadata in ConfigurationAssembly (entry assembly by default), then
+  Landscape. An omitted Orientation differs from an explicitly assigned
+  Landscape. PlayTestOrientationAttribute is runner-neutral metadata; a fixture
+  hook must resolve executing row traits before method attributes and apply
+  the result.
+
+  Theme: explicit PlayTestOptions.Theme, --theme, CODEBRIX_PLAYTEST_THEME,
+  CodeBrixPlayTestPreferredTheme project metadata in ConfigurationAssembly,
+  then Light. Values are Light or Dark, case-insensitive. VirtualSystemTheme
+  implements ISystemThemeHelperExtension and is registered before app
+  construction; refresh the framework theme cache then. This simulates an OS
+  preference, including UISettings system colors, while still allowing
+  explicit app theme choices. PlayTestApplication.SystemTheme reports the
+  launch preference, which stays fixed for the process and ignores the real
+  desktop. Headless rendering and preview share the resulting pixels; SDL has
+  no theme logic.
+
+  SlowMo: explicit PlayTestOptions.SlowMo (including zero), then
+  CODEBRIX_PLAYTEST_SLOWMO, then 250 milliseconds headed or zero headless. The
+  default uses the final Headless option, not just the environment. Keep an
+  omitted SlowMo distinct from an explicit zero. Resolve and validate once at
+  launch, then store the resolved delay in the application's options snapshot.
+  Environment values use invariant culture and must be finite and
+  non-negative; unset/empty means default. Fixtures should leave SlowMo unset
+  instead of substituting zero.
+
+--- Preview process ---
+
+PreviewProgram is the executable entry point in this assembly; PreviewConnection
+launches it with the consumer's deps/runtimeconfig so native NuGet assets
+resolve on every RID. SDL requires the process main thread on macOS. Frames
+cross a bounded queue and the stdin pipe, each prefixed by two little-endian
+Int32 dimensions (both orientations have the same byte count). Input never
+crosses back. The SDL window keeps the launch preference's proportions and
+letterboxes opposite-orientation frames; resize textures/logical presentation
+on the SDL main thread, and never resize the native window in response to test
+orientation. A truncated or malformed frame must fail the headed run.
+
+--- Input model ---
+
+VirtualInput always uses Control-based shortcuts. VirtualHost disables
+FeatureConfiguration.TextBox.UsePlatformKeyboardShortcuts before app
+construction so text editing also follows that model on macOS. Keep this
+setting in feature configuration: touching TextBox itself before dispatcher
+setup initializes brushes too early. Normal desktop hosts retain their native
+keyboard conventions.
+
+--- Locator engine and actions ---
+
+Application tests must assert actual outcomes. Preserve lazy locator
+resolution, strictness, bounded retry, hit testing, and dispatcher confinement
+when extending the API. Do not replace clicks with direct command invocation.
+Use a serialized fixture and reset page/application state between tests. Test
+both timeout and successful paths when changing the locator engine.
+Check/Uncheck dispatch pointer input, including to a ToggleSwitch template
+thumb, and verify the outcome; never set IsChecked/IsOn directly.
+Bring-into-view supports attached controls, not unrealized virtualized items.
+
+Desktop control contracts: GetByType<T> keeps add-in types in the application,
+not in PlayTest's dependency graph. Fill/value assertions fall back to the
+standard IValueProvider; checked actions fall back to IToggleProvider.
+AdvancedTextEdit owns its peer and focus forwarding. Before typing, preserve
+existing focus in a composite control's subtree; refocusing its outer control
+can defer forwarding and lose input. Prefer the automation peer's SetFocus for a
+new focus target. TypeAsync/PressSequentiallyAsync dispatch actual character
+key events, including Enter/Tab, rather than replacing Document.Text or calling
+editor handlers.
+
+Menu names use their labels without template arrows/check glyphs. Menubar,
+Menuitem (including submenus), Menuitemcheckbox, Menu and Toolbar are
+supported. Toggle menu items may leave the visible tree after a check; verify
+that item's result rather than waiting for its flyout to reopen. Hover,
+positioned/multi/right clicks and stepped drags retain strictness, bounds
+checks and hit testing. Always release a drag's pointer on failure. One outer
+recording scope represents each logical action.
+
+--- File pickers ---
+
+PlayTestFilePickers registers the framework folder/open/save extensions before
+app construction. Responses are application-owned FIFO queues, never native
+dialogs. Null is explicit cancellation; missing responses fail. Existing save
+files must not be truncated. FilePickers.Clear is the fixture's responsibility
+on reset.
+
+--- WebView ---
+
+Linux WPE, Windows Edge WebView2 and macOS WKWebView work through the app's own
+WebView add-in; PlayTest adds no WebView package or native browser dependency.
+On Windows, PlayTest's STA dispatcher also pumps native messages for WebView2's
+COM callbacks. The optional add-in supplies an offscreen composition controller
+and captures its frames into Skia; pointer and keyboard input go through the
+browser input APIs. Browser profiles live below TestResults/PlayTest/WebView2,
+per process. The head flows packaged ICU assets/data for Windows/macOS text
+initialization. On macOS the optional add-in launches an AppKit/WKWebView helper
+on its process main thread, with a nonpersistent browser data store and no
+visible native window. Navigation decisions, script results and PNG frames
+travel through redirected pipes; callbacks and presentation return to the XAML
+dispatcher. Input uses native NSEvent dispatch, not DOM actions. Page unload
+closes that helper. GPU-only GL controls remain unsupported. Validate each OS
+on its own host before claiming runtime support.
+
+--- Screenshot recording ---
+
+--screenshotfolder claims an existing empty folder only at execution, never
+during option validation/discovery. Record PNGs from the virtual Skia surface,
+not the desktop preview. buildTransitive/CodeBrix.PlayTest.Xunit.cs is
+source-compiled only into supported reflection-based xUnit consumers; the
+assembly fixture lifecycle records identity/outcome, and BeforeAfter hooks
+capture after setup and before teardown. No runtime xUnit dependency and no
+consumer test edits. Other runners reject recording until they have equivalent
+lifecycle adapters.
+
+Recording/PlayTestRecording.cs owns a versioned JSON index,
+namespace/class/method/theory-row paths, the exclusive folder claim, atomic
+index replacement, and serialized PNG writes. Keep every path under the claimed
+folder, sanitize for Windows too, and never clear or overwrite user artifacts.
+Case numbers are per-method execution order, not discovery order. Keep
+IDs/arguments in the index. Missing UI and skipped tests must not get
+fabricated images. Source locations use PDB-backed stack frames and may be
+null. Local timestamps include offsets.
+
+UI operations use a nested async scope so only the outer API boundary records;
+retry probes and internal Evaluate calls must not multiply screenshots.
+Preserve the no-recording fast path, caller location before awaiting, final
+capture on failure, and capture before application disposal. Tests must remain
+serialized.
+
+--- Tests ---
+
+  - src/Platform.UI.Runtime.Skia.PlayTest.Tests (host-free, xunit.v3 under
+    MTP, SilverAssertions; in the /Tests/ folder of all three solutions):
+    preference precedence for headless/theme/orientation/slowmo, the
+    command-line adapter (buildTransitive/CodeBrix.PlayTest.TestingPlatform.cs
+    is LINKED into the project, compiled with nullable enabled and
+    CODEBRIX_PLAYTEST_XUNIT), orientation parsing and PlayTestOrientation
+    resolution, recording-folder validation and path sanitizing, the preview
+    frame format, text normalization and the key-name table. It launches no
+    application. The suite is serialized and every test isolates and restores
+    the CLI AppContext keys as well as the PlayTest environment variables
+    (PlayTestSettingsScope). Put new configuration-only cases HERE.
+  - samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests: the
+    control/picker contract tests that need the running application, next to
+    the dedicated six-head demo application. They exercise that application's
+    actual shared XAML and build the framework from source. Put general control
+    demonstrations there, not into unrelated sample applications.
+  - JustBetweenUs and the additional CodeBrix.Samples suites exercise their own
+    application screens; the latter share PlayTestSupport in that repository.
+    They use SilverAssertions and existing app service interfaces for offline
+    data.
+  - The standalone build/test-scripts/PlayTestRecordingProbe contains an
+    intentional failure; run it through build/test-scripts/playtest-recording.py,
+    which checks that failure, PNG/index integrity, hierarchy, source lines,
+    precedence and rejected folders. It is not part of the normal demo suite.
+
+--- Third-party code ---
+
+AriaRole.cs retains its original MIT notice (Microsoft Playwright for .NET) and
+is the only PlayTest file carrying a //was previously: marker. Update the root
+THIRD-PARTY-NOTICES.txt whenever adapting additional upstream code.
+
+PLAYTEST DESKTOP CONTROL AND EDITOR COVERAGE
+==========================================
+The PlayTestDemo shared UI now includes DesktopControlsView, accessible through
+"Try desktop controls" in every head. DesktopControlTests exercises typed/role
+locators, composite editor focus, IValueProvider fill/undo/read-only, empty
+completion, toolbar commands/toggles/overflow/split buttons, nested menus,
+right/double clicks, dismissed toggle-menu state, element tab headers and invalid
+pointer positions. The demo application's add-in project references do not add
+dependencies to the PlayTest package.
+
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release --nonheadless
+
+Fresco.Brix in CodeBrix.Samples.Gpl3 provides application-level coverage of nested
+TriPaneView drags, split editors, document tabs, menus/dialogs and engraving. Its
+test-only head consumes a local PlayTest/AdvancedTextEdit set; build both with:
+
+    python3 build/pack-playtest-preview.py --version <fresh-prerelease> --with-editor
+
+The optional switch adds TextLayout and AdvancedTextEdit to the local feed.
+Nothing is published. Existing app heads retain their own package versions.
+
+Intel macOS validation (2026-09-30): the full PlayTestDemo suite passed headless
+and headed dark/portrait, including protected editor sections and disabled
+drags. The desktop-control cases have not yet been executed on Windows, Linux or
+Apple Silicon. Fresco's package-consumer suite passed in full headlessly and in a
+dark portrait preview against a local preview feed, with every automatic PNG
+validated. Its README records the application fixes, final wizard checks and
+remaining limits. (The configuration-only cases that used to live in the demo
+now run in src/Platform.UI.Runtime.Skia.PlayTest.Tests.)

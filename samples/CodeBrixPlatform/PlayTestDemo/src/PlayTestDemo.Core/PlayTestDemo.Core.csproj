@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>PlayTestDemo</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.248.1181" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" />
+    <ProjectReference Include="../../../../../src/Platform.UI/Platform.UI.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/AddIns/Platform.UI.CommandBar/Platform.UI.CommandBar.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/AddIns/Platform.UI.AdvancedTextEdit/Platform.UI.AdvancedTextEdit.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.csproj" />
+  </ItemGroup>
+</Project>

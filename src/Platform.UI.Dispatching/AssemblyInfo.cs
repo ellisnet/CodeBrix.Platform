@@ -139,3 +139,5 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.WinUI.Graphics2DSK.Tests")]
 
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
+
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

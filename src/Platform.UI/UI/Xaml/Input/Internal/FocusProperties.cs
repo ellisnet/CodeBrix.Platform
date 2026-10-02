@@ -64,6 +64,9 @@ namespace CodeBrix.Platform.UI.Xaml.Input //Was previously: Uno.UI.Xaml.Input
 			if (dependencyObject is UIElement uiElement)
 			{
 				isVisible = uiElement.Visibility == Visibility.Visible;
+#if __SKIA__
+				isVisible &= !uiElement.IsVisualPresentationSuppressed;
+#endif
 			}
 
 			return isVisible;

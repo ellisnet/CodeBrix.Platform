@@ -67,3 +67,5 @@ using CodeBrix.Platform.UI.Graphics;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics2DSK")]
 
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
+
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

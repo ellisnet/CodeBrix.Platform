@@ -62,7 +62,7 @@
 
 		<!-- The terminal engine. External to the CodeBrix.Platform family, so this reference is
 		     versioned here (not family-locked); bump deliberately. -->
-		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.262.971" />
+		<PackageReference Include="CodeBrix.Terminal.MitLicenseForever" Version="1.0.275.130" />
 
 		<!-- The default terminal font (ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/RobotoMono.ttf).
 		     Declared here so consumers get it without knowing to reference it themselves (the family's

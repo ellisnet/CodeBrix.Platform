@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PlayTestDemoHead>WinWpfSkia</PlayTestDemoHead>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX_SKIA_WPF;__CODEBRIX_SKIA_WPF__</DefineConstants>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
+  </ItemGroup>
+</Project>

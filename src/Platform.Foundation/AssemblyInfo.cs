@@ -135,3 +135,5 @@ using global::System.Runtime.InteropServices;
 // The chart add-in's Core (WPE1 C7): its engine (PlotHost) takes the chart typefaces straight from the platform's font
 // source (Contracts/IFontSourcePlatform), with no TextLayout dependency.
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Core")]
+
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

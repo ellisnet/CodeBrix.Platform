@@ -107,6 +107,7 @@
 	-->
 	<ItemGroup>
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.PlayTest\Platform.UI.Runtime.Skia.PlayTest.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Win32\Platform.UI.Runtime.Skia.Win32.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wpf\Platform.UI.Runtime.Skia.Wpf.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />

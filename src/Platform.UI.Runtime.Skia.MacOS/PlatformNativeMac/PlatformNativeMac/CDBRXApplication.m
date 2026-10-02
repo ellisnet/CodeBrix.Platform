@@ -3,10 +3,12 @@
 //
 
 #import "CDBRXApplication.h"
+#import <dlfcn.h>
 
 static UNOApplicationDelegate *ad;
 static system_theme_change_fn_ptr system_theme_change;
 static id<MTLDevice> device;
+static NSString *systemAppName;
 
 inline system_theme_change_fn_ptr codebrix_get_system_theme_change_callback(void)
 {
@@ -25,6 +27,61 @@ uint32 /* Uno.Helpers.Theming.SystemTheme */ codebrix_get_system_theme(void)
     NSAppearanceName appearanceName = [appearance bestMatchFromAppearancesWithNames:@[NSAppearanceNameAqua,
                                                                                       NSAppearanceNameDarkAqua]];
     return [appearanceName isEqualToString:NSAppearanceNameAqua] ? 0 : 1;
+}
+
+// Called once on the host's main thread, before NSApplication is initialized.
+// AppKit reads the main bundle's cached name for its application-menu title;
+// NSProcessInfo alone leaves that title showing the executable's original name.
+// Update only the process-local dictionaries, including localized overrides.
+// No Info.plist, executable, bundle identifier or other on-disk file is changed.
+bool codebrix_application_set_name(const char *name)
+{
+    if (![NSThread isMainThread] || !name) { return false; }
+    NSString *title = [NSString stringWithUTF8String:name];
+    if (title.length == 0) { return false; }
+    NSDictionary *info = NSBundle.mainBundle.infoDictionary;
+    NSDictionary *localized = NSBundle.mainBundle.localizedInfoDictionary;
+    BOOL hasLocalizedName = localized[@"CFBundleName"] || localized[@"CFBundleDisplayName"];
+    // These caches are mutable on supported macOS releases. Check instead of
+    // blindly casting: a future immutable cache must not silently ignore the
+    // explicit option or raise an Objective-C exception across the P/Invoke.
+    if (![info isKindOfClass:NSMutableDictionary.class]
+        || (hasLocalizedName && ![localized isKindOfClass:NSMutableDictionary.class])) { return false; }
+    NSMutableDictionary *names = (NSMutableDictionary *)info;
+    names[@"CFBundleName"] = title;
+    names[@"CFBundleDisplayName"] = title;
+    if (hasLocalizedName) {
+        NSMutableDictionary *localNames = (NSMutableDictionary *)localized;
+        localNames[@"CFBundleName"] = title;
+        localNames[@"CFBundleDisplayName"] = title;
+    }
+    NSProcessInfo.processInfo.processName = title;
+    systemAppName = title;
+    return true;
+}
+
+// LaunchServices owns a separate display name used by the Dock and
+// NSRunningApplication. There is no public setter for a running process.
+// Resolve its compatibility entry points dynamically so the native library
+// can still load if a future macOS release removes this SPI. Cocoa/AppKit's
+// name above remains available in that case, with a diagnostic below.
+static void updateRunningApplicationName(void)
+{
+    if (!systemAppName) { return; }
+    CFTypeRef (*currentApplication)(void) = dlsym(RTLD_DEFAULT, "_LSGetCurrentApplicationASN");
+    OSStatus (*setInformation)(int, CFTypeRef, CFStringRef, CFTypeRef, CFDictionaryRef *) =
+        dlsym(RTLD_DEFAULT, "_LSSetApplicationInformationItem");
+    CFStringRef *displayNameKey = dlsym(RTLD_DEFAULT, "_kLSDisplayNameKey");
+    CFTypeRef application = currentApplication ? currentApplication() : NULL;
+    if (application && setInformation && displayNameKey && *displayNameKey) {
+        // -2 identifies the current LaunchServices session.
+        OSStatus result = setInformation(-2, application, *displayNameKey,
+            (__bridge CFStringRef)systemAppName, NULL);
+        if (result == noErr) { return; }
+        NSLog(@"CodeBrix: macOS could not update the running application name (status %d).", (int)result);
+    } else {
+        NSLog(@"CodeBrix: this macOS version cannot update the running application name. Cocoa and AppKit use the configured name; the Dock may retain the bundle/executable name.");
+    }
 }
 
 bool codebrix_app_initialize(bool *metal)
@@ -123,6 +180,13 @@ void codebrix_application_quit(void)
 }
 
 @implementation UNOApplicationDelegate
+
+- (void)applicationWillFinishLaunching:(NSNotification *)notification
+{
+    // The process is registered with LaunchServices by this point, before the
+    // managed Application is constructed and before its windows become visible.
+    updateRunningApplicationName();
+}
 
 - (void)applicationDidFinishLaunching:(NSNotification *)notification
 {

@@ -78,6 +78,8 @@
           Condition="'$(_IsCodeBrixMacOSHead)' == 'true' and $([MSBuild]::IsOsPlatform('OSX'))">
     <PropertyGroup>
       <_CodeBrixNativeMacDylib>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Runtime.Skia.MacOS\runtimes\osx\native\libCodeBrixNativeMac.dylib</_CodeBrixNativeMacDylib>
+      <_CodeBrixNativeMacFreshDylib>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Runtime.Skia.MacOS\PlatformNativeMac\build\$(Configuration)\libCodeBrixNativeMac.dylib</_CodeBrixNativeMacFreshDylib>
+      <_CodeBrixNativeMacDylib Condition="Exists('$(_CodeBrixNativeMacFreshDylib)')">$(_CodeBrixNativeMacFreshDylib)</_CodeBrixNativeMacDylib>
     </PropertyGroup>
     <Copy SourceFiles="$(_CodeBrixNativeMacDylib)"
           DestinationFolder="$(OutDir)runtimes\osx\native"

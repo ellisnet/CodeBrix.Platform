@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
 	<!--
@@ -33,7 +33,7 @@
 		<MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
 	</PropertyGroup>
 
-	<ItemGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
+	<ItemGroup Condition="'$(CodeBrixWindowsWebViewHost)' == 'true' or '$(CodeBrixIsPlayTestHead)' == 'true'">
 
 		<!-- Managed WebView2 assemblies -> aliased, copy-local references (deps.json + bin). -->
 		<Reference Include="Microsoft.Web.WebView2.Core">
@@ -41,12 +41,12 @@
 			<Aliases>codebrixmswebview2</Aliases>
 			<Private>true</Private>
 		</Reference>
-		<Reference Include="Microsoft.Web.WebView2.WinForms">
+		<Reference Include="Microsoft.Web.WebView2.WinForms" Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
 			<HintPath>$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.WinForms.dll</HintPath>
 			<Aliases>codebrixmswebview2</Aliases>
 			<Private>true</Private>
 		</Reference>
-		<Reference Include="Microsoft.Web.WebView2.Wpf">
+		<Reference Include="Microsoft.Web.WebView2.Wpf" Condition="'$(CodeBrixWindowsWebViewHost)' == 'true'">
 			<HintPath>$(MSBuildThisFileDirectory)webview2\Microsoft.Web.WebView2.Wpf.dll</HintPath>
 			<Aliases>codebrixmswebview2</Aliases>
 			<Private>true</Private>
@@ -67,4 +67,5 @@
 
 	</ItemGroup>
 
+	<Import Project="CodeBrix.WebView.MacOS.targets" />
 </Project>

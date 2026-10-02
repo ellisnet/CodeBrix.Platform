@@ -87,6 +87,27 @@ EmulateFrameBufferDemo.
 SAMPLE APPLICATIONS (samples/CodeBrixPlatform/)
 ===============================================
 
+PlayTestDemo
+-------------
+    samples/CodeBrixPlatform/PlayTestDemo    six heads + tests (src/ layout)
+
+A dedicated application for PlayTest control and picker regression coverage.
+Its shared XAML contains checked controls, a nested scrolling target and normal
+folder/open/multiple-open/save picker buttons with visible results. Desktop heads
+use their usual pickers; PlayTests supplies paths or cancellation without UI.
+Its serialized UI cases hold the generic control/picker regression coverage
+(moved out of JustBetweenUs), method- and case-level orientation
+demonstrations and the desktop-control cases; every case here needs the running
+application. Configuration-only cases (preference precedence, command-line
+switches, invalid values) live in the host-free
+src/Platform.UI.Runtime.Skia.PlayTest.Tests project instead.
+Uses SilverAssertions, disabled nullable/implicit usings, and source references
+to the framework. No local preview NuGet feed or CodeBrix.Samples clone is needed.
+See the sample README for headed mode, theme/orientation preferences and layout.
+
+    dotnet run --project samples/CodeBrixPlatform/PlayTestDemo/src/PlayTestDemo.LinuxX11 -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+
 JustBetweenUs
 -------------
     samples/CodeBrixPlatform/JustBetweenUs

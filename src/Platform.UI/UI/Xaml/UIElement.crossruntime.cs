@@ -25,6 +25,10 @@ namespace Microsoft.UI.Xaml
 	{
 		internal bool IsActiveInVisualTree { get; private set; }
 
+		// Set before entering the tree by controls presented on a native surface
+		// outside the window. Logical visibility and bindings remain intact.
+		internal bool IsVisualPresentationSuppressed { get; set; }
+
 		private static protected readonly Logger _log = typeof(UIElement).Log();
 		private static protected readonly Logger _logDebug = _log.IsEnabled(LogLevel.Debug) ? _log : null;
 		private static protected readonly Logger _logTrace = _log.IsEnabled(LogLevel.Trace) ? _log : null;

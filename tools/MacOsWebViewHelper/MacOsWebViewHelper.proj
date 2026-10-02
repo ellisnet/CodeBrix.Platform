@@ -1,0 +1,17 @@
+<Project DefaultTargets="Build">
+  <PropertyGroup>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)obj/</BaseIntermediateOutputPath>
+    <OutputPath Condition="'$(OutputPath)' == ''">$(MSBuildThisFileDirectory)bin/</OutputPath>
+    <_CbxBuildMacWebView>true</_CbxBuildMacWebView>
+    <_CbxMacWebViewSource>$(MSBuildThisFileDirectory)PlayTestWebView.m</_CbxMacWebViewSource>
+  </PropertyGroup>
+  <Import Project="CodeBrix.WebView.MacOS.targets" />
+  <Target Name="CheckPlatform">
+    <Error Condition="!$([MSBuild]::IsOSPlatform('OSX'))" Text="Build the WKWebView helper on macOS with Apple's command-line tools installed." />
+  </Target>
+  <Target Name="Build" DependsOnTargets="CheckPlatform;_CbxCompileMacWebView">
+    <MakeDir Directories="$(OutputPath)" />
+    <Copy SourceFiles="$(_CbxMacWebViewHelper)" DestinationFolder="$(OutputPath)" />
+    <Message Importance="high" Text="Universal macOS WebView helper: $(OutputPath)CodeBrix.PlayTest.WebView" />
+  </Target>
+</Project>

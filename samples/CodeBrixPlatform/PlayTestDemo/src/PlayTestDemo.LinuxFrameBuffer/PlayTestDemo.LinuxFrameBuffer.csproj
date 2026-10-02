@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PlayTestDemoHead>LinuxFrameBuffer</PlayTestDemoHead>
+    <TargetFramework>net10.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX_SKIA_FRAMEBUFFER;__CODEBRIX_SKIA_FRAMEBUFFER__</DefineConstants>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <Import Project="../../../FrameBufferRuntime.targets" />
+</Project>

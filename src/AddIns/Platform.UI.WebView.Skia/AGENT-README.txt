@@ -26,8 +26,9 @@ What the package delivers differs by head:
     transforms and z-order behave like any other XAML content. This Linux path
     is 100% Apache-2.0 managed code that P/Invokes the distro's WPE WebKit at
     run time; no WPE engine binaries ship in the package.
-  - macOS: inert - WKWebView is built into the OS and the macOS head already
-    uses it.
+  - macOS desktop heads: WKWebView is built into the OS and the macOS head
+    already uses it. The PlayTest head uses this add-in's separate offscreen
+    WKWebView helper instead (see UI-THREAD RULES).
 
 You program against the standard WebView2 contract, which lives in the core
 framework package; this add-on supplies the per-head engine behind it. The
@@ -56,7 +57,8 @@ extension add-ons. Every head gets it transitively:
     Windows (Win32) and Skia-on-WPF heads. The Windows-head runtime packages
     flag themselves so that the package's build logic applies only there;
     there is nothing for you to configure.
-  - It is inert on macOS.
+  - Normal macOS desktop heads use their own WKWebView; PlayTest discovers
+    the add-in's offscreen WKWebView provider automatically.
 Never reference it from a head project and never look for a per-head variant.
 
 SAME-GENERATION CORE REQUIRED
@@ -319,6 +321,25 @@ Windows-head specifics
 
 UI-THREAD RULES
 ---------------
+  - The Windows PlayTest head also uses this add-in. It supplies an STA message
+    pump and discovers the offscreen Edge provider automatically. Web content is
+    captured into the Skia scene and receives synthetic browser input, with no
+    visible native browser window. The Edge WebView2 runtime must be installed.
+    Profiles are isolated by process below TestResults/PlayTest/WebView2 in the
+    test output directory. PlayTest on Linux uses WPE.
+  - macOS PlayTest uses a separate AppKit/WKWebView process so AppKit owns its
+    main thread. The helper has a nonpersistent data store and an invisible
+    native window; PNG snapshots are composited into Skia. Pointer and keyboard
+    actions dispatch native NSEvents. Page replacement shuts down the helper.
+    Requires macOS 12 or later. A package built on macOS includes a universal
+    Intel/Apple Silicon executable; a package built elsewhere includes source
+    compiled by Apple's command-line tools into the test project's obj folder.
+    Source, the shared build recipe and a standalone build project live in
+    tools/MacOsWebViewHelper at the repository root; read its README to rebuild
+    on either Intel or Apple Silicon. Keep the helper source in this repository.
+    No compiler is required at runtime. Native browser uploads, dialogs and
+    downloads are outside this offscreen adapter's current surface.
+    The regular desktop providers are unchanged.
   - WebView2 is a XAML Control: create it, set Source, and call its methods
     on the UI thread, like any other control.
   - Every event - NavigationStarting/Completed, WebMessageReceived,
@@ -600,7 +621,8 @@ WHAT THIS PACKAGE DOES NOT DO
   - Does not ship a browser engine: Linux uses the distro's WPE WebKit (apt),
     Windows uses the end user's Microsoft Edge WebView2 runtime (only the SDK
     loader and managed assemblies are bundled), macOS uses the OS WKWebView.
-  - Does nothing on macOS (inert; the head's own WKWebView support is used).
+  - Normal macOS desktop heads use the head's own WKWebView support; only
+    PlayTest uses the add-in's offscreen macOS helper.
   - No host-to-page PostWebMessageAsString/AsJson (use ExecuteScriptAsync).
   - No download Pause()/Resume() (CanResume is always false), no built-in
     download UI (DefaultDownloadDialog APIs are stubs).
@@ -630,7 +652,7 @@ Package        CodeBrix.Platform.WebView.ApacheLicenseForever   Apache-2.0
 Reference in   .Core ONLY (once); heads inherit it; same version as the core
 Heads          Win32 + WPF: Edge WebView2 SDK bundled, Edge runtime from Windows
                X11 + Wayland + FrameBuffer: system WPE WebKit, offscreen -> Skia
-               macOS: inert (WKWebView built in)
+               macOS desktop: WKWebView built in; PlayTest: offscreen helper
 Linux setup    sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1
 Missing engine PlatformNotSupportedException naming the .so, the package, the apt line
 Win32 head     [STAThread] + synchronous Main + host.Run()

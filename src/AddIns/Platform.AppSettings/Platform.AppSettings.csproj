@@ -46,7 +46,7 @@
 	<ItemGroup>
 		<!-- The SQLite engine behind settings.sqlite. External to the CodeBrix.Platform family, so
 		     this reference is versioned here (not family-locked); bump deliberately. -->
-		<PackageReference Include="CodeBrix.Sqlite.ApacheLicenseForever" Version="1.0.250.22" />
+		<PackageReference Include="CodeBrix.Sqlite.ApacheLicenseForever" Version="1.0.275.125" />
 
 		<!-- ILogger/ILoggerFactory, which AppSettingLoggingService forwards through. Referenced
 		     PUBLICLY on purpose: the Extensions.Logging project reference below is PrivateAssets="all"

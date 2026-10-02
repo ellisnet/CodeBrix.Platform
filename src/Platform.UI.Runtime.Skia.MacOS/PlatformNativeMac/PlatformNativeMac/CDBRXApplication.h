@@ -14,6 +14,7 @@ void codebrix_set_system_theme_change_callback(system_theme_change_fn_ptr p);
 uint32 codebrix_get_system_theme(void);
 
 bool codebrix_app_initialize(bool *supportsMetal);
+bool codebrix_application_set_name(const char *name);
 NSWindow* codebrix_app_get_main_window(void);
 
 id<MTLDevice> codebrix_application_get_metal_device(void);

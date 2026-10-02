@@ -1,0 +1,26 @@
+<Project>
+  <PropertyGroup>
+    <_CbxMacWebViewSource Condition="'$(_CbxMacWebViewSource)' == ''">$(MSBuildThisFileDirectory)macos/PlayTestWebView.m</_CbxMacWebViewSource>
+    <_CbxMacWebViewPrebuilt>$(MSBuildThisFileDirectory)macos/CodeBrix.PlayTest.WebView</_CbxMacWebViewPrebuilt>
+    <_CbxMacWebViewHelper>$(BaseIntermediateOutputPath)macos-webview/CodeBrix.PlayTest.WebView</_CbxMacWebViewHelper>
+  </PropertyGroup>
+  <!-- Packages built on macOS contain a universal helper. Packages produced on
+       other hosts carry its source; Apple's command-line tools build it once
+       in the consuming PlayTest project's obj directory, never in the cache. -->
+  <Target Name="_CbxCompileMacWebView" Inputs="$(_CbxMacWebViewSource);$(MSBuildThisFileFullPath)"
+          Outputs="$(_CbxMacWebViewHelper)"
+          Condition="$([MSBuild]::IsOSPlatform('OSX')) and ('$(CodeBrixIsPlayTestHead)' == 'true' or '$(_CbxBuildMacWebView)' == 'true')">
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(_CbxMacWebViewHelper)'))" />
+    <Copy SourceFiles="$(_CbxMacWebViewPrebuilt)" DestinationFiles="$(_CbxMacWebViewHelper)" Condition="Exists('$(_CbxMacWebViewPrebuilt)')" />
+    <Exec Condition="!Exists('$(_CbxMacWebViewPrebuilt)')"
+          Command="xcrun clang -fobjc-arc -fmodules -Wall -Wextra -Werror -Wno-unused-parameter -arch x86_64 -arch arm64 -mmacosx-version-min=12.0 -framework AppKit -framework WebKit &quot;$(_CbxMacWebViewSource)&quot; -o &quot;$(_CbxMacWebViewHelper)&quot;" />
+  </Target>
+  <Target Name="_CbxCopyMacWebView" BeforeTargets="GetCopyToOutputDirectoryItems;CopyFilesToOutputDirectory"
+          DependsOnTargets="_CbxCompileMacWebView"
+          Condition="$([MSBuild]::IsOSPlatform('OSX')) and ('$(CodeBrixIsPlayTestHead)' == 'true' or '$(_CbxBuildMacWebView)' == 'true')">
+    <ItemGroup>
+      <ContentWithTargetPath Include="$(_CbxMacWebViewHelper)" TargetPath="CodeBrix.PlayTest.WebView"
+                             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

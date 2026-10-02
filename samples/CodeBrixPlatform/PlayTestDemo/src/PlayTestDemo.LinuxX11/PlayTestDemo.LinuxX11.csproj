@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PlayTestDemoHead>LinuxX11</PlayTestDemoHead>
+    <TargetFramework>net10.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX_SKIA_X11;__CODEBRIX_SKIA_X11__</DefineConstants>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.X11/Platform.UI.Runtime.Skia.X11.csproj" />
+  </ItemGroup>
+</Project>

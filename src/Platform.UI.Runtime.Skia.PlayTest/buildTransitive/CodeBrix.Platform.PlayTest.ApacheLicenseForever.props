@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+    <SupportsFontManifest>true</SupportsFontManifest>
+    <CodeBrixIsPlayTestHead>true</CodeBrixIsPlayTestHead>
+  </PropertyGroup>
+</Project>

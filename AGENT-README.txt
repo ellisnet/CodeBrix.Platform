@@ -777,7 +777,7 @@ to test performance/stability - it may change or be removed.
 PER-HEAD CONFIGURATION
 ----------------------
 Each head's ".Use...()" method has an overload taking a lambda over that head's
-builder (macOS excepted). Builder calls are chainable and return the builder.
+builder. Builder calls are chainable and return the builder.
 
   WINDOWS / WIN32
 
@@ -1076,7 +1076,76 @@ builder (macOS excepted). Builder calls are chainable and return the builder.
 
   MACOS
 
-    ICodeBrixPlatformHostBuilder UseMacOS()          // no configuration overload
+    ICodeBrixPlatformHostBuilder UseMacOS()
+    ICodeBrixPlatformHostBuilder UseMacOS(Action<MacOSHostBuilder> configure)
+
+    // builder (namespace CodeBrix.Platform.UI.Runtime.Skia)
+    public class MacOSHostBuilder
+    {
+        MacOSHostBuilder UseSystemAppName(string name);
+        MacOSHostBuilder UseSystemMenuBar(bool enabled = true);
+    }
+
+    UseSystemAppName("My App") sets Cocoa's process name, AppKit's application
+    name (including the application-menu title), and macOS's running-application
+    display name used by the Dock. It is independent of UseSystemMenuBar: use
+    either option alone or both in either order. The name is applied at host
+    startup, before the managed App is created, and is process-wide rather than
+    per-window. Omitting it preserves the existing naming behavior. Null, blank,
+    and embedded-null names are rejected; Unicode names are supported.
+
+        .UseMacOS(mac => mac
+            .UseSystemAppName("Fresco.Brix")
+            .UseSystemMenuBar())
+
+    This runtime override does not rename assemblies, executable files, folders,
+    bundle identifiers, or rewrite Info.plist. A distributed .app should also
+    use matching CFBundleName/CFBundleDisplayName metadata for Finder and other
+    displays before the process starts. Running-application name synchronization
+    uses a dynamically resolved LaunchServices compatibility API; if a future
+    macOS version removes it, a diagnostic is logged and Cocoa/AppKit retain the
+    configured name while the Dock may retain the bundle/executable name.
+
+    Opt-in native menu example (only in the macOS head's Program.cs):
+
+        .UseMacOS(mac => mac.UseSystemMenuBar())
+
+    The default is the same in-window MenuBar used by every other head. With
+    this option, the FIRST VISIBLE MenuBar in each window's visual-tree order
+    is presented in the macOS system menu bar. Its in-window layout footprint
+    is zero, including its height and margin; an Auto row therefore disappears.
+    An explicitly fixed-height parent row remains the application's choice.
+    Additional MenuBars keep their normal in-window rendering and behavior.
+    Collapsed bars and bars inside collapsed ancestors are skipped. Hiding,
+    removing or reordering the selected bar selects the new first visible bar;
+    switching windows selects that window's menu. No application properties or
+    bindings are overwritten to hide the projected bar.
+
+    Standard items, submenus, separators, toggles/radio items, Click, Command,
+    CommandParameter, CanExecute, labels and visibility follow the XAML menu.
+    Native menu opening/closing provides the menu items' Loaded/Unloaded
+    lifecycle so dynamically populated menus continue to work. KeyboardAccelerators
+    supply native shortcuts; declared Control/Alt/Shift/Windows modifiers map
+    to Control/Option/Shift/Command, with no implicit Control-to-Command rewrite.
+    Existing window-level shortcuts continue to work. Custom menu item templates
+    and XAML icon visuals are not rendered inside an AppKit menu.
+    The projected bar cannot intercept in-window focus or pointer input.
+    An open ContentDialog disables the window's native menu commands until
+    the dialog closes.
+
+    The native Help menu contains the application's own items. The host
+    suppresses AppKit's automatically inserted Spotlight Help search using
+    NSApplication.helpMenu's documented unlisted-menu opt-out; macOS does not
+    require that search field. Native menu objects survive refreshes so AppKit
+    can retain its menu-tracking state.
+
+    Commands retain their application-defined locations. In particular, a File
+    > Quit command keeps its handler and save/cancel logic; the host does not add
+    a second Quit command that bypasses them. The application menu supplies the
+    standard Services and Hide/Show actions. Closing the last window continues
+    to terminate the macOS application.
+
+    This host option has no effect on Windows, Linux or PlayTest.
 
     // host (namespace CodeBrix.Platform.UI.Runtime.Skia.MacOS)
     public class MacSkiaHost : SkiaHost
@@ -1819,8 +1888,8 @@ macOS:
   - The macOS head package contains a small native library (a universal
     binary; runs on Apple Silicon and Intel Macs). Rendering is Metal by
     default with a software fallback (MacSkiaHost.RenderSurfaceType).
-  - UseMacOS() has no configuration overload; configure through
-    FeatureConfiguration and the host after Build().
+  - UseMacOS(mac => mac.UseSystemMenuBar()) opts into the system menu bar;
+    UseMacOS() keeps the in-window menu. See MACOS in PER-HEAD CONFIGURATION.
 
 LINUX (X11):
   - The broad-compatibility desktop Linux head: runs on X11 desktops and on
@@ -2391,6 +2460,9 @@ the reference lines):
         one demo per add-in (six heads each); their AGENT-READMEs describe them
 
 Framework tests that double as API examples:
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlayTestDemo
+        dedicated control/picker demo with six desktop heads and PlayTest regression
+        cases; general-purpose testing UI belongs here rather than in unrelated apps
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI.RuntimeTests
         runtime tests for controls, binding, navigation and windowing
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI.Toolkit.Tests

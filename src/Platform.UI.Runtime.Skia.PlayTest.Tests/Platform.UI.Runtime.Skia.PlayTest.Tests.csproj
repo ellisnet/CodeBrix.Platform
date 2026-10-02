@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<AssemblyName>CodeBrix.Platform.UI.Runtime.Skia.PlayTest.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.PlayTest.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+
+		<!-- The package's targets define this for xUnit v3 consumers; defining it here compiles the
+		     linked command-line adapter (below) exactly as an xUnit consumer gets it, including the
+		     screenshot-folder validation branch. -->
+		<DefineConstants>$(DefineConstants);CODEBRIX_PLAYTEST_XUNIT</DefineConstants>
+
+		<!-- Host-free by design: preference resolution, parsing, path validation, the preview frame
+		     format and text normalization are pure decisions, so no application is launched, no
+		     window or preview is opened and no Skia surface is created. Everything that needs the
+		     running application lives in samples/CodeBrixPlatform/PlayTestDemo/tests. -->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.PlayTest\Platform.UI.Runtime.Skia.PlayTest.csproj" />
+		<!-- PlayTest references the WinRT surface privately (PrivateAssets="all", as every head does),
+		     so its Windows.* types - VirtualKey for the key-name table - do not flow to this project.
+		     Reference the same flavour PlayTest compiles against. -->
+		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The package's command-line adapter is source that the buildTransitive targets compile
+		     into every Microsoft.Testing.Platform consumer. Linking the same file here tests exactly
+		     what consumers compile, under this project's xUnit/MTP versions and with nullable
+		     enabled. Only this file is linked: the xUnit recording adapter would register an
+		     assembly fixture in this suite. -->
+		<Compile Include="..\Platform.UI.Runtime.Skia.PlayTest\buildTransitive\CodeBrix.PlayTest.TestingPlatform.cs" Link="Adapters\CodeBrix.PlayTest.TestingPlatform.cs" />
+	</ItemGroup>
+
+</Project>

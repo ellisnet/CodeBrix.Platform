@@ -103,6 +103,9 @@ namespace Microsoft.UI.Xaml
 			{
 				var pNext = pElement.GetUIElementAdjustedParentInternal(true /*public parents only*/);
 
+#if __SKIA__
+				if (pNext?.IsVisualPresentationSuppressed == true) { return false; }
+#endif
 				if (pNext?.Visibility == Visibility.Collapsed)
 				{
 					return false;

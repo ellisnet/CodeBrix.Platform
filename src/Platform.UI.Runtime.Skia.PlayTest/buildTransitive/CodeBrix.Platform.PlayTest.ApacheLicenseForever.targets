@@ -1,0 +1,59 @@
+<Project>
+  <PropertyGroup>
+    <IsCodeBrixHead Condition="'$(OutputType)'=='Exe'">true</IsCodeBrixHead>
+    <_CodeBrixPlayTestRunnerSource>$(MSBuildThisFileDirectory)CodeBrix.PlayTest.TestingPlatform.cs</_CodeBrixPlayTestRunnerSource>
+    <_CodeBrixPlayTestXunitSource>$(MSBuildThisFileDirectory)CodeBrix.PlayTest.Xunit.cs</_CodeBrixPlayTestXunitSource>
+  </PropertyGroup>
+  <!-- Evaluate after runner imports, before their generated registration caches.
+       Only MTP consumers compile the adapter; other runners keep the existing API. -->
+  <Target Name="_CodeBrixPlayTestRegisterRunnerOptions"
+          BeforeTargets="_GenerateSelfRegisteredExtensionsFileInputCache;_GenerateTestingPlatformEntryPointFileInputCache;CoreCompile"
+          Condition="'$(IsTestingPlatformApplication)' == 'true'">
+    <ItemGroup>
+      <Compile Include="$(_CodeBrixPlayTestRunnerSource)" Link="PlayTest/CodeBrix.PlayTest.TestingPlatform.cs" />
+      <TestingPlatformBuilderHook Include="8afcb1d0-ae70-49c5-b9cf-6f799145f9e7">
+        <DisplayName>CodeBrix PlayTest preview</DisplayName>
+        <TypeFullName>CodeBrix.Platform.PlayTest.TestingPlatform.TestingPlatformBuilderHook</TypeFullName>
+      </TestingPlatformBuilderHook>
+    </ItemGroup>
+    <PropertyGroup Condition="'$(XunitTestProject)' == 'true' and '$(XunitTestProjectAOT)' != 'true'">
+      <DefineConstants>$(DefineConstants);CODEBRIX_PLAYTEST_XUNIT</DefineConstants>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(XunitTestProject)' == 'true' and '$(XunitTestProjectAOT)' != 'true'">
+      <Compile Include="$(_CodeBrixPlayTestXunitSource)" Link="PlayTest/CodeBrix.PlayTest.Xunit.cs" />
+    </ItemGroup>
+  </Target>
+  <ItemGroup>
+    <AssemblyMetadata Include="CodeBrixPlayTestRootNamespace" Value="$(RootNamespace)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
+    <AssemblyMetadata Include="CodeBrixPlayTestPreferredOrientation" Value="$(CodeBrixPlayTestPreferredOrientation)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
+    <AssemblyMetadata Include="CodeBrixPlayTestPreferredTheme" Value="$(CodeBrixPlayTestPreferredTheme)" />
+  </ItemGroup>
+  <Target Name="_CodeBrixPlayTestValidateTheme" BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
+    <Error Condition="'$(CodeBrixPlayTestPreferredTheme)' != 'Light' and '$(CodeBrixPlayTestPreferredTheme)' != 'Dark'"
+           Text="CodeBrixPlayTestPreferredTheme must be Light or Dark." />
+    <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
+           Text="CodeBrixPlayTestPreferredTheme requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
+  </Target>
+  <Target Name="_CodeBrixPlayTestValidateOrientation" BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">
+    <Error Condition="'$(CodeBrixPlayTestPreferredOrientation)' != 'Landscape' and '$(CodeBrixPlayTestPreferredOrientation)' != 'Portrait'"
+           Text="CodeBrixPlayTestPreferredOrientation must be Landscape or Portrait." />
+    <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
+           Text="CodeBrixPlayTestPreferredOrientation requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
+  </Target>
+  <Target Name="_CodeBrixPlayTestDefines" AfterTargets="PrepareForBuild">
+    <PropertyGroup>
+      <DefineConstants>$(DefineConstants);CODEBRIX_REFERENCE_API;HAS_CODEBRIX;HAS_CODEBRIX_WINUI;HAS_CODEBRIX_SKIA;HAS_CODEBRIX_PLAYTEST;__DESKTOP__;__CODEBRIX_SKIA__</DefineConstants>
+    </PropertyGroup>
+  </Target>
+  <Target Name="_CodeBrixPlayTestContent" BeforeTargets="CopyFilesToOutputDirectory;_CopyFilesMarkedCopyLocal">
+    <ItemGroup>
+      <ContentWithTargetPath Update="@(ContentWithTargetPath)" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
+</Project>

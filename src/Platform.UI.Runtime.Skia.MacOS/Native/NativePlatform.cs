@@ -147,6 +147,10 @@ internal static unsafe class ClipboardDataMarshaller
 
 internal static partial class NativeCodeBrix
 {
+	[LibraryImport("libCodeBrixNativeMac.dylib", StringMarshalling = StringMarshalling.Utf8)]
+	[return: MarshalAs(UnmanagedType.I1)]
+	internal static partial bool codebrix_application_set_name(string name);
+
 	[LibraryImport("libCodeBrixNativeMac.dylib")]
 	[return: MarshalAs(UnmanagedType.I1)]
 	internal static partial bool codebrix_app_initialize([MarshalAs(UnmanagedType.I1)] ref bool supportsMetal);

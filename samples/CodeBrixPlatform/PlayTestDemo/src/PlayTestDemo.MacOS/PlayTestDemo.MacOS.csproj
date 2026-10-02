@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <PlayTestDemoHead>MacOS</PlayTestDemoHead>
+    <TargetFramework>net10.0</TargetFramework>
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX_SKIA_MACOS;__CODEBRIX_SKIA_MACOS__</DefineConstants>
+  </PropertyGroup>
+  <Import Project="../../PlayTestDemo.Head.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
+  </ItemGroup>
+  <Import Project="../../../CodeBrix.MacOSHead.targets" />
+</Project>

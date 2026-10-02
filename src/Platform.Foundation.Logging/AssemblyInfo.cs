@@ -106,3 +106,5 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.TextLayout.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Android.UI.TextLayout")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.TextLayout")]
+
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
