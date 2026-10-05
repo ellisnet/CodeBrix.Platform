@@ -52,7 +52,7 @@
 
   <ItemGroup>
     <PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.252.363" />
-    <PackageReference Include="SkiaSharp.Views.WinUI" Version="4.152.0" />
+    <PackageReference Include="SkiaSharp.Views.WinUI" Version="4.153.1" />
   </ItemGroup>
 
   <ItemGroup>

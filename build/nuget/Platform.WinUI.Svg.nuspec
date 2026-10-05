@@ -20,7 +20,7 @@
 		<dependencies>
 			<group targetFramework="net10.0">
 				<dependency id="CodeBrix.Platform.ApacheLicenseForever" version="$codebrixversion$" />
-				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="4.152.0" />
+				<dependency id="CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever" version="4.153.1" />
 				<!-- Stamped with the shared family version at pack time. (The SVG element drew on Graphics2DSK's
 				     SKCanvasElement before the Core/Skia split; it now draws on the SkiaSharp views add-in's
 				     canvas host. The dependency is kept, unchanged, with the package's dependency set.) -->
