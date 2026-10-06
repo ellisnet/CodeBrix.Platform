@@ -39,7 +39,9 @@
 		     Skia implementations of the views' platform surfaces. -->
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Core\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.Core.dll" target="lib\net10.0" />
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Core\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.Core.pdb" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Core\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.Core.xml" target="lib\net10.0" />
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.dll" target="lib\net10.0" />
 		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.pdb" target="lib\net10.0" />
+		<file src="..\..\src\AddIns\CodeBrix.Platform.SkiaSharp.Views\bin\CodeBrix.Platform.SkiaSharp.Views.Skia\Release\net10.0\CodeBrix.Platform.SkiaSharp.Views.xml" target="lib\net10.0" />
 	</files>
 </package>

@@ -10,6 +10,9 @@ public partial class SKXamlCanvas
 	//The platform's surface for this canvas; created before Initialize(), whose first DPI update already repaints.
 	private readonly ISKXamlCanvasPlatform _platform;
 
+	/// <summary>Initializes a new instance of the <see cref="SKXamlCanvas" /> class.</summary>
+	/// <remarks>The canvas paints through the running platform's SkiaSharp views implementation, which the
+	/// CodeBrix.Platform.SkiaSharp.Views package provides for the Skia-based platforms.</remarks>
 	public SKXamlCanvas()
 	{
 		_platform = PlatformContract.Create<ISKXamlCanvasPlatform>(this);

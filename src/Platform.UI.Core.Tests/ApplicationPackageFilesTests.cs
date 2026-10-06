@@ -200,6 +200,7 @@ public class ApplicationPackageFilesTests : IDisposable
 	public async Task When_Both_Library_Folders_Exist_Then_The_Written_Case_Wins()
 	{
 		//Arrange
+		SkipUnlessCaseSensitiveFileSystem();
 		_packageFiles = null;
 		using var installed = new InstalledFolder();
 		installed.Write("MyLibrary/Assets/a.txt", "written");
@@ -216,6 +217,7 @@ public class ApplicationPackageFilesTests : IDisposable
 	public void When_Only_The_Written_Case_Folder_Exists_Then_A_Missing_File_Still_Maps_Into_It()
 	{
 		//Arrange
+		SkipUnlessCaseSensitiveFileSystem();
 		using var installed = new InstalledFolder();
 		installed.Write("MyLibrary/Assets/icon.scale-200.png", "variant");
 
@@ -239,6 +241,28 @@ public class ApplicationPackageFilesTests : IDisposable
 		written.Should().Be("MyLibrary");
 		noHost.Should().BeEmpty();
 	}
+
+	/// <summary>
+	/// Skips a test that needs "MyLibrary" and "mylibrary" to be two different folders. On a case-insensitive file system
+	/// (Windows, and macOS by default) they are one folder, so both spellings resolve to the same files and the test's
+	/// premise cannot be set up.
+	/// </summary>
+	private static void SkipUnlessCaseSensitiveFileSystem()
+		=> Assert.SkipUnless(_isCaseSensitiveFileSystem.Value, "The temporary folder's file system is case-insensitive, so the two library-folder spellings are one folder.");
+
+	private static readonly Lazy<bool> _isCaseSensitiveFileSystem = new(() =>
+	{
+		var probe = Path.Combine(Path.GetTempPath(), "casecheck-" + Guid.NewGuid().ToString("N"));
+		Directory.CreateDirectory(probe);
+		try
+		{
+			return !Directory.Exists(Path.Combine(Path.GetTempPath(), Path.GetFileName(probe).ToUpperInvariant()));
+		}
+		finally
+		{
+			Directory.Delete(probe);
+		}
+	});
 
 	/// <summary>A temporary installed folder that <see cref="StorageFile.ResourcePathBase"/> points at while it lives.</summary>
 	private sealed class InstalledFolder : IDisposable

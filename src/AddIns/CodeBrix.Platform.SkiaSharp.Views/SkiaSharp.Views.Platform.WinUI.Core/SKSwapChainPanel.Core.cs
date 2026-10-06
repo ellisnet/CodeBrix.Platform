@@ -10,6 +10,11 @@ public partial class SKSwapChainPanel
 {
 	private readonly ISKSwapChainPanelPlatform _platform;
 
+	/// <summary>Initializes a new instance of the <see cref="SKSwapChainPanel" /> class.</summary>
+	/// <remarks>The Skia-based platforms have no GPU swap chain: there the panel is not supported (see
+	/// <see cref="RaiseOnUnsupported" />).</remarks>
+	/// <exception cref="System.NotSupportedException">The running platform does not support the panel and
+	/// <see cref="RaiseOnUnsupported" /> is <see langword="true" /> (the default).</exception>
 	public SKSwapChainPanel()
 	{
 		_platform = PlatformContract.Create<ISKSwapChainPanelPlatform>(this);

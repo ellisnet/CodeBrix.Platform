@@ -41,6 +41,12 @@
 		<Description>SkiaSharp views (SKXamlCanvas, SKSwapChainPanel) for CodeBrix.Platform applications - the platform-neutral element API. Vendored from SkiaSharp (MIT) and compiled against CodeBrix.Platform.</Description>
 		<Copyright>Copyright (c) 2026 Jeremy Ellis and contributors. Portions copyright Microsoft Corporation (SkiaSharp, MIT licensed).</Copyright>
 		<NeutralLanguage>en</NeutralLanguage>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build output and the nuspec
+		     packs it beside this dll. The vendored sources carry upstream SkiaSharp's XML comments (taken from the
+		     SkiaSharp release after 4.153.1, where the API docs moved into the source). CS1591 (a public member with
+		     no XML comment) is fixed at source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>

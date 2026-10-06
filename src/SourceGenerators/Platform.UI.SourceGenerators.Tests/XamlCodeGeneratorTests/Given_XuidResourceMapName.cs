@@ -59,7 +59,10 @@ public class Given_XuidResourceMapName
 	/// generated code and the CodeBrixHasLocalizationResources value.</summary>
 	private static (string Code, string HasResources) Generate(string assemblyName, string? resourceMapLibraryName)
 	{
-		var folder = $"/Project/{Guid.NewGuid():N}";
+		// The generator turns the project folder into a Uri, which needs a rooted path on the build host:
+		// "/Project" has no drive on Windows ("Invalid URI").
+		var projectRoot = OperatingSystem.IsWindows() ? "C:/Project" : "/Project";
+		var folder = $"{projectRoot}/{Guid.NewGuid():N}";
 		var page = new InMemoryAdditionalText($"{folder}/MapNamePage.xaml", Xaml);
 		var resources = new InMemoryAdditionalText($"{folder}/Strings/en/Resources.resw", Resw);
 

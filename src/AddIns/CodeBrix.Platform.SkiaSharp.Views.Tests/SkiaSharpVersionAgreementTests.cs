@@ -59,7 +59,7 @@ public class SkiaSharpVersionAgreementTests
 	{
 		//Arrange
 		var addIn = typeof(SKXamlCanvas).Assembly.GetName().Version!;
-		var skiaSharp = typeof(SKObject).Assembly.GetName().Version!;
+		var skiaSharp = GetSkiaSharpPackageVersion();
 
 		//Act
 		var addInTriple = new Version(addIn.Major, addIn.Minor, addIn.Build);
@@ -81,7 +81,7 @@ public class SkiaSharpVersionAgreementTests
 	public void the_addin_informational_version_tracks_the_skiasharp_it_was_built_against()
 	{
 		//Arrange
-		var skiaSharp = typeof(SKObject).Assembly.GetName().Version!;
+		var skiaSharp = GetSkiaSharpPackageVersion();
 		var expectedPrefix = $"{skiaSharp.Major}.{skiaSharp.Minor}.{skiaSharp.Build}";
 
 		//Act
@@ -95,6 +95,19 @@ public class SkiaSharpVersionAgreementTests
 		informational!.StartsWith(expectedPrefix, StringComparison.Ordinal).Should().BeTrue(
 			$"the add-in's informational version '{informational}' must start with the SkiaSharp "
 			+ $"version it vendors ('{expectedPrefix}')");
+	}
+
+	/// <summary>
+	/// The SkiaSharp package version the loaded SkiaSharp.dll came from. SkiaSharp keeps its
+	/// AssemblyVersion at Major.Minor.0.0 across patch releases (package 4.153.1 ships AssemblyVersion
+	/// 4.153.0.0), so the package version is read from its AssemblyFileVersion (4.153.1.0) instead.
+	/// </summary>
+	private static Version GetSkiaSharpPackageVersion()
+	{
+		var fileVersion = typeof(SKObject).Assembly
+			.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+		fileVersion.Should().NotBeNull("SkiaSharp.dll must carry an AssemblyFileVersion");
+		return Version.Parse(fileVersion!);
 	}
 
 	[Fact]

@@ -62,6 +62,12 @@ internal static class TestPlatform
 			// AnalyticsInfo.DeviceForm is with no extension at all - so every other test sees the value it saw before.
 			ApiExtensibility.Register(typeof(Windows.System.Profile.Internal.IAnalyticsInfoExtension), _ => DeviceForm);
 
+			// The user's preferred languages. ApplicationLanguages reads them only on Windows (elsewhere it uses the
+			// manifest languages alone), so controls that load localized strings or create a Calendar reach this contract
+			// only on a Windows host. It reports none, so Windows falls back to the manifest languages like every other OS.
+			var globalizationPreferences = new NoGlobalizationPreferencesPlatform();
+			ApiExtensibility.Register(typeof(CodeBrix.Platform.Contracts.IGlobalizationPreferencesPlatform), _ => globalizationPreferences);
+
 			_registered = true;
 		}
 	}
@@ -93,6 +99,12 @@ internal static class TestPlatform
 		public string GetTemporaryFolderPath() => System.IO.Path.Combine(_root, "Temp");
 
 		public string GetSettingsFolderPath() => System.IO.Path.Combine(_root, "Settings");
+	}
+
+	/// <summary>An operating system that reports no preferred languages.</summary>
+	private sealed class NoGlobalizationPreferencesPlatform : CodeBrix.Platform.Contracts.IGlobalizationPreferencesPlatform
+	{
+		public System.Collections.Generic.IReadOnlyList<string> Languages { get; } = [];
 	}
 
 	/// <summary>The application-level platform: it has no extensions of its own to register.</summary>

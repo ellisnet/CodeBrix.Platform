@@ -35,6 +35,7 @@ public sealed class IconAssetLocatorTests : IDisposable
 	public void a_lower_case_library_folder_is_still_found()
 	{
 		//Arrange
+		SkipUnlessCaseSensitiveFileSystem();
 		Write("mylibrary/Icons/open.png");
 
 		//Act
@@ -62,6 +63,7 @@ public sealed class IconAssetLocatorTests : IDisposable
 	public void a_scale_variant_only_file_maps_into_the_written_case_folder_that_exists()
 	{
 		//Arrange
+		SkipUnlessCaseSensitiveFileSystem();
 		Write("MyLibrary/Icons/open.scale-200.png");
 
 		//Act
@@ -86,6 +88,28 @@ public sealed class IconAssetLocatorTests : IDisposable
 		var parsed = new Uri(uri);
 		return CodeBrix.Platform.UI.CommandBar.IconAssetLocator.ResolveHostFolder(parsed, _installed, Uri.UnescapeDataString(parsed.AbsolutePath).TrimStart('/'));
 	}
+
+	/// <summary>
+	/// Skips a test that needs "MyLibrary" and "mylibrary" to be two different folders. On a case-insensitive file system
+	/// (Windows, and macOS by default) they are one folder, so both spellings resolve to the same files and the test's
+	/// premise cannot be set up.
+	/// </summary>
+	private static void SkipUnlessCaseSensitiveFileSystem()
+		=> Assert.SkipUnless(_isCaseSensitiveFileSystem.Value, "The temporary folder's file system is case-insensitive, so the two library-folder spellings are one folder.");
+
+	private static readonly Lazy<bool> _isCaseSensitiveFileSystem = new(() =>
+	{
+		var probe = Path.Combine(Path.GetTempPath(), "casecheck-" + Guid.NewGuid().ToString("N"));
+		Directory.CreateDirectory(probe);
+		try
+		{
+			return !Directory.Exists(Path.Combine(Path.GetTempPath(), Path.GetFileName(probe).ToUpperInvariant()));
+		}
+		finally
+		{
+			Directory.Delete(probe);
+		}
+	});
 
 	private void Write(string relativePath)
 	{
