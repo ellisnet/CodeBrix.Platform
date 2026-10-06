@@ -13,8 +13,8 @@ xcrun --sdk macosx clang -dynamiclib -fobjc-arc -fmodules \
   -install_name @rpath/libCodeBrixNativeMac.dylib \
   "${native_flags[@]}" "$native_root"/PlatformNativeMac/*.m "$skia_library" \
   -framework AppKit -framework Metal -framework QuartzCore -framework WebKit \
-  -framework AVFoundation -framework CoreMedia \
+  -framework AVFoundation -framework CoreMedia -framework UniformTypeIdentifiers \
   -o "$native_output/libCodeBrixNativeMac.dylib"
-xcrun lipo "$native_output/libCodeBrixNativeMac.dylib" -verify_arch x86_64 arm64
+for native_arch in x86_64 arm64; do xcrun lipo "$native_output/libCodeBrixNativeMac.dylib" -verify_arch "$native_arch"; done
 codesign --force --sign - "$native_output/libCodeBrixNativeMac.dylib"
 echo "Universal native host: $native_output/libCodeBrixNativeMac.dylib"

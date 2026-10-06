@@ -259,12 +259,7 @@ void codebrix_webview_download_cancel(void *download)
 NSView* codebrix_webview_create(NSWindow *window, const char *ok, const char *cancel)
 {
     WKWebViewConfiguration* config = [[WKWebViewConfiguration alloc] init];
-    if (@available(macOS 11, *)) {
-        config.defaultWebpagePreferences.allowsContentJavaScript = YES;
-    } else {
-        // dotnet 9 still supports macOS 10.15
-        config.preferences.javaScriptEnabled = YES;
-    }
+    config.defaultWebpagePreferences.allowsContentJavaScript = YES;
     config.preferences.javaScriptCanOpenWindowsAutomatically = YES;
     config.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeVideo | WKAudiovisualMediaTypeAudio;
     

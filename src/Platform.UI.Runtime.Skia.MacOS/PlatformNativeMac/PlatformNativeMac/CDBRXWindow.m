@@ -955,12 +955,12 @@ NSOperatingSystemVersion _osVersion;
 #endif
             break;
         }
-#if DEBUG
         default: {
+#if DEBUG
             NSLog(@"Unhandled Event: %@", event);
+#endif
             break;
         }
-#endif
     }
 
     if (_osVersion.majorVersion >= 15) {

@@ -3,6 +3,7 @@
 //
 
 #import "CDBRXPickers.h"
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 
 NSURL* get_best_location(int32_t suggestedStartLocation)
 {
@@ -52,12 +53,16 @@ NSURL* get_best_location(int32_t suggestedStartLocation)
     return [[NSFileManager defaultManager] URLsForDirectory:path inDomains:NSUserDomainMask][0];
 }
 
-NSMutableArray<NSString*>* get_allowed(char* filters[], int filterSize)
+NSArray<UTType*>* get_allowed(char* filters[], int filterSize)
 {
-    NSMutableArray<NSString*> *allowed = [[NSMutableArray alloc] initWithCapacity:filterSize];
+    NSMutableArray<UTType*> *allowed = [[NSMutableArray alloc] initWithCapacity:filterSize];
     for (int i=0; i < filterSize; i++) {
-        NSString *s = [NSString stringWithUTF8String:filters[i]];
-        [allowed addObject:s];
+        NSString *ext = [NSString stringWithUTF8String:filters[i]];
+        // unknown extensions resolve to a dynamic type that still matches by extension
+        UTType *type = [UTType typeWithFilenameExtension:ext];
+        if (type) {
+            [allowed addObject:type];
+        }
     }
     return allowed;
 }
@@ -67,7 +72,6 @@ char* codebrix_pick_single_folder(const char* _Nullable prompt, const char* _Nul
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FolderPicker.macOS.cs
     // filters are not applied in WinUI so we don't set them up here
-    panel.allowedFileTypes = [NSArray arrayWithObject:@"none"];
     panel.canChooseDirectories = true;
     panel.canChooseFiles = false;
     panel.directoryURL = get_best_location(suggestedStartLocation);
@@ -98,7 +102,7 @@ char* codebrix_pick_single_file(const char* _Nullable prompt, const char* _Nulla
 {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileOpenPicker.macOS.cs
-    panel.allowedFileTypes = get_allowed(filters, filterSize);
+    panel.allowedContentTypes = get_allowed(filters, filterSize);
     panel.canChooseDirectories = false;
     panel.canChooseFiles = true;
     panel.allowsMultipleSelection = false;
@@ -130,7 +134,7 @@ char** codebrix_pick_multiple_files(const char* _Nullable prompt, const char* _N
 {
     NSOpenPanel *panel = [NSOpenPanel openPanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileOpenPicker.macOS.cs
-    panel.allowedFileTypes = get_allowed(filters, filterSize);
+    panel.allowedContentTypes = get_allowed(filters, filterSize);
     panel.canChooseDirectories = false;
     panel.canChooseFiles = true;
     panel.allowsMultipleSelection = true;
@@ -170,7 +174,7 @@ char* codebrix_pick_save_file(const char* _Nullable prompt, const char* _Nullabl
     NSSavePanel *panel = [NSSavePanel savePanel];
     // based on settings from uno/src/Platform.UWP/Storage/Pickers/FileSavePicker.macOS.cs
     panel.allowsOtherFileTypes = true;
-    panel.allowedFileTypes = get_allowed(filters, filterSize);
+    panel.allowedContentTypes = get_allowed(filters, filterSize);
     panel.directoryURL = get_best_location(suggestedStartLocation);
     if (identifier) {
         panel.identifier = [NSString stringWithUTF8String:identifier];

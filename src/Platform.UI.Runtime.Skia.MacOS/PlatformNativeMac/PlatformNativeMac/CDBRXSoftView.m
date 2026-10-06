@@ -34,7 +34,7 @@
                                      /* bitsPerPixel */ 32,
                                      /* bytesPerRow */ rowBytes,
                                      colorspace,
-                                     /* CGBitmapInfo */ kCGBitmapByteOrder32Big | kCGImageAlphaPremultipliedLast,
+                                     /* CGBitmapInfo */ kCGBitmapByteOrder32Big | (CGBitmapInfo)kCGImageAlphaPremultipliedLast,
                                      provider,
                                      /* const CGFloat *decode */ NULL,
                                      /* shouldInterpolate */ FALSE,
