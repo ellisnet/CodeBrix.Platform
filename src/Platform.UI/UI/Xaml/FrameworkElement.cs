@@ -538,11 +538,12 @@ namespace Microsoft.UI.Xaml
 
 		#region Requested theme dependency property
 
-		// TODO Uno: ActualTheme should always be initialized with Application.Current.RequestedTheme,
-		// and should trigger ActualThemeChanged, when the element enters the visual tree, where some
-		// higher-level element has explicitly changed its RequestedTheme. This may could start working
-		// automatically when the RequestedTheme property supports inheritance.
-
+		/// <summary>
+		/// Gets or sets the theme this element and its subtree use for theme resources (brushes, colours, the
+		/// theme-dependent values of default control styles and the default text foreground). Default follows the
+		/// nearest ancestor that sets a theme, else the application's theme; a descendant that sets its own theme
+		/// overrides it for its subtree.
+		/// </summary>
 		public ElementTheme RequestedTheme
 		{
 			get => (ElementTheme)GetValue(RequestedThemeProperty);
@@ -557,25 +558,6 @@ namespace Microsoft.UI.Xaml
 				new FrameworkPropertyMetadata(
 					ElementTheme.Default,
 					(o, e) => ((FrameworkElement)o).OnRequestedThemeChanged((ElementTheme)e.OldValue, (ElementTheme)e.NewValue)));
-
-		private void OnRequestedThemeChanged(ElementTheme oldValue, ElementTheme newValue)
-		{
-			SyncRootRequestedTheme();
-
-			if (ActualThemeChanged != null)
-			{
-				var actualThemeChanged =
-					// 1. Previously was default, and new explicit value differs from application theme
-					(oldValue == ElementTheme.Default && Application.Current?.ActualElementTheme != newValue) ||
-					// 2. Previously was explicit, and new ActualTheme is different
-					(oldValue != ElementTheme.Default && oldValue != ActualTheme);
-
-				if (actualThemeChanged)
-				{
-					ActualThemeChanged?.Invoke(this, null);
-				}
-			}
-		}
 
 		private void SyncRootRequestedTheme()
 		{
@@ -593,13 +575,18 @@ namespace Microsoft.UI.Xaml
 		/// preference for the overall theme of an app.
 		/// </summary>
 		/// <remarks>
-		/// This is always either Dark or Light. By default the color matches Application.Current.RequestedTheme.
-		/// When the FrameworkElement.RequestedTheme has non-default value, it has precedence.
+		/// This is always either Dark or Light: the element's own RequestedTheme when set, else the RequestedTheme of
+		/// the nearest ancestor that sets one, else Application.Current.RequestedTheme.
 		/// When the value changes ActualThemeChanged event is triggered.
 		/// </remarks>
-		public ElementTheme ActualTheme => RequestedTheme == ElementTheme.Default ?
-			(Application.Current?.ActualElementTheme ?? ElementTheme.Light) :
-			RequestedTheme;
+		public ElementTheme ActualTheme
+		{
+			get
+			{
+				var theme = GetEffectiveThemeOverride();
+				return theme != ElementTheme.Default ? theme : (Application.Current?.ActualElementTheme ?? ElementTheme.Light);
+			}
+		}
 
 		/// <summary>
 		/// Occurs when the ActualTheme property value has changed.
@@ -970,13 +957,19 @@ namespace Microsoft.UI.Xaml
 		/// </summary>
 		internal virtual void UpdateThemeBindings(ResourceUpdateReason updateReason)
 		{
-			TryGetResources()?.UpdateThemeBindings(updateReason);
+			if (TryGetResources() is { } resources)
+			{
+				// The element's own resources resolve their theme references in the element's theme.
+				using var themeScope = EnterThemeScope(this);
+				resources.UpdateThemeBindings(updateReason);
+			}
+
 			(this as IDependencyObjectStoreProvider).Store.UpdateResourceBindings(updateReason);
 
 			if (updateReason == ResourceUpdateReason.ThemeResource)
 			{
 				// Trigger ActualThemeChanged if relevant
-				if (ActualThemeChanged != null && RequestedTheme == ElementTheme.Default)
+				if (ActualThemeChanged != null && ShouldRaiseActualThemeChangedFromThemeWalk())
 				{
 					try
 					{

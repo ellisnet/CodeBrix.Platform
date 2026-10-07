@@ -94,11 +94,16 @@ PlayTestDemo
 A dedicated application for PlayTest control and picker regression coverage.
 Its shared XAML contains checked controls, a nested scrolling target and normal
 folder/open/multiple-open/save picker buttons with visible results. Desktop heads
-use their usual pickers; PlayTests supplies paths or cancellation without UI.
-Its serialized UI cases hold the generic control/picker regression coverage
-(moved out of JustBetweenUs), method- and case-level orientation
-demonstrations and the desktop-control cases; every case here needs the running
-application. Configuration-only cases (preference precedence, command-line
+use their usual pickers; PlayTests supplies paths, cancellation or failures
+without UI. "Try the API lab" opens a screen for held keys, hidden and
+duplicate elements, the mouse wheel, option selection, dialogs, launching,
+window events and screenshots; "Try OpenGL" opens a raw-OpenGL square and a
+GPU Skia circle, which the PlayTests measure with PixelStats through
+CodeBrix.Platform.PlayTest.OpenGL (tests/PlayTestDemo.NoOpenGL.PlayTests runs the
+same application without OpenGL). Its serialized UI cases hold the
+generic control/picker regression coverage (moved out of JustBetweenUs),
+method- and case-level orientation demonstrations, the desktop-control cases
+and the API-lab cases; every case here needs the running application. Configuration-only cases (preference precedence, command-line
 switches, invalid values) live in the host-free
 src/Platform.UI.Runtime.Skia.PlayTest.Tests project instead.
 Uses SilverAssertions, disabled nullable/implicit usings, and source references
@@ -107,6 +112,7 @@ See the sample README for headed mode, theme/orientation preferences and layout.
 
     dotnet run --project samples/CodeBrixPlatform/PlayTestDemo/src/PlayTestDemo.LinuxX11 -c Release
     dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.NoOpenGL.PlayTests/PlayTestDemo.NoOpenGL.PlayTests.csproj -c Release
 
 JustBetweenUs
 -------------

@@ -593,6 +593,27 @@ internal sealed unsafe class WpeWebView
 	public void Resize(uint logicalWidth, uint logicalHeight) => WpeThread.Post(() =>
 		LibWpe.wpe_view_backend_dispatch_set_size(_backend, Math.Max(1, logicalWidth), Math.Max(1, logicalHeight)));
 
+	/// <summary>
+	/// Sets the colour the engine paints behind the page - every pixel of a frame the document does not paint
+	/// itself. Opaque only: the frames come back as XRGB, so a transparent background would read as black.
+	/// </summary>
+	public void SetBackgroundColor(SKColor color) => WpeThread.Post(() =>
+	{
+		if (_webView == IntPtr.Zero)
+		{
+			return;
+		}
+
+		var webKitColor = new WebKitInterop.WebKitColor
+		{
+			Red = color.Red / 255.0,
+			Green = color.Green / 255.0,
+			Blue = color.Blue / 255.0,
+			Alpha = 1.0,
+		};
+		WebKitInterop.webkit_web_view_set_background_color(_webView, ref webKitColor);
+	});
+
 	public void SetScale(float scale) => WpeThread.Post(() =>
 		LibWpe.wpe_view_backend_dispatch_set_device_scale_factor(_backend, Math.Clamp(scale, 0.05f, 5.0f)));
 

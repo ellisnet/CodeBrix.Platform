@@ -16,4 +16,11 @@ internal interface INativeOpenGLWrapper : IDisposable
 
 	/// <returns>A disposable that restores the OpenGL context to what it was at the time of this method call.</returns>
 	public IDisposable MakeCurrent();
+
+	/// <summary>
+	/// The flavour of the context this wrapper hands out, when the wrapper knows it: <see langword="true"/> for
+	/// OpenGL ES, <see langword="false"/> for desktop OpenGL, <see langword="null"/> (the default) when the
+	/// consumer should decide from the running head instead.
+	/// </summary>
+	public bool? UsesGles => null;
 }

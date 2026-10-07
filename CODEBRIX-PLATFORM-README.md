@@ -255,6 +255,14 @@ A .NET 10 test head for real application XAML and view models, with C# locator/a
 
 ---
 
+**CodeBrix.Platform.PlayTest.OpenGL**
+NuGet Package ID: `CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+The OpenGL provider for the PlayTest head, for applications that use the Graphics3DGL add-in. A test project references it beside the PlayTest package and calls `CodeBrixPlayTestOpenGL.Register()`; from then on `GLCanvasElement`, `SkiaGLCanvasElement`, `OffscreenGLContext` and `SkiaGpuContext` get real contexts and their pixels appear in screenshots. Linux uses the system Mesa EGL on its surfaceless platform (no display needed), Windows uses WGL like the Win32 head, and macOS uses ANGLE on Metal like the macOS head. A machine that cannot create a context fails the launch with the concrete reason. GL content is asserted with the PlayTest head's in-run `PixelStats` measurements, never against saved images. Vulkan is not supported.
+
+---
+
 **CodeBrix.Platform.WebView**
 NuGet Package ID: `CodeBrix.Platform.WebView.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)

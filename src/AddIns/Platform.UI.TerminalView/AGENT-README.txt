@@ -233,6 +233,25 @@ Methods:
         Gives the control keyboard focus (FocusState.Programmatic). Call it
         after connecting a session so typing goes straight to the host.
 
+    public IReadOnlyList<string> GetVisibleLines()
+        The text of the rows the terminal shows now: exactly Rows strings,
+        top to bottom, following the scroll position (a view scrolled back
+        into history returns those history rows). Trailing blanks are
+        removed; an empty row is "". Read-only snapshot.
+
+    public string GetText()
+        The text of the whole buffer - the scrollback and the screen - as
+        one string. Rows are separated by '\n'; a row the terminal wrapped
+        is joined to the row it continues, so a long line reads back as one
+        line. Trailing blanks and trailing empty lines are removed; "" after
+        Reset or before anything was written. Read-only snapshot.
+
+        Both read what the engine already holds (no extra buffering) and
+        must be called on the UI thread. Feed applies data on the UI thread
+        through the dispatcher queue, so text fed a moment ago appears once
+        that work item has run - a test polls until the expected text shows
+        up rather than reading straight after Feed.
+
 Keyboard behaviour (what happens before InputEmitted fires):
   - Ctrl+Shift+C copies, Ctrl+Shift+V pastes; neither reaches the host.
   - A character outside the Basic Multilingual Plane (an emoji) that a
@@ -670,6 +689,8 @@ QUICK REFERENCE CARD
                 Feed(byte[] data, int length)  any thread; copies; bytes
                 Reset()                    RIS
                 GrabFocus()                keyboard focus
+                GetVisibleLines()          UI thread; the shown rows' text
+                GetText()                  UI thread; scrollback + screen
 
     Three wires:   InputEmitted -> transport.Write(UTF8 bytes)
                    GridResized  -> ChangeWindowSize / Pty.SetWinSize

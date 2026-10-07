@@ -76,6 +76,20 @@ internal static class WebKitInterop
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
 	public static extern void webkit_web_view_set_settings(IntPtr webView, IntPtr settings);
 
+	// WebKitColor: four gdouble channels in 0..1 (wpe-webkit-2.0 WebKitColor.h).
+	[StructLayout(LayoutKind.Sequential)]
+	public struct WebKitColor
+	{
+		public double Red;
+		public double Green;
+		public double Blue;
+		public double Alpha;
+	}
+
+	// The colour the engine paints behind the page (where the document paints no background of its own).
+	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
+	public static extern void webkit_web_view_set_background_color(IntPtr webView, ref WebKitColor color);
+
 	[DllImport(NativeLibraries.WpeWebKit, CallingConvention = CallingConvention.Cdecl)]
 	public static extern IntPtr webkit_user_content_manager_new();
 

@@ -260,10 +260,19 @@ build_metadata.AdditionalFiles.SourceItemGroup = PRIResource
 				// assemblies for which a local replacement is provided (mapping CodeBrix.Platform.* back to its Uno.*
 				// name) so the local surface is authoritative and coherent. CodeBrixAssemblyHelper loads the full local
 				// surface (UI, Toolkit, Foundation, ...), so the stripped NuGet assemblies all have a replacement.
-				var replacedNuGetFileNames = localAssemblies
+				//
+				// Since the Core/Skia split the CodeBrix.Platform package also ships "<Name>.Core.dll" assemblies that
+				// hold the types (Page, ContentDialog, ...) the local unit-test flavor declares in "<Name>.dll". Those
+				// are stripped too, under their own name and under the .Core name, or every type that moved to a Core
+				// assembly is declared twice and resolves to nothing ("The type ...Page could not be found").
+				var localFileNames = localAssemblies
 					.Select(r => System.IO.Path.GetFileName(r.FilePath ?? string.Empty))
 					.Where(f => f.StartsWith("CodeBrix.Platform", System.StringComparison.OrdinalIgnoreCase))
+					.ToArray();
+				var replacedNuGetFileNames = localFileNames
 					.Select(f => "Uno" + f.Substring("CodeBrix.Platform".Length))
+					.Concat(localFileNames)
+					.Concat(localFileNames.Select(f => System.IO.Path.GetFileNameWithoutExtension(f) + ".Core.dll"))
 					.ToHashSet(System.StringComparer.OrdinalIgnoreCase);
 
 				foreach (var reference in project.MetadataReferences.ToArray())
@@ -294,6 +303,23 @@ build_metadata.AdditionalFiles.SourceItemGroup = PRIResource
 				}
 
 				var currentTestPrefix = $"CodeBrix.Platform.UI.SourceGenerators.Tests.XamlCodeGeneratorTests.{TestOutputFolderName}.{Path.GetFileNameWithoutExtension(_testFilePath)}.{_testMethodName}.";
+
+#if !WRITE_EXPECTED
+				// The Out/ baselines are git-ignored (they are not committed), so a fresh clone has none. A test whose
+				// generator produced files but that has NO baseline at all is SKIPPED (inconclusive) instead of failing on
+				// "Produced but no baseline"; a test that HAS a baseline is still compared file by file and fails on a
+				// real mismatch.
+				if (expectedNames.Count > 0
+					&& !GetType().Assembly.GetManifestResourceNames().Any(n => n.StartsWith(currentTestPrefix, StringComparison.Ordinal)))
+				{
+					Assert.Inconclusive(
+						$"No generator baseline for this test: '{resourceDirectory}' does not exist (the XamlCodeGeneratorTests/Out/ baselines " +
+						"are git-ignored). To create it, uncomment '#define WRITE_EXPECTED' at the top of " +
+						"XamlCodeGeneratorTests/Verifiers/CSGenerator.cs, run this test once in Debug, review the files it writes, " +
+						"comment the define again and rebuild.");
+				}
+#endif
+
 				foreach (var name in GetType().Assembly.GetManifestResourceNames())
 				{
 					if (!name.StartsWith(currentTestPrefix))

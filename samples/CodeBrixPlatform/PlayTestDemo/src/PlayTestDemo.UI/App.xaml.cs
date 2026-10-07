@@ -22,6 +22,7 @@ public partial class App : Application
         var frame = new Frame();
         frame.NavigationFailed += OnNavigationFailed;
         _window = new Window { Title = "PlayTestDemo", Content = frame };
+        WindowLifecycle.Attach(_window);
         frame.Navigate(typeof(Views.MainPage), args.Arguments);
         _window.Activate();
     }

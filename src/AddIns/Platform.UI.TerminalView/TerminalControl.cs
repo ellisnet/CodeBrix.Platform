@@ -1,6 +1,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using CodeBrix.Platform.UI.TerminalView.Engine;
 using CodeBrix.Platform.UI.TerminalView.Input;
 using CodeBrix.Platform.UI.TerminalView.Internal;
@@ -301,6 +302,26 @@ public sealed partial class TerminalControl : Control
 
     /// <summary>Gives the control keyboard focus.</summary>
     public void GrabFocus() => Focus(FocusState.Programmatic);
+
+    /// <summary>
+    /// Gets the text of the rows the terminal shows now: one string per row, top to bottom, following the scroll
+    /// position (a scrolled-back view returns the history rows it shows). Trailing blanks are removed; an empty row
+    /// is an empty string. Read-only - a snapshot taken when called.
+    /// </summary>
+    /// <remarks>Call it on the UI thread: <see cref="Feed(string)"/> applies data there, so text fed from another
+    /// thread appears once the UI thread has processed it.</remarks>
+    /// <returns>The visible rows' text.</returns>
+    public IReadOnlyList<string> GetVisibleLines() => _renderer.GetVisibleLines();
+
+    /// <summary>
+    /// Gets the text of the whole buffer - the scrollback (up to <see cref="Scrollback"/> rows) and the screen - as
+    /// one string. Rows are separated by '\n'; a row the terminal wrapped is joined to the row it continues, so a
+    /// long line reads back as one line. Trailing blanks and trailing empty lines are removed. Read-only - a
+    /// snapshot taken when called.
+    /// </summary>
+    /// <remarks>Call it on the UI thread, as for <see cref="GetVisibleLines"/>.</remarks>
+    /// <returns>The buffer's text; empty when nothing has been written (or after <see cref="Reset"/>).</returns>
+    public string GetText() => _renderer.GetText();
 
     private UIElement CreateTemplateRoot()
     {

@@ -157,6 +157,9 @@ namespace Microsoft.UI.Xaml
 
 		internal void ApplyValue(IFrameworkElement owner)
 		{
+			// A visual-state setter's theme resource resolves in the owner's theme (its own or an ancestor's RequestedTheme).
+			using var themeScope = FrameworkElement.EnterThemeScope(owner as DependencyObject);
+
 			var path = TryGetOrCreateBindingPath(owner);
 
 			if (path != null)

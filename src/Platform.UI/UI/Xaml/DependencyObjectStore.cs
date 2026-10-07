@@ -1194,8 +1194,75 @@ namespace Microsoft.UI.Xaml
 		// Keep a list of inherited properties that have been updated so they can be reset.
 		HashSet<DependencyProperty>? _updatedProperties;
 
+		/// <summary>
+		/// True when this object is an element that sets its own RequestedTheme: the inherited text foreground
+		/// restarts there from the theme's default.
+		/// </summary>
+		private bool IsThemeBoundary()
+			=> FrameworkElement.HasElementThemeOverrides
+				&& ActualInstance is FrameworkElement { HasRequestedThemeOverride: true };
+
+		/// <summary>
+		/// Applies or removes the text foreground inheritance boundary after the element's RequestedTheme changed.
+		/// </summary>
+		/// <param name="wasBoundary">True when the element had its own RequestedTheme before the change.</param>
+		/// <param name="isBoundary">True when the element has its own RequestedTheme after the change.</param>
+		internal void OnThemeBoundaryChanged(bool wasBoundary, bool isBoundary)
+		{
+			if (isBoundary && !wasBoundary)
+			{
+				// Drop the text foreground inherited from above, on the element and on what it forwards.
+				foreach (var property in DependencyProperty.GetInheritedPropertiesForType(_originalObjectType))
+				{
+					if (property.IsInheritedTextForeground)
+					{
+						SetValue(property, DependencyProperty.UnsetValue, DependencyPropertyValuePrecedences.Inheritance);
+					}
+				}
+
+				List<DependencyProperty>? forwarded = null;
+				foreach (var property in _inheritedForwardedProperties.Keys)
+				{
+					if (property.IsInheritedTextForeground)
+					{
+						(forwarded ??= new()).Add(property);
+					}
+				}
+
+				if (forwarded is not null)
+				{
+					foreach (var property in forwarded)
+					{
+						var source = _inheritedForwardedProperties[property];
+						_inheritedForwardedProperties.Remove(property);
+
+						var localChildrenStores = _childrenStores;
+						for (var storeIndex = 0; storeIndex < localChildrenStores.Count; storeIndex++)
+						{
+							localChildrenStores[storeIndex].OnParentPropertyChangedCallback(source, property, DependencyProperty.UnsetValue);
+						}
+					}
+				}
+			}
+			else if (wasBoundary && !isBoundary)
+			{
+				// Inherit again: the parent passes its inheritable values down to this element once more.
+				if (Parent is IDependencyObjectStoreProvider parentProvider)
+				{
+					parentProvider.Store.PropagateInheritedProperties(this);
+				}
+			}
+		}
+
 		private void OnParentPropertyChangedCallback(ManagedWeakReference sourceInstance, DependencyProperty parentProperty, object? newValue)
 		{
+			if (parentProperty.IsInheritedTextForeground && IsThemeBoundary())
+			{
+				// An element with its own RequestedTheme restarts the text foreground from its theme's default, so the
+				// value inherited from above does not reach it or its subtree.
+				newValue = DependencyProperty.UnsetValue;
+			}
+
 			var (localProperty, propertyDetails) = GetLocalPropertyDetails(parentProperty);
 
 			if (localProperty != null)
@@ -1213,9 +1280,18 @@ namespace Microsoft.UI.Xaml
 			}
 			else
 			{
-				// Always update the inherited properties with the new value, the instance
-				// may change if a far ancestor changed.
-				_inheritedForwardedProperties[parentProperty] = sourceInstance;
+				if (newValue == DependencyProperty.UnsetValue && parentProperty.IsInheritedTextForeground)
+				{
+					// Nothing is inherited any more (a theme boundary above, or the source fell back to its own
+					// default): forget the source, so children added later do not read it again.
+					_inheritedForwardedProperties.Remove(parentProperty);
+				}
+				else
+				{
+					// Always update the inherited properties with the new value, the instance
+					// may change if a far ancestor changed.
+					_inheritedForwardedProperties[parentProperty] = sourceInstance;
+				}
 
 				// If not, propagate the DP down to the child listeners, if any.
 				var localChildrenStores = _childrenStores;
@@ -1388,6 +1464,11 @@ namespace Microsoft.UI.Xaml
 			{
 				throw new ArgumentException();
 			}
+
+			// Theme resources resolve in the effective theme of the element (or of the element providing the context).
+			using var themeScope = FrameworkElement.HasElementThemeOverrides
+				? FrameworkElement.EnterThemeScope(ActualInstance, resourceContextProvider)
+				: default;
 
 			ResourceDictionary[]? dictionariesInScope = null;
 
@@ -2011,10 +2092,16 @@ namespace Microsoft.UI.Xaml
 				// Raise the property change for generic handlers for inheritance
 				if (frameworkPropertyMetadata.Options.HasInherits())
 				{
+					// A text foreground that fell back to its default is not passed down: the default is per element
+					// (it follows the element's theme), so each child uses its own.
+					var inheritedValue = newPrecedence == DependencyPropertyValuePrecedences.DefaultValue && property.IsInheritedTextForeground
+						? DependencyProperty.UnsetValue
+						: newValue;
+
 					var localChildrenStores = _childrenStores;
 					for (var storeIndex = 0; storeIndex < localChildrenStores.Count; storeIndex++)
 					{
-						CallChildCallback(localChildrenStores[storeIndex], instanceRef, property, newValue);
+						CallChildCallback(localChildrenStores[storeIndex], instanceRef, property, inheritedValue);
 					}
 				}
 			}
@@ -2221,6 +2308,9 @@ namespace Microsoft.UI.Xaml
 
 		private void OnParentChanged(object? previousParent, object? value)
 		{
+			// Inherited element themes follow the tree.
+			FrameworkElement.InvalidateElementThemes();
+
 			if (_parentChangedCallbacks.Data.Length != 0)
 			{
 				var actualInstanceAlias = ActualInstance;

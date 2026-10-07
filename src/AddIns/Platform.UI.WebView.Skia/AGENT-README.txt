@@ -562,6 +562,19 @@ MyApp.UI/Views/MainPage.xaml:
 
 That is a working browser on all six heads.
 
+PAGE BACKGROUND (Linux)
+=======================
+Where a page paints no background of its own, the Linux (WPE) head paints
+the WebView2 control's Background behind it when that is an opaque
+SolidColorBrush - set Background="{ThemeResource
+ApplicationPageBackgroundThemeBrush}" (or any solid colour) to make a page
+without its own CSS background follow your theme; the binding follows later
+changes of Background, including a theme switch. Without a Background (the
+default) or with a non-opaque brush it is white, the default background of a
+web document. A page that sets its own CSS background always shows that.
+A frame made for a different size than the control (just after a resize) is
+drawn at its own size, never stretched, over the same colour.
+
 PERFORMANCE TIPS
 ================
   - Linux: each rendered web frame is copied into a Skia image and composited;

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CodeBrix.Platform.ApplicationModel.Core;
 using CodeBrix.Platform.ApplicationModel.DataTransfer;
 using CodeBrix.Platform.Foundation.Extensibility;
+using CodeBrix.Platform.Graphics;
 using CodeBrix.Platform.Helpers.Theming;
 using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Dispatching;
@@ -27,6 +28,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private readonly Func<Application> _factory;
     private readonly VirtualSystemTheme _theme;
     private readonly PlayTestFilePickers _filePickers;
+    private readonly PlayTestLauncher _launcher;
+    private readonly PlayTestOpenGLPlan _openGL;
     private readonly BlockingCollection<Action> _queue = new();
     private readonly ManualResetEventSlim _exit = new();
     private readonly AutoResetEvent _render = new(false);
@@ -37,6 +40,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private Thread? _renderThread;
     private volatile bool _stopping;
     private Exception? _failure;
+    // The failure is a test-configuration error (an OpenGL element with no provider): report its own message.
+    private volatile bool _failureIsConfiguration;
     private VirtualFrame? _frame;
     private volatile VirtualScreen _screen;
     private long _sequence;
@@ -49,15 +54,18 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     internal int Height => _screen.Height;
     internal ScreenOrientation Orientation => _screen.Orientation;
     internal event Action<VirtualFrame>? FramePresented;
+    internal PlayTestOpenGLInfo? OpenGL { get; private set; }
     internal UIElement? Root => Window.Root;
     UIElement? IXamlRootHost.RootElement => Root;
     public bool CanExit => true;
 
-    internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers)
+    internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers, PlayTestLauncher launcher, PlayTestOpenGLPlan openGL)
     {
         _factory = factory;
+        _openGL = openGL;
         _theme = new VirtualSystemTheme(theme);
         _filePickers = filePickers;
+        _launcher = launcher;
         _screen = new VirtualScreen(portrait ? ScreenOrientation.Portrait : ScreenOrientation.Landscape);
         Window = new VirtualWindow(this);
         Input = new VirtualInput(this);
@@ -85,6 +93,9 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => _theme);
         SystemThemeHelper.RefreshSystemTheme();
         _filePickers.Register();
+        // Like the desktop heads, register a launcher so Launcher.LaunchUriAsync never falls back to
+        // starting a process: links, files and folders are recorded for the test instead.
+        _launcher.Register();
         // Discover the application's optional add-in without adding a browser dependency
         // to PlayTest or registering any desktop head's native-window provider.
         var providerName = OperatingSystem.IsWindows() ? "WindowsOffscreenWebViewProvider"
@@ -109,6 +120,12 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         ApiExtensibility.Register(typeof(Windows.UI.ViewManagement.IApplicationViewExtension), _ => new VirtualApplicationView());
         ApiExtensibility.Register(typeof(IDisplayInformationExtension), _ => new VirtualDisplay(this));
         ApiExtensibility.Register(typeof(IClipboardExtension), _ => Clipboard);
+        // OpenGL elements ask for an INativeOpenGLWrapper per XamlRoot, as on the desktop heads. A registered
+        // provider must create a working context now (on this UI thread, where every later context is made
+        // current), so a machine without OpenGL fails the launch with the provider's reason.
+        OpenGL = PlayTestOpenGLSetup.Probe(_openGL);
+        if (PlayTestOpenGLSetup.WrapperFactory(_openGL, FailConfiguration) is { } openGLFactory)
+            ApiExtensibility.Register<XamlRoot>(typeof(INativeOpenGLWrapper), openGLFactory);
         Application.Start(_ =>
         {
             var app = _factory();
@@ -249,7 +266,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
 
     internal void ThrowIfFailed()
     {
-        if (_failure != null) throw new PlayTestException("The application or renderer failed.", _failure);
+        if (_failure != null)
+            throw new PlayTestException(_failureIsConfiguration ? _failure.Message : "The application or renderer failed.", _failure);
         if (_stopping) throw new ObjectDisposedException(nameof(PlayTestApplication));
     }
 
@@ -259,6 +277,12 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         _ready.TrySetException(error);
         lock (_frameLock) _frameChanged.TrySetException(error);
         _exit.Set();
+    }
+
+    private void FailConfiguration(PlayTestException error)
+    {
+        if (_failure == null) _failureIsConfiguration = true;
+        Fail(error);
     }
 
     public void Exit() => _exit.Set();
@@ -271,5 +295,8 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         _queue.CompleteAdding();
         _renderThread?.Join(TimeSpan.FromSeconds(5));
         _uiThread?.Join(TimeSpan.FromSeconds(5));
+        // The provider owns the process's shared display; it ends once nothing renders any more. An opted-out
+        // launch never touched it.
+        if (_openGL.Mode == PlayTestOpenGLMode.Provider) _openGL.Provider!.Dispose();
     }
 }

@@ -51,6 +51,12 @@ public sealed class PlayTestOptions
     /// <c>TestResults/PlayTest</c> by default.</summary>
     public string ArtifactsDirectory { get; set; } = Path.Combine("TestResults", "PlayTest");
 
+    /// <summary>Whether OpenGL is offered to the application: <see cref="PlayTestOpenGL.Available"/> (the
+    /// default) gives OpenGL elements real contexts from the registered provider; <see cref="PlayTestOpenGL.Unavailable"/>
+    /// launches without OpenGL so the application's no-OpenGL path runs. A launch option: it applies to the
+    /// whole run, because OpenGL elements keep their context for the life of the window.</summary>
+    public PlayTestOpenGL OpenGL { get; set; }
+
     private float DefaultSlowMo()
     {
         var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_SLOWMO");
@@ -146,6 +152,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
     /// <summary>Scripted responses for the application's folder, open-file and save-file pickers.</summary>
     public PlayTestFilePickers FilePickers { get; } = new();
 
+    /// <summary>Records the application's <c>Windows.System.Launcher</c> requests (links, files, folders)
+    /// without starting any process.</summary>
+    public PlayTestLauncher Launcher { get; } = new();
+
+    /// <summary>The window the application itself created (its <c>Window</c>, with the content it set),
+    /// for suites that launch once and read the application's own page. Read or change it inside
+    /// <see cref="EvaluateAsync{T}"/>.</summary>
+    /// <exception cref="PlayTestException">The application has not created its window.</exception>
+    public Window Window => _host.Window.ManagedWindow ?? throw new PlayTestException("The application has not created its window.");
+
     /// <summary>Current virtual-screen width in logical pixels (1920 landscape, 1080 portrait).</summary>
     public int Width => _host.Width;
 
@@ -161,13 +177,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
     public ScreenOrientation PreferredOrientation => Options.Orientation;
     /// <summary>The orientation of the current virtual screen.</summary>
     public ScreenOrientation Orientation => _host.Orientation;
+    /// <summary>What the launch found out about OpenGL: the provider, renderer and version of a probe context,
+    /// or why OpenGL elements get no context in this run.</summary>
+    public PlayTestOpenGLInfo OpenGL => _host.OpenGL ?? throw new PlayTestException("The application has not started.");
     internal VirtualHost Host => _host;
 
-    private PlayTestApplication(Func<Application> factory, PlayTestOptions options, ApplicationTheme theme)
+    private PlayTestApplication(Func<Application> factory, PlayTestOptions options, ApplicationTheme theme, PlayTestOpenGLPlan openGL)
     {
         Options = options;
         SystemTheme = theme;
-        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait, theme, FilePickers);
+        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait, theme, FilePickers, Launcher, openGL);
         Page = new Page(this);
     }
 
@@ -179,6 +198,8 @@ public sealed class PlayTestApplication : IAsyncDisposable
     /// <exception cref="ArgumentOutOfRangeException">The timeout or action delay is not positive/non-negative and finite.</exception>
     /// <exception cref="ArgumentException">A selected preference value is invalid.</exception>
     /// <exception cref="InvalidOperationException">An application was already launched in this process.</exception>
+    /// <exception cref="PlayTestException">The registered OpenGL provider could not create a context; the message
+    /// gives its reason.</exception>
     public static async Task<PlayTestApplication> LaunchAsync(Func<Application> application, PlayTestOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(application);
@@ -188,14 +209,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
         var slowMo = options.SlowMo;
         if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || slowMo < 0 || !float.IsFinite(slowMo))
             throw new ArgumentOutOfRangeException(nameof(options));
+        var openGL = PlayTestOpenGLSetup.Plan(options.OpenGL, PlayTestOpenGLProviders.Registry);
         if (Interlocked.Exchange(ref _launched, 1) != 0)
             throw new InvalidOperationException("PlayTest hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications.");
         options = new PlayTestOptions
         {
             Orientation = orientation, Headless = options.Headless,
             Timeout = options.Timeout, SlowMo = slowMo, ArtifactsDirectory = options.ArtifactsDirectory,
+            OpenGL = options.OpenGL,
         };
-        var result = new PlayTestApplication(application, options, theme);
+        var result = new PlayTestApplication(application, options, theme, openGL);
         try
         {
             // Stable default culture; an app or a test can explicitly exercise other cultures.
@@ -251,6 +274,41 @@ public sealed class PlayTestApplication : IAsyncDisposable
         await _host.CaptureAsync().ConfigureAwait(false);
     }
 
+    /// <summary>Asks the window to close, as the user clicking its close button does: the application's
+    /// <c>AppWindow.Closing</c> handlers run and may cancel, then <c>Window.Closed</c> handlers run and may
+    /// cancel by marking the event handled. When nothing cancels, the window raises its closing events and
+    /// becomes hidden (<c>Window.VisibilityChanged</c>) but the process and the application keep running:
+    /// the next <see cref="Page.SetContentAsync(Func{UIElement}, ScreenOrientation?)"/> shows the window again.</summary>
+    /// <returns>True when the window closed; false when the application cancelled the close.</returns>
+    public async Task<bool> RequestCloseAsync()
+    {
+        await using var step = Recording.PlayTestRecording.Step(this, "RequestClose");
+        var closed = await _host.OnUI(_host.Window.RequestClose).ConfigureAwait(false);
+        await _host.CaptureAsync().ConfigureAwait(false);
+        return closed;
+    }
+
+    /// <summary>Minimizes the window, as the desktop heads report it: the window is deactivated
+    /// (<c>Window.Activated</c> with Deactivated) and becomes hidden (<c>Window.VisibilityChanged</c> with
+    /// Visible false), so pause-on-hidden logic runs. Rendering continues, so screenshots still show the page.</summary>
+    /// <returns>A task that completes after the next rendered frame.</returns>
+    public async Task MinimizeAsync()
+    {
+        await using var step = Recording.PlayTestRecording.Step(this, "Minimize");
+        await _host.OnUI(_host.Window.Minimize).ConfigureAwait(false);
+        await _host.CaptureAsync().ConfigureAwait(false);
+    }
+
+    /// <summary>Restores a minimized window: it becomes visible (<c>Window.VisibilityChanged</c> with Visible
+    /// true) and is activated again. Does nothing when the window is not minimized.</summary>
+    /// <returns>A task that completes after the next rendered frame.</returns>
+    public async Task RestoreAsync()
+    {
+        await using var step = Recording.PlayTestRecording.Step(this, "Restore");
+        await _host.OnUI(_host.Window.Restore).ConfigureAwait(false);
+        await _host.CaptureAsync().ConfigureAwait(false);
+    }
+
     /// <summary>Polls <paramref name="probe"/> on the UI thread until <paramref name="predicate"/> accepts its
     /// value; use it for non-visual outcomes such as a service call completing.</summary>
     /// <typeparam name="T">The probed value's type.</typeparam>
@@ -296,13 +354,20 @@ public sealed class PlayTestApplication : IAsyncDisposable
         return new PlayTestException(message);
     }
 
-    /// <summary>Captures a final recording screenshot if one is due, then stops the application, its
-    /// renderer and any preview process. Safe to call more than once.</summary>
+    /// <summary>Captures a final recording screenshot if one is due, releases keys still held with
+    /// <see cref="Keyboard.DownAsync"/>, then stops the application, its renderer and any preview process.
+    /// Safe to call more than once.</summary>
     /// <returns>A task that completes when everything has stopped.</returns>
     public async ValueTask DisposeAsync()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
-        try { await Recording.PlayTestRecording.BeforeApplicationDisposedAsync(this).ConfigureAwait(false); }
+        try
+        {
+            await Recording.PlayTestRecording.BeforeApplicationDisposedAsync(this).ConfigureAwait(false);
+            // Held keys get their key-up events while the application can still handle them.
+            try { await _host.OnUI(Page.Keyboard.ReleaseHeldKeys).ConfigureAwait(false); }
+            catch (Exception) { /* A failed or stopped application cannot receive them. */ }
+        }
         finally
         {
             if (ReferenceEquals(Current, this)) Current = null;

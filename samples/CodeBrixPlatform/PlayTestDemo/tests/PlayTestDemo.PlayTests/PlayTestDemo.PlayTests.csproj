@@ -10,6 +10,8 @@
   <Import Project="../../PlayTestDemo.Head.targets" />
   <ItemGroup>
     <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
+    <!-- Real OpenGL contexts for the demo's OpenGL page (registered in AppFixture). -->
+    <ProjectReference Include="$(PlayTestDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
     <PackageReference Include="xunit.v3" Version="4.0.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" PrivateAssets="all" />

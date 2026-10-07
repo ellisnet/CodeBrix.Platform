@@ -319,8 +319,8 @@ Microsoft.Testing.Platform per global.json):
         surface. Linux solution only)
     src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj
         (host-free unit tests for the PlayTest head's preferences, command-line
-        adapter, recording-folder rules and preview frame format; all three
-        solutions - see THE PLAYTEST HEAD PACKAGE)
+        adapter, recording-folder rules, preview frame format, OpenGL seam and
+        PixelStats; all three solutions - see THE PLAYTEST HEAD PACKAGE)
     src/Platform.Foundation/Platform.Foundation.Tests.csproj
     src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj
     src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj
@@ -784,7 +784,9 @@ Packing only runs in the Release configuration. Two kinds of package:
     The nuspec names a dependency-version TOKEN, never a literal version.
   - CSPROJ-DRIVEN (`dotnet pack <csproj> -p:PackageVersion=$(BuildVersion)`):
     Platform.UI.Runtime.Skia and the seven heads (including the Emulated head),
-    and the add-ins WebView, AudioPlayer, VideoPlayer, MediaPlayer, TextLayout,
+    the PlayTest head and its OpenGL provider (Platform.UI.Runtime.Skia.PlayTest
+    .OpenGL, whose one package dependency is Graphics3DGL - the third project
+    that ProjectReferences an add-in), and the add-ins WebView, AudioPlayer, VideoPlayer, MediaPlayer, TextLayout,
     FlexPanel, AdvancedTextEdit, TerminalView, PlotterView, AppSettings,
     CommandBar.
     CommandBar is the second add-in that ProjectReferences another add-in (Svg,
@@ -1156,6 +1158,103 @@ CODING CONVENTIONS
     the result before keeping it: anything beyond format normalization means a
     hand edit or a hand-written member was missed.
 
+DELIBERATE DIFFERENCES FROM WINUI
+=================================
+Behaviour that intentionally does not match WinUI. Keep it when porting newer
+upstream code, and add an entry here for each new one.
+  - Accessible name from the tooltip. WinUI's
+    FrameworkElementAutomationPeer.GetNameCore is AutomationProperties.Name ->
+    LabeledBy -> the element's plain text, and never reads ToolTipService; an
+    icon-only button with only a tooltip has an EMPTY name there. Here
+    AutomationPeer.GetName() falls back to the tooltip text (a string, or a
+    ToolTip / TextBlock holding text) when GetNameCore - including every
+    derived peer's override - returned an empty name
+    (FrameworkElementAutomationPeer.GetToolTipNameFallback). Why: assistive
+    technology and UI tests then have a name for icon-only buttons without
+    each app adding AutomationProperties.Name. The fallback lives in GetName,
+    not GetNameCore, on purpose: derived peers (the CommandBar add-in's
+    ToolButtonAutomationPeer, for one) treat a non-empty base.GetNameCore() as
+    an app-set name, so a tooltip there would replace their composed names.
+
+XAML GENERATOR CONTRACTS
+========================
+  - Add-in registrations: for every [assembly: ApiExtension(...)] an
+    application references, the App code the generator emits calls
+    ApiExtensibility.Register inside an
+    "if (!ApiExtensibility.IsRegistered<TExtension>())" guard
+    (XamlFileGenerator.WriteApiExtensionRegistration). The FIRST registration
+    wins, for every add-in: a test double registered before the application
+    object is created is kept, and a second application object in the same
+    process does not throw on the duplicate.
+  - Diagnostic ids. XAML generation: UXAML0001 (error), UXAML0002 (warning),
+    UXAML0003 (resource error) - XamlCodeGeneration.Diagnostics.cs. The
+    UnoNNNN family (analyzers and generators): Uno0001 not-implemented
+    member, Uno0002 native-view disposal, Uno0003 native view implementing
+    DependencyObject, Uno0006 InitializeComponent, Uno0007 missing assembly,
+    Uno0008 binding target property not found (a warning: a {Binding},
+    {x:Bind} or {TemplateBinding} on a member the element's type does not
+    have; checked only for DependencyObject types whose base chain has no
+    partial type in the compilation being built, because other generators add
+    members the XAML generator cannot see). Uno0004/Uno0005 are unused; the
+    next new id is Uno0009.
+  - Generator test baselines. The XamlCodeGeneratorTests suite in
+    src/SourceGenerators/Platform.UI.SourceGenerators.Tests compares the
+    generated sources with baselines under XamlCodeGeneratorTests/Out/
+    (embedded into the test assembly at build time). Out/ is git-ignored and
+    NOT committed, so a fresh clone has no baselines: a test whose generator
+    produced files but that has no baseline at all is reported SKIPPED
+    (inconclusive), with a message naming the missing Out/<class>/<test>
+    folder (Verifiers/CSGenerator.cs). A test that has a baseline is still
+    compared file by file and FAILS on any mismatch. To create or refresh
+    baselines: uncomment "#define WRITE_EXPECTED" at the top of
+    XamlCodeGeneratorTests/Verifiers/CSGenerator.cs, run the tests concerned
+    once in Debug, review the files written under Out/, comment the define
+    again and rebuild (the define must never stay on: under it the content
+    check is skipped).
+
+ELEMENT THEMES (FrameworkElement.RequestedTheme)
+================================================
+Element-level RequestedTheme themes the element's subtree, the WinUI way
+("requested theme for the subtree" during theme-reference resolution):
+  - ResourceDictionary.Themes.Active is the theme ThemeDictionaries lookups
+    use: an element theme scope (thread-static, opened with
+    ResourceDictionary.PushThemeScope) when one is open, else the application
+    theme (SetActiveTheme). A dictionary's key-not-found cache is only used
+    while the active theme is the one it was filled for.
+  - FrameworkElement.EnterThemeScope(owner, contextProvider) opens the scope
+    for the effective theme of the owner (an element, the context provider, or
+    the nearest element above a non-element owner). It is opened in
+    DependencyObjectStore.UpdateResourceBindings (load, theme walks, styles,
+    visual states, brushes/storyboards/key frames of an element),
+    ResourceResolver.ApplyResource, Setter.ApplyValue (visual-state setters)
+    and around an element's own Resources in UpdateThemeBindings. Objects with
+    no element context keep the surrounding theme (application/system
+    dictionaries resolve in the application theme).
+  - Effective theme (FrameworkElement.Theming.cs): own RequestedTheme, else
+    the nearest ancestor's along FrameworkElement.Parent (so a popup child
+    follows its Popup), else Default = the application's. Cached per element
+    against a global generation that RequestedTheme changes, parent changes
+    and logical-parent changes bump; a read is a field compare. Until the first
+    element in the process sets a non-Default RequestedTheme, none of this
+    runs (HasElementThemeOverrides) and lookups are exactly the application's.
+  - A RequestedTheme change re-resolves the element's subtree with
+    Application.PropagateResourcesChanged(..., themeRoot), which skips
+    descendants that set their own theme; the XamlRoot content instead syncs
+    the application theme, whose walk covers the tree.
+  - Default text foreground: DependencyProperty.GetDefaultValue gives the six
+    text Foreground properties DefaultBrushes.GetTextForegroundBrush(element),
+    the element theme's DefaultTextForegroundThemeBrush. An element with its
+    own RequestedTheme is an inheritance boundary for inherited "Foreground"
+    properties (DependencyObjectStore.OnParentPropertyChangedCallback and
+    OnThemeBoundaryChanged), and a Foreground that falls back to its default is
+    passed to children as unset, never as the parent's default brush instance.
+  - Not implemented: a Flyout forwarding its placement target's theme to the
+    presenter; a popup child's inherited text Foreground follows the popup
+    host, not the Popup's place in the tree; ThemeResource references inside a
+    resource that is not in ThemeDictionaries are one shared object.
+  - Tests: src/Platform.UI.Tests/Windows_UI_Xaml/Theming/
+    Given_Element_Theme_Inheritance.cs and the PlayTestDemo ElementThemeTests.
+
 NOTES
 =====
   - The X11 head's DISPLAY check is a regex over "[host]:display[.screen]";
@@ -1381,6 +1480,25 @@ letterboxes opposite-orientation frames; resize textures/logical presentation
 on the SDL main thread, and never resize the native window in response to test
 orientation. A truncated or malformed frame must fail the headed run.
 
+--- Window, launcher ---
+
+VirtualWindow reports SupportsClosingCancellation = true, like the desktop
+heads, so AppWindow.Closing and Window.Closed handlers can keep the window
+open. RequestCloseAsync follows the X11/Wayland close-button path (RaiseClosing;
+the framework runs Closing/Closed and hides the window); an accepted close
+never stops the process or the application. MinimizeAsync/RestoreAsync follow
+the X11/Wayland reports: Deactivated + IsVisible false, then IsVisible true +
+CodeActivated (the Win32/WPF heads differ: WPF also raises Entered/
+LeavingBackground, Win32 raises Suspending on close - PlayTest does not).
+SetContentAsync calls ShowForNextTest so a closed or minimized window never
+leaks into the next test. Note the framework itself raises
+Window.VisibilityChanged(false) twice for an accepted close on single-window
+heads (BaseWindowImplementation.Close, then Shutdown's Hide()).
+PlayTestLauncher registers ILauncherExtension before app construction (the
+desktop heads each register one); without it Launcher falls back to
+Process.Start. It records URIs and returns configurable results; it must
+never start a process.
+
 --- Input model ---
 
 VirtualInput always uses Control-based shortcuts. VirtualHost disables
@@ -1390,11 +1508,29 @@ setting in feature configuration: touching TextBox itself before dispatcher
 setup initializes brushes too early. Normal desktop hosts retain their native
 keyboard conventions.
 
+Held keys: Keyboard.DownAsync/UpAsync and PressAsync's Delay exist for code
+that samples key state once per frame or engine cycle (the GameEngine keyboard
+adapter defers releases by one dispatcher pass and InputActionMap samples
+IsDown per cycle, so a same-step down/up is invisible to it). Keyboard keeps
+the held set on the UI thread (HeldKeys); SetContentAsync releases it before
+removing the old page and DisposeAsync releases it before stopping. No auto
+repeat. Locator.PressAsync/PressSequentiallyAsync focus Controls and any
+element with IsTabStop (game surfaces).
+
 --- Locator engine and actions ---
 
 Application tests must assert actual outcomes. Preserve lazy locator
 resolution, strictness, bounded retry, hit testing, and dispatcher confinement
-when extending the API. Do not replace clicks with direct command invocation.
+when extending the API. Every locator factory filters with VisualTree.Visible
+unless IncludeHidden is set; Visible also rejects cells an ItemsRepeater parks
+at ClearedElementsArrangePosition (-10000, -10000). Single() marks its
+strict-mode PlayTestException (Locator.StrictModeKey in Exception.Data);
+RetryAsync keeps retrying such failures and reports the last one at the
+timeout, while one-shot reads report it at once. A ContentDialog's text is the
+text of its whole template (title, content, buttons), whatever its Content.
+SelectOptionAsync (SelectorOptions.cs) reads options from Selector.Items, not
+from realized containers, and sets SelectedIndex / SelectedItems so the
+control raises its own SelectionChanged; it never opens a drop-down. Do not replace clicks with direct command invocation.
 Use a serialized fixture and reset page/application state between tests. Test
 both timeout and successful paths when changing the locator engine.
 Check/Uncheck dispatch pointer input, including to a ToggleSwitch template
@@ -1441,8 +1577,16 @@ on its process main thread, with a nonpersistent browser data store and no
 visible native window. Navigation decisions, script results and PNG frames
 travel through redirected pipes; callbacks and presentation return to the XAML
 dispatcher. Input uses native NSEvent dispatch, not DOM actions. Page unload
-closes that helper. GPU-only GL controls remain unsupported. Validate each OS
-on its own host before claiming runtime support.
+closes that helper. OpenGL controls need the separate OpenGL provider package
+(see "OpenGL provider" below). Validate each OS on its own host before claiming
+runtime support.
+
+--- Screenshots ---
+
+Screenshots.cs crops frames (whole pixels, clipped to the screen), encodes
+PNGs and implements stable capture (two consecutive identical captures in the
+same run, bounded by the timeout) for Page.ScreenshotAsync and
+Locator.ScreenshotAsync.
 
 --- Screenshot recording ---
 
@@ -1479,13 +1623,17 @@ serialized.
     is LINKED into the project, compiled with nullable enabled and
     CODEBRIX_PLAYTEST_XUNIT), orientation parsing and PlayTestOrientation
     resolution, recording-folder validation and path sanitizing, the preview
-    frame format, text normalization and the key-name table. It launches no
-    application. The suite is serialized and every test isolates and restores
+    frame format, text normalization, the key-name table and held-key order,
+    picker failure queues, the recording launcher, option matching for
+    SelectOptionAsync, strict-mode marking and screenshot cropping. It
+    launches no application. The suite is serialized and every test isolates and restores
     the CLI AppContext keys as well as the PlayTest environment variables
     (PlayTestSettingsScope). Put new configuration-only cases HERE.
   - samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests: the
     control/picker contract tests that need the running application, next to
-    the dedicated six-head demo application. They exercise that application's
+    the dedicated six-head demo application, including the OpenGL page (it
+    registers CodeBrix.Platform.PlayTest.OpenGL); PlayTestDemo.NoOpenGL.PlayTests
+    beside it launches the same application with OpenGL Unavailable. They exercise that application's
     actual shared XAML and build the framework from source. Put general control
     demonstrations there, not into unrelated sample applications.
   - JustBetweenUs and the additional CodeBrix.Samples suites exercise their own
@@ -1496,6 +1644,92 @@ serialized.
     intentional failure; run it through build/test-scripts/playtest-recording.py,
     which checks that failure, PNG/index integrity, hierarchy, source lines,
     precedence and rejected folders. It is not part of the normal demo suite.
+
+--- OpenGL provider (CodeBrix.Platform.PlayTest.OpenGL) ---
+
+The essentials:
+
+  - The HEAD owns a small public, BCL-only seam (OpenGL/PlayTestOpenGL.cs):
+    IPlayTestOpenGLProvider, IPlayTestOpenGLContext, PlayTestOpenGLProviders,
+    the launch option PlayTestOptions.OpenGL (PlayTestOpenGL Available |
+    Unavailable) and PlayTestApplication.OpenGL (PlayTestOpenGLInfo). It takes
+    no dependency on CodeBrix.Platform.OpenGL and needs no new
+    InternalsVisibleTo. OpenGL/PlayTestOpenGLSetup.cs holds the decisions
+    (Plan, Probe, WrapperFactory) apart from the host, and the internal
+    PlayTestNativeOpenGLWrapper adapts a provider context to the framework's
+    internal INativeOpenGLWrapper, declaring its flavour through
+    INativeOpenGLWrapper.UsesGles (a default interface member, null on every
+    other head; OffscreenGLContext prefers it over Graphics3DGLHeadDetection).
+  - VirtualHost.InitializeApplication, on the UI thread before Application.Start:
+    Probe (a registered provider creates one context, glGetString fills the
+    info; a failure fails the launch with the provider's reason), then
+    ApiExtensibility.Register<XamlRoot>(INativeOpenGLWrapper) unless the launch
+    opted out. VirtualHost.Dispose disposes the provider after both threads
+    have stopped; an opted-out launch never touches it.
+  - The "no provider registered" failure: the registered factory throws, but
+    GLCanvasElement and SkiaGLCanvasElement catch every exception and report
+    "initialization failed", so the factory ALSO records the PlayTestException
+    as the host's failure (VirtualHost.FailConfiguration). Every following
+    PlayTest call, including the one during which the element loaded, then
+    throws it with its own message (ThrowIfFailed keeps a configuration
+    failure's message instead of "The application or renderer failed.").
+    Measured: a demo test without Register() fails in the ClickAsync that
+    opened the OpenGL page, naming the package and Register().
+  - The PACKAGE, src/Platform.UI.Runtime.Skia.PlayTest.OpenGL (assembly and
+    namespace CodeBrix.Platform.PlayTest.OpenGL), implements the seam:
+    Egl/ (EglNative: "libEGL" resolved to libEGL.so.1 on Linux and libEGL.dylib
+    on macOS; EglProvider: ONE display per process, terminated only by the
+    provider's Dispose - Mesa and ANGLE return the same EGLDisplay for the
+    same platform and eglTerminate destroys every context on it; contexts are
+    ES 3 (then 2) with a 1x1 pbuffer or none), Providers/LinuxEglProvider
+    (eglGetPlatformDisplay(EGL_PLATFORM_SURFACELESS_MESA)), MacOSAngleProvider
+    (ANGLE's EGL_DEFAULT_DISPLAY), WindowsWglProvider (a hidden window per
+    context, GetDC -> ChoosePixelFormat -> SetPixelFormat -> wglCreateContext,
+    proc addresses from opengl32.dll exports then wglGetProcAddress, egl*
+    names answered with 0), and ContextCheck (the GL binding from
+    CodeBrix.Platform.OpenGL: GL_VERSION 3.0 or later unless ANGLE, and a
+    clear-and-read-back of a small FBO). CodeBrixPlayTestOpenGL.Register()
+    picks the provider with OperatingSystem.Is*.
+  - Packaging: the head is a PrivateAssets ProjectReference (compile only);
+    Graphics3DGL is the one package dependency (its PackageId is the published
+    one, as for VideoPlayer). It packs its OWN README.md and AGENT-README.txt.
+    It is in the _CsprojPackage list right after the head. The local
+    preview-feed script build/pack-playtest-preview.py does not pack it (pack
+    it with the command below), and build/test-scripts/pack-linux-local-feed.sh
+    packs neither the head nor this package.
+  - GPU readback needs nothing from the head: both elements read their frame
+    back into a WriteableBitmap on the UI thread, which the CPU renderer
+    composites. A single CaptureAsync (two passes with a UI barrier) already
+    shows the GL frame an action caused (measured with non-Stable captures).
+
+Build, pack and test it (Linux):
+
+    dotnet build src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj -c Release
+    dotnet pack src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj \
+        -c Release -p:PackageVersion=<version> --output <folder>
+    dotnet test --project src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.NoOpenGL.PlayTests/PlayTestDemo.NoOpenGL.PlayTests.csproj -c Release
+
+The project is plain net10.0, so all three providers COMPILE on every OS; only
+the Linux provider has RUN (Mesa surfaceless EGL, on this repository's Linux
+machine). Still to verify on the maintainer's machines:
+
+  Windows (interactive desktop, GPU driver): the PlayTestDemo suites, default
+  and --theme=dark --orientation=portrait. Expect PlayTestApplication.OpenGL to
+  report the WGL provider, the vendor's renderer, IsGles false. Check that the
+  OpenGL tests pass (the "#version 300 es" shaders compile on desktop OpenGL
+  through ARB_ES3_compatibility, as the UIReqs fixtures assume) and that no
+  hidden window lingers after the run. On Windows on ARM without the
+  Compatibility Pack the launch must fail naming GDI Generic / OpenGL 1.1.
+  macOS (Metal): the same two suites. First the U1 probe - whether SkiaSharp's
+  macOS binary builds a GRContext on ANGLE-GLES (source comments say it
+  cannot): run PlayTestDemo.PlayTests with --filter-method "*GPU_Skia*". If
+  SkiaGLStatus reads "GPU Skia unavailable" while GLStatus reads
+  "OpenGL: initialized", U1 is answered "no": SkiaGLCanvasElement then fails on
+  the real macOS head too, which is a Graphics3DGL/macOS-head matter (stop and
+  report; do not work round it in PlayTest). Also confirm ANGLE initializes on
+  the PlayTest UI thread (a background thread, no AppKit) - U4.
 
 --- Third-party code ---
 

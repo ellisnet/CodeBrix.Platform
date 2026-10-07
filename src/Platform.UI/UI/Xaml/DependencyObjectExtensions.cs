@@ -158,6 +158,9 @@ namespace Microsoft.UI.Xaml
 			// piggybacks on the DP inheritance mechanism. Therefore we use LogicalParentOverride as a workaround to modify the publicly-visible
 			// FrameworkElement.Parent without affecting DP propagation.
 			element.LogicalParentOverride = logicalParent;
+
+			// Inherited element themes follow the logical parent.
+			FrameworkElement.InvalidateElementThemes();
 		}
 
 		/// <summary>

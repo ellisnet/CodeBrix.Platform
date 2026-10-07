@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.PlayTest.OpenGL: the OpenGL context provider for the PlayTest head. It implements the
+	head's public provider seam (IPlayTestOpenGLProvider / IPlayTestOpenGLContext) with one off-screen context
+	source per OS - surfaceless EGL on Linux, WGL on a hidden window on Windows, ANGLE on macOS - and a test
+	project switches it on with CodeBrixPlayTestOpenGL.Register(). It serves applications that use the
+	Graphics3DGL add-in, so that add-in is its one package dependency (which also brings the GL binding,
+	CodeBrix.Platform.OpenGL, and on macOS the ANGLE libraries). The head itself never references this project.
+	-->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.PlayTest.OpenGL</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj (the _CsprojPackage list) with the
+		     shared date-stamped version, so no GeneratePackageOnBuild here. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
+		<Title>CodeBrix.Platform.PlayTest.OpenGL</Title>
+		<Description>Real OpenGL contexts for PlayTest runs of applications that use the Graphics3DGL add-in: surfaceless EGL on Linux, WGL on Windows and ANGLE on macOS.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.PlayTest.OpenGL</RootNamespace>
+
+		<!-- The package ships its IntelliSense text; CS1591 is fixed at source, never suppressed. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<!-- Its own README.md and consumer guide, not the repository-wide ones. -->
+		<None Include="README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Packs as the CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever dependency at the family version
+		     (the VideoPlayer add-in's precedent). It brings CodeBrix.Platform.OpenGL, whose GL binding this
+		     package uses, at the version the application under test also gets. -->
+		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.csproj" />
+		<!-- The provider seam lives in the PlayTest head. A test project that uses this package always
+		     references the head itself, so the head is a compile-time reference only, not a second
+		     package dependency. -->
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.PlayTest\Platform.UI.Runtime.Skia.PlayTest.csproj" PrivateAssets="all" />
+	</ItemGroup>
+</Project>

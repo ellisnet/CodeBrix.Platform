@@ -54,10 +54,24 @@ internal static class VisualTree
     {
         if (element == null || element.XamlRoot == null) return false;
         for (DependencyObject? node = element; node != null; node = VisualTreeHelper.GetParent(node))
+        {
             if (node is UIElement ui && ui.Visibility != Visibility.Visible) return false;
+            if (node is UIElement child && VisualTreeHelper.GetParent(node) is ItemsRepeater repeater && Recycled(child, repeater)) return false;
+        }
         var bounds = Bounds(element);
         return bounds.Width > 0 && bounds.Height > 0;
     }
+
+    // ItemsRepeater keeps cleared elements attached for reuse and parks them at
+    // ClearedElementsArrangePosition (-10000, -10000) minus their size. They are not
+    // shown, so they must not match visible-only locators.
+    internal static bool Recycled(UIElement element, ItemsRepeater repeater)
+    {
+        var offset = element.TransformToVisual(repeater).TransformPoint(default);
+        return IsRecycledPosition(offset);
+    }
+
+    internal static bool IsRecycledPosition(Point offset) => offset.X <= -10000 && offset.Y <= -10000;
 
     internal static bool Enabled(UIElement element)
     {
@@ -78,7 +92,8 @@ internal static class VisualTree
     {
         if (element is TextBlock text) return text.Text ?? "";
         if (element is TextBox input) return input.Text ?? "";
-        if (element is ContentControl content && content.Content is string value) return value;
+        // A dialog's text includes its title and buttons, whatever its Content is.
+        if (element is ContentControl content && content is not ContentDialog && content.Content is string value) return value;
         return string.Join(" ", Walk(element).OfType<TextBlock>().Select(t => t.Text));
     }
 

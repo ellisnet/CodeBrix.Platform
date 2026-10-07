@@ -23,7 +23,8 @@ public sealed class PageGetByRoleOptions
     /// <summary>True requires <see cref="Name"/> to equal the accessible name (case-sensitive,
     /// whitespace-normalized) instead of being contained in it.</summary>
     public bool? Exact { get; set; }
-    /// <summary>True also matches attached elements that are collapsed or have no size.</summary>
+    /// <summary>True also matches attached elements that are collapsed, have no size, or are kept
+    /// off-screen for reuse by an <c>ItemsRepeater</c>.</summary>
     public bool? IncludeHidden { get; set; }
 }
 
@@ -34,6 +35,17 @@ public sealed class PageGetByTextOptions
     /// <summary>True requires the whole whitespace-normalized text to match, case-sensitively;
     /// otherwise a case-insensitive substring match is used.</summary>
     public bool? Exact { get; set; }
+    /// <summary>True also matches attached elements that are collapsed, have no size, or are kept
+    /// off-screen for reuse by an <c>ItemsRepeater</c>.</summary>
+    public bool? IncludeHidden { get; set; }
+}
+
+/// <summary>Options for <see cref="Page.GetByTestId"/> and <see cref="Locator.GetByTestId"/>.</summary>
+public sealed class PageGetByTestIdOptions
+{
+    /// <summary>True also matches attached elements that are collapsed, have no size, or are kept
+    /// off-screen for reuse by an <c>ItemsRepeater</c>.</summary>
+    public bool? IncludeHidden { get; set; }
 }
 
 /// <summary>Narrows a locator with <see cref="Locator.Filter"/>.</summary>
@@ -97,7 +109,57 @@ public sealed class LocatorDragOptions : LocatorOptions
 public sealed class LocatorFillOptions : LocatorOptions { }
 
 /// <summary>Options for <see cref="Locator.PressAsync"/> and <see cref="Locator.PressSequentiallyAsync"/>.</summary>
-public sealed class LocatorPressOptions : LocatorOptions { }
+public sealed class LocatorPressOptions : LocatorOptions
+{
+    /// <summary>Milliseconds. For <see cref="Locator.PressAsync"/>, how long the key or chord is held between
+    /// key down and key up (see <see cref="KeyboardPressOptions.Delay"/>); for
+    /// <see cref="Locator.PressSequentiallyAsync"/>, the wait between characters. Zero or null: no wait.</summary>
+    public float? Delay { get; set; }
+}
+
+/// <summary>Options for <see cref="Keyboard.PressAsync"/>.</summary>
+public sealed class KeyboardPressOptions
+{
+    /// <summary>Milliseconds to hold the key or chord between key down and key up. While it is held the
+    /// application keeps running and rendering, so code that samples key state once per frame or game
+    /// cycle sees the key down. Zero or null sends key down and key up together.</summary>
+    public float? Delay { get; set; }
+}
+
+/// <summary>Options for <see cref="Keyboard.TypeAsync"/>.</summary>
+public sealed class KeyboardTypeOptions
+{
+    /// <summary>Milliseconds to wait between characters. Zero or null: no wait.</summary>
+    public float? Delay { get; set; }
+}
+
+/// <summary>One option for <see cref="Locator.SelectOptionAsync(SelectOptionValue, LocatorSelectOptionOptions)"/>.
+/// Every property that is set must match.</summary>
+public sealed class SelectOptionValue
+{
+    /// <summary>The option's value: the <c>SelectedValuePath</c> member of its item when the control sets
+    /// one, otherwise the same as its label.</summary>
+    public string? Value { get; set; }
+    /// <summary>The option's label (exact after whitespace normalization): the <c>DisplayMemberPath</c>
+    /// member, a string item, a string <c>Content</c>, the realized row's text, or the item's
+    /// <c>ToString()</c>.</summary>
+    public string? Label { get; set; }
+    /// <summary>The option's zero-based position in the control's items.</summary>
+    public int? Index { get; set; }
+}
+
+/// <summary>Options for the <c>Locator.SelectOptionAsync</c> overloads.</summary>
+public sealed class LocatorSelectOptionOptions : LocatorOptions { }
+
+/// <summary>Options for <see cref="Locator.ScreenshotAsync"/>.</summary>
+public sealed class LocatorScreenshotOptions : LocatorOptions
+{
+    /// <summary>When set, the PNG is also written to this file (its folder is created if needed).</summary>
+    public string? Path { get; set; }
+    /// <summary>True waits until two consecutive captures of the element are identical (animations and
+    /// transitions have settled) before returning, failing when that does not happen within the timeout.</summary>
+    public bool Stable { get; set; }
+}
 
 /// <summary>Options for <see cref="LocatorAssertions.ToBeVisibleAsync"/> and <see cref="LocatorAssertions.ToBeHiddenAsync"/>.</summary>
 public sealed class LocatorAssertionsToBeVisibleOptions : LocatorOptions { }
@@ -125,6 +187,11 @@ public sealed class PageScreenshotOptions
 {
     /// <summary>When set, the PNG is also written to this file (its folder is created if needed).</summary>
     public string? Path { get; set; }
+    /// <summary>True waits until two consecutive captures are identical (animations and transitions have
+    /// settled) before returning, failing when that does not happen within <see cref="Timeout"/>.</summary>
+    public bool Stable { get; set; }
+    /// <summary>Limit in milliseconds for a <see cref="Stable"/> capture. Null uses the application timeout.</summary>
+    public float? Timeout { get; set; }
 }
 
 /// <summary>An element's bounds on the virtual screen, in logical pixels, from <see cref="Locator.BoundingBoxAsync"/>.</summary>

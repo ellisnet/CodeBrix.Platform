@@ -235,7 +235,9 @@ namespace Microsoft.UI.Xaml
 
 			if (useKeysNotFoundCache)
 			{
-				if (!shouldCheckSystem && KeyNotFoundCache.Contains(resourceKey))
+				// The not-found cache describes the theme the dictionary last resolved with, so it only applies while
+				// that is still the active theme (an element-scoped theme may differ from the last one used).
+				if (!shouldCheckSystem && _activeTheme.Equals(Themes.Active) && KeyNotFoundCache.Contains(resourceKey))
 				{
 					value = null;
 					return false;
@@ -715,8 +717,60 @@ namespace Microsoft.UI.Xaml
 
 		internal static ResourceKey GetActiveTheme() => Themes.Active;
 
+		/// <summary>
+		/// The application's theme for resources, ignoring any element theme scope.
+		/// </summary>
+		internal static ResourceKey GetApplicationTheme() => Themes.Application;
+
+		/// <summary>
+		/// Sets the application's theme for resources, used whenever no element theme scope is open.
+		/// </summary>
 		internal static void SetActiveTheme(SpecializedResourceDictionary.ResourceKey key)
-			=> Themes.Active = key;
+			=> Themes.Application = key;
+
+		/// <summary>
+		/// Makes <paramref name="theme"/> the active theme for resource lookups on this thread until the returned
+		/// scope is disposed. This is how theme resources resolve for an element whose effective theme differs from
+		/// the application's (FrameworkElement.RequestedTheme on the element or an ancestor). Scopes nest.
+		/// </summary>
+		/// <param name="theme">The theme key ("Light", "Dark" or a custom theme name).</param>
+		/// <returns>A scope that restores the previous active theme when disposed.</returns>
+		internal static ThemeScope PushThemeScope(in ResourceKey theme)
+		{
+			var scope = new ThemeScope(Themes.HasScoped, Themes.Scoped);
+			Themes.Scoped = theme;
+			Themes.HasScoped = true;
+			return scope;
+		}
+
+		/// <summary>
+		/// Restores the active theme that was in effect before <see cref="PushThemeScope"/>.
+		/// </summary>
+		internal readonly struct ThemeScope : IDisposable
+		{
+			private readonly bool _isActive;
+			private readonly bool _previousHasScoped;
+			private readonly ResourceKey _previousScoped;
+
+			internal ThemeScope(bool previousHasScoped, ResourceKey previousScoped)
+			{
+				_isActive = true;
+				_previousHasScoped = previousHasScoped;
+				_previousScoped = previousScoped;
+			}
+
+			/// <summary>
+			/// Restores the previous active theme. A default-constructed scope does nothing.
+			/// </summary>
+			public void Dispose()
+			{
+				if (_isActive)
+				{
+					Themes.Scoped = _previousScoped;
+					Themes.HasScoped = _previousHasScoped;
+				}
+			}
+		}
 
 		internal void InvalidateNotFoundCache(bool propagate)
 		{
@@ -762,7 +816,19 @@ namespace Microsoft.UI.Xaml
 		{
 			public static SpecializedResourceDictionary.ResourceKey Light { get; } = "Light";
 			public static SpecializedResourceDictionary.ResourceKey Default { get; } = "Default";
-			public static SpecializedResourceDictionary.ResourceKey Active { get; set; } = Default;
+			/// <summary>The application's theme for resources.</summary>
+			public static SpecializedResourceDictionary.ResourceKey Application { get; set; } = Default;
+
+			/// <summary>The theme of the element whose resources are being resolved on this thread, if any.</summary>
+			[ThreadStatic]
+			public static SpecializedResourceDictionary.ResourceKey Scoped;
+
+			/// <summary>True while an element theme scope is open on this thread.</summary>
+			[ThreadStatic]
+			public static bool HasScoped;
+
+			/// <summary>The theme theme-dictionary lookups use: the element scope's theme, else the application's.</summary>
+			public static SpecializedResourceDictionary.ResourceKey Active => HasScoped ? Scoped : Application;
 		}
 	}
 }

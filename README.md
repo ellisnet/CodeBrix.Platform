@@ -112,6 +112,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever` | The frame-buffer head rendered off-screen, used by the CodeBrix.Develop IDE when it debugs a frame-buffer application in its emulator — the IDE substitutes it at build time; never reference it directly |
 | `CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever` | macOS host |
 | `CodeBrix.Platform.PlayTest.ApacheLicenseForever` | Test head with a Playwright-style API: runs the real application on an offscreen Skia screen, live preview optional — for test projects only |
+| `CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever` | Real OpenGL contexts for PlayTests of applications that use the Graphics3DGL add-in (surfaceless EGL on Linux, WGL on Windows, ANGLE on macOS) — for test projects only, beside the PlayTest package |
 
 The framework and add-in packages are referenced by the `.Core` library; each
 head project references exactly one of the `Runtime.Skia.*` host packages.

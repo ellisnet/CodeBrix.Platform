@@ -90,6 +90,8 @@ SimpleViewModel
 
     // Service resolution (wrap SimpleServiceResolver.Instance)
     protected static T GetService<T>() where T : class;   // throws when unregistered
+    protected static T GetService<T>(bool returnNullForUnregistered)
+        where T : class;   // true -> null when unregistered; false -> throws
     protected static IEnumerable<T> GetServices<T>() where T : class;
 
     // Messaging (wrap the ISimpleMessaging service)
@@ -1017,6 +1019,7 @@ QUICK REFERENCE CARD
     var r = await InvokeOnMainThreadAsync(async () => await WorkAsync());
     var vis = GetVisibility(flag);                     // Visible / Hidden
     var svc = GetService<IFoo>();
+    var opt = GetService<IFoo>(returnNullForUnregistered: true) ?? fallback;
     MessagingSend(this, "Msg", args);
     MessagingSubscribe<SenderVm, ArgsType>(this, "Msg", OnMsg, null);
     MessagingUnsubscribe<SenderVm, ArgsType>(this, "Msg");

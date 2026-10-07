@@ -78,6 +78,7 @@
     <Project Path="src/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated/Platform.UI.Runtime.Skia.Linux.FrameBuffer.Emulated.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />

@@ -1342,6 +1342,14 @@ implemented on the Skia heads and how the framework expects it to be used.
     Converters implement Microsoft.UI.Xaml.Data.IValueConverter (the Toolkit
     ships the common ones - see TOOLKIT TYPES below).
 
+    A {Binding}, {x:Bind} or {TemplateBinding} set on a property the element
+    does not have (no dependency property, attached property or CLR property
+    of that name - e.g. IsEnabled on a StackPanel, which is not a Control)
+    has no target and does nothing at run time. The XAML generator reports it
+    as warning Uno0008 ("Property 'X' does not exist on 'T'") - an ERROR under
+    TreatWarningsAsErrors. Bind the property on an element that has it (for
+    IsEnabled: wrap the content in a ContentControl, or bind each control).
+
     Binding to a property the generated bindable metadata knows only a getter
     for - a property with a private setter, or one whose DependencyProperty is
     internal - now writes. The engine used to hand back a setter that
@@ -1411,13 +1419,34 @@ implemented on the Skia heads and how the framework expects it to be used.
     before initialization completes - i.e. in the App constructor before
     InitializeComponent(); afterwards the setter throws NotSupportedException.
     Per-element: FrameworkElement.RequestedTheme (ElementTheme.Default / Light
-    / Dark) can be changed at run time on any element (set it on the Window's
-    root element to switch the whole app). RequestedTheme does NOT inherit down
-    the visual tree: an element's ActualTheme is its OWN RequestedTheme, or the
-    application's theme when that is Default, so setting RequestedTheme halfway
-    down a page changes that element alone and nothing under it. Set it on the
-    element the XamlRoot holds - that syncs the application theme, and every
-    element that has not asked for a theme of its own follows.
+    / Dark) can be set, and changed at run time, on any element, and it themes
+    that element AND its whole subtree, as in WinUI: {ThemeResource} references,
+    the theme-dependent brushes of the built-in control styles, and the default
+    text colour of a TextBlock with no Foreground all resolve for that theme.
+    A light app can hold <Border RequestedTheme="Dark"> whose TextBlocks,
+    Buttons, CheckBoxes and TextBoxes draw in dark-theme colours.
+      - Inheritance: an element's ActualTheme is its own RequestedTheme, else
+        that of the nearest ancestor that sets one, else the application's.
+        ActualThemeChanged fires on the element and on every descendant whose
+        ActualTheme changes.
+      - Override: a descendant with its own RequestedTheme keeps it (Dark inside
+        Light inside Dark works); a change above does not reach its subtree.
+      - Application theme changes: elements under an element-level theme keep
+        it; everything else follows the application.
+      - Text colour: below an element that sets RequestedTheme, the inherited
+        Foreground restarts from that theme's default text colour (a Foreground
+        passed down from above it does not cross it). A Foreground set on the
+        element itself or below it is kept.
+      - Setting it on the element the XamlRoot holds also switches the
+        application theme (the way to switch the whole app at run time).
+      - Limits: a resource that is NOT inside ThemeDictionaries but contains a
+        {ThemeResource} (for example <SolidColorBrush x:Key="X"
+        Color="{ThemeResource SomeColor}"/> directly in a ResourceDictionary) is
+        one shared object; put such brushes inside ThemeDictionaries (one per
+        theme) when subtrees use different themes. A Flyout does not take its
+        placement target's theme (set RequestedTheme on the flyout content).
+        Resources looked up from C# (Application.Current.Resources[...]) use the
+        application's theme.
     In XAML, {ThemeResource Key} and
     {StaticResource Key} resolve against merged ResourceDictionary entries;
     put app-wide dictionaries in App.xaml:

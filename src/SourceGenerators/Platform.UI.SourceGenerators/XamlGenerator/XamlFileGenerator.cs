@@ -263,6 +263,43 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			_isCodeBrixFluentAssembly = isCodeBrixFluentAssembly;
 		}
 
+		private static bool HasPartialSourceTypeInChain(INamedTypeSymbol? type)
+		{
+			for (; type is not null; type = type.BaseType)
+			{
+				foreach (var reference in type.DeclaringSyntaxReferences)
+				{
+					if (reference.GetSyntax() is Microsoft.CodeAnalysis.CSharp.Syntax.TypeDeclarationSyntax declaration
+						&& declaration.Modifiers.Any(m => m.IsKind(Microsoft.CodeAnalysis.CSharp.SyntaxKind.PartialKeyword)))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
+		private void ReportBindingTargetPropertyNotFound(XamlMemberDefinition member, INamedTypeSymbol declaringType)
+		{
+			Location? location = null;
+			var xamlFile = _generatorContext.AdditionalFiles.FirstOrDefault(f => f.Path == member.FilePath);
+			if (xamlFile?.GetText() is { } xamlText)
+			{
+				var position = new LinePosition(Math.Max(0, member.LineNumber - 1), Math.Max(0, member.LinePosition - 1));
+				location = Location.Create(
+					xamlFile.Path,
+					xamlText.Lines.ElementAtOrDefault(member.LineNumber - 1).Span,
+					new LinePositionSpan(position, position));
+			}
+
+			_generatorContext.ReportDiagnostic(Diagnostic.Create(
+				XamlCodeGenerationDiagnostics.BindingTargetPropertyNotFoundRule,
+				location,
+				member.Member.Name,
+				declaringType.Name));
+		}
+
 		private void TryGenerateWarningForInconsistentBaseType(IndentedStringBuilder writer, XamlObjectDefinition topLevelControl)
 		{
 			EnsureXClassName();
@@ -580,36 +617,56 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 
 			foreach (var registration in query)
 			{
-				if (registration.Length == 2)
-				{
-					writer.AppendLineIndented($"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register(typeof(global::{registration.ElementAt(0).Value}), o => new global::{registration.ElementAt(1).Value}(o));");
-				}
-				else if (registration.Length == 3)
-				{
-					writer.AppendLineIndented($"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register<global::{registration.ElementAt(2).Value}>(typeof(global::{registration.ElementAt(0).Value}), o => new global::{registration.ElementAt(1).Value}(o));");
-				}
-				else if (registration.Length == 4)
-				{
-					writer.AppendLineIndented($"if (OperatingSystem.IsOSPlatform(\"{registration.ElementAt(3).Value}\"))");
-					writer.AppendLineIndented("{");
-					using (writer.Indent())
-					{
-						if (registration.ElementAt(3).Value is not null)
-						{
-							writer.AppendLineIndented($"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register<global::{registration.ElementAt(2).Value}>(typeof(global::{registration.ElementAt(0).Value}), o => new global::{registration.ElementAt(1).Value}(o));");
-						}
-						else
-						{
-							writer.AppendLineIndented($"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register(typeof(global::{registration.ElementAt(0).Value}), o => new global::{registration.ElementAt(1).Value}(o));");
-						}
-					}
-					writer.AppendLineIndented("}");
-				}
-				else
-				{
-					throw new InvalidOperationException($"ApiExtensionAttribute should takes 2 to 4 arguments.");
-				}
+				WriteApiExtensionRegistration(writer, registration.Select(argument => argument.Value).ToArray());
 			}
+		}
+
+		/// <summary>
+		/// Writes the registration of one ApiExtensionAttribute (its constructor arguments: extension type,
+		/// implementation type, then the optional owner type and operating-system condition). The registration is
+		/// skipped when the extension type is already registered, so an extension registered before the application
+		/// object is created (a test double, or a second application object in the same process) is kept instead
+		/// of making ApiExtensibility.Register throw on the duplicate.
+		/// </summary>
+		internal static void WriteApiExtensionRegistration(IIndentedStringBuilder writer, IReadOnlyList<object?> arguments)
+		{
+			if (arguments.Count < 2 || arguments.Count > 4)
+			{
+				throw new InvalidOperationException($"ApiExtensionAttribute should takes 2 to 4 arguments.");
+			}
+
+			var extensionType = arguments[0];
+			var implementationType = arguments[1];
+			var ownerType = arguments.Count >= 3 ? arguments[2] : null;
+			var register = ownerType is not null
+				? $"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register<global::{ownerType}>(typeof(global::{extensionType}), o => new global::{implementationType}(o));"
+				: $"global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.Register(typeof(global::{extensionType}), o => new global::{implementationType}(o));";
+
+			if (arguments.Count == 4)
+			{
+				writer.AppendLineIndented($"if (OperatingSystem.IsOSPlatform(\"{arguments[3]}\"))");
+				writer.AppendLineIndented("{");
+				using (writer.Indent())
+				{
+					WriteGuardedRegistration(writer, extensionType, register);
+				}
+				writer.AppendLineIndented("}");
+			}
+			else
+			{
+				WriteGuardedRegistration(writer, extensionType, register);
+			}
+		}
+
+		private static void WriteGuardedRegistration(IIndentedStringBuilder writer, object? extensionType, string register)
+		{
+			writer.AppendLineIndented($"if (!global::CodeBrix.Platform.Foundation.Extensibility.ApiExtensibility.IsRegistered<global::{extensionType}>())");
+			writer.AppendLineIndented("{");
+			using (writer.Indent())
+			{
+				writer.AppendLineIndented(register);
+			}
+			writer.AppendLineIndented("}");
 		}
 
 		private void InitializeRemoteControlClient(IIndentedStringBuilder writer)
@@ -3979,6 +4036,21 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 					}
 					else
 					{
+						// Only for a type whose members the generator can see in full: a DependencyObject whose base chain
+						// has no partial type declared in this compilation. Other source generators (the XAML generator
+						// itself for an x:Class, the dependency-property generator inside the framework) add members to
+						// such types that this generator cannot see, and a plain object owner may get its target from a
+						// base the generator cannot see either.
+						if (declaringType is not null
+							&& declaringType.GetAllInterfaces().Any(i => SymbolEqualityComparer.Default.Equals(i, Generation.DependencyObjectSymbol.Value))
+							&& !HasPartialSourceTypeInChain(declaringType)
+							&& _metadataHelper.FindPropertyByOwnerSymbol(declaringType, member.Member.Name) is null
+							&& !IsAttachedProperty(declaringType, member.Member.Name))
+						{
+							// The by-name SetBinding below finds nothing at run time: tell the author now (Uno0008).
+							ReportBindingTargetPropertyNotFound(member, declaringType);
+						}
+
 						var pocoBuilder = isOwnerDependencyObject ? "" : $"GetDependencyObjectForXBind().";
 
 						using (writer.Indent($"{prefix}{pocoBuilder}SetBinding(", $"){postfix}"))

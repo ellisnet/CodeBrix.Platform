@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Automation.Peers;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Windows.Foundation;
 
@@ -23,13 +24,26 @@ public sealed class Locator
     internal Locator(Page page, Func<IEnumerable<UIElement>> query, string description)
     { Page = page; _query = query; Description = description; }
 
+    // Marks a strict-mode violation so retrying actions and assertions keep waiting for the
+    // ambiguity to resolve, and report it (with the match count) only when the timeout elapses.
+    internal const string StrictModeKey = "CodeBrix.Platform.PlayTest.StrictModeMatches";
+
     internal UIElement[] Resolve() => _query().Distinct().ToArray();
     internal UIElement? Single()
     {
         var matches = Resolve();
-        if (matches.Length > 1) throw new PlayTestException($"Strict mode violation: {Description} resolved to {matches.Length} elements. Use a unique name, test ID, or Nth().");
+        if (matches.Length > 1) throw StrictModeViolation(Description, matches.Length);
         return matches.SingleOrDefault();
     }
+
+    internal static PlayTestException StrictModeViolation(string description, int count)
+    {
+        var error = new PlayTestException($"Strict mode violation: {description} resolved to {count} elements. Use a unique name, test ID, or Nth().");
+        error.Data[StrictModeKey] = count;
+        return error;
+    }
+
+    internal static bool IsStrictModeViolation(Exception error) => error is PlayTestException && error.Data.Contains(StrictModeKey);
 
     /// <summary>The first match, in visual-tree order.</summary>
     public Locator First => Nth(0);
@@ -65,9 +79,10 @@ public sealed class Locator
     /// inside this locator's matches.</summary>
     /// <param name="id">The automation ID.</param>
     /// <returns>A scoped locator.</returns>
-    public Locator GetByTestId(string id)
+    /// <param name="options">Optional hidden-element filter.</param>
+    public Locator GetByTestId(string id, PageGetByTestIdOptions? options = null)
     {
-        var child = Page.GetByTestId(id);
+        var child = Page.GetByTestId(id, options);
         return new(Page, () => child.Resolve().Where(e => Resolve().Any(parent => e != parent && VisualTree.Within(e, parent))), Description + "." + child.Description);
     }
 
@@ -356,39 +371,156 @@ public sealed class Locator
         await App.SlowAsync().ConfigureAwait(false);
     }
 
-    /// <summary>Focuses the element, then presses a key or chord (see <see cref="Keyboard.PressAsync"/>).</summary>
+    /// <summary>Focuses the element (a control, or any element made focusable with <c>IsTabStop</c>), then
+    /// presses a key or chord (see <see cref="Keyboard.PressAsync"/>).</summary>
     /// <param name="key">Key name or <c>+</c>-joined chord, for example <c>Control+z</c>.</param>
-    /// <param name="options">Optional timeout for focusing.</param>
+    /// <param name="options">Optional timeout for focusing and hold time (<see cref="LocatorPressOptions.Delay"/>).</param>
     /// <returns>A task that completes after the next rendered frame.</returns>
     public async Task PressAsync(string key, LocatorPressOptions? options = null)
     {
         await using var step = Recording.PlayTestRecording.Step(App, "Press", Description);
         await RetryAsync(() => Focus(Single()), options?.Timeout, "focusable element").ConfigureAwait(false);
-        await Page.Keyboard.PressAsync(key).ConfigureAwait(false);
+        await Page.Keyboard.PressAsync(key, new KeyboardPressOptions { Delay = options?.Delay }).ConfigureAwait(false);
     }
 
     /// <summary>Focuses the control and types through its normal key handlers, including editor completion and indentation.</summary>
     /// <param name="text">The characters to type; newlines and tabs are typed as Enter and Tab.</param>
-    /// <param name="options">Optional timeout for focusing.</param>
+    /// <param name="options">Optional timeout for focusing and wait between characters (<see cref="LocatorPressOptions.Delay"/>).</param>
     /// <returns>A task that completes after the next rendered frame.</returns>
     public async Task PressSequentiallyAsync(string text, LocatorPressOptions? options = null)
     {
         await using var step = Recording.PlayTestRecording.Step(App, "Type", Description);
         ArgumentNullException.ThrowIfNull(text);
         await RetryAsync(() => Focus(Single()), options?.Timeout, "focusable element").ConfigureAwait(false);
-        await Page.Keyboard.TypeAsync(text).ConfigureAwait(false);
+        await Page.Keyboard.TypeAsync(text, new KeyboardTypeOptions { Delay = options?.Delay }).ConfigureAwait(false);
     }
 
     private static bool Focus(UIElement? element)
     {
-        if (element is not Control control || !VisualTree.Visible(control) || !VisualTree.Enabled(control)) return false;
-        if (control.XamlRoot is not { } root) return false;
+        // Controls, and other elements made focusable with IsTabStop (a game surface, a canvas).
+        if (element is not (Control or { IsTabStop: true }) || !VisualTree.Visible(element) || !VisualTree.Enabled(element)) return false;
+        if (element.XamlRoot is not { } root) return false;
         // Composite editors own a focused child. Refocusing their outer control can
         // defer focus forwarding and lose the first key, or dismiss a completion popup.
-        if (FocusManager.GetFocusedElement(root) is UIElement focused && VisualTree.Within(focused, control)) return true;
-        if (FrameworkElementAutomationPeer.CreatePeerForElement(control) is { } peer) peer.SetFocus();
-        else control.Focus(FocusState.Programmatic);
-        return FocusManager.GetFocusedElement(root) is UIElement result && VisualTree.Within(result, control);
+        if (FocusManager.GetFocusedElement(root) is UIElement focused && VisualTree.Within(focused, element)) return true;
+        if (element is Control && FrameworkElementAutomationPeer.CreatePeerForElement(element) is { } peer) peer.SetFocus();
+        else element.Focus(FocusState.Programmatic);
+        return FocusManager.GetFocusedElement(root) is UIElement result && VisualTree.Within(result, element);
+    }
+
+    /// <summary>Captures the single matching element as a PNG cropped to its bounds (clipped to the virtual
+    /// screen), once it is visible and at the same bounds over two rendered frames. An element that is
+    /// partly outside its scrolling viewport is brought into view first.</summary>
+    /// <param name="options">Optional file path, stable capture and timeout.</param>
+    /// <returns>The PNG bytes.</returns>
+    /// <exception cref="PlayTestException">The element was not ready in time, is outside the virtual screen,
+    /// a stable capture kept changing, or the locator is ambiguous.</exception>
+    public async Task<byte[]> ScreenshotAsync(LocatorScreenshotOptions? options = null)
+    {
+        await using var step = Recording.PlayTestRecording.Step(App, "Screenshot", Description);
+        var limit = options?.Timeout ?? App.Options.Timeout;
+        if (limit <= 0 || !float.IsFinite(limit)) throw new ArgumentOutOfRangeException(nameof(options), "The timeout must be positive and finite.");
+        await ScreenshotReadyAsync(options?.Timeout).ConfigureAwait(false);
+        var bytes = await Screenshots.CaptureAsync(App, VisibleBounds, options?.Stable == true, Stopwatch.StartNew(), limit, Description).ConfigureAwait(false);
+        if (options?.Path != null) await Screenshots.WriteAsync(options.Path, bytes).ConfigureAwait(false);
+        return bytes;
+    }
+
+    // UI thread: the single match's bounds, or null when it is gone or hidden.
+    internal Rect? VisibleBounds() => Single() is { } element && VisualTree.Visible(element) ? VisualTree.Bounds(element) : (Rect?)null;
+
+    internal Task ScreenshotReadyAsync(float? timeout)
+    {
+        Rect? previous = null;
+        var broughtIntoView = false;
+        return RetryAsync(() =>
+        {
+            var element = Single();
+            if (!VisualTree.Visible(element)) { previous = null; return false; }
+            var bounds = VisualTree.Bounds(element);
+            if (!broughtIntoView && (bounds.X < 0 || bounds.Y < 0 || bounds.Right > App.Width || bounds.Bottom > App.Height))
+            {
+                broughtIntoView = true;
+                element.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = false });
+                previous = null;
+                return false;
+            }
+            if (previous != bounds) { previous = bounds; return false; }
+            return true;
+        }, timeout, "visible element at stable bounds", render: true);
+    }
+
+    /// <summary>Selects the options whose value or label equals <paramref name="values"/> in a ComboBox,
+    /// ListBox, ListView or GridView, without opening its drop-down or realizing its rows, raising the
+    /// control's normal SelectionChanged event. A single-selection control selects the first matching option
+    /// in item order; a multiple-selection control selects exactly the matching options.</summary>
+    /// <param name="values">The option value or label (exact after whitespace normalization).</param>
+    /// <param name="options">Optional timeout.</param>
+    /// <returns>The values of the options selected afterwards.</returns>
+    /// <exception cref="PlayTestException">The element is not a selector, does not allow selection, or no
+    /// matching option appeared in time.</exception>
+    public Task<IReadOnlyList<string>> SelectOptionAsync(string values, LocatorSelectOptionOptions? options = null) =>
+        SelectOptionAsync(new[] { values }, options);
+
+    /// <summary>Selects the options whose value or label equals one of <paramref name="values"/>; see
+    /// <see cref="SelectOptionAsync(string, LocatorSelectOptionOptions)"/>. An empty list clears the selection.</summary>
+    /// <param name="values">Option values or labels; each must match at least one option.</param>
+    /// <param name="options">Optional timeout.</param>
+    /// <returns>The values of the options selected afterwards.</returns>
+    public Task<IReadOnlyList<string>> SelectOptionAsync(IEnumerable<string> values, LocatorSelectOptionOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var list = values.ToArray();
+        if (list.Any(v => v == null)) throw new ArgumentNullException(nameof(values));
+        return SelectAsync(list.Select(v => (Func<SelectorOption, bool>)(o => o.Value == v || VisualTree.Matches(o.Label, v, true))).ToArray(),
+            string.Join(", ", list.Select(v => $"'{v}'")), options);
+    }
+
+    /// <summary>Selects the option matching every property set on <paramref name="values"/> (value, label
+    /// and/or index); see <see cref="SelectOptionAsync(string, LocatorSelectOptionOptions)"/>.</summary>
+    /// <param name="values">The option to select.</param>
+    /// <param name="options">Optional timeout.</param>
+    /// <returns>The values of the options selected afterwards.</returns>
+    public Task<IReadOnlyList<string>> SelectOptionAsync(SelectOptionValue values, LocatorSelectOptionOptions? options = null) =>
+        SelectOptionAsync(new[] { values }, options);
+
+    /// <summary>Selects the options matching each of <paramref name="values"/>; see
+    /// <see cref="SelectOptionAsync(string, LocatorSelectOptionOptions)"/>. An empty list clears the selection.</summary>
+    /// <param name="values">The options to select; each must match at least one option.</param>
+    /// <param name="options">Optional timeout.</param>
+    /// <returns>The values of the options selected afterwards.</returns>
+    /// <exception cref="ArgumentException">An entry sets none of Value, Label and Index.</exception>
+    public Task<IReadOnlyList<string>> SelectOptionAsync(IEnumerable<SelectOptionValue> values, LocatorSelectOptionOptions? options = null)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        var list = values.ToArray();
+        if (list.Any(v => v == null || (v.Value == null && v.Label == null && v.Index == null)))
+            throw new ArgumentException("Each SelectOptionValue must set Value, Label or Index.", nameof(values));
+        return SelectAsync(list.Select(v => (Func<SelectorOption, bool>)(o => SelectorOptions.Matches(o, v))).ToArray(),
+            string.Join(", ", list.Select(SelectorOptions.Describe)), options);
+    }
+
+    private async Task<IReadOnlyList<string>> SelectAsync(Func<SelectorOption, bool>[] wanted, string requested, LocatorSelectOptionOptions? options)
+    {
+        await using var step = Recording.PlayTestRecording.Step(App, "SelectOption", Description);
+        IReadOnlyList<string> selected = Array.Empty<string>();
+        await RetryAsync(() =>
+        {
+            var element = Single();
+            if (!VisualTree.Visible(element) || !VisualTree.Enabled(element)) return false;
+            if (element is not Selector selector)
+                throw new PlayTestException($"{Description}: SelectOptionAsync requires a ComboBox, ListBox, ListView or GridView.");
+            var all = SelectorOptions.Read(selector);
+            // Like a browser, wait until every requested option is present.
+            if (!wanted.All(matches => all.Any(matches))) return false;
+            var chosen = all.Where(option => wanted.Any(matches => matches(option))).ToArray();
+            SelectorOptions.Apply(selector, chosen, Description);
+            selected = SelectorOptions.Read(selector).Where(option => option.Selected).Select(option => option.Value).ToArray();
+            return true;
+        }, options?.Timeout, $"visible, enabled selector with options {requested}").ConfigureAwait(false);
+        await App.Host.CaptureAsync().ConfigureAwait(false);
+        await App.SlowAsync().ConfigureAwait(false);
+        return selected;
     }
 
     internal async Task RetryAsync(Func<bool> check, float? timeout, string expectation, bool render = false)
@@ -397,12 +529,21 @@ public sealed class Locator
         var limit = timeout ?? App.Options.Timeout;
         if (limit <= 0 || !float.IsFinite(limit)) throw new ArgumentOutOfRangeException(nameof(timeout));
         var elapsed = Stopwatch.StartNew();
+        Exception? ambiguous = null;
         do
         {
             if (render) await App.Host.CaptureAsync().ConfigureAwait(false);
-            if (await App.EvaluateAsync(check).ConfigureAwait(false)) return;
+            try
+            {
+                if (await App.EvaluateAsync(check).ConfigureAwait(false)) return;
+                ambiguous = null;
+            }
+            // Two matches can be momentary (one dialog replacing another), so keep waiting.
+            catch (Exception error) when (IsStrictModeViolation(error)) { ambiguous = error; }
             await Task.Delay(25).ConfigureAwait(false);
         } while (elapsed.Elapsed.TotalMilliseconds < limit);
+        if (ambiguous != null)
+            throw await App.FailureAsync($"{ambiguous.Message} It was still ambiguous when the {limit}ms timeout elapsed; expected {expectation}.").ConfigureAwait(false);
         throw await App.FailureAsync($"Timeout {limit}ms: {Description}; expected {expectation}.").ConfigureAwait(false);
     }
 }

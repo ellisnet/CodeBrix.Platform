@@ -104,7 +104,18 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 
 		public string GetLocalizedControlType() => GetLocalizedControlTypeCore();
 
-		public string GetName() => GetNameCore();
+		public string GetName()
+		{
+			var name = GetNameCore();
+			return string.IsNullOrEmpty(name) && GetToolTipNameFallback() is { Length: > 0 } toolTipName
+				? toolTipName
+				: name;
+		}
+
+		/// <summary>
+		/// The name used when <see cref="GetNameCore"/> returns an empty name; <see langword="null"/> for none.
+		/// </summary>
+		private protected virtual string GetToolTipNameFallback() => null;
 
 		public AutomationPeer GetLabeledBy() => GetLabeledByCore();
 

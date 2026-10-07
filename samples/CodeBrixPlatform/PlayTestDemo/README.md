@@ -14,6 +14,31 @@ AdvancedTextEdit add-ins; the PlayTest package does not. `DesktopControlTests.cs
 covers these interactions through typed/role locators and real input, including
 failure paths, undo, composite focus and empty completion lists.
 
+“Try the API lab” opens a third shared screen (`ApiLabView`): a key sampler
+that reads key state on a timer like a game loop, hidden and duplicate
+elements, a scrolling list of buttons for the mouse wheel, a 24-row combo box
+and a multiple-selection list, a dialog with a title, a link and a launch
+button, window close/minimize counters with an “unsaved changes” switch that
+refuses to close, and a color swatch for screenshots. `ApiLabTests.cs` covers
+held keys, visible-only locators, strictness while waiting,
+`SelectOptionAsync`, dialog title filtering, the recording launcher, window
+actions, the application's own window, and element and stable screenshots.
+
+“Try OpenGL” opens `OpenGLView`: a flat orange square lit from the left, drawn
+with raw OpenGL (`GLCanvasElement`), a blue circle drawn with GPU Skia
+(`SkiaGLCanvasElement`), a button that turns the square, and the message the
+application shows when the machine gives it no OpenGL. The demo references the
+Graphics3DGL add-in; the PlayTests project references
+CodeBrix.Platform.PlayTest.OpenGL and registers it in `AppFixture`.
+`OpenGLTests.cs` measures the canvases with `PixelStats` (coverage, bounds,
+centroid, lit half against dark half, variance, mirror symmetry, the
+difference a rotation makes) and checks `PlayTestApplication.OpenGL`.
+`tests/PlayTestDemo.NoOpenGL.PlayTests` launches the same application with
+`PlayTestOptions.OpenGL = PlayTestOpenGL.Unavailable` - OpenGL is a launch
+option and PlayTest runs one application per process - and asserts the
+fallback message. On Linux the OpenGL tests need `libegl1` and
+`libgl1-mesa-dri`.
+
 ## Projects
 
 - `src/PlayTestDemo.Core`: view model and shared framework/font references.
@@ -23,6 +48,8 @@ failure paths, undo, composite focus and empty completion lists.
 - `tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj`: executable xUnit v3
   tests with a direct SilverAssertions reference. Nullable and implicit usings
   are disabled throughout the sample.
+- `tests/PlayTestDemo.NoOpenGL.PlayTests/PlayTestDemo.NoOpenGL.PlayTests.csproj`: the
+  same application launched without OpenGL, in a process of its own.
 
 Open the solution for your OS: `PlayTestDemo.Linux.slnx`,
 `PlayTestDemo.Windows.slnx`, or `PlayTestDemo.MacOS.slnx`.
@@ -43,6 +70,7 @@ dotnet run --project src/PlayTestDemo.LinuxX11 -c Release
 
 # Offscreen tests: Landscape and Light unless explicitly overridden.
 dotnet test --project tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release
+dotnet test --project tests/PlayTestDemo.NoOpenGL.PlayTests/PlayTestDemo.NoOpenGL.PlayTests.csproj -c Release
 
 # Visible, view-only preview on a desktop; no picker dialogs appear.
 dotnet test --project tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj -c Release --headed
@@ -67,13 +95,16 @@ This demo's test project holds the UI cases that need a running application:
 
 - Checkbox and toggle-switch input, checked-state assertions, and idempotence.
 - Scrolling an initially clipped button into view and clicking it.
-- Folder, open, multiple-open and save selections and cancellation.
+- Folder, open, multiple-open and save selections, cancellation and scripted
+  picker failures.
 - Ordered multi-file results, actual text reads, existing-file preservation,
   invalid-path and unscripted-picker diagnostics, FIFO responses and queue reset.
 - Forced landscape and portrait at both method and theory-row level.
 - A check that the requested preview mode reaches the running application.
 - The desktop-controls screen: AdvancedTextEdit, menus, CommandBar and related
   interactions.
+- The API lab: held keys, hidden elements, strictness, option selection,
+  dialogs, launching, window actions and screenshots.
 
 Configuration-only cases that need no running application - delay defaults,
 command-line/environment/project precedence, the `--nonheadless` alias, conflicting
@@ -81,7 +112,8 @@ options, invalid values and screenshot-folder validation - live in the host-free
 `src/Platform.UI.Runtime.Skia.PlayTest.Tests` project, not in this demo.
 
 The UI suite is serialized against one application: the fixture launches it once
-and installs a fresh **demo MainPage** for each test. It clears picker responses,
+and installs a fresh **demo MainPage** for each test. It clears picker responses
+and the launcher history,
 resolves orientation traits, and removes its own temporary files at teardown.
 Tests queue paths before clicking the application's real picker buttons; they
 verify visible status and view-model/file outcomes. The application handles

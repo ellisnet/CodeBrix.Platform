@@ -51,4 +51,72 @@ public sealed class KeyboardTests
         //Assert
         parse.Should().Throw<ArgumentException>().WithMessage($"Unsupported key '{key}'*");
     }
+
+    [Theory]
+    [InlineData("a", 'a')]
+    [InlineData("Z", 'Z')]
+    [InlineData("7", '7')]
+    [InlineData("Space", ' ')]
+    [InlineData("Enter", null)]
+    [InlineData("ArrowRight", null)]
+    public void Character_is_the_typed_character_of_single_character_keys_and_space(string key, char? expected)
+        => Keyboard.Character(key).Should().Be(expected);
+
+    [Theory]
+    [InlineData("ArrowRight", VirtualKey.Right)]
+    [InlineData("Shift", VirtualKey.Shift)]
+    [InlineData("x", VirtualKey.X)]
+    public void ParseSingle_accepts_one_key(string key, VirtualKey expected)
+        => Keyboard.ParseSingle(key).Should().Be(expected);
+
+    [Theory]
+    [InlineData("Shift+ArrowRight")]
+    [InlineData("Control+z")]
+    public void ParseSingle_rejects_chords(string key)
+    {
+        //Act
+        Action parse = () => Keyboard.ParseSingle(key);
+
+        //Assert
+        parse.Should().Throw<ArgumentException>().WithMessage($"'{key}' is a chord*");
+    }
+
+    [Theory]
+    [InlineData(null, 0f)]
+    [InlineData(0f, 0f)]
+    [InlineData(150.5f, 150.5f)]
+    public void ValidDelay_accepts_finite_non_negative_milliseconds(float? delay, float expected)
+        => Keyboard.ValidDelay(delay).Should().Be(expected);
+
+    [Theory]
+    [InlineData(-1f)]
+    [InlineData(float.NaN)]
+    [InlineData(float.PositiveInfinity)]
+    public void ValidDelay_rejects_negative_and_non_finite_values(float delay)
+    {
+        //Act
+        Action validate = () => Keyboard.ValidDelay(delay);
+
+        //Assert
+        validate.Should().Throw<ArgumentOutOfRangeException>();
+    }
+
+    [Fact]
+    public void Held_keys_are_released_most_recent_first_and_only_once()
+    {
+        //Arrange
+        var held = new HeldKeys();
+        held.Add(VirtualKey.Shift);
+        held.Add(VirtualKey.Right);
+        held.Add(VirtualKey.Shift);
+        held.Add(VirtualKey.Up);
+        held.Remove(VirtualKey.Up);
+
+        //Act
+        var released = held.TakeAll();
+
+        //Assert
+        released.Should().Equal(VirtualKey.Right, VirtualKey.Shift);
+        held.Keys.Should().BeEmpty();
+    }
 }

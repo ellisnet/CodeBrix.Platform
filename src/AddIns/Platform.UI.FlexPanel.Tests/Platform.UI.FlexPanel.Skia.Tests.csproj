@@ -14,7 +14,9 @@
 		     suite runs on the same framework assemblies an application does, matching the TextLayout
 		     add-in's test setup. The suite itself is host-free: it drives the internal flex engine
 		     with plain Item trees (via InternalsVisibleTo), the same model as the original
-		     xamarin/flex C tests - no rendering, no natives, no application host. -->
+		     xamarin/flex C tests - no rendering, no natives, no application host. The panel layout
+		     tests also measure and arrange a real FlexPanel with plain elements (no text, no
+		     templates), with the host-free dispatcher bootstrap the CommandBar suite uses. -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 
 		<AssemblyName>CodeBrix.Platform.UI.FlexPanel.Tests</AssemblyName>
@@ -37,5 +39,34 @@
 		<ProjectReference Include="..\Platform.UI.FlexPanel\Platform.UI.FlexPanel.Core.csproj" />
 		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<!-- The panel layout tests (FlexPanelLayoutTests.cs) build real XAML elements. These three are
+		     what the target below swaps in: the compile-time reference to CodeBrix.Platform resolves to
+		     the .Reference flavour, whose dispatcher stubs throw, so the .Skia variants are copied beside
+		     the tests instead - the same arrangement as the CommandBar and SkiaSharp.Views suites.
+		     DispatcherInitializer.cs then installs the host-free dispatcher overrides. -->
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<Target Name="_FlexPanelTestsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<_FpSkiaUwp>$(MSBuildThisFileDirectory)..\..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_FpSkiaUwp>
+			<_FpSkiaComp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_FpSkiaComp>
+			<_FpSkiaDisp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_FpSkiaDisp>
+		</PropertyGroup>
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_FpSkiaUwp)\CodeBrix.Platform.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_FpSkiaUwp)\CodeBrix.Platform.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_FpSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_FpSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_FpSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_FpSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_FpSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+		</ItemGroup>
+	</Target>
 
 </Project>

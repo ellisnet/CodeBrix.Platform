@@ -1,4 +1,5 @@
 using SilverAssertions;
+using Windows.Foundation;
 using Xunit;
 
 namespace CodeBrix.Platform.PlayTest.Tests;
@@ -41,4 +42,13 @@ public sealed class VisualTreeTests
     [InlineData(null, "", true)]
     public void Matches_exact_is_a_case_sensitive_normalized_equality(string? actual, string expected, bool matches)
         => VisualTree.Matches(actual, expected, exact: true).Should().Be(matches);
+
+    [Theory]
+    [InlineData(-10000, -10000, true)]
+    [InlineData(-10120, -10248, true)]
+    [InlineData(-10000, 0, false)]
+    [InlineData(0, -10000, false)]
+    [InlineData(-9999, -9999, false)]
+    public void IsRecycledPosition_recognises_the_items_repeater_parking_position(double x, double y, bool recycled)
+        => VisualTree.IsRecycledPosition(new Point(x, y)).Should().Be(recycled);
 }

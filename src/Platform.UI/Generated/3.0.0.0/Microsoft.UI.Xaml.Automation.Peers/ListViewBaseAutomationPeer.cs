@@ -28,13 +28,7 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 			}
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public ListViewBaseAutomationPeer(global::Microsoft.UI.Xaml.Controls.ListViewBase owner) : base(owner)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Xaml.Automation.Peers.ListViewBaseAutomationPeer", "ListViewBaseAutomationPeer.ListViewBaseAutomationPeer(ListViewBase owner)");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Xaml.Automation.Peers.ListViewBaseAutomationPeer.ListViewBaseAutomationPeer(Microsoft.UI.Xaml.Controls.ListViewBase)
 		// Forced skipping of method Microsoft.UI.Xaml.Automation.Peers.ListViewBaseAutomationPeer.ListViewBaseAutomationPeer(Microsoft.UI.Xaml.Controls.ListViewBase)
 		// Forced skipping of method Microsoft.UI.Xaml.Automation.Peers.ListViewBaseAutomationPeer.DropEffect.get
 		// Forced skipping of method Microsoft.UI.Xaml.Automation.Peers.ListViewBaseAutomationPeer.DropEffects.get

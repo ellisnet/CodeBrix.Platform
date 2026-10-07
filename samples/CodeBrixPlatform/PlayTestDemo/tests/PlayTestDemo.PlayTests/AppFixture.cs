@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using CodeBrix.Platform.PlayTest;
+using CodeBrix.Platform.PlayTest.OpenGL;
 using PlayTestDemo.ViewModels;
 using PlayTestDemo.Views;
 using Xunit;
@@ -21,6 +22,8 @@ public sealed class AppFixture : IAsyncLifetime
     {
         Directory.CreateDirectory(DataDirectory);
         App.InitializeLogging();
+        // The demo has an OpenGL page: give its elements real contexts.
+        CodeBrixPlayTestOpenGL.Register();
         Application = await PlayTestApplication.LaunchAsync(() => new App(), new()
         {
             ConfigurationAssembly = typeof(AppFixture).Assembly,
@@ -30,6 +33,7 @@ public sealed class AppFixture : IAsyncLifetime
     public async Task ResetAsync(ScreenOrientation? orientation)
     {
         Application.FilePickers.Clear();
+        Application.Launcher.Clear();
         await Application.Page.SetContentAsync(() => View = new MainPage(), orientation);
     }
 

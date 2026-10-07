@@ -61,6 +61,13 @@ per-head variant: there is none.
   - The Windows (Win32 and Skia-on-WPF) and Linux (X11, Wayland, FrameBuffer)
     heads activate it automatically (OS-gated ApiExtension registrations that
     the XAML source generator emits into your app).
+  - Each generated registration is skipped when an IMediaPlayerExtension (or
+    IMediaPlayerPresenterExtension) is already registered. A test that wants a
+    recording engine instead of libvlc registers it with
+    ApiExtensibility.Register<MediaPlayer>(typeof(IMediaPlayerExtension), ...)
+    BEFORE the application object is created; the generated registration then
+    keeps it, and a second application object in the same process does not
+    throw on the duplicate.
   - On the macOS head neither registration matches, so the add-in is inert and
     the head's built-in AVFoundation media support is used instead.
 

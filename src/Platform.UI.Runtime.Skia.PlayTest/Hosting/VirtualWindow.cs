@@ -17,7 +17,8 @@ internal sealed class VirtualWindow : NativeWindowWrapperBase, INativeWindowFact
     internal VirtualWindow(VirtualHost host) => _host = host;
     public override object? NativeWindow => null;
     public override string Title { get; set; } = "PlayTest";
-    public bool SupportsClosingCancellation => false;
+    // Like the desktop heads: AppWindow.Closing and Window.Closed handlers can keep the window open.
+    public bool SupportsClosingCancellation => true;
     public bool SupportsMultipleWindows => false;
     internal UIElement? Root => Window?.RootElement;
     internal Window? ManagedWindow => Window;
@@ -42,6 +43,45 @@ internal sealed class VirtualWindow : NativeWindowWrapperBase, INativeWindowFact
     }
 
     protected internal override void Activate() => ActivationState = CoreWindowActivationState.CodeActivated;
+
+    internal bool Minimized { get; private set; }
+
+    // Dispatcher-only. The close button's path in the X11 and Wayland heads: raise Closing; the
+    // framework runs AppWindow.Closing and, unless cancelled, Window.Closed and hides the window.
+    // The process keeps running; ShowForNextTest brings the window back.
+    internal bool RequestClose()
+    {
+        var closing = RaiseClosing();
+        if (closing.Cancel) return false;
+        Minimized = false;
+        IsVisible = false;
+        return true;
+    }
+
+    // Dispatcher-only. Minimize/restore as the X11 and Wayland heads report it: focus leaves the
+    // window and it becomes hidden; restoring makes it visible and active again.
+    internal void Minimize()
+    {
+        if (!IsVisible || Minimized) return;
+        Minimized = true;
+        ActivationState = CoreWindowActivationState.Deactivated;
+        IsVisible = false;
+    }
+
+    internal void Restore()
+    {
+        if (!Minimized) return;
+        Minimized = false;
+        IsVisible = true;
+        ActivationState = CoreWindowActivationState.CodeActivated;
+    }
+
+    // Dispatcher-only: a test reset after a minimize or an accepted close starts with a shown, active window.
+    internal void ShowForNextTest()
+    {
+        if (Minimized) Restore();
+        else if (!WasShown || !IsVisible) Window?.Activate();
+    }
 }
 
 internal sealed class VirtualDisplay : IDisplayInformationExtension

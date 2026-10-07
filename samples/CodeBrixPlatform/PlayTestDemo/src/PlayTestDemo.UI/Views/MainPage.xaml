@@ -5,7 +5,11 @@
   <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
     <StackPanel Padding="32" Spacing="20" MaxWidth="1000" HorizontalAlignment="Stretch">
       <TextBlock Text="PlayTestDemo" FontSize="32" FontWeight="SemiBold" />
-      <Button Content="Try desktop controls" Click="OnDesktopControls" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Button Content="Try desktop controls" Click="OnDesktopControls" />
+        <Button Content="Try the API lab" Click="OnApiLab" />
+        <Button Content="Try OpenGL" Click="OnOpenGL" />
+      </StackPanel>
       <TextBlock Text="A home for control and interaction tests. Try the controls yourself, or watch the PlayTests preview."
                  TextWrapping="Wrap" />
 

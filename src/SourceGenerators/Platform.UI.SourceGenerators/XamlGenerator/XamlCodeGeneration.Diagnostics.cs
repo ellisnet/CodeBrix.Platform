@@ -36,6 +36,24 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 																							 description: XamlGenerationFailureDescription
 																							);
 
+		/// <summary>
+		/// Uno0008: a {Binding}, {x:Bind} or {TemplateBinding} targets a property the element's type does not have
+		/// (no dependency property, no attached property, no CLR property). The binding is resolved by name at run
+		/// time and silently does nothing, so this is reported at build time - as a warning, because such XAML has
+		/// always compiled.
+		/// </summary>
+		public static readonly DiagnosticDescriptor BindingTargetPropertyNotFoundRule = new DiagnosticDescriptor(
+#pragma warning disable RS2008 // Enable analyzer release tracking
+																							 "Uno0008",
+#pragma warning restore RS2008 // Enable analyzer release tracking
+																							 "Binding target property not found",
+																							 "Property '{0}' does not exist on '{1}'; the binding has no target and does nothing at run time",
+																							 XamlCategory,
+																							 DiagnosticSeverity.Warning,
+																							 isEnabledByDefault: true,
+																							 description: "A binding markup extension is set on a property that the element's type (and its base types) does not declare as a dependency property, an attached property or a CLR property."
+																							);
+
 		public static readonly DiagnosticDescriptor ResourceParsingFailureRule = new DiagnosticDescriptor(
 #pragma warning disable RS2008 // Enable analyzer release tracking
 																							 "UXAML0003",

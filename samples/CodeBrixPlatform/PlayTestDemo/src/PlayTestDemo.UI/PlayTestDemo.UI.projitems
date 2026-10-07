@@ -17,14 +17,24 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Views\ApiLabView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Views\DesktopControlsView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\KeySampler.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Views\OpenGLView.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WindowLifecycle.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Views\ApiLabView.xaml.cs">
+      <DependentUpon>ApiLabView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
 </Project>

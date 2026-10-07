@@ -29,6 +29,10 @@ namespace Microsoft.UI.Xaml.Controls
 
 		private bool _isTransportControlsBound;
 
+		// The source the player already started (AutoPlay) while this element was not loaded yet: the first
+		// OnLoaded after that must not call Play() a second time for it.
+		private IMediaPlaybackSource _startedBeforeLoad;
+
 		#region Source Property
 
 		public IMediaPlaybackSource Source
@@ -57,6 +61,7 @@ namespace Microsoft.UI.Xaml.Controls
 				if (mpe.MediaPlayer != null)
 				{
 					mpe.MediaPlayer.Source = source;
+					mpe.NoteStartedBeforeLoad(mpe.MediaPlayer, source);
 				}
 
 				if (source == null)
@@ -234,7 +239,11 @@ namespace Microsoft.UI.Xaml.Controls
 
 				if (args.NewValue is global::Windows.Media.Playback.MediaPlayer newMediaPlayer)
 				{
+					// AutoPlay first: setting Source initializes the engine's source and starts it when AutoPlay is
+					// on, so the engine must already see the element's AutoPlay for the start-up source.
+					newMediaPlayer.AutoPlay = mpe.AutoPlay;
 					newMediaPlayer.Source = mpe.Source;
+					mpe.NoteStartedBeforeLoad(newMediaPlayer, mpe.Source);
 
 					mpe._mediaPlayerDisposable = new CompositeDisposable();
 					var weakThis = new WeakReference<MediaPlayerElement>(mpe);
@@ -346,13 +355,23 @@ namespace Microsoft.UI.Xaml.Controls
 			{
 				MediaPlayer.AutoPlay = AutoPlay;
 
-				if (MediaPlayer.PlaybackSession.PlaybackState is not MediaPlaybackState.None
+				// One Play per source: a source the player already started when it was set (AutoPlay) is not
+				// started again here. A later load (the element taken off the tree and put back) still plays.
+				var alreadyStarted = _startedBeforeLoad is not null && ReferenceEquals(_startedBeforeLoad, MediaPlayer.Source);
+				_startedBeforeLoad = null;
+
+				if (!alreadyStarted
+					&& MediaPlayer.PlaybackSession.PlaybackState is not MediaPlaybackState.None
 					&& AutoPlay)
 				{
 					MediaPlayer.Play();
 				}
 			}
 		}
+
+		// MediaPlayer.Source's setter starts a non-null source itself when AutoPlay is on.
+		private void NoteStartedBeforeLoad(global::Windows.Media.Playback.MediaPlayer player, IMediaPlaybackSource source)
+			=> _startedBeforeLoad = !IsLoaded && player.AutoPlay && source is not null ? source : null;
 
 		// The PosterSource is displayed in the following situations:
 		//  - When a valid source is not set.For example, Source is not set, Source was set to Null, or the source is invalid (as is the case when a MediaFailed event fires).

@@ -21,6 +21,12 @@ internal sealed class WpeWebViewHostElement : FrameworkElement
 	private SKImage? _frame;
 	private readonly object _frameGate = new();
 
+	/// <summary>
+	/// The colour behind the web content - the same colour the engine paints behind the page - shown where no
+	/// frame covers the area. Set on the UI thread.
+	/// </summary>
+	internal SKColor BackgroundColor { get; set; } = SKColors.White;
+
 	/// <param name="compositor">
 	/// The shared compositor, obtained from an existing visual (the hosting ContentPresenter's)
 	/// rather than Compositor.GetSharedCompositor, which is internal to the Composition assembly -
@@ -59,6 +65,13 @@ internal sealed class WpeWebViewHostElement : FrameworkElement
 		_canvasVisual?.Invalidate();
 	}
 
+	/// <summary>
+	/// Where a frame of <paramref name="frameWidth"/> x <paramref name="frameHeight"/> device pixels is drawn, in the
+	/// element's coordinates: at the top-left, at its own size (device pixels divided by the display scale).
+	/// </summary>
+	internal static SKRect GetFrameDestination(int frameWidth, int frameHeight, float scale)
+		=> new(0, 0, frameWidth / scale, frameHeight / scale);
+
 	private void PaintFrame(SKCanvas canvas, Size area)
 	{
 		SKImage? frame;
@@ -70,7 +83,16 @@ internal sealed class WpeWebViewHostElement : FrameworkElement
 			// safe option (the draw is a fast blit of an already-rasterized image).
 			if (frame is not null)
 			{
-				canvas.DrawImage(frame, new SKRect(0, 0, (float)area.Width, (float)area.Height), new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
+				// Draw the frame at its own size (device pixels / scale), anchored top-left and clipped to the
+				// area - never stretched. A frame made for another size (the engine's start-up size, or the size
+				// before a resize, until the engine delivers the next frame) then shows undistorted, with the
+				// web view's background colour behind any part of the area it does not cover.
+				var scale = XamlRoot?.RasterizationScale is > 0 and var s ? (float)s : 1f;
+				canvas.Save();
+				canvas.ClipRect(new SKRect(0, 0, (float)area.Width, (float)area.Height));
+				canvas.Clear(BackgroundColor);
+				canvas.DrawImage(frame, GetFrameDestination(frame.Width, frame.Height, scale), new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None));
+				canvas.Restore();
 			}
 		}
 

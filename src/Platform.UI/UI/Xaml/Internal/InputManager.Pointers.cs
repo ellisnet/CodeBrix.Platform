@@ -196,12 +196,23 @@ partial class InputManager
 				? FocusManager.GetFocusedElement(xamlRoot)
 				: null;
 			if (!isHandled // so isAfterHandledUp is false!
-				&& _canUnFocusOnNextLeftPointerRelease
 				&& args.GetCurrentPoint(null).Properties.PointerUpdateKind is PointerUpdateKind.LeftButtonReleased
 				&& !PointerCapture.TryGet(args.Pointer, out _)
 				&& focusedElement is UIElement uiElement)
 			{
-				uiElement.Unfocus();
+				if (!uiElement.IsInLiveTree)
+				{
+					// The press removed the focused element from the tree (e.g. its own pointer handler did): focus must
+					// not stay on an element that is gone, and the element itself can no longer reach a focus manager.
+					// (A Control moves the focus on when it is unloaded; other focusable elements rely on this.)
+					_inputManager.ContentRoot.FocusManager.ClearFocus();
+				}
+				else if (_canUnFocusOnNextLeftPointerRelease && !IsOnOrInside(uiElement, args.OriginalSource))
+				{
+					// A release on the empty background (or on any other element that did not take focus) clears it;
+					// a release ON or INSIDE the focused element leaves the focus where it is.
+					uiElement.Unfocus();
+				}
 			}
 
 			ReleaseCaptures(args.Reset(canBubbleNatively: false));
@@ -211,6 +222,10 @@ partial class InputManager
 			// (This could be the case if the args was flagged as handled in the ReleaseCaptures call above, like in RatingControl).
 			args.Handled = isAfterHandledUp;
 		}
+
+		private static bool IsOnOrInside(UIElement focusedElement, object? originalSource)
+			=> originalSource is DependencyObject source
+				&& (ReferenceEquals(source, focusedElement) || focusedElement.IsAncestorOf(source));
 
 		// As focus event are either async or cancellable,
 		// the FocusManager will explicitly notify us instead of listing to its events

@@ -308,6 +308,62 @@ public partial class Given_Parser
 	}
 
 	[TestMethod]
+	public async Task When_Binding_On_Missing_Property()
+	{
+		var xamlFiles = new[]
+		{
+			new XamlFile(
+				"MainPage.xaml",
+				"""
+				<Page x:Class="TestRepro.MainPage"
+					  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+					<StackPanel IsEnabled="{Binding IsBusy}">
+					</StackPanel>
+				</Page>
+				"""),
+		};
+
+		var test = new Verify.Test(xamlFiles) { TestState = { Sources = { _emptyCodeBehind } } }.AddGeneratedSources();
+
+		test.ExpectedDiagnostics.AddRange([
+			DiagnosticResult.CompilerWarning("Uno0008").WithSpan("//Project/0/MainPage.xaml", 6, 3, 6, 3).WithArguments("IsEnabled", "StackPanel"),
+			// ==> A warning, not an error: the page still builds and the binding does nothing at run time, as before.
+		]);
+
+		await test.RunAsync();
+	}
+
+	[TestMethod]
+	public async Task When_Binding_On_Existing_Properties_No_Warning()
+	{
+		var xamlFiles = new[]
+		{
+			new XamlFile(
+				"MainPage.xaml",
+				"""
+				<Page x:Class="TestRepro.MainPage"
+					  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+					  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+					  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006">
+
+					<Grid Tag="{Binding Title}">
+						<TextBlock Grid.Row="{Binding Row}" Text="{Binding Name}" />
+						<Button IsEnabled="{Binding CanSave}" Content="{Binding Label}" />
+						<ContentControl Content="{TemplateBinding Content}" />
+					</Grid>
+				</Page>
+				"""),
+		};
+
+		var test = new Verify.Test(xamlFiles) { TestState = { Sources = { _emptyCodeBehind } } }.AddGeneratedSources();
+
+		await test.RunAsync();
+	}
+
+	[TestMethod]
 	public async Task When_Invalid_Margin_Value()
 	{
 		var xamlFiles = new[]
@@ -793,10 +849,24 @@ public partial class Given_Parser
 							}
 						}
 					}
+					""",
+					// A stand-in for the SkiaSharp.Views add-in's canvas: the test is about the "skia" PREFIX not being
+					// read as conditional XAML, not about the package. (Referencing the published package tied the test
+					// to whichever framework build that package was compiled against; since the Core/Skia split its
+					// canvas derives from types in the .Core assemblies, which this harness replaces with the local
+					// unit-test assemblies, so its base type no longer resolved.)
+					"""
+					using Microsoft.UI.Xaml.Controls;
+
+					namespace SkiaSharp.Views.Windows
+					{
+						public partial class SKXamlCanvas : Canvas
+						{
+						}
+					}
 					"""
 				}
 			},
-			ReferenceAssemblies = _Dotnet.Current.ReferenceAssemblies.AddPackages([new PackageIdentity("CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever", "4.153.1")]),
 		}.AddGeneratedSources();
 
 		await test.RunAsync();

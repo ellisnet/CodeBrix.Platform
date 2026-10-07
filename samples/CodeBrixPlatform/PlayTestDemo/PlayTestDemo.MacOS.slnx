@@ -27,6 +27,7 @@
     <Project Path="../../../src/Platform.UI.Runtime.Skia.Linux.FrameBuffer/Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
     <Project Path="../../../src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <Project Path="../../../src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
+    <Project Path="../../../src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
   </Folder>
   <Folder Name="/Platform/Source Generators/">
     <Project Path="../../../src/SourceGenerators/System.Xaml/Platform.Xaml.csproj" />
@@ -45,5 +46,6 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj" />
+    <Project Path="tests/PlayTestDemo.NoOpenGL.PlayTests/PlayTestDemo.NoOpenGL.PlayTests.csproj" />
   </Folder>
 </Solution>

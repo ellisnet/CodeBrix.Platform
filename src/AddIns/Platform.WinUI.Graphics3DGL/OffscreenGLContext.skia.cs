@@ -159,8 +159,9 @@ public sealed class OffscreenGLContext : IDisposable
 	/// <remarks>
 	/// <para>
 	/// This method owns the per-head desktop-GL-vs-GLES branch (X11/Win32/WPF are desktop GL;
-	/// Wayland/macOS/Frame Buffer are GLES) so no consumer has to re-implement it. The head is
-	/// detected from the loaded head-runtime assembly; whichever flavor that implies is tried first
+	/// Wayland/macOS/Frame Buffer are GLES) so no consumer has to re-implement it. A head whose native
+	/// wrapper declares its flavor is taken at its word; otherwise the head is detected from the
+	/// loaded head-runtime assembly. Whichever flavor that implies is tried first
 	/// and, if it fails, the other flavor is tried, so the result is robust even on an unrecognized
 	/// host.
 	/// </para>
@@ -183,7 +184,8 @@ public sealed class OffscreenGLContext : IDisposable
 		// This is safe to nest inside a caller's own MakeCurrent() (save/restore is balanced).
 		using (_wrapper.MakeCurrent())
 		{
-			var useGles = Graphics3DGLHeadDetection.CurrentHeadUsesGles();
+			// A wrapper that declares its flavour wins; otherwise the running head decides.
+			var useGles = _wrapper.UsesGles ?? Graphics3DGLHeadDetection.CurrentHeadUsesGles();
 
 			// Try the flavor the head implies first, then fall back to the other so a misdetected or
 			// unrecognized host still succeeds where a context genuinely exists.

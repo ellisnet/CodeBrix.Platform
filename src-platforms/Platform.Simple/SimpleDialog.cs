@@ -1,7 +1,6 @@
 #pragma warning disable CS1591
 
 using System;
-using System.Text;
 using System.Threading.Tasks;
 
 #if (WIN_UI || HAS_CODEBRIX) //WIN_UI needs to be manually defined on Win UI projects (and CodeBrix.Platform net10.0-windows projects)
@@ -92,40 +91,6 @@ public class SimpleDialog : IDisposable
         string title = null,
         SimpleDialogButtons buttons = SimpleDialogButtons.OK) =>
         new(xamlRootGetter, dispatcher, message, title, buttons);
-
-    private static string BreakOnMaxLineLength(string text, int maxLineLength)
-    {
-        var result = text;
-
-        if ((!string.IsNullOrWhiteSpace(text)) && maxLineLength > 0)
-        {
-            var lines = text.Replace("\r\n", "\n").Trim().Split('\n');
-            var sb = new StringBuilder();
-            foreach (var line in lines)
-            {
-                if (line.Length > maxLineLength)
-                {
-                    var pos = 0;
-                    while (pos < line.Length)
-                    {
-                        var newLine = ((pos + maxLineLength) < line.Length)
-                            ? line.Substring(pos, maxLineLength)
-                            : line[pos..];
-                        sb.AppendLine(newLine);
-                        pos += newLine.Length;
-                    }
-                }
-                else
-                {
-                    sb.AppendLine(line);
-                }
-            }
-
-            result = sb.ToString().Trim();
-        }
-
-        return result;
-    }
 
     // ReSharper disable InconsistentNaming
     //VERY IMPORTANT: With CodeBrix.Platform, anything that touches the XamlRoot needs to be running on the main thread.
@@ -234,7 +199,9 @@ public class SimpleDialog : IDisposable
 
             var dialog = new ContentDialog
             {
-                Content = new TextBlock { Text = BreakOnMaxLineLength(_message, 74) },
+                //The text wraps at the dialog's width (a long path or URL breaks inside the word), so the
+                //  message keeps its exact characters - no line breaks are inserted into it.
+                Content = new TextBlock { Text = _message.Replace("\r\n", "\n"), TextWrapping = TextWrapping.Wrap },
                 PrimaryButtonText = firstButton,
                 IsPrimaryButtonEnabled = true,
                 IsSecondaryButtonEnabled = (secondButton != null),

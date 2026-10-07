@@ -30,6 +30,7 @@ namespace CodeBrix.Platform.UI.Xaml.Controls; //Was previously: Uno.UI.Xaml.Cont
 internal abstract partial class BaseWindowImplementation : IWindowImplementation
 {
 	private CoreWindowActivationState _lastActivationState = CoreWindowActivationState.Deactivated;
+	private bool? _lastRaisedVisibility;
 	private Size _lastSize = new Size(-1, -1);
 
 	private bool _isClosing;
@@ -374,6 +375,14 @@ internal abstract partial class BaseWindowImplementation : IWindowImplementation
 
 	private void RaiseWindowVisibilityChangedEvent(bool isVisible)
 	{
+		// Raise only real changes: an accepted Close raises "hidden" itself and then hides the native window, whose
+		// own visibility change would otherwise report "hidden" a second time.
+		if (_lastRaisedVisibility == isVisible)
+		{
+			return;
+		}
+
+		_lastRaisedVisibility = isVisible;
 		var args = new VisibilityChangedEventArgs() { Visible = isVisible };
 
 		CoreWindow?.OnVisibilityChanged(args);

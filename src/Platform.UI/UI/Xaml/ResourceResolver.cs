@@ -298,6 +298,9 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 		[UnconditionalSuppressMessage("Trimming", "IL2072", Justification = "Types manipulated here have been marked earlier")]
 		internal static void ApplyResource(DependencyObject owner, DependencyProperty property, SpecializedResourceDictionary.ResourceKey specializedKey, ResourceUpdateReason updateReason, object context, DependencyPropertyValuePrecedences? precedence)
 		{
+			// The initial value resolves in the owner's theme (its own or an ancestor's RequestedTheme).
+			using var themeScope = FrameworkElement.EnterThemeScope(owner);
+
 			// If the invocation comes from XAML and from theme resources, resolution
 			// must happen lazily, done through walking the visual tree.
 			var immediateResolution =

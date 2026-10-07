@@ -50,6 +50,12 @@ public static class HtmlPages
 	/// </summary>
 	public const string Button = "Button";
 
+	/// <summary>
+	/// The name of the page that paints NO background of its own: one 200 by 200 Red block at the top-left of a
+	/// transparent document, so everything else in the viewport is whatever the engine paints behind the page.
+	/// </summary>
+	public const string Bare = "Bare";
+
 	/// <summary>The name of the titled page, for what the engine reports as the document title.</summary>
 	public const string Title = "Title";
 
@@ -91,6 +97,12 @@ public static class HtmlPages
 		<body><div style="position:absolute;left:0;top:0;width:100px;height:100%;background:#FF0000"></div></body></html>
 		""";
 
+	private const string BareDocument =
+		"""
+		<!DOCTYPE html><html><head><meta charset="utf-8"><title>Bare</title></head>
+		<body style="margin:0"><div style="width:200px;height:200px;background:#FF0000"></div></body></html>
+		""";
+
 	private const string ButtonDocument =
 		"""
 		<!DOCTYPE html><html><head><meta charset="utf-8"><title>Button</title>
@@ -128,6 +140,7 @@ public static class HtmlPages
 		[Solid] = SolidDocument,
 		[Halves] = HalvesDocument,
 		[Bar] = BarDocument,
+		[Bare] = BareDocument,
 		[Button] = ButtonDocument,
 		[Title] = TitleDocument,
 		[Typing] = TypingDocument,

@@ -132,4 +132,35 @@ public sealed partial class ApplicationTests
         await VerifySelectionAsync(false, folder);
         fixture.Application.FilePickers.FolderRequestCount.Should().Be(2);
     }
+
+    [Theory]
+    [InlineData("Choose folder")]
+    [InlineData("Open text file")]
+    [InlineData("Open multiple files")]
+    [InlineData("Choose save path")]
+    public async Task Picker_failure_reaches_the_application_error_branch(string button)
+    {
+        var pickers = fixture.Application.FilePickers;
+        var error = new NotSupportedException("No file dialogs on this head.");
+        if (button == "Choose folder") pickers.EnqueueFolderFailure(error);
+        else if (button == "Choose save path") pickers.EnqueueSaveFileFailure(error);
+        else pickers.EnqueueOpenFileFailure(error);
+        await PickThroughButtonAsync(button);
+        (await Page.EvaluateAsync(() => fixture.Model.LastPickerError)).Should().BeSameAs(error);
+        await Expect(Page.GetByTestId("PickerOutcome")).ToHaveTextAsync("Error");
+        await Expect(Page.GetByTestId("PickerStatus")).ToHaveTextAsync("NotSupportedException: No file dialogs on this head.");
+        (pickers.FolderRequestCount + pickers.OpenFileRequestCount + pickers.SaveFileRequestCount).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task A_queued_failure_is_consumed_in_order_with_other_responses()
+    {
+        var folder = PickerDirectory();
+        fixture.Application.FilePickers.EnqueueFolderFailure(new UnauthorizedAccessException("Denied."));
+        fixture.Application.FilePickers.EnqueueFolder(folder);
+        await PickThroughButtonAsync("Choose folder");
+        await Expect(Page.GetByTestId("PickerStatus")).ToHaveTextAsync("UnauthorizedAccessException: Denied.");
+        await PickThroughButtonAsync("Choose folder");
+        await VerifySelectionAsync(false, folder);
+    }
 }

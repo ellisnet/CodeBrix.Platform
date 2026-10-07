@@ -36,9 +36,18 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
     and drive it with locators, actions and retrying assertions. Covers
     test-project setup, fixtures, orientation/theme/preview/action-delay
     preferences, command-line switches, automatic screenshot recording,
-    scripted file/folder pickers, checked controls, editors, menus, drags and
-    limitations. Maintainer notes: MAINTAINER-README.txt, THE PLAYTEST HEAD
+    scripted file/folder pickers, the recording launcher, held keys, window
+    close/minimize requests, option selection, element screenshots,
+    checked controls, editors, menus, drags and limitations. Maintainer notes: MAINTAINER-README.txt, THE PLAYTEST HEAD
     PACKAGE.
+
+    src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/AGENT-README.txt
+      CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever
+          Real OpenGL contexts for PlayTests of applications that use the
+          Graphics3DGL add-in (surfaceless EGL on Linux, WGL on Windows, ANGLE
+          on macOS); registered with CodeBrixPlayTestOpenGL.Register(). The
+          PlayTest guide's OPENGL section covers opting out, the failure
+          messages and asserting GL content with PixelStats.
 
     Related PlayTest guide:
       samples/CodeBrixPlatform/PlayTestDemo/README.md
@@ -161,6 +170,9 @@ GENERAL
   NOT-IMPLEMENTED.md
       What a "not implemented" exception from the framework means, and what to do
       about it.
+  src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/README.md
+      Human-facing overview for the PlayTest OpenGL provider package (its
+      package README).
   src-platforms/Platform.WinUI/README.md
       Human-facing overview for the WinUI toolkit packages.
   src-platforms/Platform.WPF/README.md

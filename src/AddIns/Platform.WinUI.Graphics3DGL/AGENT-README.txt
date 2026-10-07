@@ -64,6 +64,10 @@ the head. Every CodeBrix.Platform head provides one:
     macOS                          ANGLE, bundled in the package (runtimes/osx/
                                    native/libEGL.dylib + libGLESv2.dylib);
                                    nothing to install
+    PlayTest (the test head)       only when the test project references
+                                   CodeBrix.Platform.PlayTest.OpenGL and calls
+                                   CodeBrixPlayTestOpenGL.Register() (see that
+                                   package's AGENT-README)
 
 The minimum-version check is skipped when the context reports itself as
 ANGLE.

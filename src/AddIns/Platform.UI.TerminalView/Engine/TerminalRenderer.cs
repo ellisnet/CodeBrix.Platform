@@ -361,6 +361,52 @@ internal sealed class TerminalRenderer
 	/// <returns>The text.</returns>
 	internal string? GetSelectedText() => _selection.Active ? _selection.GetSelectedText() : null;
 
+	/// <summary>
+	/// The text of the rows the viewport shows now (it follows the scroll position): one string per row, top to
+	/// bottom, trailing blanks removed - an empty string for an empty row.
+	/// </summary>
+	/// <returns>The visible rows' text; always <see cref="Rows"/> entries.</returns>
+	internal IReadOnlyList<string> GetVisibleLines()
+	{
+		var buffer = _terminal.Buffer;
+		var lines = new List<string>(_terminal.Rows);
+		for (var row = 0; row < _terminal.Rows; row++)
+		{
+			var lineIndex = buffer.YDisp + row;
+			lines.Add(lineIndex < buffer.Lines.Length ? LineText(buffer, lineIndex, trimRight: true) : string.Empty);
+		}
+
+		return lines;
+	}
+
+	/// <summary>
+	/// The text of the whole buffer - the scrollback and the screen - as one string: rows separated by '\n', a row
+	/// the terminal wrapped joined to the row it continues, trailing blanks of each line and trailing empty lines
+	/// removed.
+	/// </summary>
+	/// <returns>The buffer's text; empty when the buffer holds no text.</returns>
+	internal string GetText()
+	{
+		var buffer = _terminal.Buffer;
+		var text = new StringBuilder();
+		for (var lineIndex = 0; lineIndex < buffer.Lines.Length; lineIndex++)
+		{
+			if (lineIndex > 0 && !buffer.Lines[lineIndex].IsWrapped) { text.Append('\n'); }
+
+			//Keep the trailing blanks of a row the next row continues: they are part of the wrapped line
+			var continues = lineIndex + 1 < buffer.Lines.Length && buffer.Lines[lineIndex + 1].IsWrapped;
+			text.Append(LineText(buffer, lineIndex, trimRight: !continues));
+		}
+
+		return text.ToString().TrimEnd('\n');
+	}
+
+	private static string LineText(TerminalBuffer buffer, int lineIndex, bool trimRight)
+	{
+		var text = buffer.TranslateBufferLineToString(lineIndex, trimRight).ToString() ?? string.Empty;
+		return trimRight ? text.TrimEnd(' ') : text;
+	}
+
 	/// <summary>Paints the grid, the selection and the cursor.</summary>
 	/// <param name="canvas">The canvas, scaled so one unit is one DIP.</param>
 	/// <param name="size">The paintable size in DIPs.</param>

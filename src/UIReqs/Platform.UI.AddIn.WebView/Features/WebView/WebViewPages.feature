@@ -72,6 +72,16 @@ Scenario: A WebView is composited like any other content, not a hole in the pane
 	And the 280 by 380 block at 10, 10 inside "browser" becomes uniformly "Red" within 5000 milliseconds
 	And the rightmost 280 pixels of "browser" are uniformly "Yellow"
 
+Scenario: Where the page paints nothing, the WebView shows its own background colour
+	Given the application shows a WebView named "browser" 800 by 600
+	And the web engine of "browser" has started within 20000 milliseconds
+	And the Background of "browser" is set to "Magenta"
+	When "browser" shows the page "Bare"
+	Then the navigation of "browser" completes within 5000 milliseconds
+	And the 180 by 180 block at 10, 10 inside "browser" becomes uniformly "Red" within 5000 milliseconds
+	And the 300 by 300 block at 400, 250 inside "browser" becomes uniformly "Magenta" within 5000 milliseconds
+	When the Background of "browser" is set to "White"
+
 Scenario: Refusing a navigation leaves the page where it was
 	Given the application shows a WebView named "browser" 800 by 600
 	And the web engine of "browser" has started within 20000 milliseconds

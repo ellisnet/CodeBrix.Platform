@@ -11,5 +11,9 @@ namespace Microsoft.UI.Xaml.Automation.Peers
 		{
 			throw new NotImplementedException();
 		}
+
+		public ListViewBaseAutomationPeer(global::Microsoft.UI.Xaml.Controls.ListViewBase owner) : base(owner)
+		{
+		}
 	}
 }

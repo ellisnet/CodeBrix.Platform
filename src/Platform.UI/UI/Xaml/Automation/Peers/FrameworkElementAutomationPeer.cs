@@ -279,6 +279,28 @@ public partial class FrameworkElementAutomationPeer : AutomationPeer
 		return base.GetNameCore();
 	}
 
+	// CodeBrix.Platform extension (WinUI's name stops at the plain text): an element whose peer reports no name
+	// at all - typically an icon-only button - is named by its tooltip text, so assistive technology has something
+	// to announce. AutomationPeer.GetName asks for this only when GetNameCore (including any derived peer's
+	// override) returned an empty name, so it never replaces a name.
+	private protected override string GetToolTipNameFallback()
+	{
+		var toolTip = ToolTipService.GetToolTip(Owner);
+		if (toolTip is ToolTip toolTipControl)
+		{
+			toolTip = toolTipControl.Content;
+		}
+
+		var text = toolTip switch
+		{
+			string value => value,
+			TextBlock textBlock => textBlock.Text,
+			_ => null,
+		};
+
+		return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
+	}
+
 	internal object GetDefaultPattern(PatternInterface patternInterface)
 	{
 		if (patternInterface == PatternInterface.ScrollItem)

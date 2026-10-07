@@ -138,4 +138,62 @@ public class Given_SimpleServiceResolver
 		ReferenceEquals(provider.GetRequiredService<ISimpleMessaging>(), SimpleMessaging.Instance)
 			.Should().Be(true);
 	}
+
+	/// <summary>Exposes the view model's protected service lookups to the tests below.</summary>
+	private sealed class ServiceLookupViewModel : SimpleViewModel
+	{
+		public static T Lookup<T>() where T : class => GetService<T>();
+
+		public static T Lookup<T>(bool returnNullForUnregistered) where T : class =>
+			GetService<T>(returnNullForUnregistered: returnNullForUnregistered);
+	}
+
+	[TestMethod]
+	public void When_ViewModel_GetService_Unregistered_Throws()
+	{
+		//Arrange
+		SimpleServiceResolver.CreateInstance(new FakeHost(new ServiceCollection().BuildServiceProvider()));
+
+		//Act + Assert
+		Assert.ThrowsExactly<InvalidOperationException>(() => ServiceLookupViewModel.Lookup<IGreetingService>());
+	}
+
+	[TestMethod]
+	public void When_ViewModel_GetService_ReturnNullForUnregistered_Returns_Null()
+	{
+		//Arrange
+		SimpleServiceResolver.CreateInstance(new FakeHost(new ServiceCollection().BuildServiceProvider()));
+
+		//Act
+		var resolved = ServiceLookupViewModel.Lookup<IGreetingService>(returnNullForUnregistered: true);
+
+		//Assert
+		Assert.IsNull(resolved);
+	}
+
+	[TestMethod]
+	public void When_ViewModel_GetService_ReturnNullForUnregistered_Still_Resolves_Registered()
+	{
+		//Arrange
+		var services = new ServiceCollection();
+		services.AddSingleton<IGreetingService, GreetingService>();
+		SimpleServiceResolver.CreateInstance(new FakeHost(services.BuildServiceProvider()));
+
+		//Act
+		var resolved = ServiceLookupViewModel.Lookup<IGreetingService>(returnNullForUnregistered: true);
+
+		//Assert
+		resolved.Greet().Should().Be("hello");
+	}
+
+	[TestMethod]
+	public void When_ViewModel_GetService_ReturnNullForUnregistered_False_Throws()
+	{
+		//Arrange
+		SimpleServiceResolver.CreateInstance(new FakeHost(new ServiceCollection().BuildServiceProvider()));
+
+		//Act + Assert
+		Assert.ThrowsExactly<InvalidOperationException>(
+			() => ServiceLookupViewModel.Lookup<IGreetingService>(returnNullForUnregistered: false));
+	}
 }

@@ -154,7 +154,33 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
         ?? throw new ArgumentNullException(nameof(getter));
 #endif
 
+    /// <summary>
+    /// Resolves the registered service of type <typeparamref name="T"/> from <see cref="SimpleServiceResolver.Instance"/>.
+    /// </summary>
+    /// <typeparam name="T">The service type to resolve.</typeparam>
+    /// <returns>The registered service; never <see langword="null"/>.</returns>
+    /// <exception cref="InvalidOperationException">No service of type <typeparamref name="T"/> is registered.
+    /// To get <see langword="null"/> instead (for an optional service), call
+    /// <see cref="GetService{T}(bool)"/> with <c>returnNullForUnregistered: true</c>.</exception>
     protected static T GetService<T>() where T : class => SimpleServiceResolver.Instance.GetService<T>();
+
+    /// <summary>
+    /// Resolves the registered service of type <typeparamref name="T"/> from <see cref="SimpleServiceResolver.Instance"/>,
+    /// optionally returning <see langword="null"/> when no such service is registered - for optional services, e.g.
+    /// <c>GetService&lt;IMyService&gt;(returnNullForUnregistered: true) ?? fallback</c>.
+    /// </summary>
+    /// <typeparam name="T">The service type to resolve.</typeparam>
+    /// <param name="returnNullForUnregistered"><see langword="true"/> to return <see langword="null"/> for an
+    /// unregistered service; <see langword="false"/> to throw exactly as <see cref="GetService{T}()"/> does.</param>
+    /// <returns>The registered service, or <see langword="null"/> when it is not registered and
+    /// <paramref name="returnNullForUnregistered"/> is <see langword="true"/>.</returns>
+    /// <exception cref="InvalidOperationException">No service of type <typeparamref name="T"/> is registered and
+    /// <paramref name="returnNullForUnregistered"/> is <see langword="false"/>.</exception>
+    protected static T GetService<T>(bool returnNullForUnregistered) where T : class =>
+        returnNullForUnregistered
+            ? SimpleServiceResolver.Instance.GetService(typeof(T)) as T
+            : SimpleServiceResolver.Instance.GetService<T>();
+
     protected static IEnumerable<T> GetServices<T>() where T : class => SimpleServiceResolver.Instance.GetServices<T>();
     protected static void MessagingSend<TSender, TArgs>(TSender sender, string message, TArgs args)
         where TSender : class =>

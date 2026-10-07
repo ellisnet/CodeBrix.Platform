@@ -536,7 +536,22 @@ namespace Microsoft.UI.Xaml
 		/// Propagate theme changed to <paramref name="instance"/> and its descendants, to have them update any theme bindings.
 		/// </summary>
 		internal static void PropagateResourcesChanged(object instance, ResourceUpdateReason updateReason)
+			=> PropagateResourcesChanged(instance, updateReason, themeRoot: null);
+
+		/// <summary>
+		/// Propagate theme changed to <paramref name="instance"/> and its descendants. When <paramref name="themeRoot"/> is
+		/// set (an element whose RequestedTheme changed), descendants that set their own RequestedTheme are skipped, since
+		/// their theme did not change.
+		/// </summary>
+		internal static void PropagateResourcesChanged(object instance, ResourceUpdateReason updateReason, FrameworkElement themeRoot)
 		{
+			if (themeRoot is not null
+				&& !ReferenceEquals(instance, themeRoot)
+				&& instance is FrameworkElement { HasRequestedThemeOverride: true })
+			{
+				return;
+			}
+
 			// Update ThemeResource references that have changed
 			if (instance is FrameworkElement fe)
 			{
@@ -548,7 +563,7 @@ namespace Microsoft.UI.Xaml
 			{
 				foreach (object o in p.Children)
 				{
-					PropagateResourcesChanged(o, updateReason);
+					PropagateResourcesChanged(o, updateReason, themeRoot);
 				}
 			}
 			else if (instance is ViewGroup g)
@@ -566,7 +581,7 @@ namespace Microsoft.UI.Xaml
 #endif
 				foreach (object o in g.GetChildren())
 				{
-					PropagateResourcesChanged(o, updateReason);
+					PropagateResourcesChanged(o, updateReason, themeRoot);
 				}
 			}
 		}

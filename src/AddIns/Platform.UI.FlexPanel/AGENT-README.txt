@@ -140,6 +140,12 @@ What the panel reads from each child: its Width/Height when explicitly set
 (FrameworkElement), its Margin, its Visibility, and its DesiredSize from the
 measure pass. Child Margin participates exactly as CSS margins do - it
 occupies main-axis space between siblings and offsets cross-axis alignment.
+A child that Shrink or Grow resizes on the main axis is measured again at
+its final main-axis size during the same measure pass (as CSS lays an item
+out at its resolved size), so it lays out at the size it is arranged at: a
+Grid holding a long text in a star column next to an Auto-sized button
+keeps the button visible instead of keeping its full-width layout and being
+clipped. Its basis stays the size it measured at the panel's constraints.
 A Collapsed child takes no space and no line position at all.
 
 FlexBasis  (struct, IEquatable<FlexBasis>)
@@ -317,7 +323,9 @@ No code-behind is needed.
 PERFORMANCE TIPS
 ================
   - The flex item tree is rebuilt on every measure and arrange pass, and each
-    child is measured once per measure pass. That is cheap for the dozens of
+    child is measured once per measure pass - twice for a child that Shrink
+    or Grow resized (once at the panel's constraints, once at its final
+    size). That is cheap for the dozens of
     children a toolbar, tag cloud or card row holds; for thousands of items
     use a virtualizing ItemsControl and put FlexPanel inside each item, not
     around them all.
@@ -399,7 +407,8 @@ WORKING EXAMPLES ON GITHUB
       DefaultValuesTests, PositionTests) are the ported upstream engine suite
       and drive the INTERNAL engine directly with host-free item trees - read
       them for the exact frame every combination of settings produces; they
-      are not consumer API.
+      are not consumer API. FlexPanelLayoutTests measures and arranges a real
+      FlexPanel (how a resized child is measured at its final size).
   https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/AddIns/Platform.UI.FlexPanel
       The package source: FlexPanel.cs, Models/FlexBasis.cs, Models/FlexEnums.cs
       - fully XML-documented.

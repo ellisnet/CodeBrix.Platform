@@ -277,6 +277,10 @@ public partial class FlexPanel : Panel
 
 	#region Measure and arrange
 
+	// The content sizes (margin-exclusive) the last measure pass recorded, per child: the main-axis
+	// basis the arrange pass distributes from, so it reproduces the measure pass's flex result.
+	private Dictionary<UIElement, (float Width, float Height)>? _contentSizes;
+
 	/// <inheritdoc />
 	protected override Size MeasureOverride(Size availableSize)
 	{
@@ -290,9 +294,48 @@ public partial class FlexPanel : Panel
 		// build-time values because the item tree is rebuilt on every pass anyway).
 		var naturalSizeMeasure = double.IsInfinity(availableWidth) || double.IsInfinity(availableHeight);
 
+		// Pass 1: measure every child at the panel's constraints - its content size, the flex basis
+		// the engine distributes the free space from.
+		var contentSizes = new Dictionary<UIElement, (float Width, float Height)>(Children.Count);
 		var pairs = new List<(UIElement Child, Flex.Item Item)>(Children.Count);
-		var root = BuildItemTree(availableWidth, availableHeight, naturalSizeMeasure, pairs);
+		var root = BuildItemTree(availableWidth, availableHeight, naturalSizeMeasure, pairs, SizingPass.Measure, contentSizes);
 		root.Layout(inMeasureMode: true);
+
+		// Pass 2 (CSS flexbox: an item is laid out at its resolved main size): a child the engine
+		// shrank or grew is measured again at that final main-axis size, so it lays out at the size it
+		// will be arranged at instead of keeping the larger (or smaller) layout of its content size and
+		// being clipped. Its cross-axis size may change with it (text that wraps onto more lines), so
+		// the engine runs once more with the main sizes held at the content sizes - the same
+		// distribution as pass 1 - and the cross sizes taken from the new measure. Nothing is measured
+		// in that run, so the pass cannot repeat.
+		var isRow = Direction is FlexDirection.Row or FlexDirection.RowReverse;
+		var remeasured = false;
+		foreach (var (child, item) in pairs)
+		{
+			if (!item.IsVisible || !contentSizes.TryGetValue(child, out var content))
+				continue;
+
+			var finalMain = isRow ? item.Frame[2] : item.Frame[3];
+			var contentMain = isRow ? content.Width : content.Height;
+			if (float.IsNaN(finalMain) || Math.Abs(finalMain - contentMain) < 0.5f)
+				continue;
+
+			var margin = GetMargin(child);
+			var constraints = GetConstraints(item);
+			child.Measure(isRow
+				? new Size(Math.Max(0, finalMain) + margin.Left + margin.Right, constraints.Height)
+				: new Size(constraints.Width, Math.Max(0, finalMain) + margin.Top + margin.Bottom));
+			remeasured = true;
+		}
+
+		if (remeasured)
+		{
+			pairs.Clear();
+			root = BuildItemTree(availableWidth, availableHeight, naturalSizeMeasure, pairs, SizingPass.Resolved, contentSizes);
+			root.Layout(inMeasureMode: true);
+		}
+
+		_contentSizes = contentSizes;
 
 		double measuredWidth = 0;
 		double measuredHeight = 0;
@@ -325,7 +368,7 @@ public partial class FlexPanel : Panel
 		var availableHeight = Math.Max(0, finalSize.Height - padding.Top - padding.Bottom);
 
 		var pairs = new List<(UIElement Child, Flex.Item Item)>(Children.Count);
-		var root = BuildItemTree(availableWidth, availableHeight, naturalSizeMeasure: false, pairs);
+		var root = BuildItemTree(availableWidth, availableHeight, naturalSizeMeasure: false, pairs, SizingPass.Arrange, _contentSizes);
 		root.Layout(inMeasureMode: false);
 
 		foreach (var (child, item) in pairs)
@@ -350,7 +393,22 @@ public partial class FlexPanel : Panel
 		return finalSize;
 	}
 
-	private Flex.Item BuildItemTree(double width, double height, bool naturalSizeMeasure, List<(UIElement Child, Flex.Item Item)> pairs)
+	/// <summary>How a layout run sizes the children (see <see cref="SetSelfSizing"/>).</summary>
+	private enum SizingPass
+	{
+		/// <summary>Measure each child at the panel's constraints and record its content size.</summary>
+		Measure,
+
+		/// <summary>No measuring: main axis from the recorded content size, cross axis from the
+		/// child's current desired size (measured at its resolved main size where that differed).</summary>
+		Resolved,
+
+		/// <summary>The arrange run: as <see cref="Resolved"/>, keeping explicit Width/Height values.</summary>
+		Arrange,
+	}
+
+	private Flex.Item BuildItemTree(double width, double height, bool naturalSizeMeasure, List<(UIElement Child, Flex.Item Item)> pairs,
+		SizingPass pass, Dictionary<UIElement, (float Width, float Height)>? contentSizes)
 	{
 		var root = new Flex.Item
 		{
@@ -366,6 +424,7 @@ public partial class FlexPanel : Panel
 			Height = double.IsInfinity(height) ? 0f : (float)height,
 		};
 
+		var isRow = Direction is FlexDirection.Row or FlexDirection.RowReverse;
 		foreach (var child in Children)
 		{
 			var item = new Flex.Item
@@ -390,7 +449,7 @@ public partial class FlexPanel : Panel
 				item.Height = double.IsNaN(fe.Height) ? float.NaN : (float)fe.Height;
 			}
 
-			SetSelfSizing(child, item);
+			SetSelfSizing(child, item, pass, isRow, contentSizes);
 
 			// Order is already set, so Add sees it and turns on the engine's ordered enumeration.
 			root.Add(item);
@@ -400,15 +459,17 @@ public partial class FlexPanel : Panel
 		return root;
 	}
 
-	private static void SetSelfSizing(UIElement child, Flex.Item item)
+	private static void SetSelfSizing(UIElement child, Flex.Item item, SizingPass pass, bool isRow,
+		Dictionary<UIElement, (float Width, float Height)>? contentSizes)
 	{
 		item.SelfSizing = (Flex.Item it, ref float w, ref float h, bool inMeasureMode) =>
 		{
 			var margin = GetMargin(child);
 
-			if (inMeasureMode)
+			// Only the first measure run measures; the later runs reuse the desired sizes it (and the
+			// resolved-size re-measure) left behind. In the arrange pass, never measure.
+			if (pass == SizingPass.Measure)
 				child.Measure(GetConstraints(it));
-			// In the arrange pass, never measure - reuse the measure pass's DesiredSize.
 			var desired = child.DesiredSize;
 
 			// DesiredSize includes the child's margin; the engine works with margin-exclusive
@@ -416,11 +477,27 @@ public partial class FlexPanel : Panel
 			var desiredWidth = (float)Math.Max(0, desired.Width - margin.Left - margin.Right);
 			var desiredHeight = (float)Math.Max(0, desired.Height - margin.Top - margin.Bottom);
 
+			if (pass == SizingPass.Measure)
+			{
+				if (contentSizes is not null)
+					contentSizes[child] = (desiredWidth, desiredHeight);
+			}
+			else if (contentSizes is not null && contentSizes.TryGetValue(child, out var content))
+			{
+				// Keep the main-axis basis the free space was distributed from, so the flex result
+				// matches the measure pass; a child re-measured at its resolved size would otherwise
+				// report that smaller (or larger) size as its basis.
+				if (isRow)
+					desiredWidth = content.Width;
+				else
+					desiredHeight = content.Height;
+			}
+
 			// When the child has an explicit Width/Height the item already carries it; returning
 			// NaN in the arrange pass preserves that value instead of overwriting it with a
 			// potentially stale desired size (matches the upstream FlexLayout rule).
-			w = (!inMeasureMode && !float.IsNaN(it.Width)) ? float.NaN : desiredWidth;
-			h = (!inMeasureMode && !float.IsNaN(it.Height)) ? float.NaN : desiredHeight;
+			w = (pass == SizingPass.Arrange && !float.IsNaN(it.Width)) ? float.NaN : desiredWidth;
+			h = (pass == SizingPass.Arrange && !float.IsNaN(it.Height)) ? float.NaN : desiredHeight;
 		};
 	}
 

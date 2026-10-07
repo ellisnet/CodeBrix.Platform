@@ -42,6 +42,11 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 	private readonly Control? _focusTarget;
 	private double _scale = 1.0;
 
+	// False while the engine still runs at its start-up size (the presenter had not been measured when
+	// the engine was created): frames of that placeholder size are dropped rather than shown. Written
+	// and read on the UI thread only.
+	private bool _hasRealSize;
+
 	// The page most recently handed over as TEXT, kept until the load it starts is announced.
 	// The engine only knows the base URI such a load was given (none, i.e. about:blank), but the
 	// control's contract - and every other head - announces it as the data: document the text
@@ -71,14 +76,18 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		_element = new WpeWebViewHostElement(presenter.Visual.Compositor);
 		presenter.Content = _element;
 
-		var initialWidth = (uint)Math.Max(1, presenter.ActualWidth);
-		var initialHeight = (uint)Math.Max(1, presenter.ActualHeight);
+		var initialWidth = (uint)Math.Max(1, Math.Ceiling(presenter.ActualWidth));
+		var initialHeight = (uint)Math.Max(1, Math.Ceiling(presenter.ActualHeight));
+		_hasRealSize = initialWidth > 1 && initialHeight > 1;
 		_wpe = new WpeWebView(initialWidth == 1 ? 1280 : initialWidth, initialHeight == 1 ? 720 : initialHeight);
 
 		WireEngineEvents();
 
 		_focusTarget = _coreWebView.Owner as Control;
 		WireInput();
+
+		ApplyBackgroundColor();
+		_focusTarget?.RegisterPropertyChangedCallback(Control.BackgroundProperty, (_, _) => ApplyBackgroundColor());
 
 		_element.SizeChanged += (_, _) => UpdateSizeAndScale();
 		_element.Loaded += (_, _) => UpdateSizeAndScale();
@@ -97,7 +106,17 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 	{
 		_wpe.FrameArrived += image =>
 		{
-			if (!_presenter.DispatcherQueue.TryEnqueue(() => _element.PresentFrame(image)))
+			if (!_presenter.DispatcherQueue.TryEnqueue(() =>
+				{
+					if (_hasRealSize)
+					{
+						_element.PresentFrame(image);
+					}
+					else
+					{
+						image.Dispose(); // laid out for the placeholder start-up size, not this element
+					}
+				}))
 			{
 				image.Dispose();
 			}
@@ -373,6 +392,20 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		return result;
 	}
 
+	// The engine's page background follows the WebView control's Background when that is an opaque solid colour
+	// (a ThemeResource brush re-resolves into a new brush on a theme change, which this follows too); otherwise it
+	// is white, the default background of a web document. Never transparent: frames are imported as XRGB, so
+	// unpainted (transparent) engine pixels would show black.
+	private void ApplyBackgroundColor()
+	{
+		var color = _focusTarget?.Background is Microsoft.UI.Xaml.Media.SolidColorBrush { Color: { A: 255 } solid }
+			? new SkiaSharp.SKColor(solid.R, solid.G, solid.B)
+			: SkiaSharp.SKColors.White;
+
+		_element.BackgroundColor = color;
+		_wpe.SetBackgroundColor(color);
+	}
+
 	private void UpdateSizeAndScale()
 	{
 		var newScale = _element.XamlRoot?.RasterizationScale ?? 1.0;
@@ -384,7 +417,9 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 
 		if (_element.ActualWidth >= 1 && _element.ActualHeight >= 1)
 		{
-			_wpe.Resize((uint)_element.ActualWidth, (uint)_element.ActualHeight);
+			// Round UP: a truncated size gives a frame a fraction of a pixel short of the element.
+			_wpe.Resize((uint)Math.Ceiling(_element.ActualWidth), (uint)Math.Ceiling(_element.ActualHeight));
+			_hasRealSize = true;
 		}
 	}
 

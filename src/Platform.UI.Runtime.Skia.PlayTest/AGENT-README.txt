@@ -26,9 +26,11 @@ What you get:
   - Lazy, strict, retrying locators: every action waits until its element is
     visible, enabled, at stable bounds and actually receives the hit test, then
     injects real pointer or keyboard input through the normal input pipeline.
-  - Retrying assertions, scripted file/folder pickers, an isolated clipboard,
-    a simulated OS theme, per-test orientation, PNG screenshots, automatic
-    screenshot recording, and an optional live view-only preview window.
+  - Retrying assertions, scripted file/folder pickers, a recording launcher,
+    held keys, window close/minimize requests, an isolated clipboard, a
+    simulated OS theme, per-test orientation, page and element PNG
+    screenshots, automatic screenshot recording, and an optional live
+    view-only preview window.
 
 The API names and call shapes intentionally follow Microsoft Playwright's C#
 API, and the AriaRole enum is adapted from MIT-licensed Microsoft Playwright
@@ -94,15 +96,22 @@ InvalidOperationException.
         starts the preview process.
     Page Page                             the page (locators, input, content)
     PlayTestFilePickers FilePickers       scripted picker responses
+    PlayTestLauncher Launcher             recorded Launcher requests (no process)
+    Window Window                         the window the application created
+                                          (read it inside EvaluateAsync)
     int Width, Height                     current virtual screen size
     bool Headless                         resolved at launch
     ApplicationTheme SystemTheme          simulated OS theme, fixed for the run
     ScreenOrientation PreferredOrientation  the launch preference
     ScreenOrientation Orientation         the current screen orientation
+    PlayTestOpenGLInfo OpenGL             what the launch found out about OpenGL
+                                          (see OPENGL)
     Task<T> EvaluateAsync<T>(Func<T> expression)   run on the UI thread, read state
     Task EvaluateAsync(Action action)
     Task SetOrientationAsync(ScreenOrientation? orientation = null)
         Re-lays-out the current page; null restores the launch preference.
+    Task<bool> RequestCloseAsync()        close request; false = app cancelled
+    Task MinimizeAsync(), RestoreAsync()  see WINDOW ACTIONS
     Task<T> WaitForAsync<T>(Func<T> probe, Func<T, bool> predicate,
                             float? timeout = null,
                             string description = "application outcome")
@@ -121,6 +130,8 @@ PlayTestOptions  (sealed)
     float Timeout                     default action/assertion timeout in ms (10000)
     float SlowMo                      delay after each action in ms (else resolved)
     string ArtifactsDirectory         failure screenshots; default TestResults/PlayTest
+    PlayTestOpenGL OpenGL             Available (default) | Unavailable: a launch
+                                      without OpenGL (see OPENGL)
     ScreenOrientation ResolveOrientation()   what the launch will use
     ApplicationTheme ResolveTheme()          what the launch will use
 
@@ -131,7 +142,8 @@ Page  (sealed)
 --------------
     Keyboard Keyboard, Mouse Mouse
     Locator GetByRole(AriaRole role, PageGetByRoleOptions? options = null)
-    Locator GetByTestId(string testId)             AutomationProperties.AutomationId
+    Locator GetByTestId(string testId, PageGetByTestIdOptions? options = null)
+                                                   AutomationProperties.AutomationId
     Locator GetByText(string text, PageGetByTextOptions? options = null)
     Locator GetByText(Regex text)
     Locator GetByLabel(string text, PageGetByTextOptions? options = null)
@@ -145,6 +157,7 @@ Page  (sealed)
         orientation BEFORE the factory runs, clears the isolated clipboard,
         waits for layout and rendering.
     Task<byte[]> ScreenshotAsync(PageScreenshotOptions? options = null)  PNG
+        Path, Stable (wait until two consecutive captures are identical), Timeout
     Task<string> ClipboardTextAsync()     the app's isolated clipboard text
 
 Locator matching rules:
@@ -152,13 +165,18 @@ Locator matching rules:
     the accessible name (AutomationProperties.Name, LabeledBy, or the peer's
     name) as a case-insensitive, whitespace-normalized substring, or exactly
     (case-sensitive) with Exact = true; NameRegex matches a pattern;
-    IncludeHidden = true also matches collapsed/zero-size elements.
+    IncludeHidden = true also matches hidden elements (see below).
   - GetByText: the innermost TextBlock or string-Content control whose text
     matches. GetByLabel: controls whose accessible name matches.
   - GetByType<T>: finds an application- or add-in-owned type without PlayTest
     referencing that library.
-  - All searches include open popups and flyouts. Only visible elements match
-    unless IncludeHidden / includeHidden says otherwise.
+  - All searches include open popups and flyouts.
+  - EVERY factory (GetByRole, GetByTestId, GetByText, GetByLabel, GetByType)
+    matches only visible elements unless its IncludeHidden / includeHidden
+    option is set. Hidden = not Visible itself or under a non-Visible
+    ancestor, zero-size, or a cell an ItemsRepeater keeps off-screen for
+    reuse. ToBeHiddenAsync keeps Playwright's meaning: it passes when nothing
+    visible matches.
 
 Locator  (sealed; lazy - resolved on every use)
 -----------------------------------------------
@@ -166,6 +184,21 @@ Locator  (sealed; lazy - resolved on every use)
     Locator Filter(LocatorFilterOptions options)    HasText / HasTextRegex
     Locator GetByRole(...), GetByTestId(...), GetByText(string, ...),
             GetByLabel(...), GetByType<T>(...)      scoped to this locator
+    Task<IReadOnlyList<string>> SelectOptionAsync(string | IEnumerable<string> |
+            SelectOptionValue | IEnumerable<SelectOptionValue>, LocatorSelectOptionOptions?)
+        ComboBox, ListBox, ListView, GridView: selects by value or label
+        (exact) or SelectOptionValue { Value, Label, Index } without opening a
+        drop-down or realizing rows; raises the control's normal
+        SelectionChanged. Single selection takes the first match; a multiple
+        selection list gets exactly the matches; an empty list clears. Waits
+        until every requested option exists; returns the selected values.
+        Label = DisplayMemberPath member, string item, string Content, the
+        realized row's text, or ToString(); Value = SelectedValuePath member,
+        else the label.
+    Task<byte[]> ScreenshotAsync(LocatorScreenshotOptions? options = null)
+        PNG cropped to the element (clipped to the screen) once it is visible
+        at stable bounds; Path, Stable, Timeout. A partly scrolled-out element
+        is brought into view first.
     Task ClickAsync(LocatorClickOptions? options = null)
         Position (relative logical px), Button (Left/Right/Middle),
         ClickCount 1-3, Timeout
@@ -176,8 +209,11 @@ Locator  (sealed; lazy - resolved on every use)
     Task FillAsync(string value, LocatorFillOptions? options = null)
         TextBox, PasswordBox, or any IValueProvider peer; replaces the value.
     Task PressAsync(string key, LocatorPressOptions? options = null)
+        Delay = milliseconds the key/chord is held (see Keyboard.PressAsync)
     Task PressSequentiallyAsync(string text, LocatorPressOptions? options = null)
-        Focuses, then types real key events (Enter/Tab for newline/tab).
+        Focuses, then types real key events (Enter/Tab for newline/tab);
+        Delay = wait between characters. Both focus a control or any element
+        made focusable with IsTabStop (a game surface, a canvas).
     Task CheckAsync / UncheckAsync(LocatorClickOptions? options = null)
     Task SetCheckedAsync(bool value, LocatorClickOptions? options = null)
     Task ScrollIntoViewIfNeededAsync(LocatorOptions? options = null)
@@ -188,8 +224,12 @@ Locator  (sealed; lazy - resolved on every use)
     Task<LocatorBoundingBoxResult?> BoundingBoxAsync()   null when not visible
 
 Strict mode: an operation on ONE element throws PlayTestException when the
-locator matches more than one ("Strict mode violation ... Use a unique name,
-test ID, or Nth()").
+locator matches more than one ("Strict mode violation ... resolved to N
+elements. Use a unique name, test ID, or Nth()"). Inside retrying actions and
+assertions an ambiguous match is retried - one dialog briefly overlapping the
+next is not an error - and the violation (with the match count) is reported
+only when the timeout elapses. One-shot reads (IsVisibleAsync, IsEnabledAsync,
+IsDisabledAsync, BoundingBoxAsync) still report it immediately.
 
 Assertions / LocatorAssertions
 ------------------------------
@@ -199,13 +239,22 @@ Assertions / LocatorAssertions
     ToBeCheckedAsync, ToHaveCountAsync(int), ToHaveValueAsync(string | Regex),
     ToHaveTextAsync(string | Regex), ToContainTextAsync(string)
 Every assertion retries until it holds or the timeout elapses. Text
-comparisons normalize whitespace; ToContainTextAsync is case-sensitive.
+comparisons normalize whitespace; ToContainTextAsync is case-sensitive. A
+ContentDialog's text is all of its text: title, content and button labels.
+Enabled means the element and every ancestor CONTROL are enabled (in this
+framework only controls carry IsEnabled; a panel cannot be disabled).
 
 Keyboard and Mouse
 ------------------
-    Keyboard.PressAsync(string key)       "Enter", "Control+z", "Shift+Tab",
-                                          "ArrowDown", "a", "7", "F5", "Escape"
-    Keyboard.TypeAsync(string text)       real key events to the focused control
+    Keyboard.PressAsync(string key, KeyboardPressOptions? options = null)
+                                          "Enter", "Control+z", "Shift+Tab",
+                                          "ArrowDown", "a", "7", "F5", "Escape";
+                                          Delay = ms the key/chord is held
+    Keyboard.DownAsync(string key)        press and HOLD one key (no auto-repeat)
+    Keyboard.UpAsync(string key)          release it
+    Keyboard.TypeAsync(string text, KeyboardTypeOptions? options = null)
+                                          real key events to the focused control;
+                                          Delay = ms between characters
     Keyboard.InsertTextAsync(string text) replaces the focused TextBox selection
                                           without key events (like a paste)
     Mouse.MoveAsync(x, y), DownAsync(), UpAsync(), ClickAsync(x, y),
@@ -215,6 +264,21 @@ Key names: a single letter or digit, any Windows.System.VirtualKey name
 ArrowUp, ArrowDown, ControlOrMeta. The virtual head uses one Control-based
 shortcut model on EVERY OS: ControlOrMeta is Control, and TextBox editing
 shortcuts follow Control on macOS too.
+
+Held keys. PressAsync without a Delay dispatches key down and key up in one
+UI-thread step, so code that samples key state once per frame or game cycle
+(a game loop) usually never sees the key. Hold it instead:
+    await Page.Keyboard.DownAsync("ArrowRight");   // returns after a rendered
+                                                   // frame, key still down
+    await app.WaitForAsync(() => game.ShipX, x => x > 100);
+    await Page.Keyboard.UpAsync("ArrowRight");
+    await Page.Keyboard.PressAsync("Space", new() { Delay = 150 });
+DownAsync takes one key, not a chord; hold modifiers with separate calls - a
+held Shift/Control/Alt/Meta applies to later presses and typing. Keys still
+held are released (their key-up events are dispatched to the old page) by
+Page.SetContentAsync before the page is replaced, and by DisposeAsync, so
+they never leak into the next test. A launch-once suite that never resets
+must release its own keys (UpAsync in a finally block).
 
 PageTest  (abstract, runner-neutral)
 ------------------------------------
@@ -226,12 +290,18 @@ Other types
 -----------
     PlayTestException          timeouts, strict-mode violations, unsupported
                                elements, application/renderer failures
+    PlayTestLauncher           recorded launcher requests (LAUNCHER)
     ScreenOrientation          Landscape | Portrait
     MouseButton                Left | Right | Middle
     AriaRole                   the ARIA role names
     PlayTestOrientationAttribute, LocatorPosition, LocatorBoundingBoxResult,
-    PageGetByRoleOptions, PageGetByTextOptions, LocatorFilterOptions,
-    LocatorOptions (Timeout) and its per-action subclasses, PageScreenshotOptions
+    PageGetByRoleOptions, PageGetByTextOptions, PageGetByTestIdOptions,
+    LocatorFilterOptions, LocatorOptions (Timeout) and its per-action
+    subclasses, KeyboardPressOptions, KeyboardTypeOptions, SelectOptionValue,
+    PageScreenshotOptions, LocatorScreenshotOptions
+    PixelStats, PixelHalf, PixelAxis, PixelBounds, PixelDifference   (OPENGL)
+    PlayTestOpenGL, PlayTestOpenGLInfo, IPlayTestOpenGLProvider,
+    IPlayTestOpenGLContext, PlayTestOpenGLProviders                  (OPENGL)
 
 Roles PlayTest assigns: Button (also split buttons), Checkbox, Combobox,
 Dialog (ContentDialog), Group, Img, Link, Listbox, Menu, Menubar, Menuitem
@@ -378,6 +448,9 @@ Windows.Storage.Pickers picker. No dialog is ever displayed, headed or not.
     app.FilePickers.EnqueueOpenFile(string? path)
     app.FilePickers.EnqueueOpenFiles(params string[]? paths)
     app.FilePickers.EnqueueSaveFile(string? path)
+    app.FilePickers.EnqueueFolderFailure(Exception error)
+    app.FilePickers.EnqueueOpenFileFailure(Exception error)   (single and multiple)
+    app.FilePickers.EnqueueSaveFileFailure(Exception error)
     app.FilePickers.Clear()                    queues AND request history
     FolderRequestCount, OpenFileRequestCount, SaveFileRequestCount,
     LastSuggestedFileName
@@ -389,10 +462,66 @@ Windows.Storage.Pickers picker. No dialog is ever displayed, headed or not.
     the picker opens; a save path's parent folder must exist. A NEW save path
     creates an empty file (like a native picker); an EXISTING file is returned
     intact, never truncated.
+  - A queued failure makes that picker throw the given exception (in queue
+    order with the other answers), so an application's "picker failed" or
+    "pickers not supported" branch runs; it counts as a request.
   - An unqueued picker request throws PlayTestException - it never silently
     cancels. A single-file picker rejects a multi-file response.
   - SetContentAsync does not clear the queues: call FilePickers.Clear() in
     your per-test reset.
+
+LAUNCHER
+========
+PlayTest registers its own launcher, as every desktop head does, so
+Windows.System.Launcher (a HyperlinkButton's NavigateUri, LaunchUriAsync with
+an https:, mailto: or file: URI for a document or folder) NEVER starts a
+browser, viewer or other process. Every request is recorded:
+
+    app.Launcher.LaunchedUris              IReadOnlyList<Uri>, in order
+    app.Launcher.QueriedUris               QueryUriSupportAsync requests
+    app.Launcher.LaunchResult              returned by LaunchUriAsync (true)
+    app.Launcher.QueryUriSupportResult     returned by QueryUriSupportAsync
+                                           (Available)
+    app.Launcher.Clear()                   history AND results
+
+    await Page.GetByRole(AriaRole.Link, new() { Name = "Help" }).ClickAsync();
+    await app.WaitForAsync(() => app.Launcher.LaunchedUris.Count, n => n == 1);
+    Assert.Equal(new Uri("https://example.com/help"), app.Launcher.LaunchedUris[0]);
+
+Set LaunchResult = false to reach an application's "could not open" branch.
+Call Launcher.Clear() in your per-test reset.
+
+WINDOW ACTIONS
+==============
+    bool closed = await app.RequestCloseAsync();
+        As the window's close button: AppWindow.Closing handlers run and may
+        cancel (a "save changes?" prompt), then Window.Closed handlers run and
+        may cancel by marking the event handled. Returns false when the
+        application cancelled. When the close goes ahead the window is hidden
+        (Window.VisibilityChanged) but the process and the application keep
+        running; the next Page.SetContentAsync shows the window again.
+    await app.MinimizeAsync();  await app.RestoreAsync();
+        As the Linux desktop heads report it: minimizing deactivates the
+        window (Window.Activated with Deactivated) and hides it
+        (Window.VisibilityChanged, Visible false), so pause-on-hidden logic
+        runs; restoring makes it visible and active again. Rendering and
+        screenshots continue while minimized. Page.SetContentAsync restores a
+        minimized window.
+The window is the application's own: app.Window (read it in EvaluateAsync) is
+the Window the application created, with the content it set - no test-side
+App subclass is needed to reach it.
+
+SCREENSHOTS
+===========
+    await Page.ScreenshotAsync(new() { Path = "page.png", Stable = true });
+    await Page.GetByTestId("Chart").ScreenshotAsync(new() { Path = "chart.png" });
+
+  - Element screenshots are cropped to the element's bounds in whole pixels,
+    clipped to the virtual screen.
+  - Stable = true repeats the capture until two consecutive captures are
+    identical (transitions and animations have settled), failing at the
+    timeout. An endless animation (a spinner, an animated player) inside the
+    captured area never settles: capture an area without it.
 
 CHECKED CONTROLS, SCROLLING, EDITORS, MENUS AND DRAGS
 =====================================================
@@ -404,7 +533,8 @@ CHECKED CONTROLS, SCROLLING, EDITORS, MENUS AND DRAGS
     out. A toggle menu item's result is verified even after its flyout closes.
   - ScrollIntoViewIfNeededAsync brings an ATTACHED element into its
     ScrollViewer's viewport. Virtualized, not-yet-realized items must first be
-    materialized by scrolling their container.
+    materialized by scrolling their container - or, for a selector, use
+    SelectOptionAsync, which needs no realized rows.
   - FillAsync replaces the whole value (TextBox, PasswordBox, IValueProvider;
     read-only providers are waited on, not written). PressSequentiallyAsync and
     Keyboard.TypeAsync send real key events, so completion, indentation and
@@ -422,7 +552,128 @@ screen (including screenshots and the preview), with XAML pointer and keyboard
 input: WPE WebKit on Linux (system libraries required), Edge WebView2 on
 Windows (installed runtime required), WKWebView on macOS through the add-in's
 offscreen helper. PlayTest adds no browser dependency of its own and offers no
-DOM locators; browser downloads, uploads and script dialogs are not simulated.
+DOM locators or browser download, upload or script-dialog API.
+
+Downloads started by real input do work: on Linux (WPE WebKit), a PlayTest
+pointer click on a download link in the page raised the WebView's
+DownloadStarting event, the application's download policy ran, and an
+accepted download completed to the policy's target path (verified against a
+loopback HTTP server). This has been verified on Linux only; Windows (Edge
+WebView2) and macOS (WKWebView) downloads have not been tried.
+
+OPENGL
+======
+An application that uses the Graphics3DGL add-in (GLCanvasElement,
+SkiaGLCanvasElement, OffscreenGLContext, SkiaGpuContext - also the VideoPlayer
+add-in's GPU path) gets real OpenGL contexts when the test project references
+CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever and registers it before
+the launch:
+
+    using CodeBrix.Platform.PlayTest.OpenGL;
+
+    CodeBrixPlayTestOpenGL.Register();
+    Application = await PlayTestApplication.LaunchAsync(() => new App(), new()
+    {
+        ConfigurationAssembly = typeof(AppFixture).Assembly,
+    });
+
+From then on OpenGL is available to every test, as on a desktop head: GL
+elements initialize, render on the application's UI thread, and their pixels
+are in every screenshot and in the preview. This package itself adds no OpenGL
+code and no native dependency; without the provider package there is no OpenGL.
+
+Per operating system (the provider package's AGENT-README has the detail):
+  Linux     Mesa EGL, surfaceless platform; needs libegl1 and libgl1-mesa-dri
+            (apt install libegl1 libgl1-mesa-dri). Mesa renders on the GPU's
+            render node when there is one, else on llvmpipe. No display needed.
+  Windows   WGL on opengl32.dll (a hidden window), as the Win32 head does: an
+            interactive desktop session with a GPU OpenGL driver; on Windows on
+            ARM, Microsoft's OpenCL and OpenGL Compatibility Pack.
+  macOS     ANGLE on Metal, as the macOS head does: a Mac with a Metal device.
+  Vulkan is not supported.
+
+Opting out. A launch with PlayTestOptions.OpenGL = PlayTestOpenGL.Unavailable
+has no OpenGL, exactly as if the provider were never registered: GL elements
+report that initialization failed (GLCanvasElement.GetGLInitializationState(),
+SkiaGLCanvasElement.IsGpuInitialized == false) and the application's own
+fallback runs. A registered provider is then left alone. OpenGL is a LAUNCH
+option, for the whole run: GLCanvasElement keeps its context for the life of
+the window. Test an application's no-OpenGL path in a process of its own (a
+second fixture/test project that launches with Unavailable).
+
+Both failures are loud; nothing is skipped:
+  - A registered provider that cannot create a context on this machine makes
+    LaunchAsync throw a PlayTestException naming the provider and the concrete
+    reason (a missing library, no driver, OpenGL older than 3.0, no Metal ...).
+  - With NO provider registered (and OpenGL not Unavailable), the first OpenGL
+    element the application initializes fails the test with
+        "The application initialized an OpenGL element, but no OpenGL provider
+        is registered - reference CodeBrix.Platform.PlayTest.OpenGL.
+        ApacheLicenseForever and call CodeBrixPlayTestOpenGL.Register() ..."
+    The elements themselves catch every error and only report "initialization
+    failed", so PlayTest records this as the run's failure: the PlayTest call
+    during which the element loaded (typically the click or SetContentAsync that
+    showed it) and every later call throw it. An application that never
+    initializes a GL element is not affected.
+
+PlayTestApplication.OpenGL (PlayTestOpenGLInfo), fixed at launch:
+    bool IsAvailable          real contexts in this run
+    string? Provider          the registered provider's name
+    string? Renderer          GL_RENDERER of the launch's probe context
+    string? Version           GL_VERSION of the probe context
+    bool IsGles               OpenGL ES (Linux, macOS) or desktop OpenGL (Windows)
+    bool IsSoftware           a CPU rasterizer (llvmpipe, SwiftShader, ...)
+    string? UnavailableReason why there is no OpenGL, else null
+Both branches of an application can be asserted from it (if IsAvailable,
+expect the 3D view; else expect the fallback) - neither skips.
+
+How to assert GL content. GL pixels have no visual tree. Measure the pixels the
+running test captured - Locator.ScreenshotAsync or Page.ScreenshotAsync bytes -
+with PixelStats:
+
+    var canvas = PixelStats.FromPng(await Page.GetByTestId("Viewport")
+        .ScreenshotAsync(new() { Stable = true }));
+
+    PixelStats.FromPng(byte[] png)            the only way in: bytes from this run
+    Width, Height, GetPixel(x, y), Region(x, y, w, h), Half(PixelHalf)
+    double Coverage(Color, tolerance = 8)     fraction of pixels near a colour
+    int DistinctColorCount; bool IsUniform    one colour only (all black, all
+                                              magenta ...)
+    bool IsBlank                              all transparent or black: nothing
+                                              was drawn or read back
+    PixelBounds? Bounds(Color background, tolerance = 8)
+                                              box around everything else
+    (double X, double Y)? Centroid(Color background, tolerance = 8)
+    double MeanLuminance(Color? background = null, tolerance = 8)
+                                              compare Half(Left) with Half(Right)
+                                              for the lighting direction
+    double LuminanceVariance()                shading / texture present
+    double MirrorSymmetry(PixelAxis, tolerance = 8)   1 = perfect mirror image
+    PixelDifference Difference(PixelStats other, tolerance = 0)
+                                              two captures of the SAME test, e.g.
+                                              before and after a drag or a zoom:
+                                              ChangedFraction, MaxChannelDelta
+Colours are unpremultiplied RGBA compared per channel; luminance is Rec. 709
+(0-255). Typical checks: the element initialized; the region is not blank and
+not uniform; the object covers the expected share at the expected place
+(bounds, centroid); the lit side is brighter; an input changed the picture (and
+zoom changed the coverage). Use tolerances - Linux may render on llvmpipe or a
+GPU, Windows on its driver, macOS on Metal. PixelStats reads only the bytes it
+is given: no files, no saved images, no baselines. When analysis cannot decide
+whether something "looks right", assert the structure and leave the looks to
+the screenshots (Path / --screenshotfolder) for a person to review.
+
+A single capture after an action already shows the GL frame that action caused
+(the capture renders twice with a UI-thread barrier between, and the elements
+render inside it); Stable = true additionally waits out animation.
+
+The provider seam (public, for the provider package; tests never call it):
+IPlayTestOpenGLProvider (Name, CreateContext(), Dispose), IPlayTestOpenGLContext
+(IsGles, GetProcAddress returning 0 for absent names, MakeCurrent returning a
+scope that restores the previous context), PlayTestOpenGLProviders.Register /
+IsRegistered (one provider per process; registering the same type again does
+nothing). Contexts are created and made current on the application's UI thread;
+the head disposes the provider when the application is disposed.
 
 COMPLETE EXAMPLES
 =================
@@ -452,6 +703,7 @@ COMPLETE EXAMPLES
         public Task ResetAsync(ScreenOrientation? orientation = null)
         {
             Application.FilePickers.Clear();
+            Application.Launcher.Clear();
             return Application.Page.SetContentAsync(() => new MainPage(), orientation);
         }
 
@@ -601,8 +853,15 @@ COMMON PITFALLS TO AVOID
     prove. Use CheckAsync, FillAsync, ClickAsync.
   - Asserting with a one-shot read (IsVisibleAsync, CountAsync) right after an
     action. Use Expect(...) assertions, which retry.
+  - Pressing keys a game loop never sees: use Keyboard.DownAsync/UpAsync or
+    PressAsync with a Delay (see Keyboard and Mouse).
+  - Reading a hidden element with GetByText/GetByTestId/GetByLabel: they match
+    visible elements only; pass IncludeHidden = true, or read the state with
+    EvaluateAsync.
+  - Clicking links that open a browser: they do not - read app.Launcher.
   - Leaving picker responses queued between tests: call FilePickers.Clear() in
-    the per-test reset. An unqueued picker request fails the test.
+    the per-test reset. An unqueued picker request fails the test. Clear the
+    launcher history (Launcher.Clear()) there too.
   - Reading the desktop clipboard: the application's clipboard is isolated;
     read it with Page.ClipboardTextAsync().
   - Expecting Meta/Command shortcuts on macOS: the virtual head is
@@ -615,13 +874,18 @@ COMMON PITFALLS TO AVOID
 WHAT THIS PACKAGE DOES NOT DO
 =============================
   - No browser, DOM, CSS or JavaScript, network routing, browser contexts,
-    tracing or browser downloads - it tests CodeBrix.Platform XAML apps.
+    tracing or a download API - it tests CodeBrix.Platform XAML apps.
   - One window and one application per process; no multiple windows.
-  - No GPU-only controls (OpenGL/Metal surfaces), no native dialogs other than
-    the scripted storage pickers, no horizontal mouse wheel.
+  - No OpenGL without CodeBrix.Platform.PlayTest.OpenGL (see OPENGL); no Metal
+    or Vulkan surfaces; no native dialogs other than the scripted storage
+    pickers, no horizontal mouse wheel.
   - No physical input: the preview window is view-only.
   - No pixel-diff / visual-regression comparison: ScreenshotAsync and the
-    recorder produce PNGs; comparing them is up to you.
+    recorder produce PNGs and are never compared with saved images. PixelStats
+    measures captures taken in the running test only.
+  - No real window close, minimize or process exit: RequestCloseAsync and
+    MinimizeAsync raise the window events; the application keeps running.
+  - No automatic key repeat while a key is held.
   - No automatic orientation-attribute hooks: your fixture applies
     PlayTestOrientationAttribute.Resolve (example 1).
   - Screenshot recording only under the reflection-based xUnit v3 runner;
@@ -630,9 +894,13 @@ WHAT THIS PACKAGE DOES NOT DO
 WORKING EXAMPLES ON GITHUB
 ==========================
   - PlayTestDemo - a dedicated six-head demo application and its PlayTests
-    project: checked controls, scrolling, every picker kind and cancellation,
-    method/row orientation, typed locators, editors, menus, tool bars, split
-    buttons, hover/positioned clicks and drags:
+    project: checked controls, scrolling, every picker kind, cancellation and
+    failure, method/row orientation, typed locators, editors, menus, tool
+    bars, split buttons, hover/positioned clicks and drags, and an API lab
+    (held keys, hidden elements, strictness while waiting, SelectOptionAsync,
+    dialogs, the launcher, window close/minimize, element and stable
+    screenshots), and an OpenGL page measured with PixelStats (plus
+    tests/PlayTestDemo.NoOpenGL.PlayTests, which launches without OpenGL):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlayTestDemo
     Fixture: tests/PlayTestDemo.PlayTests/AppFixture.cs
   - Host-free tests of the preferences, command-line switches, orientation
@@ -648,19 +916,25 @@ Package     CodeBrix.Platform.PlayTest.ApacheLicenseForever (test projects only)
 Using       using CodeBrix.Platform.PlayTest;
 Launch      app = await PlayTestApplication.LaunchAsync(() => new App(),
                 new() { ConfigurationAssembly = typeof(AppFixture).Assembly });
-Reset       app.FilePickers.Clear(); await app.Page.SetContentAsync(() => new MainPage(), orientation);
+Reset       app.FilePickers.Clear(); app.Launcher.Clear();
+            await app.Page.SetContentAsync(() => new MainPage(), orientation);
 Locate      Page.GetByRole(AriaRole.Button, new() { Name = "Send", Exact = true })
             Page.GetByTestId("id") / GetByText("t") / GetByLabel("l") / GetByType<T>()
             .First .Last .Nth(i) .Filter(new() { HasText = "x" }) .GetByRole(...) (scoped)
 Act         ClickAsync(new() { Button, Position, ClickCount }) HoverAsync DragByAsync(dx, dy)
             FillAsync PressAsync("Control+z") PressSequentiallyAsync("text\n")
             CheckAsync UncheckAsync SetCheckedAsync ScrollIntoViewIfNeededAsync
+            SelectOptionAsync("Row 24") ScreenshotAsync(new() { Stable = true })
+Keys        Keyboard.DownAsync("ArrowRight") / UpAsync(...) / PressAsync(k, new() { Delay = 150 })
 Assert      await Assertions.Expect(l).ToHaveTextAsync("x")   (.Not, ToBeVisibleAsync,
             ToBeHiddenAsync, ToBeEnabledAsync, ToBeDisabledAsync, ToBeCheckedAsync,
             ToHaveCountAsync, ToHaveValueAsync, ToContainTextAsync)
 Read        InputValueAsync InnerTextAsync IsCheckedAsync BoundingBoxAsync CountAsync
 State       await app.EvaluateAsync(() => vm.Count); await app.WaitForAsync(probe, ok)
 Pickers     app.FilePickers.EnqueueFolder/EnqueueOpenFile(s)/EnqueueSaveFile(path | null)
+            app.FilePickers.Enqueue{Folder|OpenFile|SaveFile}Failure(exception)
+Launcher    app.Launcher.LaunchedUris (no process is started); app.Launcher.Clear()
+Window      app.Window; await app.RequestCloseAsync() / MinimizeAsync() / RestoreAsync()
 Screen      1920x1080 Landscape | 1080x1920 Portrait; app.SetOrientationAsync(...)
 Prefs       code > --switch > CODEBRIX_PLAYTEST_* > <CodeBrixPlayTestPreferred*> > default
 CLI         --headed | --nonheadless | --headless  --theme=light|dark
@@ -668,6 +942,10 @@ CLI         --headed | --nonheadless | --headless  --theme=light|dark
 Env         CODEBRIX_PLAYTEST_HEADED=1  CODEBRIX_PLAYTEST_SLOWMO=<ms>
             CODEBRIX_PLAYTEST_THEME  CODEBRIX_PLAYTEST_ORIENTATION
 Timeout     10 s default; Page.SetDefaultTimeout(ms); per call new() { Timeout = ms }
+OpenGL      CodeBrix.Platform.PlayTest.OpenGL: CodeBrixPlayTestOpenGL.Register() before launch;
+            app.OpenGL (info); new() { OpenGL = PlayTestOpenGL.Unavailable } (opt out)
+Pixels      PixelStats.FromPng(await locator.ScreenshotAsync()) .Coverage .Bounds .Centroid
+            .Half(PixelHalf.Left).MeanLuminance(bg) .MirrorSymmetry .Difference(before)
 Failure     PlayTestException with a screenshot path + visible-UI description
             (TestResults/PlayTest by default)
 Rules       one app per process; serialized tests; real input only

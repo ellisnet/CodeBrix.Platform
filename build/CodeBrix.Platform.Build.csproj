@@ -108,6 +108,10 @@
 	<ItemGroup>
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.PlayTest\Platform.UI.Runtime.Skia.PlayTest.csproj" />
+		<!-- The PlayTest OpenGL provider (CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever) ships
+		     with the PlayTest head: real OpenGL contexts for PlayTests of Graphics3DGL applications. Its one
+		     package dependency is Graphics3DGL at the family version; the head is a compile-time reference. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.PlayTest.OpenGL\Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Win32\Platform.UI.Runtime.Skia.Win32.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wpf\Platform.UI.Runtime.Skia.Wpf.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />

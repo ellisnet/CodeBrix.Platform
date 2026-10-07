@@ -520,7 +520,13 @@ namespace Microsoft.UI.Xaml
 			return array;
 		}
 
-		private bool TryGetDefaultInheritedPropertyValue(out object defaultValue)
+		/// <summary>
+		/// True for an inherited Foreground property: the text foreground, whose inheritance restarts at an element
+		/// that sets its own RequestedTheme.
+		/// </summary>
+		internal bool IsInheritedTextForeground => IsInherited && string.Equals(Name, "Foreground", StringComparison.Ordinal);
+
+		private bool TryGetDefaultInheritedPropertyValue(DependencyObject referenceObject, out object defaultValue)
 		{
 			if (this == TextElement.ForegroundProperty ||
 				this == TextBlock.ForegroundProperty ||
@@ -529,7 +535,8 @@ namespace Microsoft.UI.Xaml
 				this == ContentPresenter.ForegroundProperty ||
 				this == IconElement.ForegroundProperty)
 			{
-				defaultValue = DefaultBrushes.TextForegroundBrush;
+				// The default text brush of the element's theme (its own or an ancestor's RequestedTheme, else the app's).
+				defaultValue = DefaultBrushes.GetTextForegroundBrush(referenceObject);
 				return true;
 			}
 
@@ -544,7 +551,7 @@ namespace Microsoft.UI.Xaml
 				return defaultValue;
 			}
 
-			if (IsInherited && TryGetDefaultInheritedPropertyValue(out var value))
+			if (IsInherited && TryGetDefaultInheritedPropertyValue(referenceObject, out var value))
 			{
 				return value;
 			}
