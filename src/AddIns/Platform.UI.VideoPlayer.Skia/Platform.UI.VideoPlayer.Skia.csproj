@@ -55,7 +55,7 @@
 		     NEVER add CodeBrix.VideoPlayback.Skia back, and never add Dav1d, Opus or .Authoring -
 		     the first two are the application's own choice to register and the third is an
 		     authoring-time tool. -->
-		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.278.1162" />
+		<PackageReference Include="CodeBrix.VideoPlayback.MitLicenseForever" Version="1.0.280.1149" />
 
 		<!-- The sound: CodeBrix.VideoPlayback plays its audio track through CodeBrix.Audio's shared core but
 		     does not choose a device backend - that is the consumer's choice (desktop or Android). This
