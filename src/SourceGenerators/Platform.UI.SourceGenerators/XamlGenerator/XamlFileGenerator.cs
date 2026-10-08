@@ -2151,6 +2151,51 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			return null;
 		}
 
+		/// <summary>
+		/// Finds the member that names the element itself: <c>x:Name</c>, or a plain <c>Name</c> attribute of the element's
+		/// own type. See <see cref="IsElementNameMember"/>.
+		/// </summary>
+		private XamlMemberDefinition? FindElementNameMember(XamlObjectDefinition xamlObjectDefinition)
+		{
+			foreach (var member in xamlObjectDefinition.Members)
+			{
+				if (IsElementNameMember(member))
+				{
+					return member;
+				}
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Determines whether the member names its element: <c>x:Name</c>, or a plain <c>Name</c> attribute whose declaring
+		/// type is the element's own type (or a base of it). An attached property whose member is "Name" (for example
+		/// <c>AutomationProperties.Name</c>) never names the element, whether or not its owner type resolves: before this
+		/// check an unresolved owner (the application template's default xmlns is the Controls CLR namespace, which does not
+		/// contain Microsoft.UI.Xaml.Automation) made the generator take the attribute's VALUE as the element's name and emit a
+		/// field named from it.
+		/// </summary>
+		private bool IsElementNameMember(XamlMemberDefinition member)
+		{
+			if (member.Member.Name != "Name")
+			{
+				return false;
+			}
+
+			if (member.Member.PreferredXamlNamespace == XamlConstants.XamlXmlNamespace)
+			{
+				return true; // x:Name
+			}
+
+			if (member.Member.IsAttachable || IsAttachedProperty(member))
+			{
+				return false;
+			}
+
+			return member.Member.DeclaringType is not { } declaringType || IsType(member.Owner.Type, declaringType);
+		}
+
 		private XamlMemberDefinition GetMember(XamlObjectDefinition xamlObjectDefinition, string memberName)
 		{
 			var member = FindMember(xamlObjectDefinition, memberName);
@@ -3304,8 +3349,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 							}
 
 							if (
-								member.Member.Name == "Name"
-								&& !IsAttachedProperty(member)
+								IsElementNameMember(member)
 								&& !isMemberInsideResourceDictionary.isInside
 							)
 							{
@@ -3427,7 +3471,23 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 							{
 								IEventSymbol? eventSymbol = null;
 								var declaringTypeSymbol = FindType(member.Member.DeclaringType);
-								if (
+								if (declaringTypeSymbol == null
+									&& member.Member.DeclaringType is { } unresolvedOwner
+									&& !IsType(objectDefinition.Type, unresolvedOwner))
+								{
+									// An attached property ("Owner.Member") whose owner type does not resolve in its xmlns. Report it at
+									// the attribute instead of falling through to the generic "not available" message, which names the
+									// unresolved owner as if it existed.
+									var hint = unresolvedOwner.Name == "AutomationProperties"
+										? " (for AutomationProperties: xmlns:auto=\"clr-namespace:Microsoft.UI.Xaml.Automation;assembly=CodeBrix.Platform.UI\" and auto:AutomationProperties." + member.Member.Name + ")"
+										: "";
+									GenerateError(
+										writer,
+										$"Unable to find the owner type '{unresolvedOwner.Name}' of attached property '{unresolvedOwner.Name}.{member.Member.Name}', value is '{member.Value}'; declare an xmlns prefix for the namespace that declares '{unresolvedOwner.Name}' and qualify the attribute with it{hint}",
+										member
+									);
+								}
+								else if (
 									!IsType(declaringTypeSymbol, objectDefinitionType)
 									|| IsAttachedProperty(member)
 									|| (eventSymbol = _metadataHelper.FindEventType(declaringTypeSymbol, member.Member.Name)) != null
@@ -6315,7 +6375,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 		{
 			foreach (var element in EnumerateSubElements(topLevelControl))
 			{
-				var nameMember = FindMember(element, "Name");
+				var nameMember = FindElementNameMember(element);
 
 				if (nameMember?.Value is string name)
 				{
@@ -6334,7 +6394,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 			var list = new List<string>();
 			foreach (var element in EnumerateSubElements(xamlObjectDefinition, stoppingCondition: IsNewScope))
 			{
-				var nameMember = FindMember(element, "Name");
+				var nameMember = FindElementNameMember(element);
 
 				if (nameMember?.Value is string name)
 				{
@@ -6440,7 +6500,7 @@ namespace CodeBrix.Platform.UI.SourceGenerators.XamlGenerator //Was previously: 
 				|| loadMember?.Value?.ToString()?.ToLowerInvariant() == "false"
 				|| hasLoadMarkup)
 			{
-				var nameMember = FindMember(definition, "Name");
+				var nameMember = FindElementNameMember(definition);
 				var nameField = nameMember is { Value: string name } ? SanitizeResourceName(name) : null;
 
 				var elementStubBaseType = Generation.ElementStubSymbol.Value.BaseType;
