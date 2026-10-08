@@ -116,10 +116,10 @@ using global::System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Android.UI.Dispatching.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Dispatching")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Dispatching.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Android.WinUI.Graphics3DGL")]
-[assembly: InternalsVisibleTo("CodeBrix.Android.WinUI.Graphics3DGL.Tests")]
-[assembly: InternalsVisibleTo("CodeBrix.Mobile.WinUI.Graphics3DGL")]
-[assembly: InternalsVisibleTo("CodeBrix.Mobile.WinUI.Graphics3DGL.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.Graphics3DGL.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Graphics3DGL")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.Graphics3DGL.Tests")]
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
 
 // The shared text engine (WPE1 C5): its second copy is compiled into the TextLayout add-in's Core assembly, which reads

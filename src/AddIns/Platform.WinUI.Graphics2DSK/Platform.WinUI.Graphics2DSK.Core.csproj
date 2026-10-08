@@ -38,10 +38,10 @@
 		<!-- Reserved for the add-in's Android and Mobile platform assemblies and their tests (decision P4). Declared
 		     here rather than in a source file so the Windows project in this folder, which compiles every *.cs file
 		     here, stays as it was. -->
-		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics2DSK" />
-		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics2DSK.Tests" />
-		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics2DSK" />
-		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics2DSK.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Android.UI.Graphics2DSK" />
+		<InternalsVisibleTo Include="CodeBrix.Android.UI.Graphics2DSK.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.UI.Graphics2DSK" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.UI.Graphics2DSK.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>

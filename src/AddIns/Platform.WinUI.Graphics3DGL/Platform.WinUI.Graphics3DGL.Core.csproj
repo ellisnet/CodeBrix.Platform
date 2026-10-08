@@ -52,10 +52,10 @@
 		     and CodeBrix.Mobile assemblies (and their tests) for the same library. As csproj items rather than a .cs file,
 		     so that the Skia project's Windows target framework, which compiles every file of this folder, is unchanged. -->
 		<InternalsVisibleTo Include="CodeBrix.Platform.WinUI.Graphics3DGL" />
-		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics3DGL" />
-		<InternalsVisibleTo Include="CodeBrix.Android.WinUI.Graphics3DGL.Tests" />
-		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics3DGL" />
-		<InternalsVisibleTo Include="CodeBrix.Mobile.WinUI.Graphics3DGL.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Android.UI.Graphics3DGL" />
+		<InternalsVisibleTo Include="CodeBrix.Android.UI.Graphics3DGL.Tests" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.UI.Graphics3DGL" />
+		<InternalsVisibleTo Include="CodeBrix.Mobile.UI.Graphics3DGL.Tests" />
 		<!-- The host-free Core suite (src/Platform.UI.Core.Tests) registers a test double for the platform contract. -->
 		<InternalsVisibleTo Include="CodeBrix.Platform.UI.Core.Tests" />
 	</ItemGroup>

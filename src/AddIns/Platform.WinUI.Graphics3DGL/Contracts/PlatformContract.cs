@@ -17,8 +17,8 @@ namespace CodeBrix.Platform.WinUI.Graphics3DGL.Contracts;
 /// makes the runtime load the platform assembly that implements the contracts. When a contract is not registered yet,
 /// the platform assemblies of this library are therefore loaded by name and their module initializers (each one's
 /// platform bootstrap) are run: <c>CodeBrix.Platform.WinUI.Graphics3DGL</c> on CodeBrix.Platform, and, by the naming
-/// rule that also reserves their InternalsVisibleTo grants (decision P4), <c>CodeBrix.Android.WinUI.Graphics3DGL</c> and
-/// <c>CodeBrix.Mobile.WinUI.Graphics3DGL</c>. A name that is not present in the application is skipped.
+/// rule that also reserves their InternalsVisibleTo grants (decision P4), <c>CodeBrix.Android.UI.Graphics3DGL</c> and
+/// <c>CodeBrix.Mobile.UI.Graphics3DGL</c>. A name that is not present in the application is skipped.
 /// </para>
 /// </remarks>
 internal static class PlatformContract
@@ -27,8 +27,8 @@ internal static class PlatformContract
 	internal static readonly string[] PlatformAssemblyNames =
 	{
 		"CodeBrix.Platform.WinUI.Graphics3DGL",
-		"CodeBrix.Android.WinUI.Graphics3DGL",
-		"CodeBrix.Mobile.WinUI.Graphics3DGL",
+		"CodeBrix.Android.UI.Graphics3DGL",
+		"CodeBrix.Mobile.UI.Graphics3DGL",
 	};
 
 	/// <summary>
