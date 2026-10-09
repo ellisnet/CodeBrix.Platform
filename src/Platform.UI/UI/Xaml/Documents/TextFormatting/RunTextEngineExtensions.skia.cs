@@ -13,7 +13,7 @@ using CodeBrix.Platform.UI.Dispatching;
 using Buffer = HarfBuzzSharp.Buffer;
 using GlyphInfo = Microsoft.UI.Xaml.Documents.TextFormatting.GlyphInfo;
 
-using SegmentInfo = (int LeadingSpaces, int TrailingSpaces, int LineBreakLength, SkiaSharp.SKTypeface? Typeface, int NextStartingIndex);
+using SegmentInfo = (int LeadingSpaces, int TrailingSpaces, int LineBreakLength, SkiaSharp.SKTypeface? Typeface, Microsoft.UI.Xaml.Documents.TextFormatting.FontDetails? FallbackFont, int NextStartingIndex);
 
 namespace Microsoft.UI.Xaml.Documents.TextFormatting;
 
@@ -62,13 +62,17 @@ internal static class RunTextEngineExtensions
 
 		if (i < text.Length && text[i] == '\t')
 		{
-			return (LeadingSpaces: 0, TrailingSpaces: 0, LineBreakLength: 0, Typeface: defaultTypeface, NextStartingIndex: i + 1);
+			return (LeadingSpaces: 0, TrailingSpaces: 0, LineBreakLength: 0, Typeface: defaultTypeface, FallbackFont: null, NextStartingIndex: i + 1);
 		}
 
 		int leadingSpaces = 0;
 		int trailingSpaces = 0;
 		int lineBreakLength = 0;
 		SKTypeface? segmentTypeface = null;
+		// The font the missing-character lookup chose for this segment, when it is not the run's own: kept so the
+		// segment is shaped with exactly that font rather than with one looked up again by family name (which cannot
+		// find a font the application loaded from its package, such as the symbols font).
+		FontDetails? segmentFallbackFont = null;
 
 		// Count leading spaces
 		while (i < text.Length && char.IsWhiteSpace(text[i]) && !Unicode.IsLineBreak(text[i]) && text[i] != '\t')
@@ -97,7 +101,7 @@ internal static class RunTextEngineExtensions
 			// Also, we don't consider tabs "spaces" since they don't get the general space treatment.
 			if (text[i] == '\t')
 			{
-				return (leadingSpaces, trailingSpaces, lineBreakLength, segmentTypeface, i);
+				return (leadingSpaces, trailingSpaces, lineBreakLength, segmentTypeface, segmentFallbackFont, i);
 			}
 
 			if (Unicode.HasWordBreakOpportunityAfter(text, i) || (i + 1 < text.Length && Unicode.HasWordBreakOpportunityBefore(text, i + 1)))
@@ -121,27 +125,20 @@ internal static class RunTextEngineExtensions
 			var (codepoint, codepointLength) = GetCodePoint(text, i);
 
 			SKTypeface? currentTypeface;
+			FontDetails? currentFallbackFont = null;
 			if (skFont.ContainsGlyph(codepoint))
 			{
 				currentTypeface = defaultTypeface;
 			}
-			else if (FontDetailsCache.GetEmbeddedFallback(
-				codepoint, run.GetFontInfo().SKFontSize, run.FontWeight, run.FontStretch, run.FontStyle) is { } embedded)
-			{
-				// The application's own declared fallback fonts, consulted before the
-				// host's and regardless of isolation.
-				currentTypeface = embedded.SKFont.Typeface;
-			}
-			else if (FeatureConfiguration.Font.RestrictToEmbeddedFonts)
-			{
-				// Under font isolation the host's fonts are off-limits, so a glyph the
-				// segment's own font lacks has nowhere else to come from — which is
-				// exactly the "not found" case handled just below.
-				currentTypeface = null;
-			}
 			else
 			{
-				currentTypeface = SKFontManager.Default.MatchCharacter(codepoint);
+				// The text engine's one missing-character lookup, shared with UnicodeText: the symbols
+				// font, then the application's own fallback fonts, then - unless font isolation is on -
+				// the host's fonts. Null (a control character, or a glyph nothing has) is the "not
+				// found" case handled just below.
+				currentFallbackFont = FontDetailsCache.GetFallbackFont(
+					codepoint, (float)run.FontSize, run.FontWeight.Weight, run.FontStretch.ToEngine(), run.FontStyle.ToEngine());
+				currentTypeface = currentFallbackFont?.SKFont.Typeface;
 			}
 
 			if (currentTypeface is null)
@@ -158,6 +155,7 @@ internal static class RunTextEngineExtensions
 			else if (segmentTypeface is null || currentTypeface == segmentTypeface)
 			{
 				segmentTypeface = currentTypeface;
+				segmentFallbackFont ??= currentFallbackFont;
 				i += codepointLength;
 			}
 			else
@@ -197,7 +195,7 @@ internal static class RunTextEngineExtensions
 			}
 		}
 
-		return (leadingSpaces, trailingSpaces, lineBreakLength, segmentTypeface, i);
+		return (leadingSpaces, trailingSpaces, lineBreakLength, segmentTypeface, segmentFallbackFont, i);
 	}
 
 	private static List<Segment> CreateSegments(Run run)
@@ -221,7 +219,7 @@ internal static class RunTextEngineExtensions
 
 		while (i < text.Length)
 		{
-			var (leadingSpaces, trailingSpaces, lineBreakLength, typeface, nextStartingIndex) = GetSegmentStartingFrom(run, i, text);
+			var (leadingSpaces, trailingSpaces, lineBreakLength, typeface, segmentFallbackFont, nextStartingIndex) = GetSegmentStartingFrom(run, i, text);
 
 			int length = nextStartingIndex - i;
 			FontDetails? fallbackFont = null;
@@ -231,18 +229,26 @@ internal static class RunTextEngineExtensions
 			float textSizeX;
 			if (typeface is not null && typeface != defaultTypeface)
 			{
-				var (details, task) = FontDetailsCache.GetFont(typeface.FamilyName, (float)run.FontSize, run.FontWeight, run.FontStretch, run.FontStyle);
-				if (task.IsCompletedSuccessfully)
+				if (segmentFallbackFont is not null)
 				{
-					fallbackFont = task.Result;
+					// The font the missing-character lookup returned - the same one UnicodeText draws with.
+					fallbackFont = segmentFallbackFont;
 				}
 				else
 				{
-					task.ContinueWith(_ =>
+					var (details, task) = FontDetailsCache.GetFont(typeface.FamilyName, (float)run.FontSize, run.FontWeight, run.FontStretch, run.FontStyle);
+					if (task.IsCompletedSuccessfully)
 					{
-						NativeDispatcher.Main.Enqueue(run.OnFontLoaded);
-					});
-					fallbackFont = details;
+						fallbackFont = task.Result;
+					}
+					else
+					{
+						task.ContinueWith(_ =>
+						{
+							NativeDispatcher.Main.Enqueue(run.OnFontLoaded);
+						});
+						fallbackFont = details;
+					}
 				}
 
 				font = fallbackFont.Font;

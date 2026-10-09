@@ -15,10 +15,12 @@ with CodeBrix.SkiaSvg into a Skia picture and hands the Image control a canvas
 element that draws that picture, as vectors, at whatever size the Image is
 arranged to.
 
-It is an INVISIBLE add-in. Application code never names a type from this
-package: you reference it once, then use the core's SvgImageSource in XAML and
-code exactly as on Windows. The package registers itself with the core's
-ApiExtensibility registry at compile time (see INSTALLATION).
+It is an INVISIBLE add-in. Application code normally never names a type from
+this package: you reference it once, then use the core's SvgImageSource in XAML
+and code exactly as on Windows. The exceptions are the public statics on
+SvgProvider - SetCss / GetCss and GetRasterizedPixelSize (see CORE API
+REFERENCE). The package registers itself with the core's ApiExtensibility
+registry at compile time (see INSTALLATION).
 
 Target: .NET 10 or later. One Skia runtime assembly serves every Skia head.
 
@@ -56,10 +58,11 @@ ApiExtensibility.Register(...) call into the generated App code. Every
 SvgImageSource constructed afterwards asks the registry for an ISvgProvider and
 gets a SvgProvider. There is nothing to call and nothing to configure.
 
-WITHOUT THE PACKAGE: SvgImageSource still exists (it is a core type), but every
-instance logs an error - "To use SVG on this platform, make sure to install the
-CodeBrix.Platform.WinUI.Svg package." - and the Image stays blank. That message
-is the symptom of a missing or mis-placed reference.
+WITHOUT THE PACKAGE: SvgImageSource still exists (it is a core type), but the
+first one logs a once-per-process warning - "SvgImageSource: no SVG provider is
+registered, SVG images stay empty. To use SVG on this platform, install the
+CodeBrix.Platform.Svg.ApacheLicenseForever package." - and every Image stays
+blank. That message is the symptom of a missing or mis-placed reference.
 
 Requirements: a Skia head (Windows Win32 or WPF host, Linux X11 / Wayland /
 frame buffer, macOS). No system package to install.
@@ -372,8 +375,8 @@ PERFORMANCE TIPS
 
 COMMON PITFALLS TO AVOID
 ========================
-  - BLANK IMAGE + "make sure to install the CodeBrix.Platform.WinUI.Svg
-    package" in the log = the add-in is not referenced by the project chain
+  - BLANK IMAGE + "no SVG provider is registered" in the log = the add-in
+    is not referenced by the project chain
     that compiles the app (put it in .Core), or the head is not a Skia head.
   - embedded:// is NOT understood by SvgImageSource. Use SetSourceAsync with
     the manifest stream (example 3).
@@ -382,10 +385,6 @@ COMMON PITFALLS TO AVOID
     OpenFailed (InvalidFormat) and Image.ImageFailed. Verify the path first
     when an image simply never appears.
   - RasterizePixelWidth/Height only take effect when BOTH are non-NaN.
-    Also, in the current provider the two values are applied crosswise when
-    the bitmap is allocated (the height value sizes the bitmap's width and
-    vice versa); use equal values for a square raster unless you have
-    verified the result at your aspect ratio.
   - Rasterized output is stretched to the arranged size: a 32 px raster shown
     at 128 px is blurry. Rasterize at the largest size you will show, or stay
     in vector mode.
@@ -454,6 +453,6 @@ URI forms:      ms-appx:///Assets/x.svg   ms-appx:///<Assembly>/Assets/x.svg
                 ms-appdata://local/x.svg  http(s)://...   file:///...
                 relative -> ms-appx:///   embedded:// -> NOT supported (use SetSourceAsync)
 
-Symptom card:   blank + "install the CodeBrix.Platform.WinUI.Svg package" -> add-in missing
+Symptom card:   blank + "no SVG provider is registered" -> add-in missing
                 OpenFailed InvalidFormat -> the parser rejected the document
                 blurry -> rasterized smaller than displayed; drop Rasterize* or enlarge

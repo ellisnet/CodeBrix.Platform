@@ -17,6 +17,9 @@ internal sealed class VirtualWindow : NativeWindowWrapperBase, INativeWindowFact
     internal VirtualWindow(VirtualHost host) => _host = host;
     public override object? NativeWindow => null;
     public override string Title { get; set; } = "PlayTest";
+    // The window is the whole virtual screen (1920x1080 or 1080x1920 at scale 1), so - like Resize, and like the
+    // frame-buffer head - a client-area resize has nothing to change and leaves Bounds at the screen size.
+    public override void ResizeClient(SizeInt32 size) { }
     // Like the desktop heads: AppWindow.Closing and Window.Closed handlers can keep the window open.
     public bool SupportsClosingCancellation => true;
     public bool SupportsMultipleWindows => false;

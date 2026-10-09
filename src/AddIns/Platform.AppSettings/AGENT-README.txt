@@ -62,6 +62,7 @@ plain file, so the same settings.sqlite can be copied between machines.
 KEY NAMESPACES / USINGS
 =======================
     using CodeBrix.Platform.AppSettings;
+    using System.Text.Json.Serialization.Metadata;  // only for the JsonTypeInfo<T> (AOT) overloads
 
 That is the whole surface. No XAML namespace is involved (nothing here is
 declarable in markup).
@@ -106,10 +107,27 @@ Reading and writing through the facade
     static void AppSettingsService.Set(string key, object? value)
     static bool AppSettingsService.HasValue(string key)
 
-There is no generic constraint on T and Set is NOT generic: it takes object?
-and serializes the value by its RUNTIME type with System.Text.Json (default
-options plus enums-as-strings). Every Set writes through to settings.sqlite
-immediately and synchronously. A null value REMOVES the key.
+    // reflection-free overloads, for a trimmed or native AOT application
+    static T    AppSettingsService.Get<T>(string key, T defaultValue,
+                                          JsonTypeInfo<T> jsonTypeInfo)
+    static void AppSettingsService.Set<T>(string key, T? value,
+                                          JsonTypeInfo<T> jsonTypeInfo)
+
+There is no generic constraint on T and the everyday Set is NOT generic: it
+takes object? and serializes the value by its RUNTIME type with
+System.Text.Json (default options plus enums-as-strings). Every Set writes
+through to settings.sqlite immediately and synchronously. A null value REMOVES
+the key.
+
+The reflection-based Get/Set/Wrap/Create carry [RequiresUnreferencedCode] and
+[RequiresDynamicCode]. A trimmed or native AOT application uses the overloads
+that take a JsonTypeInfo<T> (namespace System.Text.Json.Serialization.Metadata)
+from a source-generated JsonSerializerContext, e.g.
+MyJsonContext.Default.EditorOptions. They behave
+like the everyday ones - same defaults, same Warning-and-default on a type
+mismatch, null removes - but serialize with the context's own options, so the
+enums-as-strings default applies only when the context asks for it. A null
+jsonTypeInfo throws ArgumentNullException.
 
 Get<T>(key, defaultValue) returns defaultValue when the key is unset, when the
 stored JSON deserializes to null, or when it cannot be read as T - in that
@@ -146,8 +164,13 @@ Typed handles - AppSettingProperty<T>
     abstract class AppSettingProperty                          // the factory
         static AppSettingProperty<T> Create<T>(string key, T defaultValue,
                                                string? oldKey = null)
+        static AppSettingProperty<T> Create<T>(string key, T defaultValue,
+                                               JsonTypeInfo<T> jsonTypeInfo,
+                                               string? oldKey = null)
 
     static AppSettingProperty<T> AppSettingsService.Wrap<T>(string key, T defaultValue)
+    static AppSettingProperty<T> AppSettingsService.Wrap<T>(string key, T defaultValue,
+                                                            JsonTypeInfo<T> jsonTypeInfo)
 
 There is no public constructor: obtain a handle through
 AppSettingProperty.Create (with optional old-key migration) or
@@ -264,7 +287,9 @@ The store - AppSettingsStore
         bool HasValue(string key)
         T?   Get<T>(string key)
         T    Get<T>(string key, T defaultValue)
+        T    Get<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo)
         bool Set(string key, object? value)          // true when it changed
+        bool Set<T>(string key, T? value, JsonTypeInfo<T> jsonTypeInfo)
         void AddSettingHandler(...)  /  void RemoveSettingHandler(...)
         event EventHandler<AppSettingChangedEventArgs>? SettingChanged
 
@@ -640,7 +665,10 @@ static class AppSettingsService
     static T      Get<T>(string key, T defaultValue)
     static T?     Get<T>(string key)
     static void   Set(string key, object? value)         // null removes
+    static T      Get<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo)  // AOT
+    static void   Set<T>(string key, T? value, JsonTypeInfo<T> jsonTypeInfo)        // AOT
     static AppSettingProperty<T> Wrap<T>(string key, T defaultValue)
+    static AppSettingProperty<T> Wrap<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo)
     static void   AddSettingHandler(string key, EventHandler<AppSettingChangedEventArgs> handler)
     static void   RemoveSettingHandler(string key, EventHandler<AppSettingChangedEventArgs> handler)
 
@@ -652,6 +680,8 @@ sealed class AppSettingsStore : IDisposable
     int    AutoBackupRetention { get; set; }            // 0..10, default 5, next start
     bool   HasValue(string key);  T? Get<T>(string key);  T Get<T>(string key, T defaultValue)
     bool   Set(string key, object? value)
+    T      Get<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo)         // AOT
+    bool   Set<T>(string key, T? value, JsonTypeInfo<T> jsonTypeInfo)               // AOT
     void   AddSettingHandler(string key, EventHandler<AppSettingChangedEventArgs> handler)
     void   RemoveSettingHandler(string key, EventHandler<AppSettingChangedEventArgs> handler)
     event  EventHandler<AppSettingChangedEventArgs>? SettingChanged
@@ -667,6 +697,8 @@ abstract class AppSettingProperty<T>
     static implicit operator T(AppSettingProperty<T> property)
 abstract class AppSettingProperty
     static AppSettingProperty<T> Create<T>(string key, T defaultValue, string? oldKey = null)
+    static AppSettingProperty<T> Create<T>(string key, T defaultValue, JsonTypeInfo<T> jsonTypeInfo,
+                                           string? oldKey = null)                  // AOT
 
 class AppSettingChangedEventArgs : EventArgs
     string Key;  object? OldValue (stored JSON text);  object? NewValue (object passed to Set)

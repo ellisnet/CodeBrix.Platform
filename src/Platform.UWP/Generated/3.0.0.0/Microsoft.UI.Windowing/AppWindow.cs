@@ -122,13 +122,7 @@ namespace Microsoft.UI.Windowing
 			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.AppWindow", "void AppWindow.MoveInZOrderBelow(WindowId windowId)");
 		}
 #endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public void ResizeClient(global::Windows.Graphics.SizeInt32 size)
-		{
-			global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.UI.Windowing.AppWindow", "void AppWindow.ResizeClient(SizeInt32 size)");
-		}
-#endif
+		// Skipping already declared method Microsoft.UI.Windowing.AppWindow.ResizeClient(Windows.Graphics.SizeInt32)
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
 		public void ShowOnceWithRequestedStartupState()

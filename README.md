@@ -68,7 +68,8 @@ dotnet add package CodeBrix.Platform.AudioPlayer.ApacheLicenseForever
   persisted settings, and a full code editor
 * A diagnostics overlay, and a logging bridge onto `Microsoft.Extensions.Logging`
 
-Mobile (iOS/Android) and WebAssembly/browser targets are out of scope for this framework.
+iOS and WebAssembly/browser targets are out of scope for this framework; Android is served by the
+separate CodeBrix.Android package family.
 
 ## How an app is structured
 
@@ -195,7 +196,7 @@ this repository to the package it documents, and
 CodeBrix family.
 
 Additional sample code and usage examples are available in the sample applications in this
-repository — one per add-in, each building for every head:
+repository — one per add-in plus framework-level demos, most of them building for every head:
 https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform
 
 The canonical reference application, **JustBetweenUs**, ships a complete app across all six

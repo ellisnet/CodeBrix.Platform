@@ -19,8 +19,9 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 {
 	private readonly WaylandConnection _connection;
 	private readonly WlSurface _surface;
-	private readonly int _defaultWidth;
-	private readonly int _defaultHeight;
+	private int _defaultWidth;
+	private int _defaultHeight;
+	private bool _configured;
 
 	private IntPtr _frame;
 	private GCHandle _selfHandle;
@@ -115,6 +116,7 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 
 		_currentWidth = width;
 		_currentHeight = height;
+		_configured = true;
 
 		// Acknowledge the configure by committing a state of the chosen content size.
 		// (Invoked from a dispatch that already holds the gate; the lock is reentrant.)
@@ -253,6 +255,39 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 		{
 			this.Log().Debug("SetMinMaxSize is not yet wired for the libdecor path.");
 		}
+	}
+
+	public void RequestContentSize(int width, int height)
+	{
+		if (width <= 0 || height <= 0 || _maximized || _fullscreen || _frame == IntPtr.Zero)
+		{
+			return;
+		}
+
+		// Before the first configure the size simply becomes the one libdecor falls back to when the
+		// compositor leaves the choice to the client.
+		_defaultWidth = width;
+		_defaultHeight = height;
+
+		if (!_configured)
+		{
+			return;
+		}
+
+		_currentWidth = width;
+		_currentHeight = height;
+
+		// A client-initiated resize in libdecor is a commit of the new content size with no configuration:
+		// libdecor resizes the decorations around it.
+		lock (Gate)
+		{
+			var state = LibDecor.libdecor_state_new(width, height);
+			LibDecor.libdecor_frame_commit(_frame, state, IntPtr.Zero);
+			LibDecor.libdecor_state_free(state);
+		}
+		_connection.Flush();
+
+		Configured?.Invoke(width, height, _activated);
 	}
 
 	public void MapInitial()

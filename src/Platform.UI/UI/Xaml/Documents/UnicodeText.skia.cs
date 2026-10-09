@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Text;
 using HarfBuzzSharp;
@@ -296,7 +295,7 @@ internal readonly partial struct UnicodeText
 						FontDetails newFontDetails;
 						if (char.ConvertToUtf32(inline.Text, startInInline + i) is var codepoint && !inline.FontDetails.SKFont.ContainsGlyph(codepoint))
 						{
-							newFontDetails = GetFallbackFont(codepoint, (float)inline.FontSize, inline.FontWeight, inline.FontStretch, inline.FontStyle) ?? inline.FontDetails;
+							newFontDetails = FontDetailsCache.GetFallbackFont(codepoint, (float)inline.FontSize, inline.FontWeight, inline.FontStretch, inline.FontStyle) ?? inline.FontDetails;
 						}
 						else
 						{
@@ -338,59 +337,6 @@ internal readonly partial struct UnicodeText
 		}
 
 		return shapedLines;
-	}
-
-	private static FontDetails? GetFallbackFont(int codepoint, float fontSize, ushort fontWeight, EngineFontStretch fontStretch, EngineFontStyle fontStyle)
-	{
-		// Line-break and other control characters have no visible glyph, so they must never trigger
-		// font fallback. On some hosts (e.g. Linux with the LyX math fonts installed) SKFontManager's
-		// MatchCharacter(U+000A) resolves to a math font such as esint10, whose shaped glyph paints a
-		// stray "elongated f"/integral stroke at the end of every broken line. Returning null keeps the
-		// character in the caller's own font (via "?? inline.FontDetails"), where it maps to an inkless
-		// .notdef. This is a no-op on platforms where fallback already resolved to nothing visible.
-		if (codepoint <= 0xFFFF && char.IsControl((char)codepoint))
-		{
-			return null;
-		}
-
-		var symbolsFont = FontDetailsCache.GetFont(FontDetailsCache.Source.SymbolsFont, fontSize, fontWeight, fontStretch, fontStyle).details;
-		if (symbolsFont.SKFont.ContainsGlyph(codepoint))
-		{
-			return symbolsFont;
-		}
-		// The application's own declared fallbacks, in order. These are its fonts, shipped
-		// in its package, so they are consulted whether or not isolation is on — and they
-		// are checked BEFORE the host's fonts so text renders the same on a desktop as on
-		// a device that has nothing else installed.
-		if (FontDetailsCache.GetEmbeddedFallback(codepoint, fontSize, fontWeight, fontStretch, fontStyle) is { } embedded)
-		{
-			return embedded;
-		}
-		// Font isolation: everything below this point looks outside the application — the
-		// device's own font directory on Android, the host's installed fonts everywhere
-		// else — so under isolation there is deliberately nowhere left to look. Returning
-		// null keeps the character in the caller's own font (via "?? inline.FontDetails"),
-		// where it renders as that font's missing-glyph, which is what a device carrying
-		// only the application's fonts would show. The symbols font above is checked first
-		// and stays exempt: the framework depends on it, so it is present on a real device
-		// exactly as it is here.
-		if (FontDetailsCache.Source.RestrictToEmbeddedFonts)
-		{
-			return null;
-		}
-		if (OperatingSystem.IsAndroid())
-		{
-			foreach (var file in Directory.EnumerateFiles("/system/fonts"))
-			{
-				var font = FontDetailsCache.GetFont(file, fontSize, fontWeight, fontStretch, fontStyle).details;
-				if (font.SKFont.ContainsGlyph(codepoint))
-				{
-					return font;
-				}
-			}
-		}
-		var typeface = SKFontManager.Default.MatchCharacter(codepoint);
-		return typeface is not null ? FontDetailsCache.GetFont(typeface.FamilyName, fontSize, fontWeight, fontStretch, fontStyle).details : null;
 	}
 
 	private static IEnumerable<(ReadonlyInlineCopy Inline, int startInInline, int endInInline)> GroupByInline(List<BidiRun> line)
@@ -708,7 +654,7 @@ internal readonly partial struct UnicodeText
 				FontDetails newFontDetails;
 				if (char.ConvertToUtf32(inline.Text, i) is var codepoint && !inline.FontDetails.SKFont.ContainsGlyph(codepoint))
 				{
-					newFontDetails = GetFallbackFont(codepoint, (float)inline.FontSize, inline.FontWeight, inline.FontStretch, inline.FontStyle) ?? inline.FontDetails;
+					newFontDetails = FontDetailsCache.GetFallbackFont(codepoint, (float)inline.FontSize, inline.FontWeight, inline.FontStretch, inline.FontStyle) ?? inline.FontDetails;
 				}
 				else
 				{

@@ -162,10 +162,20 @@ Page  (sealed)
 
 Locator matching rules:
   - GetByRole: role from the control type or its automation peer; Name matches
-    the accessible name (AutomationProperties.Name, LabeledBy, or the peer's
-    name) as a case-insensitive, whitespace-normalized substring, or exactly
-    (case-sensitive) with Exact = true; NameRegex matches a pattern;
+    the accessible name as a case-insensitive, whitespace-normalized substring,
+    or exactly (case-sensitive) with Exact = true; NameRegex matches a pattern;
     IncludeHidden = true also matches hidden elements (see below).
+  - The accessible name, first non-empty wins: AutomationProperties.Name;
+    LabeledBy (the label's text); a menu item's Text / MenuBarItem's Title;
+    the automation peer's name (WinUI's: plain text such as a button's string
+    Content); the visible text inside the element (its TextBlocks, icon glyphs
+    left out - so a button whose Content is a panel is named by the text in
+    it); the ToolTipService.ToolTip text (a string, or a ToolTip / TextBlock
+    holding text - so an icon-only button is named by its tooltip); last, any
+    text the element draws (an icon glyph). A TextBox never takes its own text
+    as its name (its tooltip still applies). The tooltip step is a PlayTest
+    rule: AutomationPeer.GetName() itself follows WinUI and never reads the
+    tooltip.
   - GetByText: the innermost TextBlock or string-Content control whose text
     matches. GetByLabel: controls whose accessible name matches.
   - GetByType<T>: finds an application- or add-in-owned type without PlayTest

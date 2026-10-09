@@ -190,7 +190,8 @@ work for data items.
         the bar holds, not copies. Empty while everything fits.
     bool        ShowOverflow()
         Opens the overflow flyout. Answers false when there is nothing to show
-        or the bar is not in a window yet.
+        or the bar is not in a window yet. The flyout closes by itself after
+        an item in it is clicked (see section 5).
     double IconSize / LabelMode LabelMode / LabelPosition LabelPosition /
     bool ShowToolTips
         These ARE the four ToolBarProperties attached properties, re-exposed -
@@ -609,6 +610,18 @@ drive it:
 The bar copies its four presentation settings onto the overflow flyout's panel,
 so a button behind the chevron looks like the ones still on the bar - see
 PITFALL 5 for why that has to be done rather than inherited.
+
+Clicking an item in the overflow runs it AND closes the flyout, as the
+framework's CommandBar closes its overflow after a secondary command. That
+covers a ToolButton, a ToolToggleButton, a button inside a group that
+overflowed, and any other ButtonBase you put in the bar. Two kinds of click
+leave the flyout open, because they open a flyout of their own on top of it:
+a framework Button whose Flyout is set, and a ToolDropDownButton whose
+PopupMode is Instant. A ToolDropDownButton in the other two modes opens its
+menu on the press (or the hold, or the drop-down key), which raises no Click,
+so the overflow stays open under the menu; a Click on its main part runs the
+command and closes the overflow. Light dismiss is unchanged: a tap outside
+the flyout, Escape or Back still closes it without running anything.
 
 6. A MENU SHARED BY A TOOL BAR BUTTON AND SOMETHING ELSE
 ---------------------------------------------------------

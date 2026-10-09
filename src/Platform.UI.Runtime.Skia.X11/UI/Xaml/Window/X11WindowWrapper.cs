@@ -183,6 +183,27 @@ internal class X11WindowWrapper : NativeWindowWrapperBase
 		XLib.XSync(display, false);
 	}
 
+	/// <summary>
+	/// Sets the client area - what <c>Window.Bounds</c> reports - to <paramref name="size"/>, which is in EFFECTIVE
+	/// pixels. The application's own window IS the client area on X11 (the window manager's frame is a separate
+	/// window around it), so this is the same request the launch size makes: the size is converted to raw pixels
+	/// with the window's scale and given to the client window, and the window manager resizes its frame to fit.
+	/// </summary>
+	/// <param name="size">The client size in effective pixels.</param>
+	public override void ResizeClient(SizeInt32 size)
+	{
+		var display = _host.RootX11Window.Display;
+		var window = _host.RootX11Window.Window;
+		using var lockDiposable = X11Helper.XLock(display);
+
+		// A framed Resize still waiting for the window manager's frame would otherwise "correct" this size away.
+		_pendingFramedSize = null;
+
+		var nativeSize = WindowSizeConversion.LogicalToNative(size, _xamlRoot.RasterizationScale);
+		_ = XLib.XResizeWindow(display, window, Math.Max(1, nativeSize.Width), Math.Max(1, nativeSize.Height));
+		XLib.XSync(display, false);
+	}
+
 	private void UpdatePositionAndSize()
 	{
 		var display = _host.RootX11Window.Display;

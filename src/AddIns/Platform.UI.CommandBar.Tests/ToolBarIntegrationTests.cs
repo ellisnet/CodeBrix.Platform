@@ -278,6 +278,197 @@ public class ToolBarIntegrationTests
 
 	#endregion
 
+	#region An item clicked in the overflow
+
+	//The framework's CommandBar closes its overflow after a secondary command runs; a bar that
+	//left its flyout open kept it drawn over the page after the item had run, and the flyout's
+	//light dismiss then took the next tap or Back (FOUND on Android, and in the code on every
+	//head). Host-free the flyout cannot open - it needs a window - so these read the bar's
+	//decision through OverflowItemDismissals, which counts the closes it made.
+
+	[Fact]
+	public void A_click_on_a_button_in_the_overflow_runs_it_and_closes_the_overflow()
+	{
+		//Arrange
+		var tail = Button("Print");
+		var command = new SwitchableCommand();
+		tail.Command = command;
+		var bar = CreateBar(Button("New"), Button("Open"), Button("Save"), tail);
+		LayOut(bar, 150, 100);
+
+		//Act
+		tail.PerformClick();
+
+		//Assert
+		bar.OverflowHost.Children.Should().Contain(tail);
+		command.ExecutionCount.Should().Be(1);
+		bar.OverflowItemDismissals.Should().Be(1);
+	}
+
+	[Fact]
+	public void A_click_on_a_button_still_in_the_bar_does_not_touch_the_overflow()
+	{
+		//Arrange
+		var head = Button("New");
+		var bar = CreateBar(head, Button("Open"), Button("Save"), Button("Print"));
+		LayOut(bar, 150, 100);
+
+		//Act
+		head.PerformClick();
+
+		//Assert
+		bar.HasOverflowItems.Should().BeTrue();
+		bar.ItemsHost!.Children.Should().Contain(head);
+		bar.OverflowItemDismissals.Should().Be(0);
+	}
+
+	[Fact]
+	public void A_click_on_a_toggle_in_the_overflow_closes_the_overflow()
+	{
+		//Arrange
+		var toggle = new ToolToggleButton { Text = "Magnifier", Icon = new FakeToolIconSource() };
+		var bar = CreateBar(Button("New"), Button("Open"), Button("Save"), toggle);
+		LayOut(bar, 150, 100);
+
+		//Act
+		toggle.PerformClick();
+
+		//Assert
+		//AppBarToggleButton closes the framework's overflow too.
+		bar.OverflowHost.Children.Should().Contain(toggle);
+		toggle.IsChecked.Should().BeTrue();
+		bar.OverflowItemDismissals.Should().Be(1);
+	}
+
+	[Fact]
+	public void A_click_on_a_button_inside_a_group_in_the_overflow_closes_the_overflow()
+	{
+		//Arrange
+		var inGroup = Button("Cut");
+		var group = new ToolBarGroup();
+		group.Children.Add(Button("Copy"));
+		group.Children.Add(inGroup);
+		var bar = CreateBar(Button("New"), Button("Open"), Button("Save"), group);
+		LayOut(bar, 150, 100);
+
+		//Act
+		inGroup.PerformClick();
+
+		//Assert
+		//A group overflows whole, so the buttons inside it are in the overflow as well.
+		bar.OverflowHost.Children.Should().Contain(group);
+		bar.OverflowItemDismissals.Should().Be(1);
+	}
+
+	[Fact]
+	public void A_button_that_came_back_from_the_overflow_no_longer_closes_it()
+	{
+		//Arrange
+		var tail = Button("Print");
+		var bar = CreateBar(Button("New"), Button("Open"), Button("Save"), tail);
+		LayOut(bar, 150, 100);
+		LayOut(bar, 600, 100);
+
+		//Act
+		tail.PerformClick();
+
+		//Assert
+		bar.ItemsHost!.Children.Should().Contain(tail);
+		bar.OverflowItemDismissals.Should().Be(0);
+	}
+
+	[Fact]
+	public void A_button_that_went_into_the_overflow_twice_closes_it_once_per_click()
+	{
+		//Arrange
+		var tail = Button("Print");
+		var bar = CreateBar(Button("New"), Button("Open"), Button("Save"), tail);
+		LayOut(bar, 150, 100);
+		LayOut(bar, 600, 100);
+		LayOut(bar, 150, 100);
+
+		//Act
+		tail.PerformClick();
+
+		//Assert
+		//Each trip into the overflow subscribes the button; one subscription must not pile on top
+		//of another.
+		bar.OverflowHost.Children.Should().Contain(tail);
+		bar.OverflowItemDismissals.Should().Be(1);
+	}
+
+	[Fact]
+	public void The_main_part_of_a_drop_down_button_in_the_overflow_closes_the_overflow()
+	{
+		//Arrange
+		var command = new SwitchableCommand();
+		var dropDown = new ToolDropDownButton
+		{
+			Text = "Open",
+			Icon = new FakeToolIconSource(),
+			Flyout = new MenuFlyout(),
+			Command = command,
+		};
+		var bar = CreateBar(Button("New"), Button("Save"), Button("Print"), dropDown);
+		LayOut(bar, 150, 100);
+
+		//Act
+		dropDown.PerformClick();
+
+		//Assert
+		//A drop-down opens its menu on the press and raises no Click for it, so opening the menu
+		//leaves the overflow open; a Click is the main part running the command, which closes it.
+		bar.OverflowHost.Children.Should().Contain(dropDown);
+		command.ExecutionCount.Should().Be(1);
+		bar.OverflowItemDismissals.Should().Be(1);
+	}
+
+	[Fact]
+	public void An_instant_drop_down_button_in_the_overflow_leaves_the_overflow_open()
+	{
+		//Arrange
+		var dropDown = new ToolDropDownButton
+		{
+			Text = "Open",
+			Icon = new FakeToolIconSource(),
+			Flyout = new MenuFlyout(),
+			PopupMode = PopupMode.Instant,
+		};
+		var bar = CreateBar(Button("New"), Button("Save"), Button("Print"), dropDown);
+		LayOut(bar, 150, 100);
+
+		//Act
+		var closes = bar.ClosesOverflow(dropDown);
+
+		//Assert
+		//The whole button is its menu, so a click on it is the framework's AppBarButton-with-a-
+		//Flyout, which leaves the overflow open under the menu it opens.
+		bar.OverflowHost.Children.Should().Contain(dropDown);
+		closes.Should().BeFalse();
+	}
+
+	[Fact]
+	public void A_framework_button_with_a_flyout_in_the_overflow_leaves_the_overflow_open()
+	{
+		//Arrange
+		var withFlyout = new Button { Width = 50, Height = 20, Flyout = new MenuFlyout() };
+		var plain = new Button { Width = 50, Height = 20 };
+		var bar = CreateBar(Button("New"), Button("Save"), Button("Print"), plain, withFlyout);
+		LayOut(bar, 150, 100);
+
+		//Act
+		var closesWithFlyout = bar.ClosesOverflow(withFlyout);
+		var closesPlain = bar.ClosesOverflow(plain);
+
+		//Assert
+		bar.OverflowHost.Children.Should().Contain(withFlyout);
+		bar.OverflowHost.Children.Should().Contain(plain);
+		closesWithFlyout.Should().BeFalse();
+		closesPlain.Should().BeTrue();
+	}
+
+	#endregion
+
 	#region A drop-down inside a bar, opened by the keyboard
 
 	[Fact]

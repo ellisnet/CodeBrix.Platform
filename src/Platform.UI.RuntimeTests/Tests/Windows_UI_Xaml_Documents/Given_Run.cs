@@ -3,6 +3,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Documents.TextFormatting;
 
@@ -110,6 +112,32 @@ namespace CodeBrix.Platform.UI.RuntimeTests.Tests.Windows_UI_Xaml_Documents //Wa
 
 			Run run = new() { Text = GetText(expected) };
 			AssertSegmentsMatch(expected, run.GetSegments());
+		}
+
+		[TestMethod]
+		[RunsOnUIThread]
+		public async Task When_GetSegments_PrivateUseCharacter_Then_SymbolsFont_Is_Used()
+		{
+			// U+E700 (GlobalNavigationButton) is a Private Use Area code point the framework's symbols font draws and
+			// a text font does not. The run segmenter must resolve it the way UnicodeText does: symbols font first.
+			const int PrivateUseCodepoint = 0xE700;
+			var symbolsFontFamily = global::CodeBrix.Platform.UI.FeatureConfiguration.Font.SymbolsFont;
+			await FontFamilyHelper.PreloadAsync(symbolsFontFamily, global::Microsoft.UI.Text.FontWeights.Normal, global::Windows.UI.Text.FontStretch.Normal, global::Windows.UI.Text.FontStyle.Normal);
+
+			Run run = new() { Text = "a\uE700" };
+			var symbolsFont = FontDetailsCache.GetFont(symbolsFontFamily, (float)run.FontSize, run.FontWeight, run.FontStretch, run.FontStyle).details;
+			if (!symbolsFont.SKFont.ContainsGlyph(PrivateUseCodepoint) || run.GetFontInfo().SKFont.ContainsGlyph(PrivateUseCodepoint))
+			{
+				Assert.Inconclusive("The symbols font must have U+E700 and the run's own font must not.");
+			}
+
+			var segments = run.GetSegments();
+
+			Assert.AreEqual(2, segments.Count);
+			Assert.AreEqual("\uE700", segments[1].Text.ToString());
+			Assert.IsNull(segments[0].FallbackFont);
+			Assert.IsNotNull(segments[1].FallbackFont);
+			Assert.AreSame(symbolsFont.SKFont.Typeface, segments[1].FallbackFont.SKFont.Typeface);
 		}
 
 		private static string GetText(ExpectedSegment[] expectedSegments) => string.Concat(expectedSegments.Select(s => s.Text));

@@ -67,6 +67,15 @@ internal class MacOSWindowWrapper : NativeWindowWrapperBase
 		NativeCodeBrix.codebrix_window_resize(_nativeWindow.Handle, w, h);
 	}
 
+	/// <summary>
+	/// Sets the client area - what <c>Window.Bounds</c> reports - to <paramref name="size"/>, which is in EFFECTIVE
+	/// pixels. An NSWindow's content rect is in points, the same unit, and excludes the title bar, so this is the
+	/// same request the launch size makes: the native resize sizes the content rect and adds the title bar itself.
+	/// </summary>
+	/// <param name="size">The client size in effective pixels.</param>
+	public override void ResizeClient(SizeInt32 size)
+		=> NativeCodeBrix.codebrix_window_resize(_nativeWindow.Handle, Math.Max(1, size.Width), Math.Max(1, size.Height));
+
 	private void OnHostPositionChanged(double x, double y)
 	{
 		// in physical pixels

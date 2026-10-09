@@ -25,8 +25,9 @@ The library's FULL interaction model is wired in out of the box:
 Every one of those bindings can be rebound or removed through the Controller
 property, which takes a CodeBrix.Plotter PlotController.
 
-Every piece of chart text renders through the APPLICATION's fonts, never the
-host system's - the framework-wide "no system font fallback" rule. Text is
+Every font family a chart names resolves to one of the APPLICATION's fonts,
+never to a host font of that name: a bare family name (including the plot
+model's "Segoe UI" default) becomes the control's plot font. Text is
 shaped by the plot engine itself (SkiaSharp.HarfBuzz), so this package has no
 TextLayout dependency.
 
@@ -509,8 +510,8 @@ COMMON PITFALLS TO AVOID
     on this control).
   - "Segoe UI" (the model default) is NOT missing: every bare font name
     resolves to the application font by design. Only an ms-appx:/// URI
-    selects a different application font, and there is no system-font path
-    at all.
+    selects a different application font; a bare name never selects a host
+    font.
   - PlotterColor is a struct with sentinel values; test with IsUndefined()
     / IsAutomatic() rather than comparing against null.
   - HorizontalAlignment / VerticalAlignment clash between CodeBrix.Plotter
@@ -596,4 +597,4 @@ QUICK REFERENCE CARD
     Export:          new PngExporter { Width, Height, Dpi }.Export(model, stream)
                      (CodeBrix.Plotter.Skia; also Jpeg / Pdf / Svg)
     Rules:           bounded size | focus for keys | one view per model |
-                     no system fonts, ever
+                     bare font names map to the app font

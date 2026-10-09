@@ -123,3 +123,36 @@ Scenario: Tapping the chevron opens the overflow flyout holding the same items
 	Then the open popup has ink
 	And the overflow of "bar" holds "score"
 	And the overflow of "bar" holds "print"
+
+# The framework's CommandBar closes its overflow after a secondary command runs. A bar that left its
+# flyout open kept it drawn over the page after the item had run, and the flyout's light dismiss then
+# swallowed the next tap or Back meant for the page. This group hosts no Frame, so no Back claim is
+# made here: the next tap reaching a button on the bar is the claim that stands for both.
+Scenario: A tap on an overflow item runs it and closes the overflow
+	Given the application shows a ToolBar named "bar" with:
+		| Property | Value |
+		| Width    | 160   |
+	And the bar "bar" holds:
+		| Kind       | Name  | Icon | IconTint | Command      |
+		| ToolButton | new   | dot  | Navy     |              |
+		| ToolButton | open  | dot  | Navy     |              |
+		| ToolButton | save  | dot  | Navy     |              |
+		| ToolButton | print | dot  | Navy     |              |
+		| ToolButton | score | dot  | Red      | scoreCommand |
+	And the icons of "bar" are loaded
+	And the chevron of "bar" is named "chevron"
+	When the frame is captured as "before the overflow"
+	And "chevron" is tapped
+	Then the overflow flyout of "bar" is showing
+	And the overflow of "bar" holds "score"
+	When "score" is tapped
+	And the frame is captured as "after the item"
+	Then the Click of "score" was raised once
+	And the command "scoreCommand" was executed once
+	And no popup is open
+	And nothing outside "bar" changed between frames "after the item" and "before the overflow"
+	And the region of "bar" in frame "after the item" does not contain "Red"
+	When "new" is tapped
+	Then the Click of "new" was raised once
+	And the Click of "score" was raised once
+	And no popup is open

@@ -34,6 +34,8 @@ internal interface INativeAppWindow
 
 	void Resize(SizeInt32 size);
 
+	void ResizeClient(SizeInt32 size);
+
 	void Show(bool activateWindow);
 
 	void SetPresenter(AppWindowPresenter presenter);

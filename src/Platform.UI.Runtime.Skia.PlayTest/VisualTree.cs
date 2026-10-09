@@ -110,7 +110,49 @@ internal static class VisualTree
         if (element is MenuBarItem topMenu) return topMenu.Title ?? "";
         var peer = FrameworkElementAutomationPeer.CreatePeerForElement(element);
         var peerName = peer?.GetName();
-        return string.IsNullOrEmpty(peerName) ? (element is TextBox ? "" : Text(element)) : peerName;
+        if (!string.IsNullOrEmpty(peerName)) return peerName;
+        // A text box's value is not its name.
+        if (element is TextBox) return FallbackName(null, ToolTipText(element), null);
+        return FallbackName(ContentText(element), ToolTipText(element), Text(element));
+    }
+
+    // The name of an element whose automation peer reports none (WinUI's peer name stops at
+    // AutomationProperties.Name, LabeledBy and plain text content): the visible text inside it,
+    // then its tooltip - so an icon-only button is named by its tooltip, but a tooltip never
+    // replaces text the user can see - then, last, whatever text it draws (an icon glyph).
+    internal static string FallbackName(string? contentText, string? toolTipText, string? drawnText)
+    {
+        if (!string.IsNullOrWhiteSpace(contentText)) return contentText;
+        if (!string.IsNullOrWhiteSpace(toolTipText)) return toolTipText.Trim();
+        return drawnText ?? "";
+    }
+
+    // The text a reader sees inside an element. FontIcon and SymbolIcon draw their glyph with
+    // a TextBlock; that private-use character is not a label, so icon text is left out.
+    internal static string ContentText(UIElement element) => string.Join(" ", Walk(element)
+        .OfType<TextBlock>()
+        .Where(text => !InIcon(text, element))
+        .Select(text => text.Text));
+
+    private static bool InIcon(UIElement child, UIElement root)
+    {
+        for (var node = VisualTreeHelper.GetParent(child); node != null && node != root; node = VisualTreeHelper.GetParent(node))
+            if (node is IconElement) return true;
+        return false;
+    }
+
+    // ToolTipService.ToolTip as a name: a string, or a ToolTip or TextBlock holding text.
+    internal static string? ToolTipText(UIElement element)
+    {
+        var toolTip = ToolTipService.GetToolTip(element);
+        if (toolTip is ToolTip control) toolTip = control.Content;
+        var text = toolTip switch
+        {
+            string value => value,
+            TextBlock block => block.Text,
+            _ => null,
+        };
+        return string.IsNullOrWhiteSpace(text) ? null : text.Trim();
     }
 
     internal static AriaRole Role(UIElement element)

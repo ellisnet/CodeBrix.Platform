@@ -158,6 +158,17 @@ internal class WaylandWindowWrapper : NativeWindowWrapperBase
 			"a client cannot force its outer window size; the compositor has the last word.");
 	}
 
+	/// <summary>
+	/// Sets the client area - what <c>Window.Bounds</c> reports - to <paramref name="size"/>, which is in EFFECTIVE
+	/// pixels. An xdg surface's window geometry is surface-local logical units, the same unit, and excludes the
+	/// decorations, so this is the same request the launch size makes and no conversion happens. A floating window
+	/// takes the size; a maximized, tiled or full-screen one keeps the size the compositor configured, because on
+	/// Wayland the compositor has the last word.
+	/// </summary>
+	/// <param name="size">The client size in effective pixels.</param>
+	public override void ResizeClient(SizeInt32 size)
+		=> _host.RequestClientSize(Math.Max(1, size.Width), Math.Max(1, size.Height));
+
 	private void UpdatePositionAndSize()
 	{
 		// Wayland never exposes global window coordinates; (0,0) is the WinUI convention

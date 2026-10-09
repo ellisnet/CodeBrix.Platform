@@ -30,7 +30,9 @@ Key facts:
   - Rendering: Skia (SkiaSharp) on every platform.
   - Supported desktop targets: Windows (Win32 or WPF host), Linux (X11, native
     Wayland, or framebuffer), macOS (Apple Silicon and Intel).
-  - Out of scope for this framework: mobile (iOS/Android), WebAssembly/browser.
+  - Out of scope for this framework: WebAssembly/browser. Android is served by
+    the separate CodeBrix.Android package family (not part of this package);
+    iOS is not a target.
 
 Provenance: CodeBrix.Platform is a fork of an upstream open-source
 WinUI-compatible UI framework, re-namespaced and re-packaged under the CodeBrix
@@ -138,11 +140,12 @@ API, usage and pitfalls.
       OpenGL 3D surface (GLCanvasElement) composited into the Skia scene.
       see src/AddIns/Platform.WinUI.Graphics3DGL/AGENT-README.txt
   CodeBrix.Platform.Lottie.ApacheLicenseForever            Apache-2.0
-      Lottie / Skottie vector animation playback in XAML (pair with
-      SkiaSharp.Skottie).
+      Lottie / Skottie vector animation playback in XAML (SkiaSharp.Skottie
+      comes with it as a package dependency).
       see src/AddIns/Platform.UI.Lottie/AGENT-README.txt
   CodeBrix.Platform.Svg.ApacheLicenseForever               Apache-2.0
-      SvgImageSource on Skia targets (pair with CodeBrix.SkiaSvg.MitLicenseForever).
+      SvgImageSource on Skia targets (CodeBrix.SkiaSvg.MitLicenseForever comes
+      with it as a package dependency).
       see src/AddIns/Platform.UI.Svg/AGENT-README.txt
   CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever      MIT
       SkiaSharp XAML views (SKXamlCanvas, SKSwapChainPanel); used by the
@@ -151,7 +154,7 @@ API, usage and pitfalls.
   CodeBrix.Platform.MediaPlayer.LgplLicenseForever         LGPL-2.1-or-later
       MediaPlayerElement audio/video playback via LibVLC on the Win32, WPF,
       X11, Wayland and FrameBuffer heads (macOS has built-in media support).
-      The ONLY non-Apache package in the family.
+      The only copyleft (LGPL) package in the family.
       see src/AddIns/Platform.UI.MediaPlayer.Skia/AGENT-README.txt
   CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever  Apache-2.0
       Full code/text editor control (syntax highlighting, folding, completion).
@@ -163,6 +166,10 @@ API, usage and pitfalls.
   CodeBrix.Platform.AudioPlayer.ApacheLicenseForever       Apache-2.0
       AudioPlayer / MidiPlayer / SoundEffect - fully managed audio on all heads.
       see src/AddIns/Platform.UI.AudioPlayer.Skia/AGENT-README.txt
+  CodeBrix.Platform.CommandBar.ApacheLicenseForever        Apache-2.0
+      Tool bar / command bar family (ToolBarTray, ToolBar, ToolButton, ...)
+      bound to view-model commands; brings the Svg add-in for SVG icons.
+      see src/AddIns/Platform.UI.CommandBar/AGENT-README.txt
   CodeBrix.Platform.FlexPanel.ApacheLicenseForever         Apache-2.0
       CSS flexbox-style XAML layout panel.
       see src/AddIns/Platform.UI.FlexPanel/AGENT-README.txt
@@ -183,6 +190,19 @@ API, usage and pitfalls.
   CodeBrix.Platform.WebView.ApacheLicenseForever           Apache-2.0
       Makes the WebView2 control work on every head (WPE WebKit on Linux).
       see src/AddIns/Platform.UI.WebView.Skia/AGENT-README.txt
+
+Test head for UI tests (in a .PlayTests TEST project only - never in .Core or
+in a head project):
+
+  CodeBrix.Platform.PlayTest.ApacheLicenseForever          Apache-2.0
+      Test head: runs the application's real XAML, view models and services
+      offscreen on a fixed virtual Skia screen, driven through a
+      Playwright-style C# locator / action / assertion API.
+      see src/Platform.UI.Runtime.Skia.PlayTest/AGENT-README.txt
+  CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever   Apache-2.0
+      Gives the PlayTest head real OpenGL contexts, so Graphics3DGL content
+      renders in PlayTests; referenced beside the PlayTest package.
+      see src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/AGENT-README.txt
 
 Toolkits for Microsoft's OWN UI frameworks (NOT for CodeBrix.Platform apps;
 they share no build-time code with the framework above):
@@ -399,9 +419,10 @@ project - never in a head project. Every add-in package:
   - flows to every head transitively; an add-in that only works on some heads
     is inert on the others (it never breaks a build);
   - brings its own package dependencies in automatically (a sibling CodeBrix
-    library, a SkiaSharp.* package, ...) - the add-in's AGENT-README says
-    which, and which companion packages YOU must add alongside it (e.g.
-    SkiaSharp.Skottie for Lottie, CodeBrix.SkiaSvg.MitLicenseForever for Svg);
+    library, a SkiaSharp.* package, ...; e.g. SkiaSharp.Skottie comes with
+    Lottie and CodeBrix.SkiaSvg.MitLicenseForever with Svg) - the add-in's
+    AGENT-README says which, and names any companion package YOU must add
+    alongside it;
   - ships at the same version as the rest of the family, and needs a core of
     the same generation (several add-ins implement internal framework seams).
 
@@ -684,8 +705,8 @@ use whichever you prefer:
   These ".Use...()" methods are all extension methods in the
   "CodeBrix.Platform.UI.Hosting" namespace, surfaced by the corresponding head
   package. A head sees only the one ".Use...()" method that matches its package.
-  Every one except UseMacOS() also has an overload taking a configuration
-  lambda - see PER-HEAD CONFIGURATION in the CORE API REFERENCE.
+  Every one also has an overload taking a configuration lambda - see
+  PER-HEAD CONFIGURATION in the CORE API REFERENCE.
 
 --- THE WPF HEAD NEEDS A SOFTWARE-RENDERING LINE ---
 
@@ -1095,7 +1116,7 @@ builder. Builder calls are chainable and return the builder.
     and embedded-null names are rejected; Unicode names are supported.
 
         .UseMacOS(mac => mac
-            .UseSystemAppName("Fresco.Brix")
+            .UseSystemAppName("My App")
             .UseSystemMenuBar())
 
     This runtime override does not rename assemblies, executable files, folders,
@@ -1173,7 +1194,11 @@ nested classes; the ones an app author is most likely to need:
                                         BEFORE the host machine's fonts; set
                                         before the first text is measured
     bool RestrictToEmbeddedFonts        confine resolution to fonts the app ships
-                                        (the frame-buffer emulator sets it)
+                                        (default false; set it before the first
+                                        text is measured; the PlayTest head
+                                        always sets it, and the frame-buffer
+                                        emulated head sets it when its launch
+                                        contract asks for font isolation)
     bool IgnoreTextScaleFactor; float? MaximumTextScaleFactor
   Rendering
     bool? UseOpenGLOnWin32; bool? UseOpenGLOnX11; bool PreferGLESOverGLOnX11
@@ -1259,10 +1284,20 @@ preload it (namespace CodeBrix.Platform.UI.Xaml.Media):
         Windows.UI.Text.FontWeights.Normal, Windows.UI.Text.FontStretch.Normal,
         Windows.UI.Text.FontStyle.Normal);
 
-A character no font can supply renders as the font's .notdef glyph (blank or
-a box, depending on the font) - the framework never substitutes the host
-system's fonts unless FallbackFontFamilies is left empty and the app's fonts
-have no glyph.
+Missing characters. By default a character the requested font has no glyph for
+is looked for in the framework's SymbolsFont, then in
+FeatureConfiguration.Font.FallbackFontFamilies (the application's own fonts,
+in order; empty by default), and then in the host machine's installed fonts.
+Setting FeatureConfiguration.Font.RestrictToEmbeddedFonts = true before the
+first text is measured confines resolution to the fonts the application ships;
+a character none of them has then renders as the font's own .notdef glyph
+(blank or a box, depending on the font), and a bare family name such as
+"Segoe UI" resolves to DefaultTextFontFamily instead of a host font. The PlayTest
+head always turns the restriction on; the frame-buffer emulated head turns it
+on when its launch contract asks for font isolation. Recommendation: ship
+every font your text needs (a font package plus FallbackFontFamilies for extra
+scripts) and do not rely on host fonts - what a desktop happens to have
+installed, a device or another machine may not.
 
 LOGGING BRIDGE
 --------------
@@ -1287,7 +1322,8 @@ implemented on the Skia heads and how the framework expects it to be used.
 
     AppWindow: Title, Size, ClientSize (SizeInt32), Position (PointInt32),
     IsVisible, Presenter, TitleBar, Show(), Show(bool activateWindow),
-    Move(PointInt32), Resize(SizeInt32), SetPresenter(AppWindowPresenter),
+    Move(PointInt32), Resize(SizeInt32), ResizeClient(SizeInt32),
+    SetPresenter(AppWindowPresenter),
     SetPresenter(AppWindowPresenterKind), SetIcon(string iconPath),
     static GetFromWindowId(WindowId), events Changed / Closing.
 
@@ -1296,6 +1332,16 @@ implemented on the Skia heads and how the framework expects it to be used.
     size of that same kind, so Resize(AppWindow.Size) is a no-op. ClientSize is
     the client area only, and Window.Bounds is that same client area in
     effective pixels, which is what the page is laid out into.
+
+    ResizeClient sets the CLIENT area instead, and takes EFFECTIVE pixels -
+    the unit Window.Bounds reports - so it is the call that restores a saved
+    Window.Bounds: ResizeClient with the Bounds width and height gives the
+    same Bounds back. Each head adds its own frame. On the frame-buffer and
+    PlayTest heads the window is the whole screen and ResizeClient does
+    nothing; on Wayland a floating window takes the size, while a maximized,
+    tiled or full-screen one keeps the size the compositor gave it.
+
+        MainWindow.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(1200, 760));
 
     OverlappedPresenter: IsAlwaysOnTop, IsMaximizable, IsMinimizable, IsModal,
     IsResizable, HasBorder, HasTitleBar, PreferredMinimumWidth/Height,
@@ -2195,7 +2241,7 @@ Head-specific configuration examples (Program.cs) are in PER-HEAD CONFIGURATION.
 MINIMUM VIABLE PROJECT
 ======================
 The smallest runnable app: one .Core library, one .UI shared project, one head
-(here Linux X11). Eight files:
+(here Linux X11). Nine files:
 
     MyApp.Core/MyApp.Core.csproj          THE .Core PROJECT, keeping only the
                                           CodeBrix.Platform.ApacheLicenseForever
@@ -2357,7 +2403,10 @@ COMMON PITFALLS TO AVOID
 
 WHAT THIS PACKAGE DOES NOT DO
 =============================
-  - No mobile (iOS/Android) and no WebAssembly/browser targets. Ever.
+  - No WebAssembly/browser target. No iOS target. Android is not a head of this
+    framework: the separate CodeBrix.Android package family hosts a CodeBrix.Platform
+    application's XAML and code on Android, and an Android head never references
+    the packages in this repository.
   - No Vulkan on X11 for consumers: the renderer is in the repository behind an
     internal-only flag with no public API; X11RenderingBackend has no Vulkan
     member.
@@ -2432,7 +2481,9 @@ WHAT THIS PACKAGE DOES NOT DO
     either - AppWindow.Position always reports (0,0) on Wayland.
   - AppWindow.Resize and ApplicationView.TryResizeView. A client cannot force
     its outer window size; the compositor has the last word. (The window's
-    INITIAL size, via ApplicationView.PreferredLaunchViewSize, does work.)
+    INITIAL size, via ApplicationView.PreferredLaunchViewSize, does work, and
+    so does AppWindow.ResizeClient on a floating window - a Wayland client
+    chooses its own content size there.)
   - OverlappedPresenter.IsAlwaysOnTop. Core Wayland/xdg-shell has no
     always-on-top for regular application windows.
   - OverlappedPresenter.IsMinimizable / IsMaximizable. xdg-shell cannot remove
@@ -2463,14 +2514,17 @@ Reference application (the canonical structure, six heads):
     https://github.com/ellisnet/JustBetweenUs/tree/main/CodeBrixPlatform
 
 Samples in this repository (each is a complete .Core + .UI + heads solution;
-they consume the framework from source, so their csproj files use
+all but two consume the framework from source, so their csproj files use
 ProjectReference where yours use PackageReference - copy the structure, not
-the reference lines):
+the reference lines; the exceptions, EmulateFrameBufferDemo and
+KeyPressTester_packages, consume the packages from nuget.org exactly as an
+application does):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/JustBetweenUs
         in-repo copy of the reference app (six heads + Tests)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/EmulateFrameBufferDemo
         FrameBuffer head configured with Orientation(..., isPreferredOrientation)
-        and AutoRotationEnabled; runs in the CodeBrix.Develop emulator
+        and AutoRotationEnabled; runs in the CodeBrix.Develop emulator (three
+        Linux heads; consumes the framework from NuGet packages)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/FileFolderDialogDemo
         file/folder pickers on every head (six heads)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/ParityDemo
@@ -2478,8 +2532,19 @@ the reference lines):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/TriPaneViewDemo
         the Toolkit's TriPaneView driven from a control strip: proportions, minimum
         lengths, minimize and restore, the grip modes and per-pane scrolling (six heads)
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/EvaluateUIElementsDemo
+        evaluation rig for looking at core UI elements by hand, one numbered
+        scenario per element (six heads)
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/KeyPressTester
+        key diagnostics: shows which layer notices each key press (native
+        source, preview/bubble routing, accelerators, access keys, menus)
+        (six heads)
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/KeyPressTester_packages
+        the same KeyPressTester built from the nuget.org packages alone (six
+        heads, one .slnx)
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/AdvancedTextEditDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/AudioPlayerDemo
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/CommandBarDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/FlexPanelDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/MediaPlayerDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlotterViewDemo
@@ -2518,7 +2583,7 @@ THIS FILE'S PACKAGES:
     Linux/X11      ->  CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever         .UseLinuxX11([Action<X11HostBuilder>])
     Linux/Wayland  ->  CodeBrix.Platform.Runtime.Skia.Wayland.ApacheLicenseForever     .UseLinuxWayland([Action<WaylandHostBuilder>])  (needs a compositor)
     Linux/FB       ->  CodeBrix.Platform.Runtime.Skia.FrameBuffer.ApacheLicenseForever .UseLinuxFrameBuffer([Action<FramebufferHostBuilder>])
-    macOS          ->  CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever       .UseMacOS()
+    macOS          ->  CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever       .UseMacOS([Action<MacOSHostBuilder>])
     IDE-only       ->  CodeBrix.Platform.Runtime.Skia.FrameBuffer.Emulated.ApacheLicenseForever  (never reference)
 
 ADD-INS (all in .Core; each has its own AGENT-README):
@@ -2531,12 +2596,17 @@ ADD-INS (all in .Core; each has its own AGENT-README):
     CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever  src/AddIns/Platform.UI.AdvancedTextEdit/
     CodeBrix.Platform.AppSettings.ApacheLicenseForever       src/AddIns/Platform.AppSettings/
     CodeBrix.Platform.AudioPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.AudioPlayer.Skia/
+    CodeBrix.Platform.CommandBar.ApacheLicenseForever        src/AddIns/Platform.UI.CommandBar/        (+ CodeBrix.Platform.Svg.ApacheLicenseForever)
     CodeBrix.Platform.FlexPanel.ApacheLicenseForever         src/AddIns/Platform.UI.FlexPanel/
     CodeBrix.Platform.PlotterView.ApacheLicenseForever       src/AddIns/Platform.UI.PlotterView/
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView/
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout/
     CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia/  (+ CodeBrix.VideoPlayback)
     CodeBrix.Platform.WebView.ApacheLicenseForever           src/AddIns/Platform.UI.WebView.Skia/
+
+PLAYTEST TEST HEAD (in a .PlayTests test project only; each has its own AGENT-README):
+    CodeBrix.Platform.PlayTest.ApacheLicenseForever          src/Platform.UI.Runtime.Skia.PlayTest/
+    CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever   src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/  (beside PlayTest)
 
 TOOLKITS FOR MICROSOFT'S OWN FRAMEWORKS (not for CodeBrix.Platform apps):
     CodeBrix.Platform.WinUI.ApacheLicenseForever, .WinUI.Skia..., .WinUI.Lottie...   src-platforms/Platform.WinUI/
@@ -2563,7 +2633,7 @@ Per-head knobs:
              .AllowMultipleApplicationInstances(); FrameBufferHost.DisplayScale
              env: FRAMEBUFFER, CODEBRIX_FRAMEBUFFER_USE_DRM, CODEBRIX_DISPLAY_SCALE_OVERRIDE,
                   CODEBRIX_FRAMEBUFFER_ORIENTATION_SOURCE
-    macOS:   MacSkiaHost.RenderSurfaceType {Auto, Metal, Software}
+    macOS:   .UseSystemAppName(string), .UseSystemMenuBar(bool); MacSkiaHost.RenderSurfaceType {Auto, Metal, Software}
     All:     .AfterInit(Action), .UseDirectSkiaCanvasMode() (experimental)
 
 Framework-wide:   CodeBrix.Platform.UI.FeatureConfiguration.{Font, Rendering, TextBox, ScrollViewer, Popup, ...}

@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using SkiaSharp;
 using CodeBrix.Platform.Extensions;
@@ -78,6 +79,76 @@ internal static partial class FontDetailsCache
 		}
 
 		return null;
+	}
+
+	/// <summary>
+	/// The font to draw <paramref name="codepoint"/> in when the font the text asked for has no glyph for it, or null
+	/// when the character should stay in the requested font (a control character, or nothing else has it). This is the
+	/// ONE missing-character lookup of the text engine; both text paths (<c>UnicodeText</c> and the run segmenter of
+	/// <c>RunTextEngineExtensions</c>) call it, so they resolve a missing character identically.
+	/// </summary>
+	/// <remarks>
+	/// The order is: the framework's symbols font (<see cref="IFontSourcePlatform{TTypeface}.SymbolsFont"/>), then the
+	/// application's own fallback families (<see cref="GetEmbeddedFallback"/>), then - only while
+	/// <see cref="IFontSourcePlatform{TTypeface}.RestrictToEmbeddedFonts"/> is off - the host's fonts.
+	/// </remarks>
+	/// <param name="codepoint">The Unicode code point the requested font cannot draw.</param>
+	/// <param name="fontSize">The font size of the text.</param>
+	/// <param name="fontWeight">The font weight of the text.</param>
+	/// <param name="fontStretch">The font stretch of the text.</param>
+	/// <param name="fontStyle">The font style of the text.</param>
+	/// <returns>The fallback font, or null to keep the requested font.</returns>
+	internal static FontDetails? GetFallbackFont(int codepoint, float fontSize, ushort fontWeight, EngineFontStretch fontStretch, EngineFontStyle fontStyle)
+	{
+		// Line-break and other control characters have no visible glyph, so they must never trigger
+		// font fallback. On some hosts (e.g. Linux with the LyX math fonts installed) SKFontManager's
+		// MatchCharacter(U+000A) resolves to a math font such as esint10, whose shaped glyph paints a
+		// stray "elongated f"/integral stroke at the end of every broken line. Returning null keeps the
+		// character in the caller's own font (via "?? inline.FontDetails"), where it maps to an inkless
+		// .notdef. This is a no-op on platforms where fallback already resolved to nothing visible.
+		if (codepoint <= 0xFFFF && char.IsControl((char)codepoint))
+		{
+			return null;
+		}
+
+		var symbolsFont = GetFont(Source.SymbolsFont, fontSize, fontWeight, fontStretch, fontStyle).details;
+		if (symbolsFont.SKFont.ContainsGlyph(codepoint))
+		{
+			return symbolsFont;
+		}
+		// The application's own declared fallbacks, in order. These are its fonts, shipped
+		// in its package, so they are consulted whether or not isolation is on — and they
+		// are checked BEFORE the host's fonts so text renders the same on a desktop as on
+		// a device that has nothing else installed.
+		if (GetEmbeddedFallback(codepoint, fontSize, fontWeight, fontStretch, fontStyle) is { } embedded)
+		{
+			return embedded;
+		}
+		// Font isolation: everything below this point looks outside the application — the
+		// device's own font directory on Android, the host's installed fonts everywhere
+		// else — so under isolation there is deliberately nowhere left to look. Returning
+		// null keeps the character in the caller's own font (via "?? inline.FontDetails"),
+		// where it renders as that font's missing-glyph, which is what a device carrying
+		// only the application's fonts would show. The symbols font above is checked first
+		// and stays exempt: the framework depends on it, so it is present on a real device
+		// exactly as it is here.
+		if (Source.RestrictToEmbeddedFonts)
+		{
+			return null;
+		}
+		if (OperatingSystem.IsAndroid())
+		{
+			foreach (var file in Directory.EnumerateFiles("/system/fonts"))
+			{
+				var font = GetFont(file, fontSize, fontWeight, fontStretch, fontStyle).details;
+				if (font.SKFont.ContainsGlyph(codepoint))
+				{
+					return font;
+				}
+			}
+		}
+		var typeface = SKFontManager.Default.MatchCharacter(codepoint);
+		return typeface is not null ? GetFont(typeface.FamilyName, fontSize, fontWeight, fontStretch, fontStyle).details : null;
 	}
 
 	private static readonly Func<string?, float, ushort, EngineFontStretch, EngineFontStyle, (FontDetails details, Task<FontDetails> loadedTask)> _getFont = FuncMemoizeExtensions.AsLockedMemoized((

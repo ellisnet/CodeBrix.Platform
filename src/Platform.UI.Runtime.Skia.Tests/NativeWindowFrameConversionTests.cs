@@ -87,4 +87,69 @@ public class NativeWindowFrameConversionTests
 		clientRequest.Width.Should().Be(1);
 		clientRequest.Height.Should().Be(1);
 	}
+
+	[Fact]
+	public void a_client_size_gains_the_decorations_on_the_way_to_the_framed_window()
+	{
+		//Arrange - the frame this laptop's window manager draws: 20 wide, 50 tall.
+		var framed = new SizeInt32 { Width = 1044, Height = 690 };
+		var client = new SizeInt32 { Width = 1024, Height = 640 };
+		var requested = new SizeInt32 { Width = 1280, Height = 840 };
+
+		//Act
+		var framedRequest = NativeWindowWrapperBase.ToFramedSize(requested, framed, client);
+
+		//Assert
+		framedRequest.Width.Should().Be(1300);
+		framedRequest.Height.Should().Be(890);
+	}
+
+	[Fact]
+	public void an_undecorated_window_asks_for_the_client_size_unchanged()
+	{
+		//Arrange
+		var framed = new SizeInt32 { Width = 1024, Height = 640 };
+		var client = new SizeInt32 { Width = 1024, Height = 640 };
+		var requested = new SizeInt32 { Width = 1280, Height = 840 };
+
+		//Act
+		var framedRequest = NativeWindowWrapperBase.ToFramedSize(requested, framed, client);
+
+		//Assert
+		framedRequest.Width.Should().Be(1280);
+		framedRequest.Height.Should().Be(840);
+	}
+
+	[Fact]
+	public void an_empty_client_size_still_asks_for_a_client_area_inside_the_frame()
+	{
+		//Arrange
+		var framed = new SizeInt32 { Width = 1044, Height = 690 };
+		var client = new SizeInt32 { Width = 1024, Height = 640 };
+		var requested = new SizeInt32 { Width = 0, Height = -5 };
+
+		//Act
+		var framedRequest = NativeWindowWrapperBase.ToFramedSize(requested, framed, client);
+
+		//Assert
+		framedRequest.Width.Should().Be(21);
+		framedRequest.Height.Should().Be(51);
+	}
+
+	[Fact]
+	public void the_framed_size_for_a_client_size_converts_back_to_that_client_size()
+	{
+		//Arrange
+		var framed = new SizeInt32 { Width = 1044, Height = 690 };
+		var client = new SizeInt32 { Width = 1024, Height = 640 };
+		var requested = new SizeInt32 { Width = 800, Height = 600 };
+
+		//Act
+		var roundTrip = NativeWindowWrapperBase.ToClientSize(
+			NativeWindowWrapperBase.ToFramedSize(requested, framed, client), framed, client);
+
+		//Assert
+		roundTrip.Width.Should().Be(800);
+		roundTrip.Height.Should().Be(600);
+	}
 }

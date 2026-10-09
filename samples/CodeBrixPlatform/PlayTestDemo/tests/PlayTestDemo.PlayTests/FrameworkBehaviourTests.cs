@@ -207,6 +207,50 @@ public sealed partial class ApplicationTests
     }
 
     [Fact]
+    public async Task A_button_is_named_by_its_visible_text_before_its_tooltip()
+    {
+        await Page.SetContentAsync(() =>
+        {
+            var row = new Button
+            {
+                Content = new StackPanel { Children = { new TextBlock { Text = "Fix the parser" }, new TextBlock { Text = "#42" } } },
+            };
+            ToolTipService.SetToolTip(row, "Opened today");
+            var withIcon = new Button
+            {
+                Content = new StackPanel { Orientation = Orientation.Horizontal, Children = { new SymbolIcon(Symbol.Refresh), new TextBlock { Text = "Reload" } } },
+            };
+            ToolTipService.SetToolTip(withIcon, "Fetch the list again");
+            var iconOnly = new Button
+            {
+                Content = new StackPanel { Children = { new SymbolIcon(Symbol.Find) } },
+            };
+            ToolTipService.SetToolTip(iconOnly, "Search the issues");
+            var named = new Button
+            {
+                Content = new StackPanel { Children = { new TextBlock { Text = "Visible label" } } },
+            };
+            Microsoft.UI.Xaml.Automation.AutomationProperties.SetName(named, "Automation name");
+            ToolTipService.SetToolTip(named, "Named tooltip");
+            var plain = new Button { Content = "Close" };
+            ToolTipService.SetToolTip(plain, "Close the window");
+            return FocusRoot(row, withIcon, iconOnly, named, plain);
+        });
+
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Fix the parser #42", Exact = true })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Fix the parser" })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Opened today" })).ToHaveCountAsync(0);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Reload", Exact = true })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Fetch the list again" })).ToHaveCountAsync(0);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Search the issues", Exact = true })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Automation name", Exact = true })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Visible label" })).ToHaveCountAsync(0);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Named tooltip" })).ToHaveCountAsync(0);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Close", Exact = true })).ToHaveCountAsync(1);
+        await Expect(Page.GetByRole(AriaRole.Button, new() { Name = "Close the window" })).ToHaveCountAsync(0);
+    }
+
+    [Fact]
     public async Task List_and_grid_views_report_the_list_role_and_list_rows_stay_options()
     {
         await Page.SetContentAsync(() =>

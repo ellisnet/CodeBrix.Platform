@@ -294,9 +294,17 @@ Win32 heads multiply by the display scale, the Wayland, macOS and WPF heads
 pass the numbers through because their native calls already speak logical
 units, and every call site says which it is. AppWindow.Size and
 AppWindow.Resize are the exception: they are RAW pixels of the FRAMED window,
-a matched pair, on every head. Whether a seam means the client area or the
-framed window still differs per head and is stated in the XML docs of each
-member.
+a matched pair, on every head. AppWindow.ResizeClient follows the rule: it
+takes EFFECTIVE pixels of the CLIENT area, the pair of Window.Bounds. X11
+converts to raw pixels and sizes its own (client) window; Wayland and macOS
+pass the number through as the content size; Win32 converts to raw pixels and
+adds the frame it measures (window rect minus client rect, or
+AdjustWindowRectEx[ForDpi] when there is no client rect to measure); WPF adds
+the chrome it measures (window size minus content-host size, corrected once
+after the first layout if it was not measurable yet). The frame-buffer and
+PlayTest heads are whole-screen, so ResizeClient is a no-op there, as Resize
+is. Whether a seam means the client area or the framed window still differs
+per head and is stated in the XML docs of each member.
 
 TESTING
 =======
@@ -1162,19 +1170,16 @@ DELIBERATE DIFFERENCES FROM WINUI
 =================================
 Behaviour that intentionally does not match WinUI. Keep it when porting newer
 upstream code, and add an entry here for each new one.
-  - Accessible name from the tooltip. WinUI's
-    FrameworkElementAutomationPeer.GetNameCore is AutomationProperties.Name ->
-    LabeledBy -> the element's plain text, and never reads ToolTipService; an
-    icon-only button with only a tooltip has an EMPTY name there. Here
-    AutomationPeer.GetName() falls back to the tooltip text (a string, or a
-    ToolTip / TextBlock holding text) when GetNameCore - including every
-    derived peer's override - returned an empty name
-    (FrameworkElementAutomationPeer.GetToolTipNameFallback). Why: assistive
-    technology and UI tests then have a name for icon-only buttons without
-    each app adding AutomationProperties.Name. The fallback lives in GetName,
-    not GetNameCore, on purpose: derived peers (the CommandBar add-in's
-    ToolButtonAutomationPeer, for one) treat a non-empty base.GetNameCore() as
-    an app-set name, so a tooltip there would replace their composed names.
+  - (None at present.) Automation names follow WinUI:
+    AutomationPeer.GetName() returns GetNameCore() and never reads
+    ToolTipService. Naming an icon-only control by its tooltip is a PlayTest
+    locator rule (src/Platform.UI.Runtime.Skia.PlayTest/VisualTree.cs Name:
+    peer name, then the visible text inside the element, then the tooltip),
+    not a peer rule. Do not move it back into GetName: framework callers of
+    GetName (LabeledBy, Expander, TreeView drag text, TabViewItem headers,
+    the simple-accessibility child aggregation) would read tooltips, and a
+    tooltip there outranks the visible text of a button whose Content is a
+    panel, so name-based locators for such buttons stop matching.
 
 XAML GENERATOR CONTRACTS
 ========================

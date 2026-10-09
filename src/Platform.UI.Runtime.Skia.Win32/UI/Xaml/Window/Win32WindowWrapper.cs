@@ -596,6 +596,52 @@ internal partial class Win32WindowWrapper : NativeWindowWrapperBase, IXamlRootHo
 		if (!success) { this.LogError()?.Error($"{nameof(PInvoke.SetWindowPos)} failed: {Win32Helper.GetErrorMessage()}"); }
 	}
 
+	/// <summary>
+	/// Sets the client area - what <c>Window.Bounds</c> reports - to <paramref name="size"/>, which is in EFFECTIVE
+	/// pixels. The size is converted to raw pixels with the window's scale, the window's non-client frame is added,
+	/// and the result goes to the same <c>SetWindowPos</c> call <see cref="Resize"/> makes.
+	/// </summary>
+	/// <remarks>
+	/// The frame is MEASURED - the difference between the window rect and the client rect right now - so it is
+	/// exactly the frame this window has, including a title bar the application has extended its content into.
+	/// Only when there is no client rect to measure (a minimized window reports an empty one) is the frame worked
+	/// out from the window style with <c>AdjustWindowRectEx</c> instead.
+	/// </remarks>
+	/// <param name="size">The client size in effective pixels.</param>
+	public override void ResizeClient(SizeInt32 size)
+	{
+		var nativeClientSize = WindowSizeConversion.LogicalToNative(size, RasterizationScale);
+		nativeClientSize = new SizeInt32(Math.Max(1, nativeClientSize.Width), Math.Max(1, nativeClientSize.Height));
+
+		Resize(GetFramedSizeForClientSize(nativeClientSize));
+	}
+
+	private SizeInt32 GetFramedSizeForClientSize(SizeInt32 nativeClientSize)
+	{
+		if (PInvoke.GetWindowRect(_hwnd, out RECT windowRect)
+			&& PInvoke.GetClientRect(_hwnd, out RECT clientRect)
+			&& clientRect.Width > 0
+			&& clientRect.Height > 0)
+		{
+			return ToFramedSize(
+				nativeClientSize,
+				new SizeInt32(windowRect.Width, windowRect.Height),
+				new SizeInt32(clientRect.Width, clientRect.Height));
+		}
+
+		var frame = new RECT { left = 0, top = 0, right = nativeClientSize.Width, bottom = nativeClientSize.Height };
+		var adjusted = Environment.OSVersion.Version < new Version(10, 0, 14393)
+			? PInvoke.AdjustWindowRectEx(ref frame, GetStyle(), false, 0)
+			: PInvoke.AdjustWindowRectExForDpi(ref frame, GetStyle(), false, 0, (uint)(RasterizationScale * PInvoke.USER_DEFAULT_SCREEN_DPI));
+		if (!adjusted)
+		{
+			this.LogError()?.Error($"{nameof(PInvoke.AdjustWindowRectEx)} failed: {Win32Helper.GetErrorMessage()}");
+			return nativeClientSize;
+		}
+
+		return new SizeInt32(frame.Width, frame.Height);
+	}
+
 	private unsafe void UpdateWindowPropertiesFromPackage()
 	{
 		if (Windows.ApplicationModel.Package.Current.Logo is { } uri)

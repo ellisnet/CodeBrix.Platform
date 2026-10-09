@@ -369,6 +369,22 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 		((IXamlRootHost)this).InvalidateRender();
 	}
 
+	/// <summary>
+	/// Asks for the window's content region - the client area, in surface-local logical units, which are
+	/// effective pixels - to become <paramref name="width"/> x <paramref name="height"/>. See
+	/// <see cref="IWaylandShellSurface.RequestContentSize"/> for when the compositor's size wins instead.
+	/// </summary>
+	/// <param name="width">The client width in effective pixels.</param>
+	/// <param name="height">The client height in effective pixels.</param>
+	internal void RequestClientSize(int width, int height)
+	{
+		if (_shellSurface is { } shellSurface && !IsClosed)
+		{
+			shellSurface.RequestContentSize(width, height);
+			_connection?.Flush();
+		}
+	}
+
 	internal void SetTitle(string title)
 	{
 		if (_shellSurface is { } shellSurface && !IsClosed)

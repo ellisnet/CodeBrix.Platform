@@ -29,8 +29,9 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 	private bool _pendingFullscreen;
 	private bool _maximized;
 	private bool _fullscreen;
-	private readonly int _defaultWidth;
-	private readonly int _defaultHeight;
+	private int _defaultWidth;
+	private int _defaultHeight;
+	private bool _configured;
 
 	public event Action<int, int, bool>? Configured;
 	public event Action? CloseRequested;
@@ -113,6 +114,7 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 	private void OnSurfaceConfigure(XdgSurface xdgSurface, uint serial)
 	{
 		xdgSurface.AckConfigure(serial);
+		_configured = true;
 
 		var width = _pendingWidth > 0 ? _pendingWidth : _defaultWidth;
 		var height = _pendingHeight > 0 ? _pendingHeight : _defaultHeight;
@@ -182,6 +184,29 @@ internal sealed class XdgShellSurface : IWaylandShellSurface
 		_toplevel.SetMinSize(minWidth, minHeight);
 		_toplevel.SetMaxSize(maxWidth, maxHeight);
 		_connection.Flush();
+	}
+
+	public void RequestContentSize(int width, int height)
+	{
+		if (width <= 0 || height <= 0 || _maximized || _fullscreen)
+		{
+			return;
+		}
+
+		// xdg-shell lets a floating window pick its own size: the next buffer committed at this size IS the
+		// resize. A later configure carrying no size (0 x 0, "client decides") keeps it, which is why the
+		// fallback size moves too.
+		_defaultWidth = width;
+		_defaultHeight = height;
+		Interlocked.Exchange(ref _pendingWidth, width);
+		Interlocked.Exchange(ref _pendingHeight, height);
+
+		if (_configured)
+		{
+			_currentWidth = width;
+			_currentHeight = height;
+			Configured?.Invoke(width, height, _activated);
+		}
 	}
 
 	public void MapInitial()

@@ -123,7 +123,7 @@ An optional extension package providing `GLCanvasElement` — a XAML element for
 NuGet Package ID: `CodeBrix.Platform.Lottie.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
-An optional extension package providing Lottie vector-animation playback in CodeBrix.Platform XAML, rendered through the Skottie engine. It is referenced in an application's core library and paired with the standard `SkiaSharp.Skottie` package (and the `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` package), giving smooth, resolution-independent animation playback on every platform head. Use it to play Lottie/Bodymovin JSON animations exported from tools such as After Effects.
+An optional extension package providing Lottie vector-animation playback in CodeBrix.Platform XAML, rendered through the Skottie engine. It is referenced in an application's core library and brings the standard `SkiaSharp.Skottie` package (and the `CodeBrix.Platform.SkiaSharp.Views.MitLicenseForever` package) with it as package dependencies, giving smooth, resolution-independent animation playback on every platform head. Use it to play Lottie/Bodymovin JSON animations exported from tools such as After Effects.
 
 ---
 
@@ -131,7 +131,7 @@ An optional extension package providing Lottie vector-animation playback in Code
 NuGet Package ID: `CodeBrix.Platform.Svg.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
-An optional extension package providing SVG image support (`SvgImageSource`) on the Skia platform heads. It is referenced in an application's core library and paired with the `CodeBrix.SkiaSvg.MitLicenseForever` package, which supplies the underlying SVG parsing and Skia rendering. Use it to display scalable vector images in XAML with crisp results at any display resolution.
+An optional extension package providing SVG image support (`SvgImageSource`) on the Skia platform heads. It is referenced in an application's core library and brings the `CodeBrix.SkiaSvg.MitLicenseForever` package with it as a package dependency, which supplies the underlying SVG parsing and Skia rendering. Use it to display scalable vector images in XAML with crisp results at any display resolution.
 
 ---
 
@@ -243,7 +243,7 @@ The platform head package for Linux framebuffer targets — embedded and kiosk d
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
-The platform head package for macOS desktop applications, bootstrapped with `.UseMacOS()`. The package contains a small native library shipped as a universal binary, so applications run on both Apple Silicon and Intel Macs. As with the other heads, a macOS head project references exactly this one head package plus the application's core library.
+The platform head package for macOS desktop applications, bootstrapped with `.UseMacOS()`, or with `.UseMacOS(mac => ...)` to configure the head (for example `UseSystemAppName` and `UseSystemMenuBar`). The package contains a small native library shipped as a universal binary, so applications run on both Apple Silicon and Intel Macs. As with the other heads, a macOS head project references exactly this one head package plus the application's core library.
 
 ---
 
@@ -363,6 +363,22 @@ A redistribution of the Fluent icon font (Windows 11 iconography) for CodeBrix.P
 
 ---
 
+**CodeBrix.Platform.Fonts.Merriweather**
+NuGet Package ID: `CodeBrix.Platform.Fonts.Merriweather.OflLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform.Fonts.Merriweather](https://github.com/ellisnet/CodeBrix.Platform.Fonts.Merriweather)
+
+A redistribution of the Merriweather serif font family, structured like the sibling OpenSans and Roboto packages: a variable `Merriweather.ttf` plus static instances across weights, styles and the Normal and SemiCondensed stretches, a font manifest, and a buildTransitive MSBuild `.targets` that prunes redundant static fonts at consumer-build time while always keeping the variable fonts. Three Noto Serif companion families (Noto Serif, Noto Serif Armenian, Noto Serif Georgian) supply the Greek, Armenian and Georgian scripts that Merriweather lacks. Fonts are referenced via `ms-appx:///CodeBrix.Platform.Fonts.Merriweather/Fonts/...` URIs or set as the default text font. The assembly is metadata-only with no managed API.
+
+---
+
+**CodeBrix.Platform.Fonts.NotoMusic**
+NuGet Package ID: `CodeBrix.Platform.Fonts.NotoMusic.OflLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform.Fonts.NotoMusic](https://github.com/ellisnet/CodeBrix.Platform.Fonts.NotoMusic)
+
+A redistribution of the Noto Music font - a musical-notation symbols font covering the Unicode music blocks (Western musical symbols, Byzantine musical symbols and ancient Greek musical notation), not a text face. It ships the single static `NotoMusic.ttf` and its font manifest, with no pruning `.targets` (there is nothing to prune), and is intended to be referenced alongside one of the text font packages via `ms-appx:///CodeBrix.Platform.Fonts.NotoMusic/Fonts/NotoMusic.ttf`. The assembly is metadata-only with no managed API.
+
+---
+
 **CodeBrix.Platform.Fonts.OpenSans**
 NuGet Package ID: `CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform.Fonts.OpenSans](https://github.com/ellisnet/CodeBrix.Platform.Fonts.OpenSans)
@@ -376,6 +392,14 @@ NuGet Package ID: `CodeBrix.Platform.Fonts.Roboto.OflLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto](https://github.com/ellisnet/CodeBrix.Platform.Fonts.Roboto)
 
 A redistribution of the Roboto font family, structured like the sibling OpenSans package: a variable `Roboto.ttf` covering the full weight and width axes plus 36 static instances, a font manifest, and a buildTransitive MSBuild `.targets` that prunes redundant static fonts at consumer-build time while always keeping the variable font. It is designed for CodeBrix.Platform applications (referenced via `ms-appx:///CodeBrix.Platform.Fonts.Roboto/Fonts/...` URIs or set as the default text font) and is equally usable as a plain content-files NuGet in any .NET 10 project. The assembly is metadata-only with no managed API. The fonts are the open source Roboto family published by Google.
+
+---
+
+**CodeBrix.Platform.Fonts.RobotoMono**
+NuGet Package ID: `CodeBrix.Platform.Fonts.RobotoMono.OflLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform.Fonts.RobotoMono](https://github.com/ellisnet/CodeBrix.Platform.Fonts.RobotoMono)
+
+A redistribution of the Roboto Mono monospace font family, structured like the sibling Roboto package: a variable `RobotoMono.ttf` plus static instances in Normal and Italic styles, a font manifest, and a buildTransitive MSBuild `.targets` that prunes redundant static fonts at consumer-build time while always keeping the dash-free fonts. Three companion families supply coverage Roboto Mono lacks: Noto Sans Mono (polytonic Greek), Iosevka (Armenian, in a monospace design) and Noto Sans Georgian (Georgian). Fonts are referenced via `ms-appx:///CodeBrix.Platform.Fonts.RobotoMono/Fonts/...` URIs. The assembly is metadata-only with no managed API.
 
 ---
 

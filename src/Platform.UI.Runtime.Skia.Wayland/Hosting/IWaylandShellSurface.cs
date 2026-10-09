@@ -53,6 +53,16 @@ internal interface IWaylandShellSurface : IDisposable
 	void SetMinMaxSize(int minWidth, int minHeight, int maxWidth, int maxHeight);
 
 	/// <summary>
+	/// Asks for the window's content region to become <paramref name="width"/> x <paramref name="height"/>
+	/// surface-local (logical) units - a client-initiated resize. A floating window takes the size at once and
+	/// raises <see cref="Configured"/> with it; a maximized or full-screen window keeps the size the compositor gave
+	/// it, and before the first configure the size becomes the one the window starts at.
+	/// </summary>
+	/// <param name="width">The content width in logical units.</param>
+	/// <param name="height">The content height in logical units.</param>
+	void RequestContentSize(int width, int height);
+
+	/// <summary>
 	/// Performs the initial map/commit that starts the configure handshake. Called once,
 	/// after the caller has wired the events.
 	/// </summary>

@@ -21,6 +21,10 @@ internal class WpfWindowWrapper : NativeWindowWrapperBase
 	private bool _isFullScreen;
 	private bool _wasShown;
 
+	// Set by ResizeClient() when the window's chrome could not be measured yet, and consumed once by the host's
+	// next size change - see ApplyPendingClientSize.
+	private SizeInt32? _pendingClientSize;
+
 	public WpfWindowWrapper(CodeBrixWpfWindow wpfWindow, WinUIWindow window, XamlRoot xamlRoot) : base(window, xamlRoot)
 	{
 		_wpfWindow = wpfWindow ?? throw new ArgumentNullException(nameof(wpfWindow));
@@ -95,6 +99,8 @@ internal class WpfWindowWrapper : NativeWindowWrapperBase
 	{
 		var bounds = new Windows.Foundation.Rect(default, new Windows.Foundation.Size(size.Width, size.Height));
 		SetBoundsAndVisibleBounds(bounds, bounds);
+
+		ApplyPendingClientSize(size);
 	}
 
 	private void OnNativeClosing(object? sender, CancelEventArgs e)
@@ -184,5 +190,73 @@ internal class WpfWindowWrapper : NativeWindowWrapperBase
 			// Set size and trigger AppWindow.Changed
 			UpdateSizeFromNative();
 		}
+	}
+
+	/// <summary>
+	/// Sets the client area - what <c>Window.Bounds</c> reports, the size of the window's content host - to
+	/// <paramref name="size"/>, which is in EFFECTIVE pixels. A WPF window's Width and Height are device-independent
+	/// units, the same unit, but they include the window chrome; the chrome is the difference between the WPF
+	/// window's size and its content host's size, and is added before the window is sized.
+	/// </summary>
+	/// <remarks>
+	/// Before the window has been laid out the chrome cannot be measured, so the client size is applied as the
+	/// window size and remembered; the first host size change after that, when the chrome is known, corrects it
+	/// once (a window that refuses the size cannot start a resize loop).
+	/// </remarks>
+	/// <param name="size">The client size in effective pixels.</param>
+	public override void ResizeClient(SizeInt32 size)
+	{
+		var clientSize = new SizeInt32(Math.Max(1, size.Width), Math.Max(1, size.Height));
+
+		if (TryGetChromeSize(out var chromeWidth, out var chromeHeight))
+		{
+			_pendingClientSize = null;
+		}
+		else
+		{
+			_pendingClientSize = clientSize;
+		}
+
+		_wpfWindow.Width = clientSize.Width + chromeWidth;
+		_wpfWindow.Height = clientSize.Height + chromeHeight;
+
+		if (!_wasShown)
+		{
+			// Set size and trigger AppWindow.Changed
+			UpdateSizeFromNative();
+		}
+	}
+
+	private bool TryGetChromeSize(out double chromeWidth, out double chromeHeight)
+	{
+		var host = _wpfWindow.Host;
+		if (_wpfWindow.ActualWidth > 0 && _wpfWindow.ActualHeight > 0 && host.ActualWidth > 0 && host.ActualHeight > 0)
+		{
+			chromeWidth = Math.Max(0, _wpfWindow.ActualWidth - host.ActualWidth);
+			chromeHeight = Math.Max(0, _wpfWindow.ActualHeight - host.ActualHeight);
+			return true;
+		}
+
+		chromeWidth = 0;
+		chromeHeight = 0;
+		return false;
+	}
+
+	private void ApplyPendingClientSize(Size hostSize)
+	{
+		if (_pendingClientSize is not { } pending || !TryGetChromeSize(out var chromeWidth, out var chromeHeight))
+		{
+			return;
+		}
+
+		_pendingClientSize = null;
+
+		if (hostSize.Width == pending.Width && hostSize.Height == pending.Height)
+		{
+			return;
+		}
+
+		_wpfWindow.Width = pending.Width + chromeWidth;
+		_wpfWindow.Height = pending.Height + chromeHeight;
 	}
 }

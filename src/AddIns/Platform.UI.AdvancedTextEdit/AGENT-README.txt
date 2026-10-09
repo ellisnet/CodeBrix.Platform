@@ -847,7 +847,10 @@ RENDERING FACTS
     Redraw(...) rebuilds visual lines for a range.
   - Text is shaped and measured by the family's shared text engine (the
     TextLayout package), so glyphs, widths and line heights are identical to a
-    TextBlock in the same font - the editor never falls back to a system font.
+    TextBlock in the same font, and a missing character is resolved exactly as
+    in a TextBlock (the framework's FeatureConfiguration.Font.SymbolsFont,
+    then FeatureConfiguration.Font.FallbackFontFamilies, then host fonts
+    unless FeatureConfiguration.Font.RestrictToEmbeddedFonts is on).
   - The editor manages its own scrolling with two ScrollBar controls synced to
     the TextView's scroll offsets; there is no ScrollViewer inside.
   - Fonts: FontFamily/FontSize/FontWeight/FontStyle set on the editor are

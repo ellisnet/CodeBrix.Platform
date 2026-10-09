@@ -1,3 +1,4 @@
+using Microsoft.UI.Windowing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using CodeBrix.Platform.UI.Xaml.Controls;
 using Windows.Graphics;
@@ -122,10 +123,42 @@ public class NativeWindowWrapperBaseTests
 		Assert.AreEqual(wrapper.ClientSize.Height, result.Height);
 	}
 
+	[TestMethod]
+	public void AppWindow_ResizeClient_hands_the_client_size_to_the_native_window()
+	{
+		//Arrange
+		var wrapper = new TestNativeWindowWrapper();
+		var appWindow = new AppWindow();
+		appWindow.SetNativeWindow(wrapper);
+
+		//Act
+		appWindow.ResizeClient(new SizeInt32 { Width = 800, Height = 600 });
+
+		//Assert
+		Assert.AreEqual(1, wrapper.ResizeClientCalls);
+		Assert.AreEqual(800, wrapper.LastClientSize.Width);
+		Assert.AreEqual(600, wrapper.LastClientSize.Height);
+		Assert.AreEqual(0, wrapper.ResizeCalls);
+	}
+
 	private sealed class TestNativeWindowWrapper : NativeWindowWrapperBase
 	{
 		public override object NativeWindow => null;
 
+		public int ResizeCalls { get; private set; }
+
+		public int ResizeClientCalls { get; private set; }
+
+		public SizeInt32 LastClientSize { get; private set; }
+
 		public void SetSizesForTest(SizeInt32 size, SizeInt32 clientSize) => SetSizes(size, clientSize);
+
+		public override void Resize(SizeInt32 size) => ResizeCalls++;
+
+		public override void ResizeClient(SizeInt32 size)
+		{
+			ResizeClientCalls++;
+			LastClientSize = size;
+		}
 	}
 }

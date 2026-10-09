@@ -189,6 +189,21 @@ partial class AppWindow
 	public void Resize(SizeInt32 size) => _nativeAppWindow.Resize(size);
 
 	/// <summary>
+	/// Resizes the client area of the window - the part the window's content is laid out in, without the
+	/// title bar and borders - to the specified size.
+	/// </summary>
+	/// <param name="size">The width and height of the client area, in EFFECTIVE pixels.</param>
+	/// <remarks>
+	/// The size is in effective (logical) pixels, the unit <c>Window.Bounds</c> reports and the XAML tree is laid
+	/// out in, so <c>ResizeClient</c> is the call that round-trips with <c>Window.Bounds</c>: an application that
+	/// stores <c>Window.Bounds</c> to restore it on the next launch hands those numbers back here. Each head converts
+	/// to its own native units and adds its own frame. On a whole-screen head (the frame buffer, PlayTest) there is
+	/// no window to resize and the call does nothing; on Wayland the compositor has the last word, and a maximized,
+	/// tiled or full-screen window keeps the size the compositor gave it.
+	/// </remarks>
+	public void ResizeClient(SizeInt32 size) => _nativeAppWindow.ResizeClient(size);
+
+	/// <summary>
 	/// Applies the specified presenter to the window.
 	/// </summary>
 	/// <param name="appWindowPresenter">The presenter to apply to the window.</param>

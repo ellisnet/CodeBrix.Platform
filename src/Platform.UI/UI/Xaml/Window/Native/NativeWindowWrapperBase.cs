@@ -235,6 +235,29 @@ internal abstract class NativeWindowWrapperBase : INativeWindowWrapper
 	internal SizeInt32 ToClientSize(SizeInt32 requestedFramedSize)
 		=> ToClientSize(requestedFramedSize, Size, ClientSize);
 
+	/// <summary>
+	/// The inverse of <see cref="ToClientSize(SizeInt32, SizeInt32, SizeInt32)"/>: converts the size a window's
+	/// client area should have into the framed size - the kind <see cref="Size"/> reports and <see cref="Resize"/>
+	/// takes - using the frame extents implied by <paramref name="framedSize"/> and <paramref name="clientSize"/>.
+	/// Each dimension is clamped to at least one pixel. When no frame is known the requested size is returned
+	/// unchanged.
+	/// </summary>
+	/// <param name="requestedClientSize">The client size the caller asked for, in the same units as the other two.</param>
+	/// <param name="framedSize">The window's current framed size, i.e. <see cref="Size"/>.</param>
+	/// <param name="clientSize">The window's current client size, i.e. <see cref="ClientSize"/>.</param>
+	/// <returns>The framed size that produces the requested client area.</returns>
+	internal static SizeInt32 ToFramedSize(SizeInt32 requestedClientSize, SizeInt32 framedSize, SizeInt32 clientSize)
+	{
+		var frameWidth = Math.Max(0, framedSize.Width - clientSize.Width);
+		var frameHeight = Math.Max(0, framedSize.Height - clientSize.Height);
+
+		return new SizeInt32
+		{
+			Width = Math.Max(1, requestedClientSize.Width) + frameWidth,
+			Height = Math.Max(1, requestedClientSize.Height) + frameHeight,
+		};
+	}
+
 	protected void SetSizes(SizeInt32 size, SizeInt32 clientSize)
 	{
 		var anySizeChanged = false;
@@ -347,6 +370,16 @@ internal abstract class NativeWindowWrapperBase : INativeWindowWrapper
 	}
 
 	public virtual void Resize(SizeInt32 size)
+	{
+	}
+
+	/// <summary>
+	/// Sets the window's CLIENT area - what <see cref="Bounds"/> reports - to <paramref name="size"/>, which is in
+	/// EFFECTIVE pixels. The base implementation does nothing, which is right for a head whose window is the
+	/// whole screen; a desktop head overrides it and converts to its own native units and frame.
+	/// </summary>
+	/// <param name="size">The client size in effective pixels.</param>
+	public virtual void ResizeClient(SizeInt32 size)
 	{
 	}
 

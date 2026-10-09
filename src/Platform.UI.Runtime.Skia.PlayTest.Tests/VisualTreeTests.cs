@@ -51,4 +51,16 @@ public sealed class VisualTreeTests
     [InlineData(-9999, -9999, false)]
     public void IsRecycledPosition_recognises_the_items_repeater_parking_position(double x, double y, bool recycled)
         => VisualTree.IsRecycledPosition(new Point(x, y)).Should().Be(recycled);
+
+    // Order after AutomationProperties.Name, LabeledBy and the peer's own name: visible text,
+    // then the tooltip, then drawn (icon glyph) text.
+    [Theory]
+    [InlineData("Fix the parser", "Opened today", "Fix the parser", "Fix the parser")]
+    [InlineData("", "Save the document", "\uE105", "Save the document")]
+    [InlineData("   ", "  Save the document ", "\uE105", "Save the document")]
+    [InlineData(null, null, "\uE105", "\uE105")]
+    [InlineData("", "", "", "")]
+    [InlineData(null, null, null, "")]
+    public void FallbackName_prefers_visible_text_then_the_tooltip(string? contentText, string? toolTipText, string? drawnText, string expected)
+        => VisualTree.FallbackName(contentText, toolTipText, drawnText).Should().Be(expected);
 }

@@ -21,6 +21,15 @@ internal class FrameBufferWindowWrapper : NativeWindowWrapperBase
 
 	public override object? NativeWindow => null;
 
+	/// <summary>
+	/// Does nothing, as <see cref="NativeWindowWrapperBase.Resize"/> does here: the window is the whole panel, whose
+	/// size is the display's, so there is no client area to resize.
+	/// </summary>
+	/// <param name="size">The requested client size in effective pixels; ignored.</param>
+	public override void ResizeClient(SizeInt32 size)
+	{
+	}
+
 	private readonly bool _isPreferredOrientation;
 	private readonly DisplayOrientations? _autoRotationOrientations;
 	private readonly bool _autoRotationDisabled;

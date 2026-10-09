@@ -347,6 +347,13 @@ public partial class ToolBar : ItemsControl
 	/// <summary>The bar's items as elements, in order, including any auto-inserted separator.</summary>
 	internal IReadOnlyList<UIElement> LayoutItems => _layoutItems;
 
+	/// <summary>
+	/// How many clicks on an item in the overflow have closed the overflow flyout. Host-free there
+	/// is no window for the flyout to open in, so this count is how the unit suite sees the bar's
+	/// decision.
+	/// </summary>
+	internal int OverflowItemDismissals { get; private set; }
+
 	/// <summary>Opens the overflow flyout, if the bar has one to open.</summary>
 	/// <returns>True when a flyout was shown.</returns>
 	/// <remarks>
@@ -1001,8 +1008,17 @@ public partial class ToolBar : ItemsControl
 		//keeps focus and pointer capture on an item the bar did not move.
 		var overflowHost = overflowWanted.Count > 0 || _overflowHost is not null ? EnsureOverflowHost() : null;
 
+		var leaving = new List<UIElement>();
 		if (overflowHost is not null)
 		{
+			for (var i = 0; i < overflowHost.Children.Count; i++)
+			{
+				if (!overflowWanted.Contains(overflowHost.Children[i]))
+				{
+					leaving.Add(overflowHost.Children[i]);
+				}
+			}
+
 			RemoveAll(overflowHost.Children, mainWanted);
 		}
 
@@ -1023,9 +1039,111 @@ public partial class ToolBar : ItemsControl
 
 			SyncChildren(overflowHost.Children, overflowWanted);
 			RehookCommands(arriving);
+			WatchOverflowClicks(leaving, watch: false);
+			WatchOverflowClicks(arriving, watch: true);
 		}
 
 		HasOverflowItems = hasOverflow;
+	}
+
+	/// <summary>
+	/// Starts or stops listening for a click on every button among <paramref name="elements"/>,
+	/// including the buttons inside a group, which travels whole.
+	/// </summary>
+	/// <param name="elements">The elements that have just entered or left the overflow.</param>
+	/// <param name="watch">True for elements entering the overflow, false for elements leaving it.</param>
+	/// <remarks>
+	/// The handler is removed before it is added, so an element that comes back into the overflow
+	/// is never subscribed twice.
+	/// </remarks>
+	private void WatchOverflowClicks(List<UIElement> elements, bool watch)
+	{
+		for (var i = 0; i < elements.Count; i++)
+		{
+			Watch(elements[i]);
+		}
+
+		void Watch(UIElement element)
+		{
+			if (element is ButtonBase button)
+			{
+				button.Click -= OnOverflowItemClick;
+				if (watch)
+				{
+					button.Click += OnOverflowItemClick;
+				}
+			}
+
+			if (element is Panel panel)
+			{
+				for (var i = 0; i < panel.Children.Count; i++)
+				{
+					Watch(panel.Children[i]);
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// Closes the overflow flyout after an item in it was clicked, as the framework's CommandBar
+	/// closes its overflow after a secondary command runs.
+	/// </summary>
+	/// <param name="sender">The button that was clicked.</param>
+	/// <param name="args">Unused.</param>
+	/// <remarks>
+	/// Left open, the flyout stays drawn over the page after its item has run, and its light
+	/// dismiss takes the next tap or Back that was meant for the page.
+	/// </remarks>
+	private void OnOverflowItemClick(object sender, RoutedEventArgs args)
+	{
+		if (!ClosesOverflow(sender))
+		{
+			return;
+		}
+
+		OverflowItemDismissals++;
+		_overflowFlyout?.Hide();
+	}
+
+	/// <summary>Decides whether a click on <paramref name="sender"/> closes the overflow flyout.</summary>
+	/// <param name="sender">The button that was clicked.</param>
+	/// <returns>
+	/// True for a button that is in the overflow right now and whose click ran something rather
+	/// than opening a flyout of its own.
+	/// </returns>
+	/// <remarks>
+	/// <para>
+	/// This follows the framework's CommandBar: AppBarButton and AppBarToggleButton close the
+	/// overflow when they are clicked, EXCEPT an AppBarButton that has a Flyout, whose click opens
+	/// that flyout and leaves the overflow open under it.
+	/// </para>
+	/// <para>
+	/// A <see cref="ToolDropDownButton"/> opens its menu on the PRESS (or on the hold, or on the
+	/// drop-down key), and none of those raises Click, so opening its menu leaves the overflow
+	/// open. Its Click means its main part ran the command, which closes the overflow like any
+	/// other button - except in <see cref="PopupMode.Instant"/>, where the whole button is the
+	/// menu and no command runs. A framework <c>Button</c> with a <c>Flyout</c> opens that flyout
+	/// on Click, so it leaves the overflow open too.
+	/// </para>
+	/// </remarks>
+	internal bool ClosesOverflow(object sender)
+	{
+		if (sender is ToolDropDownButton { PopupMode: PopupMode.Instant }
+			|| sender is Button { Flyout: not null })
+		{
+			return false;
+		}
+
+		//A button still subscribed after it left the overflow inside a group is not in it now.
+		for (var element = sender as FrameworkElement; element is not null; element = element.Parent as FrameworkElement)
+		{
+			if (ReferenceEquals(element, _overflowHost))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/// <summary>

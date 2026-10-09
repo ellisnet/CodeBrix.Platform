@@ -40,9 +40,9 @@ Solutions are per build OS: <Demo>.Linux.slnx, <Demo>.MacOS.slnx and
 
 CONSUMED FROM SOURCE, NOT FROM PACKAGES
 ---------------------------------------
-With ONE exception (EmulateFrameBufferDemo, below), the samples reference the
-framework and add-ins through ProjectReference into src/ rather than through
-PackageReference. That is the opposite of what a real application does: copy
+With TWO exceptions (EmulateFrameBufferDemo and KeyPressTester_packages,
+below), the samples reference the framework and add-ins through
+ProjectReference into src/ rather than through PackageReference. That is the opposite of what a real application does: copy
 the samples' project STRUCTURE and their XAML/C#, not their reference lines.
 
 Two consequences worth knowing:
@@ -142,8 +142,9 @@ EmulateFrameBufferDemo
     samples/CodeBrixPlatform/EmulateFrameBufferDemo
     Linux heads only (X11, Wayland, FrameBuffer); one EmulateFrameBufferDemo.slnx
 
-THE ONE SAMPLE THAT CONSUMES THE PLATFORM FROM NUGET PACKAGES, exactly as a
-real application does. That is the point of it: it is the end-to-end test rig
+ONE OF THE TWO SAMPLES THAT CONSUME THE PLATFORM FROM NUGET PACKAGES (the
+other is KeyPressTester_packages), exactly as a real application does. That is
+the point of it: it is the end-to-end test rig
 for the CodeBrix.Develop frame-buffer emulator. Its .LinuxFrameBuffer head
 holds a real PackageReference to the FrameBuffer head package, and running it
 inside the IDE silently swaps ONLY that reference for the Emulated head
@@ -226,6 +227,41 @@ Run:
     dotnet run --project samples/CodeBrixPlatform/EvaluateUIElementsDemo/EvaluateUIElementsDemo.LinuxX11
     dotnet run --project samples/CodeBrixPlatform/EvaluateUIElementsDemo/EvaluateUIElementsDemo.LinuxWayland
     (the FrameBuffer, MacOS, Win32Skia and WinWpfSkia heads follow the same pattern)
+
+KeyPressTester
+--------------
+    samples/CodeBrixPlatform/KeyPressTester    six heads
+    No add-in
+
+A key diagnostics page: every key press is recorded by several independent
+listeners, in the order a key travels through the framework - the host's
+native keyboard source (CoreWindow.KeyDown/KeyUp), the window root's
+PreviewKeyDown (tunnelling), a focusable game surface, a text box, the page,
+the window root's KeyDown (bubbling), KeyboardAccelerator.Invoked, access keys
+(Alt menus) and menu item Click - so the event log and the per-listener
+counters show exactly which layers noticed each key press. Check boxes choose
+whether KeyUp and auto-repeat events are logged, whether the game surface
+marks its key events Handled, and whether it takes focus back when the window
+is activated. KEYPRESSTESTER_LOG_FILE=<path> also appends every log line to
+that file.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/KeyPressTester/KeyPressTester.LinuxX11
+
+KeyPressTester_packages
+-----------------------
+    samples/CodeBrixPlatform/KeyPressTester_packages    six heads; one KeyPressTester.slnx
+
+The same KeyPressTester application (identical .UI shared project) built from
+the CodeBrix.Platform packages on nuget.org alone, exactly as a real
+application does - the second sample, beside EmulateFrameBufferDemo, that
+consumes NuGet packages. Its own nuget.config clears every package source but
+nuget.org, and its own Directory.Build.props stops the repository's
+Directory.Build.props from being imported, so it builds like an application
+outside the repository.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/KeyPressTester_packages/KeyPressTester.LinuxX11
 
 FileFolderDialogDemo
 --------------------

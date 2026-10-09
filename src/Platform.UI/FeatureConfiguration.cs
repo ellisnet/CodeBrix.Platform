@@ -150,7 +150,6 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			/// <remarks>
 			/// Will never be deferred when .ApplyTemplate() is called explicitly.
-			/// More information there: https://github.com/unoplatform/uno/issues/3519
 			/// </remarks>
 			public static bool UseDeferredOnApplyTemplate { get; set; }
 #if false
@@ -217,7 +216,7 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			/// </summary>
 			/// <remarks>
 			/// The default is Segoe UI, which is not available on Mac and Linux as well as browsers running on Mac and Linux.
-			/// So, you can change to OpenSans. For more information, see https://aka.platform.uno/feature-opensans
+			/// So, you can change to a font the application ships, such as one of the CodeBrix.Platform.Fonts packages (Open Sans, Roboto, Merriweather, Roboto Mono).
 			/// </remarks>
 			public static string DefaultTextFontFamily { get; set; } = "Segoe UI";
 
@@ -848,11 +847,8 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 #if false
 			/// <summary>
 			/// Prevent the WebView from using hardware rendering.
-			/// This was previously the default behavior in Uno to work around a keyboard-related visual glitch in Android 5.0 (http://stackoverflow.com/questions/27172217/android-systemui-glitches-in-lollipop), however it prevents video and 3d content from being rendered.
+			/// Software rendering works around a keyboard-related visual glitch in Android 5.0, however it prevents video and 3d content from being rendered.
 			/// </summary>
-			/// <remarks>
-			/// See this for more info: https://github.com/unoplatform/uno/blob/26c5cc5992cae3c8c25adf51eb77ca4b0dd34e93/src/Uno.UI/UI/Xaml/Controls/WebView/WebView.Android.cs#L251_L255
-			/// </remarks>
 			public static bool ForceSoftwareRendering { get; set; }
 #endif
 		}
