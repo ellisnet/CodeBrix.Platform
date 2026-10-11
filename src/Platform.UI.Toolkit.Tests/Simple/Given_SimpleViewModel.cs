@@ -69,6 +69,10 @@ public class Given_SimpleViewModel
 		public void NotifyByCallerMemberName() => ThisPropertyChanged();
 
 		public static Visibility InvokeGetVisibility(bool isVisible) => GetVisibility(isVisible);
+
+		public static string InvokeBuildErrorText(string message, string details) => BuildErrorText(message, details);
+
+		public static string InvokeDescribeException(Exception exception) => DescribeException(exception);
 	}
 
 	private static List<string> Changes(TestViewModel viewModel)
@@ -233,5 +237,121 @@ public class Given_SimpleViewModel
 
 		//Assert
 		changes.Count.Should().Be(0);
+	}
+
+	private static Exception Thrown(Func<Exception> create)
+	{
+		try { throw create(); }
+		catch (Exception e) { return e; }
+	}
+
+	private static Exception NestedFailure() => Thrown(() => new InvalidOperationException(
+		"The document could not be created.",
+		Thrown(() => new NotImplementedException("FontResolver not implemented for this platform (FontResolver.cs)."))));
+
+	private static void WithConciseErrorDetails(bool concise, Action test)
+	{
+		var previous = FeatureConfiguration.SimpleViewModel.UseConciseErrorDetails;
+		FeatureConfiguration.SimpleViewModel.UseConciseErrorDetails = concise;
+		try { test(); }
+		finally { FeatureConfiguration.SimpleViewModel.UseConciseErrorDetails = previous; }
+	}
+
+	[TestMethod]
+	public void When_ConciseErrorDetails_Off_Details_Are_ToString_Cut_At_195()
+	{
+		WithConciseErrorDetails(false, () =>
+		{
+			//Arrange
+			var exception = NestedFailure();
+			var details = TestViewModel.InvokeDescribeException(exception);
+
+			//Act
+			var text = TestViewModel.InvokeBuildErrorText("Could not save.", details);
+
+			//Assert
+			details.Should().Be(exception.ToString());
+			text.Should().EndWith(exception.ToString().Trim()[..195].Trim() + "[...]");
+		});
+	}
+
+	[TestMethod]
+	public void When_ConciseErrorDetails_On_Details_List_The_Exception_Chain_Without_Stack()
+	{
+		WithConciseErrorDetails(true, () =>
+		{
+			//Act
+			var details = TestViewModel.InvokeDescribeException(NestedFailure());
+
+			//Assert
+			details.Should().Be(
+				"System.InvalidOperationException: The document could not be created.\n" +
+				"System.NotImplementedException: FontResolver not implemented for this platform (FontResolver.cs).");
+			details.Should().NotContain("   at ");
+		});
+	}
+
+	[TestMethod]
+	public void When_ConciseErrorDetails_On_Long_Details_Are_Cut_Between_Words()
+	{
+		WithConciseErrorDetails(true, () =>
+		{
+			//Arrange
+			var details = string.Join(" ", System.Linq.Enumerable.Repeat("abcdefghij", 30));
+
+			//Act
+			var text = TestViewModel.InvokeBuildErrorText("Could not save.", details);
+
+			//Assert
+			var shown = text[(text.LastIndexOf('\n') + 1)..];
+			shown.Should().EndWith("abcdefghij [...]");
+			(shown.Length - " [...]".Length).Should().BeLessThanOrEqualTo(195);
+		});
+	}
+
+	[TestMethod]
+	public void When_ConciseErrorDetails_On_A_Path_Is_Cut_After_A_Separator()
+	{
+		WithConciseErrorDetails(true, () =>
+		{
+			//Arrange
+			var details = "Access to the path '/" + string.Join("/", System.Linq.Enumerable.Repeat("folder0123456789", 15)) + "' is denied.";
+
+			//Act
+			var text = TestViewModel.InvokeBuildErrorText("Could not save.", details);
+
+			//Assert
+			text.Should().EndWith("folder0123456789/ [...]");
+		});
+	}
+
+	[TestMethod]
+	public void When_ConciseErrorDetails_On_One_Long_Token_Still_Gets_The_Hard_Cut()
+	{
+		WithConciseErrorDetails(true, () =>
+		{
+			//Arrange
+			var details = new string('x', 300);
+
+			//Act
+			var text = TestViewModel.InvokeBuildErrorText("Could not save.", details);
+
+			//Assert
+			text.Should().EndWith(new string('x', 195) + "[...]");
+		});
+	}
+
+	[TestMethod]
+	public void When_Details_Are_Short_They_Are_Shown_Whole_Either_Way()
+	{
+		foreach (var concise in new[] { false, true })
+		{
+			WithConciseErrorDetails(concise, () =>
+			{
+				var text = TestViewModel.InvokeBuildErrorText("Could not save.", "  Disk full.  ");
+				text.Should().Contain("Could not save.");
+				text.Should().EndWith("\nDisk full.");
+			});
+		}
 	}
 }

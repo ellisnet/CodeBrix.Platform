@@ -1146,6 +1146,18 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 			public static bool WaitIndefinitelyInEventTester { get; set; }
 		}
 
+		/// <summary>Configures the CodeBrix.Platform.Simple SimpleViewModel helpers.</summary>
+		public static class SimpleViewModel
+		{
+			/// <summary>
+			/// Gets or sets whether ShowError(Exception, message) builds its "Details:" text from the type and message of
+			/// each exception in the InnerException chain (one line each, no stack trace), and shortens long details at the
+			/// last space or separator (such as '/' or '.') before the limit, so no word is cut in half.
+			/// The default is false: the details are Exception.ToString() cut at exactly 195 characters.
+			/// </summary>
+			public static bool UseConciseErrorDetails { get; set; }
+		}
+
 		public static class Shape
 		{
 			/// <summary>

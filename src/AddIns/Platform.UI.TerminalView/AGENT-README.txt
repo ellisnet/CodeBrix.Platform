@@ -232,6 +232,11 @@ Methods:
     public void GrabFocus()
         Gives the control keyboard focus (FocusState.Programmatic). Call it
         after connecting a session so typing goes straight to the host.
+        As in WinUI, the control's FocusState afterwards is never
+        Programmatic: the focus manager turns a programmatic focus into
+        Keyboard (last input a hardware key, gamepad, or Tab/arrow from the
+        software keyboard) or Pointer (anything else, including no input
+        yet). FocusState therefore cannot tell this call from a tap.
 
     public IReadOnlyList<string> GetVisibleLines()
         The text of the rows the terminal shows now: exactly Rows strings,

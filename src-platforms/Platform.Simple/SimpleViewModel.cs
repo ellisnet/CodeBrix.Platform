@@ -297,16 +297,7 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
     {
         if (!string.IsNullOrWhiteSpace(message))
         {
-            message = $"{ErrorOccurredLabel}\n   {message.Trim()}";
-            details = (string.IsNullOrWhiteSpace(details))
-                ? ""
-                : (details.Trim().Length > 200)
-                    ? $"{details.Trim()[..195].Trim()}[...]"
-                    : details.Trim();
-            message += (details == "")
-                ? ""
-                : $"\n\n{DetailsLabel}\n{details}";
-            using var dialog = CreateDialog(message, ErrorTitle);
+            using var dialog = CreateDialog(BuildErrorText(message, details), ErrorTitle);
             _ = await dialog.ShowAsync();
         }
     }
@@ -318,8 +309,69 @@ public abstract class SimpleViewModel : INotifyPropertyChanged, IDisposable
             var msg = (string.IsNullOrWhiteSpace(message))
                 ? exception.Message
                 : $"{message.Trim()} - {exception.Message}";
-            await ShowError(msg, exception.ToString());
+            await ShowError(msg, DescribeException(exception));
         }
+    }
+
+#if HAS_CODEBRIX
+    private static bool UseConciseErrorDetails =>
+        CodeBrix.Platform.UI.FeatureConfiguration.SimpleViewModel.UseConciseErrorDetails;
+#else
+    //The WIN_UI / MAUI / WPF editions have no FeatureConfiguration; they keep the original details
+    private static bool UseConciseErrorDetails => false;
+#endif
+
+    //Details longer than the limit are cut to (at most) the cut length, then marked with "[...]"
+    private const int ErrorDetailsLimit = 200;
+    private const int ErrorDetailsCut = 195;
+
+    //Where concise details may be cut without splitting a word (a separator stays on the kept side)
+    private static readonly char[] ErrorDetailsBreaks = [' ', '\n', '\r', '\t', '/', '\\', '.', ',', ';', ':', '-'];
+
+    /// <summary>The text of ShowError's dialog: the label and message, then the (shortened) details, if any.</summary>
+    protected static string BuildErrorText(string message, string details)
+    {
+        var text = $"{ErrorOccurredLabel}\n   {message.Trim()}";
+        details = (string.IsNullOrWhiteSpace(details)) ? "" : ShortenErrorDetails(details.Trim());
+        return (details == "")
+            ? text
+            : $"{text}\n\n{DetailsLabel}\n{details}";
+    }
+
+    /// <summary>The details ShowError(Exception, message) shows for an exception: Exception.ToString(), or with
+    /// FeatureConfiguration.SimpleViewModel.UseConciseErrorDetails one "Type: Message" line per exception in the
+    /// InnerException chain.</summary>
+    protected static string DescribeException(Exception exception)
+    {
+        if (exception == null) { return ""; }
+        if (!UseConciseErrorDetails) { return exception.ToString(); }
+
+        var lines = new List<string>();
+        for (var current = exception; current != null; current = current.InnerException)
+        {
+            lines.Add($"{current.GetType().FullName}: {current.Message}");
+        }
+
+        return string.Join("\n", lines);
+    }
+
+    private static string ShortenErrorDetails(string details)
+    {
+        if (details.Length <= ErrorDetailsLimit) { return details; }
+
+        if (UseConciseErrorDetails)
+        {
+            //Cut at the last space or separator inside the cut length; one very long token (nothing to break at
+            //  in its second half) still gets the hard cut
+            var breakAt = details.LastIndexOfAny(ErrorDetailsBreaks, ErrorDetailsCut - 1);
+            if (breakAt >= ErrorDetailsCut / 2)
+            {
+                var keep = char.IsWhiteSpace(details[breakAt]) ? breakAt : breakAt + 1;
+                return $"{details[..keep].TrimEnd()} [...]";
+            }
+        }
+
+        return $"{details[..ErrorDetailsCut].Trim()}[...]";
     }
 
     protected virtual async Task<bool> ConfirmDialog(
