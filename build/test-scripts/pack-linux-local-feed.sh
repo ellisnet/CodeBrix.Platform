@@ -82,6 +82,7 @@ CSPROJS=(
 	src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj
 	src/AddIns/Platform.UI.AudioPlayer.Skia/Platform.UI.AudioPlayer.Skia.csproj
 	src/AddIns/Platform.UI.VideoPlayer.Skia/Platform.UI.VideoPlayer.Skia.csproj
+	src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Skia.csproj
 	src/AddIns/Platform.UI.MediaPlayer.Skia/Platform.UI.MediaPlayer.Skia.csproj
 	src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Core.csproj
 	src/AddIns/Platform.UI.FlexPanel/Platform.UI.FlexPanel.Core.csproj

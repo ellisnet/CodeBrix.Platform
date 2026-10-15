@@ -46,6 +46,11 @@ public partial class WaylandApplicationHost : SkiaHost, ISkiaApplicationHost, ID
 		// of the presentation backend, so it works under the default Vulkan renderer too.
 		ApiExtensibility.Register<XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), xamlRoot => new WaylandNativeOpenGLWrapper(xamlRoot));
 
+		// The window's Vulkan device for add-ins that adopt it (DirectGpuRenderingMode). The builder answers null - no
+		// provider - unless the window renders (or, before its lazily created renderer exists, will render) with Vulkan.
+		ApiExtensibility.Register<XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeGpuDeviceProvider),
+			xamlRoot => (XamlRootMap.GetHostForRoot(xamlRoot) as WaylandXamlRootHost)?.CreateNativeGpuDeviceProvider()!);
+
 		ApiExtensibility.Register(typeof(CodeBrix.Platform.Extensions.System.ILauncherExtension), o => new CodeBrix.Platform.UI.Runtime.Skia.Extensions.System.LinuxLauncherExtension(o));
 
 		// File pickers ride xdg-desktop-portal over DBus — display-server-agnostic, so these

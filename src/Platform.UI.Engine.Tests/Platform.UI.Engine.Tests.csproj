@@ -52,6 +52,8 @@
 		<ProjectReference Include="..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Core.csproj" />
 		<!-- VideoPlayer (WPE1 C11): the rules and the source resolver over IAssetLocation. -->
 		<ProjectReference Include="..\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Core.csproj" />
+		<!-- WebGpu: the frame scheduler (when each driver runs a frame) and the timing/size rules. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.WebGpu\Platform.UI.WebGpu.Core.csproj" />
 		<!-- Toolkit (WPE1 C12): Engine/TriPaneLayoutState over TriPaneViewLayoutMath. -->
 		<ProjectReference Include="..\Platform.UI.Toolkit\Platform.UI.Toolkit.Core.csproj" />
 		<!-- CommandBar (WPE1 C14): the icon helpers of its Engine namespace (IconResourceScheme, IconUri, SvgTintCss). -->

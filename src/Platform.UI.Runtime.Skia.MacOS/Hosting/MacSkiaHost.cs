@@ -34,6 +34,7 @@ public class MacSkiaHost : SkiaHost, ISkiaApplicationHost
 		MacOSSystemThemeHelperExtension.Register();
 		MacOSNativeOpenGLWrapper.Register();
 		MacOSNativeSkiaGpuContext.Register(); // Skia-on-Metal GPU context for off-screen GPU renderers
+		MacOSNativeGpuDeviceProvider.Register(); // the window's own Metal device, for add-ins that adopt it
 		MacOSNativeWebViewProvider.Register();
 		MacOSMediaPlayerExtension.Register();
 		MacOSMediaPlayerPresenterExtension.Register();

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI.Runtime.Skia.Vulkan;
 using CodeBrix.Platform.UI.Runtime.Skia.Vulkan.UnmanagedInterop;
 
@@ -18,8 +19,13 @@ internal unsafe partial class VulkanDevice
 	/// - Always requires VK_KHR_swapchain
 	/// - Does not require compute bit by default
 	/// </summary>
+	/// <param name="instance">The instance.</param>
+	/// <param name="instanceApi">Its API.</param>
+	/// <param name="checkSurface">A surface the device must be able to present to, or null.</param>
+	/// <param name="forAdoption">True to also enable what an adopter needs (<see cref="VulkanAdoptionProfile"/>);
+	/// the heads pass <c>DirectGpuRenderingMode.IsEnabled</c>, so with the latch off nothing changes.</param>
 	public static VulkanDevice Create(VulkanInstance instance, VulkanInstanceApi instanceApi,
-		VkSurfaceKHR? checkSurface = null)
+		VkSurfaceKHR? checkSurface = null, bool forAdoption = false)
 	{
 		uint deviceCount = 0;
 		var vkInstance = instance.Handle;
@@ -77,11 +83,24 @@ internal unsafe partial class VulkanDevice
 		// Only keep the swapchain extension plus any that are in the supported set
 		enabledExtensions = new[] { VK_KHR_swapchain };
 
+		using var adoption = forAdoption
+			? VulkanAdoptionProfile.Create(instance, dev.PhysicalDevice, dev.Extensions, dev.ApiVersion)
+			: null;
+		if (adoption is not null)
+		{
+			enabledExtensions = enabledExtensions.Concat(adoption.Extensions).Distinct().ToArray();
+			typeof(VulkanDevice).Log().Info(
+				"Direct GPU rendering: the Vulkan device enables, for adoption, the extensions ["
+				+ string.Join(", ", adoption.Extensions) + "] and every supported feature of ["
+				+ string.Join(", ", adoption.FeatureStructures) + "].");
+		}
+
 		using var pEnabledExtensions = new Utf8BufferArray(enabledExtensions);
 
 		var createInfo = new VkDeviceCreateInfo
 		{
 			sType = VkStructureType.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
+			pNext = adoption?.FeatureChain ?? IntPtr.Zero,
 			queueCreateInfoCount = 1,
 			pQueueCreateInfos = &queueCreateInfo,
 			ppEnabledExtensionNames = pEnabledExtensions,
@@ -104,6 +123,7 @@ internal unsafe partial class VulkanDevice
 		public VkPhysicalDeviceType Type;
 		public List<string> Extensions;
 		public uint QueueCount;
+		public uint ApiVersion;
 	}
 
 	static List<string> GetDeviceExtensions(VulkanInstanceApi instance, VkPhysicalDevice physicalDevice)
@@ -159,7 +179,8 @@ internal unsafe partial class VulkanDevice
 				Extensions = supportedExtensions,
 				Type = properties.deviceType,
 				QueueFamilyIndex = (uint)c,
-				QueueCount = familyProperties[c].queueCount
+				QueueCount = familyProperties[c].queueCount,
+				ApiVersion = properties.apiVersion,
 			};
 		}
 

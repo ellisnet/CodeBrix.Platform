@@ -13,6 +13,7 @@ using Windows.UI.ViewManagement;
 using CodeBrix.Platform.Foundation.Logging;
 using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Hosting;
+using CodeBrix.Platform.UI.Runtime.Skia.Vulkan;
 using CodeBrix.Platform.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using CodeBrix.Platform.WinUI.Runtime.Skia.Wayland.Protocols.FractionalScaleV1;
@@ -26,7 +27,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 /// Per-window host: owns the window's content wl_surface and renderer, and delegates the
 /// shell/decoration lifecycle to an <see cref="IWaylandShellSurface"/> (xdg-shell or libdecor).
 /// </summary>
-internal partial class WaylandXamlRootHost : IXamlRootHost
+internal partial class WaylandXamlRootHost : IXamlRootHost, IVulkanContextOwner
 {
 	private static bool _firstWindowCreated;
 	private static readonly object _hostsMutex = new();
@@ -48,6 +49,31 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 	private IWaylandShellSurface? _shellSurface;
 	private WlSurface? _wlSurface;
 	private IWaylandRenderer? _renderer;
+
+	// The renderer, created lazily on the first render-timer tick (null until then). The native GPU device
+	// provider reads it to decide whether the head has a Vulkan device.
+	internal IWaylandRenderer? Renderer => _renderer;
+
+	// The live Vulkan context of this window's renderer, for INativeGpuDeviceProvider adopters: null until the
+	// renderer exists, when it is not the Vulkan renderer, and after it is disposed.
+	VulkanContext? IVulkanContextOwner.VulkanContext => (_renderer as IVulkanContextOwner)?.VulkanContext;
+
+	bool IVulkanContextOwner.HasDisposedContext => (_renderer as IVulkanContextOwner)?.HasDisposedContext ?? false;
+
+	/// <summary>
+	/// The INativeGpuDeviceProvider builder's answer for this window: a provider when the window renders - or,
+	/// before its lazily created renderer exists, is going to render - with Vulkan; otherwise null (no provider).
+	/// </summary>
+	internal static object? NativeGpuDeviceProviderFor(IWaylandRenderer? renderer, WaylandRendererChoice choice, IVulkanContextOwner window)
+		=> renderer switch
+		{
+			IVulkanContextOwner => VulkanNativeGpuDeviceProvider.For(window),
+			null when choice == WaylandRendererChoice.Vulkan => VulkanNativeGpuDeviceProvider.For(window),
+			_ => null,
+		};
+
+	internal object? CreateNativeGpuDeviceProvider()
+		=> NativeGpuDeviceProviderFor(_renderer, WaylandRendererSelection.Choose(), this);
 	private WpViewport? _viewport;
 	private WpFractionalScaleV1? _fractionalScale;
 	private WaylandDisplayInformationExtension? _displayInformationExtension;
@@ -486,27 +512,9 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 			// at all: the application exits so a missing-Vulkan device cannot be mistaken for a
 			// working Vulkan configuration.
 			var forceVulkan = FeatureConfiguration.Rendering.ForceVulkanOnWayland;
-			var useVulkan = forceVulkan ? true : FeatureConfiguration.Rendering.UseVulkanOnWayland;
-			var useEgl = FeatureConfiguration.Rendering.UseOpenGLOnWayland;
-			if (useVulkan == null && useEgl == null)
-			{
-				if (IsEnvironmentFlagSet("CODEBRIX_WAYLAND_NO_GPU"))
-				{
-					useVulkan = false;
-					useEgl = false;
-				}
-				else if (IsEnvironmentFlagSet("CODEBRIX_WAYLAND_USE_EGL"))
-				{
-					useVulkan = false;
-					useEgl = true;
-				}
-				else
-				{
-					useVulkan = true;
-				}
-			}
+			var choice = WaylandRendererSelection.Choose();
 
-			if (useVulkan ?? false)
+			if (choice == WaylandRendererChoice.Vulkan)
 			{
 				try
 				{
@@ -542,7 +550,7 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 			if (_renderer == null)
 			{
-				if (useEgl ?? false)
+				if (choice == WaylandRendererChoice.OpenGLES)
 				{
 					try
 					{
@@ -568,9 +576,6 @@ internal partial class WaylandXamlRootHost : IXamlRootHost
 
 		return _renderer;
 	}
-
-	private static bool IsEnvironmentFlagSet(string name)
-		=> string.Equals(Environment.GetEnvironmentVariable(name), "1", StringComparison.Ordinal);
 
 	private void UpdateRendererBackground()
 	{

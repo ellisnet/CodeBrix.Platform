@@ -361,8 +361,13 @@ public sealed class LottieSteps
 	/// a segment - the play command's action is already complete when it is handed back - so the
 	/// only signal is the player's IsPlaying property, and the only honest way to watch it is to
 	/// keep asking. Each look captures a fresh frame, which is also what keeps the animation
-	/// being drawn: the frame the poll ends on is the scenario's current frame, so what a
-	/// scenario says next is about the picture the animation stopped on.
+	/// being drawn. Once the player says it has stopped, ONE MORE frame is captured and becomes
+	/// the scenario's current frame, so what a scenario says next is about the picture the
+	/// animation stopped on: the look that saw IsPlaying turn false captured its frame BEFORE it
+	/// asked, and the segment may have ended in between - under load that frame showed the square
+	/// short of the end of the segment (90% of the centre block red) although the player had
+	/// stopped exactly where it should. The engine sets the segment's end before it reports the
+	/// stop, so every frame drawn after the stop is seen shows that end.
 	/// </summary>
 	/// <param name="name">The Gherkin name of the player.</param>
 	/// <param name="milliseconds">How long the segment has to end in.</param>
@@ -383,6 +388,11 @@ public sealed class LottieSteps
 		stopped.Should().BeTrue(
 			"\"{0}\" must have reached the end of its segment and stopped within {1} milliseconds",
 			name, milliseconds);
+
+		// The frame drawn after the stop was observed, never the one captured before the question.
+		await TestTargetFixture.WaitForIdleAsync().ConfigureAwait(false);
+		await ScenarioFrames.CaptureAsync(_scenarioContext, ScenarioFrames.CurrentFrameName)
+			.ConfigureAwait(false);
 	}
 
 	// --------------------------------------------------------------- inner

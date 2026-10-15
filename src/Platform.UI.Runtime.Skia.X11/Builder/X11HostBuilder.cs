@@ -20,8 +20,10 @@ public partial class X11HostBuilder : IPlatformHostBuilder
 
 	/// <summary>
 	/// Sets the rendering backend for the X11 host.
-	/// This takes precedence over <see cref="FeatureConfiguration.Rendering.UseOpenGLOnX11"/>
-	/// if set.
+	/// This takes precedence over <see cref="FeatureConfiguration.Rendering.UseVulkanOnX11"/>,
+	/// <see cref="FeatureConfiguration.Rendering.UseOpenGLOnX11"/> and
+	/// <see cref="FeatureConfiguration.Rendering.PreferGLESOverGLOnX11"/> if set
+	/// (<see cref="X11RenderingBackend.Default"/> changes nothing).
 	/// </summary>
 	public X11HostBuilder RenderingBackend(X11RenderingBackend backend)
 	{
@@ -59,16 +61,13 @@ public partial class X11HostBuilder : IPlatformHostBuilder
 		return new X11ApplicationHost(appBuilder, _renderFrameRate, preloadVlc: _preloadMediaPlayer);
 	}
 
-	private static void ApplyRenderingBackend(X11RenderingBackend backend)
+	internal static void ApplyRenderingBackend(X11RenderingBackend backend)
 	{
 		switch (backend)
 		{
-			// Not selectable yet: the Vulkan renderer is present in the repo but is not a
-			// completed/tested/supported configuration. Uncomment this case together with the
-			// X11RenderingBackend.Vulkan enum member when Vulkan rendering is officially offered.
-			//case X11RenderingBackend.Vulkan:
-			//	FeatureConfiguration.Rendering.UseVulkanOnX11 = true;
-			//	break;
+			case X11RenderingBackend.Vulkan:
+				FeatureConfiguration.Rendering.UseVulkanOnX11 = true;
+				break;
 			case X11RenderingBackend.OpenGL:
 				FeatureConfiguration.Rendering.UseVulkanOnX11 = false;
 				FeatureConfiguration.Rendering.UseOpenGLOnX11 = true;

@@ -216,6 +216,9 @@
 
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.VideoPlayer.Skia.csproj</_AdjustedOutputProjects>
 		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.VideoPlayer.Core.csproj</_AdjustedOutputProjects>
+
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.WebGpu.Skia.csproj</_AdjustedOutputProjects>
+		<_AdjustedOutputProjects>$(_AdjustedOutputProjects);Platform.UI.WebGpu.Core.csproj</_AdjustedOutputProjects>
 	</PropertyGroup>
 
 	<PropertyGroup>

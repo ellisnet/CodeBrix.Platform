@@ -13,6 +13,9 @@ using CodeBrix.Platform.UI.CommandBar;
 using CodeBrix.Platform.UI.FlexPanel;
 using CodeBrix.Platform.UI.VideoPlayer.Skia;
 using CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
+using CodeBrix.Platform.UI.WebGpu;
+using CodeBrix.Platform.UI.WebGpu.Contracts;
+using CodeBrix.Platform.UI.WebGpu.Internal;
 using CodeBrix.Platform.WinUI.Graphics3DGL;
 using CodeBrix.Platform.OpenGL;
 using Microsoft.Web.WebView2.Core;
@@ -189,6 +192,39 @@ public class AddInCoreTests
 		AssertOnlyCoreAssembliesAreLoaded("CodeBrix.Platform.UI.VideoPlayer.Core");
 	}
 
+	[Fact]
+	public void When_The_WebGpu_Rules_And_Frame_Scheduler_Run_Then_Only_Core_Assemblies_Are_Loaded()
+	{
+		//Arrange
+		var timer = new HostFreeFrameTimer();
+		var frames = 0;
+		var scheduler = new WebGpuFrameScheduler(timer, () =>
+		{
+			frames++;
+			return WebGpuFrameOutcome.Rendered;
+		})
+		{
+			Driver = WebGpuFrameDriver.OnDemand,
+		};
+
+		//Act
+		scheduler.Attach();
+		scheduler.Invalidate();
+		timer.RunQueued();
+		var changed = new WebGpuRenderPathChangedEventArgs(WebGpuRenderPath.None, WebGpuRenderPath.Readback);
+		var lost = new WebGpuDeviceLostEventArgs("no adapter");
+
+		//Assert
+		frames.Should().Be(1);
+		WebGpuRenderViewRules.TargetPixelSize(100, 50, 2.0).Should().Be((200, 100));
+		WebGpuRenderViewRules.ChooseRenderPath(false, null, false).Should().Be(WebGpuRenderPath.Readback);
+		WebGpuDeviceGate.Evaluate(null).MayCreate.Should().BeTrue();
+		changed.NewPath.Should().Be(WebGpuRenderPath.Readback);
+		lost.Reason.Should().Be("no adapter");
+		typeof(WebGpuRenderPath).Assembly.GetName().Name.Should().Be("CodeBrix.Platform.UI.WebGpu.Core");
+		AssertOnlyCoreAssembliesAreLoaded("CodeBrix.Platform.UI.WebGpu.Core");
+	}
+
 	/// <summary>
 	/// The WebView package's Core content (plan section 4.6: the WebView2 API surface and the CoreWebView2 model) is the
 	/// framework's own, in CodeBrix.Platform.UI.Core; the add-in assembly holds only the per-OS plumbing (the Linux WPE
@@ -306,7 +342,36 @@ public class AddInCoreTests
 			"CodeBrix.Platform.UI.AudioPlayer.Skia", "CodeBrix.Audio", "CodeBrix.Audio.Engine",
 			"CodeBrix.Platform.WinUI.Graphics3DGL", "CodeBrix.Platform.UI.VideoPlayer.Skia", "CodeBrix.VideoPlayback",
 			"CodeBrix.Platform.UI.WebView.Skia", "CodeBrix.Platform.UI.MediaPlayer.Skia", "CodeBrix.MediaCore",
+			"CodeBrix.Platform.UI.WebGpu.Skia", "CodeBrix.WebGpu.Native", "CodeBrix.WebGpu.Skia",
 		});
+	}
+
+	/// <summary>The WebGpu frame scheduler's timer with no dispatcher: queued ticks run when the test says so.</summary>
+	private sealed class HostFreeFrameTimer : IWebGpuFrameTimer
+	{
+		private readonly System.Collections.Generic.Queue<Action> _queued = new();
+
+		public void Schedule(TimeSpan delay, Action callback)
+		{
+		}
+
+		public void Cancel()
+		{
+		}
+
+		public bool Post(Action callback)
+		{
+			_queued.Enqueue(callback);
+			return true;
+		}
+
+		internal void RunQueued()
+		{
+			while (_queued.Count > 0)
+			{
+				_queued.Dequeue()();
+			}
+		}
 	}
 
 	/// <summary>A setting value of an enum type, stored as its name.</summary>

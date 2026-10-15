@@ -47,6 +47,13 @@ public sealed class WebViewSteps
 	public const string WebViewKind = "WebView";
 
 	/// <summary>
+	/// The kind a feature file asks for to get a NEW web view control of its own, built for that scenario and never
+	/// given a page: what it shows is what a web view shows before its engine has painted anything. The shared
+	/// "WebView" cannot say that once any scenario has shown a page in it.
+	/// </summary>
+	public const string FreshWebViewKind = "FreshWebView";
+
+	/// <summary>
 	/// The prerequisite name every feature file declares with a <c>@needs-wpe</c> tag: the system
 	/// web engine this add-in binds. It is not a package - it is three shared libraries that come
 	/// from the machine - so a machine without them reports "skipped: wpe is not on this machine"
@@ -123,6 +130,7 @@ public sealed class WebViewSteps
 				// a scenario asks for a "WebView". The factory names it, points the scenario's
 				// name at it and centres it, exactly as it does for a control it just built.
 				ElementFactory.RegisterKind(WebViewKind, () => WebViewFixture.Shared);
+				ElementFactory.RegisterKind(FreshWebViewKind, () => new WebView2());
 			}
 			catch (Exception failure) when (failure is TypeLoadException or FileNotFoundException
 				or FileLoadException or MissingMemberException)

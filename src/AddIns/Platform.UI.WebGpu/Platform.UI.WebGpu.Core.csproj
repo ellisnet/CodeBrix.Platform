@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.UI.WebGpu.Core: the platform-neutral part of the WebGpu add-in - the public enums and event args
+	that name no WebGPU or SkiaSharp type (WebGpuFrameDriver, WebGpuRenderPath, the render-path and device-lost event
+	args), the element's pure rules (frame-driver timing, direct-path eligibility, target size, resize settle), the
+	frame scheduler engine that decides WHEN a frame runs for each driver, and the platform contract that engine
+	reaches its owner's thread through (Contracts/). It references only the platform-neutral framework Core assembly:
+	no SkiaSharp and no CodeBrix.WebGpu, so CodeBrix.Android can re-ship it through its intake unchanged.
+	The WebGpuRenderView element itself is in the Skia project in this folder (Platform.UI.WebGpu.Skia.csproj, assembly
+	CodeBrix.Platform.UI.WebGpu.Skia): its public API is made of CodeBrix.WebGpu.Native types (Device, Texture,
+	CommandEncoder, the sharing contracts and hand-off structs) and SkiaSharp types (the overlay's SKCanvas). That
+	project carries the package, with this assembly inside it.
+	-->
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+	</PropertyGroup>
+
+	<Import Project="../../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.WebGpu.Core</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.WebGpu</RootNamespace>
+
+		<CodeBrixRuntimeIdentifier>Core</CodeBrixRuntimeIdentifier>
+		<PlatformItemsBasePath>.\</PlatformItemsBasePath>
+
+		<!-- Ships inside the WebGpu package (the Skia project bundles it); there is no package of its own. -->
+		<IsPackable>false</IsPackable>
+
+		<!-- The add-in ships its IntelliSense text: the .xml lands beside the dll in the build
+		     output and the Skia project packs it beside this dll, so nothing in the packaging
+		     recipe needs to know about it. CS1591 (a public member with no XML comment) is fixed at
+		     source rather than suppressed - the comment IS the deliverable here. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Core.csproj" />
+	</ItemGroup>
+	<!-- Trimmable and AOT-compatible (WPE1 C1): IsAotCompatible implies IsTrimmable (the IsTrimmable assembly
+	     metadata) and turns on the trim, AOT and single-file analyzers, whose findings are fixed at source. -->
+	<PropertyGroup>
+		<IsAotCompatible>true</IsAotCompatible>
+	</PropertyGroup>
+
+</Project>

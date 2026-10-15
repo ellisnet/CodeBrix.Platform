@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 using CodeBrix.Platform.UI.Runtime.Skia.Vulkan.Interop;
 using CodeBrix.Platform.UI.Runtime.Skia.Vulkan.UnmanagedInterop;
+using CodeBrix.Platform.UI.Hosting;
 using SkiaSharp;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.Vulkan; //Was previously: Uno.UI.Runtime.Skia.Vulkan
@@ -30,6 +31,13 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 	private SKSurface? _cachedSkSurface;
 
 	public GRContext? GrContext => _grContext;
+
+	/// <summary>
+	/// The handles, extensions and versions an add-in needs to adopt this context's device, captured once when
+	/// <see cref="Initialize"/> succeeds (under the device lock, where the queue handle may be read); null before
+	/// that and after <see cref="Dispose"/>.
+	/// </summary>
+	public VulkanNativeDeviceInfo? NativeDeviceInfo { get; private set; }
 	public SKSurface? CachedSkSurface => _cachedSkSurface;
 	public bool IsInitialized => _grContext != null;
 
@@ -63,8 +71,9 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 		var surfaceHandle = factory.CreateSurface((VulkanInstance)_instance, nativeWindowHandle);
 		var vkSurface = new VkSurfaceKHR { Handle = surfaceHandle };
 
-		// Create device (checks surface presentation support)
-		_device = VulkanDevice.Create((VulkanInstance)_instance, _instanceApi, vkSurface);
+		// Create device (checks surface presentation support). With direct GPU rendering on, the device also enables
+		// what an add-in needs to adopt it (VulkanAdoptionProfile); with it off, creation is unchanged.
+		_device = VulkanDevice.Create((VulkanInstance)_instance, _instanceApi, vkSurface, DirectGpuRenderingMode.IsEnabled);
 
 		// Destroy the temporary surface used for device selection
 		_instanceApi.DestroySurfaceKHR(new VkInstance { Handle = _instance.Handle }, vkSurface, IntPtr.Zero);
@@ -85,7 +94,56 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 
 			// Create SkiaSharp Vulkan context
 			CreateGrContext();
+
+			CaptureNativeDeviceInfo();
 		}
+	}
+
+	/// <summary>
+	/// Initializes the instance, device and SkiaSharp context exactly as <see cref="Initialize"/> does, but with no
+	/// window: no surface, swapchain or intermediate render image (<see cref="RenderFrame"/> and
+	/// <see cref="BlitAndPresent"/> do nothing). The context then owns a real device and <see cref="GrContext"/> for
+	/// off-screen GPU work - what the test suites use to exercise device adoption (<see cref="NativeDeviceInfo"/>)
+	/// on this machine's GPU without opening a window. Like <see cref="Initialize"/>, the device is made adoptable
+	/// only while direct GPU rendering is enabled.
+	/// </summary>
+	/// <param name="getProcAddr">The Vulkan loader's <c>vkGetInstanceProcAddr</c>.</param>
+	/// <exception cref="VulkanException">No Vulkan device, or SkiaSharp could not create its context.</exception>
+	internal void InitializeHeadless(VkGetInstanceProcAddressDelegate getProcAddr)
+	{
+		_instance = VulkanInstance.Create(getProcAddr, Array.Empty<string>());
+		_instanceApi = new VulkanInstanceApi(_instance);
+
+		// No surface to check presentation support against: the first graphics-capable device is taken, the same
+		// selection Initialize makes on a machine whose devices can all present.
+		_device = VulkanDevice.Create((VulkanInstance)_instance, _instanceApi, null, DirectGpuRenderingMode.IsEnabled);
+		_deviceApi = new VulkanDeviceApi(_device);
+
+		using (_device.Lock())
+		{
+			CreateGrContext();
+			CaptureNativeDeviceInfo();
+		}
+	}
+
+	// Device lock held (VulkanDevice.MainQueueHandle throws outside it).
+	private void CaptureNativeDeviceInfo()
+	{
+		var instance = _instance!;
+		var device = _device!;
+		NativeDeviceInfo = new VulkanNativeDeviceInfo(
+			instance: instance.Handle,
+			physicalDevice: device.PhysicalDeviceHandle,
+			device: device.Handle,
+			queue: device.MainQueueHandle,
+			queueFamilyIndex: device.GraphicsQueueFamilyIndex,
+			// VulkanDevice.Create takes queue 0 of the graphics family as the main queue.
+			queueIndex: 0,
+			apiVersion: instance.ApiVersion,
+			instanceExtensions: instance.EnabledExtensions,
+			deviceExtensions: device.EnabledExtensions,
+			// The loader's own vkGetInstanceProcAddr, resolved through the delegate the instance was created with.
+			getInstanceProcAddr: instance.GetInstanceProcAddress(instance.Handle, "vkGetInstanceProcAddr"));
 	}
 
 	private void CreateGrContext()
@@ -374,6 +432,7 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 	{
 		if (_disposed) return;
 		_disposed = true;
+		NativeDeviceInfo = null;
 
 		if (_device != null)
 		{
@@ -428,6 +487,42 @@ internal sealed class VulkanContext : IVulkanPlatformGraphicsContext, IDisposabl
 
 		public void Dispose() { }
 	}
+}
+
+/// <summary>
+/// An immutable snapshot of a <see cref="VulkanContext"/>'s device for adoption by an add-in (see
+/// <see cref="VulkanNativeGpuDeviceProvider"/>). Handles are raw Vulkan handles; nothing here is owned by the snapshot.
+/// </summary>
+internal sealed class VulkanNativeDeviceInfo
+{
+	public VulkanNativeDeviceInfo(IntPtr instance, IntPtr physicalDevice, IntPtr device, IntPtr queue,
+		uint queueFamilyIndex, uint queueIndex, uint apiVersion,
+		System.Collections.Generic.IReadOnlyList<string> instanceExtensions,
+		System.Collections.Generic.IReadOnlyList<string> deviceExtensions, IntPtr getInstanceProcAddr)
+	{
+		Instance = instance;
+		PhysicalDevice = physicalDevice;
+		Device = device;
+		Queue = queue;
+		QueueFamilyIndex = queueFamilyIndex;
+		QueueIndex = queueIndex;
+		ApiVersion = apiVersion;
+		// Copied so a later change to the context's own lists can never show through.
+		InstanceExtensions = System.Linq.Enumerable.ToArray(instanceExtensions);
+		DeviceExtensions = System.Linq.Enumerable.ToArray(deviceExtensions);
+		GetInstanceProcAddr = getInstanceProcAddr;
+	}
+
+	public IntPtr Instance { get; }
+	public IntPtr PhysicalDevice { get; }
+	public IntPtr Device { get; }
+	public IntPtr Queue { get; }
+	public uint QueueFamilyIndex { get; }
+	public uint QueueIndex { get; }
+	public uint ApiVersion { get; }
+	public System.Collections.Generic.IReadOnlyList<string> InstanceExtensions { get; }
+	public System.Collections.Generic.IReadOnlyList<string> DeviceExtensions { get; }
+	public IntPtr GetInstanceProcAddr { get; }
 }
 
 // Extension to convert IntPtr to Vulkan handle structs for API calls

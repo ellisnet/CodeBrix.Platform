@@ -73,3 +73,8 @@ Scenario: Stretch None draws the clip at its own pixel size
 	Then the 124 by 92 block at 258, 194 inside "player" is uniformly "#FF0000"
 	And the 200 by 100 block at 20, 20 inside "player" is uniformly "Black"
 	And the region of "player" contains at most 6 percent "#FF0000"
+
+Scenario: Before anything is opened the player shows what is behind it
+	Given the application shows a Grid named "cell" 640 by 480 with Background "#00FF00"
+	And the layout "cell" holds a VideoPlayer named "player"
+	Then the region of "player" shows at least 99 percent "#00FF00" within 3000 milliseconds

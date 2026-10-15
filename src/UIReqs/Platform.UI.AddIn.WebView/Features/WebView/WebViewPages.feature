@@ -24,6 +24,11 @@ Feature: A page shown in a WebView
 	is now announced where the engine asks whether it may go ahead, and the refusal is the answer to
 	that question, so the page a scenario says no to is not the page it ends up showing.
 
+	A second defect is fenced here as well: until its first frame arrived, the web view CLEARED its area to
+	transparent on the canvas everything behind it had already been painted on - a hole through the panel instead
+	of what the application put behind the control. It now draws nothing until it has a frame, so what is behind it
+	shows through, and the scenario that says so uses a web view of its own that no scenario has given a page.
+
 Scenario: A WebView shows the page it was given
 	Given the application shows a WebView named "browser" 800 by 600
 	And the web engine of "browser" has started within 20000 milliseconds
@@ -128,3 +133,11 @@ Scenario: A page that lives in a file on this machine loads
 	And the region of "browser" shows at least 99 percent "Purple" within 5000 milliseconds
 	And the address of "browser" begins with "file://"
 	And the navigation of "browser" reported success
+
+Scenario: Before its engine has painted anything, a WebView shows what is behind it
+	Given the application shows a Grid named "cell" 640 by 480 with Background "#00FF00"
+	And the layout "cell" holds a FreshWebView named "fresh" with:
+		| Property | Value |
+		| Width    | 600   |
+		| Height   | 400   |
+	Then the region of "fresh" shows at least 99 percent "#00FF00" within 3000 milliseconds

@@ -69,3 +69,12 @@ using CodeBrix.Platform.UI.Graphics;
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]
+
+// The WebGpu add-in's test suite: its direct-path GPU tests run a head's own Vulkan device (VulkanContext, initialized
+// headless) behind the provider the X11 and Wayland heads register (Vulkan/VulkanNativeGpuDeviceProvider.skia.cs).
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia.Tests")]
+
+// The WebGpu add-in's UIReqs pair: the direct-path scenarios offer a head's Vulkan device (VulkanContext, initialized
+// headless, behind VulkanNativeGpuDeviceProvider) as the window's provider on the software frame-buffer harness.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AddIn.WebGpu.UIReqs")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AddIn.WebGpu.UIReqs.Portrait")]

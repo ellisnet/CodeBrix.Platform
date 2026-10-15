@@ -206,9 +206,10 @@ internal sealed class VideoSurfaceElement : FrameworkElement
 			}
 		}
 
-		// No frame yet (nothing opened, or nothing decoded so far): leave the area transparent, so
-		// whatever the application put behind the player shows through until the first picture.
-		canvas.Clear(SKColors.Transparent);
+		// No frame yet (nothing opened, or nothing decoded so far): draw NOTHING, so whatever the
+		// application put behind the player shows through until the first picture. Not a
+		// Clear(Transparent): this canvas is the one everything behind the element was already
+		// painted on, and a clear would punch a transparent hole through it.
 	}
 
 	/// <summary>

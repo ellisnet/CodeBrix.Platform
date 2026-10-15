@@ -30,6 +30,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private readonly PlayTestFilePickers _filePickers;
     private readonly PlayTestLauncher _launcher;
     private readonly PlayTestOpenGLPlan _openGL;
+    private readonly PlayTestWebGpuPlan _webGpu;
     private readonly BlockingCollection<Action> _queue = new();
     private readonly ManualResetEventSlim _exit = new();
     private readonly AutoResetEvent _render = new(false);
@@ -40,7 +41,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     private Thread? _renderThread;
     private volatile bool _stopping;
     private Exception? _failure;
-    // The failure is a test-configuration error (an OpenGL element with no provider): report its own message.
+    // The failure is a test-configuration error (an OpenGL or WebGPU element with no provider): report its own message.
     private volatile bool _failureIsConfiguration;
     private VirtualFrame? _frame;
     private volatile VirtualScreen _screen;
@@ -55,14 +56,16 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
     internal ScreenOrientation Orientation => _screen.Orientation;
     internal event Action<VirtualFrame>? FramePresented;
     internal PlayTestOpenGLInfo? OpenGL { get; private set; }
+    internal PlayTestWebGpuInfo? WebGpu { get; private set; }
     internal UIElement? Root => Window.Root;
     UIElement? IXamlRootHost.RootElement => Root;
     public bool CanExit => true;
 
-    internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers, PlayTestLauncher launcher, PlayTestOpenGLPlan openGL)
+    internal VirtualHost(Func<Application> factory, bool portrait, ApplicationTheme theme, PlayTestFilePickers filePickers, PlayTestLauncher launcher, PlayTestOpenGLPlan openGL, PlayTestWebGpuPlan webGpu)
     {
         _factory = factory;
         _openGL = openGL;
+        _webGpu = webGpu;
         _theme = new VirtualSystemTheme(theme);
         _filePickers = filePickers;
         _launcher = launcher;
@@ -126,6 +129,11 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         OpenGL = PlayTestOpenGLSetup.Probe(_openGL);
         if (PlayTestOpenGLSetup.WrapperFactory(_openGL, FailConfiguration) is { } openGLFactory)
             ApiExtensibility.Register<XamlRoot>(typeof(INativeOpenGLWrapper), openGLFactory);
+        // WebGPU elements create their own device after asking the head's IOwnedGpuDeviceGate (the desktop heads
+        // register none). A registered provider must prove an adapter and device now, so a machine without WebGPU
+        // fails the launch with the provider's reason; the gate then answers every WebGPU element of the run.
+        WebGpu = PlayTestWebGpuSetup.Probe(_webGpu);
+        ApiExtensibility.Register<XamlRoot>(typeof(IOwnedGpuDeviceGate), PlayTestWebGpuSetup.GateFactory(_webGpu, WebGpu, FailConfiguration));
         Application.Start(_ =>
         {
             var app = _factory();
@@ -298,5 +306,7 @@ internal sealed class VirtualHost : SkiaHost, ISkiaApplicationHost, IXamlRootHos
         // The provider owns the process's shared display; it ends once nothing renders any more. An opted-out
         // launch never touched it.
         if (_openGL.Mode == PlayTestOpenGLMode.Provider) _openGL.Provider!.Dispose();
+        // Likewise the WebGPU provider (and whatever its probe kept for the elements); an opted-out launch never touched it.
+        if (_webGpu.Mode == PlayTestWebGpuMode.Provider) _webGpu.Provider!.Dispose();
     }
 }

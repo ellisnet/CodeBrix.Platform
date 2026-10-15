@@ -112,6 +112,10 @@
 		     with the PlayTest head: real OpenGL contexts for PlayTests of Graphics3DGL applications. Its one
 		     package dependency is Graphics3DGL at the family version; the head is a compile-time reference. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.PlayTest.OpenGL\Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
+		<!-- The PlayTest WebGPU provider (CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever) ships with the
+		     PlayTest head the same way: real WebGPU devices for PlayTests of WebGpu add-in applications. Its one
+		     package dependency is the WebGpu add-in at the family version; the head is a compile-time reference. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.PlayTest.WebGpu\Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Win32\Platform.UI.Runtime.Skia.Win32.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Wpf\Platform.UI.Runtime.Skia.Wpf.csproj" />
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\Platform.UI.Runtime.Skia.Linux.FrameBuffer\Platform.UI.Runtime.Skia.Linux.FrameBuffer.csproj" />
@@ -151,6 +155,18 @@
 		     (Dav1d, BSD-2) and Opus (BSD-3) are deliberately NOT dependencies - the application
 		     references and registers those itself. -->
 		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Skia.csproj" />
+
+		<!-- The WebGpu AddIn (CodeBrix.Platform.WebGpu.ApacheLicenseForever) ships with every family release:
+		     the XAML-declarable WebGpuRenderView element - a frame protocol (BeginFrame/EndFrame on any one
+		     thread) with Continuous, OnDemand and Manual drivers, IWebGpuRenderer, a SkiaSharp overlay, and a
+		     native-module hand-off - on every Skia head through its Readback render path, backed by the
+		     CodeBrix.WebGpu.Skia.MitLicenseForever nuget (which brings CodeBrix.WebGpu.Native and the wgpu
+		     engine's natives for every runtime identifier). Its package dependencies are exactly
+		     CodeBrix.Platform, CodeBrix.WebGpu.Skia and SkiaSharp at the family pin; the add-in's Core assembly
+		     rides INSIDE the package (../AddIn.CorePackaging.targets). CodeBrix.WebGpu.Graphics stays OUT of the
+		     dependency graph: that higher layer is the application's choice and composes with the view through
+		     the WebGpu sharing contracts. -->
+		<_CsprojPackage Include="$(MSBuildThisFileDirectory)..\src\AddIns\Platform.UI.WebGpu\Platform.UI.WebGpu.Skia.csproj" />
 
 		<!-- The MediaPlayer AddIn (CodeBrix.Platform.MediaPlayer.LgplLicenseForever) ships with every
 		     family release: one windowing-agnostic vmem package for the Win32, WPF, X11, Wayland, and

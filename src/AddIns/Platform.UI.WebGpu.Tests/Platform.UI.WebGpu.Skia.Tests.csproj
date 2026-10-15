@@ -1,0 +1,97 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>$(NetUnitTests)</TargetFramework>
+
+		<!-- xUnit.net v3 test projects are self-executing binaries and must build as Exe;
+		     run via Microsoft.Testing.Platform, matching the CodeBrix family test convention. -->
+		<OutputType>Exe</OutputType>
+		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
+		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+
+		<!-- The add-in binds the Skia flavour of Platform.UI (like the VideoPlayer suite), so this suite does too.
+		     No window is ever created: the rules and the frame scheduler are pure logic, the surface paints onto raster
+		     canvases, the render engine runs the real frame protocol on a real WebGPU device (each GPU test skips with
+		     the engine's reason where no adapter exists), and the element tests construct the view host-free. -->
+		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
+
+		<AssemblyName>CodeBrix.Platform.UI.WebGpu.Skia.Tests</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.WebGpu.Tests</RootNamespace>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+
+		<!-- The GPU tests record WebGPU commands (pointers to descriptor structs) and call the view's native-module
+		     hand-off through its function pointers. -->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+		<PackageReference Include="xunit.v3" Version="4.0.1" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
+	</ItemGroup>
+
+	<!-- The surface and engine tests really paint and read pixels, so Skia's own native binary has to be here: a head
+	     project normally supplies it and there is no head in a test run. Only Skia - nothing in this suite lays out
+	     text. The WebGPU natives come with CodeBrix.WebGpu.Native through the add-in. -->
+	<ItemGroup Condition="!$([MSBuild]::IsOSPlatform('Windows')) and !$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Linux" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="$(SkiaSharpVersion)" />
+	</ItemGroup>
+
+	<ItemGroup Condition="$([MSBuild]::IsOSPlatform('OSX'))">
+		<PackageReference Include="SkiaSharp.NativeAssets.macos" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.WebGpu\Platform.UI.WebGpu.Skia.csproj" />
+		<ProjectReference Include="..\..\Platform.UI\Platform.UI.Skia.csproj" />
+
+		<!-- The add-in references this with PrivateAssets="all" - the assembly has no nuget of its own and ships inside
+		     the main framework package, so it is there in any real application but does NOT flow across the project
+		     reference into a test run. The engine logs through it (device ready, device lost, the direct-path notice),
+		     so every test that runs a frame needs it here. -->
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- What the target below swaps in (the element tests construct the view, a XAML type): the compile-time
+		     reference to CodeBrix.Platform resolves to the .Reference flavour, so without these a STALE .Skia build
+		     would be copied beside the tests. ReferenceOutputAssembly is false because they are needed at run time
+		     only - the compile still binds .Reference. The CommandBar suite does the same, for the same reason. -->
+		<ProjectReference Include="..\..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<!-- Constructing the view runs the dependency-object machinery, which touches the dispatcher. Assembly resolution
+	     hands a host-free test process the .Reference variants of the runtime assemblies, whose dispatcher stubs throw
+	     NotSupportedException("Ref assembly") - so swap in the .Skia variants, exactly as the CommandBar and
+	     SkiaSharp.Views suites do. DispatcherInitializer.cs then installs the host-free dispatcher overrides those
+	     assemblies expect a head to install. -->
+	<Target Name="_WebGpuTestsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
+		<PropertyGroup>
+			<_WgSkiaUwp>$(MSBuildThisFileDirectory)..\..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_WgSkiaUwp>
+			<_WgSkiaComp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_WgSkiaComp>
+			<_WgSkiaDisp>$(MSBuildThisFileDirectory)..\..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_WgSkiaDisp>
+		</PropertyGroup>
+		<ItemGroup>
+			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
+				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_WgSkiaUwp)\CodeBrix.Platform.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_WgSkiaUwp)\CodeBrix.Platform.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_WgSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_WgSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_WgSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
+			<ReferenceCopyLocalPaths Include="$(_WgSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_WgSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
+		</ItemGroup>
+	</Target>
+
+</Project>

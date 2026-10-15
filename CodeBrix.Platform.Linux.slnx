@@ -69,6 +69,7 @@
     <Project Path="src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
@@ -115,6 +116,8 @@
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Core.csproj" />
     <Project Path="src/AddIns/Platform.UI.Svg/Platform.UI.Svg.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Core.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Core.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj" />
     <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Core.csproj" />
     <!-- CodeBrix.Platform Linux solution: Uno.WinUI.Graphics2DSK.Windows excluded —
@@ -150,6 +153,7 @@
     <Project Path="src/Platform.UI.Engine.Tests/Platform.UI.Engine.Tests.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Tests/Platform.UI.Runtime.Skia.Tests.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests.csproj" />
     <!-- CodeBrix.Platform Linux solution: Uno.UI.RuntimeTests.Windows excluded — its only
          ProjectReference is to Platform.UI.Toolkit.Windows.csproj (which is itself excluded above
          due to the XamlCompiler.exe dependency), so it cannot be satisfied on Linux. Build
@@ -168,6 +172,7 @@
     <Project Path="src/AddIns/Platform.UI.TerminalView.Tests/Platform.UI.TerminalView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.PlotterView.Tests/Platform.UI.PlotterView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.VideoPlayer.Tests/Platform.UI.VideoPlayer.Skia.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu.Tests/Platform.UI.WebGpu.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.AppSettings.Tests/Platform.AppSettings.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Tests.csproj" />
@@ -218,6 +223,8 @@
     <Project Path="src/UIReqs/Platform.UI.AddIn.CommandBar.Portrait/Platform.UI.AddIn.CommandBar.UIReqs.Portrait.csproj" />
     <Project Path="src/UIReqs/Platform.UI.AddIn.VideoPlayer/Platform.UI.AddIn.VideoPlayer.UIReqs.csproj" />
     <Project Path="src/UIReqs/Platform.UI.AddIn.VideoPlayer.Portrait/Platform.UI.AddIn.VideoPlayer.UIReqs.Portrait.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.WebGpu/Platform.UI.AddIn.WebGpu.UIReqs.csproj" />
+    <Project Path="src/UIReqs/Platform.UI.AddIn.WebGpu.Portrait/Platform.UI.AddIn.WebGpu.UIReqs.Portrait.csproj" />
     <Project Path="src/UIReqs/Platform.UI.AddIn.Lottie/Platform.UI.AddIn.Lottie.UIReqs.csproj" />
     <Project Path="src/UIReqs/Platform.UI.AddIn.Lottie.Portrait/Platform.UI.AddIn.Lottie.UIReqs.Portrait.csproj" />
     <Project Path="src/UIReqs/Platform.UI.AddIn.MediaPlayer/Platform.UI.AddIn.MediaPlayer.UIReqs.csproj" />

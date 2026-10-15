@@ -96,10 +96,9 @@ internal sealed class WpeWebViewHostElement : FrameworkElement
 			}
 		}
 
-		if (frame is null)
-		{
-			// No frame yet (engine still starting or page not painted): leave the area blank.
-			canvas.Clear(SKColors.Transparent);
-		}
+		// No frame yet (engine still starting or page not painted): draw NOTHING, so whatever the
+		// application put behind the web view shows through until the first frame. Not a
+		// Clear(Transparent): this canvas is the one everything behind the element was already
+		// painted on, and a clear would punch a transparent hole through it.
 	}
 }

@@ -357,6 +357,32 @@ Media assets come from samples/assets/video (see SHARED SAMPLE ASSETS below).
 Run:
     dotnet run --project samples/CodeBrixPlatform/VideoPlayerDemo/VideoPlayerDemo.LinuxX11
 
+WebGpuDemo
+----------
+    samples/CodeBrixPlatform/WebGpuDemo    six heads + two PlayTests projects
+    Add-in: CodeBrix.Platform.WebGpu
+
+Four pages: a WGSL triangle recorded with the raw CodeBrix.WebGpu.Native binding
+in the Render event (the add-in is its only dependency); glTF models (Cube Pets,
+the Survival Kit chest and the Avian, CC0) drawn into the view by
+CodeBrix.WebGpu.Graphics through the view's sharing contracts, with a
+procedural sky and an orbit camera; an IWebGpuRenderer set from XAML; and a
+Controls page with the Continuous / OnDemand / Manual drivers, Invalidate,
+pause, a TargetFrameRate slider, the RenderPath and a SkiaSharp HUD drawn by the
+Overlay event. Each head's Program.cs shows UseDirectGpuRenderingMode() (and on
+X11 the Vulkan renderer choice) as commented lines.
+
+The DEMO (never the add-in) references CodeBrix.WebGpu.Graphics and
+CodeBrix.Graphics3D.Gltf2.
+
+PlayTests: tests/WebGpuDemo.PlayTests registers CodeBrix.Platform.PlayTest.WebGpu
+and measures every page with PixelStats; tests/WebGpuDemo.NoWebGpu.PlayTests
+launches with PlayTestOptions.WebGpu = Unavailable.
+
+Run:
+    dotnet run --project samples/CodeBrixPlatform/WebGpuDemo/src/WebGpuDemo.LinuxX11
+    dotnet test --project samples/CodeBrixPlatform/WebGpuDemo/tests/WebGpuDemo.PlayTests/WebGpuDemo.PlayTests.csproj
+
 CommandBarDemo
 --------------
     samples/CodeBrixPlatform/CommandBarDemo    six heads

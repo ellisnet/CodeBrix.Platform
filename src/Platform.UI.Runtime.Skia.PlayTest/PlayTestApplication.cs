@@ -57,6 +57,13 @@ public sealed class PlayTestOptions
     /// whole run, because OpenGL elements keep their context for the life of the window.</summary>
     public PlayTestOpenGL OpenGL { get; set; }
 
+    /// <summary>Whether WebGPU is offered to the application: <see cref="PlayTestWebGpu.Available"/> (the default)
+    /// lets WebGPU elements create their devices once the registered provider has proved an adapter at launch;
+    /// <see cref="PlayTestWebGpu.Unavailable"/> launches without WebGPU so the application's no-WebGPU path runs. A
+    /// launch option: it applies to the whole run, because WebGPU elements keep their device for the life of the
+    /// window.</summary>
+    public PlayTestWebGpu WebGpu { get; set; }
+
     private float DefaultSlowMo()
     {
         var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_SLOWMO");
@@ -180,13 +187,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
     /// <summary>What the launch found out about OpenGL: the provider, renderer and version of a probe context,
     /// or why OpenGL elements get no context in this run.</summary>
     public PlayTestOpenGLInfo OpenGL => _host.OpenGL ?? throw new PlayTestException("The application has not started.");
+    /// <summary>What the launch found out about WebGPU: the provider, adapter and backend of its probe, or why WebGPU
+    /// elements get no device in this run.</summary>
+    public PlayTestWebGpuInfo WebGpu => _host.WebGpu ?? throw new PlayTestException("The application has not started.");
     internal VirtualHost Host => _host;
 
-    private PlayTestApplication(Func<Application> factory, PlayTestOptions options, ApplicationTheme theme, PlayTestOpenGLPlan openGL)
+    private PlayTestApplication(Func<Application> factory, PlayTestOptions options, ApplicationTheme theme, PlayTestOpenGLPlan openGL, PlayTestWebGpuPlan webGpu)
     {
         Options = options;
         SystemTheme = theme;
-        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait, theme, FilePickers, Launcher, openGL);
+        _host = new VirtualHost(factory, options.Orientation == ScreenOrientation.Portrait, theme, FilePickers, Launcher, openGL, webGpu);
         Page = new Page(this);
     }
 
@@ -198,8 +208,8 @@ public sealed class PlayTestApplication : IAsyncDisposable
     /// <exception cref="ArgumentOutOfRangeException">The timeout or action delay is not positive/non-negative and finite.</exception>
     /// <exception cref="ArgumentException">A selected preference value is invalid.</exception>
     /// <exception cref="InvalidOperationException">An application was already launched in this process.</exception>
-    /// <exception cref="PlayTestException">The registered OpenGL provider could not create a context; the message
-    /// gives its reason.</exception>
+    /// <exception cref="PlayTestException">The registered OpenGL provider could not create a context, or the registered
+    /// WebGPU provider could not create a device; the message gives its reason.</exception>
     public static async Task<PlayTestApplication> LaunchAsync(Func<Application> application, PlayTestOptions? options = null)
     {
         ArgumentNullException.ThrowIfNull(application);
@@ -210,15 +220,16 @@ public sealed class PlayTestApplication : IAsyncDisposable
         if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || slowMo < 0 || !float.IsFinite(slowMo))
             throw new ArgumentOutOfRangeException(nameof(options));
         var openGL = PlayTestOpenGLSetup.Plan(options.OpenGL, PlayTestOpenGLProviders.Registry);
+        var webGpu = PlayTestWebGpuSetup.Plan(options.WebGpu, PlayTestWebGpuProviders.Registry);
         if (Interlocked.Exchange(ref _launched, 1) != 0)
             throw new InvalidOperationException("PlayTest hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications.");
         options = new PlayTestOptions
         {
             Orientation = orientation, Headless = options.Headless,
             Timeout = options.Timeout, SlowMo = slowMo, ArtifactsDirectory = options.ArtifactsDirectory,
-            OpenGL = options.OpenGL,
+            OpenGL = options.OpenGL, WebGpu = options.WebGpu,
         };
-        var result = new PlayTestApplication(application, options, theme, openGL);
+        var result = new PlayTestApplication(application, options, theme, openGL, webGpu);
         try
         {
             // Stable default culture; an app or a test can explicitly exercise other cultures.

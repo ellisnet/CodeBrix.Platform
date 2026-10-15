@@ -187,6 +187,12 @@ API, usage and pitfalls.
       on the GPU where the head can give one. AV1 and Opus decoding arrive as
       separate packages the application registers.
       see src/AddIns/Platform.UI.VideoPlayer.Skia/AGENT-README.txt
+  CodeBrix.Platform.WebGpu.ApacheLicenseForever            Apache-2.0
+      WebGpuRenderView - WebGPU rendering in a XAML element on all heads:
+      Continuous / OnDemand / Manual frame drivers, a SkiaSharp overlay, and
+      the device shared with other WebGPU libraries and native modules. The
+      same element exists in CodeBrix.Android.
+      see src/AddIns/Platform.UI.WebGpu/AGENT-README.txt
   CodeBrix.Platform.WebView.ApacheLicenseForever           Apache-2.0
       Makes the WebView2 control work on every head (WPE WebKit on Linux).
       see src/AddIns/Platform.UI.WebView.Skia/AGENT-README.txt
@@ -203,6 +209,10 @@ in a head project):
       Gives the PlayTest head real OpenGL contexts, so Graphics3DGL content
       renders in PlayTests; referenced beside the PlayTest package.
       see src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/AGENT-README.txt
+  CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever   Apache-2.0
+      Gives the PlayTest head real WebGPU devices, so WebGpuRenderView
+      content renders in PlayTests; referenced beside the PlayTest package.
+      see src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/AGENT-README.txt
 
 Toolkits for Microsoft's OWN UI frameworks (NOT for CodeBrix.Platform apps;
 they share no build-time code with the framework above):
@@ -250,7 +260,10 @@ CodeBrix.Platform-specific entry points:
     using CodeBrix.Platform.UI.Hosting;            // CodeBrixPlatformHostBuilder, CodeBrixPlatformHost,
                                                    // .Use...() methods, Win32HostBuilder, X11HostBuilder,
                                                    // WaylandHostBuilder, IWindowsSkiaHostBuilder,
-                                                   // X11RenderingBackend, WaylandRenderingBackend
+                                                   // X11RenderingBackend, WaylandRenderingBackend,
+                                                   // DirectSkiaCanvasMode, DirectGpuRenderingMode
+    using CodeBrix.Platform.Graphics;              // INativeGpuDeviceProvider, NativeGpuDeviceKind
+                                                   // (GPU add-in authors only)
     using CodeBrix.Platform.UI.Runtime.Skia;       // FramebufferHostBuilder, FilePickerOptions,
                                                    // FolderPickerOptions, SoftwareKeyboardOptions,
                                                    // SoftwareKeyHeight, UserInterfaceScale, SkiaHost
@@ -767,6 +780,7 @@ HOST BUILDER (namespace CodeBrix.Platform.UI.Hosting)
     ICodeBrixPlatformHostBuilder AfterInit(Action action)
         // runs after the host is initialized and BEFORE the run loop starts
     ICodeBrixPlatformHostBuilder UseDirectSkiaCanvasMode()      // EXPERIMENTAL
+    ICodeBrixPlatformHostBuilder UseDirectGpuRenderingMode()    // EXPERIMENTAL
 
     public abstract class CodeBrixPlatformHost
     {
@@ -794,6 +808,50 @@ SKXamlCanvas draw each frame straight into its on-screen bitmap buffer (one fewe
 full-frame copy per paint); it is an app-wide, one-way opt-in that changes nothing
 if omitted. Order relative to the .Use...() call does not matter. Enable it only
 to test performance/stability - it may change or be removed.
+
+EXPERIMENTAL: chaining ".UseDirectGpuRenderingMode()" onto the host builder lets
+add-ins that produce GPU content composite it directly on the head's GPU device
+where the head offers one (Vulkan or Metal renderers), instead of reading frames
+back to the processor; heads without such a renderer ignore it. It is an
+app-wide, one-way opt-in (DirectGpuRenderingMode.IsEnabled reports it) that
+changes nothing if omitted, and order relative to the .Use...() call does not
+matter. On the X11 head, when the app made no renderer choice of its own, it
+also makes the head try its Vulkan renderer first (see LINUX / X11), and the
+X11 and Wayland heads create their Vulkan device with the extra extensions and
+features (where the GPU supports them) that a WebGPU engine needs to adopt it.
+An add-in that cannot use the head's device falls back to its read-back path by
+itself. The WebGpu add-in (WebGpuRenderView) uses it: RenderPath DirectVulkan on
+the X11 Vulkan renderer and on Wayland, DirectMetal on macOS, Readback elsewhere.
+It may change or be removed.
+
+The seam such add-ins use (namespace CodeBrix.Platform.Graphics; ApiExtensibility
+is in CodeBrix.Platform.Foundation.Extensibility):
+
+    public enum NativeGpuDeviceKind { Vulkan, Metal }
+    public interface INativeGpuDeviceProvider
+    {
+        NativeGpuDeviceKind Kind { get; }
+        bool IsAvailable { get; }        string? Reason { get; }
+        nint VkInstance, VkPhysicalDevice, VkDevice, VkQueue { get; }
+        uint VkQueueFamilyIndex, VkQueueIndex, VkApiVersion { get; }
+        IReadOnlyList<string> VkInstanceExtensions, VkDeviceExtensions { get; }
+        nint VkGetInstanceProcAddr { get; }
+        nint MetalDevice, MetalCommandQueue { get; }
+        SkiaSharp.GRContext? GRContext { get; }   // the head's own; never dispose
+        IDisposable BeginFrame();  // Vulkan: holds the head's device lock (re-entrant);
+                                   // Metal: no-op scope
+    }
+
+Resolve it per window with ApiExtensibility.CreateInstance<INativeGpuDeviceProvider>
+(xamlRoot, out var provider). It resolves ONLY for a window whose renderer has
+a device of its own - X11 on its Vulkan renderer, Wayland on its Vulkan
+renderer, macOS in Metal mode; everywhere else (OpenGL, OpenGL ES, software,
+Win32, WPF, frame buffer, PlayTest) CreateInstance returns false. The provider
+is live: IsAvailable turns false when the window's renderer is gone (Reason
+says why), and on Wayland, whose renderer is created for the first frame, it
+may be false until then. The device belongs to the head: never destroy,
+release or wait idle on these handles, and submit to the queue only inside a
+BeginFrame() scope.
 
 PER-HEAD CONFIGURATION
 ----------------------
@@ -865,10 +923,13 @@ builder. Builder calls are chainable and return the builder.
     }
     public enum X11RenderingBackend
     {
-        Default,   // try OpenGL, fall back to software
-        OpenGL,    // OpenGL via GLX, fall back to software
-        OpenGLES,  // OpenGL ES via EGL, fall back to software
-        Software,  // software rendering only
+        Default  = 0,  // try OpenGL, fall back to software (Vulkan first when
+                       // UseDirectGpuRenderingMode() is on)
+        Vulkan   = 1,  // Vulkan (VK_KHR_xlib_surface), falling back to OpenGL
+                       // (GLX, else OpenGL ES) and then software
+        OpenGL   = 2,  // OpenGL via GLX, fall back to software
+        OpenGLES = 3,  // OpenGL ES via EGL, fall back to software
+        Software = 4,  // software rendering only
     }
 
     Example:
@@ -877,10 +938,18 @@ builder. Builder calls are chainable and return the builder.
             .RenderFrameRate(30))
 
     Feature flags (set before Build()): FeatureConfiguration.Rendering.
-    UseOpenGLOnX11 (bool?; null = OpenGL if available) and PreferGLESOverGLOnX11
-    (bool). A Vulkan renderer exists in the repository but is NOT a supported
-    configuration: the enum has no Vulkan member and package consumers cannot
-    select it.
+    UseVulkanOnX11 (bool?; true = Vulkan first, false = never Vulkan, null =
+    Vulkan first only under UseDirectGpuRenderingMode() with no other renderer
+    choice), UseOpenGLOnX11 (bool?; null = OpenGL if available) and
+    PreferGLESOverGLOnX11 (bool). The builder's RenderingBackend (other than
+    Default) takes precedence over all three.
+
+    UseDirectGpuRenderingMode() and X11: when the latch is on and the app made
+    no X11 renderer choice (no RenderingBackend other than Default,
+    UseVulkanOnX11 and UseOpenGLOnX11 null, PreferGLESOverGLOnX11 false), the
+    head tries Vulkan first and, if Vulkan cannot be created, logs one warning
+    and continues with its normal OpenGL/software chain. With the latch off the
+    selection is unchanged (OpenGL by default).
 
     The host type is X11ApplicationHost (namespace
     CodeBrix.Platform.WinUI.Runtime.Skia.X11); it implements IDisposable.
@@ -1201,7 +1270,7 @@ nested classes; the ones an app author is most likely to need:
                                         contract asks for font isolation)
     bool IgnoreTextScaleFactor; float? MaximumTextScaleFactor
   Rendering
-    bool? UseOpenGLOnWin32; bool? UseOpenGLOnX11; bool PreferGLESOverGLOnX11
+    bool? UseOpenGLOnWin32; bool? UseVulkanOnX11; bool? UseOpenGLOnX11; bool PreferGLESOverGLOnX11
     bool? UseVulkanOnWayland; bool ForceVulkanOnWayland; bool? UseOpenGLOnWayland
     bool? UseMetalOnMacOS
     bool EnableVisualSubtreeSkippingOptimization (+ ...CleanFramesThreshold,
@@ -1969,8 +2038,9 @@ macOS:
 LINUX (X11):
   - The broad-compatibility desktop Linux head: runs on X11 desktops and on
     Wayland desktops via XWayland. Activates only when DISPLAY is set.
-  - Renders with OpenGL (GLX) by default, OpenGL ES (EGL) on request, and falls
-    back to software; choose with X11HostBuilder.RenderingBackend.
+  - Renders with OpenGL (GLX) by default, Vulkan or OpenGL ES (EGL) on request,
+    and falls back to software; choose with X11HostBuilder.RenderingBackend
+    (UseDirectGpuRenderingMode() prefers Vulkan when no choice was made).
   - On some Linux ARM64 systems (e.g. Raspberry Pi), the native SkiaSharp library
     may fail to auto-load FreeType, throwing an "undefined symbol" error at
     startup. If you hit this, preload FreeType when launching, e.g.:
@@ -2281,8 +2351,8 @@ PERFORMANCE TIPS
 ================
   - PICK THE RENDER BACKEND DELIBERATELY. Defaults per head: Win32 OpenGL
     (else software); WPF OpenGL - but set Software (airspace); X11 OpenGL/GLX
-    (else software; OpenGL ES via PreferGLESOverGLOnX11 or
-    X11RenderingBackend.OpenGLES); Wayland Vulkan (else software; OpenGL ES is a
+    (else software; Vulkan via X11RenderingBackend.Vulkan, OpenGL ES via
+    PreferGLESOverGLOnX11 or X11RenderingBackend.OpenGLES); Wayland Vulkan (else software; OpenGL ES is a
     peer path); FrameBuffer DRM/GBM OpenGL ES (else software on /dev/fb0);
     macOS Metal (else software). GPU paths win for large windows and animation;
     software Skia is perfectly adequate for form-style UIs and is the ONLY
@@ -2297,6 +2367,10 @@ PERFORMANCE TIPS
     cannot starve keyboard and pointer input.
   - SKXamlCanvas-HEAVY APPS (Graphics2DSK): try UseDirectSkiaCanvasMode() -
     one fewer full-frame copy per paint. Experimental; measure.
+  - GPU-CONTENT ADD-INS: try UseDirectGpuRenderingMode() - add-ins that support
+    it (the WebGpu add-in's WebGpuRenderView) composite on the head's
+    Vulkan/Metal device instead of reading every frame back to the processor.
+    Experimental; measure.
   - LET THE FRAMEWORK SKIP CLEAN SUBTREES:
     FeatureConfiguration.Rendering.EnableVisualSubtreeSkippingOptimization (and
     its two thresholds) avoids re-rendering subtrees that have not changed.
@@ -2407,9 +2481,6 @@ WHAT THIS PACKAGE DOES NOT DO
     framework: the separate CodeBrix.Android package family hosts a CodeBrix.Platform
     application's XAML and code on Android, and an Android head never references
     the packages in this repository.
-  - No Vulkan on X11 for consumers: the renderer is in the repository behind an
-    internal-only flag with no public API; X11RenderingBackend has no Vulkan
-    member.
   - The optional capabilities (2D/3D canvases, Lottie, SVG, media/audio
     playback, web view, editor, terminal, charts, flex layout, settings store)
     are NOT in these nine packages; they are separate add-in packages (see the
@@ -2550,6 +2621,7 @@ application does):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlotterViewDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/TerminalViewDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/VideoPlayerDemo
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebGpuDemo
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebViewDemo
         one demo per add-in (six heads each); their AGENT-READMEs describe them
 
@@ -2602,11 +2674,13 @@ ADD-INS (all in .Core; each has its own AGENT-README):
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView/
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout/
     CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia/  (+ CodeBrix.VideoPlayback)
+    CodeBrix.Platform.WebGpu.ApacheLicenseForever            src/AddIns/Platform.UI.WebGpu/            (+ CodeBrix.WebGpu.Skia)
     CodeBrix.Platform.WebView.ApacheLicenseForever           src/AddIns/Platform.UI.WebView.Skia/
 
 PLAYTEST TEST HEAD (in a .PlayTests test project only; each has its own AGENT-README):
     CodeBrix.Platform.PlayTest.ApacheLicenseForever          src/Platform.UI.Runtime.Skia.PlayTest/
     CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever   src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/  (beside PlayTest)
+    CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever   src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/  (beside PlayTest)
 
 TOOLKITS FOR MICROSOFT'S OWN FRAMEWORKS (not for CodeBrix.Platform apps):
     CodeBrix.Platform.WinUI.ApacheLicenseForever, .WinUI.Skia..., .WinUI.Lottie...   src-platforms/Platform.WinUI/
@@ -2621,7 +2695,7 @@ Per-head knobs:
     Win32:   Win32HostBuilder.PreloadMediaPlayer(bool); Win32Host.RenderSurfaceType? {Software, OpenGL}
     WPF:     .WpfApplication(Func<Application>), .DispatcherScheduling(RenderFirst|InputFair);
              WpfHost.RenderSurfaceType? {Software, OpenGL}, IgnorePixelScaling
-    X11:     .RenderingBackend(Default|OpenGL|OpenGLES|Software), .RenderFrameRate(int), .PreloadMediaPlayer(bool)
+    X11:     .RenderingBackend(Default|Vulkan|OpenGL|OpenGLES|Software), .RenderFrameRate(int), .PreloadMediaPlayer(bool)
     Wayland: .RenderingBackend(Default|Vulkan|OpenGLES|Software|VulkanForced), .RenderFrameRate(int)
              env: CODEBRIX_WAYLAND_NO_GPU=1, CODEBRIX_WAYLAND_USE_EGL=1 (code beats env)
     FB:      .UseKMSDRM(...)/.DisableKMSDRM(), .ScaleUserInterface(Percent100|150|200),
@@ -2634,7 +2708,7 @@ Per-head knobs:
              env: FRAMEBUFFER, CODEBRIX_FRAMEBUFFER_USE_DRM, CODEBRIX_DISPLAY_SCALE_OVERRIDE,
                   CODEBRIX_FRAMEBUFFER_ORIENTATION_SOURCE
     macOS:   .UseSystemAppName(string), .UseSystemMenuBar(bool); MacSkiaHost.RenderSurfaceType {Auto, Metal, Software}
-    All:     .AfterInit(Action), .UseDirectSkiaCanvasMode() (experimental)
+    All:     .AfterInit(Action), .UseDirectSkiaCanvasMode(), .UseDirectGpuRenderingMode() (both experimental)
 
 Framework-wide:   CodeBrix.Platform.UI.FeatureConfiguration.{Font, Rendering, TextBox, ScrollViewer, Popup, ...}
 Fonts:            FeatureConfiguration.Font.DefaultTextFontFamily = "ms-appx:///<Pkg>/Fonts/<file>.ttf";

@@ -76,6 +76,11 @@ public partial class X11ApplicationHost : SkiaHost, ISkiaApplicationHost, IDispo
 
 		ApiExtensibility.Register<XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeOpenGLWrapper), xamlRoot => new X11NativeOpenGLWrapper(xamlRoot));
 
+		// The window's Vulkan device for add-ins that adopt it (DirectGpuRenderingMode). The builder answers null - no
+		// provider - unless the window renders with the Vulkan renderer.
+		ApiExtensibility.Register<XamlRoot>(typeof(CodeBrix.Platform.Graphics.INativeGpuDeviceProvider),
+			xamlRoot => (XamlRootMap.GetHostForRoot(xamlRoot) as X11XamlRootHost)?.CreateNativeGpuDeviceProvider()!);
+
 		ApiExtensibility.Register(typeof(ISystemThemeHelperExtension), _ => LinuxSystemThemeHelper.Instance);
 
 		if (Type.GetType("CodeBrix.Platform.UI.MediaPlayer.Skia.X11.X11MediaPlayerPresenterExtension, CodeBrix.Platform.UI.MediaPlayer.Skia.X11") is { } mediaPresenterExtensionType

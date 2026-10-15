@@ -18,6 +18,7 @@ using SkiaSharp;
 using CodeBrix.Platform.Extensions.Disposables;
 using CodeBrix.Platform.UI;
 using CodeBrix.Platform.UI.Runtime.Skia;
+using CodeBrix.Platform.UI.Runtime.Skia.Vulkan;
 using CodeBrix.Platform.UI.Xaml.Controls;
 
 namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11; //Was previously: Uno.WinUI.Runtime.Skia.X11
@@ -88,6 +89,14 @@ internal partial class X11XamlRootHost : IXamlRootHost
 	private X11Window? _x11Window;
 	private X11Window? _x11TopWindow;
 	private X11Renderer? _renderer;
+
+	// The renderer this window was created with (Vulkan, OpenGL, OpenGL ES or software); set once in the
+	// constructor. The native GPU device provider reads it to decide whether the head has a Vulkan device.
+	internal X11Renderer? Renderer => _renderer;
+
+	// The INativeGpuDeviceProvider builder's answer for this window: a provider when it renders with the Vulkan
+	// renderer, else null (no provider). The renderer is chosen once, in the constructor.
+	internal object? CreateNativeGpuDeviceProvider() => VulkanNativeGpuDeviceProvider.For(_renderer);
 
 	private static readonly Stopwatch _stopwatch = Stopwatch.StartNew();
 
@@ -392,7 +401,9 @@ internal partial class X11XamlRootHost : IXamlRootHost
 		IntPtr rootXWindow = XLib.XRootWindow(display, screen);
 		_x11Window = CreateSoftwareRenderWindow(display, screen, size, rootXWindow);
 		var topWindowDisplay = XLib.XOpenDisplay(IntPtr.Zero);
-		if (FeatureConfiguration.Rendering.UseVulkanOnX11)
+		// Vulkan first only when selected (X11RenderingBackend.Vulkan / UseVulkanOnX11) or, with no explicit
+		// renderer choice, when the app opted into DirectGpuRenderingMode; otherwise the chain below is unchanged.
+		if (X11RendererSelection.ShouldTryVulkan())
 		{
 			try
 			{
@@ -401,7 +412,10 @@ internal partial class X11XamlRootHost : IXamlRootHost
 			}
 			catch (Exception e)
 			{
-				this.Log().Info($"Vulkan rendering not available: {e.Message}. Falling back to OpenGL.");
+				if (this.Log().IsEnabled(LogLevel.Warning))
+				{
+					this.Log().Warn($"Vulkan rendering ({X11RendererSelection.VulkanReason()}) not available: {e.Message}. Falling back to the OpenGL/software renderers.");
+				}
 				if (_x11TopWindow is not null)
 				{
 					_ = XLib.XDestroyWindow(_x11TopWindow.Value.Display, _x11TopWindow.Value.Window);

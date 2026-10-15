@@ -42,6 +42,7 @@
 		<ProjectReference Include="..\AddIns\Platform.UI.AudioPlayer.Skia\Platform.UI.AudioPlayer.Core.csproj" />
 		<ProjectReference Include="..\AddIns\Platform.WinUI.Graphics3DGL\Platform.WinUI.Graphics3DGL.Core.csproj" />
 		<ProjectReference Include="..\AddIns\Platform.UI.VideoPlayer.Skia\Platform.UI.VideoPlayer.Core.csproj" />
+		<ProjectReference Include="..\AddIns\Platform.UI.WebGpu\Platform.UI.WebGpu.Core.csproj" />
 	</ItemGroup>
 
 	<!-- The Skia-canvas add-ins' Core assemblies (plan rule R7: they reference SkiaSharp, but no Skia assembly of the
@@ -91,7 +92,7 @@
 		</AssemblyAttribute>
 	</ItemGroup>
 
-	<!-- Phase D (G6, WPD D2): EVERY Core assembly the family produces - the framework's twelve and the add-ins' fourteen -
+	<!-- Phase D (G6, WPD D2): EVERY Core assembly the family produces - the framework's twelve and the add-ins' fifteen -
 	     is read by CoreAssemblyReferenceTests from the path below ("Core" = must be Skia-free; "R7" = a Skia-canvas add-in
 	     Core, which may reference SkiaSharp/HarfBuzzSharp). The five Cores not already in this graph are built first but
 	     NOT referenced, like the R7 Cores above, so the graph and the loaded-assembly assertions are unchanged. -->
@@ -173,6 +174,10 @@
 		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
 			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.VideoPlayer.Core</_Parameter1>
 			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.VideoPlayer.Skia/bin/Platform.UI.VideoPlayer.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.VideoPlayer.Core.dll</_Parameter2>
+		</AssemblyAttribute>
+		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+			<_Parameter1>CoreAssembly:CodeBrix.Platform.UI.WebGpu.Core</_Parameter1>
+			<_Parameter2>Core|$(MSBuildThisFileDirectory)../AddIns/Platform.UI.WebGpu/bin/Platform.UI.WebGpu.Core/$(Configuration)/net10.0/CodeBrix.Platform.UI.WebGpu.Core.dll</_Parameter2>
 		</AssemblyAttribute>
 		<AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
 			<_Parameter1>CoreAssembly:CodeBrix.Platform.SkiaSharp.Views.Core</_Parameter1>

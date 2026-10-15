@@ -38,6 +38,7 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 	private bool _initializationCompleted;
 	private string? _lastSvgClipPath;
 	private Size _nativeWindowSize;
+	private volatile bool _isClosed;
 
 	public MacOSWindowHost(MacOSWindowNative nativeWindow, Window winUIWindow, XamlRoot xamlRoot)
 	{
@@ -223,6 +224,30 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 		NativeCodeBrix.codebrix_window_get_metal_handles(_nativeWindow.Handle, out device, out _);
 		return device != 0;
 	}
+
+	/// <summary>
+	/// The window's Metal device and the command queue its compositor <see cref="GrContext"/> submits on, or
+	/// <see langword="false"/> when the head is not in Metal mode or the window has closed. Neither handle is owned
+	/// by the caller. Used by <see cref="MacOSNativeGpuDeviceProvider"/> for add-ins that adopt the window's device.
+	/// </summary>
+	internal bool TryGetMetalHandles(out nint device, out nint queue)
+	{
+		device = 0;
+		queue = 0;
+		if (_isClosed || _context is null || MacSkiaHost.Current.RenderSurfaceType != RenderSurfaceType.Metal)
+		{
+			return false;
+		}
+
+		NativeCodeBrix.codebrix_window_get_metal_handles(_nativeWindow.Handle, out device, out queue);
+		return device != 0 && queue != 0;
+	}
+
+	/// <summary>The window's compositor Skia context (Metal mode), or null in software mode / after close.</summary>
+	internal GRContext? GrContext => _isClosed ? null : _context;
+
+	/// <summary>True once the native window has closed.</summary>
+	internal bool IsClosed => _isClosed;
 
 	void IXamlRootHost.InvalidateRender() => NativeCodeBrix.codebrix_window_invalidate(_nativeWindow.Handle);
 
@@ -636,6 +661,7 @@ internal class MacOSWindowHost : IXamlRootHost, ICodeBrixKeyboardInputSource, IC
 			if (window is not null)
 			{
 				Unregister(handle);
+				window._isClosed = true;
 				window._nativeWindow.Destroyed();
 				window.Closed?.Invoke(window, EventArgs.Empty);
 			}

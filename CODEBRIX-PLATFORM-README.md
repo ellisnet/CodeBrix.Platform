@@ -219,7 +219,7 @@ The platform head package for hosting CodeBrix.Platform content inside a WPF des
 NuGet Package ID: `CodeBrix.Platform.Runtime.Skia.X11.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
-The broad-compatibility platform head package for desktop Linux: it runs on X11 desktops and also on Wayland desktops through XWayland (the X11 compatibility layer). A Linux head project references this package and bootstraps with `.UseLinuxX11()`. Ship this head for maximum desktop-Linux reach — alone, or alongside a native Wayland head.
+The broad-compatibility platform head package for desktop Linux: it runs on X11 desktops and also on Wayland desktops through XWayland (the X11 compatibility layer). A Linux head project references this package and bootstraps with `.UseLinuxX11()`. Ship this head for maximum desktop-Linux reach — alone, or alongside a native Wayland head. Rendering is GPU-accelerated OpenGL (GLX) by default, falling back automatically to software rendering; Vulkan and OpenGL ES (EGL) renderers, and a software-only mode, can be selected in code (`RenderingBackend(...)` on the head builder). An application that opts into the experimental `UseDirectGpuRenderingMode()` (which lets GPU-content add-ins composite directly on the head's GPU device) and makes no renderer choice of its own gets the Vulkan renderer first, with the same automatic fallback.
 
 ---
 
@@ -263,6 +263,14 @@ The OpenGL provider for the PlayTest head, for applications that use the Graphic
 
 ---
 
+**CodeBrix.Platform.PlayTest.WebGpu**
+NuGet Package ID: `CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+The WebGPU provider for the PlayTest head, for applications that use the WebGpu add-in. A test project references it beside the PlayTest package and calls `CodeBrixPlayTestWebGpu.Register()`; the launch then proves that a WebGPU adapter and device exist on the machine (the add-in's own device route: Vulkan on Linux, Direct3D 12 or Vulkan on Windows, Metal on macOS), and every `WebGpuRenderView` creates its own device and renders through its read-back path, so its pixels appear in screenshots. A machine that cannot create a device fails the launch with the engine's reason; `PlayTestOptions.WebGpu = PlayTestWebGpu.Unavailable` launches without WebGPU to test an application's fallback. WebGPU content is asserted with the PlayTest head's in-run `PixelStats` measurements, never against saved images.
+
+---
+
 **CodeBrix.Platform.WebView**
 NuGet Package ID: `CodeBrix.Platform.WebView.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
@@ -292,6 +300,14 @@ NuGet Package ID: `CodeBrix.Platform.VideoPlayer.ApacheLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
 
 An optional add-on package providing video playback with a single reference in the application's core library and no native setup at all — like the AudioPlayer add-on, and unlike the WebView and MediaPlayer add-ons, there is no per-OS engine and nothing to install, so the package is live on all six platform heads, macOS included. It provides one XAML-declarable element, `VideoPlayer`, that plays AV1 video from WebM and Matroska containers and from CodeBrix `.cbv` video files, with Ogg Vorbis or Opus sound. Its transport surface is a superset of the AudioPlayer element's — the same `Play`/`Pause`/`Stop`/`Seek` with bindable `Source`, `Volume`, `IsLooping`, `Duration` and a two-way debounced `Position`, plus `IsMuted` — so one scrubber markup drives either kind of player. On top of that it adds what video needs: `Stretch` letterboxing (`None`/`Fill`/`Uniform`/`UniformToFill`), an ordered colour-grading effect chain composed into a single lookup per pixel, drawable layers and a `Composing` hook for subtitles, overlays or a webcam picture-in-picture, captions and chapters carried as data, a `SourceMode` for streaming, memory-mapping or preloading a file, and `CapturePresentedFrame()` for a screenshot of what is on screen. The picture is composed on the graphics device wherever the running head can supply one — the package depends on `CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever` for that, so an application needs no GPU wiring of its own — and on the processor everywhere else, with `RenderPath` stating the intent and `ActiveRenderPath` reporting what actually runs. AV1 decoding is BSD-2-Clause and Opus is BSD-3-Clause, so neither is a dependency of this Apache-2.0 package: an application references `CodeBrix.VideoPlayback.Dav1d.BsdLicenseForever` and, for Opus sound, `CodeBrix.Audio.Opus.BsdLicenseForever`, and registers them at start-up. The code for this package is original to CodeBrix, with playback delivered through the fully managed `CodeBrix.VideoPlayback.MitLicenseForever` package (see Section 5.3) — the engine only, never its `CodeBrix.VideoPlayback.Skia` companion, which is the presenter for hosts outside this family and pins its own SkiaSharp: the composing presenter and its colour shader are this add-on's own internal code, compiled against the family's single SkiaSharp pin, so an application never carries two.
+
+---
+
+**CodeBrix.Platform.WebGpu**
+NuGet Package ID: `CodeBrix.Platform.WebGpu.ApacheLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.Platform](https://github.com/ellisnet/CodeBrix.Platform)
+
+An optional add-on package providing WebGPU rendering in a page with a single reference in the application's core library and no native setup — the WebGPU engine's native library for every platform arrives with the package's dependencies, so it is live on all six platform heads, macOS included. It provides one XAML-declarable element, `WebGpuRenderView`, which owns its WebGPU device and hands the application a frame to record into: a command encoder and a texture the size of the element, already cleared to its `ClearColor`. Frames are driven three ways through one frame protocol (`BeginFrame`/`EndFrame`, callable from any one thread at a time): `Continuous` at a `TargetFrameRate` (latest wins, never a backlog), `OnDemand` once per `Invalidate()`, or `Manual`, where the application — or its own render thread — opens frames itself. Rendering code lives in the view's events (`DeviceReady`, `Render`, `DeviceLost`, `RenderPathChanged`) or in an `IWebGpuRenderer` class, and a SkiaSharp `Overlay` draws HUDs and labels over every frame. By default the finished frame is read back once and drawn through the head's own canvas (the `Readback` render path), so the view clips, overlaps and transforms like any other XAML content; an application that opts in to direct GPU rendering gets a direct path where the head offers one. The view is also an `IWebGpuDeviceSource` and an `IWebGpuTextureTarget` — the sharing contracts of the CodeBrix.WebGpu packages — so another WebGPU library (such as `CodeBrix.WebGpu.Graphics`, which an application adds itself) renders into it directly, and it hands itself to native (Rust, C, C++) modules as a C struct with frame functions they can call from their own thread. The code for this package is original to CodeBrix; the WebGPU API is the raw `CodeBrix.WebGpu.Native.MitLicenseForever` binding, brought in through `CodeBrix.WebGpu.Skia.MitLicenseForever`. The same `WebGpuRenderView`, in the same namespace and with the same API, exists for Android in the CodeBrix.Android family (`CodeBrix.Android.WebGpu.ApacheLicenseForever`), so pages and renderers move between the two unchanged.
 
 ---
 
@@ -600,6 +616,30 @@ NuGet Package ID: `CodeBrix.VideoProcessing.MitLicenseForever`
 Source: [github.com/ellisnet/CodeBrix.VideoProcessing](https://github.com/ellisnet/CodeBrix.VideoProcessing)
 
 A fully managed, cross-platform FFmpeg/FFprobe wrapper that launches the external `ffmpeg`/`ffprobe` executables and parses their output — it is a wrapper, not a codec, and bundles no binaries. It provides media analysis (durations, streams, codecs, resolutions, bitrates), a fluent builder for converting, transcoding, and muxing video and audio, snapshot and GIF extraction, raw-frame and byte-stream piping in and out of FFmpeg, and a bridge between video frames and in-memory images via CodeBrix.Imaging. Progress and log callbacks plus a graceful cancellation model are included. The `ffmpeg` and `ffprobe` executables must be installed and on the PATH (or configured explicitly) at run time.
+
+---
+
+**CodeBrix.WebGpu.Native**
+NuGet Package ID: `CodeBrix.WebGpu.Native.MitLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.WebGpu](https://github.com/ellisnet/CodeBrix.WebGpu)
+
+Thin, generated .NET bindings over a native WebGPU implementation (the wgpu engine) that ships inside the package for every supported platform: every C function of the WebGPU API and of the engine's native extensions as a blittable `LibraryImport` on one `WebGpu` class, every C struct with its exact memory layout, and callbacks as `delegate* unmanaged` function pointers with no hidden allocations. It runs on each platform's own GPU API — Vulkan on Linux and Android, Direct3D 12 and Vulkan on Windows, Metal on macOS. Beyond the API it carries the pieces for sharing one GPU device: native-device access (the Vulkan, Direct3D 12 or Metal objects behind a WebGPU device or texture, and adopting an existing native device), the `IWebGpuDeviceSource` and `IWebGpuTextureTarget` sharing contracts that let two libraries use one device and one texture without referencing each other, and the versioned device and per-frame hand-off structs (with C headers and a function table) for native modules written in Rust, C or C++. It is the API the CodeBrix.Platform WebGpu add-in (Section 5.1) hands its frames out in, and it reaches an application through `CodeBrix.WebGpu.Skia`.
+
+---
+
+**CodeBrix.WebGpu.Skia**
+NuGet Package ID: `CodeBrix.WebGpu.Skia.MitLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.WebGpu](https://github.com/ellisnet/CodeBrix.WebGpu)
+
+WebGPU rendering into SkiaSharp surfaces: given an `SKSurface`, an `SKCanvas`, a `GRContext` or nothing at all, it draws WebGPU into it the fastest way the inputs allow — with no copy when the surface lives on the same GPU device, one GPU-side draw when it is on the device but cannot be shared, and a processor read-back otherwise — and reports which way it took; it also renders headless, to an `SKImage`, an `SKBitmap` or bytes. It creates a WebGPU device of its own or adopts the Vulkan or Metal device behind an application's Skia context. The CodeBrix.Platform WebGpu add-in (Section 5.1) is built on it — its device, its off-screen targets and its device adoption — and brings it, with `CodeBrix.WebGpu.Native`, to the application as a package dependency.
+
+---
+
+**CodeBrix.WebGpu.Graphics**
+NuGet Package ID: `CodeBrix.WebGpu.Graphics.MitLicenseForever`
+Source: [github.com/ellisnet/CodeBrix.WebGpu](https://github.com/ellisnet/CodeBrix.WebGpu)
+
+A small, friendly graphics layer over WebGPU that needs no raw binding calls: one `GraphicsContext` that owns or shares the device, typed buffers and textures, WGSL shaders with readable compile errors, pipeline builders that derive vertex layouts from structs, a batched 2D sprite and shape renderer, a lit 3D mesh renderer, glTF 2.0 models with physically based shading, skinning, morph targets and animation, and image-based lighting with a skybox and tone mapping. It depends on `CodeBrix.WebGpu.Native`, `CodeBrix.Imaging` and `CodeBrix.Graphics3D.Gltf2`. It is never a dependency of the CodeBrix.Platform WebGpu add-in: an application that wants it references it itself, and it renders straight into a `WebGpuRenderView` through the sharing contracts (`GraphicsContext.Wrap(view)` and `BeginFrame(view)`), as the WebGpuDemo sample's Models page shows.
 
 ---
 

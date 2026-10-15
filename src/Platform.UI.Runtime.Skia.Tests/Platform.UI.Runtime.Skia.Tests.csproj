@@ -32,6 +32,8 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Platform.UI.Runtime.Skia\Platform.UI.Runtime.Skia.csproj" />
 		<ProjectReference Include="..\Platform.UI.Runtime.Skia.X11\Platform.UI.Runtime.Skia.X11.csproj" />
+		<!-- The Wayland head's renderer selection and native GPU device provider rule (host-free, no compositor). -->
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.Wayland\Platform.UI.Runtime.Skia.Wayland.csproj" />
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
 

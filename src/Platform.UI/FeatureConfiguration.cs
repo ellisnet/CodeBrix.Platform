@@ -984,16 +984,16 @@ namespace CodeBrix.Platform.UI //Was previously: Uno.UI
 		public static class Rendering
 		{
 			/// <summary>
-			/// Determines if Vulkan rendering should be enabled on the X11 target.
-			/// When true, attempts to use Vulkan for hardware-accelerated rendering. Falls back to
-			/// OpenGL (or software rendering) if Vulkan is unavailable.
+			/// Determines if Vulkan rendering should be enabled on the X11 target. When true, Vulkan is
+			/// attempted first, falling back to the OpenGL chain (<see cref="UseOpenGLOnX11"/>,
+			/// <see cref="PreferGLESOverGLOnX11"/>) and then to software rendering if Vulkan is
+			/// unavailable. When false, Vulkan is never used. If null (the default), Vulkan is used only
+			/// when <c>CodeBrix.Platform.UI.Hosting.DirectGpuRenderingMode</c> is enabled AND the
+			/// application made no other X11 renderer choice (<see cref="UseOpenGLOnX11"/> is null and
+			/// <see cref="PreferGLESOverGLOnX11"/> is false); otherwise the X11 default (OpenGL, else
+			/// software) applies unchanged. Normally set via <c>X11RenderingBackend.Vulkan</c>.
 			/// </summary>
-			/// <remarks>
-			/// Intentionally internal for now: the Vulkan renderer is present in the repo but not yet
-			/// offered to consumers of the CodeBrix.Platform packages. Make this public (and expose a
-			/// host-builder API) when Vulkan rendering is officially offered.
-			/// </remarks>
-			internal static bool UseVulkanOnX11 { get; set; }
+			public static bool? UseVulkanOnX11 { get; set; }
 
 			/// <summary>
 			/// Determines if OpenGL rendering should be enabled on the X11 target. If null, defaults to

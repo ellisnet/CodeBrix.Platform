@@ -104,6 +104,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.TerminalView.ApacheLicenseForever` | Terminal emulator view (`TerminalControl` element rendering a CodeBrix.Terminal engine: VT100 / VT220 / xterm escape sequences, 256-color ANSI attributes, scrollback, selection, clipboard copy and paste) — transport-agnostic, for SSH clients, embedded consoles and build-output panes |
 | `CodeBrix.Platform.TextLayout.ApacheLicenseForever` | Shaped, bidirectional text layout without XAML — measurement, caret and hit-test geometry, selection rectangles, glyph outlines, drawing to any `SKCanvas` |
 | `CodeBrix.Platform.VideoPlayer.ApacheLicenseForever` | Video playback (`VideoPlayer` element: AV1 in WebM, Matroska and CodeBrix `.cbv` files, with the AudioPlayer transport surface plus muting, `Stretch` letterboxing, a colour-grading effect chain, drawable layers, and captions and chapters as data) — composed on the GPU wherever a head can supply a context, on the processor everywhere else, with the framework's own SkiaSharp and no second copy; AV1 and Opus decoding arrive as separate packages the application registers |
+| `CodeBrix.Platform.WebGpu.ApacheLicenseForever` | WebGPU rendering in a page (`WebGpuRenderView` element: Continuous, OnDemand and Manual frame drivers over one `BeginFrame`/`EndFrame` protocol callable from any thread, an `IWebGpuRenderer` class or events, a SkiaSharp overlay for HUDs, and the device shared with other WebGPU libraries and native modules) — composited like any other XAML content on every head, with a direct GPU path where the head offers one to applications that opt in |
 | `CodeBrix.Platform.WebView.ApacheLicenseForever` | WebView on every head (adds Linux support via the system WPE WebKit engine) |
 | `CodeBrix.Platform.Runtime.Skia.Win32.ApacheLicenseForever` | Windows (Win32) host |
 | `CodeBrix.Platform.Runtime.Skia.Wpf.ApacheLicenseForever` | Windows (WPF) host |
@@ -114,6 +115,7 @@ A CodeBrix.Platform solution has three kinds of projects:
 | `CodeBrix.Platform.Runtime.Skia.MacOS.ApacheLicenseForever` | macOS host |
 | `CodeBrix.Platform.PlayTest.ApacheLicenseForever` | Test head with a Playwright-style API: runs the real application on an offscreen Skia screen, live preview optional — for test projects only |
 | `CodeBrix.Platform.PlayTest.OpenGL.ApacheLicenseForever` | Real OpenGL contexts for PlayTests of applications that use the Graphics3DGL add-in (surfaceless EGL on Linux, WGL on Windows, ANGLE on macOS) — for test projects only, beside the PlayTest package |
+| `CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever` | Real WebGPU devices for PlayTests of applications that use the WebGpu add-in (Vulkan on Linux, Direct3D 12 or Vulkan on Windows, Metal on macOS) — for test projects only, beside the PlayTest package |
 
 The framework and add-in packages are referenced by the `.Core` library; each
 head project references exactly one of the `Runtime.Skia.*` host packages.

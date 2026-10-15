@@ -38,8 +38,10 @@ namespace CodeBrix.Platform.UI.VideoPlayer.Skia.Internal;
 /// scopes are no-ops on Metal).</item>
 /// <item>Frame notifications arrive on the decode thread and are coalesced to a single queued tick,
 /// latest wins, so a slow user-interface thread never accumulates a backlog.</item>
-/// <item>One readback per frame into two alternating BGRA bitmaps, wrapped zero-copy and presented;
-/// the previous wrapper is disposed by the surface element under its own gate.</item>
+/// <item>One readback per frame into a reference-counted BGRA buffer no picture is still using
+/// (<see cref="VideoFrameReadback"/>), wrapped zero-copy and presented; the previous wrapper is
+/// disposed by the surface element under its own gate, and its buffer is freed or reused only once
+/// Skia - including a recorded window frame replayed later - has let go of it.</item>
 /// <item>A paused present is available so a seek reaches the screen with playback stopped - and,
 /// when there is nothing to decode, it rebuilds the picture from the frame already on screen, so a
 /// change to the effect chain or the layers reaches a paused screen too.</item>
@@ -66,11 +68,10 @@ internal sealed class VideoRenderDriver : IDisposable
 	private bool _gpuInitAttempted;
 	private bool _gpuAvailable;
 
-	// Double-buffered processor readback targets: one frame reads back into one bitmap while the
-	// surface element may still be blitting the wrapper over the other. Written on the UI thread.
-	private SKBitmap? _readbackA;
-	private SKBitmap? _readbackB;
-	private bool _writeToA = true;
+	// The processor readback targets. Reference-counted, not two alternating bitmaps: the heads may
+	// replay a recorded window frame (with an older picture in it) after later frames, a resize or a
+	// teardown, so a buffer is reused only once no picture draws it. Used on the UI thread.
+	private readonly VideoFrameReadback _readback = new();
 
 	private int _tickScheduled;
 
@@ -313,35 +314,16 @@ internal sealed class VideoRenderDriver : IDisposable
 		}
 	}
 
-	// UI thread (context current when the image is graphics-backed). Reads the frame back into the
-	// write-side bitmap, wraps it with no copy, and presents it.
+	// UI thread (context current when the image is graphics-backed). Reads the frame back into a
+	// buffer no picture is using, wraps it with no copy, and presents it.
 	private void ReadbackAndPresent(SKImage image)
 	{
-		var width = image.Width;
-		var height = image.Height;
-		if (width <= 0 || height <= 0)
+		if (image.Width <= 0 || image.Height <= 0)
 		{
 			return;
 		}
 
-		var info = new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
-		var target = _writeToA ? _readbackA : _readbackB;
-
-		if (target is null || target.Width != width || target.Height != height)
-		{
-			target?.Dispose();
-			target = new SKBitmap(info);
-			if (_writeToA)
-			{
-				_readbackA = target;
-			}
-			else
-			{
-				_readbackB = target;
-			}
-		}
-
-		if (!image.ReadPixels(info, target.GetPixels(), target.RowBytes, 0, 0))
+		if (_readback.Read(image) is not { } picture)
 		{
 			if (this.Log().IsEnabled(LogLevel.Warning))
 			{
@@ -350,9 +332,7 @@ internal sealed class VideoRenderDriver : IDisposable
 			return;
 		}
 
-		_writeToA = !_writeToA;
-
-		_surface.PresentFrame(SKImage.FromPixels(info, target.GetPixels(), target.RowBytes));
+		_surface.PresentFrame(picture);
 	}
 
 	// UI thread. Creates the backend-neutral off-screen graphics context once the element is loaded
@@ -520,9 +500,7 @@ internal sealed class VideoRenderDriver : IDisposable
 
 		ReleaseRenderResources();
 
-		_readbackA?.Dispose();
-		_readbackA = null;
-		_readbackB?.Dispose();
-		_readbackB = null;
+		// A buffer a recorded picture still draws is freed by that picture, not here.
+		_readback.Dispose();
 	}
 }

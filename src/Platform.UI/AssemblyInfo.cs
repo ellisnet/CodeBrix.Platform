@@ -29,6 +29,10 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.PlotterView.Tests")]
+// The WebGpu add-in's test suite: test doubles of the owned-GPU-device gate (Graphics/IOwnedGpuDeviceGate.cs).
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia.Tests")]
+// The PlayTest.WebGpu provider package's suite: hands the PlayTest head's gate to the view's gate evaluation.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.PlayTest.WebGpu.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.CommandBar")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.CommandBar.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.XamlHost")]
@@ -53,6 +57,9 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia")]
+// The WebGpu add-in (its Core and platform assembly): the owned-GPU-device gate (Graphics/IOwnedGpuDeviceGate.cs).
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Core")]
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia")]
 
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.HotDesign.Client")]
 
@@ -95,6 +102,8 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 
 // The host-free Core suite (src/Platform.UI.Core.Tests) registers test doubles for the platform contracts.
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Core.Tests")]
+// The PlayTest head's host-free suite drives the head's IOwnedGpuDeviceGate (Graphics/IOwnedGpuDeviceGate.cs).
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest.Tests")]
 
 // Element handler seam (WPH1, decisions D-P3 and the AP1-B cross-assembly rule): the CodeBrix.Android and CodeBrix.Mobile
 // counterparts (and their tests) of every Skia-side assembly granted above - the framework Skia twins and the add-ins'
@@ -168,6 +177,10 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Android.UI.FlexPanel.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.FlexPanel")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.FlexPanel.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.WebGpu")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.WebGpu.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebGpu")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebGpu.Tests")]
 
 [assembly: AssemblyMetadata("IsTrimmable", "True")]
 

@@ -544,8 +544,11 @@ public sealed class CommonSteps
 				await ScenarioFrames.CaptureAsync(_scenarioContext, SettlingFrameName).ConfigureAwait(false);
 				await ScenarioFrames.CaptureAsync(_scenarioContext, SettledFrameName).ConfigureAwait(false);
 
-				var before = await RegionAsync(name, SettlingFrameName).ConfigureAwait(false);
-				var after = await RegionAsync(name, SettledFrameName).ConfigureAwait(false);
+				// One measurement for both frames: measured twice, an element whose layout is still
+				// settling could change size in between, and two regions of different sizes cannot be
+				// compared at all (that threw instead of polling on).
+				var (after, before) = await ScenarioFrames.RegionPairAsync(_scenarioContext, name,
+					SettledFrameName, SettlingFrameName).ConfigureAwait(false);
 
 				return CanvasAssert.FractionDiffering(after, before) <= CanvasAssert.SameFraction;
 			},

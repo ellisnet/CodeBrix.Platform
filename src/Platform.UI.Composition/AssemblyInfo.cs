@@ -35,6 +35,9 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.SkiaSharp.Views.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.WinUI.Graphics3DGL.Core")]
+// The WebGpu add-in's render view owns its canvas visual (Compositor.GetSharedCompositor), as Graphics2DSK's
+// SKCanvasElement does.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia")]
 
 [assembly: InternalsVisibleTo("CodeBrix.PlatformIslandsSamplesApp")]
 [assembly: InternalsVisibleTo("CodeBrix.PlatformIslandsSamplesApp.Skia")]
@@ -131,6 +134,10 @@ using System.Runtime.InteropServices;
 [assembly: InternalsVisibleTo("CodeBrix.Android.UI.WebView.Tests")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebView")]
 [assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebView.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.WebGpu")]
+[assembly: InternalsVisibleTo("CodeBrix.Android.UI.WebGpu.Tests")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebGpu")]
+[assembly: InternalsVisibleTo("CodeBrix.Mobile.UI.WebGpu.Tests")]
 [assembly: System.Reflection.AssemblyMetadata("IsTrimmable", "True")]
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("CodeBrix.Platform.UI.Runtime.Skia.PlayTest")]

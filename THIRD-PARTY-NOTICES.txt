@@ -490,6 +490,24 @@ Asset files (non-source) carried in this repository, by origin:
     - Image / SVG test fixtures under src/Platform.UI.RuntimeTests/Assets/ and
       src/Platform.UI.Tests/ (PNG, SVG, Lottie JSON used by unit/runtime tests).
 
+  Sample-only assets (NOT shipped in any package):
+    - samples/CodeBrixPlatform/WebGpuDemo/src/WebGpuDemo.Core/Assets/models/ —
+      public-domain glTF models (CC0 1.0, Creative Commons Zero,
+      http://creativecommons.org/publicdomain/zero/1.0/), copied with their
+      licence files from the CodeBrix.WebGpu repository's WebGpuModelViewer
+      sample. Each pack's licence file sits beside its models:
+        cube-pets/ (animal-cat, animal-dog, animal-fox and the pack's colour
+          map) - "Cube Pets" by Kenney (www.kenney.nl),
+          LICENSE-Kenney-cube-pets.txt
+        survival-kit/ (chest and the pack's colour map) - "Survival Kit" by
+          Kenney (www.kenney.nl), LICENSE-Kenney-survival-kit.txt
+        crystals-and-avian/ (avian and the pack's colour map) - the Avian from
+          "Crystals and Avian" by Jeremy Ellis for the Hakunaverse project, made
+          in the style of the Kenney kits (not a Kenney product),
+          LICENSE-JeremyEllis-crystals-and-avian.txt
+      CC0 asks for no attribution; the credit is given anyway, as the packs
+      invite.
+
   Note: the Fluent symbol icon font that ships with applications is NOT carried
   as a file in this repository's source tree; it is provided to applications by
   a separate package and is therefore not part of this repository.
@@ -829,6 +847,117 @@ POSSIBILITY OF SUCH DAMAGE.
     from the AvalonEdit test suite. The definitions in the upstream
     ThirdParty-Highlightings folder are NOT included. Ships in the
     CodeBrix.Platform.AdvancedTextEdit.ApacheLicenseForever package.
+
+================================================================================
+ PART F — THE WEBGPU ENGINE BEHIND THE WEBGPU ADD-IN
+================================================================================
+
+25. CodeBrix.WebGpu (CodeBrix.WebGpu.Skia.MitLicenseForever and
+    CodeBrix.WebGpu.Native.MitLicenseForever) and the engine it ships
+    Project URL:  https://github.com/ellisnet/CodeBrix.WebGpu
+    License:      MIT (the CodeBrix.WebGpu packages); the engine's own licences
+                  follow, verbatim from the CodeBrix.WebGpu packages' notices
+
+    The WebGpu add-in (src/AddIns/Platform.UI.WebGpu/, package
+    CodeBrix.Platform.WebGpu.ApacheLicenseForever) is written for this
+    repository (Apache-2.0) and contains no third-party code. It references
+    CodeBrix.WebGpu.Skia.MitLicenseForever, which brings
+    CodeBrix.WebGpu.Native.MitLicenseForever, as ordinary NuGet package
+    dependencies: nothing from them is copied into this repository or into the
+    add-in's package, and their native WebGPU libraries reach an application
+    through NuGet, each beside its own complete licence file. Because every
+    application that uses the add-in runs that engine, its provenance and the
+    licences of its two upstream projects are recorded here as well. In the
+    words of the CodeBrix.WebGpu packages' own THIRD-PARTY-NOTICES.txt:
+
+      1. THE SHIPPED BINARIES. The CodeBrix.WebGpu.Native package's
+         runtimes/<rid>/native/ folders contain
+         libcodebrix_wgpu.so / libcodebrix_wgpu.dylib / codebrix_wgpu.dll. Each is
+         built from the codebrix-wgpu Rust crate in wgpu-native-tools/codebrix-wgpu/
+         (written for this repository, MIT), which links wgpu-native, which in turn
+         compiles in the wgpu engine crates and their dependencies from crates.io.
+         Beside every binary is LICENSE-WgpuNative.txt - composed from
+         wgpu-native-tools/licenses/ by wgpu-native-tools/licenses/
+         compose-license-wgpunative.sh - with the full licence text of wgpu-native,
+         of webgpu-headers and of EVERY crate compiled into the library, grouped by
+         licence. That file, identical on every runtime identifier, is the complete
+         notice for the binaries; it is not repeated here.
+
+      2. THE VENDORED SOURCE. wgpu-native-tools/wgpu-native/ is an unmodified copy
+         of the wgpu-native release (gfx-rs/wgpu-native, tag v29.0.1.1; "wgpu 29.0.3
+         via wgpu-native v29.0.1.1"), and wgpu-native-tools/wgpu-native/ffi/
+         webgpu-headers/ an unmodified copy of webgpu-native/webgpu-headers at the
+         commit that release pins (673658bc2bd70ec39fc55ebe6bb0173cf6d0a603). The
+         archives and their SHA-256 sums are in wgpu-native-tools/upstream-downloads/.
+         Build-time patches live in wgpu-native-tools/patches/ and are applied to a
+         scratch copy only; the vendored trees are never edited.
+
+    wgpu-native is offered under "MIT OR Apache-2.0"; this repository uses it under
+    the MIT License. webgpu-headers is BSD-3-Clause. Both are compatible with this
+    repository's MIT licence; their texts follow.
+
+    25.1 wgpu-native  (https://github.com/gfx-rs/wgpu-native, release v29.0.1.1)
+         License: MIT (chosen from "MIT OR Apache-2.0") - verbatim:
+
+    MIT License
+
+    Copyright (c) 2021 The gfx-rs developers
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+
+    25.2 webgpu-headers  (https://github.com/webgpu-native/webgpu-headers,
+         commit 673658bc2bd70ec39fc55ebe6bb0173cf6d0a603)
+         License: BSD-3-Clause - verbatim:
+
+    BSD 3-Clause License
+
+    Copyright (c) 2019, "WebGPU native" developers
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+    1. Redistributions of source code must retain the above copyright notice, this
+       list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright notice,
+       this list of conditions and the following disclaimer in the documentation
+       and/or other materials provided with the distribution.
+
+    3. Neither the name of the copyright holder nor the names of its
+       contributors may be used to endorse or promote products derived from
+       this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+    OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    The crates compiled into the native libraries, with their versions,
+    licences and licence texts, are listed in LICENSE-WgpuNative.txt beside
+    each native library in the CodeBrix.WebGpu.Native package.
 
 ================================================================================
 

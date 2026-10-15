@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<!--
+	CodeBrix.Platform.PlayTest.WebGpu: the WebGPU provider for the PlayTest head. It implements the head's public
+	provider seam (IPlayTestWebGpuProvider) with one provider for every operating system - the WebGpu add-in's own
+	device route (WebGpuSkiaDevice.Create: Vulkan on Linux, Direct3D 12 then Vulkan on Windows, Metal on macOS) - and
+	a test project switches it on with CodeBrixPlayTestWebGpu.Register(). It serves applications that use the WebGpu
+	add-in, so that add-in is its one package dependency (which also brings the WebGPU engine through
+	CodeBrix.WebGpu.Skia and CodeBrix.WebGpu.Native). The head itself never references this project.
+	-->
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.PlayTest.WebGpu</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<TargetFrameworks>$(NetSkiaPreviousAndCurrent)</TargetFrameworks>
+		<Nullable>enable</Nullable>
+		<Deterministic>true</Deterministic>
+		<!-- The launch-time check records one clear pass, which takes pointers to WebGPU descriptor structs. -->
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<Import Project="../targetframework-override-noplatform.props" />
+
+	<PropertyGroup>
+		<!-- Packed by build/CodeBrix.Platform.Build.csproj (the _CsprojPackage list) with the
+		     shared date-stamped version, so no GeneratePackageOnBuild here. -->
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
+		<!-- `dotnet pack` sets _IsPacking=true for every project of the graph, and the WebGpu add-in (a split Core/Skia
+		     add-in, ../AddIns/AddIn.CorePackaging.targets) then packs from its existing Release output with
+		     NoBuild=true - so a pack that BUILT this project would ask that reference to build and fail (NETSDK1085).
+		     This package therefore packs the same way, from the Release build that precedes the pack (the driver
+		     builds before it packs). -->
+		<NoBuild Condition="'$(_IsPacking)' == 'true'">true</NoBuild>
+		<Title>CodeBrix.Platform.PlayTest.WebGpu</Title>
+		<Description>Real WebGPU devices for PlayTest runs of applications that use the WebGpu add-in: the launch proves an adapter and device exist (Vulkan on Linux, Direct3D 12 or Vulkan on Windows, Metal on macOS), and WebGpuRenderView then renders through its read-back path, so its pixels appear in PlayTest screenshots.</Description>
+
+		<PackageId Condition="'$(CODEBRIX_UWP_BUILD)'!='true'">CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever</PackageId>
+
+		<RootNamespace>CodeBrix.Platform.PlayTest.WebGpu</RootNamespace>
+
+		<!-- The package ships its IntelliSense text; CS1591 is fixed at source, never suppressed. -->
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon-codebrix-128.png" Pack="true" PackagePath="\" Visible="false" />
+		<!-- Its own README.md and consumer guide, not the repository-wide ones. -->
+		<None Include="README.md" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="AGENT-README.txt" Pack="true" PackagePath="\" Visible="false" />
+		<None Include="..\..\THIRD-PARTY-NOTICES.txt" Pack="true" PackagePath="\" Visible="false" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Packs as the CodeBrix.Platform.WebGpu.ApacheLicenseForever dependency at the family version (the
+		     PlayTest.OpenGL package's precedent with Graphics3DGL). It brings CodeBrix.WebGpu.Skia, whose
+		     WebGpuSkiaDevice the launch probe creates, at the version the application under test also gets - so the
+		     probe proves exactly the device route the WebGpuRenderView elements then take. -->
+		<ProjectReference Include="..\AddIns\Platform.UI.WebGpu\Platform.UI.WebGpu.Skia.csproj" />
+		<!-- The provider seam lives in the PlayTest head. A test project that uses this package always
+		     references the head itself, so the head is a compile-time reference only, not a second
+		     package dependency. -->
+		<ProjectReference Include="..\Platform.UI.Runtime.Skia.PlayTest\Platform.UI.Runtime.Skia.PlayTest.csproj" PrivateAssets="all" />
+	</ItemGroup>
+</Project>

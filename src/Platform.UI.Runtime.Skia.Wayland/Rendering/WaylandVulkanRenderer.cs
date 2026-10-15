@@ -28,7 +28,7 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.Wayland;
 /// queue, so this path does not use wl_shm buffers or the wl_callback frame dance, and it is
 /// safe alongside the application's own event pump.
 /// </remarks>
-internal sealed class WaylandVulkanRenderer : IWaylandRenderer
+internal sealed class WaylandVulkanRenderer : IWaylandRenderer, IVulkanContextOwner
 {
 	private readonly object _gate = new();
 	private readonly IXamlRootHost _host;
@@ -203,6 +203,12 @@ internal sealed class WaylandVulkanRenderer : IWaylandRenderer
 		_vulkanContext.Resize(width, height);
 		_sized = true;
 	}
+
+	// The window's device for INativeGpuDeviceProvider adopters; gone once the renderer is disposed.
+	VulkanContext? IVulkanContextOwner.VulkanContext => _disposed ? null : _vulkanContext;
+
+	// Tells the provider's Reason "disposed (window closed)" from "not created yet" once the context is gone.
+	bool IVulkanContextOwner.HasDisposedContext => _disposed;
 
 	public void Dispose()
 	{

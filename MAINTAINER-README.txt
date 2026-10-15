@@ -42,6 +42,7 @@ Package ids and the AGENT-README that covers each:
     CodeBrix.Platform.TerminalView.ApacheLicenseForever      src/AddIns/Platform.UI.TerminalView
     CodeBrix.Platform.TextLayout.ApacheLicenseForever        src/AddIns/Platform.UI.TextLayout
     CodeBrix.Platform.VideoPlayer.ApacheLicenseForever       src/AddIns/Platform.UI.VideoPlayer.Skia
+    CodeBrix.Platform.WebGpu.ApacheLicenseForever            src/AddIns/Platform.UI.WebGpu
     CodeBrix.Platform.WebView.ApacheLicenseForever           src/AddIns/Platform.UI.WebView.Skia
 
   Toolkits for Microsoft's own frameworks (src-platforms/):
@@ -195,7 +196,12 @@ REPOSITORY LAYOUT
       SkiaGpuContext and OffscreenGLContext (their API is made of SkiaSharp types). Both are in
       the nuspec, from bin/<project name>/. VideoPlayer: the element stays in the Skia assembly
       (its API is made of CodeBrix.VideoPlayback and SkiaSharp types); its Core holds the rules,
-      the source resolver and VideoPlayerFailedEventArgs. WebView and MediaPlayer are not split:
+      the source resolver and VideoPlayerFailedEventArgs. WebGpu has the same shape: the element
+      (WebGpuRenderView), IWebGpuRenderer, WebGpuFrame, the hand-off struct and the Readback
+      presenter stay in the Skia assembly (their API is made of CodeBrix.WebGpu and SkiaSharp
+      types); its Core holds the enums and event args that name no WebGPU type, the rules, the
+      frame scheduler and the IWebGpuFrameTimer contract the scheduler runs on (Skia:
+      WebGpuFrameTimerSkiaPlatform, a DispatcherQueueTimer). WebView and MediaPlayer are not split:
       their Core content (WebView2/CoreWebView2, MediaPlayerElement/MediaPlayer) is the
       framework's own, and the add-in assemblies are only the per-OS plumbing (WPE, LibVLC).
       ENGINES (WPE1): inside a Core, the part a non-XAML platform (CodeBrix.Mobile) reuses is
@@ -322,13 +328,21 @@ Microsoft.Testing.Platform per global.json):
     src/Platform.UI.Runtime.Skia.Tests/Platform.UI.Runtime.Skia.Tests.csproj
         (host-free unit tests for the Skia runtime's pure window-sizing
         arithmetic - effective-pixel to raw-pixel conversion, framed-to-client
-        conversion - and for the X11 head's EWMH window-state rule; xunit.v3
+        conversion - for the X11 head's EWMH window-state rule, the X11 and
+        Wayland renderer selection rules and the native GPU device provider
+        rule (which windows get an INativeGpuDeviceProvider); xunit.v3
         under Microsoft.Testing.Platform, no window, no X server, no Skia
         surface. Linux solution only)
     src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj
         (host-free unit tests for the PlayTest head's preferences, command-line
-        adapter, recording-folder rules, preview frame format, OpenGL seam and
+        adapter, recording-folder rules, preview frame format, OpenGL and WebGPU seams and
         PixelStats; all three solutions - see THE PLAYTEST HEAD PACKAGE)
+    src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests.csproj
+        (the PlayTest WebGPU provider package driven through the head's own
+        launch-time setup - plan, probe, gate - with the real device route,
+        and the gate handed to the WebGpu view's own gate evaluation; GPU
+        tests skip with the engine's reason where no adapter exists; all
+        three solutions - see THE PLAYTEST HEAD PACKAGE, WebGPU provider)
     src/Platform.Foundation/Platform.Foundation.Tests.csproj
     src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj
     src/Platform.UI.Dispatching/Platform.UI.Dispatching.Tests.csproj
@@ -342,7 +356,7 @@ Microsoft.Testing.Platform per global.json):
     src/AddIns/Platform.AppSettings.Tests, Platform.UI.AdvancedTextEdit.Tests,
     Platform.UI.CommandBar.Tests, Platform.UI.FlexPanel.Tests,
     Platform.UI.PlotterView.Tests, Platform.UI.TerminalView.Tests,
-    Platform.UI.TextLayout.Tests, Platform.UI.VideoPlayer.Tests,
+    Platform.UI.TextLayout.Tests, Platform.UI.VideoPlayer.Tests, Platform.UI.WebGpu.Tests,
     CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Tests.csproj),
     src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
 
@@ -351,6 +365,27 @@ Microsoft.Testing.Platform per global.json):
     $(SkiaSharpVersion), and the SKXamlCanvas paint-and-present path down to the
     presented pixels. Run it after changing $(SkiaSharpVersion) in
     src/Directory.Build.targets, before launching any head.
+
+    Platform.UI.WebGpu.Tests runs the WebGpu add-in's frame protocol on this
+    machine's real WebGPU device (owned device, Readback path): clear-colour and
+    triangle pixels read back, frames from a worker thread, the native hand-off
+    driven through its function pointers, and the drivers' timing (the
+    Continuous rate test runs real frames through the real scheduler on a
+    virtual clock and a hand-run timer, so it is exact under any load; its
+    wall-clock twin asserts only the load-proof bound - never above the target
+    rate). Every GPU test
+    skips with the engine's reason where no adapter exists; the suite runs one
+    test at a time. Its element tests construct the view host-free, with the
+    CommandBar suite's dispatcher bootstrap and Skia-assembly swap.
+    Its DirectVulkan tests (WebGpuDirectVulkanGpuTests) adopt a HEAD's Vulkan
+    device: the shared VulkanContext initialized headless (InitializeHeadless,
+    latch on so the device is adoptable) behind the very
+    VulkanNativeGpuDeviceProvider the X11/Wayland heads register, then wrap the
+    frame textures on that context's GRContext and play a recorded picture
+    onto a GPU surface - the head's paint in miniature - and force a failure at
+    each step to prove the Readback fallback. They skip with the reason where
+    there is no Vulkan device (or libvulkan.so.1). Platform.UI's Skia
+    AssemblyInfo grants this suite (and the WebGpu UIReqs pair) for that.
 
     A host-free add-in suite that builds XAML objects must run its
     XAML-touching test classes one at a time: the bootstrap those suites use
@@ -499,10 +534,11 @@ ADD-IN UIREQS PROJECTS. Every add-in under src/AddIns that ships as its own
 package and has something to look at has its own pair, alongside the core
 pair, under src/UIReqs/Platform.UI.AddIn.<Name>/ and .../<Name>.Portrait/,
 with the assembly and namespace CodeBrix.Platform.UI.AddIn.<Name>.UIReqs. The
-fifteen at the time of writing: FlexPanel, Graphics2DSK, SkiaSharpViews, Svg,
+sixteen at the time of writing: FlexPanel, Graphics2DSK, SkiaSharpViews, Svg,
 PlotterView, TextLayout, CommandBar, AdvancedTextEdit, TerminalView, Lottie,
-Graphics3DGL, WebView, AudioPlayer, VideoPlayer and MediaPlayer (AppSettings
-has no UI and MSAL is not packed from this repository). All thirty projects
+Graphics3DGL, WebView, AudioPlayer, VideoPlayer, MediaPlayer and WebGpu
+(AppSettings has no UI and MSAL is not packed from this repository). All
+thirty-two projects
 sit in the "UI Requirements/AddIns" folder of CodeBrix.Platform.Linux.slnx and
 run from the same solution-wide command as the core pair.
 
@@ -542,7 +578,7 @@ ProjectReference to it, or every failure path throws FileNotFoundException
 from its first this.Log() call instead of raising MediaFailed.
 
 PREREQUISITES AND FIXTURES. A system engine an add-in needs (libvlc, the WPE
-WebKit libraries, an EGL context, an audio output device) is probed in the
+WebKit libraries, an EGL context, an audio output device, a WebGPU adapter) is probed in the
 add-in's [BeforeTestRun]; a missing one is recorded through
 Support/Prerequisite.cs and every scenario tagged @needs-<name> is then
 skipped with that reason, so another machine reports "skipped: libvlc not
@@ -555,7 +591,12 @@ outside the test output folder. Audio fixtures are 22.05 kHz: the shared
 audio output opens once per process at the rate of the first thing played,
 and the SFZ synthesizer refuses anything below 16 kHz. Every wait is a signal
 or a bounded poll with a stated budget; engines get larger budgets on the
-first scenario of a feature. Timers that repaint (a caret, a cursor,
+first scenario of a feature. A poll that captures a frame and THEN asks the
+element's state ends on a frame taken before the answer: when the next claims
+are about the picture the state change left (a segment that ended by itself,
+a clip that stopped), capture once more after the state was observed - under
+load the last polled frame can predate the change (Lottie's "stops playing
+within" step does this). Timers that repaint (a caret, a cursor,
 animation ticks) are stopped or hidden by an explicit Given before any
 two-frame comparison.
 
@@ -569,8 +610,11 @@ solution-wide run at four test modules at a time:
 Scenario counts per orientation at the time of writing: FlexPanel 15,
 Graphics2DSK 13, SkiaSharpViews 14, Svg 13, PlotterView 15, TextLayout 15,
 CommandBar 16, AdvancedTextEdit 15, TerminalView 14, Lottie 14, Graphics3DGL
-14, WebView 15, AudioPlayer 14, VideoPlayer 16, MediaPlayer 16 - 219 per
-orientation beside the core's 275. None of this belongs in an add-in's
+14, WebView 17, AudioPlayer 14, VideoPlayer 17, MediaPlayer 16, WebGpu 11 - 233 per
+orientation beside the core's 275. (WebGpu's direct-path feature runs on this
+software harness by offering the headless head Vulkan device as the window's
+provider and reading the picture through the view's capture: a software head
+cannot draw a GPU image, so a DirectVulkan window proof is a live X11 run.) None of this belongs in an add-in's
 AGENT-README: self-test material is maintainer material.
 
 MAINTENANCE FACTS, none of them obvious from the source:
@@ -792,9 +836,12 @@ Packing only runs in the Release configuration. Two kinds of package:
     The nuspec names a dependency-version TOKEN, never a literal version.
   - CSPROJ-DRIVEN (`dotnet pack <csproj> -p:PackageVersion=$(BuildVersion)`):
     Platform.UI.Runtime.Skia and the seven heads (including the Emulated head),
-    the PlayTest head and its OpenGL provider (Platform.UI.Runtime.Skia.PlayTest
-    .OpenGL, whose one package dependency is Graphics3DGL - the third project
-    that ProjectReferences an add-in), and the add-ins WebView, AudioPlayer, VideoPlayer, MediaPlayer, TextLayout,
+    the PlayTest head and its two providers - OpenGL (Platform.UI.Runtime.Skia
+    .PlayTest.OpenGL, whose one package dependency is Graphics3DGL) and WebGPU
+    (Platform.UI.Runtime.Skia.PlayTest.WebGpu, whose one package dependency is
+    the WebGpu add-in; it packs the preceding Release build, see THE PLAYTEST
+    HEAD PACKAGE, WebGPU provider) - both of which ProjectReference an add-in,
+    and the add-ins WebView, AudioPlayer, VideoPlayer, WebGpu, MediaPlayer, TextLayout,
     FlexPanel, AdvancedTextEdit, TerminalView, PlotterView, AppSettings,
     CommandBar.
     CommandBar is the second add-in that ProjectReferences another add-in (Svg,
@@ -802,8 +849,8 @@ Packing only runs in the Release configuration. Two kinds of package:
     it without SVG icons); that is why Platform.UI.Svg.Skia.csproj carries its
     PUBLISHED PackageId (CodeBrix.Platform.Svg.ApacheLicenseForever) for the
     same reason Graphics3DGL does.
-    VideoPlayer is the only add-in that ProjectReferences another add-in
-    (Graphics3DGL, for its off-screen GPU Skia context); that is why
+    VideoPlayer also ProjectReferences another add-in (Graphics3DGL, for its
+    off-screen GPU Skia context); that is why
     Platform.WinUI.Graphics3DGL.csproj carries its PUBLISHED PackageId
     (CodeBrix.Platform.Graphics3DGL.ApacheLicenseForever) rather than its legacy
     assembly name - the SDK packer reads a referenced project's PackageId to
@@ -824,6 +871,28 @@ Packing only runs in the Release configuration. Two kinds of package:
     the effect chain, the shader SOURCE, the composition context - stays in the
     engine and is consumed from it, never re-declared. The same rule applies to
     any future add-in that draws frames from a library with its own Skia package.
+    WebGpu (CodeBrix.Platform.WebGpu.ApacheLicenseForever) depends on exactly
+    CodeBrix.Platform, CodeBrix.WebGpu.Skia.MitLicenseForever (which brings
+    CodeBrix.WebGpu.Native and the WebGPU engine's natives) and SkiaSharp at the
+    family pin - the version CodeBrix.WebGpu.Skia itself requires; its Core
+    assembly rides inside the package. It must NEVER depend on
+    CodeBrix.WebGpu.Graphics: that layer is the application's choice and composes
+    with the view through the WebGpu sharing contracts. A CodeBrix.WebGpu.Skia
+    bump is a csproj PackageReference change, checked against the family's
+    SkiaSharp pin.
+    PUBLISHING the WebGpu add-in and its PlayTest provider needs no step of its
+    own: both are in the _CsprojPackage list, build in the Windows solution and
+    ride the family publish at the family version. Inspect the two nupkgs
+    before uploading (unzip -l and the nuspec): the add-in carries
+    lib/net10.0/CodeBrix.Platform.UI.WebGpu.Core.dll and
+    CodeBrix.Platform.UI.WebGpu.Skia.dll (+ .xml each) and depends on exactly
+    the three packages above; the provider carries
+    lib/net10.0/CodeBrix.Platform.PlayTest.WebGpu.dll (+ .xml) and depends on
+    the add-in only. CodeBrix.Android ships the add-in's Core assembly through
+    its intake from a PINNED published family version (its
+    build/PlatformPin.props), so after this family is published the Android
+    repository re-pins to that version and re-runs its intake before its own
+    publish.
     The PackageId in each csproj is conditional on CODEBRIX_UWP_BUILD; the
     buildTransitive props/targets are packed renamed to <PackageId>.props/.targets.
 
@@ -1025,10 +1094,13 @@ framework, taken from its 6.5.x development line, re-licensed and re-packaged
 under the CodeBrix.Platform name. Every renamed namespace carries a
 "//Was previously: <upstream namespace>" comment on its namespace line; that
 comment is the record of the mapping - keep it when touching a file. The
-Vulkan renderer under the X11 head was pulled from the upstream 6.7.x line and
-is gated behind the internal FeatureConfiguration.Rendering.UseVulkanOnX11
-flag with no public API (X11RenderingBackend has its Vulkan member commented
-out; enable both together when Vulkan is officially offered).
+Vulkan renderer under the X11 head was pulled from the upstream 6.7.x line; it
+is selectable through X11RenderingBackend.Vulkan / the public tri-state
+FeatureConfiguration.Rendering.UseVulkanOnX11, and preferred (null flag, no
+other renderer choice) when DirectGpuRenderingMode is on. The "try Vulkan
+first?" rule is the pure X11RendererSelection.ShouldTryVulkan (fenced in
+Platform.UI.Runtime.Skia.Tests); keep X11XamlRootHost calling it rather than
+re-reading the flags.
 
 Other vendored / derived components:
   - tools/WaylandBindingsGenerator: a frozen fork of the MIT-licensed NWayland
@@ -1165,6 +1237,72 @@ CODING CONVENTIONS
     PackageDownload-only project); it writes nothing outside Generated/. Diff
     the result before keeping it: anything beyond format normalization means a
     hand edit or a hand-written member was missed.
+
+GPU DEVICE SEAMS (DIRECT GPU RENDERING)
+======================================
+Three framework seams exist for add-ins that produce GPU content (the WebGpu
+add-in is the first user); none of them names an add-in.
+
+  - DirectGpuRenderingMode (src/Platform.UI/Hosting, Core assembly): the
+    one-way latch set by UseDirectGpuRenderingMode(), shaped exactly like
+    DirectSkiaCanvasMode (private static _isEnabled, internal Enable(); the
+    Core.Tests switch resets it by reflection and asserts the shape). The
+    Android head reaches Enable() through the Core assembly's friend grant.
+    Its framework effects are the X11 Vulkan preference (see PROVENANCE) and
+    the adoptable Vulkan device profile (below).
+  - INativeGpuDeviceProvider (src/Platform.UI/Graphics, .skia.cs - it names
+    GRContext) + NativeGpuDeviceKind (non-.skia, so it is in the Core
+    assembly, like SkiaGpuBackend). Public. Each head registers ONE
+    ApiExtensibility builder at startup (ApiExtensibility.Register throws on a
+    second registration, so it cannot be registered late) and the builder
+    answers null - "no provider" - for a window without a device of its own:
+    X11 -> VulkanNativeGpuDeviceProvider.For(host.Renderer); Wayland ->
+    WaylandXamlRootHost.NativeGpuDeviceProviderFor (Vulkan renderer, or no
+    renderer yet and WaylandRendererSelection.Choose() == Vulkan, because the
+    Wayland renderer is created on the first render tick); macOS ->
+    MacOSNativeGpuDeviceProvider (Metal mode only; the window's own device,
+    queue and compositor GRContext, nothing owned - not to be confused with
+    MacOSNativeSkiaGpuContext, a separate context on its own queue). The
+    Vulkan provider reads VulkanContext.NativeDeviceInfo, captured once in
+    Initialize under the device lock (VulkanDevice.MainQueueHandle demands the
+    lock) and cleared in Dispose; its BeginFrame() is the device lock, which
+    the X11 and Wayland Vulkan renderers hold around every frame, so adopters
+    are externally synchronized with the head. The macOS provider compiles
+    with the Linux solution but has only run on macOS.
+  - VulkanAdoptionProfile (src/Platform.UI/Vulkan, internal): with the latch
+    ON, VulkanDevice.Create (both VulkanContext.Initialize, i.e. X11 and
+    Wayland, and the headless InitializeHeadless the tests use) also enables
+    the device extensions the WebGPU engine requires of a device it adopts -
+    the list lives ONLY in VulkanAdoptionProfile.EngineDeviceExtensions - and
+    every SUPPORTED feature of the Vulkan 1.0-1.3 feature structures (+
+    VK_EXT_robustness2's when enabled), through a VkPhysicalDeviceFeatures2
+    chain filled by vkGetPhysicalDeviceFeatures2. Each item only where the GPU
+    supports it; nothing can make device creation fail (an unadoptable device
+    is refused at adoption and the add-in uses Readback). One Information line
+    (category ...Vulkan.Interop.VulkanDevice) lists what was enabled. With the
+    latch OFF device creation is byte-for-byte the old one (VK_KHR_swapchain,
+    no features) - fenced by the WebGpu suite's VulkanAdoptionProfileTests.
+    WHY a hard-coded list: wgpuCodebrixInstanceAdoptVulkanDevice refuses a
+    device without the extensions wgpu-hal would enable on that adapter, and
+    hands the device to wgpu-hal assuming its features are enabled, but the
+    native library exposes no query of either (FIXLIST note against
+    CodeBrix.WebGpu.Native). The list tracks wgpu 29.0.3 via wgpu-native
+    v29.0.1.1 and MUST be revisited when the WebGpu packages bump the engine:
+    run the WebGpu suite's DirectVulkan GPU tests; a refusal names the missing
+    extensions in the engine's log (wgpuSetLogCallback).
+  - IVulkanContextOwner.HasDisposedContext (default false; the X11/Wayland
+    Vulkan renderers and the Wayland host implement it) lets the provider's
+    Reason say "disposed (the window was closed)" rather than "not created
+    yet" once a renderer is gone.
+  - IOwnedGpuDeviceGate (src/Platform.UI/Graphics, internal, Core): asked by
+    an element that creates its OWN device (OwnedGpuDeviceApis.WebGpu) before
+    it does. Desktop heads register none. The PlayTest head registers one for
+    every launch (WebGpu/PlayTestWebGpuSetup.cs): Provider -> null (go
+    ahead) + the provider's opaque probe State; OptedOut -> the reason
+    string; NotRegistered -> records the configuration failure and throws
+    (the OpenGL twin throws from its INativeOpenGLWrapper builder instead,
+    because GL elements resolve that wrapper anyway). The Core AssemblyInfo
+    grants the WebGpu add-in's Platform, Android and Mobile assembly names.
 
 DELIBERATE DIFFERENCES FROM WINUI
 =================================
@@ -1641,6 +1779,10 @@ serialized.
     beside it launches the same application with OpenGL Unavailable. They exercise that application's
     actual shared XAML and build the framework from source. Put general control
     demonstrations there, not into unrelated sample applications.
+  - src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests: the WebGPU provider
+    package (see WebGPU provider below); samples/CodeBrixPlatform/WebGpuDemo/tests
+    holds the running-application suites for it (WebGpuDemo.PlayTests and
+    WebGpuDemo.NoWebGpu.PlayTests).
   - JustBetweenUs and the additional CodeBrix.Samples suites exercise their own
     application screens; the latter share PlayTestSupport in that repository.
     They use SilverAssertions and existing app service interfaces for offline
@@ -1735,6 +1877,96 @@ machine). Still to verify on the maintainer's machines:
   the real macOS head too, which is a Graphics3DGL/macOS-head matter (stop and
   report; do not work round it in PlayTest). Also confirm ANGLE initializes on
   the PlayTest UI thread (a background thread, no AppKit) - U4.
+
+--- WebGPU option (provider package: CodeBrix.Platform.PlayTest.WebGpu) ---
+
+The head side mirrors OpenGL file for file (WebGpu/PlayTestWebGpu.cs,
+WebGpu/PlayTestWebGpuSetup.cs; tests in PlayTestWebGpuTests beside
+PlayTestOpenGLTests):
+
+  - Public, BCL-only seam: PlayTestWebGpu (Available | Unavailable, same
+    default as OpenGL), PlayTestOptions.WebGpu, PlayTestApplication.WebGpu
+    (PlayTestWebGpuInfo: Provider, AdapterName, BackendName,
+    DeviceDescription, IsSoftware, UnavailableReason), IPlayTestWebGpuProvider
+    (Name, Probe() -> PlayTestWebGpuProbeResult, Dispose),
+    PlayTestWebGpuProviders.Register / IsRegistered. The probe result is
+    strings + a bool + an opaque State object, so the head never references a
+    WebGPU library; the provider package (which references the add-in) owns
+    the real types.
+  - VirtualHost.InitializeApplication probes right after OpenGL (a failure
+    fails the launch with the provider's reason) and ALWAYS registers the
+    framework's internal IOwnedGpuDeviceGate for XamlRoot (see GPU DEVICE
+    SEAMS): unlike OpenGL, a WebGPU element would otherwise create its own
+    device on an opted-out launch. The gate answers OwnedGpuDeviceApis.WebGpu
+    only: null + the probe's State (Provider), the opt-out reason (OptedOut),
+    or record-and-throw (NotRegistered, through VirtualHost.FailConfiguration,
+    the same "configuration failure" path as OpenGL). VirtualHost.Dispose
+    disposes the provider after the threads stop.
+  - The add-in element's side of the contract: resolve the gate from its
+    XamlRoot before creating a device; no gate = proceed; a reason = report no
+    device (RenderPath None + its device-lost notification with that reason);
+    an exception = report initialization failure and let PlayTest fail the
+    test with the recorded message.
+
+--- WebGPU provider (CodeBrix.Platform.PlayTest.WebGpu) ---
+
+  - The PACKAGE, src/Platform.UI.Runtime.Skia.PlayTest.WebGpu (assembly and
+    namespace CodeBrix.Platform.PlayTest.WebGpu), implements the seam with ONE
+    provider for every OS, Providers/WebGpuSkiaDeviceProvider: the WebGpu
+    add-in's own device route (WebGpuSkiaDevice.Create - Vulkan on Linux,
+    Direct3D 12 then Vulkan on Windows, Metal on macOS), so the launch proves
+    exactly what the views will do. Probe() creates a device (unavailable ->
+    InvalidOperationException with the engine's reason plus a per-OS remedy,
+    which the head turns into the failed launch), runs DeviceCheck (a 4x4
+    BGRA8Unorm headless target cleared by one render pass and read back - "a
+    device exists" means "it renders and reads back", the OpenGL
+    ContextCheck's twin), describes the adapter through AdapterGetInfo (never
+    DeviceGetAdapterInfo, which the engine does not implement and which ends
+    the process) and DISPOSES the device before returning. State is null:
+    each WebGpuRenderView creates its own device on its first frame, exactly
+    as on a desktop head. Two owned devices in one process are no problem for
+    the engine; keeping the probe's alive would only hold GPU memory for the
+    run. CodeBrixPlayTestWebGpu.Register() registers it on Linux, Windows and
+    macOS (PlatformNotSupportedException elsewhere).
+  - Under PlayTest the view runs Readback only: the head renders in software
+    and registers no INativeGpuDeviceProvider, so DirectGpuRenderingMode has
+    nothing to adopt. Assert RenderPath == Readback in PlayTests, never a
+    direct path.
+  - Packaging: the head is a PrivateAssets ProjectReference (compile only); the
+    WebGpu add-in is the one package dependency (CodeBrix.Platform comes
+    through it), exactly like OpenGL with Graphics3DGL. It packs its OWN
+    README.md and AGENT-README.txt and is in the _CsprojPackage list right
+    after the OpenGL provider. Because the add-in is a split Core/Skia add-in
+    (AddIn.CorePackaging.targets sets NoBuild=true while _IsPacking), this
+    csproj also sets NoBuild during a pack and packs the Release output that
+    precedes it - a pack that built it would ask the add-in to build and fail
+    with NETSDK1085. Build Release first (the driver does). Like the OpenGL
+    provider it is not in build/pack-playtest-preview.py or
+    build/test-scripts/pack-linux-local-feed.sh.
+  - Tests: src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests (IVT from the
+    PlayTest head, Platform.UI for IOwnedGpuDeviceGate, and the add-in's Core
+    for WebGpuDeviceGate): registration, the real probe and the launch info,
+    the gate in each mode as the view evaluates it, an unavailable device
+    failing the launch with the engine's reason (a factory asking for a
+    backend the platform's native library lacks), and the exact "not
+    registered" message. The running application is
+    samples/CodeBrixPlatform/WebGpuDemo: WebGpuDemo.PlayTests registers the
+    provider in its fixture; WebGpuDemo.NoWebGpu.PlayTests launches with
+    PlayTestOptions.WebGpu = Unavailable.
+
+Build, pack and test it (Linux):
+
+    dotnet build src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj -c Release
+    dotnet pack src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj \
+        -c Release -p:PackageVersion=<version> --output <folder>
+    dotnet test --project src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/WebGpuDemo/tests/WebGpuDemo.PlayTests/WebGpuDemo.PlayTests.csproj -c Release
+    dotnet test --project samples/CodeBrixPlatform/WebGpuDemo/tests/WebGpuDemo.NoWebGpu.PlayTests/WebGpuDemo.NoWebGpu.PlayTests.csproj -c Release
+
+Only the Linux route has RUN (Vulkan on this repository's Intel UHD). Still to
+verify on the maintainer's machines: Windows (Direct3D 12) and macOS (Metal) -
+the two WebGpuDemo PlayTests suites; expect PlayTestApplication.WebGpu to name
+the GPU and BackendName "Direct3D 12" / "Metal".
 
 --- Third-party code ---
 

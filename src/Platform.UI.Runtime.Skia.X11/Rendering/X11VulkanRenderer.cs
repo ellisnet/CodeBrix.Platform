@@ -11,11 +11,18 @@ namespace CodeBrix.Platform.WinUI.Runtime.Skia.X11; //Was previously: Uno.WinUI.
 /// Vulkan-backed X11 renderer. Extends X11Renderer to provide Vulkan hardware-accelerated
 /// rendering via the shared VulkanContext, following the same pattern as the OpenGL and EGL renderers.
 /// </summary>
-internal class X11VulkanRenderer : X11Renderer
+internal class X11VulkanRenderer : X11Renderer, IVulkanContextOwner
 {
 	private readonly VulkanContext _vulkanContext;
 	private IDisposable? _deviceLock;
 	private bool _needsFullResize;
+	private bool _disposed;
+
+	// The window's device for INativeGpuDeviceProvider adopters; gone once the renderer is disposed.
+	VulkanContext? IVulkanContextOwner.VulkanContext => _disposed ? null : _vulkanContext;
+
+	// Tells the provider's Reason "disposed (window closed)" from "not created yet" once the context is gone.
+	bool IVulkanContextOwner.HasDisposedContext => _disposed;
 
 	private X11VulkanRenderer(IXamlRootHost host, X11Window x11Window, VulkanContext vulkanContext)
 		: base(host, x11Window)
@@ -97,6 +104,7 @@ internal class X11VulkanRenderer : X11Renderer
 
 	public override void Dispose()
 	{
+		_disposed = true;
 		_deviceLock?.Dispose();
 		_deviceLock = null;
 		_vulkanContext.Dispose();

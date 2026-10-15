@@ -100,6 +100,28 @@ public static class ScenarioFrames
 	}
 
 	/// <summary>
+	/// The same element's region in two captured frames, cut with ONE measurement of the element's
+	/// bounds. Two separate <see cref="RegionAsync"/> calls measure twice, and an element whose
+	/// layout is still settling can change size in between - its regions then cannot even be
+	/// compared. One rectangle for both frames is what "did this region change" means: an element
+	/// that moved or resized shows as pixels that differ.
+	/// </summary>
+	/// <param name="context">The scenario.</param>
+	/// <param name="elementName">The Gherkin name of the element.</param>
+	/// <param name="frameName">The first frame.</param>
+	/// <param name="otherFrameName">The second frame.</param>
+	/// <returns>The element's region in each frame, the same size.</returns>
+	public static async Task<(Region Region, Region Other)> RegionPairAsync(ScenarioContext context,
+		string elementName, string frameName, string otherFrameName)
+	{
+		var element = ElementRegistry.Resolve(elementName);
+		var bounds = await DeviceRect.OfAsync(element).ConfigureAwait(false);
+		return (
+			new Region(Get(context, frameName), bounds, $"the region of \"{elementName}\" in frame \"{frameName}\""),
+			new Region(Get(context, otherFrameName), bounds, $"the region of \"{elementName}\" in frame \"{otherFrameName}\""));
+	}
+
+	/// <summary>
 	/// A rectangle CUT OUT of one named element's region, addressed in that element's own
 	/// coordinates. The element's rectangle is taken with NO inset, so the coordinates a scenario
 	/// writes are measured from the element's real top left corner rather than from a shrunken

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<AssemblyName>CodeBrix.Platform.UI.AddIn.WebGpu.UIReqs.Portrait</AssemblyName>
+		<RootNamespace>CodeBrix.Platform.UI.AddIn.WebGpu.UIReqs.Portrait</RootNamespace>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- The twin: it owns its PanelOrientation.cs and its reqnroll.json, and links every other
+		     source file, every feature file and every asset of the project named here. -->
+		<UIReqsLandscapeProjectDir>..\Platform.UI.AddIn.WebGpu</UIReqsLandscapeProjectDir>
+	</PropertyGroup>
+
+	<Import Project="..\UIReqs.Common.targets" />
+
+	<ItemGroup>
+		<ProjectReference Include="..\Platform.UI.Core\Platform.UI.Core.UIReqs.csproj" />
+		<ProjectReference Include="..\..\AddIns\Platform.UI.WebGpu\Platform.UI.WebGpu.Skia.csproj" />
+		<ProjectReference Include="..\..\CodeBrix.Platform.Extensions.Logging\CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+	</ItemGroup>
+
+</Project>

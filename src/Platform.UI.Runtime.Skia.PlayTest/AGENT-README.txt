@@ -106,6 +106,8 @@ InvalidOperationException.
     ScreenOrientation Orientation         the current screen orientation
     PlayTestOpenGLInfo OpenGL             what the launch found out about OpenGL
                                           (see OPENGL)
+    PlayTestWebGpuInfo WebGpu             what the launch found out about WebGPU
+                                          (see WEBGPU)
     Task<T> EvaluateAsync<T>(Func<T> expression)   run on the UI thread, read state
     Task EvaluateAsync(Action action)
     Task SetOrientationAsync(ScreenOrientation? orientation = null)
@@ -132,6 +134,8 @@ PlayTestOptions  (sealed)
     string ArtifactsDirectory         failure screenshots; default TestResults/PlayTest
     PlayTestOpenGL OpenGL             Available (default) | Unavailable: a launch
                                       without OpenGL (see OPENGL)
+    PlayTestWebGpu WebGpu             Available (default) | Unavailable: a launch
+                                      without WebGPU (see WEBGPU)
     ScreenOrientation ResolveOrientation()   what the launch will use
     ApplicationTheme ResolveTheme()          what the launch will use
 
@@ -312,6 +316,8 @@ Other types
     PixelStats, PixelHalf, PixelAxis, PixelBounds, PixelDifference   (OPENGL)
     PlayTestOpenGL, PlayTestOpenGLInfo, IPlayTestOpenGLProvider,
     IPlayTestOpenGLContext, PlayTestOpenGLProviders                  (OPENGL)
+    PlayTestWebGpu, PlayTestWebGpuInfo, IPlayTestWebGpuProvider,
+    PlayTestWebGpuProbeResult, PlayTestWebGpuProviders               (WEBGPU)
 
 Roles PlayTest assigns: Button (also split buttons), Checkbox, Combobox,
 Dialog (ContentDialog), Group, Img, Link, Listbox, Menu, Menubar, Menuitem
@@ -685,6 +691,76 @@ IsRegistered (one provider per process; registering the same type again does
 nothing). Contexts are created and made current on the application's UI thread;
 the head disposes the provider when the application is disposed.
 
+WEBGPU
+======
+An application that uses the WebGpu add-in (WebGpuRenderView) gets real WebGPU
+devices when the test project references
+CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever and registers it before
+the launch, exactly as OpenGL does:
+
+    using CodeBrix.Platform.PlayTest.WebGpu;
+
+    CodeBrixPlayTestWebGpu.Register();
+    Application = await PlayTestApplication.LaunchAsync(() => new App(), new()
+    {
+        ConfigurationAssembly = typeof(AppFixture).Assembly,
+    });
+
+The registered provider proves at launch that a WebGPU adapter and device can
+be created on this machine; WebGPU elements then create their own devices and
+render through their read-back path (no window is needed), so their pixels are
+in every screenshot and in the preview. Assert them with PixelStats (see
+OPENGL). This package itself adds no WebGPU code and no native dependency.
+
+Per operating system (the provider package's AGENT-README has the detail) -
+the WebGpu add-in's own device route:
+  Linux     Vulkan: the GPU's driver, or a software Vulkan driver; needs
+            mesa-vulkan-drivers (apt install mesa-vulkan-drivers). No display
+            needed.
+  Windows   Direct3D 12, then Vulkan: a GPU driver with either.
+  macOS     Metal: a Mac with a Metal device.
+A view's RenderPath is always Readback under PlayTest (never a direct path:
+the virtual head offers no window GPU device). A view under the Continuous
+driver never settles for a Stable screenshot; pause it or use OnDemand first.
+
+Opting out. A launch with PlayTestOptions.WebGpu = PlayTestWebGpu.Unavailable
+has no WebGPU: WebGPU elements report that no device is available (with the
+reason "PlayTestOptions.WebGpu is Unavailable for this launch.") and the
+application's own fallback runs, whether or not a provider is registered. Like
+OpenGL it is a LAUNCH option, for the whole run; test the no-WebGPU path in a
+process of its own.
+
+Both failures are loud; nothing is skipped:
+  - A registered provider that cannot create an adapter/device on this
+    machine makes LaunchAsync throw a PlayTestException naming the provider
+    and the concrete reason.
+  - With NO provider registered (and WebGpu not Unavailable), the first WebGPU
+    element the application initializes fails the test with
+        "The application initialized a WebGPU element, but no WebGPU provider
+        is registered - reference CodeBrix.Platform.PlayTest.WebGpu.
+        ApacheLicenseForever and call CodeBrixPlayTestWebGpu.Register() ..."
+    recorded as the run's failure, as for OpenGL: the PlayTest call during
+    which the element loaded and every later call throw it. An application
+    that never initializes a WebGPU element is not affected.
+
+PlayTestApplication.WebGpu (PlayTestWebGpuInfo), fixed at launch:
+    bool IsAvailable          WebGPU elements get a device in this run
+    string? Provider          the registered provider's name
+    string? AdapterName       the probed adapter (a GPU, or e.g. llvmpipe)
+    string? BackendName       its native backend (Vulkan, Metal, D3D12 ...)
+    string? DeviceDescription further detail from the provider, or null
+    bool IsSoftware           a CPU rasterizer
+    string? UnavailableReason why there is no WebGPU, else null
+
+The provider seam (public, for the provider package; tests never call it):
+IPlayTestWebGpuProvider (Name, Probe() returning a PlayTestWebGpuProbeResult -
+adapter name, backend name, device description, IsSoftware and an opaque State
+object the head hands to the WebGPU elements unchanged - and Dispose),
+PlayTestWebGpuProviders.Register / IsRegistered (one provider per process;
+registering the same type again does nothing). The probe runs on the
+application's UI thread; the head disposes the provider when the application
+is disposed.
+
 COMPLETE EXAMPLES
 =================
 
@@ -886,7 +962,8 @@ WHAT THIS PACKAGE DOES NOT DO
   - No browser, DOM, CSS or JavaScript, network routing, browser contexts,
     tracing or a download API - it tests CodeBrix.Platform XAML apps.
   - One window and one application per process; no multiple windows.
-  - No OpenGL without CodeBrix.Platform.PlayTest.OpenGL (see OPENGL); no Metal
+  - No OpenGL without CodeBrix.Platform.PlayTest.OpenGL (see OPENGL) and no
+    WebGPU without CodeBrix.Platform.PlayTest.WebGpu (see WEBGPU); no Metal
     or Vulkan surfaces; no native dialogs other than the scripted storage
     pickers, no horizontal mouse wheel.
   - No physical input: the preview window is view-only.
@@ -913,6 +990,11 @@ WORKING EXAMPLES ON GITHUB
     tests/PlayTestDemo.NoOpenGL.PlayTests, which launches without OpenGL):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/PlayTestDemo
     Fixture: tests/PlayTestDemo.PlayTests/AppFixture.cs
+  - WebGpuDemo - the WebGpu add-in's demo and its PlayTests: a raw WebGPU
+    triangle, glTF models, an IWebGpuRenderer class and the frame drivers,
+    measured with PixelStats through CodeBrix.Platform.PlayTest.WebGpu (plus
+    tests/WebGpuDemo.NoWebGpu.PlayTests, which launches without WebGPU):
+    https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebGpuDemo
   - Host-free tests of the preferences, command-line switches, orientation
     resolution and recording folder rules:
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/src/Platform.UI.Runtime.Skia.PlayTest.Tests
@@ -954,6 +1036,8 @@ Env         CODEBRIX_PLAYTEST_HEADED=1  CODEBRIX_PLAYTEST_SLOWMO=<ms>
 Timeout     10 s default; Page.SetDefaultTimeout(ms); per call new() { Timeout = ms }
 OpenGL      CodeBrix.Platform.PlayTest.OpenGL: CodeBrixPlayTestOpenGL.Register() before launch;
             app.OpenGL (info); new() { OpenGL = PlayTestOpenGL.Unavailable } (opt out)
+WebGpu      CodeBrix.Platform.PlayTest.WebGpu: CodeBrixPlayTestWebGpu.Register() before launch;
+            app.WebGpu (info); new() { WebGpu = PlayTestWebGpu.Unavailable } (opt out)
 Pixels      PixelStats.FromPng(await locator.ScreenshotAsync()) .Coverage .Bounds .Centroid
             .Half(PixelHalf.Left).MeanLuminance(bg) .MirrorSymmetry .Difference(before)
 Failure     PlayTestException with a screenshot path + visible-UI description

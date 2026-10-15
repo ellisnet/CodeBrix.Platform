@@ -49,12 +49,24 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           PlayTest guide's OPENGL section covers opting out, the failure
           messages and asserting GL content with PixelStats.
 
+    src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/AGENT-README.txt
+      CodeBrix.Platform.PlayTest.WebGpu.ApacheLicenseForever
+          Real WebGPU devices for PlayTests of applications that use the
+          WebGpu add-in (the add-in's own device route: Vulkan on Linux,
+          Direct3D 12 or Vulkan on Windows, Metal on macOS); registered with
+          CodeBrixPlayTestWebGpu.Register(). The PlayTest guide's WEBGPU
+          section covers opting out and the failure messages.
+
     Related PlayTest guide:
       samples/CodeBrixPlatform/PlayTestDemo/README.md
         Runnable examples: demo and PlayTests project structure, build/run
         commands, coverage and validation. Start here to run the dedicated
         control/picker demo or add general PlayTest regression examples.
         Includes Windows and macOS native preview pixel-check commands.
+      samples/CodeBrixPlatform/WebGpuDemo/README.md
+        The WebGpu add-in's demo and its two PlayTests projects (with and
+        without WebGPU): what each page shows, the direct-rendering opt-in
+        lines, and how to run the PlayTests.
 
   src/AddIns/Platform.WinUI.Graphics2DSK/AGENT-README.txt
       CodeBrix.Platform.Graphics2DSK.ApacheLicenseForever
@@ -131,6 +143,14 @@ AGENT-README FILES (consumer documentation, one per NuGet package)
           Video playback (AV1 in WebM, Matroska and CodeBrix .cbv files) with a
           colour-grading effect chain, on the GPU where a head can give one.
 
+  src/AddIns/Platform.UI.WebGpu/AGENT-README.txt
+      CodeBrix.Platform.WebGpu.ApacheLicenseForever
+          WebGPU rendering in a XAML element (WebGpuRenderView) on every head:
+          frame drivers, the Readback and direct GPU render paths, a SkiaSharp
+          overlay, device choice and information, and the native-module
+          hand-off and module contract. The same element exists in
+          CodeBrix.Android.
+
   src/AddIns/Platform.UI.WebView.Skia/AGENT-README.txt
       CodeBrix.Platform.WebView.ApacheLicenseForever
           Makes the XAML WebView2 control work on the Skia desktop heads, downloads
@@ -169,10 +189,17 @@ GENERAL
       The family-wide catalogue of the CodeBrix.Platform packages.
   NOT-IMPLEMENTED.md
       What a "not implemented" exception from the framework means, and what to do
-      about it.
+      about it; also the features implemented for every head but not yet verified
+      on all of them.
   src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/README.md
       Human-facing overview for the PlayTest OpenGL provider package (its
       package README).
+  src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/README.md
+      Human-facing overview for the PlayTest WebGPU provider package (its
+      package README).
+  src/AddIns/Platform.UI.WebGpu/README.md
+      Human-facing overview for the WebGpu add-in package (its package
+      README).
   src-platforms/Platform.WinUI/README.md
       Human-facing overview for the WinUI toolkit packages.
   src-platforms/Platform.WPF/README.md

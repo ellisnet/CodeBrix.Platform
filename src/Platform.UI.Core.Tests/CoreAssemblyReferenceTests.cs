@@ -23,7 +23,7 @@ namespace CodeBrix.Platform.UI.Core.Tests;
 /// </summary>
 public class CoreAssemblyReferenceTests
 {
-	/// <summary>Every Core assembly of the family: the framework's twelve and the add-ins' fourteen (8 of them R7).</summary>
+	/// <summary>Every Core assembly of the family: the framework's twelve and the add-ins' fifteen (8 of them R7).</summary>
 	private static readonly string[] ExpectedCoreAssemblies =
 	{
 		"CodeBrix.Platform.UI.Core", "CodeBrix.Platform.UI.Composition.Core", "CodeBrix.Platform.Core",
@@ -33,6 +33,7 @@ public class CoreAssemblyReferenceTests
 		"CodeBrix.Platform.UI.Adapter.Microsoft.Extensions.Logging.Core", "CodeBrix.Platform.Extensions.Logging.Core",
 		"CodeBrix.Platform.UI.FlexPanel.Core", "CodeBrix.Platform.UI.CommandBar.Core", "CodeBrix.Platform.AppSettings.Core",
 		"CodeBrix.Platform.UI.AudioPlayer.Core", "CodeBrix.Platform.WinUI.Graphics3DGL.Core", "CodeBrix.Platform.UI.VideoPlayer.Core",
+		"CodeBrix.Platform.UI.WebGpu.Core",
 		"CodeBrix.Platform.SkiaSharp.Views.Core", "CodeBrix.Platform.WinUI.Graphics2DSK.Core", "CodeBrix.Platform.UI.Svg.Core",
 		"CodeBrix.Platform.UI.Lottie.Core", "CodeBrix.Platform.UI.TextLayout.Core", "CodeBrix.Platform.UI.AdvancedTextEdit.Core",
 		"CodeBrix.Platform.UI.TerminalView.Core", "CodeBrix.Platform.UI.PlotterView.Core",
@@ -47,7 +48,7 @@ public class CoreAssemblyReferenceTests
 		"CodeBrix.Platform.SkiaSharp.Views", "CodeBrix.Platform.UI.Svg", "CodeBrix.Platform.UI.Lottie",
 		"CodeBrix.Platform.UI.TextLayout", "CodeBrix.Platform.UI.AdvancedTextEdit", "CodeBrix.Platform.UI.TerminalView",
 		"CodeBrix.Platform.UI.PlotterView", "CodeBrix.Platform.WinUI.Graphics3DGL", "CodeBrix.Platform.UI.VideoPlayer.Skia",
-		"CodeBrix.Platform.UI.WebView.Skia", "CodeBrix.Platform.UI.MediaPlayer.Skia",
+		"CodeBrix.Platform.UI.WebView.Skia", "CodeBrix.Platform.UI.MediaPlayer.Skia", "CodeBrix.Platform.UI.WebGpu.Skia",
 		// Pre-split names of the Core-by-whole libraries: they must not come back as references either.
 		"CodeBrix.Platform.Foundation", "CodeBrix.Platform.Foundation.Logging", "CodeBrix.Platform.UI.FluentTheme",
 		"CodeBrix.Platform.UI.FluentTheme.v1", "CodeBrix.Platform.UI.FluentTheme.v2",

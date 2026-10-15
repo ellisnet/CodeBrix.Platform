@@ -1,0 +1,55 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>WebGpuDemo</RootNamespace>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+
+    <!-- CodeBrix.Platform needs these defines for its internal conditional compilation (the VideoPlayerDemo set). -->
+    <DefineConstants>$(DefineConstants);HAS_CODEBRIX;HAS_CODEBRIX_WINUI;RESOLVE_SERVICES;SIMPLE_ENUM;SIMPLE_MESSAGING</DefineConstants>
+
+    <!-- The renderers in Rendering/ record WebGPU commands, which takes pointers to descriptor structs. Only this
+         project needs it: the shared .UI pages hold no WebGPU code of their own. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.12" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.OpenSans.ApacheLicenseForever" Version="1.0.248.1181" />
+    <PackageReference Include="CodeBrix.Platform.Fonts.Fluent.ApacheLicenseForever" Version="1.0.248.1204" />
+
+    <!-- The OPTIONAL higher layer, the APPLICATION's choice and never the add-in's: CodeBrix.WebGpu.Graphics (glTF
+         models, physically based shading, image-based lighting, a skybox) drawing straight into the view through the
+         two sharing contracts the view implements (IWebGpuDeviceSource, IWebGpuTextureTarget). Only the Models page
+         uses it. Gltf2 is the glTF library Graphics itself is built on, at the version Graphics pins; the demo names it
+         because it builds the scene's ground plane in memory with it. -->
+    <PackageReference Include="CodeBrix.WebGpu.Graphics.MitLicenseForever" Version="1.0.287.390" />
+    <PackageReference Include="CodeBrix.Graphics3D.Gltf2.MitLicenseForever" Version="1.0.261.293" />
+  </ItemGroup>
+
+  <!--
+    CodeBrix.Platform from source, the in-repository sample way (no framework NuGets); the XAML generator and the
+    Skia runtime swap are wired in each head by ../../WebGpuDemo.Head.targets.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="../../../../../src/Platform.UI/Platform.UI.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.Toolkit/Platform.UI.Toolkit.Skia.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.FluentTheme/Platform.UI.FluentTheme.Core.csproj" />
+    <ProjectReference Include="../../../../../src/CodeBrix.Platform.Extensions.Logging/CodeBrix.Platform.Extensions.Logging.Core.csproj" />
+    <ProjectReference Include="../../../../../src/Platform.UI.Adapter.Microsoft.Extensions.Logging/Platform.UI.Adapter.Microsoft.Extensions.Logging.Core.csproj" />
+
+    <!-- The WebGpu add-in, normally consumed as the CodeBrix.Platform.WebGpu.ApacheLicenseForever NuGet; referenced
+         from source here, ONCE, in Core: every head (and both PlayTests projects) inherit it. It brings
+         CodeBrix.WebGpu.Skia and CodeBrix.WebGpu.Native - which is all the Triangle, Renderer class and Controls pages
+         need: they draw with the raw binding and nothing else. -->
+    <ProjectReference Include="../../../../../src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Skia.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- A handful of public-domain (CC0) models, copied with their licence files from the CodeBrix.WebGpu repository's
+         WebGpuModelViewer sample (see README.md, Credits): loose copy-to-output files the Models page loads by path. -->
+    <Content Include="Assets\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

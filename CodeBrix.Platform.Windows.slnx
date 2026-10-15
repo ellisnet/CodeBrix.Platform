@@ -45,6 +45,7 @@
     <Project Path="src/Platform.UI.Runtime.Skia.MacOS/Platform.UI.Runtime.Skia.MacOS.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.OpenGL/Platform.UI.Runtime.Skia.PlayTest.OpenGL.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.WebGpu/Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32/Platform.UI.Runtime.Skia.Win32.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Win32.Support/Platform.UI.Runtime.Skia.Win32.Support.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.Wpf/Platform.UI.Runtime.Skia.Wpf.csproj" />
@@ -91,6 +92,8 @@
     <Project Path="src/AddIns/Platform.AppSettings/Platform.AppSettings.Core.csproj" />
     <Project Path="src/AddIns/Platform.AppSettings/Platform.AppSettings.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout/Platform.UI.TextLayout.Core.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Core.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu/Platform.UI.WebGpu.Skia.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebView.Skia/Platform.UI.WebView.Skia.csproj" />
     <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Core.csproj" />
     <Project Path="src/AddIns/Platform.WinUI.Graphics2DSK/Platform.WinUI.Graphics2DSK.Windows.csproj" />
@@ -122,6 +125,7 @@
     <Project Path="src/Platform.UI.Core.Tests/Platform.UI.Core.Tests.csproj" />
     <Project Path="src/Platform.UI.Engine.Tests/Platform.UI.Engine.Tests.csproj" />
     <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.Tests/Platform.UI.Runtime.Skia.PlayTest.Tests.csproj" />
+    <Project Path="src/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests/Platform.UI.Runtime.Skia.PlayTest.WebGpu.Tests.csproj" />
     <Project Path="src/Platform.UI.RuntimeTests/Platform.UI.RuntimeTests.Windows.csproj" />
     <Project Path="src/Platform.Foundation/Platform.Foundation.Tests.csproj" />
     <Project Path="src/Platform.UI.Composition/Platform.UI.Composition.Tests.csproj" />
@@ -138,6 +142,7 @@
     <Project Path="src/AddIns/Platform.UI.TerminalView.Tests/Platform.UI.TerminalView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.PlotterView.Tests/Platform.UI.PlotterView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.VideoPlayer.Tests/Platform.UI.VideoPlayer.Skia.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebGpu.Tests/Platform.UI.WebGpu.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.AppSettings.Tests/Platform.AppSettings.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Tests.csproj" />
     <Project Path="src/AddIns/CodeBrix.Platform.SkiaSharp.Views.Tests/CodeBrix.Platform.SkiaSharp.Views.Skia.Tests.csproj" />
