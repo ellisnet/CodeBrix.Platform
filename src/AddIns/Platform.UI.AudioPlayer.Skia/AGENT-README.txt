@@ -145,7 +145,11 @@ setters):
                                      the file synchronously (Duration is valid
                                      immediately) and, when AutoPlay is true,
                                      starts playback. "" unloads.
-    bool     AutoPlay                default false
+    bool     AutoPlay                default false. Set true at run time
+                                     while a source is loaded and not
+                                     playing, it starts playback - a paused
+                                     player included; false never stops one.
+                                     (MidiPlayer: the same rule.)
     TimeSpan Position                two-way; see SCRUBBER BINDING
     double   PositionSeconds         Position in seconds, two-way, no converter
     TimeSpan Duration                read-only; TimeSpan.Zero while unloaded

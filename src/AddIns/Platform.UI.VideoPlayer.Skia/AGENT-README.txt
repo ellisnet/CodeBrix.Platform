@@ -165,7 +165,9 @@ VideoPlayer — the source
       the file's size in memory, and the read happens while Source is being set.
       Ignored for streams and addresses. Read AT OPEN, so set it BEFORE Source.
 
-  bool AutoPlay                    default false
+  bool AutoPlay                    default false. Set true at run time while a
+      source is open and not playing, it starts playback - a paused player
+      included; false never stops one.
 
 VideoPlayer — the transport (the AudioPlayer element's members, plus IsMuted)
 -----------------------------------------------------------------------------

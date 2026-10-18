@@ -44,6 +44,16 @@ namespace CodeBrix.Platform.UI.PlotterView;
 /// <see cref="PlotFontFamily"/> says otherwise.
 /// </para>
 /// <para>
+/// The chart follows this element's <see cref="FrameworkElement.ActualTheme"/> for every colour the application has
+/// not set, and re-applies it when the theme changes: under the light theme the chart keeps CodeBrix.Plotter's own
+/// colours; under the dark theme the model's text colour (and through it every title, axis label and legend text left
+/// Automatic), the plot-area border and each axis's line, tick and grid-line colours take light-on-dark twins, and so do
+/// the tracker and zoom-rectangle colours. A colour is "set" once the application gives it any value other than the
+/// CodeBrix.Plotter default (on the model, an axis or a legend) or assigns it on this control
+/// (<see cref="TrackerBackground"/>, <see cref="TrackerForeground"/>, <see cref="ZoomRectangleStroke"/>); a set colour
+/// is never changed, in either theme. Series colours are never changed.
+/// </para>
+/// <para>
 /// Interaction is customizable through <see cref="Controller"/>: bind or unbind gestures on a
 /// <see cref="PlotController"/> to change what the mouse, keyboard and touch do. Give the
 /// control a bounded size (a Grid star cell is ideal) and keyboard focus lands on it when it
@@ -77,6 +87,11 @@ public sealed partial class PlotterControl : Control, IPlotView
         _canvas.PointerCaptureLost += OnCanvasPointerLost;
 
         Template = new ControlTemplate(CreateTemplateRoot);
+
+        //Every chart colour the application has not set follows this element's theme (see the remarks above)
+        ActualThemeChanged += (_, _) => ApplyActualTheme();
+        Loaded += (_, _) => ApplyActualTheme();
+        ApplyActualTheme();
     }
 
     /// <summary>Identifies the <see cref="Model"/> dependency property.</summary>
@@ -130,14 +145,14 @@ public sealed partial class PlotterControl : Control, IPlotView
         }
     }
 
-    /// <summary>The tracker box fill. Default: near-opaque dark gray.</summary>
+    /// <summary>The tracker box fill. Default: follows the theme (near-opaque dark gray under the light theme, near-opaque light gray under the dark theme); once assigned, the assigned colour in both.</summary>
     public PlotterColor TrackerBackground
     {
         get => _host.TrackerBackground;
         set { _host.TrackerBackground = value; InvalidateCanvas(); }
     }
 
-    /// <summary>The tracker text color. Default: white.</summary>
+    /// <summary>The tracker text color. Default: follows the theme (white under the light theme, black under the dark theme); once assigned, the assigned colour in both.</summary>
     public PlotterColor TrackerForeground
     {
         get => _host.TrackerForeground;
@@ -158,7 +173,7 @@ public sealed partial class PlotterControl : Control, IPlotView
         set { _host.ZoomRectangleFill = value; InvalidateCanvas(); }
     }
 
-    /// <summary>The zoom rectangle border color. Default: black.</summary>
+    /// <summary>The zoom rectangle border color. Default: follows the theme (black under the light theme, white under the dark theme); once assigned, the assigned colour in both.</summary>
     public PlotterColor ZoomRectangleStroke
     {
         get => _host.ZoomRectangleStroke;
@@ -267,6 +282,18 @@ public sealed partial class PlotterControl : Control, IPlotView
         {
             //The clipboard can be transiently unavailable; the copy simply doesn't take.
         }
+    }
+
+    private void ApplyActualTheme()
+    {
+        var dark = ActualTheme == ElementTheme.Dark;
+        if (_host.IsDarkTheme == dark)
+        {
+            return;
+        }
+
+        _host.IsDarkTheme = dark;
+        InvalidatePlot(false);
     }
 
     private void OnModelChanged(PlotModel? oldModel, PlotModel? newModel)

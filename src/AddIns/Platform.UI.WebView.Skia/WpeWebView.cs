@@ -96,6 +96,12 @@ internal sealed unsafe class WpeWebView
 			WebKitInterop.webkit_user_content_manager_add_script(_ucm, bridgeScript);
 			WebKitInterop.webkit_user_script_unref(bridgeScript);
 
+			// The host-to-page half (PostWebMessageAsString / AsJson): window.chrome.webview's 'message' listeners.
+			// Added after the bridge script, which creates window.chrome.webview; user scripts run in insertion order.
+			var listenerScript = WebKitInterop.webkit_user_script_new(WebViewScripts.MessageListenerScript, WebKitInterop.InjectedFramesAll, WebKitInterop.InjectionTimeStart, IntPtr.Zero, IntPtr.Zero);
+			WebKitInterop.webkit_user_content_manager_add_script(_ucm, listenerScript);
+			WebKitInterop.webkit_user_script_unref(listenerScript);
+
 			// The boxed backend wrapper transfers to the view at construction; the destroy
 			// notify tears the exportable down when the view goes away.
 			var backendWrapper = WebKitInterop.webkit_web_view_backend_new(_backend, &OnBackendDestroyedNative, _exportable);

@@ -287,6 +287,10 @@ public sealed class AudioPlayerSteps
 
 		ElementFactory.RegisterProperty<AudioPlayerElement>("IsLooping",
 			(player, value) => player.IsLooping = ReadBoolean(value));
+		ElementFactory.RegisterProperty<AudioPlayerElement>("AutoPlay",
+			(player, value) => player.AutoPlay = ReadBoolean(value));
+		ElementFactory.RegisterProperty<MidiPlayerElement>("AutoPlay",
+			(player, value) => player.AutoPlay = ReadBoolean(value));
 
 		// The MIDI sequence is written on first use rather than committed as a binary nobody can
 		// read; doing it here means the first scenario does not pay for it.

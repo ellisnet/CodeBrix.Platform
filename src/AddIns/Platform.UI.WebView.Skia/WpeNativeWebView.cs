@@ -26,7 +26,7 @@ namespace CodeBrix.Platform.UI.WebView.Skia.Linux;
 /// into the Skia scene through <see cref="WpeWebViewHostElement"/>, and XAML routed input is
 /// translated into WPE input events.
 /// </summary>
-internal sealed class WpeNativeWebView : ICleanableNativeWebView
+internal sealed class WpeNativeWebView : ICleanableNativeWebView, INativeWebViewMessaging
 {
 	// Pixels of scroll per 120-unit wheel detent, matching common browser behavior.
 	private const double WheelPixelsPerTick = 53.0;
@@ -501,6 +501,40 @@ internal sealed class WpeNativeWebView : ICleanableNativeWebView
 		// comma) to be passed to eval; the [1..^1] part removes the surrounding [ and ].
 		var argumentString = arguments is not null ? JsonSerializer.Serialize(arguments)[1..^1] : "";
 		return ExecuteScriptAsync($"{script}({argumentString})", token);
+	}
+
+	/// <summary>
+	/// Delivers CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson to the page's window.chrome.webview 'message'
+	/// listeners by evaluating a delivery script (<see cref="WebViewScripts"/>; the payload is only ever a JSON string
+	/// literal in it). A page whose message channel does not exist yet - the document-start script has not run - drops
+	/// the message, with a Debug log line.
+	/// </summary>
+	/// <param name="payload">The string, or the JSON text when <paramref name="isJson"/> is true.</param>
+	/// <param name="isJson">Whether <paramref name="payload"/> is JSON (the page receives the parsed value).</param>
+	/// <exception cref="ArgumentException"><paramref name="isJson"/> is true and <paramref name="payload"/> is not valid JSON.</exception>
+	public void PostWebMessage(string payload, bool isJson)
+	{
+		var script = isJson ? WebViewScripts.JsonMessageDelivery(payload) : WebViewScripts.StringMessageDelivery(payload);
+		_ = DeliverWebMessageAsync(script);
+	}
+
+	private async Task DeliverWebMessageAsync(string script)
+	{
+		try
+		{
+			var listeners = await _wpe.EvaluateScriptAsync(script).ConfigureAwait(false);
+			if (listeners == WebViewScripts.NoChannelResult && this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug("A web message was dropped: the page's message channel is not set up yet (posted before the document-start script ran).");
+			}
+		}
+		catch (Exception e)
+		{
+			if (this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug($"A web message could not be delivered: {e.Message}");
+			}
+		}
 	}
 
 	public void SetUserAgent(string userAgent) => _wpe.SetUserAgent(userAgent);

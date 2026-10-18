@@ -62,40 +62,4 @@
 		<ProjectReference Include="..\Platform.UI\Platform.UI.Skia.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<!-- These three are what the target below swaps in, and nothing else in this project's
-		     reference graph builds them: the compile-time reference to CodeBrix.Platform resolves
-		     to the .Reference flavour, so without these a STALE .Skia build would be copied beside
-		     the tests and the suite would silently measure yesterday's framework.
-		     ReferenceOutputAssembly is false because they are needed at run time only - the
-		     compile still binds .Reference, exactly as it did before. -->
-		<ProjectReference Include="..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
-	</ItemGroup>
-
-	<!-- Every type here is a XAML type: constructing one runs the dependency-object machinery,
-	     which touches the dispatcher. Assembly resolution hands a host-free test process the
-	     .Reference variants of the runtime assemblies, whose dispatcher stubs throw
-	     NotSupportedException("Ref assembly") - so swap in the .Skia variants, exactly as the
-	     from-source sample heads and the add-in suites do. DispatcherInitializer.cs then installs
-	     the host-free dispatcher overrides those assemblies expect a head to install. -->
-	<Target Name="_HeadlessTestsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
-		<PropertyGroup>
-			<_CbSkiaUwp>$(MSBuildThisFileDirectory)..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbSkiaUwp>
-			<_CbSkiaComp>$(MSBuildThisFileDirectory)..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbSkiaComp>
-			<_CbSkiaDisp>$(MSBuildThisFileDirectory)..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbSkiaDisp>
-		</PropertyGroup>
-		<ItemGroup>
-			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.pdb')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-		</ItemGroup>
-	</Target>
-
 </Project>

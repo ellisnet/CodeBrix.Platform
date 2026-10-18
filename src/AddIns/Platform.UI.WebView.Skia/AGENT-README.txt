@@ -232,12 +232,37 @@ The host receives it in WebMessageReceived (always on the UI thread):
     };
 Settings.IsWebMessageEnabled must be true (the default).
 
-HOST-TO-PAGE: CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson are
-NOT implemented on the Skia heads (they log a not-implemented message, or
-throw NotImplementedException when FeatureConfiguration.ApiInformation
-.IsFailWhenNotImplemented is true). Push data into the page with
-ExecuteScriptAsync instead:
+HOST-TO-PAGE MESSAGING
+----------------------
+On the Linux heads (X11, Wayland, FrameBuffer) the host posts to the page with
+the WebView2 calls, and the page listens with the WebView2 page API:
+    Browser.CoreWebView2.PostWebMessageAsString("hello");      // data = "hello"
+    Browser.CoreWebView2.PostWebMessageAsJson("{\"n\":1}");     // data = {n: 1}
+Page side (window.chrome.webview, set up before any page script runs):
+    window.chrome.webview.addEventListener('message', function (e) {
+        // e.type === 'message'; e.data is the string (AsString) or the parsed
+        // JSON value (AsJson); e.source is window.chrome.webview
+    });
+    window.chrome.webview.removeEventListener('message', listener);
+    window.chrome.webview.onmessage = function (e) { ... };   // also called
+Listeners are kept in the page; one that throws does not stop the others.
+A round trip is just the two directions together: the page answers with
+window.chrome.webview.postMessage(...) and the host hears it in
+WebMessageReceived. The text reaches the page exactly as posted (quotes, line
+breaks, U+2028/U+2029 and "</script>" included): it is passed as an encoded
+string, never as script. Pitfalls:
+  - PostWebMessageAsJson throws ArgumentException for text that is not JSON.
+  - A message posted before the page's document has started loading (no page
+    yet, or between pages) is dropped, with a Debug log line. Post after
+    NavigationCompleted, or have the page post "ready" and post after that.
+  - Posting does not wait for the page; the page receives messages in the order
+    posted.
+On the Windows heads (Win32, WPF) and macOS these two calls are not
+implemented yet: they log a not-implemented message (or throw when
+FeatureConfiguration.ApiInformation.IsFailWhenNotImplemented is true). There,
+push data into the page with ExecuteScriptAsync:
     await Browser.ExecuteScriptAsync("window.receiveFromHost('hello')");
+CodeBrix.Android's web view offers the same page-side API.
 
 DOWNLOADS
 ---------
@@ -299,8 +324,9 @@ FeatureConfiguration.WebView and FeatureConfiguration.WebView2 exist but carry
 no settable members on the Skia heads (their upstream flags are compiled out),
 so there is nothing WebView-specific to configure. The one relevant global
 switch is FeatureConfiguration.ApiInformation.IsFailWhenNotImplemented, which
-turns not-implemented members (PostWebMessageAsString, CoreWebView2Environment
-.*, ...) from a logged message into a thrown NotImplementedException.
+turns not-implemented members (PostWebMessageAsString on the Windows and macOS
+heads, CoreWebView2Environment.*, ...) from a logged message into a thrown
+NotImplementedException.
 
 Windows-head specifics
 ----------------------

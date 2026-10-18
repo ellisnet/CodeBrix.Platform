@@ -67,6 +67,20 @@ namespace Windows.Media.Playback
 			}
 		}
 
+		/// <summary>
+		/// Gets the natural width of the current video, in pixels: 0 while the player has no source, while no
+		/// MediaPlayerPresenter (a MediaPlayerElement) shows the player, or before the size is known.
+		/// </summary>
+		public uint NaturalVideoWidth
+			=> MediaPlayer?.Source is null ? 0 : MediaPlayer.NaturalVideoSizeSource?.NaturalVideoWidth ?? 0;
+
+		/// <summary>
+		/// Gets the natural height of the current video, in pixels: 0 while the player has no source, while no
+		/// MediaPlayerPresenter (a MediaPlayerElement) shows the player, or before the size is known.
+		/// </summary>
+		public uint NaturalVideoHeight
+			=> MediaPlayer?.Source is null ? 0 : MediaPlayer.NaturalVideoSizeSource?.NaturalVideoHeight ?? 0;
+
 		public bool IsUpdateTimePosition { get; set; }
 
 		public double UpdateTimePositionRate { get; set; }

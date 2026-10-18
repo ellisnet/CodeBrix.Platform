@@ -215,17 +215,22 @@ MediaPlaybackSession (MediaPlayer.PlaybackSession)
     public double BufferingProgress { get; }
     public MediaPlaybackState PlaybackState { get; }
         // enum MediaPlaybackState { None, Opening, Buffering, Playing, Paused }
+    public uint NaturalVideoWidth { get; }        // pixels; 0 = no source, no
+    public uint NaturalVideoHeight { get; }       // MediaPlayerElement, or not known yet
     public event TypedEventHandler<MediaPlaybackSession, object> PositionChanged;
     public event TypedEventHandler<MediaPlaybackSession, object> PlaybackStateChanged;
     public event TypedEventHandler<MediaPlaybackSession, object> NaturalDurationChanged;
     public event TypedEventHandler<MediaPlaybackSession, object> PlaybackRateChanged;
     public event TypedEventHandler<MediaPlaybackSession, object> BufferingProgressChanged;
 
-NOT available: MediaPlaybackSession.NaturalVideoWidth / NaturalVideoHeight
-throw NotImplementedException on the Skia heads. The natural size is used
-internally by the presenter for Stretch, but there is no public readback; use
-MediaPlayer.IsVideo and the NaturalVideoDimensionChanged event to learn that a
-video track exists.
+NaturalVideoWidth / NaturalVideoHeight report the size of the video track
+the MediaPlayerElement showing the player has decoded. They are 0 while the
+player has no source, while no MediaPlayerElement shows the player (a bare
+MediaPlayer has no presenter to ask), and until the first frame's size is
+known: read them in a MediaPlayer.NaturalVideoDimensionChanged handler
+rather than straight after setting Source. The session's
+own NaturalVideoSizeChanged event is not raised; use the player's
+NaturalVideoDimensionChanged.
 
 Windows.Media.Core.MediaSource and playlists
 --------------------------------------------

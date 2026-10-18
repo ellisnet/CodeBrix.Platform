@@ -140,18 +140,45 @@ Properties:
         resets the typeface cache and repaints.
 
     public PlotterColor TrackerBackground { get; set; }
-        Tracker box fill. Default PlotterColor.FromArgb(0xE6, 0x2D, 0x2D,
-        0x30) - near-opaque dark gray.
+        Tracker box fill. Default follows the theme (see THEMES below):
+        PlotterColor.FromArgb(0xE6, 0x2D, 0x2D, 0x30) - near-opaque dark gray
+        - under the light theme, FromArgb(0xE6, 0x2C, 0x2C, 0x2C) under the
+        dark theme (a dark callout with light text in both themes, as WinUI
+        tooltips are dark in the dark theme). Once assigned, the assigned
+        colour in both themes.
     public PlotterColor TrackerForeground { get; set; }
-        Tracker text and border color. Default PlotterColors.White.
+        Tracker text and border color. Default follows the theme:
+        PlotterColors.White under both themes.
     public double TrackerFontSize { get; set; }
         Tracker text size in DIPs. Default 12; values below 4 clamp to 4.
     public PlotterColor ZoomRectangleFill { get; set; }
         Default PlotterColor.FromArgb(0x40, 0xFF, 0xFF, 0x00) - translucent
         yellow.
     public PlotterColor ZoomRectangleStroke { get; set; }
-        Default PlotterColors.Black.
+        Default follows the theme: PlotterColors.Black (light theme),
+        PlotterColors.White (dark theme).
     (Each of the five setters above repaints immediately.)
+
+THEMES: the control follows its ActualTheme for every chart colour the app
+has not set, and re-applies it when the theme changes (ActualThemeChanged).
+Under the light theme the chart keeps CodeBrix.Plotter's own colours exactly.
+Under the dark theme the model's TextColor (and through it every title,
+subtitle, axis label, axis title and legend text left Automatic), the
+PlotAreaBorderColor, each axis's AxislineColor, TicklineColor, Major/Minor/
+ExtraGridlineColor and a legend's SeriesInvisibleTextColor take light-on-dark
+twins (white, keeping a translucent default's alpha), and the tracker and
+zoom-rectangle colours switch too. Series colours never change. A colour
+counts as SET - and is never changed, in either theme - once the app gives it
+any value other than the CodeBrix.Plotter default, or assigns the control's
+TrackerBackground / TrackerForeground / ZoomRectangleStroke. To pin your own
+look, set the colours on the model, its axes and legends (and the tracker
+properties) explicitly. Pitfall: because CodeBrix.Plotter's defaults for
+these properties are concrete black values rather than Automatic, a colour
+set to EXACTLY the Plotter default (PlotterColors.Black for TextColor, say)
+cannot be told apart from one left alone and turns white under the dark
+theme; pin black text with a near-black such as
+PlotterColor.FromRgb(0x01, 0x01, 0x01), or set RequestedTheme="Light" on the
+control.
 
 IPlotView members the control exposes (a controller, a manipulator, or your
 own code can call them):
@@ -572,11 +599,11 @@ QUICK REFERENCE CARD
       Model (DP)               PlotModel?         one view per model
       Controller               IPlotController?   null = stock PlotController
       PlotFontFamily           string?            ms-appx:/// URI or null
-      TrackerBackground        PlotterColor       0xE6 2D 2D 30
-      TrackerForeground        PlotterColor       White
+      TrackerBackground        PlotterColor       0xE6 2D 2D 30 (dark: 2C 2C 2C)
+      TrackerForeground        PlotterColor       White (both themes)
       TrackerFontSize          double             12 (min 4)
       ZoomRectangleFill        PlotterColor       0x40 FF FF 00
-      ZoomRectangleStroke      PlotterColor       Black
+      ZoomRectangleStroke      PlotterColor       Black (dark theme: White)
       ActualModel              PlotModel?         == Model
       ActualController         IController        Controller ?? default
       ClientArea               PlotterRect        (0,0,w,h) DIPs

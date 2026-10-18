@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -39,6 +39,24 @@ namespace Windows.Media.Playback
 		}
 
 		public bool AutoPlay { get; set; }
+
+		// The presenter showing this player (weakly held: a player must not keep a presenter alive), which answers the
+		// session's NaturalVideoWidth / NaturalVideoHeight.
+		private WeakReference<CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize> _naturalVideoSizeSource;
+
+		/// <summary>
+		/// Gets what reports the natural size of this player's video (the MediaPlayerPresenter showing it), or null when
+		/// nothing does.
+		/// </summary>
+		internal CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize NaturalVideoSizeSource
+			=> _naturalVideoSizeSource is not null && _naturalVideoSizeSource.TryGetTarget(out var source) ? source : null;
+
+		/// <summary>
+		/// Sets what reports the natural size of this player's video; the last presenter to show the player wins.
+		/// </summary>
+		/// <param name="source">The size source, or null to clear it.</param>
+		internal void SetNaturalVideoSizeSource(CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize source)
+			=> _naturalVideoSizeSource = source is null ? null : new WeakReference<CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize>(source);
 
 		private bool _isMuted;
 		public bool IsMuted

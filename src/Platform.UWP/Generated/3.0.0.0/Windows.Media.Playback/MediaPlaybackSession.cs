@@ -81,26 +81,8 @@ namespace Windows.Media.Playback
 #endif
 		// Skipping already declared property MediaPlayer
 		// Skipping already declared property NaturalDuration
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public uint NaturalVideoHeight
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member uint MediaPlaybackSession.NaturalVideoHeight is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
-#if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
-		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]
-		public uint NaturalVideoWidth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member uint MediaPlaybackSession.NaturalVideoWidth is not implemented. For more information, visit https://github.com/ellisnet/CodeBrix.Platform/blob/main/NOT-IMPLEMENTED.md");
-			}
-		}
-#endif
+		// Skipping already declared property NaturalVideoHeight
+		// Skipping already declared property NaturalVideoWidth
 		// Skipping already declared property PlaybackState
 #if IS_UNIT_TESTS || __SKIA__ || __NETSTD_REFERENCE__ || __CODEBRIX_CORE__
 		[global::CodeBrix.Platform.NotImplemented("IS_UNIT_TESTS", "__SKIA__", "__NETSTD_REFERENCE__", "__CODEBRIX_CORE__")]

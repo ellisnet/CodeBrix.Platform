@@ -3,12 +3,13 @@
   <!--
     Shared build logic for the CodeBrix.Platform macOS sample heads (the *.MacOS heads under
     samples/CodeBrixPlatform). These heads consume the platform from source via ProjectReference
-    instead of the NuGet packages, so two things the NuGet normally provides must be reproduced
-    here. Rather than copy this into every head, each *.MacOS.csproj imports this one file:
+    instead of the NuGet packages, so what the NuGet normally provides - the native macOS dylib in
+    the head's output - must be reproduced here. Rather than copy this into every head, each
+    *.MacOS.csproj imports this one file:
 
         <Import Project="..\..\CodeBrix.MacOSHead.targets" />
 
-    A new macOS sample head only needs that single import line to pick up both fixes.
+    A new macOS sample head only needs that single import line to pick it up.
 
     GATING: this file is imported only by the *.MacOS heads, and every target below is additionally
     gated on $(_IsCodeBrixMacOSHead) (project name ends with ".MacOS"). So even if this file were
@@ -22,43 +23,6 @@
   <PropertyGroup>
     <_IsCodeBrixMacOSHead Condition="$(MSBuildProjectName.EndsWith('.MacOS'))">true</_IsCodeBrixMacOSHead>
   </PropertyGroup>
-
-  <!--
-    Runtime-replace, reproduced (build-integrated). Before the Core/Skia split, Platform.UI.Skia compiled
-    against the .Reference WinRT projection and the .Reference Composition/Dispatching layers, and this
-    target swapped the .Skia implementations into the copy-local list in their place.
-
-    Since the split there is no .Reference flavor: every framework library is a platform-neutral
-    CodeBrix.Platform*.Core.dll (built once, from its *.Core.csproj) plus, for the libraries that have
-    Skia code, a Skia twin under the old assembly name (CodeBrix.Platform, .UI, .UI.Composition,
-    .UI.Dispatching, .UI.Toolkit). Reference resolution now puts the Skia twins in the copy-local list
-    directly, so the swap below re-adds the very files it removes; it is kept (inert) so this file keeps
-    working unchanged for a head that still resolves an older build. Foundation is Core by whole
-    (CodeBrix.Platform.Foundation.Core.dll, whose AssemblyInfo carries the Runtime.Skia.MacOS grant), so it
-    is no longer swapped.
-    NOTE (WPB1): this file cannot be built on Linux; it was edited by inspection.
-  -->
-  <Target Name="_CodeBrixMacOSUseSkiaRuntimeAssemblies"
-          AfterTargets="ResolveAssemblyReferences"
-          Condition="'$(_IsCodeBrixMacOSHead)' == 'true'">
-    <PropertyGroup>
-      <_CbMacSkiaUwp>$(MSBuildThisFileDirectory)..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbMacSkiaUwp>
-      <_CbMacSkiaComp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbMacSkiaComp>
-      <_CbMacSkiaDisp>$(MSBuildThisFileDirectory)..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbMacSkiaDisp>
-    </PropertyGroup>
-    <ItemGroup>
-      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-      <!-- Add the .Skia variants in their place. -->
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbMacSkiaUwp)\CodeBrix.Platform.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbMacSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbMacSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-    </ItemGroup>
-  </Target>
 
   <!--
     Native macOS dylib copy (from-source / ProjectReference build). The NuGet package ships

@@ -39,7 +39,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.Platform.OpenGL.MitLicenseForever" Version="1.0.252.16" />
+		<PackageReference Include="CodeBrix.Platform.OpenGL.MitLicenseForever" Version="1.0.290.833" />
 	</ItemGroup>
 
 	<ItemGroup>

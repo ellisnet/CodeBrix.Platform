@@ -42,7 +42,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.278.1152" />
+		<PackageReference Include="CodeBrix.SkiaSvg.MitLicenseForever" Version="1.0.284.1048" />
 	</ItemGroup>
 
 	<ItemGroup>

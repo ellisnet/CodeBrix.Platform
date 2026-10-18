@@ -104,9 +104,14 @@ public sealed partial class AudioPlayer : FrameworkElement
 
 	/// <summary>Identifies the <see cref="AutoPlay"/> dependency property.</summary>
 	public static readonly DependencyProperty AutoPlayProperty = DependencyProperty.Register(
-		nameof(AutoPlay), typeof(bool), typeof(AudioPlayer), new PropertyMetadata(false));
+		nameof(AutoPlay), typeof(bool), typeof(AudioPlayer),
+		new PropertyMetadata(false, (o, e) => ((AudioPlayer)o).OnAutoPlayChanged((bool)e.NewValue)));
 
-	/// <summary>When true, playback starts as soon as a source is loaded. Defaults to false.</summary>
+	/// <summary>
+	/// When true, playback starts as soon as a source is loaded. Defaults to false. Setting it to true while a source is
+	/// already loaded and not playing starts playback then, so the order of AutoPlay and <see cref="Source"/> in XAML
+	/// does not matter.
+	/// </summary>
 	public bool AutoPlay
 	{
 		get => (bool)GetValue(AutoPlayProperty);
@@ -290,6 +295,16 @@ public sealed partial class AudioPlayer : FrameworkElement
 		_transport.Load(load, sourceDescription, Volume, IsLooping, AutoPlay);
 
 	private void UnloadSource() => _transport.Unload();
+
+	//AutoPlay set after the source was loaded: start it the way the load would have (the transport's Play is the same
+	//call the load makes when AutoPlay is already true).
+	private void OnAutoPlayChanged(bool autoPlay)
+	{
+		if (autoPlay && _transport.IsSourceLoaded && !IsPlaying)
+		{
+			_transport.Play();
+		}
+	}
 
 	private void ReportFailure(string message, Exception error)
 	{

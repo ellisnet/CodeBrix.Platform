@@ -22,24 +22,4 @@
   </ItemGroup>
   <Import Project="$(WebGpuDemoPlatformSource)SourceGenerators/Platform.UI.SourceGenerators/Content/Platform.UI.SourceGenerators.props" />
   <Import Project="$(WebGpuDemoPlatformSource)SourceGenerators/Platform.UI.Tasks/Content/Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == ''" />
-  <Target Name="_WebGpuDemoUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences" Condition="'$(WebGpuDemoHead)' != 'MacOS'">
-    <PropertyGroup>
-      <_WebGpuDemoSkiaUwp>$(WebGpuDemoPlatformSource)Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_WebGpuDemoSkiaUwp>
-      <_WebGpuDemoSkiaComp>$(WebGpuDemoPlatformSource)Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_WebGpuDemoSkiaComp>
-      <_WebGpuDemoSkiaDisp>$(WebGpuDemoPlatformSource)Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_WebGpuDemoSkiaDisp>
-    </PropertyGroup>
-    <ItemGroup>
-      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-      <!-- Add the .Skia variants in their place. -->
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_WebGpuDemoSkiaUwp)\CodeBrix.Platform.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_WebGpuDemoSkiaUwp)\CodeBrix.Platform.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_WebGpuDemoSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_WebGpuDemoSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_WebGpuDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_WebGpuDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_WebGpuDemoSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-    </ItemGroup>
-  </Target>
-
 </Project>

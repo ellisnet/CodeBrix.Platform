@@ -1050,6 +1050,10 @@
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource SystemChromeBlackMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource SystemChromeDisabledLowColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForeground"  Color="{StaticResource SystemBaseHighColor}" />
+			<!-- The PointerOver and Pressed members of the header-foreground family complete the state set a platform
+			     library probes when it maps a key family onto a native widget; no template references them. -->
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPointerOver" Color="{StaticResource SystemBaseHighColor}" />
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPressed" Color="{StaticResource SystemBaseHighColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource SystemBaseMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{ThemeResource SystemAccentColor}" />
 			<SolidColorBrush x:Key="TextControlButtonBackground" Color="Transparent"  />
@@ -2355,6 +2359,10 @@
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource SystemChromeBlackMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource SystemChromeDisabledLowColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForeground" Color="{StaticResource SystemBaseHighColor}" />
+			<!-- The PointerOver and Pressed members of the header-foreground family complete the state set a platform
+			     library probes when it maps a key family onto a native widget; no template references them. -->
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPointerOver" Color="{StaticResource SystemBaseHighColor}" />
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPressed" Color="{StaticResource SystemBaseHighColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource SystemBaseMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{ThemeResource SystemAccentColor}" />
 			<SolidColorBrush x:Key="TextControlButtonBackground" Color="Transparent" />
@@ -3646,6 +3654,10 @@
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{StaticResource SystemChromeBlackMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlPlaceholderForegroundDisabled" Color="{StaticResource SystemChromeDisabledLowColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForeground"  Color="{StaticResource SystemBaseHighColor}" />
+			<!-- The PointerOver and Pressed members of the header-foreground family complete the state set a platform
+			     library probes when it maps a key family onto a native widget; no template references them. -->
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPointerOver" Color="{StaticResource SystemBaseHighColor}" />
+			<SolidColorBrush x:Key="TextControlHeaderForegroundPressed" Color="{StaticResource SystemBaseHighColor}" />
 			<SolidColorBrush x:Key="TextControlHeaderForegroundDisabled" Color="{StaticResource SystemBaseMediumLowColor}" />
 			<SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{ThemeResource SystemAccentColor}" />
 			<SolidColorBrush x:Key="TextControlButtonBackground" Color="Transparent"  />

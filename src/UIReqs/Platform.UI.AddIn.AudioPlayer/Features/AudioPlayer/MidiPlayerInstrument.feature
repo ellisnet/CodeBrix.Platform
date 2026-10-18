@@ -54,3 +54,27 @@ Scenario: A playing MIDI player sounds voices and moves the musical clock on
 	And the BeatPosition of "midi" rises within 3000 milliseconds
 	And the Value of "scrubber" is more than 3.0
 	And the region of "HorizontalDecreaseRect" contains at least 90 percent "Accent"
+
+@needs-audio-device
+Scenario: A MIDI player told to AutoPlay before it loads plays as soon as it is ready
+	Given the application shows a StackPanel named "deck" 900 by 260
+	And the layout "deck" holds a MidiPlayer named "midi" with:
+		| Property | Value |
+		| AutoPlay | true  |
+	And the Instrument of "midi" is set to "silent.sfz"
+	And the Source of "midi" is set to "tiny.mid"
+	When the MediaOpened of "midi" is raised within 10000 milliseconds
+	And "midi" plays past 1.0 seconds within 6000 milliseconds
+	Then "midi" is playing
+
+@needs-audio-device
+Scenario: A MIDI player told to AutoPlay after it has loaded starts playing then
+	Given the application shows a StackPanel named "deck" 900 by 260
+	And the layout "deck" holds a MidiPlayer named "midi"
+	And the Instrument of "midi" is set to "silent.sfz"
+	And the Source of "midi" is set to "tiny.mid"
+	And the MediaOpened of "midi" is raised within 10000 milliseconds
+	Then "midi" is not playing
+	When the AutoPlay of "midi" is set to "true"
+	And "midi" plays past 1.0 seconds within 6000 milliseconds
+	Then "midi" is playing

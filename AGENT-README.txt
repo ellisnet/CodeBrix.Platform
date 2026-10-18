@@ -779,6 +779,8 @@ HOST BUILDER (namespace CodeBrix.Platform.UI.Hosting)
         where TApplication : Microsoft.UI.Xaml.Application
     ICodeBrixPlatformHostBuilder AfterInit(Action action)
         // runs after the host is initialized and BEFORE the run loop starts
+    ICodeBrixPlatformHostBuilder RestrictToEmbeddedFonts()
+        // text uses only the fonts the app ships (see below)
     ICodeBrixPlatformHostBuilder UseDirectSkiaCanvasMode()      // EXPERIMENTAL
     ICodeBrixPlatformHostBuilder UseDirectGpuRenderingMode()    // EXPERIMENTAL
 
@@ -802,6 +804,32 @@ first frame (e.g. reading FrameBufferHost state, wiring diagnostics):
         .AfterInit(() => Console.Error.WriteLine("host initialized"))
         .UseLinuxX11()
         .Build();
+
+RESTRICTING TEXT TO THE APP'S OWN FONTS: chaining ".RestrictToEmbeddedFonts()"
+onto the host builder sets FeatureConfiguration.Font.RestrictToEmbeddedFonts =
+true. The host machine's installed fonts are then never consulted: not for a
+bare family name (FontFamily="Arial" resolves to the app's default font), and
+not for missing-character fallback - a character none of the app's fonts has
+(its default font, FallbackFontFamilies) renders as that font's .notdef glyph.
+The framework's SymbolsFont stays exempt and is still tried first. Text then
+looks on a desktop exactly as on a device that carries only the app's fonts.
+The builder call is the recommended front door; setting the property yourself
+is its exact equivalent. It is NOT a one-way latch: the property stays
+settable, but set it (either way) before the first text is measured - resolved
+fonts are cached, so text resolved before a change keeps its fonts. Order
+relative to the .Use...() call does not matter. Put the same line in every
+head's Program.cs:
+
+    // Win32 head
+    var host = CodeBrixPlatformHostBuilder.Create()
+        .App(() => new App())
+        .RestrictToEmbeddedFonts()
+        .UseWindowsWin32()
+        .Build();
+
+    // the X11, Wayland, frame-buffer, WPF and macOS heads: the same chain with
+    // .UseLinuxX11() / .UseLinuxWayland() / .UseLinuxFrameBuffer() /
+    // .UseWindowsWpf() / .UseMacOS() in place of .UseWindowsWin32()
 
 EXPERIMENTAL: chaining ".UseDirectSkiaCanvasMode()" onto the host builder makes
 SKXamlCanvas draw each frame straight into its on-screen bitmap buffer (one fewer
@@ -1357,8 +1385,9 @@ Missing characters. By default a character the requested font has no glyph for
 is looked for in the framework's SymbolsFont, then in
 FeatureConfiguration.Font.FallbackFontFamilies (the application's own fonts,
 in order; empty by default), and then in the host machine's installed fonts.
-Setting FeatureConfiguration.Font.RestrictToEmbeddedFonts = true before the
-first text is measured confines resolution to the fonts the application ships;
+Calling .RestrictToEmbeddedFonts() on the host builder (or setting
+FeatureConfiguration.Font.RestrictToEmbeddedFonts = true) before the first
+text is measured confines resolution to the fonts the application ships;
 a character none of them has then renders as the font's own .notdef glyph
 (blank or a box, depending on the font), and a bare family name such as
 "Segoe UI" resolves to DefaultTextFontFamily instead of a host font. The PlayTest
@@ -1408,7 +1437,11 @@ implemented on the Skia heads and how the framework expects it to be used.
     same Bounds back. Each head adds its own frame. On the frame-buffer and
     PlayTest heads the window is the whole screen and ResizeClient does
     nothing; on Wayland a floating window takes the size, while a maximized,
-    tiled or full-screen one keeps the size the compositor gave it.
+    tiled or full-screen one keeps the size the compositor gave it. This is a
+    deliberate difference from WinUI, whose AppWindow.ResizeClient takes
+    PHYSICAL pixels: on every CodeBrix.Platform head ResizeClient, like the
+    OverlappedPresenter PreferredMinimum/Maximum sizes, takes EFFECTIVE pixels,
+    so do not multiply by the display scale.
 
         MainWindow.AppWindow.ResizeClient(new Windows.Graphics.SizeInt32(1200, 760));
 
@@ -1610,6 +1643,21 @@ implemented on the Skia heads and how the framework expects it to be used.
 
     Rich formats (text, HTML, PNG images, file lists, custom formats) work on
     the desktop heads; the FrameBuffer head has only the opt-in text clipboard.
+
+  DEVICE INFORMATION (Windows.System.Profile.AnalyticsInfo)
+
+    AnalyticsInfo.DeviceForm, AnalyticsInfo.VersionInfo.DeviceFamily and
+    AnalyticsInfo.VersionInfo.DeviceFamilyVersion. DeviceFamilyVersion is the
+    WinUI encoding - one unsigned 64-bit number as a decimal string, major in
+    bits 63..48, minor 47..32, build 31..16, revision 15..0 - and it is real on
+    every head: the desktop heads report the host operating system's version
+    (Environment.OSVersion), and a platform that knows better supplies its own
+    (CodeBrix.Android reports the Android release). "0" means the platform
+    could not say. Decode it like this:
+
+        var v = ulong.Parse(AnalyticsInfo.VersionInfo.DeviceFamilyVersion);
+        var version = new Version((int)(v >> 48), (int)((v >> 32) & 0xFFFF),
+            (int)((v >> 16) & 0xFFFF), (int)(v & 0xFFFF));
 
 TOOLKIT TYPES FOLDED INTO THE CORE PACKAGE
 ------------------------------------------

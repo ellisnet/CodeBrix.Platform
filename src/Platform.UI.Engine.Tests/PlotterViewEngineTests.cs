@@ -131,6 +131,35 @@ public class PlotterViewEngineTests
 		EngineIsolation.AssertNoWinUILoaded("PlotterView");
 	}
 
+	[Fact]
+	public void When_The_Theme_Changes_Then_The_Tracker_And_Zoom_Colours_The_App_Did_Not_Set_Follow_It_And_The_Model_Paints_Light_On_Dark()
+	{
+		//Arrange
+		TestFontSourcePlatform.EnsureRegistered();
+		var view = new TestPlotView(200, 150);
+		var host = view.Host;
+		var model = new PlotModel();
+		model.Axes.Add(new CodeBrix.Plotter.Axes.LinearAxis { Position = CodeBrix.Plotter.Axes.AxisPosition.Bottom });
+		host.SetModel(null, model);
+		host.TrackerBackground = PlotterColors.Purple;
+		var light = (host.TrackerBackground, host.TrackerForeground, host.ZoomRectangleStroke);
+
+		//Act
+		host.IsDarkTheme = true;
+		var dark = (host.TrackerBackground, host.TrackerForeground, host.ZoomRectangleStroke);
+		view.InvalidatePlot(true);
+		using var bitmap = new SKBitmap(200, 150);
+		using var canvas = new SKCanvas(bitmap);
+		host.Paint(canvas, new SKSize(200, 150));
+
+		//Assert
+		light.Should().Be((PlotterColors.Purple, PlotterColors.White, PlotterColors.Black));
+		dark.Should().Be((PlotterColors.Purple, PlotterColors.Black, PlotterColors.White), "the app's tracker fill stays; the rest follow the theme");
+		model.TextColor.Should().Be(PlotterColors.White);
+		model.Axes[0].AxislineColor.Should().Be(PlotterColors.White);
+		EngineIsolation.AssertNoWinUILoaded("PlotterView");
+	}
+
 	/// <summary>A view that forwards to its engine, as PlotterControl does, with no XAML.</summary>
 	private sealed class TestPlotView : IPlotView
 	{

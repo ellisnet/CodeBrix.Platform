@@ -9,7 +9,7 @@ using CodeBrix.Platform.Foundation.Logging;
 
 namespace Microsoft.UI.Xaml.Controls
 {
-	public partial class MediaPlayerPresenter : Border
+	public partial class MediaPlayerPresenter : Border, CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize
 	{
 		private WeakReference<MediaPlayerElement>? _wrOwner;
 		private CompositeDisposable? _mediaPlayerDisposable;
@@ -78,8 +78,18 @@ namespace Microsoft.UI.Xaml.Controls
 				presenter._mediaPlayerDisposable?.Dispose();
 				presenter._mediaPlayerDisposable = null;
 
+				// The player's session asks the presenter showing it for the natural video size (the presenter extension
+				// knows it); a player this presenter no longer shows stops asking it.
+				if (args.OldValue is global::Windows.Media.Playback.MediaPlayer oldPlayer
+					&& ReferenceEquals(oldPlayer.NaturalVideoSizeSource, presenter))
+				{
+					oldPlayer.SetNaturalVideoSizeSource(null);
+				}
+
 				if (args.NewValue is global::Windows.Media.Playback.MediaPlayer newPlayer)
 				{
+					newPlayer.SetNaturalVideoSizeSource(presenter);
+
 #pragma warning disable IDE0055
 					presenter._mediaPlayerDisposable = new CompositeDisposable();
 					var weakThis = new WeakReference<MediaPlayerPresenter>(presenter);
@@ -106,6 +116,10 @@ namespace Microsoft.UI.Xaml.Controls
 		#endregion
 
 		partial void OnMediaPlayerChangedPartial(global::Windows.Media.Playback.MediaPlayer mediaPlayer);
+
+		uint CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize.NaturalVideoWidth => NaturalVideoWidth;
+
+		uint CodeBrix.Platform.Media.Playback.IMediaPlayerNaturalVideoSize.NaturalVideoHeight => NaturalVideoHeight;
 
 		#region Stretch Property
 

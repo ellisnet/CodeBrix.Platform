@@ -138,3 +138,18 @@ Scenario: A bar, a scatter and a pie plot each draw a picture of their own
 	Then the region of "plot" in frame "slices" differs from frame "markers"
 	And the region of "plot" contains at least 5 percent "Red"
 	And the plot "plot" reported no render error
+
+Scenario: Under the dark theme a Plotter draws the colours its model left alone light on dark
+	Given the font "ms-appx:///CodeBrix.Platform.Fonts.OpenSans/Fonts/OpenSans.ttf" is warm
+	And the root theme is set to "Dark"
+	And the application shows a Grid named "cell" with:
+		| Property | Value |
+		| Width    | 900   |
+		| Height   | 600   |
+	And the layout "cell" holds a Plotter named "plot" with:
+		| Property | Value |
+		| Model    | Line  |
+	When the frame is captured
+	Then the region of "plot" contains "#FFFFFF"
+	And the region of "plot" does not contain "#000000"
+	And the plot "plot" reported no render error

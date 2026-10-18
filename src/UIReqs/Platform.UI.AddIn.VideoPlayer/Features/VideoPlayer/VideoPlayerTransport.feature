@@ -92,6 +92,27 @@ Scenario: A looping VideoPlayer returns to its first picture instead of ending
 	Then the video "player" is playing
 	And the PlaybackEnded of "player" was never raised
 
+Scenario: A VideoPlayer told to AutoPlay before its clip is opened plays the clip
+	Given the application shows a Grid named "cell" 640 by 480
+	And the layout "cell" holds a VideoPlayer named "player" with:
+		| Property | Value |
+		| AutoPlay | true  |
+	When the clip "twocolour_raw_videoonly.mkv" is opened in "player"
+	Then the video "player" is playing
+	And "player" has played past 1.0 seconds within 6000 milliseconds
+	And the region of "player" shows at least 99 percent "#0000FF" within 5000 milliseconds
+
+Scenario: A VideoPlayer told to AutoPlay after its clip is opened plays the clip
+	Given the application shows a Grid named "cell" 640 by 480
+	And the layout "cell" holds a VideoPlayer named "player"
+	And the clip "twocolour_raw_videoonly.mkv" is opened in "player"
+	And the region of "player" shows at least 99 percent "#FF0000" within 8000 milliseconds
+	Then the video "player" is not playing
+	When the AutoPlay of "player" is set to "true"
+	Then the video "player" is playing
+	And "player" has played past 1.0 seconds within 6000 milliseconds
+	And the region of "player" shows at least 99 percent "#0000FF" within 5000 milliseconds
+
 @needs-audio-device
 Scenario: A clip that carries a soundtrack plays its picture with the sound silenced
 	Given the application shows a Grid named "cell" 640 by 480

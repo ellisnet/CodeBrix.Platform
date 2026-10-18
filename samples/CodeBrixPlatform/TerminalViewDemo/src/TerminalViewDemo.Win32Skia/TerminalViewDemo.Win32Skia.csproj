@@ -67,40 +67,4 @@
   <Import Project="..\..\..\..\..\src\SourceGenerators\Platform.UI.SourceGenerators\Content\Platform.UI.SourceGenerators.props" />
   <Import Project="..\..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
 
-  <!--
-    Runtime-replace, reproduced (build-integrated). Platform.UI.Skia compiles against the
-    .Reference WinRT projection and the .Reference Composition/Dispatching layers; the NuGet's
-    runtime-replace targets swapped in the .Skia implementations. We consume the platform via
-    project references (no NuGet), so reference resolution puts the .Reference variants of these
-    same-named/same-versioned assemblies in the copy-local list. The Reference variants lack
-    Skia-only types (e.g. Windows.UI.ViewManagement.IApplicationViewExtension in
-    CodeBrix.Platform.dll) -> TypeLoadException in Win32Host.
-
-    Rather than overwrite output after the fact (which races VS's own copy step), we edit the
-    copy-local list right after reference resolution and before the output copy: drop the
-    .Reference entries and add the .Skia ones, so the normal CopyFilesToOutputDirectory places
-    the .Skia builds. Only the three assemblies that actually differ are swapped (Foundation is
-    byte-identical; UI/Toolkit/FluentTheme already resolve to .Skia). Compile still uses the
-    .Reference API surface (identical), so only runtime copy is affected.
-  -->
-  <Target Name="_AtedUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
-    <PropertyGroup>
-      <_AtedSkiaUwp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_AtedSkiaUwp>
-      <_AtedSkiaComp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_AtedSkiaComp>
-      <_AtedSkiaDisp>$(MSBuildThisFileDirectory)..\..\..\..\..\src\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_AtedSkiaDisp>
-    </PropertyGroup>
-    <ItemGroup>
-      <!-- Drop the .Reference variants resolved for the runtime-replaced assemblies (dll + pdb). -->
-      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-        Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-      <!-- Add the .Skia variants in their place. -->
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_AtedSkiaUwp)\CodeBrix.Platform.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_AtedSkiaUwp)\CodeBrix.Platform.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_AtedSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_AtedSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_AtedSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-      <ReferenceCopyLocalPaths Include="$(_AtedSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_AtedSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-    </ItemGroup>
-  </Target>
-
 </Project>

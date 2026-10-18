@@ -166,6 +166,25 @@ REPOSITORY LAYOUT
       Core is CodeBrix.Platform.UI.AudioPlayer.Core.dll (not ".Skia.Core") with AudioPlayer and
       SoundEffect over two output contracts; MidiPlayer stays in the Skia assembly because its
       public API is made of CodeBrix.Audio types.
+      AnalyticsInfo (Platform.UWP, System/Profile/Internal): two internal ApiExtensibility seams a
+      platform library registers - IAnalyticsInfoExtension (GetDeviceForm, the device form) and,
+      additively beside it, IAnalyticsVersionInfoExtension (GetDeviceFamilyVersion, the WinUI-encoded
+      OS version as a decimal string, null when unknown). Both are read on every access of the
+      public property. With no version extension registered, DeviceFamilyVersion encodes
+      Environment.OSVersion.Version (VersionHelpers.ToDeviceFamilyVersion, components clamped to
+      0..65535); a registered extension that returns null reports "0". Fenced in
+      src/Platform.UI.Core.Tests/AnalyticsVersionInfoTests.cs. CodeBrix.Android implements these
+      seams and its intake gate fingerprints the seams it uses, so never change either interface's
+      members - add a new interface instead.
+      WebView (Platform.UWP/UI): INativeWebView is the native web view seam; a native view MAY also
+      implement the optional, additive INativeWebViewMessaging (PostWebMessage(string payload, bool
+      isJson)), which CoreWebView2.PostWebMessageAsString / AsJson delegate to (a view without it keeps
+      those two reporting not-implemented; no view yet = dropped with a Debug line). The Linux WPE view
+      implements it: AddIns/Platform.UI.WebView.Skia/WebViewScripts.cs holds the document-start listener
+      script and the delivery scripts (payload only ever a JSON string literal), the same text shape as
+      CodeBrix.Android's WebViewScripts; fenced by AddIns/Platform.UI.WebView.Tests and the WebView
+      UIReqs round-trip scenario. The Win32/WPF/macOS native views do not implement it yet: see
+      WEBVIEW APP-TO-PAGE MESSAGING ON WINDOWS AND MACOS below for what each needs.
       SkiaSharp.Views: its Core holds SKXamlCanvas, SKSwapChainPanel and the Skia-canvas host
       seam the drawing add-ins build on (Hosting/: SKCanvasHost and SKCanvasHostElement, an
       SKCanvas-typed paint over the framework's SKCanvasVisualBase; a consumer needs the Core's
@@ -254,12 +273,14 @@ that csproj; see its comment).
 
 The samples under samples/CodeBrixPlatform consume the framework FROM SOURCE
 via ProjectReference (each head references its head csproj under src/ plus the
-SourceGenerators project). Because buildTransitive targets do not flow across
-a ProjectReference, the sample heads carry the runtime-replace logic
-themselves; the macOS sample heads import samples/CodeBrixPlatform/
-CodeBrix.MacOSHead.targets for it. A new macOS sample head needs only that one
-import line. (Since the Core/Skia split there is no Reference flavor for that
-logic to swap out; it re-adds the same Skia files and is kept inert.)
+SourceGenerators project). Since the Core/Skia split, reference resolution puts
+the Skia twins (CodeBrix.Platform, .UI.Composition, .UI.Dispatching, ...) in a
+head's copy-local list directly, so a from-source head (and a host-free test
+suite) needs no runtime-replace step of its own. Because buildTransitive
+targets do not flow across a ProjectReference, the macOS sample heads import
+samples/CodeBrixPlatform/CodeBrix.MacOSHead.targets for the one thing the
+NuGet would otherwise do for them (copying the native macOS dylib into the
+output); a new macOS sample head needs only that one import line.
 
 BUILD FAILS WITH CS2012 (task DLL locked): the solution build may fail with
     error CS2012: Cannot open '...\Platform.XamlMerge.Task\obj\Release\
@@ -357,7 +378,7 @@ Microsoft.Testing.Platform per global.json):
     Platform.UI.CommandBar.Tests, Platform.UI.FlexPanel.Tests,
     Platform.UI.PlotterView.Tests, Platform.UI.TerminalView.Tests,
     Platform.UI.TextLayout.Tests, Platform.UI.VideoPlayer.Tests, Platform.UI.WebGpu.Tests,
-    CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Tests.csproj),
+    Platform.UI.WebView.Tests, CodeBrix.Platform.SkiaSharp.Views.Tests (all *.Tests.csproj),
     src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj
 
     CodeBrix.Platform.SkiaSharp.Views.Tests is the guard for a SkiaSharp version
@@ -1459,6 +1480,122 @@ NOTES
     release that carries the Core split (the first family version published
     after 1.0.254.167): the copy ships in that release and is gone from the
     one after it.
+
+WEBVIEW APP-TO-PAGE MESSAGING ON WINDOWS AND MACOS (TO DO)
+==========================================================
+A WebView has two message directions. Page-to-app is the page calling
+window.chrome.webview.postMessage(...) and the application receiving it in
+CoreWebView2.WebMessageReceived; every head has that. App-to-page is the
+reverse: the application calls CoreWebView2.PostWebMessageAsString(...) or
+PostWebMessageAsJson(...) and the page's window.chrome.webview 'message'
+listeners (addEventListener / onmessage, as WebView2 offers them) receive an
+event whose data is the string, or the parsed JSON value. Core forwards those
+two calls to the head's native web view when it implements the optional,
+additive seam INativeWebViewMessaging (src/Platform.UWP/UI/
+INativeWebViewMessaging.cs: void PostWebMessage(string payload, bool isJson)).
+A native view that does not implement it keeps the two methods reporting
+not-implemented, which is what every head did before the seam existed.
+
+Implemented: the Linux WPE view (AddIns/Platform.UI.WebView.Skia/
+WpeNativeWebView.cs, PostWebMessage at the end of the file) and, in
+CodeBrix.Android, the Android view. The page-side text they share is in
+AddIns/Platform.UI.WebView.Skia/WebViewScripts.cs: MessageListenerScript (a
+document-start script that gives window.chrome.webview its listener API, run
+AFTER the script that creates window.chrome.webview), StringMessageDelivery and
+JsonMessageDelivery (the scripts a PostWebMessage evaluates; the payload only
+ever reaches the page as a JSON string literal, never as script text; a script
+evaluates to the number of listeners reached, or "-1" when the page has no
+channel because the document-start script did not run). JsonMessageDelivery
+validates the JSON first and throws ArgumentException, which is the contract
+of the seam. Host-free tests: AddIns/Platform.UI.WebView.Tests.
+
+NOT implemented: the five native views below. They need a Windows and a Mac
+build and runtime check, which this Linux repository cannot give them. Do them
+in that order; the Windows three are a few lines each.
+
+1. Win32 head: src/Platform.UI.Runtime.Skia.Win32/UI/Xaml/Controls/WebView/
+   Win32NativeWebView.cs, class Win32NativeWebView. Add INativeWebViewMessaging
+   to its interface list; PostWebMessage forwards to the wrapped Microsoft
+   control (_nativeWebView, a mswebview2 CoreWebView2): PostWebMessageAsJson
+   when isJson, else PostWebMessageAsString. No scripts: Edge's own
+   window.chrome.webview already has the listeners. Core calls the seam on the
+   UI thread, which is the thread that owns the control, so no marshalling.
+2. WPF head: src/Platform.UI.Runtime.Skia.Wpf/Extensions/WpfNativeWebView.cs,
+   class WpfNativeWebView. Same two forwards, but through the file's
+   ExecuteEnsuringCoreWebView2(...) helper (as Navigate does), because the WPF
+   control's CoreWebView2 is created asynchronously and is null until then.
+3. Windows offscreen view of the WebView add-in (the PlayTest host):
+   src/AddIns/Platform.UI.WebView.Skia/Windows/WindowsOffscreenWebView.cs,
+   class WindowsOffscreenWebView. Same two forwards through the file's
+   WithBrowserAsync(browser => ...) helper, which waits for the composition
+   controller's browser. This file compiles on Linux (the aliased
+   Microsoft.Web.WebView2.Core reference in the add-in csproj), so the build
+   check is local; the runtime check is a Windows PlayTest run.
+   For all three: validate the JSON yourself before forwarding (JsonDocument
+   .Parse, as JsonMessageDelivery does) so an invalid payload throws the seam's
+   ArgumentException on every head instead of whatever the native control
+   throws.
+4. macOS head: src/Platform.UI.Runtime.Skia.MacOS/UI/Xaml/Controls/WebView/
+   MacOSNativeWebView.cs plus the native dylib source src/Platform.UI.Runtime
+   .Skia.MacOS/PlatformNativeMac/PlatformNativeMac/CDBRXWebView.m. Today this
+   head's page has NO window.chrome.webview object at all: a page posts to the
+   host through window.webkit.messageHandlers.unoWebView.postMessage (the
+   script message handler the WKWebView subclass in CDBRXWebView.m registers in
+   initWithFrame:configuration: and reads in its didReceiveScriptMessage:).
+   Two steps:
+   a. Native (needs a Mac and a dylib rebuild, BUILDING section above): in
+      initWithFrame:configuration:, after addScriptMessageHandler, add two
+      WKUserScripts with injectionTime WKUserScriptInjectionTimeAtDocumentStart
+      and forMainFrameOnly:NO, in this order: first the bridge that creates
+      window.chrome.webview with a postMessage that forwards to
+      that same handler (the one-liner in tools/MacOsWebViewHelper/
+      PlayTestWebView.m, with the handler name changed from codebrixWebView to
+      the head's), then the text of
+      WebViewScripts.MessageListenerScript, verbatim. Pages that already post
+      through window.webkit.messageHandlers.unoWebView keep working.
+   b. Managed: add INativeWebViewMessaging to MacOSNativeWebView; PostWebMessage
+      builds the delivery script (StringMessageDelivery / JsonMessageDelivery)
+      and runs it through the existing ExecuteScriptAsync (it reaches
+      codebrix_webview_execute_script, which is evaluateJavaScript), logging a
+      Debug line when the result is "-1", as the WPE view does. The head cannot
+      see WebViewScripts where it is now (internal to the add-in assembly):
+      move WebViewScripts.cs to src/Platform.UI/UI/Xaml/Controls/WebView/Core/
+      (Platform.UI already grants its internals to the add-in and to the heads;
+      give the test assembly CodeBrix.Platform.UI.WebView.Tests an
+      InternalsVisibleTo line in Platform.UI so WebViewScriptsTests keep
+      compiling) and keep ONE copy of the text; do not paste a second copy into
+      a head. The native .m needs the listener text as a string literal
+      regardless, so keep the C# constant and the .m literal identical and say
+      so in a comment on both.
+5. macOS offscreen view of the WebView add-in (the PlayTest host):
+   src/AddIns/Platform.UI.WebView.Skia/MacOS/MacOSOffscreenWebView.cs, class
+   MacOSOffscreenWebView, plus the helper tools/MacOsWebViewHelper/
+   PlayTestWebView.m. The helper ALREADY installs the window.chrome.webview
+   bridge at document start (handler codebrixWebView); add a second WKUserScript
+   right after it with the text of WebViewScripts.MessageListenerScript, same
+   injection time, forMainFrameOnly:NO. Managed: add INativeWebViewMessaging;
+   PostWebMessage sends the delivery script through the existing "script"
+   request (the same path ExecuteScriptAsync uses) and logs a Debug line on
+   "-1". Rebuild the helper on a Mac (tools/MacOsWebViewHelper/README.md:
+   dotnet build tools/MacOsWebViewHelper/MacOsWebViewHelper.proj); packing the
+   add-in on macOS puts the universal executable in buildTransitive/macos.
+
+Verifying on Windows and macOS: the UIReqs round trip ("A page that listens
+hears the messages its host posts and answers each one", src/UIReqs/
+Platform.UI.AddIn.WebView/Features/WebView/WebViewScripting.feature) runs on
+the Linux frame-buffer head only, so the check on the other two systems is by
+hand. samples/CodeBrixPlatform/WebViewDemo (WebViewDemo.Windows.slnx: Win32Skia
+and WinWpfSkia; WebViewDemo.MacOS.slnx) has no messaging page yet: give it one
+that registers a 'message' listener and echoes event.data back through
+window.chrome.webview.postMessage, then call PostWebMessageAsString and
+PostWebMessageAsJson from a button and watch WebMessageReceived; the page of
+the UIReqs scenario (src/UIReqs/Platform.UI.AddIn.WebView, WebViewSteps.cs
+around the PostWebMessage steps) is the reference for what the page should do.
+Pass = both echoes arrive, the string one as the string and the JSON one as
+the parsed value, and no not-implemented line in the log. Check the PlayTest
+host (views 3 and 5) with the same page under a PlayTest run. When a view is
+done, delete it from this list and from the "do not implement it yet" sentence
+in REPOSITORY LAYOUT; when all five are done, delete this section.
 
 MACOS APPLICATION NAMING AND SYSTEM MENU VALIDATION
 --------------------------------------------------

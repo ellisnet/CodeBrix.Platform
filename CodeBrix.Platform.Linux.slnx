@@ -173,6 +173,7 @@
     <Project Path="src/AddIns/Platform.UI.PlotterView.Tests/Platform.UI.PlotterView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.VideoPlayer.Tests/Platform.UI.VideoPlayer.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.WebGpu.Tests/Platform.UI.WebGpu.Skia.Tests.csproj" />
+    <Project Path="src/AddIns/Platform.UI.WebView.Tests/Platform.UI.WebView.Skia.Tests.csproj" />
     <Project Path="src/AddIns/Platform.AppSettings.Tests/Platform.AppSettings.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.Lottie/Platform.UI.Lottie.Tests.csproj" />
     <Project Path="src/AddIns/Platform.UI.TextLayout.Tests/Platform.UI.TextLayout.Skia.Tests.csproj" />

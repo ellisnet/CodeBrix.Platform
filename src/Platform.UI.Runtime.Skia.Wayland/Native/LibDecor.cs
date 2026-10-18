@@ -127,6 +127,12 @@ internal static partial class LibDecor
 	internal static partial void libdecor_frame_commit(IntPtr frame, IntPtr state, IntPtr configuration);
 
 	[LibraryImport(LibName)]
+	internal static partial void libdecor_frame_set_min_content_size(IntPtr frame, int contentWidth, int contentHeight);
+
+	[LibraryImport(LibName)]
+	internal static partial void libdecor_frame_set_max_content_size(IntPtr frame, int contentWidth, int contentHeight);
+
+	[LibraryImport(LibName)]
 	internal static partial void libdecor_frame_set_minimized(IntPtr frame);
 
 	[LibraryImport(LibName)]

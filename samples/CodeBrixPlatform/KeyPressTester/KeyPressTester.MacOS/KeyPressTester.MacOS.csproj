@@ -62,8 +62,7 @@
   <Import Project="..\..\..\..\src\SourceGenerators\Platform.UI.Tasks\Content\Platform.UI.Tasks.targets" Condition="'$(SkipCodeBrixResourceGeneration)' == '' " />
 
   <!--
-    Shared macOS-head build logic (from-source runtime-replace assembly swap + native dylib copy
-    and de-quarantine). Lives in one file so all *.MacOS sample heads stay in sync; see that file
+    Shared macOS-head build logic (native dylib copy and de-quarantine). Lives in one file so all *.MacOS sample heads stay in sync; see that file
     for the full rationale. Imported only by *.MacOS heads and self-gated to them, so it never
     affects the other platform heads.
   -->

@@ -131,6 +131,48 @@ public partial class CoreWebView2
 		UpdateFromInternalSource();
 	}
 
+	/// <summary>
+	/// Posts a message to the page: its window.chrome.webview 'message' listeners (and onmessage) receive an event whose
+	/// data is <paramref name="webMessageAsString"/>. Supported where the head's web view implements the message
+	/// channel (the Linux Skia heads); elsewhere it reports that it is not implemented. A message posted before the
+	/// page's channel exists is dropped.
+	/// </summary>
+	/// <param name="webMessageAsString">The message (null is sent as an empty string).</param>
+	public void PostWebMessageAsString(string webMessageAsString)
+		=> PostWebMessage(webMessageAsString ?? string.Empty, isJson: false, "void CoreWebView2.PostWebMessageAsString(string webMessageAsString)");
+
+	/// <summary>
+	/// Posts a JSON message to the page: its window.chrome.webview 'message' listeners (and onmessage) receive an
+	/// event whose data is the parsed value of <paramref name="webMessageAsJson"/>. Supported where the head's web view
+	/// implements the message channel (the Linux Skia heads); elsewhere it reports that it is not implemented.
+	/// </summary>
+	/// <param name="webMessageAsJson">The message as JSON text.</param>
+	/// <exception cref="ArgumentException"><paramref name="webMessageAsJson"/> is not valid JSON (where the channel exists).</exception>
+	public void PostWebMessageAsJson(string webMessageAsJson)
+		=> PostWebMessage(webMessageAsJson, isJson: true, "void CoreWebView2.PostWebMessageAsJson(string webMessageAsJson)");
+
+	private void PostWebMessage(string payload, bool isJson, string memberSignature)
+	{
+		if (_nativeWebView is INativeWebViewMessaging messaging)
+		{
+			messaging.PostWebMessage(payload, isJson);
+			return;
+		}
+
+		if (_nativeWebView is null)
+		{
+			// No native web view yet (the control has not been templated): there is no page to deliver to.
+			if (this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().LogDebug("A web message was posted before the web view exists; it was dropped.");
+			}
+
+			return;
+		}
+
+		global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2", memberSignature);
+	}
+
 	public void GoBack() => _nativeWebView?.GoBack();
 
 	public void GoForward() => _nativeWebView?.GoForward();

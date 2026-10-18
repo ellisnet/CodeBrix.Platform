@@ -100,11 +100,56 @@ internal sealed class PlotHost
 		}
 	}
 
-	/// <summary>The tracker box fill.</summary>
-	internal PlotterColor TrackerBackground { get; set; } = PlotterColor.FromArgb(0xE6, 0x2D, 0x2D, 0x30);
+	/// <summary>The tracker box fill under the light theme (a dark callout over the light chart).</summary>
+	internal static readonly PlotterColor LightTrackerBackground = PlotterColor.FromArgb(0xE6, 0x2D, 0x2D, 0x30);
 
-	/// <summary>The tracker text colour.</summary>
-	internal PlotterColor TrackerForeground { get; set; } = PlotterColors.White;
+	/// <summary>The tracker text colour under the light theme.</summary>
+	internal static readonly PlotterColor LightTrackerForeground = PlotterColors.White;
+
+	/// <summary>
+	/// The tracker box fill under the dark theme: a dark callout with light text, the WinUI dark-theme tooltip
+	/// convention, so the tracker matches the tooltips around the chart instead of being the one light surface.
+	/// </summary>
+	internal static readonly PlotterColor DarkTrackerBackground = PlotterColor.FromArgb(0xE6, 0x2C, 0x2C, 0x2C);
+
+	/// <summary>The tracker text (and box border) colour under the dark theme.</summary>
+	internal static readonly PlotterColor DarkTrackerForeground = PlotterColors.White;
+
+	/// <summary>The zoom rectangle border colour under the light theme.</summary>
+	internal static readonly PlotterColor LightZoomRectangleStroke = PlotterColors.Black;
+
+	/// <summary>The zoom rectangle border colour under the dark theme.</summary>
+	internal static readonly PlotterColor DarkZoomRectangleStroke = PlotterColors.White;
+
+	private readonly PlotTheme _theme = new();
+	private PlotterColor? _trackerBackground;
+	private PlotterColor? _trackerForeground;
+	private PlotterColor? _zoomRectangleStroke;
+
+	/// <summary>
+	/// Whether the view shows the dark theme. Every colour the application has not set - on the model (see
+	/// <see cref="PlotTheme"/>) and the tracker and zoom rectangle colours below - follows it; the host sets it from its
+	/// element's actual theme and repaints.
+	/// </summary>
+	internal bool IsDarkTheme
+	{
+		get => _theme.IsDark;
+		set => _theme.IsDark = value;
+	}
+
+	/// <summary>The tracker box fill: the application's colour once set, otherwise the current theme's.</summary>
+	internal PlotterColor TrackerBackground
+	{
+		get => _trackerBackground ?? (IsDarkTheme ? DarkTrackerBackground : LightTrackerBackground);
+		set => _trackerBackground = value;
+	}
+
+	/// <summary>The tracker text colour: the application's colour once set, otherwise the current theme's.</summary>
+	internal PlotterColor TrackerForeground
+	{
+		get => _trackerForeground ?? (IsDarkTheme ? DarkTrackerForeground : LightTrackerForeground);
+		set => _trackerForeground = value;
+	}
 
 	/// <summary>The tracker text size in DIPs (at least 4).</summary>
 	internal double TrackerFontSize
@@ -116,8 +161,12 @@ internal sealed class PlotHost
 	/// <summary>The zoom rectangle fill.</summary>
 	internal PlotterColor ZoomRectangleFill { get; set; } = PlotterColor.FromArgb(0x40, 0xFF, 0xFF, 0x00);
 
-	/// <summary>The zoom rectangle border colour.</summary>
-	internal PlotterColor ZoomRectangleStroke { get; set; } = PlotterColors.Black;
+	/// <summary>The zoom rectangle border colour: the application's colour once set, otherwise the current theme's.</summary>
+	internal PlotterColor ZoomRectangleStroke
+	{
+		get => _zoomRectangleStroke ?? (IsDarkTheme ? DarkZoomRectangleStroke : LightZoomRectangleStroke);
+		set => _zoomRectangleStroke = value;
+	}
 
 	/// <summary>
 	/// Replaces the model: detaches the old one from the view, attaches the new one (a model can be attached to only
@@ -251,6 +300,10 @@ internal sealed class PlotHost
 			{
 				plotModel.Update(updateData);
 			}
+
+			//Every colour the application has not set follows the view's theme (after the Update, which may have
+			//created the default axes; the light theme writes nothing the application did not already see)
+			_theme.Apply(model);
 
 			if (model.Background.IsVisible())
 			{

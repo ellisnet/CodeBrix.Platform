@@ -117,38 +117,6 @@
 		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.FluentTheme\Platform.UI.FluentTheme.Core.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<!-- These three are what the target below swaps in, and nothing else in a UIReqs project's
-		     reference graph builds them: the compile-time reference to CodeBrix.Platform resolves
-		     to the .Reference flavour, so without these a STALE .Skia build would be copied beside
-		     the scenarios and the run would silently measure yesterday's framework.
-		     ReferenceOutputAssembly is false because they are needed at run time only. -->
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UWP\Platform.Skia.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Composition\Platform.UI.Composition.Skia.csproj" ReferenceOutputAssembly="false" />
-		<ProjectReference Include="$(MSBuildThisFileDirectory)..\Platform.UI.Dispatching\Platform.UI.Dispatching.Skia.csproj" ReferenceOutputAssembly="false" />
-	</ItemGroup>
-
-	<!-- Assembly resolution hands a host-free test process the .Reference variants of the runtime
-	     assemblies, whose stubs throw NotSupportedException("Ref assembly") - so swap in the .Skia
-	     variants, exactly as src/Platform.UI.Headless.Tests and the from-source sample heads do. -->
-	<Target Name="_UIReqsUseSkiaRuntimeAssemblies" AfterTargets="ResolveAssemblyReferences">
-		<PropertyGroup>
-			<_CbSkiaUwp>$(MSBuildThisFileDirectory)..\Platform.UWP\bin\Platform.Skia\$(Configuration)\net10.0</_CbSkiaUwp>
-			<_CbSkiaComp>$(MSBuildThisFileDirectory)..\Platform.UI.Composition\bin\Platform.UI.Composition.Skia\$(Configuration)\net10.0</_CbSkiaComp>
-			<_CbSkiaDisp>$(MSBuildThisFileDirectory)..\Platform.UI.Dispatching\bin\Platform.UI.Dispatching.Skia\$(Configuration)\net10.0</_CbSkiaDisp>
-		</PropertyGroup>
-		<ItemGroup>
-			<ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)"
-				Condition="'%(FileName)' == 'CodeBrix.Platform' or '%(FileName)' == 'CodeBrix.Platform.UI.Composition' or '%(FileName)' == 'CodeBrix.Platform.UI.Dispatching'" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.dll" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaUwp)\CodeBrix.Platform.pdb" Condition="Exists('$(_CbSkiaUwp)\CodeBrix.Platform.pdb')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb" Condition="Exists('$(_CbSkiaComp)\CodeBrix.Platform.UI.Composition.pdb')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.dll')" />
-			<ReferenceCopyLocalPaths Include="$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb" Condition="Exists('$(_CbSkiaDisp)\CodeBrix.Platform.UI.Dispatching.pdb')" />
-		</ItemGroup>
-	</Target>
-
 	<!-- The font packages carry their .ttf files as library assets beside the package assembly
 	     (lib/<tfm>/<assembly name>/Fonts). A head unpacks those through the Platform.UI.Tasks
 	     asset targets; a UIReqs project imports none of that XAML machinery on purpose, so the

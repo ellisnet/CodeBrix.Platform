@@ -249,12 +249,29 @@ internal sealed class LibDecorShellSurface : IWaylandShellSurface
 
 	public void SetMinMaxSize(int minWidth, int minHeight, int maxWidth, int maxHeight)
 	{
-		// libdecor exposes min/max via libdecor_frame_set_min_content_size /
-		// set_max_content_size; not bound yet (rarely used). No-op for now.
-		if (this.Log().IsEnabled(LogLevel.Debug))
+		if (_frame == IntPtr.Zero)
 		{
-			this.Log().Debug("SetMinMaxSize is not yet wired for the libdecor path.");
+			return;
 		}
+
+		// The content-size limits (0 = no limit, as on xdg_toplevel) are frame state: libdecor sends them, translated
+		// to window-geometry units that include its own decorations, with the next frame commit. Before the first
+		// configure that commit is the configure's acknowledgement; after it, the current size is committed again
+		// now (no configuration: a client-initiated change, as in RequestContentSize).
+		var limits = WaylandContentLimits.Normalize(minWidth, minHeight, maxWidth, maxHeight);
+		lock (Gate)
+		{
+			LibDecor.libdecor_frame_set_min_content_size(_frame, limits.MinWidth, limits.MinHeight);
+			LibDecor.libdecor_frame_set_max_content_size(_frame, limits.MaxWidth, limits.MaxHeight);
+
+			if (_configured)
+			{
+				var state = LibDecor.libdecor_state_new(_currentWidth, _currentHeight);
+				LibDecor.libdecor_frame_commit(_frame, state, IntPtr.Zero);
+				LibDecor.libdecor_state_free(state);
+			}
+		}
+		_connection.Flush();
 	}
 
 	public void RequestContentSize(int width, int height)
