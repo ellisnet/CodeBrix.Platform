@@ -115,7 +115,8 @@ Dependency properties (XAML-settable):
                                   to the display refresh). Negative, NaN or
                                   infinite throws ArgumentOutOfRangeException
                                   and keeps the old value.
-  bool IsPaused                   Pauses Continuous (the last frame stays up).
+  bool IsPaused                   Pauses Continuous (the last frame stays up;
+                                  on Readback the frame in flight is shown).
   IWebGpuRenderer? Renderer       Called before each matching event.
   Stretch Stretch                 Default Fill (the texture IS the element's
                                   size); the others matter only between a
@@ -188,7 +189,8 @@ Methods:
                                   when this thread already has a frame open.
   void EndFrame()                 Ends this thread's frame: validates and
                                   submits its commands, reads the picture back
-                                  and shows it. Throws InvalidOperationException
+                                  and shows it before returning (on every
+                                  driver). Throws InvalidOperationException
                                   without an open frame on this thread, and
                                   WebGpuSkiaValidationException (namespace
                                   CodeBrix.WebGpu.Skia) when the commands fail
@@ -337,6 +339,17 @@ RENDER PATHS
              and draws it through the head's own canvas, so the view clips,
              overlaps, transforms and fades like any other XAML content. Cost:
              one GPU-to-processor copy per frame.
+             Under the Continuous driver the copy is double-buffered: a frame's
+             read-back is begun when it ends and completed when the NEXT frame
+             ends, so the copy overlaps the next frame's recording and the
+             picture on screen is ONE FRAME BEHIND the newest frame. OnDemand,
+             Manual and native-module frames (and every frame ended through the
+             public EndFrame) are read back and presented before EndFrame
+             returns - one picture per frame, none left waiting. The frame in
+             flight is presented when continuous ticking stops: FrameDriver
+             leaves Continuous, IsPaused becomes true, or the view is unloaded.
+             A frame still in flight when the view resizes or loses its device
+             is dropped (it is never shown after a newer picture).
   Direct*    When the application opts in to direct GPU rendering
              (UseDirectGpuRenderingMode() on the host builder - EXPERIMENTAL,
              app-wide, one-way), the view uses the head's own GPU device where
@@ -423,10 +436,19 @@ DIRECT PATHS (DirectVulkan, DirectMetal)
   or, if the device never appears, Readback.
 
   The head's Vulkan device. To be adoptable, a Vulkan device must have been
-  created with the device extensions and features the WebGPU engine expects.
-  With the latch on, the X11 and Wayland heads create their device that way
-  (only what the GPU supports; one Information line lists it); with the latch
-  off their device creation is unchanged. Nothing for the application to do.
+  created with the device extensions and features the WebGPU engine requires.
+  With the latch on, the X11 and Wayland heads ASK THE ENGINE, through this
+  package, what it requires of the window's physical device, and create the
+  device with exactly those extensions and the engine's own feature chain. The
+  X11 head creates its device when the window opens, usually before this
+  package's assembly has loaded; the head then loads it by name to ask. When the
+  engine cannot be asked (an application without this package) or cannot answer
+  (it cannot use that GPU), the head falls back to a fixed list of extensions
+  and every feature the GPU supports, and adoption decides. Only what the GPU
+  supports is ever enabled, device creation never fails because of it, and one
+  Information line (category ...Vulkan.Interop.VulkanDevice) says which route
+  was taken, the extensions and the API versions. With the latch off device
+  creation is unchanged. Nothing for the application to do.
 
   Metal (macOS). The view adopts the window's MTLDevice; WebGPU gets its own
   command queue on it, and each frame's submission is waited for before the
@@ -711,6 +733,9 @@ MINIMUM VIABLE PROJECT
 
 PERFORMANCE TIPS
 ================
+  - On Readback under Continuous the read-back of one frame overlaps the
+    recording of the next (one frame of latency, see RENDER PATHS); the other
+    drivers wait for each frame's copy inside EndFrame.
   - The frame path reuses everything it can: the frame object, the event args,
     the hand-off structs and the read-back pixel buffers (two or three
     circulate; a buffer is only written once no picture of it can still be

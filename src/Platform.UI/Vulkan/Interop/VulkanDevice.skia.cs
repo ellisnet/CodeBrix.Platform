@@ -21,6 +21,12 @@ internal partial class VulkanDevice : IVulkanDevice, IDisposable
 	private int _lockCount;
 	private readonly string[] _enabledExtensions;
 
+	/// <summary>How the adoption profile decided what this device enables; null when it was created without one.</summary>
+	internal VulkanAdoptionRoute? AdoptionRoute { get; private init; }
+
+	/// <summary>The line the adoption profile logged at creation; null when it was created without one.</summary>
+	internal string? AdoptionDescription { get; private init; }
+
 	private VulkanDevice(VulkanInstanceApi instanceApi, VkDevice handle, VkPhysicalDevice physicalDeviceHandle,
 		VkQueue mainQueue, uint graphicsQueueIndex, string[] enabledExtensions)
 	{

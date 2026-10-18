@@ -56,7 +56,20 @@ internal abstract class WebGpuPresenter : IDisposable
 
 	/// <summary>Shows the frame <see cref="EndPass"/> submitted.</summary>
 	/// <param name="host">The engine's owner, which presents to the surface.</param>
-	internal abstract void Show(IWebGpuRenderEngineHost host);
+	/// <param name="allowDeferred">True when another frame is sure to follow (the Continuous driver, not paused): a path
+	/// that reads frames back may then finish this frame's read-back during the NEXT frame and present the previous
+	/// frame now (one frame of latency). False: the frame is presented before this returns. The direct paths ignore
+	/// it (they present GPU-resident frames at once).</param>
+	internal abstract void Show(IWebGpuRenderEngineHost host, bool allowDeferred);
+
+	/// <summary>
+	/// Completes and presents a frame <see cref="Show"/> left pending (allowDeferred), if there is one - when continuous
+	/// ticking stops, so that no frame sits unpresented. Nothing on the paths that never defer.
+	/// </summary>
+	/// <param name="host">The engine's owner, which presents to the surface.</param>
+	internal virtual void FlushPendingFrame(IWebGpuRenderEngineHost host)
+	{
+	}
 
 	/// <summary>
 	/// Errors the device reported since the last call that mean its state can no longer be trusted, joined into one

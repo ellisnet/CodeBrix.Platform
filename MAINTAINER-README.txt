@@ -373,7 +373,15 @@ Microsoft.Testing.Platform per global.json):
     Continuous rate test runs real frames through the real scheduler on a
     virtual clock and a hand-run timer, so it is exact under any load; its
     wall-clock twin asserts only the load-proof bound - never above the target
-    rate). Every GPU test
+    rate; under Continuous the Readback path presents one frame behind, so
+    both flush the frame in flight at the end, as the view does). The
+    deferred (double-buffered) read-back has its own fences: frame N-1's
+    picture after N frames and frame N's after the flush, a synchronous frame
+    dropping the older pending one, a resize cancelling it, flush-before-
+    detach order, two buffers over 200 frames, and the view's flush on a
+    driver change / pause / unload (WebGpuRenderViewGpuTests); a 1080p timing
+    line (synchronous vs deferred ms/frame) goes to the test output, not
+    asserted. Every GPU test
     skips with the engine's reason where no adapter exists; the suite runs one
     test at a time. Its element tests construct the view host-free, with the
     CommandBar suite's dispatcher bootstrap and Skia-assembly swap.
@@ -1272,24 +1280,44 @@ add-in is the first user); none of them names an add-in.
   - VulkanAdoptionProfile (src/Platform.UI/Vulkan, internal): with the latch
     ON, VulkanDevice.Create (both VulkanContext.Initialize, i.e. X11 and
     Wayland, and the headless InitializeHeadless the tests use) also enables
-    the device extensions the WebGPU engine requires of a device it adopts -
-    the list lives ONLY in VulkanAdoptionProfile.EngineDeviceExtensions - and
-    every SUPPORTED feature of the Vulkan 1.0-1.3 feature structures (+
-    VK_EXT_robustness2's when enabled), through a VkPhysicalDeviceFeatures2
-    chain filled by vkGetPhysicalDeviceFeatures2. Each item only where the GPU
-    supports it; nothing can make device creation fail (an unadoptable device
-    is refused at adoption and the add-in uses Readback). One Information line
-    (category ...Vulkan.Interop.VulkanDevice) lists what was enabled. With the
-    latch OFF device creation is byte-for-byte the old one (VK_KHR_swapchain,
-    no features) - fenced by the WebGpu suite's VulkanAdoptionProfileTests.
-    WHY a hard-coded list: wgpuCodebrixInstanceAdoptVulkanDevice refuses a
-    device without the extensions wgpu-hal would enable on that adapter, and
-    hands the device to wgpu-hal assuming its features are enabled, but the
-    native library exposes no query of either (FIXLIST note against
-    CodeBrix.WebGpu.Native). The list tracks wgpu 29.0.3 via wgpu-native
-    v29.0.1.1 and MUST be revisited when the WebGpu packages bump the engine:
-    run the WebGpu suite's DirectVulkan GPU tests; a refusal names the missing
-    extensions in the engine's log (wgpuSetLogCallback).
+    what the WebGPU engine requires of a device it adopts. It ASKS THE ENGINE:
+    the add-in registers an IVulkanAdoptRequirementsSource
+    (src/Platform.UI/Vulkan/IVulkanAdoptRequirementsSource.skia.cs; the add-in's
+    Internal/WebGpuVulkanAdoptRequirementsSource.skia.cs calls
+    CodeBrix.WebGpu.Native.VulkanAdoptRequirements.Query) in
+    VulkanAdoptionProfile.RequirementsSource from its SkiaPlatformBootstrap
+    module initializer (Platform.UI grants the add-in assembly
+    InternalsVisibleTo for this). The query's descriptor is filled exactly as
+    the later AdoptVulkan fills the adoption's (instance, physical device,
+    instance apiVersion, vkGetInstanceProcAddr resolved through itself, enabled
+    instance extensions, no required features). The device then enables
+    VK_KHR_swapchain + the engine's extensions (filtered against the device's
+    supported list; VK_KHR_image_format_list added below Vulkan 1.2 if the
+    engine names VK_KHR_swapchain_mutable_format without it - wgpu-hal adds it
+    itself there, this is defensive) and takes the engine's
+    VkPhysicalDeviceFeatures2 chain as pNext unchanged; the profile's Dispose
+    (after vkCreateDevice) frees it. A future head feature must be MERGED into
+    that chain, never replace it.
+    TIMING: X11 creates the window's device when the window opens, before
+    anything has loaded the add-in, so with no source registered the profile
+    loads VulkanAdoptionProfile.AddInBootstrapTypeName by Type.GetType and runs
+    the module constructor (fenced by the add-in suite: a rename breaks a
+    test). Wayland creates its device lazily at the first frame (often already
+    registered). FALLBACK when no source exists (app without the add-in) or the
+    query throws (no Vulkan backend, wgpu cannot use the GPU): the fixed list
+    VulkanAdoptionProfile.FallbackDeviceExtensions where supported + every
+    SUPPORTED feature of the Vulkan 1.0-1.3 structures (+ VK_EXT_robustness2's
+    when enabled), through a vkGetPhysicalDeviceFeatures2-filled chain. Nothing
+    can make device creation fail (an unadoptable device is refused at
+    adoption and the add-in uses Readback). One Information line (category
+    ...Vulkan.Interop.VulkanDevice) names the route (engine query / fallback
+    list + reason), the extensions and the instance/device API versions; the
+    created VulkanDevice keeps it (AdoptionRoute, AdoptionDescription) for the
+    tests. With the latch OFF device creation is byte-for-byte the old one
+    (VK_KHR_swapchain, no features) - fenced by the WebGpu suite's
+    VulkanAdoptionProfileTests, which also compare the head's extensions with
+    an independent query for the same GPU. On a WebGpu package bump nothing
+    needs revisiting unless the fallback list should track the engine again.
   - IVulkanContextOwner.HasDisposedContext (default false; the X11/Wayland
     Vulkan renderers and the Wayland host implement it) lets the provider's
     Reason say "disposed (the window was closed)" rather than "not created

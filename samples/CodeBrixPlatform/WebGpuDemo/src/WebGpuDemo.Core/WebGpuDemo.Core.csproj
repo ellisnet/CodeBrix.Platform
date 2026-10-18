@@ -25,8 +25,8 @@
          two sharing contracts the view implements (IWebGpuDeviceSource, IWebGpuTextureTarget). Only the Models page
          uses it. Gltf2 is the glTF library Graphics itself is built on, at the version Graphics pins; the demo names it
          because it builds the scene's ground plane in memory with it. -->
-    <PackageReference Include="CodeBrix.WebGpu.Graphics.MitLicenseForever" Version="1.0.287.390" />
-    <PackageReference Include="CodeBrix.Graphics3D.Gltf2.MitLicenseForever" Version="1.0.261.293" />
+    <PackageReference Include="CodeBrix.WebGpu.Graphics.MitLicenseForever" Version="1.0.291.34" />
+    <PackageReference Include="CodeBrix.Graphics3D.Gltf2.MitLicenseForever" Version="1.0.290.996" />
   </ItemGroup>
 
   <!--

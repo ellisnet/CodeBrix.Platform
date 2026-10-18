@@ -604,7 +604,7 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		WebGpuFrameScheduler? scheduler = null;
 		owner.Invoke(() =>
 		{
-			scheduler = new WebGpuFrameScheduler(owner, () => RunBuiltIn(ref frames)) { Driver = WebGpuFrameDriver.OnDemand };
+			scheduler = new WebGpuFrameScheduler(owner, () => RunBuiltIn(ref frames, scheduler)) { Driver = WebGpuFrameDriver.OnDemand };
 			AttachAt(16, 16);
 			scheduler.Attach();
 		});
@@ -625,10 +625,11 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		Thread.Sleep(150);
 		owner.Invoke(scheduler.Detach);
 
-		//Assert
+		//Assert: OnDemand frames are presented inside their own EndFrame - one picture per frame, none left pending.
 		afterCoalesced.Should().Be(2);
 		Volatile.Read(ref frames).Should().Be(3);
 		_host.Presented.Should().Be(3);
+		((WebGpuReadbackPresenter)_engine.Presenter!).HasPendingFrame.Should().BeFalse();
 	}
 
 	[Fact]
@@ -644,16 +645,18 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		long now = 1_000_000;
 		var frames = 0;
 		var frameCost = 0L;
-		var scheduler = new WebGpuFrameScheduler(timer, () =>
+		WebGpuFrameScheduler? scheduler = null;
+		scheduler = new WebGpuFrameScheduler(timer, () =>
 		{
-			var outcome = RunBuiltIn(ref frames);
+			var outcome = RunBuiltIn(ref frames, scheduler);
 			now += frameCost;
 			return outcome;
 		}, () => now, 1_000_000) { TargetFrameRate = 60 };
 		AttachAt(128, 128);
 		scheduler.Attach();
-		timer.RunPosted().Should().Be(1); // the first frame: the device is created and the first picture presented
+		timer.RunPosted().Should().Be(1); // the first frame: the device is created and its read-back begun
 		frames.Should().Be(1);
+		_host.Presented.Should().Be(0); // Continuous on Readback runs one frame behind
 
 		//Act 1: two virtual seconds at 60 frames a second, every frame taking a quarter of a period.
 		frameCost = 4_000;
@@ -667,10 +670,11 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 			deadlines++;
 		}
 
-		//Assert 1: one real frame per period - 120 periods in two seconds - and never more.
+		//Assert 1: one real frame per period - 120 periods in two seconds - and never more; every frame but the newest
+		// presented (one frame behind).
 		deadlines.Should().Be(120);
 		frames.Should().Be(121);
-		_host.Presented.Should().Be(121);
+		_host.Presented.Should().Be(120);
 
 		//Act 2: one frame takes three and a half periods (a stall); then frames are cheap again.
 		frameCost = 58_000;
@@ -688,8 +692,11 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		timer.PostedCount.Should().Be(0);
 		timer.PendingDelay.Should().Be(TimeSpan.FromTicks((16_667 - 1_000) * 10));
 
+		// As the view does when ticking stops: the frame in flight is presented, then the driver detaches.
+		_engine.FlushPendingFrame().Should().BeTrue();
 		scheduler.Detach();
 		scheduler.IsTickPending.Should().BeFalse();
+		_host.Presented.Should().Be(123);
 	}
 
 	[Fact]
@@ -705,7 +712,7 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		WebGpuFrameScheduler? scheduler = null;
 		owner.Invoke(() =>
 		{
-			scheduler = new WebGpuFrameScheduler(owner, () => RunBuiltIn(ref frames)) { TargetFrameRate = 60 };
+			scheduler = new WebGpuFrameScheduler(owner, () => RunBuiltIn(ref frames, scheduler)) { TargetFrameRate = 60 };
 			AttachAt(128, 128);
 		});
 		owner.Invoke(scheduler!.Attach);
@@ -717,7 +724,12 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		Thread.Sleep(2000);
 		var counted = Volatile.Read(ref frames) - start;
 		var seconds = clock.Elapsed.TotalSeconds;
-		owner.Invoke(scheduler.Detach);
+		owner.Invoke(() =>
+		{
+			// The view's order when ticking stops: present the frame in flight, then detach the driver.
+			_engine.FlushPendingFrame();
+			scheduler.Detach();
+		});
 		var rate = counted / seconds;
 		TestContext.Current.TestOutputHelper?.WriteLine($"Continuous at TargetFrameRate 60: {counted} frames in {seconds:F2} s = {rate:F1} fps (128x128 Readback).");
 
@@ -725,6 +737,7 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		counted.Should().BeGreaterThan(0);
 		rate.Should().BeLessThanOrEqualTo(61.5);
 		scheduler.IsTickPending.Should().BeFalse();
+		_host.Presented.Should().Be(Volatile.Read(ref frames));
 	}
 
 	[Fact]
@@ -795,6 +808,267 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		((WebGpuReadbackPresenter)_engine.Presenter!).BufferCount.Should().Be(2);
 	}
 
+	// ------------------------------------------------------------------ the Continuous driver's deferred read-back
+
+	private static readonly SKColor[] FrameColours =
+	{
+		new(200, 0, 0), new(0, 200, 0), new(0, 0, 200), new(200, 200, 0), new(0, 200, 200), new(200, 0, 200),
+	};
+
+	// One frame cleared to its own colour, ended as the Continuous driver ends it (deferred) or as every other one does.
+	private void RenderColour(SKColor colour, bool deferred)
+	{
+		_engine.ClearColor = colour;
+		_engine.OpenFrame(wait: true).Should().Be(WebGpuFrameOutcome.Rendered);
+		_engine.EndFrame(deferred);
+	}
+
+	private WebGpuReadbackPresenter Readback => (WebGpuReadbackPresenter)_engine.Presenter!;
+
+	[Fact]
+	public void deferred_frames_present_one_frame_behind_and_the_flush_presents_the_last_one()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+
+		//Act
+		for (var i = 0; i < 5; i++)
+		{
+			RenderColour(FrameColours[i], deferred: true);
+		}
+
+		var beforeFlush = (_host.Presented, Pixel: _host.PixelAt(8, 8), Readback.HasPendingFrame, Readback.Target!.PendingReadbackCount);
+		var flushed = _engine.FlushPendingFrame();
+
+		//Assert: after N deferred frames N-1 pictures, the newest being frame N-1's; the flush shows frame N.
+		beforeFlush.Presented.Should().Be(4);
+		beforeFlush.Pixel.Should().Be(FrameColours[3]);
+		beforeFlush.HasPendingFrame.Should().BeTrue();
+		beforeFlush.PendingReadbackCount.Should().Be(1);
+		flushed.Should().BeTrue();
+		_host.Presented.Should().Be(5);
+		_host.PixelAt(8, 8).Should().Be(FrameColours[4]);
+		Readback.HasPendingFrame.Should().BeFalse();
+		Readback.Target!.PendingReadbackCount.Should().Be(0);
+	}
+
+	[Fact]
+	public void a_flush_with_nothing_pending_presents_nothing()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: false);
+
+		//Act
+		var flushed = _engine.FlushPendingFrame();
+		var withoutDevice = new WebGpuRenderEngine(new RecordingEngineHost()).FlushPendingFrame();
+
+		//Assert
+		flushed.Should().BeTrue();
+		withoutDevice.Should().BeTrue();
+		_host.Presented.Should().Be(1);
+	}
+
+	[Fact]
+	public void a_synchronous_frame_after_deferred_ones_drops_the_older_pending_frame_and_presents_itself()
+	{
+		// A Manual frame or a native module's frame while the Continuous driver runs: the newer picture wins, the
+		// pending one is never shown after it.
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: true);
+		RenderColour(FrameColours[1], deferred: true);
+
+		//Act
+		RenderColour(FrameColours[2], deferred: false);
+		var flushed = _engine.FlushPendingFrame();
+
+		//Assert
+		flushed.Should().BeTrue();
+		_host.Presented.Should().Be(2);
+		_host.PixelAt(8, 8).Should().Be(FrameColours[2]);
+		Readback.HasPendingFrame.Should().BeFalse();
+		Readback.Target!.PendingReadbackCount.Should().Be(0);
+	}
+
+	[Fact]
+	public void a_resize_with_a_pending_frame_cancels_it_and_nothing_stale_is_presented()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: true);
+		RenderColour(FrameColours[1], deferred: true); // presents frame 0; frame 1 pending on the 16x16 target
+		var oldTarget = Readback.Target!;
+
+		//Act: the next frame is at a new size - a new target; the pending frame on the old one is dropped.
+		_engine.SetPixelSize(32, 16);
+		_engine.ClearColor = FrameColours[2];
+		_engine.OpenFrame(wait: true).Should().Be(WebGpuFrameOutcome.Rendered);
+		var whileOpen = (Readback.HasPendingFrame, NewTarget: !ReferenceEquals(Readback.Target, oldTarget), Readback.Target!.PendingReadbackCount, _host.Presented);
+		_engine.EndFrame(allowDeferredPresent: true);
+		var afterEnd = (_host.Presented, _host.PictureSize, Pixel: _host.PixelAt(8, 8));
+		_engine.FlushPendingFrame();
+
+		//Assert
+		whileOpen.HasPendingFrame.Should().BeFalse();
+		whileOpen.NewTarget.Should().BeTrue();
+		whileOpen.PendingReadbackCount.Should().Be(0);
+		whileOpen.Presented.Should().Be(1);
+		afterEnd.Presented.Should().Be(1);          // frame 1 never shown; frame 2 pending
+		afterEnd.PictureSize.Should().Be((16, 16));
+		afterEnd.Pixel.Should().Be(FrameColours[0]);
+		_host.Presented.Should().Be(2);
+		_host.PictureSize.Should().Be((32, 16));
+		_host.PixelAt(20, 8).Should().Be(FrameColours[2]);
+	}
+
+	[Fact]
+	public void flushing_before_detach_presents_the_pending_frame_before_the_teardown()
+	{
+		// The view's Unloaded order: FlushPendingFrame, then the scheduler and the engine detach.
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: true);
+		_host.RecordPresents = true;
+
+		//Act
+		_engine.FlushPendingFrame();
+		_engine.Detach();
+
+		//Assert
+		_host.Events.Should().EndWith(new[] { "Present", "DeviceLost:The view was unloaded.", "ClearPresented", "Path:Readback->None" });
+	}
+
+	[Fact]
+	public void a_detach_without_a_flush_cancels_the_pending_frame_and_presents_nothing()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: true);
+		RenderColour(FrameColours[1], deferred: true);
+		_host.RecordPresents = true;
+
+		//Act
+		_engine.Detach();
+
+		//Assert
+		_host.Presented.Should().Be(1);
+		_host.Events.Should().NotContain("Present");
+		_host.Events.Should().EndWith(new[] { "DeviceLost:The view was unloaded.", "ClearPresented", "Path:Readback->None" });
+	}
+
+	[Fact]
+	public void a_rejected_frame_begins_no_read_back_and_the_pending_one_still_completes()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(16, 16);
+		RenderColour(FrameColours[0], deferred: true);
+
+		//Act: a frame whose commands fail validation (a pipeline of another format drawn into the frame).
+		using var wrongFormat = new TrianglePipeline(((IWebGpuDeviceSource)_engine).Device, TextureFormat.RGBA8Unorm);
+		_engine.ClearColor = FrameColours[1];
+		_engine.OpenFrame(wait: true).Should().Be(WebGpuFrameOutcome.Rendered);
+		wrongFormat.Draw(_engine.Frame.Encoder, _engine.Frame.TextureView);
+		Action act = () => _engine.EndFrame(allowDeferredPresent: true);
+		act.Should().Throw<WebGpuSkiaValidationException>();
+		var afterRejected = (_host.Presented, Readback.Target!.PendingReadbackCount);
+		_engine.FlushPendingFrame();
+
+		//Assert: nothing begun for the rejected frame; the earlier pending frame is still shown by the flush.
+		afterRejected.Presented.Should().Be(0);
+		afterRejected.PendingReadbackCount.Should().Be(1);
+		_host.Presented.Should().Be(1);
+		_host.PixelAt(8, 8).Should().Be(FrameColours[0]);
+	}
+
+	[Fact]
+	public void steady_state_of_the_deferred_path_reads_back_into_two_buffers_over_200_frames()
+	{
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(32, 32);
+		for (var i = 0; i < 10; i++)
+		{
+			RenderColour(FrameColours[i % FrameColours.Length], deferred: true);
+		}
+
+		var early = Readback.BufferCount;
+
+		//Act
+		for (var i = 0; i < 200; i++)
+		{
+			RenderColour(FrameColours[i % FrameColours.Length], deferred: true);
+		}
+
+		//Assert: the host holds the newest picture while the next completes into the other buffer - two, no growth.
+		early.Should().Be(2);
+		Readback.BufferCount.Should().Be(2);
+		_host.Presented.Should().Be(209);
+		Readback.Target!.PendingReadbackCount.Should().Be(1);
+	}
+
+	[Fact]
+	public void the_deferral_rule_allows_only_the_unpaused_continuous_driver()
+	{
+		//Arrange
+		var scheduler = new WebGpuFrameScheduler(new FakeFrameTimer(), () => WebGpuFrameOutcome.NotReady);
+
+		//Act
+		var continuous = WebGpuRenderEngine.MayDeferPresent(scheduler);
+		scheduler.IsPaused = true;
+		var paused = WebGpuRenderEngine.MayDeferPresent(scheduler);
+		scheduler.IsPaused = false;
+		scheduler.Driver = WebGpuFrameDriver.OnDemand;
+		var onDemand = WebGpuRenderEngine.MayDeferPresent(scheduler);
+		scheduler.Driver = WebGpuFrameDriver.Manual;
+		var manual = WebGpuRenderEngine.MayDeferPresent(scheduler);
+
+		//Assert
+		continuous.Should().BeTrue();
+		paused.Should().BeFalse();
+		onDemand.Should().BeFalse();
+		manual.Should().BeFalse();
+	}
+
+	[Fact]
+	public void readback_timing_at_1080p_synchronous_versus_deferred()
+	{
+		// A record for the report, not a claim: the time per frame of the two Readback presentations at 1920x1080.
+		//Arrange
+		TestGpu.RequireAdapter();
+		AttachAt(1920, 1080);
+		RenderColour(FrameColours[0], deferred: false); // device, target, buffers and pipelines exist before timing
+
+		//Act
+		var synchronous = TimeFrames(deferred: false);
+		var deferred = TimeFrames(deferred: true);
+		_engine.FlushPendingFrame();
+
+		//Assert
+		TestContext.Current.TestOutputHelper?.WriteLine(
+			$"Readback 1920x1080, 120 frames: synchronous {synchronous:F2} ms/frame, deferred (Continuous) {deferred:F2} ms/frame.");
+		_host.Presented.Should().Be(1 + 120 + 120);
+		_host.PixelAt(960, 540).Should().Be(FrameColours[119 % FrameColours.Length]);
+	}
+
+	private double TimeFrames(bool deferred)
+	{
+		var clock = Stopwatch.StartNew();
+		for (var i = 0; i < 120; i++)
+		{
+			RenderColour(FrameColours[i % FrameColours.Length], deferred);
+		}
+
+		return clock.Elapsed.TotalMilliseconds / 120;
+	}
+
 	private static SKBitmap Replay(SKPicture recording, int width, int height)
 	{
 		var bitmap = new SKBitmap(new SKImageInfo(width, height, SKColorType.Bgra8888, SKAlphaType.Premul));
@@ -804,8 +1078,9 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 		return bitmap;
 	}
 
-	// The built-in drivers' frame, as the view runs it (minus the events).
-	private WebGpuFrameOutcome RunBuiltIn(ref int frames)
+	// The built-in drivers' frame, as the view runs it (minus the events): the presentation may be deferred exactly when
+	// the view would defer it (Continuous, not paused).
+	private WebGpuFrameOutcome RunBuiltIn(ref int frames, WebGpuFrameScheduler? scheduler)
 	{
 		var outcome = _engine.OpenFrame(wait: false);
 		if (outcome != WebGpuFrameOutcome.Rendered)
@@ -813,7 +1088,7 @@ public sealed unsafe class WebGpuRenderEngineGpuTests : IDisposable
 			return outcome;
 		}
 
-		_engine.EndFrame();
+		_engine.EndFrame(scheduler is not null && WebGpuRenderEngine.MayDeferPresent(scheduler));
 		Interlocked.Increment(ref frames);
 		return outcome;
 	}

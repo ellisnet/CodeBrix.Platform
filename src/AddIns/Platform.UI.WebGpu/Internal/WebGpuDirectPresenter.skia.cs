@@ -365,7 +365,8 @@ internal abstract unsafe class WebGpuDirectPresenter : WebGpuPresenter, IWebGpuD
 
 	/// <summary>Publishes the frame <see cref="EndPass"/> submitted and asks the surface to show it.</summary>
 	/// <param name="host">The engine's owner.</param>
-	internal override void Show(IWebGpuRenderEngineHost host)
+	/// <param name="allowDeferred">Ignored: a GPU-resident frame is published at once, on every driver.</param>
+	internal override void Show(IWebGpuRenderEngineHost host, bool allowDeferred)
 	{
 		var index = _write;
 		_write = -1;

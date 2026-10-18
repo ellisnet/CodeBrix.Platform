@@ -60,7 +60,7 @@
 		     CodeBrix.WebGpu.Graphics here: that higher layer is the APPLICATION's choice, and it composes with the
 		     view through the sharing contracts (IWebGpuDeviceSource, IWebGpuTextureTarget) without this package
 		     knowing it exists. -->
-		<PackageReference Include="CodeBrix.WebGpu.Skia.MitLicenseForever" Version="1.0.287.390" />
+		<PackageReference Include="CodeBrix.WebGpu.Skia.MitLicenseForever" Version="1.0.291.34" />
 
 		<!-- Platform.UI.Skia packs as the CodeBrix.Platform.ApacheLicenseForever dependency, at the same family
 		     version as this build (the whole family ships together). Extensions.Logging is PrivateAssets="all"

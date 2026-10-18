@@ -38,6 +38,10 @@ internal sealed class RecordingEngineHost : IWebGpuRenderEngineHost
 	/// <summary>The reason of the last DeviceLost, or null.</summary>
 	internal string? LastLostReason { get; private set; }
 
+	/// <summary>True to record every Readback present as "Present" in <see cref="Events"/> too (off by default, so the
+	/// lifecycle sequences other tests assert stay as they are).</summary>
+	internal bool RecordPresents { get; set; }
+
 	/// <summary>Runs when DeviceReady is raised (the test's "renderer").</summary>
 	internal System.Action? OnReady { get; set; }
 
@@ -71,6 +75,10 @@ internal sealed class RecordingEngineHost : IWebGpuRenderEngineHost
 
 		previous?.Dispose();
 		Interlocked.Increment(ref _presented);
+		if (RecordPresents)
+		{
+			Record("Present");
+		}
 	}
 
 	public void PresentDirect(IWebGpuDirectFrameSource source)

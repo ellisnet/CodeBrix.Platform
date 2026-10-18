@@ -89,14 +89,14 @@ internal unsafe partial class VulkanDevice
 		if (adoption is not null)
 		{
 			enabledExtensions = enabledExtensions.Concat(adoption.Extensions).Distinct().ToArray();
-			typeof(VulkanDevice).Log().Info(
-				"Direct GPU rendering: the Vulkan device enables, for adoption, the extensions ["
-				+ string.Join(", ", adoption.Extensions) + "] and every supported feature of ["
-				+ string.Join(", ", adoption.FeatureStructures) + "].");
+			typeof(VulkanDevice).Log().Info(adoption.Description);
 		}
 
 		using var pEnabledExtensions = new Utf8BufferArray(enabledExtensions);
 
+		// The head enables no features of its own (pEnabledFeatures stays null). With an adoption profile the chain is
+		// the adopting engine's (or the fallback's): a future head feature must be MERGED into it - chained in front of
+		// it, or OR-ed into a copy - never replace it, or the engine runs on features that are not enabled.
 		var createInfo = new VkDeviceCreateInfo
 		{
 			sType = VkStructureType.VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
@@ -113,7 +113,11 @@ internal unsafe partial class VulkanDevice
 		instanceApi.GetDeviceQueue(createdDevice, dev.QueueFamilyIndex, 0, out var createdQueue);
 
 		return new VulkanDevice(instanceApi, createdDevice, dev.PhysicalDevice, createdQueue,
-			dev.QueueFamilyIndex, enabledExtensions);
+			dev.QueueFamilyIndex, enabledExtensions)
+		{
+			AdoptionRoute = adoption?.Route,
+			AdoptionDescription = adoption?.Description,
+		};
 	}
 
 	struct DeviceInfo

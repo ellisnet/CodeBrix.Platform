@@ -27,6 +27,9 @@ internal sealed class HeadlessVulkanHead : IVulkanContextOwner, IDisposable
 	/// <summary>The provider the heads register for a Vulkan window, over this context.</summary>
 	internal INativeGpuDeviceProvider Provider { get; }
 
+	/// <summary>The head's Vulkan device (what its creation enabled, and how it decided).</summary>
+	internal CodeBrix.Platform.UI.Runtime.Skia.Vulkan.Interop.VulkanDevice Device => (CodeBrix.Platform.UI.Runtime.Skia.Vulkan.Interop.VulkanDevice)_context!.Device;
+
 	/// <summary>The head's GPU context.</summary>
 	internal GRContext GrContext => _context!.GrContext!;
 

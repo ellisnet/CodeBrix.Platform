@@ -276,7 +276,7 @@ internal sealed unsafe class WebGpuRenderEngine : IWebGpuDeviceSource, IWebGpuTe
 
 	/// <summary>
 	/// Opens a frame: <see cref="WebGpuFrameOutcome.Rendered"/> means it is open on this thread (and the frame gate is
-	/// held until <see cref="EndFrame"/>); anything else means no frame is open.
+	/// held until <see cref="EndFrame()"/>); anything else means no frame is open.
 	/// </summary>
 	/// <param name="wait">True to wait while another thread holds a frame (Manual, modules); false to give up at once
 	/// (the built-in drivers).</param>
@@ -316,12 +316,36 @@ internal sealed unsafe class WebGpuRenderEngine : IWebGpuDeviceSource, IWebGpuTe
 
 	/// <summary>
 	/// Ends the frame this thread opened: validates and submits its commands, reads the picture back and presents it,
-	/// then releases the frame gate.
+	/// then releases the frame gate. Always synchronous: the frame is presented before this returns (the public
+	/// EndFrame, Manual frames, native modules).
 	/// </summary>
 	/// <exception cref="InvalidOperationException">This thread holds no open frame.</exception>
 	/// <exception cref="WebGpuSkiaValidationException">The frame's commands failed validation; nothing was submitted
 	/// or presented (the previous picture stays).</exception>
-	internal void EndFrame()
+	internal void EndFrame() => EndFrame(allowDeferredPresent: false);
+
+	/// <summary>
+	/// True when a built-in frame may leave its presentation to the next frame (<see cref="EndFrame(bool)"/>): only
+	/// under the Continuous driver while it is not paused - the one driver that is sure to run another frame. The view
+	/// asks this when the frame ENDS, after the Render handlers ran (a handler may have changed the driver).
+	/// </summary>
+	/// <param name="scheduler">The view's scheduler.</param>
+	/// <returns>True when deferring is allowed.</returns>
+	internal static bool MayDeferPresent(WebGpuFrameScheduler scheduler) =>
+		scheduler.Driver == WebGpuFrameDriver.Continuous && !scheduler.IsPaused;
+
+	/// <summary>
+	/// Ends the frame this thread opened, as <see cref="EndFrame()"/> does - except that with
+	/// <paramref name="allowDeferredPresent"/> the Readback path may finish the read-back of THIS frame during the next
+	/// one and present the previous frame now (see <see cref="WebGpuReadbackPresenter"/>). Only the built-in Continuous
+	/// driver passes true (<see cref="MayDeferPresent"/>); the frame left pending is completed by the next frame or by
+	/// <see cref="FlushPendingFrame"/>.
+	/// </summary>
+	/// <param name="allowDeferredPresent">True to allow the deferred presentation.</param>
+	/// <exception cref="InvalidOperationException">This thread holds no open frame.</exception>
+	/// <exception cref="WebGpuSkiaValidationException">The frame's commands failed validation; nothing was submitted,
+	/// begun or presented (the previous picture stays).</exception>
+	internal void EndFrame(bool allowDeferredPresent)
 	{
 		if (!Frame.IsOpen || Volatile.Read(ref _frameThread) != Environment.CurrentManagedThreadId)
 		{
@@ -344,7 +368,7 @@ internal sealed unsafe class WebGpuRenderEngine : IWebGpuDeviceSource, IWebGpuTe
 
 			if (rejected is null)
 			{
-				presenter.Show(_host);
+				presenter.Show(_host, allowDeferredPresent);
 			}
 
 			if (presenter.TakeErrors() is { } errors)
@@ -375,6 +399,50 @@ internal sealed unsafe class WebGpuRenderEngine : IWebGpuDeviceSource, IWebGpuTe
 		}
 
 		rejected?.Throw();
+	}
+
+	/// <summary>
+	/// Completes and presents the frame a deferred <see cref="EndFrame(bool)"/> left pending, if any: the view calls this
+	/// when continuous ticking stops (the driver leaves Continuous, the view is paused, the view unloads), so that the
+	/// last frame does not sit unpresented. Never blocks on a frame another thread holds.
+	/// </summary>
+	/// <returns>True when the flush ran (there may have been nothing to flush); false when a frame was open.</returns>
+	internal bool FlushPendingFrame()
+	{
+		// Inside this thread's own open frame (a Render handler that paused the view or changed its driver): that
+		// frame's EndFrame asks MayDeferPresent after the handler ran, so it presents synchronously and drops the older
+		// pending frame itself.
+		if (Volatile.Read(ref _frameThread) == Environment.CurrentManagedThreadId)
+		{
+			return false;
+		}
+
+		// Another thread holds an open frame (Manual, a native module): that frame's own EndFrame presents
+		// synchronously and drops the older pending frame - so the user-interface thread never waits for it here.
+		if (!Monitor.TryEnter(_frameGate))
+		{
+			return false;
+		}
+
+		try
+		{
+			if (_presenter is not { } presenter)
+			{
+				return true;
+			}
+
+			presenter.FlushPendingFrame(_host);
+			if (presenter.TakeErrors() is { } errors)
+			{
+				LoseDevice("The WebGPU device reported an error and was replaced: " + errors);
+			}
+
+			return true;
+		}
+		finally
+		{
+			Monitor.Exit(_frameGate);
+		}
 	}
 
 	// Frame gate held. Everything that has to happen before a frame can be recorded.

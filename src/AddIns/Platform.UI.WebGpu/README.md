@@ -50,7 +50,10 @@ touch WebGPU objects: copy what it shows into a field while rendering.
 ## Render path
 
 `RenderPath` says how frames reach the screen. The default, on every head, is `Readback`: the view renders
-off-screen and draws each finished frame through the head's own canvas (one copy per frame). An application that
+off-screen and draws each finished frame through the head's own canvas (one copy per frame). Under the `Continuous`
+driver that copy is double-buffered - it overlaps the next frame, so the picture on screen is one frame behind -
+while `OnDemand`, `Manual` and native-module frames are shown before `EndFrame` returns; the frame in flight is shown
+as soon as continuous ticking stops (the driver changes, `IsPaused`, the view unloads). An application that
 opts in with `UseDirectGpuRenderingMode()` on the host builder (experimental, app-wide) lets the view render on the
 head's own GPU device where the head offers one - `DirectVulkan` on the X11 head's Vulkan renderer and on Wayland,
 `DirectMetal` on macOS - with no copy at all; on every other head, and whenever any step of a direct path fails, the

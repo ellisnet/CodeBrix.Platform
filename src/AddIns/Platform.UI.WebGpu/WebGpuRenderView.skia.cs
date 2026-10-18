@@ -45,7 +45,10 @@ namespace CodeBrix.Platform.UI.WebGpu;
 /// <para>
 /// <b>Render path.</b> <see cref="RenderPath"/> says how frames reach the screen. Readback - the default on every head -
 /// renders off-screen, reads each finished frame back once and draws it through the head's own canvas, so the view
-/// clips, overlaps and transforms like any other XAML content. Where the application opted in to direct GPU
+/// clips, overlaps and transforms like any other XAML content. Under the Continuous driver that read-back overlaps the
+/// next frame (the picture on screen is one frame behind); OnDemand, Manual and native-module frames are presented
+/// before <see cref="EndFrame"/> returns, and the frame in flight is presented when continuous ticking stops (the
+/// driver changes, <see cref="IsPaused"/>, the view unloads). Where the application opted in to direct GPU
 /// rendering (<c>UseDirectGpuRenderingMode()</c>) the view ADOPTS the head's own GPU device where the head offers one
 /// (DirectVulkan on the X11 Vulkan renderer and on Wayland, DirectMetal on macOS) and hands the head GPU-resident
 /// frames with no readback; everywhere else, and whenever a step of a direct path fails, it uses Readback (one log
@@ -156,7 +159,7 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 	/// <summary>Identifies the <see cref="FrameDriver"/> dependency property.</summary>
 	public static readonly DependencyProperty FrameDriverProperty = DependencyProperty.Register(
 		nameof(FrameDriver), typeof(WebGpuFrameDriver), typeof(WebGpuRenderView),
-		new PropertyMetadata(WebGpuFrameDriver.Continuous, (o, e) => ((WebGpuRenderView)o)._scheduler.Driver = (WebGpuFrameDriver)e.NewValue));
+		new PropertyMetadata(WebGpuFrameDriver.Continuous, (o, e) => ((WebGpuRenderView)o).OnFrameDriverChanged((WebGpuFrameDriver)e.OldValue, (WebGpuFrameDriver)e.NewValue)));
 
 	/// <summary>What decides when frames run: Continuous (the default), OnDemand or Manual.</summary>
 	public WebGpuFrameDriver FrameDriver
@@ -185,7 +188,7 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 	/// <summary>Identifies the <see cref="IsPaused"/> dependency property.</summary>
 	public static readonly DependencyProperty IsPausedProperty = DependencyProperty.Register(
 		nameof(IsPaused), typeof(bool), typeof(WebGpuRenderView),
-		new PropertyMetadata(false, (o, e) => ((WebGpuRenderView)o)._scheduler.IsPaused = (bool)e.NewValue));
+		new PropertyMetadata(false, (o, e) => ((WebGpuRenderView)o).OnIsPausedChanged((bool)e.NewValue)));
 
 	/// <summary>True pauses the Continuous driver (the last frame stays on screen); false resumes it.</summary>
 	public bool IsPaused
@@ -324,7 +327,8 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 		_engine.OpenFrame(wait: true) == WebGpuFrameOutcome.Rendered ? _engine.Frame : null;
 
 	/// <summary>
-	/// Ends the frame this thread opened: validates and submits its commands, reads the picture back and shows it.
+	/// Ends the frame this thread opened: validates and submits its commands, reads the picture back and shows it -
+	/// before returning, on every driver.
 	/// </summary>
 	/// <exception cref="InvalidOperationException">This thread has no open frame.</exception>
 	/// <exception cref="CodeBrix.WebGpu.Skia.WebGpuSkiaValidationException">The frame's commands failed WebGPU
@@ -478,10 +482,15 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 		_scheduler.Attach();
 	}
 
-	// UI thread. Leaving the tree: no more frames; the device is released now (not at disposal), after DeviceLost.
-	private void OnUnloaded(object sender, RoutedEventArgs e)
+	private void OnUnloaded(object sender, RoutedEventArgs e) => LeaveTree();
+
+	// UI thread. Leaving the tree: the frame the Continuous driver left pending is presented first; then no more frames,
+	// and the device is released now (not at disposal), after DeviceLost. Internal for the tests (a host-free view is
+	// never in a tree, so it never raises Unloaded).
+	internal void LeaveTree()
 	{
 		HookXamlRoot(null);
+		_engine.FlushPendingFrame();
 		_scheduler.Detach();
 		_engine.Detach();
 		_resizeSettleTimer.Stop();
@@ -544,6 +553,27 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 		_scheduler.NotifyResized();
 	}
 
+	// UI thread. The Readback path runs one frame behind under Continuous (WebGpuReadbackPresenter): when the driver
+	// leaves Continuous, the frame it left pending is presented at once.
+	private void OnFrameDriverChanged(WebGpuFrameDriver oldValue, WebGpuFrameDriver newValue)
+	{
+		_scheduler.Driver = newValue;
+		if (oldValue == WebGpuFrameDriver.Continuous && newValue != WebGpuFrameDriver.Continuous)
+		{
+			_engine.FlushPendingFrame();
+		}
+	}
+
+	// UI thread. Pausing stops continuous ticking: the frame left pending is presented at once.
+	private void OnIsPausedChanged(bool isPaused)
+	{
+		_scheduler.IsPaused = isPaused;
+		if (isPaused)
+		{
+			_engine.FlushPendingFrame();
+		}
+	}
+
 	// UI thread. One frame of a built-in driver: the renderer, then the event. A failure is logged (once per kind) and
 	// the driver carries on; it never escapes into the dispatcher.
 	private WebGpuFrameOutcome RunBuiltInFrame()
@@ -576,7 +606,8 @@ public sealed partial class WebGpuRenderView : FrameworkElement, IWebGpuDeviceSo
 
 		try
 		{
-			_engine.EndFrame();
+			// Asked now, after the handlers ran: only a Continuous, unpaused driver may leave the picture to the next frame.
+			_engine.EndFrame(WebGpuRenderEngine.MayDeferPresent(_scheduler));
 		}
 		catch (Exception e)
 		{

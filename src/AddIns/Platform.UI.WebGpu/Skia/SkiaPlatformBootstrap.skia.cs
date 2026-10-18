@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 using CodeBrix.Platform.Foundation.Extensibility;
+using CodeBrix.Platform.UI.Runtime.Skia.Vulkan;
+using CodeBrix.Platform.UI.WebGpu.Internal;
 using CodeBrix.Platform.UI.WebGpu.Contracts;
 using Microsoft.UI.Xaml;
 
@@ -9,7 +11,9 @@ namespace CodeBrix.Platform.UI.WebGpu.Skia;
 /// Registers this assembly's implementations of the WebGpu add-in's platform contracts with
 /// <see cref="ApiExtensibility"/> (the frame timer the Core's scheduler runs on). Runs as a module initializer, so the
 /// registrations exist before any code of this assembly runs; the Core assembly's <see cref="PlatformContract"/> runs
-/// it when it first needs a contract.
+/// it when it first needs a contract. Also registers the WebGPU engine's adopt-requirements source for the heads'
+/// Vulkan devices (<see cref="VulkanAdoptionProfile"/>), which loads this type by its assembly-qualified name - a
+/// rename here must follow there (fenced by a test).
 /// </summary>
 internal static class SkiaPlatformBootstrap
 {
@@ -40,6 +44,11 @@ internal static class SkiaPlatformBootstrap
 			{
 				ApiExtensibility.Register<FrameworkElement>(typeof(IWebGpuFrameTimer), owner => new WebGpuFrameTimerSkiaPlatform(owner));
 			}
+
+			//The WebGPU engine's adopt-requirements source: what the heads' Vulkan devices enable while direct GPU
+			//rendering is on. The X11 head usually creates its device before this assembly has loaded; it then loads
+			//this assembly by the name VulkanAdoptionProfile.AddInBootstrapTypeName gives and runs this initializer.
+			VulkanAdoptionProfile.RequirementsSource ??= new WebGpuVulkanAdoptRequirementsSource();
 
 			_registered = true;
 		}

@@ -74,6 +74,10 @@ using CodeBrix.Platform.UI.Graphics;
 // headless) behind the provider the X11 and Wayland heads register (Vulkan/VulkanNativeGpuDeviceProvider.skia.cs).
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia.Tests")]
 
+// The WebGpu add-in itself: it registers the engine's adopt-requirements source the heads' Vulkan devices are created
+// with while direct GPU rendering is on (Vulkan/IVulkanAdoptRequirementsSource.skia.cs, Vulkan/VulkanAdoptionProfile.skia.cs).
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia")]
+
 // The WebGpu add-in's UIReqs pair: the direct-path scenarios offer a head's Vulkan device (VulkanContext, initialized
 // headless, behind VulkanNativeGpuDeviceProvider) as the window's provider on the software frame-buffer harness.
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.AddIn.WebGpu.UIReqs")]
