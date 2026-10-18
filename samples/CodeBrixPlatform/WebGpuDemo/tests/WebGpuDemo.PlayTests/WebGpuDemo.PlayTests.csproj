@@ -12,9 +12,9 @@
     <ProjectReference Include="$(WebGpuDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest/Platform.UI.Runtime.Skia.PlayTest.csproj" />
     <!-- Real WebGPU devices for the demo's views (registered in AppFixture). -->
     <ProjectReference Include="$(WebGpuDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest.WebGpu/Platform.UI.Runtime.Skia.PlayTest.WebGpu.csproj" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
-    <PackageReference Include="xunit.v3" Version="4.0.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all" />
     <PackageReference Include="SilverAssertions.ApacheLicenseForever" Version="1.0.248.1071" />
   </ItemGroup>
   <Import Project="$(WebGpuDemoPlatformSource)Platform.UI.Runtime.Skia.PlayTest/buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />

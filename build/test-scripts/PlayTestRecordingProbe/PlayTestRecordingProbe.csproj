@@ -11,7 +11,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="../../../samples/CodeBrixPlatform/PlayTestDemo/tests/PlayTestDemo.PlayTests/PlayTestDemo.PlayTests.csproj" />
-    <PackageReference Include="xunit.v3" Version="4.0.1" />
+    <PackageReference Include="xunit.v3" Version="4.0.2" />
   </ItemGroup>
   <Import Project="../../../src/Platform.UI.Runtime.Skia.PlayTest/buildTransitive/CodeBrix.Platform.PlayTest.ApacheLicenseForever.targets" />
 </Project>

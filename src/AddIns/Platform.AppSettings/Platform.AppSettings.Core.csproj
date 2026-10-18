@@ -40,7 +40,7 @@
 	<ItemGroup>
 		<!-- ILogger/ILoggerFactory, which AppSettingLoggingService forwards through (the package
 		     dependency itself is declared by the Skia project, which packs). -->
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
 	</ItemGroup>
 
 	<ItemGroup>
