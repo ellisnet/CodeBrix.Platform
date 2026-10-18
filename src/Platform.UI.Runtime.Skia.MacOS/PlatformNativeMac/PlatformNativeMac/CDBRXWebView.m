@@ -452,6 +452,24 @@ void codebrix_webview_set_user_agent(WKWebView* webview, const char* user_agent)
     webview.customUserAgent = user_agent ? [NSString stringWithUTF8String:user_agent] : nil;
 }
 
+// Maps window.chrome.webview.postMessage (the WebView2 contract) onto the unoWebView handler, so app code written for
+// the Windows heads works unchanged here. The value is posted as its JSON text (the handler only takes strings, and
+// CoreWebView2 reads what it forwards as WebMessageAsJson), so a string arrives for TryGetWebMessageAsString and any
+// other value as its JSON, as on WebView2 and the PlayTest helper. The page's own JSON.stringify keeps the value's key
+// order, as WebView2 does. Pages that post through window.webkit.messageHandlers.unoWebView directly keep working as
+// before; window.webkit.messageHandlers.codebrixWebView (the other heads' WebKit idiom) is handled below.
+static NSString *const CDBRXChromeWebViewBridgeScript =
+    @"if(!window.chrome){window.chrome={};}"
+    @"if(!window.chrome.webview){window.chrome.webview={postMessage:function(m){"
+    @"window.webkit.messageHandlers.unoWebView.postMessage(JSON.stringify(m));}};}";
+
+// The host-to-page half (PostWebMessageAsString / AsJson): window.chrome.webview's 'message' listeners. This literal
+// MUST stay identical to WebViewScripts.MessageListenerScript (src/Platform.UI/UI/Xaml/Controls/WebView/Core/
+// WebViewScripts.cs, its DispatchFunctionName substituted), which builds the delivery scripts that call into it; the
+// host-free WebViewScriptsTests check that it does. Keep it on one line.
+static NSString *const CDBRXMessageListenerScript =
+    @"(function(){var v=window.chrome&&window.chrome.webview;if(!v||typeof v.__codebrixDispatchMessage==='function'){return;}var ls=[];v.addEventListener=function(t,f){if(t==='message'&&typeof f==='function'&&ls.indexOf(f)<0){ls.push(f);}};v.removeEventListener=function(t,f){if(t==='message'){var i=ls.indexOf(f);if(i>=0){ls.splice(i,1);}}};if(!('onmessage' in v)){v.onmessage=null;}function call(f,e){try{f.call(v,e);}catch(x){setTimeout(function(){throw x;},0);}}Object.defineProperty(v,'__codebrixDispatchMessage',{value:function(d){var e={type:'message',data:d,source:v},n=0;if(typeof v.onmessage==='function'){n++;call(v.onmessage,e);}ls.slice().forEach(function(f){n++;call(f,e);});return n;}});})();";
+
 @implementation UNOWebView : WKWebView
 
 - (nullable instancetype)initWithCoder:(NSCoder *)coder {
@@ -467,6 +485,15 @@ void codebrix_webview_set_user_agent(WKWebView* webview, const char* user_agent)
         
         __weak id weakSelf = self;
         [configuration.userContentController addScriptMessageHandler:weakSelf name:@"unoWebView"];
+        // window.webkit.messageHandlers.codebrixWebView, the WebKit idiom the Linux heads and the PlayTest helper offer.
+        [configuration.userContentController addScriptMessageHandler:weakSelf name:@"codebrixWebView"];
+
+        // Document-start scripts, in this order (user scripts run in insertion order): the bridge creates
+        // window.chrome.webview, then the listener script gives it its 'message' listeners.
+        [configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:CDBRXChromeWebViewBridgeScript
+            injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO]];
+        [configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:CDBRXMessageListenerScript
+            injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO]];
     }
     return self;
 }
@@ -519,6 +546,7 @@ void codebrix_webview_set_user_agent(WKWebView* webview, const char* user_agent)
         [self removeFromSuperview];
     }
     [self.configuration.userContentController removeScriptMessageHandlerForName:@"unoWebView"];
+    [self.configuration.userContentController removeScriptMessageHandlerForName:@"codebrixWebView"];
 }
 
 // WKUIDelegate
@@ -850,6 +878,25 @@ createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration
 #if DEBUG
             NSLog(@"didReceiveScriptMessage (not a string) body: %@", message.body);
 #endif
+        }
+    } else if ([message.name isEqualToString:@"codebrixWebView"]) {
+        // The WebKit idiom of the other heads and the PlayTest helper: any value, forwarded as its JSON text (which is
+        // what CoreWebView2 reads as WebMessageAsJson). A value with no JSON form (a Date, a function) is dropped.
+        NSData *json = nil;
+        @try {
+            json = [NSJSONSerialization dataWithJSONObject:message.body ?: NSNull.null
+                options:NSJSONWritingFragmentsAllowed | NSJSONWritingWithoutEscapingSlashes error:nil];
+        } @catch (NSException *exception) {
+#if DEBUG
+            NSLog(@"didReceiveScriptMessage (no JSON form) body: %@ exception: %@", message.body, exception);
+#endif
+        }
+        NSString *text = json ? [[NSString alloc] initWithData:json encoding:NSUTF8StringEncoding] : nil;
+        if (text) {
+#if DEBUG
+            NSLog(@"didReceiveScriptMessage json %@", text);
+#endif
+            codebrix_get_webview_receive_web_message_callback()(self, text.UTF8String);
         }
     }
 }

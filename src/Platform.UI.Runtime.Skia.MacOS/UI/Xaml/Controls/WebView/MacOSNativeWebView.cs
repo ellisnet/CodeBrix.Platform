@@ -14,7 +14,7 @@ using CodeBrix.Platform.UI.Xaml.Controls;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.MacOS; //Was previously: Uno.UI.Runtime.Skia.MacOS
 
-internal class MacOSNativeWebView : MacOSNativeElement, INativeWebView
+internal class MacOSNativeWebView : MacOSNativeElement, INativeWebView, INativeWebViewMessaging
 {
 	private readonly MacOSWindowNative _window;
 	private readonly CoreWebView2 _owner;
@@ -256,6 +256,41 @@ internal class MacOSNativeWebView : MacOSNativeElement, INativeWebView
 	}
 
 	public void Stop() => NativeCodeBrix.codebrix_webview_stop(_webview);
+
+	/// <summary>
+	/// Delivers CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson to the page's window.chrome.webview 'message'
+	/// listeners by evaluating a delivery script (<see cref="WebViewScripts"/>; the payload is only ever a JSON string
+	/// literal in it). The listeners come from the document-start scripts libCodeBrixNativeMac.dylib installs; a page
+	/// whose message channel does not exist yet - or a dylib built before those scripts - drops the message, with a
+	/// Debug log line.
+	/// </summary>
+	/// <param name="payload">The string, or the JSON text when <paramref name="isJson"/> is true.</param>
+	/// <param name="isJson">Whether <paramref name="payload"/> is JSON (the page receives the parsed value).</param>
+	/// <exception cref="ArgumentException"><paramref name="isJson"/> is true and <paramref name="payload"/> is not valid JSON.</exception>
+	public void PostWebMessage(string payload, bool isJson)
+	{
+		var script = isJson ? WebViewScripts.JsonMessageDelivery(payload) : WebViewScripts.StringMessageDelivery(payload);
+		_ = DeliverWebMessageAsync(script);
+	}
+
+	private async Task DeliverWebMessageAsync(string script)
+	{
+		try
+		{
+			var listeners = await ExecuteScriptAsync(script, CancellationToken.None);
+			if (listeners == WebViewScripts.NoChannelResult && this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug("A web message was dropped: the page's message channel is not set up yet (posted before the document-start script ran).");
+			}
+		}
+		catch (Exception e)
+		{
+			if (this.Log().IsEnabled(LogLevel.Debug))
+			{
+				this.Log().Debug($"A web message could not be delivered: {e.Message}");
+			}
+		}
+	}
 
 	private static readonly Dictionary<nint, WeakReference<MacOSNativeWebView>> _webViews = [];
 

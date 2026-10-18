@@ -34,6 +34,13 @@ static void Send(NSDictionary *message)
         [configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:
             @"window.chrome=window.chrome||{};window.chrome.webview={postMessage:v=>window.webkit.messageHandlers.codebrixWebView.postMessage(v)};"
             injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO]];
+        // window.chrome.webview's 'message' listeners (PostWebMessageAsString / AsJson), after the bridge that
+        // creates it. This literal MUST stay identical to WebViewScripts.MessageListenerScript
+        // (src/Platform.UI/UI/Xaml/Controls/WebView/Core/WebViewScripts.cs, its DispatchFunctionName
+        // substituted); the host-free WebViewScriptsTests check that it does. Keep it on one line.
+        [configuration.userContentController addUserScript:[[WKUserScript alloc] initWithSource:
+            @"(function(){var v=window.chrome&&window.chrome.webview;if(!v||typeof v.__codebrixDispatchMessage==='function'){return;}var ls=[];v.addEventListener=function(t,f){if(t==='message'&&typeof f==='function'&&ls.indexOf(f)<0){ls.push(f);}};v.removeEventListener=function(t,f){if(t==='message'){var i=ls.indexOf(f);if(i>=0){ls.splice(i,1);}}};if(!('onmessage' in v)){v.onmessage=null;}function call(f,e){try{f.call(v,e);}catch(x){setTimeout(function(){throw x;},0);}}Object.defineProperty(v,'__codebrixDispatchMessage',{value:function(d){var e={type:'message',data:d,source:v},n=0;if(typeof v.onmessage==='function'){n++;call(v.onmessage,e);}ls.slice().forEach(function(f){n++;call(f,e);});return n;}});})();"
+            injectionTime:WKUserScriptInjectionTimeAtDocumentStart forMainFrameOnly:NO]];
         _view = [[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:configuration];
         _view.navigationDelegate = self;
         _view.UIDelegate = self;

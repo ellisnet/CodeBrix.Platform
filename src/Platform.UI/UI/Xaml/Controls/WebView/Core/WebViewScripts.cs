@@ -1,13 +1,17 @@
+#nullable enable
+
 using System;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
-namespace CodeBrix.Platform.UI.WebView.Skia.Linux;
+namespace CodeBrix.Platform.UI.Xaml.Controls;
 
 /// <summary>
-/// The host-to-page message channel of the Linux web view, as pure text (host-free tested): the document-start script
-/// that gives window.chrome.webview its WebView2 'message' listeners, and the scripts that deliver
-/// CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson to them. The page-side API and the delivery scripts are
-/// the same shape as CodeBrix.Android's web view, so a page behaves the same on both.
+/// The host-to-page message channel of the script-injecting native web views (the Linux WPE view and the two macOS
+/// WKWebView views), as pure text (host-free tested): the document-start script that gives window.chrome.webview its
+/// WebView2 'message' listeners, and the scripts that deliver CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson
+/// to them. The page-side API and the delivery scripts are the same shape as CodeBrix.Android's web view, so a page
+/// behaves the same on all of them.
 /// </summary>
 internal static class WebViewScripts
 {
@@ -27,6 +31,12 @@ internal static class WebViewScripts
 	/// is the message (the string of PostWebMessageAsString, the parsed value of PostWebMessageAsJson). A listener that
 	/// throws does not stop the others (its error is reported asynchronously).
 	/// </summary>
+	/// <remarks>
+	/// The macOS WKWebView views inject this script natively, so the same text is a string literal in
+	/// src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/PlatformNativeMac/CDBRXWebView.m and in
+	/// tools/MacOsWebViewHelper/PlayTestWebView.m. Keep those two literals identical to this constant (with
+	/// <see cref="DispatchFunctionName"/> substituted); a change here is a change there, and a rebuild of both.
+	/// </remarks>
 	internal const string MessageListenerScript =
 		"(function(){var v=window.chrome&&window.chrome.webview;if(!v||typeof v." + DispatchFunctionName + "==='function'){return;}"
 		+ "var ls=[];"
@@ -46,7 +56,7 @@ internal static class WebViewScripts
 	/// </summary>
 	/// <param name="message">The message (null is sent as an empty string, as WebView2 marshals it).</param>
 	/// <returns>The script.</returns>
-	internal static string StringMessageDelivery(string? message) => Delivery(JsonSerializer.Serialize(message ?? string.Empty));
+	internal static string StringMessageDelivery(string? message) => Delivery(JsonSerializer.Serialize(message ?? string.Empty, WebViewScriptsJsonSerializerContext.Default.String));
 
 	/// <summary>
 	/// The script that delivers PostWebMessageAsJson(<paramref name="json"/>) to the page: event.data is the parsed JSON
@@ -72,11 +82,19 @@ internal static class WebViewScripts
 			throw new ArgumentException("The message is not valid JSON: " + exception.Message, nameof(json), exception);
 		}
 
-		return Delivery("JSON.parse(" + JsonSerializer.Serialize(json) + ")");
+		return Delivery("JSON.parse(" + JsonSerializer.Serialize(json, WebViewScriptsJsonSerializerContext.Default.String) + ")");
 	}
 
 	private static string Delivery(string dataExpression) =>
 		"(function(){var v=window.chrome&&window.chrome.webview;"
 		+ "if(!v||typeof v." + DispatchFunctionName + "!=='function'){return " + NoChannelResult + ";}"
 		+ "return v." + DispatchFunctionName + "(" + dataExpression + ");})()";
+}
+
+// Source-generated string serialization (the framework assembly is trim- and AOT-analysed); its default encoder is
+// the one the delivery scripts rely on: quotes, line breaks, U+2028/U+2029, '<', '>' and every non-ASCII character escaped.
+[JsonSourceGenerationOptions]
+[JsonSerializable(typeof(string))]
+internal sealed partial class WebViewScriptsJsonSerializerContext : JsonSerializerContext
+{
 }

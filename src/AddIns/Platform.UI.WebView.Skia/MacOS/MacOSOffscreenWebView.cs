@@ -8,7 +8,10 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CodeBrix.Platform.Extensions;
+using CodeBrix.Platform.Extensions.Logging;
 using CodeBrix.Platform.UI.Xaml.Controls;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -29,7 +32,7 @@ public sealed class MacOSOffscreenWebViewProvider(CoreWebView2 owner) : INativeW
         => new MacOSOffscreenWebView(owner, presenter);
 }
 
-internal sealed class MacOSOffscreenWebView : ICleanableNativeWebView
+internal sealed class MacOSOffscreenWebView : ICleanableNativeWebView, INativeWebViewMessaging
 {
     private readonly CoreWebView2 _owner;
     private readonly OffscreenWebViewElement _element;
@@ -283,6 +286,17 @@ internal sealed class MacOSOffscreenWebView : ICleanableNativeWebView
         => (await RequestAsync("script", new { script }).WaitAsync(token)).GetString();
     public Task<string?> InvokeScriptAsync(string script, string[]? arguments, CancellationToken token)
         => ExecuteScriptAsync($"{script}({JsonSerializer.Serialize(arguments ?? Array.Empty<string>())[1..^1]})", token);
+    // Host-to-page messaging: a delivery script for the 'message' listeners the helper's document-start
+    // script gives window.chrome.webview (the payload is only ever a JSON string literal in it). Core
+    // validates a JSON payload before it gets here; a page without the channel drops the message.
+    public void PostWebMessage(string payload, bool isJson) => Observe(DeliverWebMessageAsync(
+        isJson ? WebViewScripts.JsonMessageDelivery(payload) : WebViewScripts.StringMessageDelivery(payload)));
+    private async Task DeliverWebMessageAsync(string script)
+    {
+        if (await ExecuteScriptAsync(script, CancellationToken.None).ConfigureAwait(false) == WebViewScripts.NoChannelResult
+            && this.Log().IsEnabled(LogLevel.Debug))
+            this.Log().Debug("A web message was dropped: the page's message channel is not set up yet (posted before the document-start script ran).");
+    }
     public void SetScrollingEnabled(bool enabled) => _scrollEnabled = enabled;
     public void SetUserAgent(string userAgent) => Observe(RequestAsync("userAgent", new { value = userAgent }));
     public void OnLoaded() => Resize();

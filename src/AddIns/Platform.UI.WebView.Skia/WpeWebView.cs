@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using CodeBrix.Platform.Extensions;
 using CodeBrix.Platform.Extensions.Logging;
 using CodeBrix.Platform.UI.WebView.Skia.Linux.Interop;
+using CodeBrix.Platform.UI.Xaml.Controls;
 using SkiaSharp;
 
 namespace CodeBrix.Platform.UI.WebView.Skia.Linux;

@@ -1,9 +1,10 @@
 #nullable enable
 
 using System;
+using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using CodeBrix.Platform.UI.WebView.Skia.Linux;
+using CodeBrix.Platform.UI.Xaml.Controls;
 using SilverAssertions;
 using Xunit;
 
@@ -114,6 +115,27 @@ public class WebViewScriptsTests
 		//Assert
 		script.Should().Contain("{return " + WebViewScripts.NoChannelResult + ";}");
 		WebViewScripts.NoChannelResult.Should().Be("-1");
+	}
+
+	[Theory]
+	[InlineData("src/Platform.UI.Runtime.Skia.MacOS/PlatformNativeMac/PlatformNativeMac/CDBRXWebView.m")]
+	[InlineData("tools/MacOsWebViewHelper/PlayTestWebView.m")]
+	public void the_macos_views_inject_exactly_the_listener_script_the_delivery_scripts_call_into(string nativeSource)
+	{
+		//Arrange
+		var directory = new DirectoryInfo(AppContext.BaseDirectory);
+		while (directory is not null && !File.Exists(Path.Combine(directory.FullName, "README-INDEX.txt")))
+		{
+			directory = directory.Parent;
+		}
+		directory.Should().NotBeNull("the tests run from inside the repository");
+
+		//Act
+		var source = File.ReadAllText(Path.Combine(directory!.FullName, nativeSource));
+
+		//Assert - the Objective-C literal of the script, which has no character an @"..." literal would escape
+		WebViewScripts.MessageListenerScript.Should().NotContainAny("\"", "\\");
+		source.Should().Contain("@\"" + WebViewScripts.MessageListenerScript + "\"");
 	}
 
 	// The literal must not be able to end the string, end a <script> element, or break a line in a script.

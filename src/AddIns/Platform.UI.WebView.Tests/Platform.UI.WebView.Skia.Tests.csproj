@@ -9,8 +9,9 @@
 		<UseMicrosoftTestingPlatformRunner>true</UseMicrosoftTestingPlatformRunner>
 		<TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
 
-		<!-- Host-free: the suite drives the add-in's pure script text (the host-to-page message channel and the
-		     delivery scripts, via InternalsVisibleTo) - no web engine, no window. The page-side behaviour is
+		<!-- Host-free: the suite drives the framework's pure script text (WebViewScripts in Platform.UI: the
+		     host-to-page message channel and the delivery scripts, via InternalsVisibleTo) and checks the macOS
+		     native sources inject that same channel text - no web engine, no window. The page-side behaviour is
 		     proven against the real engine by the WebView UIReqs. -->
 		<CodeBrixRuntimeIdentifier>Skia</CodeBrixRuntimeIdentifier>
 

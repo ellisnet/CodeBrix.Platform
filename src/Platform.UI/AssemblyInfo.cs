@@ -57,6 +57,8 @@ using CodeBrix.Platform.Foundation.Diagnostics.CodeAnalysis;
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Skia")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.VideoPlayer.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Skia")]
+// The WebView add-in's host-free tests: WebViewScripts (UI/Xaml/Controls/WebView/Core), the script text the WPE and macOS views share.
+[assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebView.Tests")]
 // The WebGpu add-in (its Core and platform assembly): the owned-GPU-device gate (Graphics/IOwnedGpuDeviceGate.cs).
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Core")]
 [assembly: InternalsVisibleTo("CodeBrix.Platform.UI.WebGpu.Skia")]
