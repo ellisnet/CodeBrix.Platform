@@ -47,7 +47,7 @@ internal class Win32NativeWebViewProvider(CoreWebView2 owner) : INativeWebViewPr
 	}
 }
 
-internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
+internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping, INativeWebViewMessaging
 {
 	private const string WindowClassName = "CodeBrixPlatformWebViewWindow";
 	private const uint SC_MASK = 0xFFF0; // Mask to extract system command from wParam
@@ -516,4 +516,21 @@ internal class Win32NativeWebView : INativeWebView, ISupportsVirtualHostMapping
 
 	public void SetVirtualHostNameToFolderMapping(string hostName, string folderPath, CoreWebView2HostResourceAccessKind accessKind)
 		=> _nativeWebView.SetVirtualHostNameToFolderMapping(hostName, folderPath, (NativeWebView.CoreWebView2HostResourceAccessKind)accessKind);
+
+	/// <summary>
+	/// Delivers CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson through Edge's own calls: its
+	/// window.chrome.webview already has the 'message' listeners, so no script is injected. Core validates a JSON
+	/// payload before it gets here and calls on the UI thread, which owns the control.
+	/// </summary>
+	public void PostWebMessage(string payload, bool isJson)
+	{
+		if (isJson)
+		{
+			_nativeWebView.PostWebMessageAsJson(payload);
+		}
+		else
+		{
+			_nativeWebView.PostWebMessageAsString(payload);
+		}
+	}
 }

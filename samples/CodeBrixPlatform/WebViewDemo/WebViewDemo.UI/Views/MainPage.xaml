@@ -8,6 +8,7 @@
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -37,10 +38,22 @@
                     VerticalAlignment="Center" Content="URL" Click="UrlButton_Click" />
         </Grid>
 
-        <WebView2 x:Name="Browser" Grid.Row="1" Margin="0,10,0,10"
+        <!-- Host-to-page messaging. "Echo page" loads an inline page that listens for 'message'
+             events on window.chrome.webview and posts each one straight back; the two Post
+             buttons call CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson, and
+             WebMessageReceived shows what the page answered. -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+            <Button Height="40" VerticalAlignment="Center" Content="Echo page" Click="EchoPageButton_Click" />
+            <Button Height="40" Margin="8,0,0,0" VerticalAlignment="Center" Content="Post string" Click="PostStringButton_Click" />
+            <Button Height="40" Margin="8,0,0,0" VerticalAlignment="Center" Content="Post JSON" Click="PostJsonButton_Click" />
+            <TextBlock x:Name="MessageText" Margin="12,0,0,0" VerticalAlignment="Center"
+                       Text="No web message received yet" />
+        </StackPanel>
+
+        <WebView2 x:Name="Browser" Grid.Row="2" Margin="0,10,0,10"
                   Source="https://en.wikipedia.org/wiki/Inanna" />
 
-        <TextBlock x:Name="StatusText" Grid.Row="2" Text="Ready" />
+        <TextBlock x:Name="StatusText" Grid.Row="3" Text="Ready" />
 
     </Grid>
 </Page>

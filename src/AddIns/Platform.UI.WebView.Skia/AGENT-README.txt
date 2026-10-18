@@ -234,8 +234,9 @@ Settings.IsWebMessageEnabled must be true (the default).
 
 HOST-TO-PAGE MESSAGING
 ----------------------
-On the Linux heads (X11, Wayland, FrameBuffer) the host posts to the page with
-the WebView2 calls, and the page listens with the WebView2 page API:
+On the Linux heads (X11, Wayland, FrameBuffer) and the Windows heads (Win32,
+WPF) the host posts to the page with the WebView2 calls, and the page listens
+with the WebView2 page API:
     Browser.CoreWebView2.PostWebMessageAsString("hello");      // data = "hello"
     Browser.CoreWebView2.PostWebMessageAsJson("{\"n\":1}");     // data = {n: 1}
 Page side (window.chrome.webview, set up before any page script runs):
@@ -257,10 +258,18 @@ string, never as script. Pitfalls:
     NavigationCompleted, or have the page post "ready" and post after that.
   - Posting does not wait for the page; the page receives messages in the order
     posted.
-On the Windows heads (Win32, WPF) and macOS these two calls are not
-implemented yet: they log a not-implemented message (or throw when
-FeatureConfiguration.ApiInformation.IsFailWhenNotImplemented is true). There,
-push data into the page with ExecuteScriptAsync:
+  - On Windows, Edge hands a PostWebMessageAsJson object to the page with its
+    keys in Edge's own (sorted) order, not the order in the text, so a page
+    that JSON.stringify()s what it received need not reproduce the posted
+    text byte for byte. Read values by name.
+On Windows the two calls go straight to Edge's own PostWebMessageAsString /
+PostWebMessageAsJson, so the page-side API is Edge's native
+window.chrome.webview; on Linux the add-in supplies the same API with a
+document-start script. The PlayTest host's offscreen Windows view has it too.
+On macOS these two calls are not implemented yet: they log a not-implemented
+message (or throw when FeatureConfiguration.ApiInformation
+.IsFailWhenNotImplemented is true). There, push data into the page with
+ExecuteScriptAsync:
     await Browser.ExecuteScriptAsync("window.receiveFromHost('hello')");
 CodeBrix.Android's web view offers the same page-side API.
 
@@ -324,8 +333,8 @@ FeatureConfiguration.WebView and FeatureConfiguration.WebView2 exist but carry
 no settable members on the Skia heads (their upstream flags are compiled out),
 so there is nothing WebView-specific to configure. The one relevant global
 switch is FeatureConfiguration.ApiInformation.IsFailWhenNotImplemented, which
-turns not-implemented members (PostWebMessageAsString on the Windows and macOS
-heads, CoreWebView2Environment.*, ...) from a logged message into a thrown
+turns not-implemented members (PostWebMessageAsString on the macOS head,
+CoreWebView2Environment.*, ...) from a logged message into a thrown
 NotImplementedException.
 
 Windows-head specifics
@@ -631,8 +640,9 @@ COMMON PITFALLS TO AVOID
     SourceFromCore shortcut) inside navigation callbacks.
   - CoreWebView2.Navigate(string) requires an ABSOLUTE URI and throws
     ArgumentException otherwise; the same goes for new Uri(...) into Source.
-  - PostWebMessageAsString / PostWebMessageAsJson do nothing on the Skia heads
-    (see PAGE-TO-HOST MESSAGING); use ExecuteScriptAsync for host-to-page.
+  - PostWebMessageAsString / PostWebMessageAsJson reach the page on the Linux
+    and Windows heads only (see HOST-TO-PAGE MESSAGING); on macOS they log
+    not-implemented, so use ExecuteScriptAsync for host-to-page there.
   - Subscribing to CoreWebView2.DownloadStarting (or other CoreWebView2
     events) only after the first navigation already finished misses that
     navigation; subscribe in the constructor or right after
@@ -662,7 +672,8 @@ WHAT THIS PACKAGE DOES NOT DO
     loader and managed assemblies are bundled), macOS uses the OS WKWebView.
   - Normal macOS desktop heads use the head's own WKWebView support; only
     PlayTest uses the add-in's offscreen macOS helper.
-  - No host-to-page PostWebMessageAsString/AsJson (use ExecuteScriptAsync).
+  - No host-to-page PostWebMessageAsString/AsJson on macOS (use
+    ExecuteScriptAsync there); the Linux and Windows heads have them.
   - No download Pause()/Resume() (CanResume is always false), no built-in
     download UI (DefaultDownloadDialog APIs are stubs).
   - No CoreWebView2Environment configuration (user data folder, browser
@@ -676,8 +687,10 @@ WORKING EXAMPLES ON GITHUB
 ==========================
   - WebViewDemo (all six heads: address box, Go/Back/Forward, a modal
     ContentDialog over the WebView, NavigationCompleted reading
-    CoreWebView2.Source and DocumentTitle, and DownloadStarting wired into a
-    status line with BytesReceivedChanged / StateChanged):
+    CoreWebView2.Source and DocumentTitle, DownloadStarting wired into a
+    status line with BytesReceivedChanged / StateChanged, and a messaging row:
+    an inline echo page, PostWebMessageAsString / PostWebMessageAsJson buttons
+    and WebMessageReceived showing what the page answered):
     https://github.com/ellisnet/CodeBrix.Platform/tree/main/samples/CodeBrixPlatform/WebViewDemo
     The shared page is WebViewDemo.UI/Views/MainPage.xaml(.cs).
   - The core WebView2 contract sources (control + CoreWebView2 facade):
@@ -706,7 +719,9 @@ Script         string? r = await Browser.ExecuteScriptAsync("document.title");
 Page -> host   window.chrome.webview.postMessage(x)  or
                window.webkit.messageHandlers.codebrixWebView.postMessage(x)
                -> WebMessageReceived(args.TryGetWebMessageAsString() / WebMessageAsJson)
-Host -> page   ExecuteScriptAsync(...)   (PostWebMessageAs* NOT implemented)
+Host -> page   CoreWebView2.PostWebMessageAsString(s) / PostWebMessageAsJson(json)
+               -> window.chrome.webview.addEventListener('message', e => e.data)
+               (Linux and Windows; on macOS use ExecuteScriptAsync(...) instead)
 User-Agent     Browser.CoreWebView2.Settings.UserAgent = "MyApp/1.0";  "" = default
 Nav events     NavigationStarting(args.Uri, args.Cancel) / NavigationCompleted
                (args.IsSuccess, HttpStatusCode, WebErrorStatus); NewWindowRequested
@@ -717,5 +732,5 @@ Downloads      CoreWebView2.DownloadStarting: args.Cancel | args.ResultFilePath 
                BytesReceivedChanged, EstimatedEndTimeChanged
                default: silent save to Downloads with "name (1).ext" renaming
 Threads        all events on the UI thread; touch the control on the UI thread
-Not on Skia    PostWebMessageAs*, CoreWebView2Environment.*, download Pause/Resume,
-               DefaultDownloadDialog, CoreProcessFailed; Linux: IME, popups, cursor
+Not on Skia    CoreWebView2Environment.*, download Pause/Resume, DefaultDownloadDialog,
+               CoreProcessFailed; macOS: PostWebMessageAs*; Linux: IME, popups, cursor

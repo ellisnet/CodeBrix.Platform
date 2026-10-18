@@ -506,11 +506,17 @@ WebViewDemo
 An address box with Go / Back / Forward over a WebView2 control, plus download
 handling: the page subscribes to CoreWebView2.DownloadStarting and reports the
 resolved target path, showing where to accept the default, redirect via
-args.ResultFilePath, or cancel.
+args.ResultFilePath, or cancel. A second row shows host-to-page messaging:
+"Echo page" loads an inline page that listens on window.chrome.webview and
+posts every message straight back, "Post string" and "Post JSON" call
+CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson, and the line
+beside them shows what WebMessageReceived heard.
 
-Self-test: WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL=<url> makes the app navigate
+Self-tests: WEBVIEWDEMO_SELFTEST_DOWNLOAD_URL=<url> makes the app navigate
 straight to that URL, log "WVD-SELFTEST:" lines for the download, and exit
-when it completes.
+when it completes. WEBVIEWDEMO_SELFTEST_MESSAGING=1 loads the echo page, posts
+a string and a JSON message to it, and exits 0 when both echoes arrive (1
+after 30 seconds).
 
 The Linux heads need the system WPE WebKit runtime:
     sudo apt install libwpewebkit-2.0-1 libwpebackend-fdo-1.0-1 libwpe-1.0-1

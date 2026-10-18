@@ -30,7 +30,7 @@ public sealed class WindowsOffscreenWebViewProvider(CoreWebView2 owner) : INativ
         => new WindowsOffscreenWebView(owner, presenter);
 }
 
-internal sealed class WindowsOffscreenWebView : ICleanableNativeWebView, ISupportsVirtualHostMapping
+internal sealed class WindowsOffscreenWebView : ICleanableNativeWebView, ISupportsVirtualHostMapping, INativeWebViewMessaging
 {
     private readonly CoreWebView2 _owner;
     private readonly OffscreenWebViewElement _element;
@@ -312,6 +312,13 @@ internal sealed class WindowsOffscreenWebView : ICleanableNativeWebView, ISuppor
         => Observe(WithBrowserAsync(browser => browser.SetVirtualHostNameToFolderMapping(host, folder, (Native.CoreWebView2HostResourceAccessKind)access)));
     public void ClearVirtualHostNameToFolderMapping(string host)
         => Observe(WithBrowserAsync(browser => browser.ClearVirtualHostNameToFolderMapping(host)));
+    // Host-to-page messaging through Edge's own calls (its window.chrome.webview already has the
+    // 'message' listeners), once the composition controller's browser exists. Core validates a JSON
+    // payload before it gets here.
+    public void PostWebMessage(string payload, bool isJson) => Observe(WithBrowserAsync(browser =>
+    {
+        if (isJson) browser.PostWebMessageAsJson(payload); else browser.PostWebMessageAsString(payload);
+    }));
     public void OnLoaded() { _unloaded = false; Resize(); }
     public void OnUnloaded()
     {

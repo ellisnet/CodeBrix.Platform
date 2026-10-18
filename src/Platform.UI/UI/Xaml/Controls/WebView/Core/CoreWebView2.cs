@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using CodeBrix.Platform.Extensions;
@@ -134,8 +135,8 @@ public partial class CoreWebView2
 	/// <summary>
 	/// Posts a message to the page: its window.chrome.webview 'message' listeners (and onmessage) receive an event whose
 	/// data is <paramref name="webMessageAsString"/>. Supported where the head's web view implements the message
-	/// channel (the Linux Skia heads); elsewhere it reports that it is not implemented. A message posted before the
-	/// page's channel exists is dropped.
+	/// channel (the Linux and Windows Skia heads); elsewhere it reports that it is not implemented. A message posted
+	/// before the page's channel exists is dropped.
 	/// </summary>
 	/// <param name="webMessageAsString">The message (null is sent as an empty string).</param>
 	public void PostWebMessageAsString(string webMessageAsString)
@@ -144,7 +145,8 @@ public partial class CoreWebView2
 	/// <summary>
 	/// Posts a JSON message to the page: its window.chrome.webview 'message' listeners (and onmessage) receive an
 	/// event whose data is the parsed value of <paramref name="webMessageAsJson"/>. Supported where the head's web view
-	/// implements the message channel (the Linux Skia heads); elsewhere it reports that it is not implemented.
+	/// implements the message channel (the Linux and Windows Skia heads); elsewhere it reports that it is not
+	/// implemented.
 	/// </summary>
 	/// <param name="webMessageAsJson">The message as JSON text.</param>
 	/// <exception cref="ArgumentException"><paramref name="webMessageAsJson"/> is not valid JSON (where the channel exists).</exception>
@@ -155,6 +157,13 @@ public partial class CoreWebView2
 	{
 		if (_nativeWebView is INativeWebViewMessaging messaging)
 		{
+			if (isJson)
+			{
+				// Checked here, once for every head, so an invalid payload throws the same ArgumentException whether the
+				// native view evaluates a delivery script (Linux, Android) or hands the text to Edge (Windows).
+				EnsureJson(payload);
+			}
+
 			messaging.PostWebMessage(payload, isJson);
 			return;
 		}
@@ -171,6 +180,24 @@ public partial class CoreWebView2
 		}
 
 		global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Microsoft.Web.WebView2.Core.CoreWebView2", memberSignature);
+	}
+
+	/// <summary>Throws the <see cref="ArgumentException"/> of PostWebMessageAsJson when <paramref name="json"/> is not JSON.</summary>
+	private static void EnsureJson(string? json)
+	{
+		if (json is null)
+		{
+			throw new ArgumentException("The message is not valid JSON: it is null.", "webMessageAsJson");
+		}
+
+		try
+		{
+			using var document = JsonDocument.Parse(json);
+		}
+		catch (JsonException exception)
+		{
+			throw new ArgumentException("The message is not valid JSON: " + exception.Message, "webMessageAsJson", exception);
+		}
 	}
 
 	public void GoBack() => _nativeWebView?.GoBack();

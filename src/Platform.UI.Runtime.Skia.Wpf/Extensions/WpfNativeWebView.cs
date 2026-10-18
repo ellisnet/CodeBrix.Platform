@@ -22,7 +22,7 @@ using WpfWebView2 = WpfWebView.Microsoft.Web.WebView2.Wpf.WebView2;
 
 namespace CodeBrix.Platform.UI.Runtime.Skia.Wpf.Extensions; //Was previously: Uno.UI.Runtime.Skia.Wpf.Extensions
 
-internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMapping
+internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMapping, INativeWebViewMessaging
 {
 	private WpfWebView2 _nativeWebView;
 	private CoreWebView2 _coreWebView2;
@@ -266,4 +266,22 @@ internal sealed class WpfNativeWebView : INativeWebView, ISupportsVirtualHostMap
 
 	public void SetVirtualHostNameToFolderMapping(string hostName, string folderPath, CoreWebView2HostResourceAccessKind accessKind)
 		=> ExecuteEnsuringCoreWebView2(() => _nativeWebView.CoreWebView2.SetVirtualHostNameToFolderMapping(hostName, folderPath, (WpfCoreWebView2HostResourceAccessKind)accessKind));
+
+	/// <summary>
+	/// Delivers CoreWebView2.PostWebMessageAsString / PostWebMessageAsJson through Edge's own calls (its
+	/// window.chrome.webview already has the 'message' listeners), once the WPF control's CoreWebView2 exists - it is
+	/// created asynchronously and null until then. Core validates a JSON payload before it gets here.
+	/// </summary>
+	public void PostWebMessage(string payload, bool isJson)
+		=> ExecuteEnsuringCoreWebView2(() =>
+		{
+			if (isJson)
+			{
+				_nativeWebView.CoreWebView2.PostWebMessageAsJson(payload);
+			}
+			else
+			{
+				_nativeWebView.CoreWebView2.PostWebMessageAsString(payload);
+			}
+		});
 }
