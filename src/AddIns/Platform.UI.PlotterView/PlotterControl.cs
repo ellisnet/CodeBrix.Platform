@@ -145,14 +145,14 @@ public sealed partial class PlotterControl : Control, IPlotView
         }
     }
 
-    /// <summary>The tracker box fill. Default: follows the theme (near-opaque dark gray under the light theme, near-opaque light gray under the dark theme); once assigned, the assigned colour in both.</summary>
+    /// <summary>The tracker box fill. Default: follows the theme (near-opaque dark gray in both themes - 0x2D2D30 under the light theme, 0x2C2C2C under the dark theme, a dark callout as WinUI tooltips are dark in the dark theme); once assigned, the assigned colour in both.</summary>
     public PlotterColor TrackerBackground
     {
         get => _host.TrackerBackground;
         set { _host.TrackerBackground = value; InvalidateCanvas(); }
     }
 
-    /// <summary>The tracker text color. Default: follows the theme (white under the light theme, black under the dark theme); once assigned, the assigned colour in both.</summary>
+    /// <summary>The tracker text color. Default: white under both themes (the box is a dark callout in both); once assigned, the assigned colour in both.</summary>
     public PlotterColor TrackerForeground
     {
         get => _host.TrackerForeground;

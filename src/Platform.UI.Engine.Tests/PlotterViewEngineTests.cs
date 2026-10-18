@@ -154,7 +154,9 @@ public class PlotterViewEngineTests
 
 		//Assert
 		light.Should().Be((PlotterColors.Purple, PlotterColors.White, PlotterColors.Black));
-		dark.Should().Be((PlotterColors.Purple, PlotterColors.Black, PlotterColors.White), "the app's tracker fill stays; the rest follow the theme");
+		dark.Should().Be((PlotterColors.Purple, PlotterColors.White, PlotterColors.White),
+			"the app's tracker fill stays, the tracker text is white in both themes (a dark callout, as WinUI tooltips are dark in the dark theme) and the zoom stroke follows the theme");
+		PlotHost.DarkTrackerBackground.Should().NotBe(PlotHost.LightTrackerBackground); // a fill the app did not set would follow too
 		model.TextColor.Should().Be(PlotterColors.White);
 		model.Axes[0].AxislineColor.Should().Be(PlotterColors.White);
 		EngineIsolation.AssertNoWinUILoaded("PlotterView");
