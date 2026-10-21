@@ -1668,6 +1668,18 @@ page's DataContext.
   hook must resolve executing row traits before method attributes and apply
   the result.
 
+  Sound: explicit PlayTestOptions.Audible, --audible/--muted,
+  CODEBRIX_PLAYTEST_AUDIBLE (true/false/1/0), CodeBrixPlayTestAudible project
+  metadata, then silent. LaunchAsync sets the "CodeBrix.Audio.Muted" AppContext
+  switch to the opposite of the result before the application exists; the
+  targets also put it in runtimeconfig (unless the property is true) so audio
+  started before launch is silent. CodeBrix.Audio reads the switch when it
+  creates a playback device and then writes zeros, so the application's audio
+  keeps its timing. PlayTest has no audio reference: the switch name is a
+  string constant on both sides (AudioPlaybackDevice.MutedSwitchName there,
+  PlayTestApplication.AudioMutedSwitch here). Not covered: the MediaPlayer
+  add-in (its own media engine) and WebView pages.
+
   Theme: explicit PlayTestOptions.Theme, --theme, CODEBRIX_PLAYTEST_THEME,
   CodeBrixPlayTestPreferredTheme project metadata in ConfigurationAssembly,
   then Light. Values are Light or Dark, case-insensitive. VirtualSystemTheme

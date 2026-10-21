@@ -16,6 +16,7 @@ public sealed class PlayTestOptionsTests
 {
     private const string OrientationMetadata = "CodeBrixPlayTestPreferredOrientation";
     private const string ThemeMetadata = "CodeBrixPlayTestPreferredTheme";
+    private const string AudibleMetadata = "CodeBrixPlayTestAudible";
 
     [Fact]
     public void Headless_defaults_to_true()
@@ -362,6 +363,88 @@ public sealed class PlayTestOptionsTests
 
         //Assert
         resolve.Should().Throw<ArgumentException>().WithMessage($"*{source}*system*");
+    }
+
+    [Fact]
+    public void ResolveAudible_defaults_to_silent()
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+        var options = new PlayTestOptions { ConfigurationAssembly = WithMetadata() };
+
+        //Act
+        var audible = options.ResolveAudible();
+
+        //Assert
+        audible.Should().BeFalse();
+        options.Audible.Should().BeFalse();
+    }
+
+    [Theory]
+    [InlineData(null, null, "true", true)]
+    [InlineData(null, null, "False", false)]
+    [InlineData(null, "1", "false", true)]
+    [InlineData(null, "TRUE", "false", true)]
+    [InlineData(null, "0", "true", false)]
+    [InlineData(null, "", "true", true)]
+    [InlineData(false, "1", "true", false)]
+    [InlineData(true, "0", "false", true)]
+    public void ResolveAudible_prefers_command_line_then_environment_then_project(
+        bool? commandLine, string? environment, string project, bool expected)
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+        AppContext.SetData(PlayTestSettingsScope.AudibleKey, commandLine);
+        Environment.SetEnvironmentVariable(PlayTestSettingsScope.AudibleVariable, environment);
+        var options = new PlayTestOptions { ConfigurationAssembly = WithMetadata((AudibleMetadata, project)) };
+
+        //Act
+        var audible = options.ResolveAudible();
+
+        //Assert
+        audible.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void ResolveAudible_explicit_code_value_wins(bool explicitAudible)
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+        AppContext.SetData(PlayTestSettingsScope.AudibleKey, !explicitAudible);
+        Environment.SetEnvironmentVariable(PlayTestSettingsScope.AudibleVariable, "invalid environment");
+        var options = new PlayTestOptions
+        {
+            ConfigurationAssembly = WithMetadata((AudibleMetadata, "invalid project")),
+            Audible = explicitAudible,
+        };
+
+        //Act
+        var audible = options.ResolveAudible();
+
+        //Assert
+        audible.Should().Be(explicitAudible);
+    }
+
+    [Theory]
+    [InlineData("loud", null, "CODEBRIX_PLAYTEST_AUDIBLE")]
+    [InlineData(null, "loud", AudibleMetadata)]
+    public void ResolveAudible_invalid_selected_value_names_its_source(string? environment, string? project, string source)
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+        Environment.SetEnvironmentVariable(PlayTestSettingsScope.AudibleVariable, environment);
+        var options = new PlayTestOptions
+        {
+            ConfigurationAssembly = project == null ? WithMetadata() : WithMetadata((AudibleMetadata, project)),
+        };
+
+        //Act
+        Action resolve = () => options.ResolveAudible();
+
+        //Assert
+        resolve.Should().Throw<ArgumentException>().WithMessage($"*{source}*loud*");
     }
 
     [Fact]

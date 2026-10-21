@@ -27,12 +27,13 @@ internal sealed class PreviewCommandLineOptions : ICommandLineOptionsProvider
     internal const string HeadlessSetting = "CodeBrix.Platform.PlayTest.CommandLineHeadless";
     internal const string ThemeSetting = "CodeBrix.Platform.PlayTest.CommandLineTheme";
     internal const string OrientationSetting = "CodeBrix.Platform.PlayTest.CommandLineOrientation";
+    internal const string AudibleSetting = "CodeBrix.Platform.PlayTest.CommandLineAudible";
     internal const string ScreenshotFolderSetting = "CodeBrix.Platform.PlayTest.CommandLineScreenshotFolder";
 
     public string Uid => "CodeBrix.Platform.PlayTest.PreviewCommandLineOptions";
     public string Version => "1.0.0";
     public string DisplayName => "CodeBrix PlayTest preview";
-    public string Description => "Controls the PlayTest preview, display preferences and screenshot recording.";
+    public string Description => "Controls the PlayTest preview, display preferences, sound and screenshot recording.";
     public Task<bool> IsEnabledAsync() => Task.FromResult(true);
 
     public IReadOnlyCollection<CommandLineOption> GetCommandLineOptions() => new[]
@@ -42,6 +43,8 @@ internal sealed class PreviewCommandLineOptions : ICommandLineOptionsProvider
         new CommandLineOption("headless", "Run PlayTest without a preview; overrides CODEBRIX_PLAYTEST_HEADED.", ArgumentArity.Zero, false),
         new CommandLineOption("theme", "Simulated system theme: light or dark (case insensitive); overrides environment/project preferences.", ArgumentArity.ExactlyOne, false),
         new CommandLineOption("orientation", "Preferred orientation: landscape or portrait (case insensitive); overrides environment/project preferences.", ArgumentArity.ExactlyOne, false),
+        new CommandLineOption("audible", "Let the application's sound reach the speakers; overrides CODEBRIX_PLAYTEST_AUDIBLE and the project preference.", ArgumentArity.Zero, false),
+        new CommandLineOption("muted", "Keep the application silent (the default); overrides CODEBRIX_PLAYTEST_AUDIBLE and the project preference.", ArgumentArity.Zero, false),
         new CommandLineOption("screenshotfolder", "Record test screenshots and screenshot-index.json in an existing, empty folder (xUnit v3 4+).", ArgumentArity.ExactlyOne, false),
     };
 
@@ -82,6 +85,10 @@ internal sealed class PreviewCommandLineOptions : ICommandLineOptionsProvider
         var headless = commandLineOptions.IsOptionSet("headless");
         if (headed && headless)
             return Task.FromResult(ValidationResult.Invalid("PlayTest cannot combine --headless with --headed or --nonheadless."));
+        var audible = commandLineOptions.IsOptionSet("audible");
+        var muted = commandLineOptions.IsOptionSet("muted");
+        if (audible && muted)
+            return Task.FromResult(ValidationResult.Invalid("PlayTest cannot combine --audible with --muted."));
 
         try
         {
@@ -92,6 +99,7 @@ internal sealed class PreviewCommandLineOptions : ICommandLineOptionsProvider
             var folder = commandLineOptions.TryGetOptionArgumentList("screenshotfolder", out var folderValues)
                 ? ValidateValue("screenshotfolder", folderValues) : null;
             AppContext.SetData(HeadlessSetting, headed ? (object)false : headless ? true : null);
+            AppContext.SetData(AudibleSetting, audible ? (object)true : muted ? false : null);
             AppContext.SetData(ThemeSetting, theme);
             AppContext.SetData(OrientationSetting, orientation);
             AppContext.SetData(ScreenshotFolderSetting, folder);

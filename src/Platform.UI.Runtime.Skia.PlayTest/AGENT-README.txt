@@ -344,6 +344,11 @@ Each preference is resolved ONCE at launch, highest priority first:
                 > --headed / --nonheadless / --headless
                 > CODEBRIX_PLAYTEST_HEADED=1 (any other value: headless)
                 > headless
+  Sound         PlayTestOptions.Audible (code)
+                > --audible / --muted
+                > CODEBRIX_PLAYTEST_AUDIBLE=true|false (or 1|0)
+                > <CodeBrixPlayTestAudible>true|false</...> in the test .csproj
+                > silent
   Action delay  PlayTestOptions.SlowMo (code, including an explicit 0)
                 > CODEBRIX_PLAYTEST_SLOWMO=<milliseconds>
                 > 250 ms headed, 0 headless (follows the FINAL Headless value)
@@ -389,6 +394,21 @@ All physical keyboard, pointer, wheel and touch input to the preview is
 discarded, and closing it does not stop the tests. Screenshots always contain
 the virtual screen itself, never the preview bars.
 
+SOUND
+=====
+PlayTests are SILENT unless a run opts in (see PREFERENCES; app.Audible reports
+the result). Silent means CodeBrix.Audio playback devices write zeros: the
+application's audio still runs with its real timing - a game's music and sound
+effects, the AudioPlayer and VideoPlayer add-ins - so code paths and timing are
+unchanged, and only the speakers hear nothing. The package does this through
+CodeBrix.Audio's "CodeBrix.Audio.Muted" AppContext switch: its targets set the
+switch in the test's runtimeconfig (so audio a fixture starts before launch is
+silent too), and the launch then applies the resolved choice.
+
+Not covered: the MediaPlayer add-in (it plays through its own media engine) and
+web pages in a WebView. A CodeBrix.Audio version that predates the switch plays
+audibly; a fixture can set its own game engine's master volume to zero instead.
+
 COMMAND-LINE SWITCHES
 =====================
 With the Microsoft.Testing.Platform runner the package registers, automatically:
@@ -397,6 +417,7 @@ With the Microsoft.Testing.Platform runner the package registers, automatically:
     dotnet test MyApp.PlayTests.csproj --nonheadless       (alias for --headed)
     dotnet test MyApp.PlayTests.csproj --headless
     dotnet test MyApp.PlayTests.csproj --nonheadless --theme=dark --orientation=portrait
+    dotnet test MyApp.PlayTests.csproj --audible               (hear the application)
     dotnet test MyApp.PlayTests.csproj --screenshotfolder="$HOME/Temp/run-1"
 
   - --theme accepts light|dark and --orientation landscape|portrait (any case;
@@ -404,7 +425,8 @@ With the Microsoft.Testing.Platform runner the package registers, automatically:
     and project preferences; explicit fixture options, per-test orientation
     requirements and application RequestedTheme choices still win.
   - Combining --headless with --headed or --nonheadless is rejected before any
-    test runs.
+    test runs, as is combining --audible with --muted. --muted keeps a project
+    whose CodeBrixPlayTestAudible is true silent for one run.
   - The switches appear in --help. The generated xUnit/MSTest/NUnit MTP entry
     points register them; a CUSTOM MTP entry point must call its generated
     AddSelfRegisteredExtensions(builder, args).
@@ -1030,9 +1052,13 @@ Window      app.Window; await app.RequestCloseAsync() / MinimizeAsync() / Restor
 Screen      1920x1080 Landscape | 1080x1920 Portrait; app.SetOrientationAsync(...)
 Prefs       code > --switch > CODEBRIX_PLAYTEST_* > <CodeBrixPlayTestPreferred*> > default
 CLI         --headed | --nonheadless | --headless  --theme=light|dark
-            --orientation=landscape|portrait  --screenshotfolder=<empty folder>
+            --orientation=landscape|portrait  --audible | --muted
+            --screenshotfolder=<empty folder>
 Env         CODEBRIX_PLAYTEST_HEADED=1  CODEBRIX_PLAYTEST_SLOWMO=<ms>
             CODEBRIX_PLAYTEST_THEME  CODEBRIX_PLAYTEST_ORIENTATION
+            CODEBRIX_PLAYTEST_AUDIBLE=1
+Sound       silent by default (CodeBrix.Audio output muted); app.Audible
+            opt in: --audible, CODEBRIX_PLAYTEST_AUDIBLE=1, <CodeBrixPlayTestAudible>true
 Timeout     10 s default; Page.SetDefaultTimeout(ms); per call new() { Timeout = ms }
 OpenGL      CodeBrix.Platform.PlayTest.OpenGL: CodeBrixPlayTestOpenGL.Register() before launch;
             app.OpenGL (info); new() { OpenGL = PlayTestOpenGL.Unavailable } (opt out)

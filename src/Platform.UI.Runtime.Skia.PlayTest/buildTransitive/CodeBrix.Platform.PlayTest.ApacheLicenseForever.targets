@@ -32,12 +32,28 @@
   <ItemGroup Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
     <AssemblyMetadata Include="CodeBrixPlayTestPreferredTheme" Value="$(CodeBrixPlayTestPreferredTheme)" />
   </ItemGroup>
+  <ItemGroup Condition="'$(CodeBrixPlayTestAudible)' != ''">
+    <AssemblyMetadata Include="CodeBrixPlayTestAudible" Value="$(CodeBrixPlayTestAudible)" />
+  </ItemGroup>
+  <!-- PlayTests are silent: CodeBrix.Audio output is muted from process start, so audio a fixture starts
+       before the launch is silent too. The launch then applies the resolved choice: code, the audible or
+       muted command-line switch, CODEBRIX_PLAYTEST_AUDIBLE, then CodeBrixPlayTestAudible. -->
+  <ItemGroup Condition="'$(CodeBrixPlayTestAudible)' != 'true'">
+    <RuntimeHostConfigurationOption Include="CodeBrix.Audio.Muted" Value="true" />
+  </ItemGroup>
   <Target Name="_CodeBrixPlayTestValidateTheme" BeforeTargets="GenerateAssemblyInfo"
           Condition="'$(CodeBrixPlayTestPreferredTheme)' != ''">
     <Error Condition="'$(CodeBrixPlayTestPreferredTheme)' != 'Light' and '$(CodeBrixPlayTestPreferredTheme)' != 'Dark'"
            Text="CodeBrixPlayTestPreferredTheme must be Light or Dark." />
     <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
            Text="CodeBrixPlayTestPreferredTheme requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
+  </Target>
+  <Target Name="_CodeBrixPlayTestValidateAudible" BeforeTargets="GenerateAssemblyInfo"
+          Condition="'$(CodeBrixPlayTestAudible)' != ''">
+    <Error Condition="'$(CodeBrixPlayTestAudible)' != 'true' and '$(CodeBrixPlayTestAudible)' != 'false'"
+           Text="CodeBrixPlayTestAudible must be true or false." />
+    <Error Condition="'$(GenerateAssemblyInfo)' == 'false'"
+           Text="CodeBrixPlayTestAudible requires GenerateAssemblyInfo, or an explicit AssemblyMetadata attribute instead of the MSBuild property." />
   </Target>
   <Target Name="_CodeBrixPlayTestValidateOrientation" BeforeTargets="GenerateAssemblyInfo"
           Condition="'$(CodeBrixPlayTestPreferredOrientation)' != ''">

@@ -16,18 +16,18 @@ namespace CodeBrix.Platform.PlayTest.Tests;
 
 // PreviewCommandLineOptions is the source adapter the package compiles into every
 // Microsoft.Testing.Platform consumer (linked into this project by the csproj). It validates
-// --headed/--nonheadless/--headless/--theme/--orientation/--screenshotfolder and hands the result
+// --headed/--nonheadless/--headless/--theme/--orientation/--audible/--muted/--screenshotfolder and hands the result
 // to PlayTestOptions through AppContext, never through the environment.
 public sealed class PreviewCommandLineOptionsTests
 {
     [Fact]
-    public void GetCommandLineOptions_lists_the_six_playtest_switches()
+    public void GetCommandLineOptions_lists_the_eight_playtest_switches()
     {
         //Act
         var names = new PreviewCommandLineOptions().GetCommandLineOptions().Select(o => o.Name).ToArray();
 
         //Assert
-        names.Should().BeEquivalentTo(new[] { "headed", "nonheadless", "headless", "theme", "orientation", "screenshotfolder" });
+        names.Should().BeEquivalentTo(new[] { "headed", "nonheadless", "headless", "theme", "orientation", "audible", "muted", "screenshotfolder" });
     }
 
     [Fact]
@@ -38,6 +38,7 @@ public sealed class PreviewCommandLineOptionsTests
         PreviewCommandLineOptions.ThemeSetting.Should().Be(PlayTestSettingsScope.ThemeKey);
         PreviewCommandLineOptions.OrientationSetting.Should().Be(PlayTestSettingsScope.OrientationKey);
         PreviewCommandLineOptions.ScreenshotFolderSetting.Should().Be(PlayTestSettingsScope.ScreenshotFolderKey);
+        PreviewCommandLineOptions.AudibleSetting.Should().Be(PlayTestSettingsScope.AudibleKey);
     }
 
     [Theory]
@@ -99,6 +100,44 @@ public sealed class PreviewCommandLineOptionsTests
         result.IsValid.Should().BeFalse();
         result.ErrorMessage.Should().Contain("cannot combine");
         AppContext.GetData(PreviewCommandLineOptions.HeadlessSetting).Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("audible", "0", "false", true)]
+    [InlineData("muted", "1", "true", false)]
+    [InlineData(null, "1", "false", true)]
+    [InlineData(null, null, null, false)]
+    public async Task ValidateCommandLineOptionsAsync_audible_and_muted_override_environment_and_project(
+        string? option, string? environment, string? project, bool expected)
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+        Environment.SetEnvironmentVariable(PlayTestSettingsScope.AudibleVariable, environment);
+        var assembly = project == null ? InvalidProjectPreferences() : AudibleProjectPreference(project);
+
+        //Act
+        var result = await new PreviewCommandLineOptions().ValidateCommandLineOptionsAsync(Switches(option));
+        var options = new PlayTestOptions { ConfigurationAssembly = assembly };
+
+        //Assert
+        result.IsValid.Should().BeTrue();
+        options.ResolveAudible().Should().Be(expected);
+        Environment.GetEnvironmentVariable(PlayTestSettingsScope.AudibleVariable).Should().Be(environment);
+    }
+
+    [Fact]
+    public async Task ValidateCommandLineOptionsAsync_rejects_audible_with_muted()
+    {
+        //Arrange
+        using var scope = new PlayTestSettingsScope();
+
+        //Act
+        var result = await new PreviewCommandLineOptions().ValidateCommandLineOptionsAsync(Switches("audible", "muted"));
+
+        //Assert
+        result.IsValid.Should().BeFalse();
+        result.ErrorMessage.Should().Contain("cannot combine");
+        AppContext.GetData(PreviewCommandLineOptions.AudibleSetting).Should().BeNull();
     }
 
     [Theory]
@@ -220,6 +259,16 @@ public sealed class PreviewCommandLineOptionsTests
             ?? throw new InvalidOperationException("AssemblyMetadataAttribute(string, string) is missing.");
         foreach (var key in new[] { "CodeBrixPlayTestPreferredTheme", "CodeBrixPlayTestPreferredOrientation" })
             assembly.SetCustomAttribute(new CustomAttributeBuilder(constructor, new object[] { key, "invalid project" }));
+        return assembly;
+    }
+
+    private static Assembly AudibleProjectPreference(string value)
+    {
+        var assembly = AssemblyBuilder.DefineDynamicAssembly(
+            new AssemblyName("Preferences_" + Guid.NewGuid().ToString("N")), AssemblyBuilderAccess.RunAndCollect);
+        var constructor = typeof(AssemblyMetadataAttribute).GetConstructor(new[] { typeof(string), typeof(string) })
+            ?? throw new InvalidOperationException("AssemblyMetadataAttribute(string, string) is missing.");
+        assembly.SetCustomAttribute(new CustomAttributeBuilder(constructor, new object[] { "CodeBrixPlayTestAudible", value }));
         return assembly;
     }
 

@@ -27,11 +27,15 @@ public sealed class PlayTestOptions
 {
     private ScreenOrientation? _orientation;
     private ApplicationTheme? _theme;
+    private bool? _audible;
     private float? _slowMo;
     /// <summary>An explicit orientation overrides command-line, environment and project preferences.</summary>
     public ScreenOrientation Orientation { get => _orientation ?? ScreenOrientation.Landscape; set => _orientation = value; }
     /// <summary>An explicit simulated system theme overrides command-line, environment and project preferences.</summary>
     public ApplicationTheme Theme { get => _theme ?? ApplicationTheme.Light; set => _theme = value; }
+    /// <summary>Whether the application's sound reaches the speakers. PlayTests are silent unless a run opts in;
+    /// an explicit value overrides command-line, environment and project preferences.</summary>
+    public bool Audible { get => _audible ?? false; set => _audible = value; }
     /// <summary>The test assembly containing project preferences; defaults to the entry assembly.</summary>
     public Assembly? ConfigurationAssembly { get; set; }
     /// <summary>An explicit value overrides the runner's --headed/--headless option,
@@ -118,6 +122,29 @@ public sealed class PlayTestOptions
             : ParseTheme(preference, "CodeBrixPlayTestPreferredTheme");
     }
 
+    /// <summary>Resolves whether the run plays sound: code, command line, environment, project metadata, then silent.</summary>
+    /// <returns>True when the application's audio should reach the speakers.</returns>
+    /// <exception cref="ArgumentException">The selected environment or project value is not true/false or 1/0.</exception>
+    public bool ResolveAudible()
+    {
+        if (_audible is { } explicitAudible) return explicitAudible;
+        if (AppContext.GetData("CodeBrix.Platform.PlayTest.CommandLineAudible") is bool commandLine) return commandLine;
+        var environment = Environment.GetEnvironmentVariable("CODEBRIX_PLAYTEST_AUDIBLE");
+        if (!string.IsNullOrEmpty(environment))
+            return ParseAudible(environment, "CODEBRIX_PLAYTEST_AUDIBLE");
+        var assembly = ConfigurationAssembly ?? Assembly.GetEntryAssembly();
+        var preference = assembly?.GetCustomAttributes<AssemblyMetadataAttribute>()
+            .SingleOrDefault(a => a.Key == "CodeBrixPlayTestAudible")?.Value;
+        return !string.IsNullOrEmpty(preference) && ParseAudible(preference, "CodeBrixPlayTestAudible");
+    }
+
+    private static bool ParseAudible(string value, string source)
+    {
+        if (value == "1" || string.Equals(value, "true", StringComparison.OrdinalIgnoreCase)) return true;
+        if (value == "0" || string.Equals(value, "false", StringComparison.OrdinalIgnoreCase)) return false;
+        throw new ArgumentException($"{source} must be true or false (or 1 or 0); received '{value}'.");
+    }
+
     private static ApplicationTheme ParseTheme(string value, string source)
     {
         if (string.Equals(value, "light", StringComparison.OrdinalIgnoreCase)) return ApplicationTheme.Light;
@@ -144,6 +171,8 @@ public sealed class PlayTestException : Exception
 /// thread. One application per process: share it through a fixture and dispose it when the suite ends.</summary>
 public sealed class PlayTestApplication : IAsyncDisposable
 {
+    // CodeBrix.Audio's AudioPlaybackDevice.MutedSwitchName, named here so PlayTest needs no audio reference.
+    internal const string AudioMutedSwitch = "CodeBrix.Audio.Muted";
     private static int _launched;
     private readonly VirtualHost _host;
     private PreviewConnection? _preview;
@@ -177,6 +206,9 @@ public sealed class PlayTestApplication : IAsyncDisposable
 
     /// <summary>True when no preview window is shown; resolved once at launch.</summary>
     public bool Headless => Options.Headless;
+    /// <summary>True when the application's sound reaches the speakers; resolved once at launch. False unless
+    /// the run opted in, so PlayTests are silent by default.</summary>
+    public bool Audible => Options.Audible;
     /// <summary>The simulated OS theme, resolved before app construction and fixed for this run.
     /// An application may explicitly choose its own requested theme.</summary>
     public ApplicationTheme SystemTheme { get; }
@@ -216,6 +248,7 @@ public sealed class PlayTestApplication : IAsyncDisposable
         options ??= new PlayTestOptions();
         var orientation = options.ResolveOrientation();
         var theme = options.ResolveTheme();
+        var audible = options.ResolveAudible();
         var slowMo = options.SlowMo;
         if (options.Timeout <= 0 || !float.IsFinite(options.Timeout) || slowMo < 0 || !float.IsFinite(slowMo))
             throw new ArgumentOutOfRangeException(nameof(options));
@@ -225,10 +258,15 @@ public sealed class PlayTestApplication : IAsyncDisposable
             throw new InvalidOperationException("PlayTest hosts one application per process. Share an application fixture and reset the page between tests; use separate processes for independent applications.");
         options = new PlayTestOptions
         {
-            Orientation = orientation, Headless = options.Headless,
+            Orientation = orientation, Headless = options.Headless, Audible = audible,
             Timeout = options.Timeout, SlowMo = slowMo, ArtifactsDirectory = options.ArtifactsDirectory,
             OpenGL = options.OpenGL, WebGpu = options.WebGpu,
         };
+        // Silence CodeBrix.Audio output (the GameEngine's sound and music, the AudioPlayer and VideoPlayer
+        // add-ins) for the whole run. CodeBrix.Audio reads this switch when it creates a playback device, so
+        // audio keeps running - with its real timing - and only the speakers hear nothing. The package's
+        // targets also set it in runtimeconfig, which covers audio a fixture starts before this launch.
+        AppContext.SetSwitch(AudioMutedSwitch, !audible);
         var result = new PlayTestApplication(application, options, theme, openGL, webGpu);
         try
         {
