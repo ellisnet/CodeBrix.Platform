@@ -190,17 +190,17 @@ internal partial class OpenGLWpfRenderer : IWpfRenderer
 
 			var glInfo = new GRGlFramebufferInfo((uint)framebuffer, colorType.ToGlSizedFormat());
 
-			_renderTarget = new GRBackendRenderTarget((int)size.Width, (int)size.Width, samples, stencil, glInfo);
+			_renderTarget = new GRBackendRenderTarget((int)size.Width, (int)size.Height, samples, stencil, glInfo);
 
 			// create the surface
 			_surface?.Dispose();
 			_surface = SKSurface.Create(_grContext, _renderTarget, surfaceOrigin, colorType);
 
-			_backBuffer = new WriteableBitmap((int)size.Width, (int)size.Width, 96, 96, PixelFormats.Pbgra32, null);
+			_backBuffer = new WriteableBitmap((int)size.Width, (int)size.Height, 96, 96, PixelFormats.Pbgra32, null);
 
 			if (this.Log().IsEnabled(LogLevel.Trace))
 			{
-				this.Log().Trace($"Recreate render surface {(int)size.Width}x{(int)size.Width} colorType:{colorType} sample:{samples}");
+				this.Log().Trace($"Recreate render surface {(int)size.Width}x{(int)size.Height} colorType:{colorType} sample:{samples}");
 			}
 			return _surface.Canvas;
 		});
